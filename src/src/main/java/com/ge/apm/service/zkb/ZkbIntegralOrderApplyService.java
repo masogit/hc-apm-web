@@ -192,10 +192,10 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         return zkbContractList;
     }
 
-    public List<ZkbIntegralOrder> queryIntegralOrderByCreatedBy(UserAccount userAccount){
+    public List<ZkbIntegralOrder> queryIntegralOrderByCreatedBy(UserAccount userAccount,String engineerNo){
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbIntegralOrder.OrderTypeEnum.ToolBox.name()));
-        filters.add(new SearchFilter("createdBy", SearchFilter.Operator.EQ,userAccount.getUid()));
+        filters.add(new SearchFilter("engineerNo", SearchFilter.Operator.EQ, engineerNo));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.OrderedReject.name()));
         List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderRepository.findBySearchFilter(filters);
@@ -209,7 +209,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.OrderedReject.name()));
         Date dt = DateUtils.addYears(new Date(), -3);
-        filters.add(new SearchFilter("status", SearchFilter.Operator.GTE, dt));
+        filters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, dt));
 
         List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderRepository.findBySearchFilter(filters);
         return zkbIntegralOrders;
@@ -589,7 +589,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
     public boolean checkLogic(ZkbIntegralOrder zkbIntegralOrder, UserAccount currentUser, ZkbContract zkbContract){
         boolean checkFlag = true;
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
-            List<ZkbIntegralOrder> zkbIntegralOrders = queryIntegralOrderByCreatedBy(currentUser);
+            List<ZkbIntegralOrder> zkbIntegralOrders = queryIntegralOrderByCreatedBy(currentUser, zkbIntegralOrder.getEngineerNo());
             if(CollectionUtils.isNotEmpty(zkbIntegralOrders) && zkbIntegralOrders.size() >=1){
                 WebUtil.addErrorMessage("超过可申请数量，申请失败！");
                 checkFlag = false;
@@ -662,8 +662,8 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
         List<String> strs = Arrays.asList(ZkbPartOrderStep.PartOrderStep.ManagePending.name(),ZkbPartOrderStep.PartOrderStep.EngineerQualificationPending.name(),ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
         if(strs.contains(zkbIntegralOrder.getCurrentStep())){
-            sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
-            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
+            sendMessage(zkbIntegralOrder, UserContextService.getAccessToken(), WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
+            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL), WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
         }
     }
 
@@ -711,15 +711,16 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
-    public void sendMessage(ZkbIntegralOrder zkbIntegralOrder,String token) {
+    @Async
+    public void sendMessage(ZkbIntegralOrder zkbIntegralOrder,String token, String subject) {
         HashMap<String, Object> emailWrapperMap = null;
         try {
             emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
             emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
-            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
-
+            //emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
+            emailWrapperMap.put("subject", subject);
             String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_MESSAGE);
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
@@ -730,14 +731,15 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
-    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token, String url){
+    @Async
+    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token, String url,String subject){
         try {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
             emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
-            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
-            //String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
+            //emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
+            emailWrapperMap.put("subject", subject);
 
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);

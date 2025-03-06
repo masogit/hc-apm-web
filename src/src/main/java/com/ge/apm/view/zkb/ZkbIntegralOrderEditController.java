@@ -188,14 +188,14 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
             WebUtil.addErrorMessage("当前申请需要扣除" +deductScore+ "，积分不够！");
         }
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
-            List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByCreatedBy(currentUser);
+           /* List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByCreatedBy(currentUser);
             if(CollectionUtils.isNotEmpty(zkbIntegralOrders) && zkbIntegralOrders.size() >=1){
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
                 WebUtil.addErrorMessage("超过可申请数量，申请失败！");
                 return;
-            }
+            }*/
 
-            zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByTenantThreeYear(currentUser);
+            List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByTenantThreeYear(currentUser);
             if(zkbIntegralOrders.size() >= 2){
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
                 WebUtil.addErrorMessage("超过可申请数量，申请失败！");
