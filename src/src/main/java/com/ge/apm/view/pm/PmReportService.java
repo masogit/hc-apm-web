@@ -575,6 +575,70 @@ public class PmReportService {
         }
     }
 
+    public String generateMessageTip(Map<String, Boolean> woOrders) {
+        StringBuilder messageTipBuilder = new StringBuilder();
+        for (Map.Entry<String, Boolean> entry : woOrders.entrySet()) {
+            if (!entry.getValue()) {
+                continue; // 跳过未选中的工单
+            }
+            String id = entry.getKey();
+            V2_PmOrder v2PmOrder = pmOrderService.findById(id);
+            if (v2PmOrder == null  ) {
+                continue; // 跳过无效工单或服务请求
+            }
+            List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
+            // 过滤掉包含 "-工单报告.pdf" 的对象
+            List<V2_BlobObject> filteredBlobObjects = blobObjects != null
+                    ? blobObjects.stream()
+                    .filter(item -> item.getObjectName().contains("-工单报告.pdf")).collect(Collectors.toList())
+                    : Collections.emptyList();
+            // 如果过滤后列表为空，则添加 SR 编号到提示信息中
+            if (org.apache.commons.collections.CollectionUtils.isEmpty(filteredBlobObjects)) {
+                messageTipBuilder.append(v2PmOrder.getPmNum()).append(",");
+            }
+        }
+        // 去掉最后多余的逗号并补充提示信息
+        if (messageTipBuilder.length() > 0) {
+            messageTipBuilder.deleteCharAt(messageTipBuilder.length() - 1); // 删除最后一个逗号
+            messageTipBuilder.append("不存在工单报告！");
+        }
+        messageTipBuilder.append("请确认是否需要下载？");
+        return messageTipBuilder.toString();
+    }
+    public DefaultStreamedContent generateEhome(Map<String, Boolean> woOrders, UserAccount userAccount ) throws IOException {
+        if (!woOrders.values().contains(true)) {
+            throw new BusinessException("未选中工单记录");
+        }
+        String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "工单报告.zip";
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+             ZipOutputStream zout = new ZipOutputStream(bout)) {
+            woOrders.forEach((id, selected) -> {
+                if (selected) {
+                    try {
+                        V2_PmOrder v2PmOrder = pmOrderService.findById(id);
+                        List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
+                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
+                            byBoUuid = byBoUuid.stream()
+                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
+                                    .collect(Collectors.toList());
+                        }
+                        for (V2_BlobObject v2BlobObject : byBoUuid) {
+                            String vname = v2BlobObject.getObjectName();
+                            zout.putNextEntry(new ZipEntry(vname));
+                            byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(v2BlobObject.getObjectStorageId()).getStream());
+                            IOUtils.write(bytess, zout);
+                        }
+                        zout.closeEntry();
+                    } catch (Exception e) {
+                        logger.error("报告下载失败 e :",e);
+                    }
+                }
+            });
+            zout.close();
+            return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", reportName);
+        }
+    }
+
     public byte[] generate(V2_PmOrder pmOrder, byte[] activeTemplateBytes) throws IOException {
         PmOrderRule rule = this.pmOrderService.acqPmOrderRule(pmOrder);
         List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(pmOrder.getId());

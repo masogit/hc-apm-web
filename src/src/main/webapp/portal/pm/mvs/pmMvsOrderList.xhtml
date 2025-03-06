@@ -24,15 +24,15 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
                 <p:ajax event="rowSelect" listener="#{v2PmOrderMvsController.onSelectPmOrder()}" update="pmTab:pmMvsOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
-                <p:ajax event="filter" listener="#{v2PmOrderMvsController.onFilter}" update="datalist pmTab:pmOrderDetailForm" oncomplete="updateSelectAllCheckBox();"/>
+                <p:ajax event="filter" listener="#{v2PmOrderMvsController.onFilter}" update="datalist pmTab:pmOrderDetailForm  @(.pmOrderDetailFormCls)" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36" visible="#{v2PmOrderMvsController.queryIndex==2 or v2PmOrderMvsController.queryIndex==3 or v2PmOrderMvsController.queryIndex==0 or v2PmOrderMvsController.queryIndex==6 or v2PmOrderMvsController.queryIndex == 31 or v2PmOrderMvsController.queryIndex == 7 or v2PmOrderMvsController.queryIndex == -1}" exportable="false">
                     <p:selectBooleanCheckbox  value="#{v2PmOrderMvsController.selectedMap[item.id]}"  class="selectCheckBox">
-                        <p:ajax process="@this" listener="#{v2PmOrderMvsController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.exportExcelBtn) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();" />
+                        <p:ajax process="@this" listener="#{v2PmOrderMvsController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.exportExcelBtn) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn) @(.downloadConfirm)" oncomplete="updateSelectAllCheckBox();" />
                     </p:selectBooleanCheckbox>
                     <f:facet name="header">
                         <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
-                            <p:ajax  listener="#{v2PmOrderMvsController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
+                            <p:ajax  listener="#{v2PmOrderMvsController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn) @(.downloadConfirm)" oncomplete="updateSelectAllCheckBox();"/>
 
                         </p:selectBooleanCheckbox>
                     </f:facet>
@@ -147,12 +147,24 @@
                     <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderMvsController.exportExcel}" disabled="#{v2PmOrderMvsController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
                         <p:fileDownload value="#{v2PmOrderMvsController.excelFile}"/>
                     </p:commandButton>
-
-                    <ui:fragment rendered="true">
-                        <p:commandButton  icon="ui-icon-arrow-1-s" actionListener="#{v2PmOrderMvsController.doExportMaintenanceReport()}" class="btn btn-sm btn-gray btn-export-maintenance-report" title="#{msg.ExportMaintenanceWorkorder}" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false">
-                            <p:fileDownload value="#{v2PmOrderMvsController.maintenanceReport}" />
+                     <p:commandButton  icon="ui-icon-arrow-1-s" actionListener="#{v2PmOrderMvsController.doExportMaintenanceReport()}" class=" btn-sm btn-gray btn-export-maintenance-report" title="#{msg.ExportMaintenanceWorkorder}" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false">
+                        <p:fileDownload value="#{v2PmOrderMvsController.maintenanceReport}" />
+                    </p:commandButton>
+                    <p:commandButton icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="   btn-export-maintenance-report" title="批量下载附件工单" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false"/>
+                     <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
+                                     message="#{v2PmOrderMvsController.messageTip}"
+                                     header="确认下载"
+                                     severity="warn" class="downloadConfirm">
+                        <p:commandButton value="确定" ajax="false"
+                                         actionListener="#{v2PmOrderMvsController.doExportWorkOrderReport()}"
+                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton" icon="ui-icon-check">
+                            <p:fileDownload value="#{v2PmOrderMvsController.maintenanceWorkReport}" oncomplete="PF('downloadConfirm').hide()" />
                         </p:commandButton>
-                    </ui:fragment>
+                        <!-- 取消按钮 -->
+                        <p:commandButton value="取消" type="button"
+                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton" icon="ui-icon-close"
+                        />
+                    </p:confirmDialog>
                 </f:facet>
             </p:dataTable>
         </h:form>
