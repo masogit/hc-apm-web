@@ -328,13 +328,12 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
         }else{
             //如果当前步骤是commercial则需要推送短信
             if(ZkbPartOrderStep.PartOrderStep.CommercialPending.name().equals(zkbIntegralOrder.getCurrentStep())){
-                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
-                zkbIntegralOrderApplyService.sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL), WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
+                zkbIntegralOrderApplyService.sendMessage(zkbIntegralOrder, UserContextService.getAccessToken(), WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
             }else if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.Complete.name().equals(zkbIntegralOrder.getCurrentStep())){
-                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_GE_ADMIN_EMAIL));
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_GE_ADMIN_EMAIL), WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
             }else if(!ZkbPartOrderStep.PartOrderStep.Complete.name().equals(zkbIntegralOrder.getCurrentStep())){
-                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
-
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL), WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
             }
         }
 

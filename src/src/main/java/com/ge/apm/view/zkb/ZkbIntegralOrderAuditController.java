@@ -94,7 +94,7 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
             if(userContextService.isZkbUser()) {
                 if(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name().equals(selected.getStatus())){
                     if(CopyByInvok.F.equals(selected.getEngineerQualificationsFlag())){
-                        WebUtil.addErrorMessage("申请人无资质，需有资质的工程师提交申请！","");
+                        WebUtil.addErrorMessage("工程师无资质，需有资质的工程师提交申请！","");
                     }
                 }
             }
