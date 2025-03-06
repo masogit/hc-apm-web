@@ -4,10 +4,7 @@ import com.ge.apm.domain.EfficiencyEquipmentInfo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public interface EfficiencyEquipmentMapper {
 
@@ -35,4 +32,10 @@ public interface EfficiencyEquipmentMapper {
         List<EfficiencyEquipmentInfo>  getEfficiencyEquipmentInfo(@Param("startDate")Date startDate, @Param("endDate")Date endDate, @Param("tenantUid") String tenantUid, @Param("assetUids") Set<String> assetUids, @Param("orgUid") String orgUid, @Param("orgUidList") List<String> orgUidList, @Param("qrCodes") List<String> qrCodes);
 
 
+
+
+        List<EfficiencyEquipmentInfo>  selectList(Map<String, Object> param);
+
+
+        Long selectListCount(Map<String, Object> param);
 }

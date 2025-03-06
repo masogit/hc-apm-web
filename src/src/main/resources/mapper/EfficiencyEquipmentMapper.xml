@@ -114,5 +114,431 @@
 
     </select>
 
+    <select id="selectList" resultType="com.ge.apm.domain.EfficiencyEquipmentInfo">
+        WITH time_range AS (
+        SELECT #{startDate}::date AS start_date, #{endDate}::date AS end_date
+        ),
+        income_summary AS (
+        SELECT
+        asset_uid,
+        SUM(total_amount) AS income
+        FROM
+        his_equipment_data_result
+        WHERE
+        tenant_uid = #{tenantUid}
+        AND exec_time BETWEEN (SELECT start_date FROM time_range) AND (SELECT end_date FROM time_range)
+        GROUP BY
+        asset_uid
+        ),
+        expense_summary AS (
+        SELECT
+        asset_uid,
+        SUM(cost_amount) AS cost
+        FROM
+        asset_cost_amount_info
+        WHERE
+        tenant_uid = #{tenantUid}
+        AND statistical_date BETWEEN (SELECT start_date FROM time_range) AND (SELECT end_date FROM time_range)
+        GROUP BY
+        asset_uid
+        ),
+        monthly_dates AS (
+        SELECT
+        asset_id,
+        deprecate_date,
+        deprecate_amount AS dep_amount,
+        deprecate_date AS month_start,
+        (deprecate_date + INTERVAL '1 month - 1 day')::date AS month_end
+        FROM
+        asset_depreciation
+        ),
+        depreciation AS (
+        SELECT
+        asset_id,
+        SUM(
+        CASE
+        WHEN start_date >= month_start AND start_date   <![CDATA[<=]]> month_end AND end_date <![CDATA[<=]]> month_end THEN
+        dep_amount * (end_date - start_date + 1) / (month_end - month_start + 1)
+        WHEN start_date >= month_start AND start_date <![CDATA[<=]]> month_end THEN
+        dep_amount * (month_end - start_date + 1) / (month_end - month_start + 1)
+        WHEN end_date >= month_start AND end_date <![CDATA[<=]]> month_end THEN
+        dep_amount * (end_date - month_start + 1) / (month_end - month_start + 1)
+        WHEN start_date <![CDATA[<=]]> month_start AND end_date >= month_end THEN
+        dep_amount
+        ELSE 0
+        END
+        ) AS total_depreciation
+        FROM
+        monthly_dates
+        JOIN time_range ON TRUE
+        GROUP BY
+        asset_id
+        ),
+        result AS (
+        SELECT
+            e.uid as uid,
+        e.asset_uid AS assetUid,
+        COALESCE(income.income, 0) AS income,
+        COALESCE(expense.cost, 0) AS entryCost,
+        COALESCE(d.total_depreciation, 0) AS depreciation,
+        COALESCE(expense.cost, 0) +COALESCE(d.total_depreciation, 0) as cost,
+        ai.NAME AS assetName,
+        ai.serial_num AS serialNum,
+        ai.qr_code AS qrCode,
+        ai.function_type AS functionType,
+        ai.purchase_price AS purchasePrice,
+        ai.clinical_dept_name AS clinicalDeptName,
+        ai.asset_group AS assetGroup,
+        ai.make_short_name AS makerShortName,
+        ai.id AS assetId,
+        e.positive_rate AS positiveRate,
+        (COALESCE(income.income, 0) - COALESCE(expense.cost, 0) - COALESCE(d.total_depreciation, 0)) AS profits,
+        CASE
+        WHEN COALESCE(income.income, 0) = 0 THEN 0
+        ELSE (COALESCE(income.income, 0) - COALESCE(expense.cost, 0) - COALESCE(d.total_depreciation, 0)) / COALESCE(income.income, 0) * 100
+        END AS profitsRate
+        FROM
+        efficiency_equipment_info e
+        LEFT JOIN asset_info ai ON e.asset_uid = ai.uid
+        LEFT JOIN income_summary income ON e.asset_uid = income.asset_uid
+        LEFT JOIN expense_summary expense ON e.asset_uid = expense.asset_uid
+        LEFT JOIN depreciation d ON ai.id = d.asset_id
+
+        where ai.tenant_uid=#{tenantUid}
+
+        <if test="selectedOrgUid != null">
+            AND ( ai.institution_uid = #{selectedOrgUid} OR ai.hospital_uid = #{selectedOrgUid} OR ai.site_uid = #{selectedOrgUid} )
+        </if>
+
+        <if test="orgUidList != null and orgUidList.size > 0">
+            AND (
+            ai.institution_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.hospital_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.site_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.clinical_dept_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.asset_dept_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="assetUids != null and assetUids.size() > 0">
+            and   e.asset_uid IN
+            <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+        <if test="assetName != null  and assetName!='' ">
+            AND ai.name like concat('%',#{assetName},'%')
+        </if>
+        <if test="serialNum != null  and serialNum!='' ">
+            AND ai.serial_num like concat('%',#{serialNum},'%')
+        </if>
+        <if test="clinicalDeptName != null and clinicalDeptName!='' ">
+            AND ai.clinical_dept_name like concat('%',#{clinicalDeptName},'%')
+        </if>
+        <if test="qrCode != null and qrCode!='' ">
+            AND ai.qr_code like concat('%',#{qrCode},'%')
+        </if>
+        <if test="assetGroup != null ">
+            AND ai.asset_group =#{assetGroup}
+        </if>
+        <if test="departNum != null and departNum!='' ">
+            AND ai.depart_num like concat('%',#{departNum},'%')
+        </if>
+        <if test="functionType != null and functionType!='' ">
+            AND ai.function_type like concat('%',#{functionType},'%')
+        </if>
+        <if test="financingNum != null and financingNum!='' ">
+            AND ai.financing_num like concat('%',#{financingNum},'%')
+        </if>
+        <if test="makerShortName != null and makerShortName!='' ">
+            AND ai.make_short_name like concat('%',#{makerShortName},'%')
+        </if>
+        )
+        SELECT
+        *
+        FROM
+        result r
+        <where>
+            <if test="purchasePriceGTE!=null ">
+              and  r.purchasePrice>=#{purchasePriceGTE}
+            </if>
+            <if test="purchasePriceLTE!=null ">
+                and  r.purchasePrice <![CDATA[<=]]> #{purchasePriceLTE}
+            </if>
+
+            <if test="incomeGTE!=null ">
+                and  r.income>=#{incomeGTE}
+            </if>
+            <if test="incomeLTE!=null ">
+                and   r.income <![CDATA[<=]]> #{incomeLTE}
+            </if>
+            <if test="incomeGTE!=null ">
+                and  r.income>=#{incomeGTE}
+            </if>
+            <if test="incomeLTE!=null ">
+                and  r.income <![CDATA[<=]]> #{incomeLTE}
+            </if>
+            <if test="costGTE!=null ">
+                and r.cost>=#{costGTE}
+            </if>
+            <if test="costLTE!=null ">
+                and  r.cost <![CDATA[<=]]> #{costLTE}
+            </if>
+
+
+            <if test="profitsGTE!=null ">
+                and  r.profits>=#{profitsGTE}
+            </if>
+            <if test="profitsLTE!=null ">
+                and  r.profits <![CDATA[<=]]> #{profitsLTE}
+            </if>
+
+            <if test="profitsRateGTE!=null ">
+                and r.profitsRate>=#{profitsRateGTE}
+            </if>
+            <if test="profitsRateLTE!=null ">
+                and  r.profitsRate <![CDATA[<=]]> #{profitsRateLTE}
+            </if>
+            <if test="positiveRateGTE!=null ">
+                and r.positiveRate>=#{positiveRateGTE}
+            </if>
+            <if test="positiveRateLTE!=null ">
+                and r.positiveRate <![CDATA[<=]]> #{positiveRateLTE}
+            </if>
+
+        </where>
+        <if test="orderBy != null">
+            ORDER BY ${orderBy}
+        </if>
+        LIMIT #{page} OFFSET #{offset}
+    </select>
+
+    <select id="selectListCount" resultType="long">
+        WITH time_range AS (
+        SELECT #{startDate}::date AS start_date, #{endDate}::date AS end_date
+        ),
+        income_summary AS (
+        SELECT
+        asset_uid,
+        SUM(total_amount) AS income
+        FROM
+        his_equipment_data_result
+        WHERE
+        tenant_uid = #{tenantUid}
+        AND exec_time BETWEEN (SELECT start_date FROM time_range) AND (SELECT end_date FROM time_range)
+        GROUP BY
+        asset_uid
+        ),
+        expense_summary AS (
+        SELECT
+        asset_uid,
+        SUM(cost_amount) AS cost
+        FROM
+        asset_cost_amount_info
+        WHERE
+        tenant_uid = #{tenantUid}
+        AND statistical_date BETWEEN (SELECT start_date FROM time_range) AND (SELECT end_date FROM time_range)
+        GROUP BY
+        asset_uid
+        ),
+        monthly_dates AS (
+        SELECT
+        asset_id,
+        deprecate_date,
+        deprecate_amount AS dep_amount,
+        deprecate_date AS month_start,
+        (deprecate_date + INTERVAL '1 month - 1 day')::date AS month_end
+        FROM
+        asset_depreciation
+        ),
+        depreciation AS (
+        SELECT
+        asset_id,
+        SUM(
+        CASE
+        WHEN start_date >= month_start AND start_date   <![CDATA[<=]]> month_end AND end_date <![CDATA[<=]]> month_end THEN
+        dep_amount * (end_date - start_date + 1) / (month_end - month_start + 1)
+        WHEN start_date >= month_start AND start_date <![CDATA[<=]]> month_end THEN
+        dep_amount * (month_end - start_date + 1) / (month_end - month_start + 1)
+        WHEN end_date >= month_start AND end_date <![CDATA[<=]]> month_end THEN
+        dep_amount * (end_date - month_start + 1) / (month_end - month_start + 1)
+        WHEN start_date <![CDATA[<=]]> month_start AND end_date >= month_end THEN
+        dep_amount
+        ELSE 0
+        END
+        ) AS total_depreciation
+        FROM
+        monthly_dates
+        JOIN time_range ON TRUE
+        GROUP BY
+        asset_id
+        ),
+        result AS (
+        SELECT
+        e.asset_uid AS assetUid,
+        COALESCE(income.income, 0) AS income,
+        COALESCE(expense.cost, 0) AS entryCost,
+        COALESCE(d.total_depreciation, 0) AS depreciation,
+        COALESCE(expense.cost, 0) +COALESCE(d.total_depreciation, 0) as cost,
+        ai.NAME AS assetName,
+        ai.serial_num AS serialNum,
+        ai.qr_code AS qrCode,
+        ai.function_type AS functionType,
+        ai.purchase_price AS purchasePrice,
+        ai.clinical_dept_name AS clinicalDeptName,
+        ai.asset_group AS assetGroup,
+        ai.make_short_name AS makerShortName,
+        ai.id AS assetId,
+        e.positive_rate AS positiveRate,
+        (COALESCE(income.income, 0) - COALESCE(expense.cost, 0) - COALESCE(d.total_depreciation, 0)) AS profits,
+        CASE
+        WHEN COALESCE(income.income, 0) = 0 THEN 0
+        ELSE (COALESCE(income.income, 0) - COALESCE(expense.cost, 0) - COALESCE(d.total_depreciation, 0)) / COALESCE(income.income, 0) * 100
+        END AS profitsRate
+        FROM
+        efficiency_equipment_info e
+        LEFT JOIN asset_info ai ON e.asset_uid = ai.uid
+        LEFT JOIN income_summary income ON e.asset_uid = income.asset_uid
+        LEFT JOIN expense_summary expense ON e.asset_uid = expense.asset_uid
+        LEFT JOIN depreciation d ON ai.id = d.asset_id
+
+        where ai.tenant_uid=#{tenantUid}
+
+        <if test="selectedOrgUid != null">
+            AND ( ai.institution_uid = #{selectedOrgUid} OR ai.hospital_uid = #{selectedOrgUid} OR ai.site_uid = #{selectedOrgUid} )
+        </if>
+
+        <if test="orgUidList != null and orgUidList.size > 0">
+            AND (
+            ai.institution_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.hospital_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.site_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.clinical_dept_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.asset_dept_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            )
+        </if>
+
+        <if test="assetUids != null and assetUids.size() > 0">
+            and   e.asset_uid IN
+            <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+
+
+        <if test="assetName != null  and assetName!='' ">
+            AND ai.name like concat('%',#{assetName},'%')
+        </if>
+        <if test="serialNum != null  and serialNum!='' ">
+            AND ai.serial_num like concat('%',#{serialNum},'%')
+        </if>
+        <if test="clinicalDeptName != null and clinicalDeptName!='' ">
+            AND ai.clinical_dept_name like concat('%',#{clinicalDeptName},'%')
+        </if>
+        <if test="qrCode != null and qrCode!='' ">
+            AND ai.qr_code like concat('%',#{qrCode},'%')
+        </if>
+        <if test="assetGroup != null ">
+            AND ai.asset_group =#{assetGroup}
+        </if>
+        <if test="departNum != null and departNum!='' ">
+            AND ai.depart_num like concat('%',#{departNum},'%')
+        </if>
+        <if test="functionType != null and functionType!='' ">
+            AND ai.function_type like concat('%',#{functionType},'%')
+        </if>
+        <if test="financingNum != null and financingNum!='' ">
+            AND ai.financing_num like concat('%',#{financingNum},'%')
+        </if>
+        <if test="makerShortName != null and makerShortName!='' ">
+            AND ai.make_short_name like concat('%',#{makerShortName},'%')
+        </if>
+
+        )
+        SELECT
+         count(*)
+        FROM
+        result r
+        <where>
+            <if test="purchasePriceGTE!=null ">
+                and  r.purchasePrice>=#{purchasePriceGTE}
+            </if>
+            <if test="purchasePriceLTE!=null ">
+                and  r.purchasePrice <![CDATA[<=]]> #{purchasePriceLTE}
+            </if>
+
+            <if test="incomeGTE!=null ">
+                and  r.income>=#{incomeGTE}
+            </if>
+            <if test="incomeLTE!=null ">
+                and   r.income <![CDATA[<=]]> #{incomeLTE}
+            </if>
+            <if test="incomeGTE!=null ">
+                and  r.income>=#{incomeGTE}
+            </if>
+            <if test="incomeLTE!=null ">
+                and  r.income <![CDATA[<=]]> #{incomeLTE}
+            </if>
+            <if test="costGTE!=null ">
+                and r.cost>=#{costGTE}
+            </if>
+            <if test="costLTE!=null ">
+                and  r.cost <![CDATA[<=]]> #{costLTE}
+            </if>
+
+
+            <if test="profitsGTE!=null ">
+                and  r.profits>=#{profitsGTE}
+            </if>
+            <if test="profitsLTE!=null ">
+                and  r.profits <![CDATA[<=]]> #{profitsLTE}
+            </if>
+
+            <if test="profitsRateGTE!=null ">
+                and r.profitsRate>=#{profitsRateGTE}
+            </if>
+            <if test="profitsRateLTE!=null ">
+                and  r.profitsRate <![CDATA[<=]]> #{profitsRateLTE}
+            </if>
+            <if test="positiveRateGTE!=null ">
+                and r.positiveRate>=#{positiveRateGTE}
+            </if>
+            <if test="positiveRateLTE!=null ">
+                and r.positiveRate <![CDATA[<=]]> #{positiveRateLTE}
+            </if>
+
+        </where>
+
+    </select>
+
 
 </mapper>

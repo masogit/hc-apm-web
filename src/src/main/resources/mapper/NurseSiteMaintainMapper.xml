@@ -103,6 +103,12 @@
             <if test="deptUid != null">
                 and ai.clinical_dept_uid = #{deptUid}
             </if>
+            <if test="configId != null">
+                and nsm.config_id = #{configId}
+            </if>
+            <if test="status != null">
+                and nsm.status in ${status}
+            </if>
             <if test="orgUidList != null and orgUidList.size > 0">
                 and (
                 ai.site_uid in
