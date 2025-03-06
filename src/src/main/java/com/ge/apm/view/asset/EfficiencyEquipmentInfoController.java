@@ -11,10 +11,12 @@ import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -25,7 +27,9 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
@@ -36,6 +40,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -128,6 +133,11 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private BigDecimal positiveRate;
 
     private SystemTemplateService systemTemplateService;
+    @Getter
+    @Setter
+    private Map<String,Object> filterObject;
+
+    private Sort lastPageSort;
 
     @Override
     protected GenericRepositoryUUID<EfficiencyEquipmentInfo> getDAO() {
@@ -153,43 +163,50 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
 
         this.selectedMap = new HashMap<>();
+        filterObject=new HashMap<>();
     }
 
 
 
     @Override
     protected Page<EfficiencyEquipmentInfo> loadData(PageRequest pageRequest) {
-
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
+        Map<String, Object> param = new HashMap<>();
+        param.put("page", pageRequest.getPageSize());
 
-        if (!this.hasFilterOnField("siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(orgUidList)){
+            param.put("orgUidList",orgUidList);
         }
-
         if (null != selectSite) {
-            this.updateSearchFilter(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
+            param.put("selectedOrgUid",selectSite.getUid());
         }
-        Page<EfficiencyEquipmentInfo> page = efficiencyEquipmentInfoRepository.findBySearchFilter(this.searchFilters, pageRequest);
-        currentPageAssets=page.getContent();
-        if(!CollectionUtils.isEmpty(currentPageAssets)){
-
-            calculationData(currentPageAssets,startDate,endDate);
+        param.put("startDate",startDate);
+        param.put("endDate",endDate);
+        param.put("tenantUid",user.getTenantUID());
+        covQueryCondition(searchFilters,param);
+        lastPageSort = pageRequest.getSort();
+        StringBuilder orderBy = new StringBuilder();
+        for (Sort.Order order : lastPageSort) {
+            String property = order.getProperty();
+            boolean ascending = order.isAscending();
+            switch (property){
+                case "positiveRate":
+                case "purchasePrice":
+                    orderBy.append("r."+(property)).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                default:
+                    orderBy.append("r."+(property)).append(ascending ? " ASC" : " DESC").append(",");
+                    break;
+            }
         }
-        return page;
+        param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
+        List<EfficiencyEquipmentInfo> efficiencyEquipmentInfos = efficiencyEquipmentMapper.selectList(param);
+        Long count = efficiencyEquipmentMapper.selectListCount(param);
+        return  new PageImpl<>(efficiencyEquipmentInfos, pageRequest, count);
     }
 
     private void calculationData(List<EfficiencyEquipmentInfo> currentPageAssets,Date startDate,Date endDate) {
@@ -323,11 +340,111 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         }
     }
 
+//    @Override
+//    public void onFilter(FilterEvent event) {
+//        super.onFilter(event);
+//        this.selectedMap.clear();
+//    }
     @Override
     public void onFilter(FilterEvent event) {
-        super.onFilter(event);
+        onFilterCustom(event, this::numberField);
         this.selectedMap.clear();
     }
+protected boolean numberField(String fieldName, String filterVal) {
+    if (isNumberField(fieldName)) {
+        processNumberFiled(filterVal, fieldName);
+        return true;
+    }
+    return false;
+}
+    private Map<String, Boolean> numberFields = null;
+
+    protected boolean isNumberField(String fieldName){
+        if(numberFields==null){
+            numberFields = new HashMap<String, Boolean>();
+            Class a = getBeanClass();
+            for(Field f: a.getDeclaredFields()){
+                if(f.getType()==Double.class ||  f.getType()== BigDecimal.class  ||  f.getType()==Integer.class       )
+                    numberFields.put(f.getName(), Boolean.TRUE);
+            }
+        }
+        return numberFields.get(fieldName)!=null;
+    }
+
+    protected void processNumberFiled(String filterVal, String fieldName) {
+        String[] values = filterVal.split("~");
+        if (values.length > 0) {
+            Optional.ofNullable((values[0])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, var)));
+        }
+        if (values.length > 1) {
+            Optional.ofNullable((values[1])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, var)));
+        }
+    }
+
+
+    public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        for (SearchFilter searchFilter :searchFilters) {
+            String fieldName = searchFilter.fieldName;
+            switch (fieldName) {
+                case "assetName":
+                    param.put("assetName", searchFilter.value);
+                    break;
+                case "functionType":
+                    param.put("functionType", searchFilter.value);
+                    break;
+                case "makerShortName":
+                    param.put("makerShortName", searchFilter.value);
+                    break;
+                case "serialNum":
+                    param.put("serialNum", searchFilter.value);
+                    break;
+                case "assetGroup":
+                    try {
+                        param.put("assetGroup", Integer.parseInt(searchFilter.value.toString()));
+                    }catch (Exception e){
+                        logger.error("his设备绩效 assetGroup 搜索数值转换异常 e:",e);
+                    }
+
+                    break;
+
+                case "qrCode":
+                    param.put("qrCode", searchFilter.value);
+                    break;
+
+                case "clinicalDeptName":
+                    param.put("clinicalDeptName", searchFilter.value);
+                    break;
+                case "cost":
+                case "income":
+                case "profits":
+                case "profitsRate":
+                case "positiveRate":
+                case "purchasePrice":
+                    try {
+                        double num = Double.parseDouble(searchFilter.value.toString());
+                        String pararName;
+                        if (searchFilter.operator.name().equals("GTE")) {
+                            pararName= fieldName+"GTE";
+                            param.put(pararName, num);
+                        } else {
+                            pararName=fieldName+"LTE";
+                            param.put(pararName, num);
+                        }
+                    }catch (Exception e){
+                        logger.error("his设备绩效数值区间搜索数值转换异常 e:",e);
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+
+
+
 
     public boolean isChecked() {
         return selectedMap.containsValue(true);
@@ -370,50 +487,55 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     public void exportExcel()  {
         try {
             Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-            List<String> orgUidList=null;
-
-            List<String> qrCodes=null;
-
-            String orgUid=null;
-            if(selectSite!=null){
-                orgUid = selectSite.getUid();
-            }else{
-                orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+            if (searchFilters == null) {
+                searchFilters = new ArrayList<>();
             }
-            if(!assetUids.isEmpty()){
+            Map<String, Object> param = new HashMap<>();
+            param.put("page", 5000);
 
-                List<AssetInfo> byUids = assetInfoRepository.getByUids(assetUids);
-                qrCodes=  byUids.stream().map(AssetInfo::getQrCode).filter(Objects::nonNull).collect(Collectors.toList());
+            param.put("offset", 0);
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(orgUidList)){
+                param.put("orgUidList",orgUidList);
             }
+            if (null != selectSite) {
+                param.put("selectedOrgUid",selectSite.getUid());
+            }
+            param.put("startDate",startDate);
+            param.put("endDate",endDate);
+            param.put("tenantUid",user.getTenantUID());
+            if(CollectionUtils.isNotEmpty(assetUids)){
+                param.put("assetUids",assetUids);
+            }
+            covQueryCondition(searchFilters,param);
 
 
-            List<EfficiencyEquipmentInfo> list = efficiencyEquipmentMapper.getEfficiencyEquipmentInfo(startDate, endDate, user.getTenantUID(),assetUids,orgUid,orgUidList,qrCodes);
+            StringBuilder orderBy = new StringBuilder();
+            for (Sort.Order order : lastPageSort) {
+                String property = order.getProperty();
+                boolean ascending = order.isAscending();
+                switch (property){
+                    case "positiveRate":
+                    case "purchasePrice":
+                        orderBy.append("r."+(property)).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                        break;
+                    default:
+                        orderBy.append("r."+(property)).append(ascending ? " ASC" : " DESC").append(",");
+                        break;
+                }
+            }
+            param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
+
+            List<EfficiencyEquipmentInfo> efficiencyEquipmentInfos = efficiencyEquipmentMapper.selectList(param);
+
             List<I18nMessage> assetGroup = i18nMessageService.getByMsgType("assetGroup");
             Map<String, String> assetGroupMap  = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue, (value1, value2) -> value1));
-            List<Integer> assetIds = list.stream().map(EfficiencyEquipmentInfo::getAssetId).collect(Collectors.toList());
-            Map<Integer, BigDecimal> assetDepreciationAmount = getAssetDepreciationAmount(startDate, endDate, assetIds);
 
 
-            for (EfficiencyEquipmentInfo efficiencyEquipmentInfo : list) {
-                if (efficiencyEquipmentInfo.getAssetGroup() != null) {
-                    efficiencyEquipmentInfo.setAssetGroupName(assetGroupMap.get(efficiencyEquipmentInfo.getAssetGroup().toString()));
-                }
-                BigDecimal income = efficiencyEquipmentInfo.getIncome() != null ? efficiencyEquipmentInfo.getIncome() : BigDecimal.ZERO;
-                BigDecimal cost = efficiencyEquipmentInfo.getCost() != null ? efficiencyEquipmentInfo.getCost() : BigDecimal.ZERO;
-                Integer id = efficiencyEquipmentInfo.getAssetId();
-                BigDecimal bigDecimal =assetDepreciationAmount!=null? assetDepreciationAmount.get(id)!=null? assetDepreciationAmount.get(id):BigDecimal.ZERO:BigDecimal.ZERO;
-                efficiencyEquipmentInfo.setIncome(income);
-                efficiencyEquipmentInfo.setCost(cost.add(bigDecimal));
-                BigDecimal profits = income.subtract(cost).subtract(bigDecimal);
-                efficiencyEquipmentInfo.setProfits(profits);
-                if(!(income.compareTo(BigDecimal.ZERO)==0)){
-                    efficiencyEquipmentInfo.setProfitsRate(profits.multiply(BigDecimal.valueOf(100)).divide(income,2, RoundingMode.HALF_UP));
-                }else{
-                    efficiencyEquipmentInfo.setProfitsRate(BigDecimal.ZERO);
-                }
-            }
-//            downloadFile(parseListToMap(list), fields);
-            easyExcelExport(list);
+            efficiencyEquipmentInfos.forEach(item->item.setAssetGroupName(assetGroupMap.get(item.getAssetGroup().toString())));
+
+
+            easyExcelExport(efficiencyEquipmentInfos);
         }catch (Exception e){
             logger.error("导出效益设备异常 e:",e);
         }
