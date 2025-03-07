@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.ge.apm.service.nurseSite.export.AssetOptRecordExport;
 import com.ge.apm.service.nurseSite.export.AssetOptRecordExportUtil;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -29,8 +28,6 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ibm.icu.util.Calendar;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 
 
 @Service
@@ -47,10 +44,7 @@ public class AssetOptRecordService {
 	OrgInfoRepository orgInfoRepository;
 	@Autowired
 	UaaService uaaService;
-	public AssetOptRecordRepository getAssetOptRecordRepository(){
-		return assetOptRecordRepository;
-	}
-	
+
 	public List<String> findAccessClinicalUidListByUserUid(String userUid){
 		return uaaService.findAccessClinicalUidByUserUid(userUid);
 	}
