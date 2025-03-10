@@ -274,14 +274,6 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Transient
     private String partApproveSignature;
 
-    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
-    @ManyToOne(fetch = FetchType.EAGER)
-    private MvsIbMapping mvsIbMapping;
-
-    @JoinColumn(name = "asset_uid", referencedColumnName = "e_home_ib_uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
-    @ManyToOne(fetch = FetchType.EAGER)
-    private MvsIbMapping eMvsIbMapping;
-
     @Transient
     private String businessDigest;
 
@@ -850,15 +842,5 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
         this.originalPmNum = originalPmNum;
     }
 
-    public MvsIbMapping getMvsIbMapping() {
-        if(  mvsIbMapping == null
-                && eMvsIbMapping != null) {
-            return eMvsIbMapping;
-        }
-        return mvsIbMapping;
-    }
 
-    public void setMvsIbMapping(MvsIbMapping mvsIbMapping) {
-        this.mvsIbMapping = mvsIbMapping;
-    }
 }
