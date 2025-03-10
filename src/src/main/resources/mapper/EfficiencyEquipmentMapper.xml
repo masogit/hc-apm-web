@@ -192,6 +192,7 @@
         ai.make_short_name AS makerShortName,
         ai.id AS assetId,
         e.positive_rate AS positiveRate,
+        e.display_name AS displayName,
         (COALESCE(income.income, 0) - COALESCE(expense.cost, 0) - COALESCE(d.total_depreciation, 0)) AS profits,
         CASE
         WHEN COALESCE(income.income, 0) = 0 THEN 0
