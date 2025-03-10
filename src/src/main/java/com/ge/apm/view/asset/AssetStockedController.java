@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -413,6 +414,10 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             rootNode.getChildren().add(node);
         }
         rootNode.setExpanded(true);
+        TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, org);
+        if (null != selectedOrgNode) {
+            TreeNodeUtil.expandParentsNodes(selectedOrgNode);
+        }
         return orgTree;
     }
 
