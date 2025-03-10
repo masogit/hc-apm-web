@@ -68,9 +68,6 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
-    @JoinColumn(name = "asset_uid", referencedColumnName = "mvs_ib_uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
-    @ManyToOne(fetch = FetchType.EAGER)
-    private MvsIbMapping mvsIbMapping;
 
     @Basic(optional = false)
     @NotNull
@@ -345,13 +342,6 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Transient
     private Integer repairPersonId;
 
-    public MvsIbMapping getMvsIbMapping() {
-        return mvsIbMapping;
-    }
-
-    public void setMvsIbMapping(MvsIbMapping mvsIbMapping) {
-        this.mvsIbMapping = mvsIbMapping;
-    }
 
     public Integer getRepairPersonId() {
         return repairPersonId;
@@ -531,13 +521,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setImportBy(String importBy) { this.importBy = importBy; }
 
     public AssetInfo getAssetInfo() {
-        if(assetInfo == null
-                && mvsIbMapping != null
-                && mvsIbMapping.getAssetInfo() != null){
-            return mvsIbMapping.getAssetInfo();
-        }
         return assetInfo;
     }
+
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
     }

@@ -961,7 +961,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 logger.info("workordermgrmvsfilter "+JSONObject.toJSONString(filters));
                 pageResult = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = pageResult.getContent();
-                loadMVSClinicalDeptList();
+                //loadMVSClinicalDeptList();
             }else{
                 pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
                 bySearchFilterInternal = pageResult.getContent();
@@ -3835,28 +3835,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return orgList;
     }
 
-    public List<OrgInfo> LoadSiteNameListMVS() {
-        if (CollectionUtils.isEmpty(orgListMVS)) {
-            if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                orgListMVS = bySearchFilterMVS.stream()
-                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
-                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                        .map(info -> Optional.ofNullable(info.getSiteUID())
-                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
-                                        .orElse(null))
-                                .orElse(null))
-                        .filter(Objects::nonNull) // 过滤掉所有 null 值
-                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                        .stream()
-                        .map(val -> cacheService.findOrgByUid(val))
-                        .collect(Collectors.toList());
-            }
-            if (!CollectionUtils.isEmpty(orgListMVS)) {
-                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
-            }
-        }
-        return orgListMVS;
-    }
+
 
     public boolean getHospitalShow() {
         return hospitalShow;
@@ -3870,26 +3849,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return null;
     }
 
-    private void loadMVSClinicalDeptList() {
-        try {
-            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                clinicalDeptListMVS = bySearchFilterMVS.stream()
-                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
-                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                        .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
-                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
-                                        .orElse(null))
-                                .orElse(null))
-                        .filter(Objects::nonNull) // 过滤掉所有 null 值
-                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                        .stream()
-                        .map(val -> cacheService.findOrgByUid(val))
-                        .collect(Collectors.toList());
-            }
-        } catch (Exception e) {
-            logger.info("暂无MVS列表");
-        }
-    }
+
 
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
         this.workHoursList = workHoursList;
@@ -3915,9 +3875,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             if(StringUtils.isNotBlank(tenantUID) && tenantUID.equals(workOrder.getTenantUID())){
                 workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
             }else if(StringUtils.isNotBlank(tenantUID) && !tenantUID.equals(workOrder.getTenantUID())){
-                if(workOrder.getMvsIbMapping() != null  && workOrder.getMvsIbMapping().getAssetInfo() != null){
+               /* if(workOrder.getMvsIbMapping() != null  && workOrder.getMvsIbMapping().getAssetInfo() != null){
                     workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getMvsIbMapping().getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
-                }
+                }*/
             }
             workOrder.setRepairName(ObjectUtils.isEmpty(workOrder_step)?"":workOrder_step.getOwnerName());
             workOrder.setRepairPersonId(ObjectUtils.isEmpty(workOrder_step)?null:workOrder_step.getOwnerId());
