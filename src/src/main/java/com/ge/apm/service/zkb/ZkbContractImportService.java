@@ -68,6 +68,10 @@ public class ZkbContractImportService {
 
     @Autowired
     private ZkbContractQuotaLogService zkbContractQuotaLogService;
+
+    @Autowired
+    private ZkbIntegralService zkbIntegralService;
+
     @Resource(name = "zkbZoneRepository")
     private ZkbZoneRepository zkbZoneRepository;
 
@@ -159,6 +163,7 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("599合同年份", "setFirstYearFlag");
             contractRow.setFieldStringValue("关联合同号", "setLinkContractNo");
             contractRow.setFieldStringValue("2022年起探头高低端名额分类", "setAssetQuotaType");
+            contractRow.setFieldStringValue("积分是否清零", "setResetZeroScoreFlag");
 
             if(contractInfoVO.isNull()){
                 break;
@@ -391,6 +396,9 @@ public class ZkbContractImportService {
             if(ZkbContract.ContractType.DI.toString().equals(newZkbContract.getContractType())){
                 zkbContractQuotaLogService.saveData(newZkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             }
+        }
+        if(StringUtils.isNotEmpty(contractInfoVO.getResetZeroScoreFlag()) && "Y".equals(contractInfoVO.getResetZeroScoreFlag())){
+            zkbIntegralService.resetZeroScore(contractInfoVO.getTenantUID(), currentUser, ZkbIntegralRecord.RecordType.ContractImport.name(), "合同导入积分清零");
         }
 
     }
