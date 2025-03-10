@@ -194,6 +194,12 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
             Double[] lowerRight = {(positionX + widthItem) / width, (positionY + heightItem) / height};
             range.add(lowerRight);
             jsonObject.put("Range", range);
+            List<Double[]> box = new ArrayList<>();
+            box.add(new Double[]{positionX,positionY}); // 左上
+            box.add(new Double[]{positionX+widthItem,positionY}); // 右上
+            box.add(new Double[]{positionX+widthItem,positionY+heightItem});  // 右下
+            box.add(new Double[]{positionX,positionY+heightItem});  // 左下
+            jsonObject.put("Box", box);
             return jsonObject;
         }).collect(Collectors.toList());
         templateJsonObject.put("Elements",collect);
