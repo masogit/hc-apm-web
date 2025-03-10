@@ -146,4 +146,29 @@ public class DateUtil {
 		calendar.add(Calendar.DATE,1);
 		return calendar.getTime();
 	}
+
+	public static String generateCostTime(Date start,Date end){
+		com.ibm.icu.util.Calendar ca1= com.ibm.icu.util.Calendar.getInstance();
+		ca1.setTime(start);
+		com.ibm.icu.util.Calendar ca2= com.ibm.icu.util.Calendar.getInstance();
+		ca2.setTime(end);
+		int year=ca1.fieldDifference(end, com.ibm.icu.util.Calendar.YEAR);
+		int day=ca1.fieldDifference(end, com.ibm.icu.util.Calendar.DAY_OF_YEAR);
+		int hour=ca1.fieldDifference(end, com.ibm.icu.util.Calendar.HOUR_OF_DAY);
+		int minute=ca1.fieldDifference(end, com.ibm.icu.util.Calendar.MINUTE);
+		StringBuilder sb=new StringBuilder();
+		if(year>0){
+			sb.append(year+"年");
+		}
+		if(day>0){
+			sb.append(day+"天");
+		}
+		if(hour>0){
+			sb.append(hour+"时");
+		}
+		if(minute>0){
+			sb.append(minute+"分");
+		}
+		return sb.toString();
+	}
 }
