@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
+import com.deepoove.poi.plugin.table.LoopColumnTableRenderPolicy;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
 import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
@@ -13,11 +14,13 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.WordExportServiceUtil;
-import com.ge.apm.service.asset.ArrivalItemTableRenderPolicy;
-import com.ge.apm.service.asset.AssetOutStockTableRenderPolicy;
-import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.*;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.utils.ImageUtils;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
@@ -55,6 +58,9 @@ public class WordReportExportService {
     private UserAccountRepository userAccountRepository;
     @Autowired
     private NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
+
+    @Autowired
+    private SystemTemplateService systemTemplateService;
 
     private final static List<Integer> PASS_STATUS = Arrays.asList(2, 5, 6, 7);
     private final static List<Integer> FAILURE_STATUS = Arrays.asList(3, 8);
@@ -228,20 +234,30 @@ public class WordReportExportService {
             }
             for (Map.Entry<Integer, Map<Integer, Date>> m : stringMapMap.entrySet()) {
                 reports = new ArrayList<>();
-                int count = m.getValue().size();
+//                int count = m.getValue().size();
                 dataMap = m.getValue();
-                XWPFDocument document = new XWPFDocument();
-                for (int i=0;i<nurseSiteMaintainItemList.size();i++) {
-                    if (i > 0) {
-                        //不同设备分页
-                        document.createParagraph().setPageBreak(true);
-                    }
-                        creatPage(i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap,updateByMapMap, configMap);
-                }
-                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                document.write(outStream);
-                outStream.close();
-                byte[] bytes = outStream.toByteArray();
+//                XWPFDocument document = new XWPFDocument();
+//                for (int i=0;i<nurseSiteMaintainItemList.size();i++) {
+//                    if (i > 0) {
+//                        //不同设备分页
+//                        document.createParagraph().setPageBreak(true);
+//                    }
+//                        creatPage(i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap,updateByMapMap, configMap);
+//                }
+                List<String> items = new ArrayList<>();
+                Map<String, Object> paramMap = checkDataBuildMap(dataMap, nurseSiteMaintainItemList, stringMap, commentMapMap, updateByMapMap, configMap,items);
+                UserAccount user = UserContextService.getCurrentUserAccount();
+                byte[] byteArray = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.DAILY_CHECK, user);
+                Map<String, RenderPolicy> bindings = new HashMap<>();
+                bindings.put("checkItems", new LoopColumnTableRenderPolicy());
+                bindings.put("checkResult",new CheckConvertRenderPolicy(items));
+                bindings.put("pageBreak", new PageBreakPluginFactory(nurseSiteMaintainItemList.size(),"{{pageBreak}}"));
+                byte[] bytes = WordExportServiceUtil.generate(paramMap, byteArray, bindings);
+//
+//                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+//                document.write(outStream);
+//                outStream.close();
+//                byte[] bytes = outStream.toByteArray();
                 reports.add(bytes);
                 reportMap.put(m.getKey(), reports);
             }
@@ -250,6 +266,8 @@ public class WordReportExportService {
 
         return zip(reportMapMap);
     }
+
+
 
     public byte[] writeMaintainHistoryDetailToDocx( List<NurseSiteMaintainHistory> listMaintain) throws IOException {
 
@@ -578,6 +596,73 @@ public class WordReportExportService {
         tblPr.getTblW().setType(STTblWidth.DXA);
         tblPr.getTblW().setW(new BigInteger("11250"));
     }
+
+    private Map<String, Object> checkDataBuildMap(Map<Integer, Date> dataMap , List<NurseSiteMaintainItem> nurseSiteMaintainItemList, Map<Date, Map<String, Map<String, String>>> stringMap, Map<Date, Map<String, String>> commentMapMap, Map<Date, Map<String, String>> updateByMapMap, Map<String, String> configMap, List<String> items) {
+
+
+        Map<String, Object> sectionsMap = new HashMap<>();
+
+        List<Object> sections = new ArrayList<>();
+        for (NurseSiteMaintainItem nurseSiteMaintainItem : nurseSiteMaintainItemList) {
+            Map<String, Object> checkItemMap = new HashMap<>();
+            String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
+            JSONArray itemDetails = JSON.parseArray(itemDetail);
+            int num = itemDetails.size();
+            List<String> checkItems = itemDetails.stream().map(obj -> ((JSONObject) obj).getString("name")).collect(Collectors.toList());
+//            checkItems.add(0,"日期");
+            checkItems.add("检查者");
+            checkItems.add("备注");
+            List<Object> itemTitleList = new ArrayList<>();
+            for (String checkItem : checkItems) {
+                Map<String, String> itemTitleMap = new HashMap<>();
+                itemTitleMap.put("checkItem",checkItem);
+                itemTitleList.add(itemTitleMap);
+            }
+            items.add("日期");
+            items.addAll(checkItems);
+            checkItemMap.put("checkItems",itemTitleList);
+
+            AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
+            String assetUid = assetInfo.getUid();
+            String title = assetInfo.getName() + "(" + assetInfo.getDepartNum() + ")" + "-" + DateFormatUtils.format(dataMap.get(1), "yyyy-MM");
+            checkItemMap.put("checkTitle",title);
+
+            List<Object> objects = new ArrayList<>();
+            for (int n = 1; n <= dataMap.size(); n++) {
+                Map<String, Object> paramMap = new HashMap<>();
+
+                Date date = dataMap.get(n);
+                String dateStr = DateFormatUtils.format(date, "MMdd");
+                paramMap.put("日期",dateStr);
+                Map<String, Map<String, String>> assetUidMap = stringMap.get(date);
+                Map<String, String> itemMap = assetUidMap.get(assetUid);
+                paramMap.putAll(itemMap);
+                for (int m = 1; m <= 2; m++) {
+                    if (m==1) {
+                        Map<String, String> map = updateByMapMap.get(date);
+                        String updateByUid = map.get(assetUid);
+                        if(updateByUid != null){
+                            UserAccount userAccount = userAccountRepository.getByUid(updateByUid);
+                            paramMap.put("检查者",userAccount.getName());
+                        }
+                    } else {
+                        Map<String, String> map = commentMapMap.get(date);
+                        String comment = map.get(assetUid);
+                        paramMap.put("备注",comment);
+                    }
+                }
+                objects.add(paramMap);
+            }
+            checkItemMap.put("checkResult",objects);
+            sections.add(checkItemMap);
+        }
+        sectionsMap.put("sections",sections);
+        String dataStr = DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS");
+        sectionsMap.put("exportDate","导出时间:"+dataStr);
+        return sectionsMap;
+    }
+
+
 
     public byte[] zip(Map<String,Map<Integer,List<byte[]>>> reportMapMap) throws IOException {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();

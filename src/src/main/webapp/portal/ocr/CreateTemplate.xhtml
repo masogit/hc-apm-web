@@ -123,7 +123,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup >
-                                <p:commandButton  value="#{msg.Save}" icon="ui-icon-check" action="#{ocrTemplateController.saveChange()}" oncomplete="" validateClient="false" update="ocrEditForm:preView :growl"  style="float:right"/>
+                                <p:commandButton  value="#{msg.Save}" icon="ui-icon-check" action="#{ocrTemplateController.saveChange()}" oncomplete="" validateClient="false" update="ocrEditForm:preView :growl :ocrEditForm"  style="float:right"/>
                                 <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="templateList.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:right"/>
                             </h:panelGroup>
 

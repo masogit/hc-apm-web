@@ -936,6 +936,7 @@ public class NurseSiteMaintainService {
 		Map<String, UserAccount> mapModifyBy = new HashMap<>();
 		List<UserAccount> listModify = null;
 		if (ObjectUtil.isNotEmpty(listTempMaintain)) {
+			listTempMaintain.sort((item,next)->next.getScheduleDate().compareTo(item.getScheduleDate()));
 			setModifyByUids = listTempMaintain.stream().map(NurseSiteMaintain::getCreateByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
 			setModifyByUids.addAll(listTempMaintain.stream().map(NurseSiteMaintain::getModifyByUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet()));
 		}
