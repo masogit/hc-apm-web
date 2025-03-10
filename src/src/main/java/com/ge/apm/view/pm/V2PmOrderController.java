@@ -1964,7 +1964,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 logger.info("loadData.MvsSearchFilter" +JSONObject.toJSONString(filters));
                 result  = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = result.getContent();
-                loadMVSClinicalDeptList();
+                //loadMVSClinicalDeptList();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
                 bySearchFilterInternal = result.getContent();
@@ -2006,7 +2006,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = result.getContent();
-                loadMVSClinicalDeptList();
+               // loadMVSClinicalDeptList();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
                 bySearchFilterInternal = result.getContent();
