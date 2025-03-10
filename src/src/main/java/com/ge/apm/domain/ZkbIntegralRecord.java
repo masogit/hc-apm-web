@@ -17,7 +17,7 @@ public class ZkbIntegralRecord implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum RecordType{
-        KpiAdd,KpiModify,KpiDelete,QuotaDeduct,QuotaReturn,ScoreEdit
+        KpiAdd,KpiModify,KpiDelete,QuotaDeduct,QuotaReturn,ScoreEdit,ContractEdit,ContractImport
     }
 
     @Id
