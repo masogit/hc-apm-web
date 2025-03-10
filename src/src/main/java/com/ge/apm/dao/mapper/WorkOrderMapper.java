@@ -2,11 +2,13 @@ package com.ge.apm.dao.mapper;
 
 import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.WorkOrderEventRecordDto;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import com.ge.apm.domain.WorkFlow;
-import com.ge.apm.domain.WorkOrder;
-import com.ge.apm.domain.WorkflowConfig;
 
 public interface WorkOrderMapper {
 	@Select("select count(wo.id) from asset_info ai left join work_order wo on ai.id= wo.asset_id "+
@@ -29,5 +31,12 @@ public interface WorkOrderMapper {
 	
 	@Select("select id ,request_time,current_person_id from work_order  where id = #{parentWoId}")
 	public WorkOrder fetchParentWorkOrder(Integer parentWoId);
+
+//	@Select("SELECT sr.case_priority casePriority, sr.request_time requestTime, sr.request_reason requestReason, sr.requestor_name requestorName, wo.dispatch_mode dispatchMode, wo.approval_date approvalDate, wo.current_step_id currentStepId, wo.current_step_name currentStepName, wo.current_person_name currentPersonName FROM v2_service_request sr, v2_work_order wo WHERE sr.id = wo.sr_id ${ew.sqlSegment}")
+	@Select("SELECT wo.*, sr.case_priority casePriority, sr.request_time requestTime, sr.request_reason requestReason, sr.requestor_name requestorName FROM v2_service_request sr " +
+			"LEFT JOIN ( SELECT wo.asset_id, wo.sr_id, wo.dispatch_mode dispatchMode, wo.approval_date approvalDate, wo.current_step_id currentStepId, wo.current_step_name currentStepName, wo.current_person_name currentPersonName, count(wod.id) detailCount " +
+			"FROM v2_work_order wo LEFT JOIN v2_work_order_detail wod ON wo.id = wod.wo_id WHERE wo.asset_id in (${assetIds}) group by wo.id ) wo ON sr.id = wo.sr_id " +
+			"WHERE 1=1 ${ew.sqlSegment}")
+	List<WorkOrderEventRecordDto> getEventRecord(Pagination pagination, @Param("ew") Wrapper wrapper, @Param("assetIds") String assetIds);
 
 }

@@ -12,7 +12,7 @@
 <ui:composition>
     <!--    <ui:define name="content">-->
     <!--            <div class="ui-g-12 card">-->
-    <p:dataTable id="approvalList" value="#{assetApprovalController.lazyModel}"
+    <p:dataTable id="approvalList" value="#{inspectionServiceController.detailApprovalEventList}"
                  var="item"
                  widgetVar="approvalList"
                  lazy="true" paginator="true" paginatorPosition="bottom"

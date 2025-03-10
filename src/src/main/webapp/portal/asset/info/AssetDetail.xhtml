@@ -27,7 +27,8 @@
         </div>
 
         <div class="ui-g-12 card" >
-            <p:tabView dynamic="true" id="assetDetail">
+            <p:tabView dynamic="true" id="assetDetail" cache="true">
+                <p:ajax event="tabChange" listener="#{inspectionServiceController.onTabChange}" />
                 <p:tab title="#{msg.BasicInfo}">
                     <p:accordionPanel id="accordion" multiple="false" >
                         <p:tab title="#{msg.BasicInfo}">
@@ -193,104 +194,133 @@
                     </h:form>
 
                 </p:tab>
-                <p:tab title="#{msg.EventRecord}">
-                    <h:form>
-                        <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
+                <p:tab title="#{msg.EventRecord}" id="EventRecordTab">
+                    <h:form id="EventRecord">
+                        <p:fieldset legend="#{msg.FilterCondition}">
+                            <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.startTime}*</label>
+                                    <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                locale="#{userContextService.getCalendarLocale()}"
+                                                pattern="#{userContextService.timeFormat()}" id="startTime"
+                                                value="#{inspectionServiceController.startTime}"
+                                                required="false" requiredMessage="#{msg.startTime} #{msg.ValidationRequire}"
+                                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.endTime}*</label>
+                                    <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                locale="#{userContextService.getCalendarLocale()}"
+                                                pattern="#{userContextService.timeFormat()}" id="endTime"
+                                                value="#{inspectionServiceController.endTime}"
+                                                required="false" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"
+                                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                                <p:commandButton value="查询" validateClient="true" actionListener="#{inspectionServiceController.query(assetInfoDetailController.selected)}" update=":growl EventRecord"/>
+                            </p:panelGrid>
+                        </p:fieldset>
 
-                            <p:panel  header="#{msg.MaintainanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
-                                <f:facet name="actions">
-                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
-                                    <p:commandButton ajax="false" value="#{msg.ExportAllReports}"
-                                                     actionListener="#{workOrderReportExportController.exportAllWoByAssetInfoId(assetInfoDetailController.selected.id)}"
-                                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                                        <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
-                                    </p:commandButton>
-                                    <p:commandButton ajax="false" value="#{msg.ExportAllDetails}"
-                                                     actionListener="#{workOrderReportExportController.exportAllWoDocxByAssetInfoId(assetInfoDetailController.selected.id)}"
-                                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                                        <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
-                                    </p:commandButton>
-                                </f:facet>
+                        <p:panel header="#{msg.MaintainanceRecord}" style="margin-bottom:20px;" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                            <f:facet name="actions">
+                                <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                                <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
+                                <p:commandButton ajax="false" value="#{msg.ExportAllReports}"
+                                                 actionListener="#{workOrderReportExportController.exportAllWoByAssetInfoId(assetInfoDetailController.selected.id)}"
+                                                 icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                    <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+                                </p:commandButton>
+                                <p:commandButton ajax="false" value="#{msg.ExportAllDetails}"
+                                                 actionListener="#{workOrderReportExportController.exportAllWoDocxByAssetInfoId(assetInfoDetailController.selected.id)}"
+                                                 icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                    <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
+                                </p:commandButton>
+                            </f:facet>
 
-                                <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.id)}" emptyMessage="#{msg.noRecordFound}"
-                                             paginator="true" paginatorPosition="both" rows="5"
-                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                    <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" >
-                                        <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
-                                    </p:column>
-                                    <p:column headerText="#{msg.requestTime}" >
-                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;queryIndex=12&amp;actionName=View&amp;selectedid='.concat(assetInfoDetailController.getWorkOrderId(item.id)))}" styleClass="p-mr-2">
-                                            <h:outputText value="#{item.requestTime}">
-                                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                                            </h:outputText>
-                                        </p:commandLink>
-                                    </p:column>
-                                    <p:column headerText="#{msg.requestReason}" >
-                                        <h:outputText value="#{item.requestReason}"/>
-                                    </p:column>
-                                    <p:column headerText="#{msg.requestorName}" >
-                                        <h:outputText value="#{item.requestorName}"/>
-                                    </p:column>
-                                </p:dataTable>
-                            </p:panel>
-
-                            <p:panel  header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
-                                <f:facet name="actions">
-                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/measuring/measuringResultMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                                </f:facet>
-                                <p:dataTable var="item" value="#{inspectionServiceController.getMeasureAssetList(assetInfoDetailController.selected.id)}" emptyMessage="#{msg.noRecordFound}"
-                                             paginator="true" paginatorPosition="both" rows="5"
-                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                    <p:column headerText="#{msg.serialNum}">
-                                        <h:outputText value="#{item.serialNum}" />
-                                    </p:column>
-                                    <p:column headerText="计量证书编号">
-                                        <h:outputText value="#{item.meteringNO}" />
-                                    </p:column>
-                                    <p:column headerText="检定结论">
-                                        <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}" />
-                                    </p:column>
-                                    <p:column headerText="计量日期">
-                                        <h:outputText value="#{item.checkDate}">
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <p:dataTable var="item" value="#{inspectionServiceController.detailWorkOrderList}" emptyMessage="#{msg.noRecordFound}"
+                                         paginator="true" paginatorPosition="bottom" rows="5" widgetVar="varworkOrderListgl"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                <p:ajax event="filter" listener="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.id)}" />
+                                <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" >
+                                    <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.requestTime}" >
+                                    <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;queryIndex=12&amp;actionName=View&amp;selectedid='.concat(assetInfoDetailController.getWorkOrderId(item.id)))}" styleClass="p-mr-2">
+                                        <h:outputText value="#{item.requestTime}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                                         </h:outputText>
-                                    </p:column>
-                                </p:dataTable >
-                            </p:panel>
-                            <!--test-->
-                            <p:panel  header="#{msg.InternalMaintenanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
-                                <f:facet name="actions">
-                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
-                                </f:facet>
-                                <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoDetailController.selected.id)}" emptyMessage="#{msg.noRecordFound}"
-                                             paginator="true" paginatorPosition="both" rows="5"
-                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                    <p:column headerText="#{msg.creatorUID}" >
-                                        <h:outputText value="#{item.creatorName}"/>
-                                    </p:column>
-                                    <p:column headerText="#{msg.MaintenanceID}" >
-                                        <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;orderId='.concat(item.id).concat('&amp;queryTab=' .concat(assetInfoDetailController.getQueryTabValue(item))))}" styleClass="p-mr-2">
-                                            <h:outputText value="#{item.pmNum}"/>
-                                        </p:commandLink>
-                                    </p:column>
-                                    <p:column headerText="#{msg.currentStep}" >
-                                        <h:outputText value="#{item.currentStepName}"/>
-                                    </p:column>
-                                    <p:column headerText="#{msg.currentPersonUID}" >
-                                        <h:outputText value="#{item.currentPersonName}"/>
-                                    </p:column>
-                                </p:dataTable>
-                            </p:panel>
+                                    </p:commandLink>
+                                </p:column>
+                                <p:column headerText="#{msg.requestReason}" >
+                                    <h:outputText value="#{item.requestReason}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.requestorName}" >
+                                    <h:outputText value="#{item.requestorName}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varworkOrderListgl').filter()" value="#{inspectionServiceController.stepFilter}">
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{inspectionServiceController.needTwoSubStatus ? inspectionServiceController.getWoSteps('2,3,4,5,6,9,10,11'):inspectionServiceController.getWoSteps('2,3,4,5,6,9')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <p:graphicImage  width="165" height="38" name="#{inspectionServiceController.getStepImg(item)}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.currentStep}" >
+                                    <h:outputText value="#{item.currentStepName}"/>
+                                </p:column>
+                                <p:column headerText="当前处理人" >
+                                    <h:outputText value="#{item.currentPersonName}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+                        <p:panel header="#{msg.InternalMaintenanceRecord}" style="margin-bottom:20px;" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                            <f:facet name="actions">
+                                <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                                <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
+                            </f:facet>
+                            <p:dataTable var="item" value="#{inspectionServiceController.detailPmOrderList}" emptyMessage="#{msg.noRecordFound}"
+                                         paginator="true" paginatorPosition="bottom" rows="5" widgetVar="varPmOrderListgl"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                <p:column headerText="#{msg.creatorUID}" >
+                                    <h:outputText value="#{item.creatorName}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.MaintenanceID}" >
+                                    <p:commandLink ajax="false" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;orderId='.concat(item.id).concat('&amp;queryTab=' .concat(assetInfoDetailController.getQueryTabValue(item))))}" styleClass="p-mr-2">
+                                        <h:outputText value="#{item.pmNum}"/>
+                                    </p:commandLink>
+                                </p:column>
+                                <p:column headerText="#{msg.currentStep}" filterMatchMode="contains" filterBy="#{item.currentStepName}" >
+                                    <f:facet name="filter" >
+                                        <p:selectOneMenu onchange="PF('varPmOrderListgl').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{inspectionServiceController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{item.currentStepName}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.currentPersonUID}" >
+                                    <h:outputText value="#{item.currentPersonName}"/>
+                                </p:column>
+                                <p:column headerText="类型" >
+                                    <h:outputText value="#{(item.ruleLevel == 2 || item.ruleLevel == 3) ? '保养' : item.ruleLevel == 4 ? '质控' : ''}"/>
+                                </p:column>
+                                <p:column headerText="完成时间" >
+                                    <h:outputText value="#{item.endTime}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+                        <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
                             <p:panel  header="盘点记录" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' ) and userContextService.hasCurrentTenantName('')}">
                                 <f:facet name="actions">
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/inventory/inventoryOrderDetailAssetInfoMainAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                 </f:facet>
-                                <p:dataTable var="item" value="#{inspectionServiceController.getInventoryOrderDetailList(assetInfoDetailController.selected.id)}" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataTable var="item" value="#{inspectionServiceController.detailInventoryOrderDetailList}" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="盘点状态" >
                                         <h:outputText value="#{item.status==0?msg.NonInventory:item.status==1?msg.Inventorized:item.status==2?msg.NonLedger:item.status==3?msg.HasIssue:item.status==4?msg.NoWorkOrder:item.status}" />
 
@@ -368,8 +398,8 @@
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/maintainMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl nurseSiteMaintainForm" onclick="PF('nurseSiteMaintainDialog').show()"/>
                                 </f:facet>
-                                <p:dataTable var="item" value="#{maintainController.getMaintainDataList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
-                                             paginator="true" paginatorPosition="both" rows="5"
+                                <p:dataTable var="item" value="#{inspectionServiceController.detailMaintainDataList}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="bottom" rows="5"
                                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                     <p:column styleClass="textCenter"  headerText="计划检查日期" >
@@ -382,9 +412,6 @@
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
                                     </p:column>
-                                    <!--                            <p:column headerText="负责人" >
-                                                                    <h:outputText value="#{item.principal}"/>
-                                                                </p:column>-->
                                     <p:column headerText="检查人" >
                                         <h:outputText value="#{item.checker}"/>
                                     </p:column>
@@ -396,8 +423,8 @@
                             <c:choose>
                                 <c:when test="#{userContextService.accessContainsApmFeature('NURSESITE_USING')}">
                                     <p:panel  header="使用登记记录" id="B">
-                                        <p:dataTable id="usingRecordeList" var="item" value="#{assetOperationRecordController.getAssetOperationRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
-                                                     paginator="true" paginatorPosition="both" rows="5"
+                                        <p:dataTable id="usingRecordeList" var="item" value="#{inspectionServiceController.detailAssetOperationRecordList}" emptyMessage="#{msg.noRecordFound}"
+                                                     paginator="true" paginatorPosition="bottom" rows="5"
                                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Toolbar}"
                                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                             <p:column headerText="住院号">
@@ -435,8 +462,8 @@
                                             <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
                                         </f:facet>
 
-                                        <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
-                                                     paginator="true" paginatorPosition="both" rows="5"
+                                        <p:dataTable var="item" value="#{inspectionServiceController.detailAssetOptRecordList}" emptyMessage="#{msg.noRecordFound}"
+                                                     paginator="true" paginatorPosition="bottom" rows="5"
                                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                             <p:column headerText="开机时间" >
@@ -464,9 +491,36 @@
                                 </c:otherwise>
                             </c:choose>
 
-                            <p:panel  header="不良事件记录" >
+                            <p:panel header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <f:facet name="actions">
+                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/measuring/measuringResultMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                                </f:facet>
+                                <p:dataTable var="item" value="#{inspectionServiceController.detailMeasureAssetList}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="bottom" rows="5"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                    <p:column headerText="#{msg.serialNum}">
+                                        <h:outputText value="#{item.serialNum}" />
+                                    </p:column>
+                                    <p:column headerText="计量证书编号">
+                                        <h:outputText value="#{item.meteringNO}" />
+                                    </p:column>
+                                    <p:column headerText="检定结论">
+                                        <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}" />
+                                    </p:column>
+                                    <p:column headerText="计量日期">
+                                        <h:outputText value="#{item.checkDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable >
+                            </p:panel>
 
-                                <p:dataTable id="approvalList" value="#{assetAdverseEventsController.lazyModel}"
+                            <p:panel  header="不良事件记录" >
+                                <f:facet name="actions">
+                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" />
+                                </f:facet>
+                                <p:dataTable id="approvalList" value="#{inspectionServiceController.detailAdverseEventList}"
                                              var="item"
                                              widgetVar="assetAdverseEvents"
                                              lazy="true" paginator="true" paginatorPosition="bottom"
@@ -475,8 +529,7 @@
                                              rowKey="#{item.id}" sortMode="single" sortOrder="descending"
                                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  {RowsPerPageDropdown} {Exporters}"
                                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                             rows="5" emptyMessage="#{msg.noRecordFound}"
-                                >
+                                             rows="5" emptyMessage="#{msg.noRecordFound}">
 
                                     <p:column headerText="工单编号" >
                                         <h:outputText value="#{item.workOrderNum}"/>
@@ -511,19 +564,18 @@
                     </h:form>
                     <p:panel  id="approvale"
                               header="设备流程记录"
-                              toggleable="true"
-                              toggleSpeed="500"  widgetVar="approvale"
-                              style="margin-bottom:20px;">
+                              toggleable="true" toggleSpeed="500"
+                              widgetVar="approvale" style="margin-bottom:20px;">
                         <ui:include src="ApprovalProcess.xhtml"/>
                     </p:panel>
 
 
                     <p:panel id="modifyRecordList"
                              header="#{msg.ModifyRecord}"
-                             toggleable="true"
-                             toggleSpeed="500" collapsed="#{assetInfoDetailController.assetChangeHistoryCount > 0 ? false : true}" widgetVar="panel"
+                             toggleable="true" toggleSpeed="500"
+                             collapsed="#{inspectionServiceController.detailAssetChangeHistoryList.size() > 0 ? false : true}" widgetVar="panel"
                              style="margin-bottom:20px;">
-                        <p:dataTable var="item" value="#{assetInfoDetailController.changeHistoryList}"
+                        <p:dataTable var="item" value="#{inspectionServiceController.detailAssetChangeHistoryList}"
                                      emptyMessage="#{msg.noRecordFound}" lazy="true">
                             <ui:include src="ImportantFieldsView.xhtml"/>
                         </p:dataTable>
