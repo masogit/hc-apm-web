@@ -346,6 +346,8 @@ public class ZkbIntegralService {
                 return "合同编辑";
             case "ContractImport" :
                 return "合同导入";
+            case "ScheduleClear" :
+                return "定时任务清理";
             default:
                 return "";
         }
