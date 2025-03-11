@@ -132,6 +132,10 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Setter
     private BigDecimal positiveRate;
 
+    @Getter
+    @Setter
+    private String displayName;
+
     private SystemTemplateService systemTemplateService;
     @Getter
     @Setter
@@ -640,17 +644,25 @@ protected boolean numberField(String fieldName, String filterVal) {
         this.positiveRate=null;
     }
     public void  editBatch(){
-        if(positiveRate.compareTo(BigDecimal.valueOf(100))>0){
-            this.positiveRate=null;
-            WebUtil.addErrorMessage("阳性率不能大于100");
-            return;
+        if(positiveRate!=null){
+            if(positiveRate.compareTo(BigDecimal.valueOf(100))>0){
+                this.positiveRate=null;
+                WebUtil.addErrorMessage("阳性率不能大于100");
+                return;
+            }
         }
         Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-        int count=efficiencyEquipmentInfoRepository.updateBatchPositiveRate(assetUids,positiveRate);
-        if(count>0){
-            WebUtil.addErrorMessage("修改阳性率成功");
+        int count;
+        if(positiveRate!=null){
+             count=efficiencyEquipmentInfoRepository.updateBatch(assetUids,positiveRate,displayName);
         }else{
-            WebUtil.addErrorMessage("修改阳性率失败");
+             count=efficiencyEquipmentInfoRepository.updateBatchDisplayName(assetUids,displayName);
+        }
+
+        if(count>0){
+            WebUtil.addErrorMessage("批量修改成功");
+        }else{
+            WebUtil.addErrorMessage("批量修改失败");
         }
         this.selectedMap = new HashMap<>();
         this.positiveRate=null;

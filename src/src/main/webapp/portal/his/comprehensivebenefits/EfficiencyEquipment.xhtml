@@ -124,6 +124,10 @@
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
+
+                        <p:column headerText="展示名称" filterBy="#{item.displayName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.displayName}"/>
+                        </p:column>
                         <p:column headerText="#{msg.functionType}"  filterBy="#{item.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.functionType}"/>
                         </p:column>

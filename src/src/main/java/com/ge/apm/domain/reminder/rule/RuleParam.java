@@ -31,6 +31,8 @@ public class RuleParam {
 
     private List<String> noticeUser;
 
+    private List<String> customRole;
+
     private String messageType;
 
     private Integer pushType;
