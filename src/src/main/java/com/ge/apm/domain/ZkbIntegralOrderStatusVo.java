@@ -1,6 +1,8 @@
 package com.ge.apm.domain;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 public class ZkbIntegralOrderStatusVo {
@@ -53,5 +55,9 @@ public class ZkbIntegralOrderStatusVo {
      * Submit 代表提交显示按钮
      */
     private String showBtn = "";
+
+    @Getter
+    @Setter
+    private String maintainTips = "";
 
 }
