@@ -206,9 +206,9 @@
                             </h:panelGroup>
 
                             <h:panelGroup id = "hospitalId">
-                                <label class="label">#{msg.hospitalId}*</label>
+                                <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
                                 <p:inputText id="selectedUserOrgName" value="#{assetInstallationController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
-                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" disabled="#{userContextService.accessContainsFunctionMenu('INSTALL_ASSET_OUT_STOCK_EDIT') and assetInstallationController.isChangeDept()}" class="btn btn-sm popupIconButton"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <c:if test="#{assetInfoEditController.isSelect46Account}">
                                         <p:inputText id="assetEditTreeNodeNameFilter" class="treeNodeNameFilter" value="#{assetInfoEditController.treeNodeNameFilter}"/>
@@ -229,8 +229,8 @@
                             </h:panelGroup>
 
                             <h:panelGroup id = "clinicalDeptName">
-                                <label class="label">#{msg.clinicalDeptName}*</label>
-                                <p:autoComplete dropdown="true" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
+                                <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
+                                <p:autoComplete dropdown="true" disabled="#{userContextService.accessContainsFunctionMenu('INSTALL_ASSET_OUT_STOCK_EDIT') and assetInstallationController.isChangeDept()}" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
                                     <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="@(.clinicalOwnerName) @(.parentAssetList)" />
                                     <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="@(.clinicalOwnerName) @(.parentAssetList)" />
                                 </p:autoComplete>

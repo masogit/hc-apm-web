@@ -59,6 +59,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     private UserAccount loginUser;
     private List<SysRole> roles;
+    private List<CustomRole> customRoles;
     private boolean isApm;
     private List<ReminderRule> apmRuleList;
     private String retrieval;
@@ -83,6 +84,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         ruleOrgRepository = WebUtil.getBean(ReminderRuleOrgRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         roles = sysRoleRepository.find();
+        customRoles = uaaService.getTenantCustomRoles(loginUser.getTenantUID());
     }
 
     @Override
@@ -304,6 +306,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     public void setRoles(List<SysRole> roles) {
         this.roles = roles;
     }
+
+
 
     public Boolean getApm() {
         return isApm;
