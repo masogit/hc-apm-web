@@ -103,7 +103,7 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
                     if(ZkbIntegralOrder.OrderTypeEnum.EngineerOnSiteMaintenance.name().equals(selected.getOrderType())){
                         Date date1 = DateUtil.parse("2024/11/22");
                         if(date1.after(zkbContract.getCreatedDate())){
-                            WebUtil.addErrorMessage("该合同需要联系OTR添加 PM active entitlement；","");
+                            zkbIntegralOrderStatusVo.setMaintainTips("该合同需要联系OTR添加 PM active entitlement；");
                         }
                     }
                 }
