@@ -13,15 +13,21 @@
                     <p:panelGrid style="height: 350px; width: 450px; overflow: auto;" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.noticeType eq msg.noticeTypeRole}">
                             <label class="label">#{msg.noticeSetting}<span style="color:red">*</span></label>
-                            <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.noticeUser}" required="true" filter="true" filterMatchMode="contains"
-                                                  label="#{msg.SelectOneMessage}#{fieldMsg.fieldValue('noticeType', 'noticeTypeRole')}" dynamic="true" panelStyle="width: 15rem" scrollHeight="250">
+                            <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.noticeUser}" filter="true" filterMatchMode="contains" updateLabel="true"
+                                                  label="#{msg.SelectOneMessage}#{fieldMsg.fieldValue('noticeType', 'noticeTypeRole')}" dynamic="true" panelStyle="width: 300px" style="width:50%" scrollHeight="250">
                                 <f:selectItems value="#{reminderRuleController.roles}" var="roleItem" itemLabel="#{roleItem.roleDesc}" itemValue="#{roleItem.id}"/>
+                            </p:selectCheckboxMenu>
+                            <br/>
+                            <br/>
+                            <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.customRole}" filter="true" filterMatchMode="contains" updateLabel="true"
+                                                  label="#{msg.SelectOneMessage}#{msg.CustomRole}" dynamic="true" panelStyle="width: 300px" style="width:50%" scrollHeight="250">
+                                <f:selectItems value="#{reminderRuleController.customRoles}" var="customRoleItem" itemLabel="#{customRoleItem.name}" itemValue="#{customRoleItem.id}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.noticeType eq msg.noticeTypeUser}">
                             <label class="label">#{msg.noticeSetting}<span style="color:red">*</span></label>
-                            <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.noticeUser}" required="true" filter="true" filterMatchMode="contains"
-                                                  label="#{msg.SelectOneMessage}#{fieldMsg.fieldValue('noticeType', 'noticeTypeUser')}" dynamic="true" panelStyle="width: 15rem" scrollHeight="250">
+                            <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.noticeUser}" required="true" filter="true" filterMatchMode="contains" updateLabel="true"
+                                                  label="#{msg.SelectOneMessage}#{fieldMsg.fieldValue('noticeType', 'noticeTypeUser')}" dynamic="true" panelStyle="width: 300px" style="width:50%" scrollHeight="250">
                                 <f:selectItems value="#{reminderRuleController.getUserList()}" var="userItem" itemLabel="#{userItem.name}" itemValue="#{userItem.id}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
