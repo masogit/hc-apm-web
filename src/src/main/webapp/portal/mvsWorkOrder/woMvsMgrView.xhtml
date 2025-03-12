@@ -60,20 +60,18 @@
                                 <!-- 基础信息列 -->
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">工单主类型</label>
-                                    <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.mainSubType}"
-                                                   styleClass="value"/>
+                                     <h:outputText value="#{fieldMsg.fieldValues('workOrderEhomeMani', mvsTransactionWorkController.selected.parentKey)}"  styleClass="value"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">工单子类型</label>
-                                    <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.typeCode}"
-                                                   styleClass="value"/>
-                                </h:panelGroup>
+                                    <c:set var="dynamicKey" value="#{mvsTransactionWorkController.selected.typeKey}"/>
+                                    <h:outputText value="#{fieldMsg.fieldValues('workOrderEhome', dynamicKey)}"  styleClass="value"/>
+                                 </h:panelGroup>
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">工程师</label>
                                     <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.engineer}"
                                                    styleClass="value"/>
                                 </h:panelGroup>
-
                                 <!-- 编号状态列 -->
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">工单编号</label>
@@ -82,17 +80,13 @@
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">工单状态</label>
-                                    <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.status}"
-                                                   styleClass="value status-#{mvsTransactionWorkController.selected.workOrderDTO.status.toLowerCase()}"/>
+                                    <h:outputText value="#{fieldMsg.fieldValues('woStatusEhome', mvsTransactionWorkController.selected.workOrderDTO.status)}"  styleClass="value"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">创建人</label>
                                     <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.ownerName}"
                                                    styleClass="value"/>
-                                </h:panelGroup>
-
-                                <!-- 时间信息列 -->
-                                <h:panelGroup styleClass="field-group">
+                                </h:panelGroup> <h:panelGroup styleClass="field-group">
                                     <label class="label">开单时间</label>
                                     <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.creationTime}">
                                         <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
@@ -110,25 +104,11 @@
                                         <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
                                     </p:outputLabel>
                                 </h:panelGroup>
-
-                                <!-- 设备与工时列 -->
-                                <h:panelGroup styleClass="field-group">
-                                    <label class="label">备机开启时间</label>
-                                    <p:outputLabel value="#{empty mvsTransactionWorkController.selected.workOrderDTO.backupStartTime ? '无' : mvsTransactionWorkController.selected.workOrderDTO.backupStartTime}">
-                                        <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"
-                                                           rendered="#{not empty mvsTransactionWorkController.selected.workOrderDTO.backupStartTime}"/>
-                                    </p:outputLabel>
-                                </h:panelGroup>
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">总工时(小时)</label>
-                                    <p:outputLabel value="#{empty mvsTransactionWorkController.selected.workOrderDTO.workHour ? '无' : mvsTransactionWorkController.selected.workOrderDTO.workHour}"
+                                    <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.workHour}"
                                                    styleClass="value"/>
                                 </h:panelGroup>
-                                <h:panelGroup styleClass="field-group">
-                                    <label class="label">计划开始时间</label>
-                                    <p:outputLabel value="无" styleClass="value"/>
-                                </h:panelGroup>
-
                                 <!-- 描述信息列（长文本特殊处理） -->
                                 <h:panelGroup styleClass="field-group full-width">
                                     <label class="label">问题描述P</label>
@@ -176,26 +156,15 @@
                               <h:panelGroup rendered="#{not empty mvsTransactionWorkController.selected.partsContextData}">
                                 <label class="label">#{msg.UsedPart}</label>
                                 <p:dataTable id="x3" class="cl3" value="#{mvsTransactionWorkController.selected.partsContextData}" var="detailItem">
-
-                                        <!-- 已存在字段 -->
-                                        <p:column headerText="备件名称">
+                                         <p:column headerText="备件名称">
                                             <h:outputText value="#{detailItem.partName}" />
                                         </p:column>
-
-                                        <!-- 补全字段 -->
-                                        <p:column headerText="备件描述">
+                                         <p:column headerText="备件描述">
                                             <h:outputText value="#{detailItem.partDescription}" />
                                         </p:column>
-
                                         <p:column headerText="数量">
                                             <h:outputText value="#{detailItem.quantity}" />
                                         </p:column>
-
-                                        <p:column headerText="实际使用数量">
-                                            <!-- 不存在字段留空 -->
-                                            <h:outputText value="" />
-                                        </p:column>
-
                                         <p:column headerText="备件序列号">
                                             <h:outputText value="#{detailItem.partSerialNum}" />
                                         </p:column>
@@ -234,14 +203,8 @@
                                 <p:dataTable  value="#{mvsTransactionWorkController.selected.hoursContextData}" var="coWorkerItem" lazy="false" paginator="false"
                                               rowKey="#{coWorkerItem.recordId}"  rows="1000" emptyMessage="#{msg.noRecordFound}" >
                                     <p:column headerText="工时类型">
-                                        <h:outputText value="#{coWorkerItem.workType}"/>
+                                         <h:outputText value="#{fieldMsg.fieldValues('workOrderHoursTypeEhome', coWorkerItem.type)}"  styleClass="value"/>
                                     </p:column>
-
-                                    <!-- 新增列 -->
-                                    <p:column headerText="工时/等待">
-                                        <h:outputText value="#{coWorkerItem.workType eq 'WAITING' ? '等待' : '工时'}"/>
-                                    </p:column>
-
                                     <p:column headerText="开始时间">
                                         <h:outputText value="#{coWorkerItem.startTime}">
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
@@ -253,19 +216,12 @@
                                          </h:outputText>
                                     </p:column>
                                  <p:column headerText="工时(小时)">
-                                     <h:outputText value="#{coWorkerItem.durationHours}">
+                                     <h:outputText value="#{coWorkerItem.workingHours}">
                                          <f:convertNumber maxFractionDigits="2"/>
                                      </h:outputText>
                                  </p:column>
-
                                  <p:column headerText="备注">
-                                     <h:outputText value="#{coWorkerItem.workTag}"/>
-                                 </p:column>
-
-                                 <p:column headerText="工程师">
-                                     <h:outputText value="#{coWorkerItem.creatorId}"/>
-                                     <!-- 若需要显示姓名而非ID，可替换为： -->
-                                     <!-- <h:outputText value="#{userService.getName(coWorkerItem.creatorId)}"/> -->
+                                     <h:outputText value="#{coWorkerItem.tag}"/>
                                  </p:column>
                                 </p:dataTable>
                             </h:panelGroup>

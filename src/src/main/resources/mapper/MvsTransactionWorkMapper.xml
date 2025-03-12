@@ -26,18 +26,33 @@
     <result property="createdBy" column="created_by"/>
     <result property="createdDate" column="created_date"/>
     <result property="modifiedDate" column="modified_date"/>
-
- </resultMap>
-<!-- 查询优化建议 -->
-<select id="loadData" resultMap="eHomeTransactionWorkOrderMap">
-    SELECT
-        id, ucm_id, sr_id, sr_num,
-        total_man_hour, pat_problems, pat_actions, pat_tests,
-        status, current_person_name, type_key, parent_key,
-        close_time, comment, sr_context, wo_context,
-        attachments_context, parts_context, hours_context,
-        created_by, created_date, modified_date
-    FROM mvs_transaction_work_order
-</select>
+</resultMap>
+    <!-- 查询优化建议 -->
+    <select id="loadData" resultMap="eHomeTransactionWorkOrderMap">
+        SELECT
+            id, ucm_id, sr_id, sr_num,
+            total_man_hour, pat_problems, pat_actions, pat_tests,
+            status, current_person_name, type_key, parent_key,
+            close_time, comment, sr_context, wo_context,
+            attachments_context, parts_context, hours_context,
+            created_by, created_date, modified_date
+        FROM mvs_transaction_work_order
+        WHERE 1=1
+        <if test="srNum != null">
+            and sr_Num like concat('%', #{srNum}, '%')
+        </if>
+        <if test="status != null ">
+            and status = #{status}
+        </if>
+        <if test="typeKey != null ">
+            and type_key = #{typeKey}
+        </if>
+        <if test="msgKeyArray != null and msgKeyArray.length > 0">
+            and  type_key IN
+            <foreach item="item" index="index" collection="msgKeyArray" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 
 </mapper>

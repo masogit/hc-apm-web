@@ -5562,3 +5562,150 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('trainMvsStatus','Closed','已关单','Closed',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('trainMvsStatus','Processed','已完成','Processed',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('trainMvsStatus','Pending','待完成','Pending',NULL,-1);
+
+
+-- 维修工单模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','XCWX','现场维修','Field Maintenance',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','YCZC','远程支持','Remote Support',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','JSZC','技术支持','Technical Support',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','WXPT','维修陪同','Maintenance Escort',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','ZBWC','转包/外采','Subcontract/External Procurement',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','WX-OJT','OJT','OJT',NULL,-1);
+
+-- 入保前评估模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','RBQPG-1','入保前评估','Pre-insurance Assessment',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','RBQPG-JT','OJT','OJT',NULL,-1);
+
+-- 销售支持模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','XSZC-1','销售支持','Sales Support',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','KHZC-XJ','客户支持-巡检','Customer Support - Inspection',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','KHZC-ZK','客户支持-质控','Customer Support - Quality Control',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','KHZC-BY','客户支持-保养','Customer Support - Maintenance',NULL,-1);
+
+-- 保养模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','BZBY','标准保养','Standard Maintenance',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','SDBY','深度保养','Deep Maintenance',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','BY-OJT','OJT','OJT',NULL,-1);
+
+-- 巡检模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','XJ-1','巡检','Inspection',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','XJ-OJT','OJT','OJT',NULL,-1);
+
+-- 质控模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','ZK-1','质控','Quality Control',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','ZK-OJT','OJT','OJT',NULL,-1);
+
+-- 非维修工作模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','BWZC','非维修类事务','Non-maintenance Tasks',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','GEFEZC','GE FE支持','GE FE Support',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','APMZC','APM支持','APM Support',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','PD','盘点','Inventory Check',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','QT-2','其他','Other',NULL,-1);
+
+-- 强检模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','QJ','强检','Mandatory Inspection',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','JL-OJT','OJT','OJT',NULL,-1);
+
+-- 培训模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','YYPX','应用培训','Application Training',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','YSXJPX','医师巡检培训','Physician Inspection Training',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','EHSAQJC','EHS检查','EHS Inspection',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','EHSLLJJ','EHS培训','EHS Training',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','PX-OJT','OJT','OJT',NULL,-1);
+
+-- 客户拜访与服务报告
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','KHBF','客户拜访','Customer Visit',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','FWBG','服务报告','Service Report',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','PMOGL-OJT','OJT','OJT',NULL,-1);
+
+-- 其他模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','QT-1','其他','Other',NULL,-1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','QT-OJT','OJT','OJT',NULL,-1);
+
+-- 巡场模块
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhome','XC-1','巡场','Site Patrol',NULL,-1);
+
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'WX', '维修', 'Maintenance', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'RBQPG', '入保前评估', 'Pre-insurance Assessment', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'XSZC', '商务支持', 'Business Support', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'BY', '保养', 'Preventive Maintenance', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'XJ', '巡检', 'Inspection', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'ZK', '质控', 'Quality Control', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'XWXGZ', '事务性工作', 'Transactional Work', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'JL', '计量', 'Calibration', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'PX', '培训', 'Training', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'PMOGL', 'PMO管理', 'PMO Management', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'QT', '其他', 'Other', NULL, -1);
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderEhomeMani', 'XC', '巡场', 'Site Patrol', NULL, -1);
+
+-- 工单状态国际化配置
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('woStatusEhome','Open','进行中','In Progress',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('woStatusEhome','Cancelled','已取消','Cancelled',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('woStatusEhome','Closed','已完成','Completed',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('woStatusEhome','Pending','已关单','Pending Closure',NULL,-1);
+
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','1','设备不清晰','Device Unclear',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','2','IOU/Support biz','IOU/Support Business',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','3','内部支持','Internal Support',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','4','GE FE支持','GE FE Support',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','5','保外支持','Out-of-Warranty Support',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','6','acct级别服务','Account-Level Service',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','7','巡场','Site Patrol',NULL,-1);
+
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('reportTypeAcctEhome','8','Precheck','Pre-inspection',NULL,-1);
+
+
+
+
+
+
+-- 工时类型 - 差旅
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('workOrderHoursTypeEhome', '1', '差旅', 'Travel', NULL, -1);
+
+-- 工时类型 - 工作
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('workOrderHoursTypeEhome', '2', '工作', 'Work', NULL, -1);
+
+-- 工时类型 - 备件等待
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('workOrderHoursTypeEhome', '3', '备件等待', 'Spare Parts Waiting', NULL, -1);
+
+-- 工时类型 - 设备观察
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('workOrderHoursTypeEhome', '4', '设备观察', 'Equipment Monitoring', NULL, -1);
+
+-- 工时类型 - 远程预判
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('workOrderHoursTypeEhome', '5', '远程预判', 'Remote Diagnosis', NULL, -1);
+
+-- 工时类型 - 寄修
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('workOrderHoursTypeEhome', '6', '寄修', 'Mail-in Repair', NULL, -1);
+
+-- 工时类型 - 商务确认
+      INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
+      VALUES ('workOrderHoursTypeEhome', '7', '商务确认', 'Business Confirmation', NULL, -1);
