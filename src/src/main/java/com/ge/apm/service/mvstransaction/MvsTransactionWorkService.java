@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -16,8 +17,8 @@ public class MvsTransactionWorkService {
 
     @Autowired
     MvsTransactionWorkMapper mvsTransactionWorkMapper;
-    public List<EHomeTransactionWorkOrder> loadData( ) {
-        return mvsTransactionWorkMapper.loadData(new HashMap<>());
+    public List<EHomeTransactionWorkOrder> loadData(Map<String, Object> params ) {
+        return mvsTransactionWorkMapper.loadData(params);
     }
 
 

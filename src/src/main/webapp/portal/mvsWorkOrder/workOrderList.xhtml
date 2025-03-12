@@ -11,66 +11,71 @@
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="MVS院级工单"/>
             </div>
-        <div class="ui-g-12 ">
-            <div class="ui-g-12 card">
-                <h:form id="woMvsMgrListForm">
-                    <p:dataTable id="datalist"  var="item" value="#{mvsTransactionWorkController.lazyModel}" widgetVar="varDataList" selectionMode="single"
-                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"  selection="#{mvsTransactionWorkController.selected}"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500" >
-                        <p:ajax event="rowSelect" listener="#{mvsTransactionWorkController.onSelectWorkOrder}" update = ":woMvsMgrDetailForm" />
-                        <p:column headerText="工单状态" filterBy="#{item.mvsIbMapping.assetInfo.name}" filterMatchMode="LIKE">
-                             <h:outputText value="#{fieldMsg.fieldValues('woStatusEhome', item.status)}"/>
-                        </p:column>
-                        <p:column headerText="工单类型"    filterBy="#{item.pmType}" filterMatchMode="EQ">
-                            <!--<f:facet name="filter" >
-                                <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>-->
-                            <c:set var="dynamicKey" value="#{item.parentKey}_#{item.typeKey}"/>
-                            <h:outputText value="#{fieldMsg.fieldValues('workOrderEhome', dynamicKey)}"/>
-                         </p:column>
+            <div class="ui-g-12 ">
+                <div class="ui-g-12 card">
+                    <h:form id="woMvsMgrListForm">
+                        <p:dataTable id="datalist"  var="item" value="#{mvsTransactionWorkController.lazyModel}" widgetVar="varDataList" selectionMode="single"
+                                     lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"  selection="#{mvsTransactionWorkController.selected}"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500" >
+                            <p:ajax event="rowSelect" listener="#{mvsTransactionWorkController.onSelectWorkOrder}" update = ":woMvsMgrDetailForm" />
+                            <p:ajax event="filter" listener="#{mvsTransactionWorkController.onFilter}" />
+                            <p:column headerText="工单状态" filterBy="#{item.status}" filterMatchMode="EQ">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()"    >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('woStatusEhome')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{fieldMsg.fieldValues('woStatusEhome', item.status)}"/>
+                            </p:column>
+                            <p:column headerText="工单类型"    filterBy="#{item.typeKey}" filterMatchMode="EQ">
+                                <f:facet name="filter" >
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{mvsTransactionWorkController.i18nMessageListWorkOrderType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <c:set var="dynamicKey" value="#{item.typeKey}"/>
+                                <h:outputText value="#{fieldMsg.fieldValues('workOrderEhome', dynamicKey)}"/>
+                             </p:column>
 
-                        <p:column headerText="SR编号">
-                            <h:outputText value="#{item.srNum}"/>
-                        </p:column>
+                            <p:column headerText="SR编号" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.srNum}"/>
+                            </p:column>
 
-                        <p:column headerText="工单编号">
-                            <h:outputText value="#{item.workOrderDTO.workOrderNumber}"/>
-                        </p:column>
+                            <p:column headerText="工单编号"  >
+                                <h:outputText value="#{item.workOrderDTO.workOrderNumber}"/>
+                            </p:column>
 
-                        <p:column headerText="工单Owner">
-                            <h:outputText value="#{item.workOrderDTO.ownerName}"/>
-                        </p:column>
+                            <p:column headerText="工单Owner"  >
+                                <h:outputText value="#{item.workOrderDTO.ownerName}"/>
+                            </p:column>
 
-                        <p:column headerText="故障描述">
-                            <h:outputText value="#{item.maintenanceOrderDTO.faultDesc}"/>
-                        </p:column>
-                        <p:column headerText="接单时间">
-                            <h:outputText value="#{item.maintenanceOrderDTO.acceptanceTime}">
-                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="客户姓名">
-                           <h:outputText value="#{item.maintenanceOrderDTO.customerName}"/>
-                        </p:column>
-                        <p:column headerText="报修时间">
-                           <h:outputText value="#{item.maintenanceOrderDTO.requestTime}">
-                               <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                            </h:outputText>
-                        </p:column>
-                     </p:dataTable>
-                </h:form>
-                <ui:include src="woMvsMgrView.xhtml"/>
-
+                            <p:column headerText="故障描述"  >
+                                <h:outputText value="#{item.maintenanceOrderDTO.faultDesc}"/>
+                            </p:column>
+                            <p:column headerText="接单时间">
+                                <h:outputText value="#{item.maintenanceOrderDTO.acceptanceTime}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="客户姓名" >
+                               <h:outputText value="#{item.maintenanceOrderDTO.customerName}"/>
+                            </p:column>
+                            <p:column headerText="报修时间">
+                               <h:outputText value="#{item.maintenanceOrderDTO.requestTime}">
+                                   <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                         </p:dataTable>
+                    </h:form>
+                    <ui:include src="woMvsMgrView.xhtml"/>
+                </div>
             </div>
-        </div>
-
         </div>
     </ui:define>
 </ui:composition>
