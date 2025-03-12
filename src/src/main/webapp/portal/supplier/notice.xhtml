@@ -77,7 +77,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">通知内容<span style="color:red">*</span></label>
-                        <p:inputTextarea id="noticeContent" value="#{venderNoticeController.selected.noticeContent}" maxlength="256" required="true" requiredMessage="通知内容 #{msg.ValidationRequire}"/>
+                        <p:inputTextarea id="noticeContent" value="#{venderNoticeController.selected.noticeContent}" style="width: 80%" maxlength="256" required="true" requiredMessage="通知内容 #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:commandButton validateClient="true" actionListener="#{venderNoticeController.saveSubmit}" value="#{msg.Save}" update="supplierTab:VenderNoticeForm:datalist2 :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'VenderNoticeEditDialog');"/>
