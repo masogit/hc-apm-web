@@ -603,6 +603,7 @@ public class WordReportExportService {
         Map<String, Object> sectionsMap = new HashMap<>();
 
         List<Object> sections = new ArrayList<>();
+        List<String> objects1 = new ArrayList<>();
         for (NurseSiteMaintainItem nurseSiteMaintainItem : nurseSiteMaintainItemList) {
             Map<String, Object> checkItemMap = new HashMap<>();
             String itemDetail = configMap.get(nurseSiteMaintainItem.getConfigId());
@@ -618,8 +619,10 @@ public class WordReportExportService {
                 itemTitleMap.put("checkItem",checkItem);
                 itemTitleList.add(itemTitleMap);
             }
-            items.add("日期");
-            items.addAll(checkItems);
+
+            objects1 = new ArrayList<>();
+            objects1.add("日期");
+            objects1.addAll(checkItems);
             checkItemMap.put("checkItems",itemTitleList);
 
             AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
@@ -659,6 +662,7 @@ public class WordReportExportService {
         sectionsMap.put("sections",sections);
         String dataStr = DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS");
         sectionsMap.put("exportDate","导出时间:"+dataStr);
+        items.addAll(objects1);
         return sectionsMap;
     }
 
