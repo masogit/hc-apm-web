@@ -1,19 +1,15 @@
 package com.ge.apm.service.budget;
 
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.data.PictureRenderData;
-import com.deepoove.poi.data.TextRenderData;
-import com.deepoove.poi.data.style.Style;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.domain.budget.PurchaseOrderInfo;
-import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.FileDownloadService;
-import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -27,10 +23,8 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import java.io.*;
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -121,7 +115,7 @@ public class BudgetApplicationExportService {
         Map<String, Object> data = createReportData(budgetApplicationAsset, budgetApplication);
 //        byte[] templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
 
-        byte[] templateBytes =fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getCode(), SystemTemplate.SystemTemplateEnum.OVER_FIFTY_THOUSAND.getFileType());
+        byte[] templateBytes =fileDownloadService.getTemplateFileByte(SystemTemplateEnum.OVER_FIFTY_THOUSAND.getCode(), SystemTemplateEnum.OVER_FIFTY_THOUSAND.getFileType());
 
         /*if(budgetApplicationAsset.getApplicationAmount().compareTo(new BigDecimal(TOTAL_SPLIT)) > 0){
             templateBytes = buildReportTemplate(OVER_FIFTY_THOUSAND);
@@ -307,21 +301,24 @@ public class BudgetApplicationExportService {
     }
 
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
-             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            //template.registerPolicy("arrival_item", new ArrivalItemTableRenderPolicy());
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if (template != null) {
-                template.close();
-            }
-        }
-        return bytes;
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try(ByteArrayOutputStream out = new ByteArrayOutputStream();
+//             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+//            template = XWPFTemplate.compile(inputStream);
+//            //template.registerPolicy("arrival_item", new ArrivalItemTableRenderPolicy());
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        }finally {
+//            if (template != null) {
+//                template.close();
+//            }
+//        }
+//        return bytes;
+
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        return  WordExportServiceUtil.generate(data, templateBytes, bindings);
     }
 
     private String buildFileName(Map<String, Object> data, boolean isEncoding,String orderType){

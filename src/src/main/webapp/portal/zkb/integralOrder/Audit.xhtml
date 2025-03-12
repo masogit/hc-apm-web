@@ -215,6 +215,10 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">合同号*</label>
+                            <p:inputText value="#{zkbIntegralOrderAuditController.selected.contractNo}"  disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">数量*</label>
                             <p:inputText value="#{zkbIntegralOrderAuditController.selected.qty}"  disabled="true" />
                         </h:panelGroup>
@@ -255,6 +259,14 @@
                             <p:inputTextarea id="receiverAddress" value="#{zkbIntegralOrderAuditController.selected.receiverAddress}" disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
+
+                    <h:panelGroup rendered="#{(zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed') and zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox'}">
+                        <p:dataList id="uploadList" value="#{zkbIntegralOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">合同附件上传</f:facet>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        </p:dataList>
+
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset legend="工程师资质审批" rendered="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showEngineer}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -299,7 +311,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">区域经理审批备注（是否上过培训课）</label>
+                            <label class="label">区域经理审批备注</label>
                             <p:inputTextarea id="manageRemark" value="#{zkbIntegralOrderAuditController.selected.manageRemark}" rows="4" cols="60" disabled="#{!(zkbIntegralOrderAuditController.selected.currentStep eq 'ManagePending')}">
                             </p:inputTextarea>
                         </h:panelGroup>
@@ -323,7 +335,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="orderedFieldset" legend="400派工" rendered="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showOrder}">
-                    <p:panelGrid id="orderedGrid" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid id="orderedGrid" columns="#{zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox' ? 2 :3}" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <c:if test="#{!(zkbIntegralOrderAuditController.selected.status eq 'OrderedReject') and !(zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox')}">
                             <h:panelGroup >
                                 <label class="label">SR#*</label>
@@ -350,6 +362,13 @@
                             </h:panelGroup>
                         </c:if>
                         <c:if test="#{!(zkbIntegralOrderAuditController.selected.status eq 'OrderedReject') and zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox'}">
+                            <c:if test="#{(zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed') and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}">
+                                <h:panelGroup>
+                                    <p:outputLabel style="color: red; " value="请审核上传的附件是否符合订购要求，CCS和Biomed合同要求合同里注明积分兑换活动" />
+                                    <p:commandLink validateClient="false" immediate="false" process="@this" value="查看示例" oncomplete="PF('showSampleDlg').show()" />
+                                </h:panelGroup>
+                                <h:panelGroup></h:panelGroup>
+                            </c:if>
                             <h:panelGroup>
                                 <label class="label">Order#*</label>
                                 <p:inputText value="#{zkbIntegralOrderAuditController.selected.orderNo}" disabled="#{!(zkbIntegralOrderAuditController.selected.currentStep eq 'OrderPending' and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag)}" required="true" requiredMessage="订单号 #{msg.ValidationRequire}"/>
@@ -386,5 +405,10 @@
 
             </h:form>
         </div>
+        <p:dialog id="showSampleDlg" widgetVar="showSampleDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="查看示例" height="320">
+            <p:graphicImage url="image.png" style="width: 800px; height: 300px;"/>
+
+        </p:dialog>
+
     </ui:define>
 </ui:composition>

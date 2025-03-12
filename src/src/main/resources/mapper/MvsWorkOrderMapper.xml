@@ -18,6 +18,7 @@
         <result property="status" column="status"/>
         <result property="intExtType" column="int_ext_type"/>
         <result property="parentWoId" column="parent_wo_id"/>
+        <result property="ackSignature" column="ack_signature"/>
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>
             <result property="name" column="asset_name"/>
@@ -52,6 +53,10 @@
             <result property="customerPosition" column="sr_customer_position"/>
             <result property="status" column="sr_status"/>
         </association>
+        <collection property="v2_workOrder_detail_list" ofType="com.ge.apm.domain.V2_WorkOrder_Detail">
+            <id property="id" column="step_id"/>
+            <result property="woId" column="wo_id"/>
+        </collection>
     </resultMap>
     <select id="loadData" resultMap="v2_WorkOrderMap">
         SELECT T.*,
@@ -86,9 +91,9 @@
         a.uid AS asset_uid
         FROM v2_work_order T
         inner JOIN v2_service_request vs on T.sr_id = VS.ID
-        LEFT JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid
-        LEFT JOIN mvs_ib_mapping m2 ON T.asset_uid = m2.e_home_ib_uid AND m1.ib_id IS NULL
-        LEFT JOIN asset_info a ON COALESCE(m1.ib_id, m2.ib_id) = a.id
+        inner JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
+        inner JOIN asset_info a ON m1.ib_id = a.id
+        left JOIN v2_work_order_detail ws ON T.id = ws.wo_id
         WHERE 1=1
         <if test="srNum != null">
             and vs.sr_Num like concat('%', #{srNum}, '%')

@@ -125,4 +125,14 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
 
     @Query(value = "select sag.* from asset_type_group sag where sag.parent_uid is null and tenant_uid=?1", nativeQuery = true)
     List<AssetTypeGroup> getTopAuthGroupAndTenantUid(String tenantUid);
+
+    @Query(value = "with recursive cte_child_auth_group as (\n" +
+            "    select sag.uid, sag.asset_group, sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid from asset_type_group sag where tenant_uid = ?1 and encoded in (?2) \n" +
+            "    union all \n" +
+            "    select sag.uid, sag.asset_group, sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid from asset_type_group sag\n" +
+            "    inner join cte_child_auth_group cte_child\n" +
+            "    on sag.uid = cte_child.parent_uid where sag.tenant_uid = ?1\n" +
+            ") \n" +
+            "select distinct * from cte_child_auth_group where parent_uid is null\n", nativeQuery = true)
+    List<AssetTypeGroup> listParentAssetTypeGroupByEncodeds(String tenantUid, Collection<String> encodeds);
 }

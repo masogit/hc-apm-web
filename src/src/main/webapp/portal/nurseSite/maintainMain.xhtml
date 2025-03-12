@@ -2,6 +2,12 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 	<ui:define name="head">
 		<h:outputStylesheet name="css/inspection.css" />
+		<style>
+			.schedule-item-nopass-partialpass {
+				color: white !important;
+				background-color: #7022f6 !important;
+			}
+		</style>
 	</ui:define>
 	<ui:define name="content">
 		<div class="ui-g">
@@ -30,8 +36,9 @@
 						<tr style="background-color: #90EE90"><td style="color: black ;float: left">　　通　过，未延期，有备注</td></tr>    <!--	5 -->
 						<tr  style="background-color: #FFFFE0" ><td style="color: black ;float: left">　　通　过，延　期，无备注</td></tr>  <!--	7 -->
 						<tr  style="background-color: #FFD700"><td style="color: black ;float: left">　　通　过，延　期，有备注</td></tr> <!--	6 -->
-						<tr style="background-color: #FFC0CB"><td style="color: black ;float: left">　　有问题，未延期</td></tr>   <!--	8 -->
-						<tr style="background-color: #FF0000"><td style="color: whitesmoke;float: left">　　有问题，延　期</td></tr>    <!--	3-->
+						<tr  style="background-color: #7022f6"><td style="color: whitesmoke ;float: left">　　有问题，进行中</td></tr> <!--	6 -->
+						<tr style="background-color: #FFC0CB"><td style="color: black ;float: left">　　有问题，已完成，未延期</td></tr>   <!--	8 -->
+						<tr style="background-color: #FF0000"><td style="color: whitesmoke;float: left">　　有问题，已完成，延　期</td></tr>    <!--	3-->
 					</table>
 				</div>
                 </div>

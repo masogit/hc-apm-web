@@ -183,4 +183,7 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Query(value = "SELECT DISTINCT item.* FROM nurse_site_maintain_item item LEFT JOIN nurse_site_maintain_data itemdata ON item.id = itemdata.parent_id WHERE item.asset_uid in (?1)  AND itemdata.check_value IS NULL ",nativeQuery = true)
 	public List<NurseSiteMaintainItem> findNoCheckedByAssetUidIn(List<String> assetUid);
 
+
+	@Query(value="select exists (select 1 from nurse_site_maintain_item o where o.parent_id=?1 and ( o.is_finish = false or o.is_finish is null ))",nativeQuery=true)
+	boolean findUnCheck(String id);
 }

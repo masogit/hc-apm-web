@@ -7,6 +7,8 @@ import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.MvsWorkOrderMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FileInfoResult;
+import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.AssetFaultTypeService;
@@ -17,7 +19,9 @@ import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.pm.V2PmOrderController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -29,6 +33,7 @@ import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -47,7 +52,10 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+
 
 /**
  *
@@ -69,6 +77,10 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private Integer queryIndex;
     private AssetFaultTypeService assetFaultTypeService;
     private List<AssetTypeGroup> assetTypeGroupList;
+
+    private String messageTip;
+
+    private Map<String, Boolean> selectedMap;
 
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSetMVS;
@@ -93,12 +105,33 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private List<V2_BlobObject> audioList;
     private List<V2_BlobObject> attachList;
 
+    private List<V2_BlobObject> attachListEhme;
+    private List<V2_BlobObject> attachListEhmeFile;
+    private List<V2_BlobObject> attachListEhmeImg;
+
 
     private String requestAssetUid;
     private String queryAssetUid;
     private ConfigCacheService cacheService;
     private OrgInfoTreeService orgInfoTreeService;
     private Map<String, Integer> woStatus = new HashMap<String, Integer>();
+    private FileDownloadService fileDownloadService;
+
+    public List<V2_BlobObject> getAttachListEhmeFile() {
+        return attachListEhmeFile;
+    }
+
+    public void setAttachListEhmeFile(List<V2_BlobObject> attachListEhmeFile) {
+        this.attachListEhmeFile = attachListEhmeFile;
+    }
+
+    public List<V2_BlobObject> getAttachListEhmeImg() {
+        return attachListEhmeImg;
+    }
+
+    public void setAttachListEhmeImg(List<V2_BlobObject> attachListEhmeImg) {
+        this.attachListEhmeImg = attachListEhmeImg;
+    }
 
     private OrgInfo selectSite;
     private CustomConfigObject currentCustomConfig;
@@ -115,9 +148,86 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private UserAccount loginUser;
 
     private ConfigItemValueRepository configItemValueRepository;
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public String getMessageTip() {
+        return  woService.generateMessageTip(selectedMap);
+    }
+
+    public void setMessageTip(String messageTip) {
+        this.messageTip = messageTip;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
+    List<String> woIdList = new ArrayList<String>();
+    public boolean isTargetSelected() {
+        return !selectedMap.isEmpty() && selectedMap.values().contains(true);
+    }
+    public void pick(String itemId){
+        woIdList = new ArrayList<>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                woIdList.add(k);
+
+        });
+    }
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !bySearchFilterMVS.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (V2_WorkOrder item : bySearchFilterMVS) {
+            selectedMap.put(item.getId(), !isSelectedAll);
+        }
+        woIdList = new ArrayList<>();
+        selectedMap.forEach((k, v) -> {
+            if (v == true)
+                woIdList.add(k);
+        });
+    }
+    private StreamedContent maintenanceReport;
+    /**
+     * Getter method for maintenance report.
+     *
+     * @return {@link StreamedContent} object that contains maintenance report.
+     */
+    public StreamedContent getMaintenanceReport() {
+        return maintenanceReport;
+    }
+
+    /**
+     * Setter for maintenance report.
+     *
+     * @param maintenanceReport {@link StreamedContent} object.
+     */
+    public void setMaintenanceReport(StreamedContent maintenanceReport) {
+        this.maintenanceReport = maintenanceReport;
+    }
+
+    /**
+     * Generate maintenance report.
+     */
+    public void doExportWorkOrderReport() {
+        maintenanceReport = null;
+        try {
+            maintenanceReport = woService.generate(selectedMap, loginUser);
+        } catch (BusinessException e) {
+            logger.error("downLoad pm_word BusinessException ",e);
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            logger.error("downLoad pm_word Exception",e);
+            java.util.logging.Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("FailedToGenerateTheMaintenanceReport"));
+        }
+    }
+
     @Override
     protected void init() {
         try {
+            fileDownloadService = WebUtil.getBean(FileDownloadService.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             loginUser = UserContextService.getCurrentUserAccount();
@@ -316,6 +426,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             List<V2_WorkOrder> workOrderList = mvsWorkOrderMapper.loadData(params);
             pageResult = new PageImpl<V2_WorkOrder>(this.pageNum(workOrderList, pageRequest), pageRequest, workOrderList.size());
             bySearchFilterMVS = pageResult.getContent();
+            selectedMap = new HashMap();
             loadMVSClinicalDeptList();
             needTwoSubStatusBatch(pageResult.getContent());
         } catch (Exception e) {
@@ -405,7 +516,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         }
         if (loginUser.isEnableAssetTypeGroup() && !org.apache.commons.collections4.CollectionUtils.isEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-            params.put("assetInfoAssetType", encodedList);
+            params.put("assetInfoAssetType", encodedList.stream().toArray(String[]::new));
         }
         return params;
     }
@@ -437,12 +548,17 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         confirmedDownTime = null;
         selectedWorkOrderList = null;
         picList = null;
-        attachList = null;
+        attachList = new ArrayList<>();
+        attachListEhme = new ArrayList<>();
+        attachListEhmeFile = new ArrayList<>();
+        attachListEhmeImg = new ArrayList<>();
         selectedAsset = null;
         locationName = null;
     }
 
     public void onSelectWorkOrder() {
+        attachListEhmeFile = new ArrayList<>();
+        attachListEhmeImg = new ArrayList<>();
         newServiceRequest = null;
         currentStatus = selected.getAssetInfo().getStatus();
         needConfirmTime = false;
@@ -450,6 +566,47 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         audioList = woService.getPicListBySrUid(selected.getSrId(), 2, null);
         picList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        attachListEhme = blobObjectRepository.findByBoUuidAndBoType(selected.getId(),  V2_BlobObject.BO_SUB_TYPE_EHOME);
+        if(!CollectionUtils.isEmpty(attachListEhme)){
+            Set<String> objectIds = attachListEhme.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
+            List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(objectIds);
+            List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif");
+            if (fileInfoResults == null) {
+                fileInfoResults = new ArrayList<>();
+            }
+            List<FileInfoResult> imageFiles = fileInfoResults.stream()
+                    .filter(result -> result != null && result.getObjectName() != null)
+                    .filter(result -> imageExtensions.stream()
+                            .anyMatch(ext -> result.getObjectName().toLowerCase().endsWith(ext)))
+                    .collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(imageFiles)){
+                attachListEhmeImg = imageFiles.stream()
+                        .filter(result -> result.getObjectId() != null)
+                        .map(result -> {
+                            V2_BlobObject blobObject = new V2_BlobObject();
+                            blobObject.setObjectStorageId(result.getObjectId());
+                            blobObject.setObjectName(result.getObjectName());
+                            return blobObject;
+                        })
+                        .collect(Collectors.toList());
+            }
+            List<FileInfoResult> otherFiles = fileInfoResults.stream()
+                    .filter(result -> result != null && result.getObjectName() != null)
+                    .filter(result -> imageExtensions.stream()
+                            .noneMatch(ext -> result.getObjectName().toLowerCase().endsWith(ext)))
+                    .collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(otherFiles)){
+                attachListEhmeFile = otherFiles.stream()
+                        .filter(result -> result.getObjectId() != null)
+                        .map(result -> {
+                            V2_BlobObject blobObject = new V2_BlobObject();
+                            blobObject.setObjectStorageId(result.getObjectId());
+                            blobObject.setObjectName(result.getObjectName());
+                            return blobObject;
+                        })
+                        .collect(Collectors.toList());
+            }
+        }
     }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
@@ -686,8 +843,6 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         this.newServiceRequest = newServiceRequest;
     }
 
-
-
     public String getLocationName() {
         return locationName;
     }
@@ -695,8 +850,6 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     public void setLocationName(String locationName) {
         this.locationName = locationName;
     }
-
-
 
     public Date getConfirmedDownTime() {
         return confirmedDownTime;
@@ -741,6 +894,14 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
 
     public void setRequestAssetUid(String requestAssetUid) {
         this.requestAssetUid = requestAssetUid;
+    }
+
+    public List<V2_BlobObject> getAttachListEhme() {
+        return attachListEhme;
+    }
+
+    public void setAttachListEhme(List<V2_BlobObject> attachListEhme) {
+        this.attachListEhme = attachListEhme;
     }
 
     public List<V2_BlobObject> getAttachList() {

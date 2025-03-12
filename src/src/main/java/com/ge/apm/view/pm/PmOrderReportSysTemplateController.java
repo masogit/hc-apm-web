@@ -1,7 +1,6 @@
 package com.ge.apm.view.pm;
 
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderReportTemplateRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
@@ -10,6 +9,7 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
@@ -76,7 +76,7 @@ public class PmOrderReportSysTemplateController extends GenericCRUDUUIDControlle
     }
 
     public boolean existsSiteTemplate() {
-        return   systemTemplateService.existsSiteTemplate(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT.getCode(),user.getSiteUID());
+        return   systemTemplateService.existsSiteTemplate(SystemTemplateEnum.PM_ORDER_REPORT.getCode(),user.getSiteUID());
     }
     @Override
     protected GenericRepositoryUUID<SystemTemplateValue> getDAO() {
@@ -87,7 +87,7 @@ public class PmOrderReportSysTemplateController extends GenericCRUDUUIDControlle
     protected Page<SystemTemplateValue> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, user.getSiteUID()));
-        searchFilters.add(new SearchFilter("templateType", SearchFilter.Operator.EQ, SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT.getCode()));
+        searchFilters.add(new SearchFilter("templateType", SearchFilter.Operator.EQ, SystemTemplateEnum.PM_ORDER_REPORT.getCode()));
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
@@ -159,7 +159,7 @@ public class PmOrderReportSysTemplateController extends GenericCRUDUUIDControlle
     public StreamedContent getActiveTemplate() {
 
         try {
-            byte[] activeTemplateBytes = systemTemplateService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT, user);
+            byte[] activeTemplateBytes = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.PM_ORDER_REPORT, user);
             return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
         } catch (IOException e) {
             WebUtil.addErrorMessage("下载模版失败!");
@@ -208,10 +208,10 @@ public class PmOrderReportSysTemplateController extends GenericCRUDUUIDControlle
         selected.setCreateBy(user.getUid());
         selected.setFileName(file.getFileName());
         selected.setStorageId(uploadedFileObject.getObjectStorageId());
-        selected.setTemplateType(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT.getCode());
+        selected.setTemplateType(SystemTemplateEnum.PM_ORDER_REPORT.getCode());
         dao.save(selected);
         uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_SYSTEM_TEMPLATE);
-        uploadedFileObject.setBoSubType(SystemTemplate.SystemTemplateEnum.PM_ORDER_REPORT.getCode());
+        uploadedFileObject.setBoSubType(SystemTemplateEnum.PM_ORDER_REPORT.getCode());
         uploadedFileObject.setBoUuid(selected.getId());
         blobFileService.saveBlobObject(uploadedFileObject);
     }

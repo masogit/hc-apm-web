@@ -1,10 +1,15 @@
 package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
+import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -114,8 +119,13 @@ public class ExportTerminatedAppraisalService {
                 AssetInfo assetInfo = assetInfoMap.get(item);
                 if (assetInfo != null) {
                     try {
-                        byte[] bytes = generate(assetInfo, templateBytes);
-                        if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
+                        Map<String, Object> datas = getData(assetInfo);
+//                        byte[] bytes = generate(assetInfo, templateBytes);
+                        Map<String, RenderPolicy> bindings = new HashMap<>();
+                         bindings.put("list", new AssetScrapConvertRenderPolicy());
+                        byte[] bytes = WordExportServiceUtil.generate(datas, templateBytes, bindings);
+
+                        if (!Arrays.equals(bytes, new byte[0])) {
                             String name = assetInfo.getName() + "-" + "资产报废单" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
@@ -149,21 +159,26 @@ public class ExportTerminatedAppraisalService {
         return data;
     }
 
-    private byte[] generate(AssetInfo assetInfo, byte[] templateBytes) {
-        Map<String, Object> datas = getData(assetInfo);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
-        template.registerPolicy("list", new AssetScrapConvertRenderPolicy());
-
-        template.render(datas);
-        try {
-            template.write(out);
-        } catch (IOException e) {
-            logger.error("报废鉴定报导出失败 generate error:", e);
-            return new byte[0];
-        }
-        return out.toByteArray();
-    }
+//    private byte[] generate(AssetInfo assetInfo, byte[] templateBytes) {
+//        Map<String, Object> datas = getData(assetInfo);
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+////        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
+////        template.registerPolicy("list", new AssetScrapConvertRenderPolicy());
+//
+//        Configure config = Configure.newBuilder()
+//                .bind("list", new AssetScrapConvertRenderPolicy())
+//                .build();
+//        XWPFTemplate   template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes), config);
+//
+//        template.render(datas);
+//        try {
+//            template.write(out);
+//        } catch (IOException e) {
+//            logger.error("报废鉴定报导出失败 generate error:", e);
+//            return new byte[0];
+//        }
+//        return out.toByteArray();
+//    }
 
     public Map<String, Object> getData(AssetInfo assetInfo) {
         Map<String, Object> map = new HashMap<>();
@@ -204,7 +219,7 @@ public class ExportTerminatedAppraisalService {
         }
         byte[] defaultSignatureBytes = getDefaultSignatureBytes();
         String signature="signature.png";
-        map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
+        map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, PictureType.PNG, defaultSignatureBytes));
 //        map.put(approvaAauditSignature1.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
 //        map.put(approvaAauditSignature2.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
 //        map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
@@ -216,7 +231,7 @@ public class ExportTerminatedAppraisalService {
             map.put(approvalResone.name(), assetScrap.getApprovalReason());
             if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
                 byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
-                map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, signature, signatureBytes));
+                map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, PictureType.PNG, signatureBytes));
             }
 //            List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
 

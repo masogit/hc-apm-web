@@ -11,6 +11,7 @@ import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
@@ -394,7 +395,7 @@ public class OrgInfoService {
         List<Map<String, Object>> resultList = new ArrayList<>();
 //        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Org_Template.xlsx");
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        InputStream  stream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ORG_INFO.getCode(), SystemTemplate.SystemTemplateEnum.ORG_INFO.getFileType());
+        InputStream  stream=fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.ORG_INFO.getCode(), SystemTemplateEnum.ORG_INFO.getFileType());
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;

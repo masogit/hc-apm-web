@@ -1,7 +1,7 @@
 package com.ge.apm.service.wo;
 
 import com.alibaba.fastjson.JSONObject;
-import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +10,10 @@ import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +22,6 @@ import org.springframework.stereotype.Component;
 import webapp.framework.context.LocaleHolder;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -40,6 +42,9 @@ public class PmOrderReportTemplateService {
 
     @Autowired
     private BlobFileService blobFileService;
+
+    @Autowired
+    private SystemTemplateService systemTemplateService;
 
 
     public boolean isLocale(){
@@ -68,15 +73,20 @@ public class PmOrderReportTemplateService {
             templateBytes = IOUtils.toByteArray(blobFileService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
-            String fileName = null;
-            if (isLocale()){
-                fileName = "maintenance-template_zh.docx";
-            } else {
-                fileName = "maintenance-template_en.docx";
+//            String fileName = null;
+//            if (isLocale()){
+//                fileName = "maintenance-template_zh.docx";
+//            } else {
+//                fileName = "maintenance-template_en.docx";
+//
+//            }
+//            templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/" + fileName ));
 
-            }
-            templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/" + fileName ));
+            templateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.PM_ORDER_REPORT, user);
+
         }
+
+
         return templateBytes;
     }
 
@@ -147,10 +157,13 @@ public class PmOrderReportTemplateService {
                 }
             }
         }
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
-        template.write(out);
-        return new ByteArrayInputStream(out.toByteArray());
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
+//        template.write(out);
+
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        byte[] generate = WordExportServiceUtil.generate(builder.build().data(), IOUtils.toByteArray(stream), bindings);
+        return new ByteArrayInputStream(generate);
     }
 
     public InputStream generateMeasureReportTemplateByRule(InputStream stream, MeasureOrderRule rule) throws IOException {
@@ -169,10 +182,13 @@ public class PmOrderReportTemplateService {
                 }
             }
         }
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
-        template.write(out);
-        return new ByteArrayInputStream(out.toByteArray());
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
+//        template.write(out);
+
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        byte[] generate = WordExportServiceUtil.generate(builder.build().data(), IOUtils.toByteArray(stream), bindings);
+        return new ByteArrayInputStream(generate);
     }
 
     public InputStream generateReportTemplateBySchemaId(byte[] activeTemplateBytes, String fReportId, String pReportId) throws IOException {
@@ -197,10 +213,13 @@ public class PmOrderReportTemplateService {
                 builder.performanceReport(schema);
             }
         }
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
-        template.write(out);
-        return new ByteArrayInputStream(out.toByteArray());
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
+//        template.write(out);
+//        return new ByteArrayInputStream(out.toByteArray());
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        byte[] generate = WordExportServiceUtil.generate(builder.build().data(), IOUtils.toByteArray(stream), bindings);
+        return new ByteArrayInputStream(generate);
     }
 
     public InputStream updateReportTemplateBySchemaId(InputStream  stream, String fReportId, String pReportId) throws IOException {
@@ -227,10 +246,13 @@ public class PmOrderReportTemplateService {
         data.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(),null);
         data.put(MaintenanceTemplate.Component.CHECK_LIST.toString(),null);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(stream).render(data);
-        template.write(out);
-        return new ByteArrayInputStream(out.toByteArray());
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        XWPFTemplate template = XWPFTemplate.compile(stream).render(data);
+//        template.write(out);
+//        return new ByteArrayInputStream(out.toByteArray());
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        byte[] generate = WordExportServiceUtil.generate(data, IOUtils.toByteArray(stream), bindings);
+        return new ByteArrayInputStream(generate);
     }
 
 

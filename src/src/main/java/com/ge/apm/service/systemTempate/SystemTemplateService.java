@@ -7,6 +7,7 @@ import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.SystemTemplateValue;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class SystemTemplateService {
 
         return systemTemplateMapper.findByKeyAndSiteForUseParentList(templateType,siteUid,hospitalUid,institutionUid,tenantUid);
     }
-    public byte[] getTemplateFileByte(SystemTemplate.SystemTemplateEnum templateEnum , UserAccount user) throws IOException {
+    public byte[] getTemplateFileByte(SystemTemplateEnum templateEnum , UserAccount user) throws IOException {
         List<SystemTemplate> byKeyAndSiteForUseParent = this.findByKeyAndSiteForUseParent(templateEnum.getCode(), user);
         if(CollectionUtils.isNotEmpty(byKeyAndSiteForUseParent)){
             SystemTemplate systemTemplate = byKeyAndSiteForUseParent.get(0);
@@ -57,7 +58,7 @@ public class SystemTemplateService {
     }
 
 
-    public InputStream getTemplateInputStream(SystemTemplate.SystemTemplateEnum templateEnum , UserAccount user) throws IOException {
+    public InputStream getTemplateInputStream(SystemTemplateEnum templateEnum , UserAccount user) throws IOException {
         List<SystemTemplate> byKeyAndSiteForUseParent = this.findByKeyAndSiteForUseParent(templateEnum.getCode(), user);
         if(CollectionUtils.isNotEmpty(byKeyAndSiteForUseParent)){
             SystemTemplate systemTemplate = byKeyAndSiteForUseParent.get(0);

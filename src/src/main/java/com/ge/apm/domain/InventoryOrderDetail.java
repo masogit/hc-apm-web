@@ -9,14 +9,19 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.baomidou.mybatisplus.annotations.TableField;
+import com.ge.apm.service.adverseEvent.AdverseEventDateConverter;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import webapp.framework.web.WebUtil;
+import com.alibaba.excel.annotation.ExcelProperty;
 
 /**
  * Created by 212605082 on 2017/6/19.
@@ -26,121 +31,225 @@ import webapp.framework.web.WebUtil;
 public class InventoryOrderDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @ExcelIgnore
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String id;
-//    @ManyToOne(fetch = FetchType.EAGER)
+    //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumn(name = "inventory_order_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 //    private InventoryOrder inventoryOrder;
+    @ExcelIgnore
     @Column(name = "inventory_order_id")
     private String inventoryOrderId;
+    @ExcelIgnore
     @Column(name = "site_id")
     private Integer siteId;
+    @ExcelIgnore
     @Column(name = "hospital_id")
     private Integer hospitalId;
+
+    @ExcelIgnore
     @Column(name = "qr_code")
     private String qrCode;
+
+    @ExcelProperty(value = "设备编号（院方）",index = 0)
     @Column(name = "depart_num")
     private String departNum;
+    @ExcelIgnore
     @Column(name = "asset_group")
     private Integer assetGroup;
+    @ExcelIgnore
     @Column(name = "asset_group_name")
     private String assetGroupName;
+    @ExcelIgnore
     @Column(name = "org_id")
     private Integer orgId;
+    @ExcelIgnore
     @Column(name = "org_name")
     private String orgName;
+
+    @ExcelProperty(value = "问题描述",index = 10)
     @Column(name = "comment")
     private String comment;
+    @ExcelIgnore
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Fetch(FetchMode.SUBSELECT)
     private List<V2_BlobObject> attachments;
+    @ExcelIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "clinical_dept_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private OrgInfo clinicalDept;
-    
+    @ExcelIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private AssetInfo assetInfo;
     //0:未盘点，1：已盘点，2：无台账, 3:有问题 ,4:无工单
+    @ExcelIgnore
     @Column(name = "status")
     private Integer status;
-    
+
+    @ExcelIgnore
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     @Size(max = 32)
     private String tenantUID;
 
+    @ExcelIgnore
     @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
     private String institutionUID;
 
+    @ExcelIgnore
     @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
     private String hospitalUID;
 
+    @ExcelIgnore
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-    
+
+    @ExcelIgnore
     @Column(name = "last_modified_by", length = 50)
     private String lastModifiedBy;
 
+    @ExcelIgnore
     @Column(name = "last_modified_date")
     private Date lastModifiedDate ;
 
+    @ExcelIgnore
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
+
+
+    @ExcelProperty(value = "所属科室",index = 3)
     @Size(max = 64)
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;
 
+    @ExcelIgnore
     @Column(name = "asset_type", length = 50)
     private String assetType;
 
+    @ExcelIgnore
     @Column(name = "is_last")
     private Boolean isLast;
 
+    @ExcelProperty(value = "未通过项",index = 11)
     @Transient
     private String inventoryCheckListItems;
 
+    @ExcelProperty(value = "已解决",index = 12)
     @Transient
     private String isSolved;
 
+    @ExcelIgnore
     @Transient
     private Date planEndTime;
 
+    @ExcelIgnore
     @Transient
     private Date planStartTime;
 
+    @ExcelIgnore
     @Transient
     @Getter @Setter
     private Integer assetId;
 
+
+    @ExcelProperty(value = "设备型号",index = 2)
     @Transient
     @Getter @Setter
     private String functionType;
 
+    @ExcelIgnore
     @Transient
     @Getter @Setter
     private String financingNum;
 
+    @ExcelIgnore
     @Transient
     @Getter @Setter
     private String assetStatus;
 
+
+    @ExcelProperty(value = "采购价格",index = 5)
+    @Transient
+    @Getter @Setter
+    private Double purchasePrice;//采购价格(元)
+
+    @ExcelProperty(value = "账面数量",index = 6)
+    @Transient
+    @Getter @Setter
+    private int   quantity=1;//账面数量
+
+
+    @ExcelProperty(value = "入账时间",index = 7,converter = AdverseEventDateConverter.class)
+    @Transient
+    @Getter @Setter
+    @Temporal(TemporalType.DATE)
+    private Date purchaseDate;//采购日期
+
+    @ExcelProperty(value = "盘点数量",index = 8)
+    @Transient
+    private int inventoryCount;//盘点数量
+
+    @ExcelProperty(value = "当前状态",index = 9)
+    @Transient
+    private String assetStatusName;
+
+
+
+
+
+    @ExcelProperty(value = "盘亏",index = 13)
+    @Transient
+    private String  inventoryLoss;
+
+    @ExcelProperty(value = "盘盈",index = 14)
+    @Transient
+    private String  inventoryProfit;
+
+    @ExcelProperty(value = "盘点状态",index = 15)
+    @Transient
+    private String statusName;
+
+    @ExcelProperty(value = "备注",index = 16)
+    @Transient
+    @Getter @Setter
+    private String assetComments;
+
+
+    @ExcelProperty(value = "制造商",index = 17)
+    @Transient
+    @Getter @Setter
+    private String makerShortName;
+
+    @ExcelProperty(value = "盘点时间",index = 18)
+    @Transient
+    private String  inventoryDate;
+
+    @ExcelProperty(value = "盘点人",index = 19)
+    @Transient
+    private String  inventoryName;
+
+
+    @ExcelProperty(value = "按安装位置",index = 4)
     @Transient
     @Getter @Setter
     private String locationName;
 
+
+    @ExcelProperty(value = "设备名称",index = 1)
     @Transient
     @Getter @Setter
     private String name;
 
+    @ExcelIgnore
     @Transient
     @Getter @Setter
     private String assetUid;
 
+    @ExcelIgnore
     @Transient
     @TableField(exist = false)
     private String encodeAssetDetailStr;
@@ -313,7 +422,7 @@ public class InventoryOrderDetail implements Serializable {
     public void setStatus(Integer status) {
         this.status = status;
     }
-    
+
     public String getTenantUID() {
         return tenantUID;
     }
@@ -346,21 +455,21 @@ public class InventoryOrderDetail implements Serializable {
         this.siteUID = siteUID;
     }
 
-	public String getLastModifiedBy() {
-		return lastModifiedBy;
-	}
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
 
-	public void setLastModifiedBy(String lastModifiedBy) {
-		this.lastModifiedBy = lastModifiedBy;
-	}
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 
-	public Date getLastModifiedDate() {
-		return lastModifiedDate;
-	}
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
 
-	public void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 
     public String getAssetType() {
         return assetType;
@@ -389,5 +498,76 @@ public class InventoryOrderDetail implements Serializable {
 
     public void setEncodeAssetDetailStr(String encodeAssetDetailStr) {
         this.encodeAssetDetailStr = encodeAssetDetailStr;
+    }
+
+    public String  getAssetStatusName(){
+        // 1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
+        switch (getAssetStatus()){
+            case "1":
+                return "正常";
+            case "2":
+                return "停机";
+            case "3":
+                return "限制功能使用";
+            case "4":
+                return "待报废";
+            case "5":
+                return "停用";
+
+        }
+        return null;
+    }
+
+    public String  getStatusName(){
+        //0:未盘点，1：已盘点，2：无台账, 3:有问题 ,4:无工单
+        switch (getStatus()){
+            case 0:
+                return "未盘点";
+            case 1:
+                return "已盘点";
+            case 2:
+                return "无台账";
+            case 3:
+                return "有问题";
+            case 4:
+                return "无工单";
+
+        }
+        return null;
+    }
+
+    public String  getInventoryName( ) {
+        if(status==0){
+            return "";
+        }
+        return getLastModifiedBy();
+    }
+
+    public String getInventoryDate(){
+        if(status==0){
+            return "";
+        }
+        return DateUtil.formatDate(getLastModifiedDate());
+    }
+
+    public int getInventoryCount(){
+        if(status==1){
+            return 1;
+        }
+        return 0;
+    }
+    public String getInventoryLoss(){
+        if(status!=1){
+            return "盘亏";
+        }
+        return "";
+    }
+
+
+    public String getInventoryProfit(){
+        if(status==1){
+            return "盘盈";
+        }
+        return "";
     }
 }

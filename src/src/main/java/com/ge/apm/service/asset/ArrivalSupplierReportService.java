@@ -1,12 +1,13 @@
 package com.ge.apm.service.asset;
 
-import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.SystemTemplate;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -103,7 +103,7 @@ public class ArrivalSupplierReportService {
 //
         FileDownloadService fileDownloadService = WebUtil.getBean(FileDownloadService.class);
 
-        InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getCode(), SystemTemplate.SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getFileType());
+        InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getCode(), SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getFileType());
         if(inputStream != null){
             templateBytes = IOUtils.toByteArray(inputStream);
         }
@@ -129,22 +129,32 @@ public class ArrivalSupplierReportService {
 
     private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
 
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream inputStream = new ByteArrayInputStream(templateBytes);
-            template = XWPFTemplate.compile(inputStream);
-            template.registerPolicy("arrival_item", new ArrivalItemTableRenderPolicy());
-            template.render(data);
-            template.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if (template != null) {
-                template.close();
-            }
-        }
-        return bytes;
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try {
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            InputStream inputStream = new ByteArrayInputStream(templateBytes);
+////            template = XWPFTemplate.compile(inputStream);
+////            template.registerPolicy("arrival_item", new ArrivalItemTableRenderPolicy());
+//
+//
+//            Configure config = Configure.newBuilder()
+//                    .bind("arrival_item", new ArrivalItemTableRenderPolicy())
+//                    .build();
+//            template = XWPFTemplate.compile(inputStream, config);
+//            template.render(data);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        }finally {
+//            if (template != null) {
+//                template.close();
+//            }
+//        }
+//        return bytes;
+
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("arrival_item", new ArrivalItemTableRenderPolicy());
+        return WordExportServiceUtil.generate(data, templateBytes, bindings);
     }
 
     private String buildFileName(Map<String, Object> data, boolean isEncoding){

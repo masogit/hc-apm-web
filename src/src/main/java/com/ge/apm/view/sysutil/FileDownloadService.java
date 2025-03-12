@@ -9,23 +9,16 @@ import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.DownloadTemplateFileType;
-import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.streaming.SXSSFRow;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.context.RequestContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StreamUtils;
 import webapp.framework.web.WebUtil;
@@ -38,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -71,9 +65,28 @@ public class FileDownloadService {
             return null;
         }
     }
+    public StreamedContent getFileForEhome(String fileId) {
+        try {
+            return msService.downloadSingleFileForEhome(fileId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<FileInfoResult> getFileInfoForEhome(Collection<String> fileIds) {
+        try {
+            return msService.getFiles(fileIds);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public void downloadFile(String fileId) {
         StreamedContent file = getFile(fileId);
+        exportFile(file.getStream(), file.getName());
+    }
+    public void downloadFileForEhome(String fileId) {
+        StreamedContent file = getFileForEhome(fileId);
         exportFile(file.getStream(), file.getName());
     }
 
@@ -101,7 +114,7 @@ public class FileDownloadService {
         UserContextService ucs = WebUtil.getBean(UserContextService.class);
 //        String fileName = DownloadTemplateFileType.getTemplateFile(type, ucs.isLocale());
 
-        SystemTemplate.SystemTemplateEnum systemTemplate = DownloadTemplateFileType.getSystemTemplate(type, ucs.isLocale());
+        SystemTemplateEnum systemTemplate = DownloadTemplateFileType.getSystemTemplate(type, ucs.isLocale());
 
 //        InputStream inputStream = FileDownloadService.class.getClassLoader().getResourceAsStream("template/" + fileName);
 

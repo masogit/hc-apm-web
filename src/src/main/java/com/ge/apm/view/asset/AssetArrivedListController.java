@@ -7,6 +7,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.ArrivalSupplierReportService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -14,6 +15,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.wo.Map2XmlConverter;
 import com.ge.apm.view.wo.WorkOrderReportExportController;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
@@ -43,7 +45,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -73,6 +74,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private Map<String, Boolean> selectedMap;
     private List<ArrivalList> currentPageAssets;
 
+
+    private SystemTemplateService systemTemplateService;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListRepository.class);
@@ -81,6 +85,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         arrivalSupplierReportService = WebUtil.getBean(ArrivalSupplierReportService.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
         supplierService = WebUtil.getBean(SupplierService.class);
@@ -308,13 +313,14 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             List<TenantInfo> tanentIfos = tenantInfoDao.findByCustomTenant("3");
             String tanentInfoUid = tanentIfos.get(0).getUid();
             File xsl = null;
-            if (tenantUid.equals(tanentInfoUid)) {
-                xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-                        getResource("../../portal/pdf/arrivalItem2.xsl").getPath());
-            } else {
-                xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-                        getResource("../../portal/pdf/arrivalItem.xsl").getPath());
-            }
+//            if (tenantUid.equals(tanentInfoUid)) {
+//                xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+//                        getResource("../../portal/pdf/arrivalItem2.xsl").getPath());
+//            } else {
+//                xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+//                        getResource("../../portal/pdf/arrivalItem.xsl").getPath());
+//            }
+            InputStream templateInputStream = systemTemplateService.getTemplateInputStream(SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT_PDF, currentUserAccount);
 
 
 //
@@ -339,7 +345,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             TransformerFactory factory = TransformerFactory.newInstance();
             try {
-                Transformer transformer = factory.newTransformer(new StreamSource(xsl));
+                Transformer transformer = factory.newTransformer(new StreamSource(templateInputStream));
                 Source src = new StreamSource(new StringReader(woXml));
                 Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
                 Result res = new SAXResult(fop.getDefaultHandler());

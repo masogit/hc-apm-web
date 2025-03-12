@@ -99,6 +99,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_BUDGET = "budget";
     public static final String BO_TYPE_BUDGET_PURCHASE = "budgetPurchase";
     public static final String BO_SUB_TYPE_DOCS = "Docs";
+    public static final String BO_SUB_TYPE_EHOME = "WorkOrderEHome";
     public static final String BO_SUB_TYPE_IMG = "Image";
     public static final String BO_SUB_TYPE_EXCEL = "Excel";
     public static final String BO_SUB_FILE = "File";
@@ -111,6 +112,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ZKB_PART_CLOSE_FILE = "ZkbPartOrderClose";
     public static final String BO_TYPE_ZKB_PART_ORDER_PROVE = "ZkbPartOrderProve";
     public static final String BO_TYPE_ZKB_PART_ORDER_RETURN = "ZkbPartOrderReturn";
+    public static final String BO_TYPE_ZKB_INTEGRAL_ORDER = "ZkbIntegralOrder";
     public static final String BO_TYPE_COIL_OPPORTUNITY = "CoilOpportunity";
     public static final String BO_TYPE_ADJUST_EQUIPMENT = "AdjustEquipment";
     public static final String BO_TYPE_IBU_INFO = "IBUInfo";
@@ -126,6 +128,8 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ZKB_ENGINEER="ZkbEngineer";
 
     public static final String BO_TYPE_QRCODE_BACKGROUND = "qrCodeBackground";
+
+    public static final String BO_TYPE_TRAIN_DETAIL = "TrainDetail";
 
     @Id
     @GeneratedValue(generator = "uuid")

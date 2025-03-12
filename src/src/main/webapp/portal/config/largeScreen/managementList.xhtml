@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .ui-selectmanycheckbox td{
+                width: 80px !important;
+            }
+            .ui-state-highlight{
+                background-color: #5180ce !important;
+                color: #ffffff;
+            }
+            .ui-datatable-tablewrapper{
+                /*max-height: 400px !important;*/
+                overflow-y: auto;
+            }
+            .ui-inputnumber input{
+                width: 95%;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="大屏配置管理"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="configItemForm">
+                    <p:dataTable id="datalist" class="datalist" value="#{largeScreenConfigController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{largeScreenConfigController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" update="editButton deleteButton" />
+                        <p:ajax event="filter" listener="#{largeScreenConfigController.onFilter}" />
+
+                        <p:column headerText="版本名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="最近#{msg.EnableTime}"  >
+                            <h:outputText value="#{item.usingDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <h:outputText value="#{item.status eq 1 ? msg.InService :(item.status eq -1?'默认':msg.NotEnabled) }"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.All}" itemValue=""/>
+                                    <f:selectItem itemLabel="#{msg.InService}" itemValue="1"/>
+                                    <f:selectItem itemLabel="#{msg.NotEnabled}" itemValue="0"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="操作"  exportable="false">
+                            <p:commandButton title="启用" action="#{largeScreenConfigController.enable(item)}"  icon="ui-icon ui-icon-play-circle-outline" update="@(form)" rendered="#{item.status eq 0}" >
+                                <p:confirm header="配置-#{item.name}" message="您确认要启用选中的配置吗？" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                            <p:commandButton title="停用" action="#{largeScreenConfigController.disabled(item)}"  icon="ui-icon ui-icon-pause-circle-outline" update="@(form)" rendered="#{item.status eq 1}" >
+                                <p:confirm header="配置-#{item.name}" message="您确认要停用选中的配置吗？" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                            <p:commandButton title="复制" action="#{largeScreenConfigController.cloneLargeScreenConfig(item)}" icon="ui-icon ui-icon-content-copy" update="@(form)" >
+                                <p:confirm header="配置-#{item.name}" message="您确认要复制选中的配置吗？" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" actionListener="#{largeScreenConfigController.prepareEdit}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":largeScreenConfigDlg" oncomplete="PF('largeScreenConfigDlg').show()" disabled="#{empty largeScreenConfigController.selected}" />
+                            <p:commandButton id="deleteButton" icon="ui-icon ui-icon-delete" actionListener="#{largeScreenConfigController.delete()}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":configItemForm"  disabled="#{empty largeScreenConfigController.selected}" >
+                                <p:confirm header="删除-#{item.name}" message="您确认要删除选中的配置吗？" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <ui:include src="largeScreenConfigEdit.xhtml"/>
+    </ui:define>
+</ui:composition>
