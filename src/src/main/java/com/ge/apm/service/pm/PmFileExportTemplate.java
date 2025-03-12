@@ -5,6 +5,7 @@ import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.pure.PmExportFormatter;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -41,7 +42,7 @@ public class PmFileExportTemplate extends AssetFileImportBaseService {
 
         webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
 //        InputStream inputStream = PmFileExportTemplate.class.getClassLoader().getResourceAsStream("template/PmOrder_export.xlsx");
-        InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplate.SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
+        InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
         pmSheet = workBook.getSheet("Sheet1");
     }

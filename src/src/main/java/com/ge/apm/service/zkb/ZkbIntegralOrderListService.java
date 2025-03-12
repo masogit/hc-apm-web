@@ -78,6 +78,9 @@ public class ZkbIntegralOrderListService {
 
         specification = buildRoleSpecification(currentUser, ZkbPartOrderStep.PartOrderStep.OrderPending.name(), isZkbUser);
         zkbIntegralOrderStatusVo.setPendingOrderQty(zkbIntegralOrderRepository.count(specification));
+
+        specification = buildRoleSpecification(currentUser, ZkbPartOrderStep.PartOrderStep.Complete.name(), isZkbUser);
+        zkbIntegralOrderStatusVo.setPendingCompleteQty(zkbIntegralOrderRepository.count(specification));
     }
 
     public Specification<ZkbIntegralOrder> buildPendingSpecification(UserAccount currentUser, List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList) {
@@ -114,10 +117,11 @@ public class ZkbIntegralOrderListService {
                 }
                 if (userConfigPredicates.size() > 0) {
                     predicates.add(builder.or(userConfigPredicates.toArray(new Predicate[0])));
+                }else{
+                    predicates.add(builder.isFalse(builder.literal(true)));
                 }
             } else {
-                return null;
-                //predicates.add(builder.isNull(root.get("currentStep")));
+                predicates.add(builder.isFalse(builder.literal(true)));
             }
 
             return builder.and(predicates.toArray(new Predicate[0]));

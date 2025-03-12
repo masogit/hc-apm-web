@@ -1,6 +1,8 @@
 package com.ge.apm.view.pm;
 
-import com.deepoove.poi.NiceXWPFDocument;
+import com.deepoove.poi.xwpf.BodyContainer;
+import com.deepoove.poi.xwpf.BodyContainerFactory;
+import com.deepoove.poi.xwpf.NiceXWPFDocument;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.template.ElementTemplate;
 import com.deepoove.poi.template.run.RunTemplate;
@@ -45,12 +47,14 @@ public class PmPartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy
         RunTemplate runTemplate = (RunTemplate)eleTemplate;
         XWPFRun run = runTemplate.getRun();
         try {
-            XWPFTable table = doc.insertNewTable(run,1,maxCell);
+//            XWPFTable table = doc.insertNewTable(run,1,maxCell);
+            BodyContainer bodyContainer = BodyContainerFactory.getBodyContainer(run);
+            XWPFTable table = bodyContainer.insertNewTable(run, 1, maxCell);
             this.render(table, data);
 //            run.setText("", 23); // 清除页面标签
             runTemplate.getRun().setText("", 0);
         } catch (Exception var10) {
-            logger.error("dynamic table error:" + var10.getMessage(), var10);
+//            logger.error("dynamic table error:" + var10.getMessage(), var10);
         }
     }
     public void render(XWPFTable table, Object data) {

@@ -1,6 +1,8 @@
 package com.ge.apm.service.utils;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.policy.RenderPolicy;
+import com.ge.apm.service.WordExportServiceUtil;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,22 +37,25 @@ public class MicroServiceUtilTest {
     }
 
     private byte[] renderDocx(Map<String, Object> datas, byte[] templateBytes) throws IOException {
-        byte[] bytes;
-        XWPFTemplate template = null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream(); InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-            template = XWPFTemplate.compile(inputStream);
-            template.render(datas);
-            template.write(out);
-            bytes = out.toByteArray();
-        } finally {
-            try {
-                if (template != null) {
-                    template.close();
-                }
-            } catch (Exception ignore) {
+//        byte[] bytes;
+//        XWPFTemplate template = null;
+//        try (ByteArrayOutputStream out = new ByteArrayOutputStream(); InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+//            template = XWPFTemplate.compile(inputStream);
+//            template.render(datas);
+//            template.write(out);
+//            bytes = out.toByteArray();
+//        } finally {
+//            try {
+//                if (template != null) {
+//                    template.close();
+//                }
+//            } catch (Exception ignore) {
+//
+//            }
+//        }
+//        return bytes;
 
-            }
-        }
-        return bytes;
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        return WordExportServiceUtil.generate(datas, templateBytes, bindings);
     }
 }

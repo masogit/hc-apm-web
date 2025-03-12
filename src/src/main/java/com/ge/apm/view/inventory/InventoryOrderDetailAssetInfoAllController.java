@@ -1,15 +1,19 @@
 package com.ge.apm.view.inventory;
 
+import com.alibaba.excel.util.MapUtils;
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.InventoryOrderMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -18,6 +22,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +35,8 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,12 +58,18 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     //选定的院区
     private OrgInfo selectSite;
     private OrgInfoTreeService orgInfoTreeService;
+
+    private OrgInfoRepository orgInfoRepository;
+    private SystemTemplateService systemTemplateService;
+
     @Getter @Setter
     private String filterClinicalDeptOrg;
     @Getter @Setter
     private Set<String> clinicalDeptOrgUidSet;
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
+
+    private StreamedContent excelFile;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -65,6 +79,8 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         inventoryOrderMapper = WebUtil.getBean(InventoryOrderMapper.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
@@ -227,5 +243,99 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 
     public void setSelectSite(OrgInfo selectSite) {
         this.selectSite = selectSite;
+    }
+
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(StreamedContent excelFile) {
+        this.excelFile = excelFile;
+    }
+
+
+    public void exportExcel() throws IOException {
+
+
+        byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.INVENTORY_ORDER_LIST, currentUser);
+        List<InventoryOrderDetail> resultList ;
+        //before
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            resultList =new ArrayList<>();
+        }else{
+            Map<String, Object> param = MapUtil.newHashMap();
+            List<SearchFilter> searchFilters = this.searchFilters;
+            if (searchFilters == null) {
+                searchFilters = new ArrayList<>();
+            }
+            List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+            List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+            if (currentUser.isEnableAssetTypeGroup()) {
+                param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+            }
+            param.put("tenantUid", currentUser.getTenantUID());
+            param.put("page", 5000);
+            param.put("offset", 0);
+            if (ObjectUtil.isNotEmpty(orderIdList)) {
+                param.put("orderIdList", orderIdList);
+            }
+            if (ObjectUtil.isNotEmpty(selectSite)) {
+                param.put("selectedOrgUid", selectSite.getUid());
+                searchFilters.add(new SearchFilter("selectedOrgUid", SearchFilter.Operator.EQ, selectSite.getUid()));
+            }
+            if (ObjectUtil.isNotEmpty(orgUidList)) {
+                param.put("orgUidList", orgUidList);
+            }
+            if (ObjectUtil.isNotEmpty(queryAssetUid)) {
+                param.put("queryAssetUid", queryAssetUid);
+                searchFilters.add(new SearchFilter("queryAssetUid", SearchFilter.Operator.EQ, queryAssetUid));
+            }
+            if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
+                param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
+            }
+            inventoryOrderService.covQueryCondition(searchFilters, param);
+            List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
+            Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
+            List<Map<String, Object>> mapList = ListUtil.newArrayList();
+            Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
+            Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
+            Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
+            Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
+            Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
+            resultList = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+
+        }
+
+        double totalPrice = resultList.stream()
+                .map(item -> Optional.ofNullable(item.getPurchasePrice()).orElse(0.0))
+                .mapToDouble(Double::doubleValue)
+                .sum();
+        Map<String, Object> map = MapUtils.newHashMap();
+//        Map<String, Object> map =  new HashMap<>();
+        OrgInfo orgInfo = orgInfoRepository.getByUid(currentUser.getSiteUID());
+
+        map.put("totalPrice", totalPrice);
+        map.put("sum", resultList.size());
+        map.put("hospitalName", orgInfo.getName());
+
+        byte[] bytes = EasyExcelExportUtil.exportExcel(templateFileByte, resultList, map);
+        excelFile = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/vnd.ms-excel", "InventoryOrderDetailAssetInfo.xlsx");
+
+//        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+//            ExcelWriter excelWriter = EasyExcel.write(baos).withTemplate(new ByteArrayInputStream(templateFileByte)).build();
+//            WriteSheet writeSheet = EasyExcel.writerSheet().build();
+//            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+//            excelWriter.fill(resultList, fillConfig, writeSheet);
+//            excelWriter.fill(map, writeSheet);
+//            excelWriter.finish();
+//
+//            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
+//            excelFile = new DefaultStreamedContent(byteArrayInputStream, "application/vnd.ms-excel", "InventoryOrderDetailAssetInfo.xlsx");
+////            baos.close();
+////            byteArrayInputStream.close();
+//        }catch (Exception e){
+//            logger.error("InventoryOrderDetailAssetInfoAllController exportExcel error:",e);
+//        }
+
     }
 }

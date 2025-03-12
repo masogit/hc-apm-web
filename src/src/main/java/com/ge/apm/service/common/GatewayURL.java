@@ -132,6 +132,7 @@ public enum GatewayURL {
     PART_ORDER_SEND_EMAIL_ENGINEER("/hcapmreportservice/api/apm/report/partOrder/sendHtmlToEngineerByGeAdmin"),
     INTEGRAL_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/integralOrder/sendMessage"),
     INTEGRAL_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/integralOrder/sendEmail"),
+    INTEGRAL_ORDER_SEND_GE_ADMIN_EMAIL("/hcapmreportservice/api/apm/report/integralOrder/sendGeAdminHtml"),
     INTEGRAL_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/integralOrder/sendWeChatMessages"),
 
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
@@ -212,6 +213,13 @@ public enum GatewayURL {
     CLEAN_ORG_CACHE("/api/apm/configCache/cleanOrgInfoCache/{uid}"),
     CLEAN_TENANT_CACHE("/api/apm/configCache/cleanTenantCache/{uid}"),
     CLEAN_CACHE_NAMES("/api/apm/configCache/cleanCacheNames"),
+    // OCR action
+    OCR_IMAGE("/hcapmgateway/api/apm/ocr/recognition/readImageToObject"),
+    OCR_DOCUMENT("/hcapmgateway/api/apm/ocr/recognition/readFileToObject"),
+    OCR_RECOGNITION_BASE64("/hcapmgateway/api/apm/ocr/recognition"),
+    OCR_RECOGNITION_IMAGE("/hcapmgateway/api/apm/ocr/recognition/image"),
+    OCR_RECOGNITION_DOC("/hcapmgateway/api/apm/ocr/recognition/doc"),
+    OCR_DOC_RESULT("/hcapmgateway/api/apm/ocr/doc/result/{id}"),
     ;
     private final String url;
 

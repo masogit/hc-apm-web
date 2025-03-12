@@ -174,13 +174,22 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                     return "兑换GE工程师现场保养合同类型只能是CCS或Biomed！";
                 }
             }
-            boolean r = checkScoreFlagValid(ct, selected.getOrderType(), userAccount);
-            zkbIntegralOrderStatusVo.setScoreCanApply(r);
-            if(!r){
-                return"积分申请不符合条件，请检查！";
+            String rs = checkScoreFlagValid(ct, selected.getOrderType(), userAccount);
+            zkbIntegralOrderStatusVo.setScoreCanApply(StrUtil.isEmpty(rs));
+            if(StrUtil.isNotEmpty(rs)){
+                return"积分申请不符合条件：" + rs;
             }
         }
         return "";
+    }
+
+    public List<ZkbContract> queryContractByTenantUid(UserAccount userAccount){
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,userAccount.getTenantUID()));
+        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, new Date()));
+        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(new Date(), -1)));
+        List<ZkbContract> zkbContractList = zkbContractRepository.findBySearchFilter(filters);
+        return zkbContractList;
     }
 
     public List<ZkbIntegralOrder> queryIntegralOrderByCreatedBy(UserAccount userAccount){
@@ -211,8 +220,8 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("id", SearchFilter.Operator.IN,strings));
         filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenUId));
-        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, requestTime));
-        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(requestTime, -1)));
+        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, new Date()));
+        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(new Date(), -1)));
         List<ZkbContract> zkbContracts = zkbContractRepository.findBySearchFilter(filters);
         return zkbContracts;
     }
@@ -263,13 +272,14 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         return zkbIntegralService.queryScoreFlag(userAccount.getTenantUID());
     }
 
-    public boolean checkScoreFlagValid(ZkbContract zkbContract,String orderType,UserAccount userAccount){
+    public String checkScoreFlagValid(ZkbContract zkbContract,String orderType,UserAccount userAccount){
+        StringBuilder sb = new StringBuilder();
         List<String> ids = new ArrayList<>();
         List<ZkbContract> zkbContractList = new ArrayList<>();
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
             zkbContractList = zkbContractRepository.queryByTenantAndDate(userAccount.getTenantUID(), new Date());
             if(CollectionUtils.isEmpty(zkbContractList)){
-                return false;
+                return sb.append("不存在有效期内合同！").toString();
             }
             ids = zkbContractList.stream().map(ZkbContract::getId).collect(Collectors.toList());
         }
@@ -378,7 +388,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
             d++;
         }
         if(a > d){
-            flag = false;
+            return sb.append("该租户申请未归还数量超过30%，请及时归还！").toString();
         }
 
         if(flag){
@@ -406,22 +416,30 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 filters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Ordered.toString()));
                 List<ZkbPartOrder> threeMonthList = zkbPartOrderRepository.findBySearchFilter(filters);
                 if(threeMonthList != null && threeMonthList.size() > 0){
-                    flag = false;
+                    return sb.append("该租户存在超过3个月未归还数据，请及时归还！").toString();
                 }
             }
         }
-        return flag;
+        return "";
     }
 
-    public void preSave(ZkbIntegralOrder zkbIntegralOrder, ZkbIntegralOrderStatusVo zkbIntegralOrderStatusVo){
-        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
-            zkbIntegralOrderStatusVo.setQuotaTips("此次申请扣除900积分！");
-        }else {
-            zkbIntegralOrderStatusVo.setQuotaTips("此次申请扣除200积分！");
+    public void tempSave(ZkbIntegralOrder zkbIntegralOrder, UserAccount userAccount, ZkbContract zkbContract, List<V2_BlobObject> v2_blobObjectList){
+        if(StrUtil.isEmpty(zkbIntegralOrder.getId())){
+            tempSaveForCreate(zkbIntegralOrder, userAccount, zkbContract, v2_blobObjectList);
+        }else{
+            zkbIntegralOrderRepository.save(zkbIntegralOrder);
+            if(CollectionUtils.isNotEmpty(v2_blobObjectList)){
+                for(V2_BlobObject v2BlobObject : v2_blobObjectList){
+                    if(StrUtil.isEmpty(v2BlobObject.getBoUuid())){
+                        v2BlobObject.setBoUuid(zkbIntegralOrder.getId());
+                        blobObjectRepository.save(v2BlobObject);
+                    }
+                }
+            }
         }
     }
 
-    public void create(ZkbIntegralOrder zkbIntegralOrder, UserAccount userAccount, ZkbContract zkbContract){
+    public void tempSaveForCreate(ZkbIntegralOrder zkbIntegralOrder, UserAccount userAccount, ZkbContract zkbContract, List<V2_BlobObject> v2_blobObjectList){
         if(userAccount.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             zkbIntegralOrder.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
@@ -436,6 +454,170 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         String orderNo = "IO"+simpleDateFormat.format(new Date())+String.format("%04d",index);
         zkbIntegralOrder.setIntegralOrderNo(orderNo);
         zkbIntegralOrder.setOrderIndex(index);
+        zkbIntegralOrderRepository.save(zkbIntegralOrder);
+        if(CollectionUtils.isNotEmpty(v2_blobObjectList)){
+            for(V2_BlobObject v2BlobObject : v2_blobObjectList){
+                if(StrUtil.isEmpty(v2BlobObject.getBoUuid())){
+                    v2BlobObject.setBoUuid(zkbIntegralOrder.getId());
+                    blobObjectRepository.save(v2BlobObject);
+                }
+            }
+        }
+    }
+
+    public boolean checkSave(ZkbIntegralOrder zkbIntegralOrder, List<V2_BlobObject> v2_blobObjectList, ZkbContract zkbContract, HashMap<String, Object> selectedWorkFlow){
+        if(zkbIntegralOrder == null){
+            WebUtil.addErrorMessage("zkbIntegralOrder 不能为空！");
+            return false;
+        }
+        if(zkbContract == null){
+            WebUtil.addErrorMessage("合同 不能为空！");
+            return false;
+        }
+        boolean rs = true;
+        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
+            if(StrUtil.isEmpty(zkbIntegralOrder.getCatId())){
+                WebUtil.addErrorMessage("工具箱号 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getContractId())){
+                WebUtil.addErrorMessage("合同号 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getZkbEngineerName())){
+                WebUtil.addErrorMessage("工程师姓名 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getZkbEngineerPhone())){
+                WebUtil.addErrorMessage("工程师电话 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getEngineerNo())){
+                WebUtil.addErrorMessage("工程师学员号 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getReceiver())){
+                WebUtil.addErrorMessage("收货人 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getReceiverPhone())){
+                WebUtil.addErrorMessage("收货人电话 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getReceiverAddress())){
+                WebUtil.addErrorMessage("收货人地址 不能为空！");
+                rs = false;
+            }
+
+            if(ZkbContract.ContractType.CCS.name().equals(zkbContract.getContractType()) ||
+                    ZkbContract.ContractType.Biomed.name().equals(zkbContract.getContractType())){
+                if(CollectionUtils.isEmpty(v2_blobObjectList)){
+                    WebUtil.addErrorMessage("合同附件 不能为空！");
+                    rs = false;
+                }
+            }
+        }else {
+            if(StrUtil.isEmpty(zkbIntegralOrder.getArtificialType())){
+                WebUtil.addErrorMessage("机型 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getUrgentOrder())){
+                WebUtil.addErrorMessage("是否为紧急订单 不能为空！");
+                rs = false;
+            }else{
+                if(CopyByInvok.T.equals(zkbIntegralOrder.getUrgentOrder())){
+                    if(StrUtil.isEmpty(zkbIntegralOrder.getUrgencyReasons())){
+                        WebUtil.addErrorMessage("订单紧急的原因 不能为空！");
+                        rs = false;
+                    }
+                }
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getZkbEngineerName())){
+                WebUtil.addErrorMessage("ZKB工程师姓名 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getZkbEngineerPhone())){
+                WebUtil.addErrorMessage("ZKB工程师电话 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getProductNumber())){
+                WebUtil.addErrorMessage("产品型号 不能为空！");
+                rs = false;
+            }
+            if(StrUtil.isEmpty(zkbIntegralOrder.getFaultDescription())){
+                WebUtil.addErrorMessage("故障描述 不能为空！");
+                rs = false;
+            }
+            if(selectedWorkFlow.get("id") == null || StrUtil.isEmpty(selectedWorkFlow.get("id").toString())){
+                if(StrUtil.isEmpty(zkbIntegralOrder.getUrgentOrder())){
+                    WebUtil.addErrorMessage("工单 不能为空！");
+                    rs = false;
+                }
+            }
+            if(selectedWorkFlow.get("srNum") == null || StrUtil.isEmpty(selectedWorkFlow.get("srNum").toString())){
+                if(StrUtil.isEmpty(zkbIntegralOrder.getUrgentOrder())){
+                    WebUtil.addErrorMessage("工单srNum 不能为空！");
+                    rs = false;
+                }
+            }
+            if(selectedWorkFlow.get("assetId") == null || StrUtil.isEmpty(selectedWorkFlow.get("assetId").toString())){
+                if(StrUtil.isEmpty(zkbIntegralOrder.getUrgentOrder())){
+                    WebUtil.addErrorMessage("设备 不能为空！");
+                    rs = false;
+                }
+            }
+        }
+        return rs;
+    }
+
+    public boolean checkScore(UserAccount currentUser,ZkbIntegralOrder zkbIntegralOrder){
+        boolean checkFlag = true;
+        Integer score = queryScore(currentUser);
+        Integer deductScore = 0;
+        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
+            deductScore = 900;
+        }else {
+            deductScore = 200;
+        }
+        if(score < deductScore){
+            WebUtil.addErrorMessage("当前申请需要扣除" +deductScore+ "，积分不够！", "");
+            checkFlag = false;
+        }
+        return checkFlag;
+    }
+
+    public boolean checkLogic(ZkbIntegralOrder zkbIntegralOrder, UserAccount currentUser, ZkbContract zkbContract){
+        boolean checkFlag = true;
+        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
+            List<ZkbIntegralOrder> zkbIntegralOrders = queryIntegralOrderByCreatedBy(currentUser);
+            if(CollectionUtils.isNotEmpty(zkbIntegralOrders) && zkbIntegralOrders.size() >=1){
+                WebUtil.addErrorMessage("超过可申请数量，申请失败！");
+                checkFlag = false;
+            }
+
+            zkbIntegralOrders = queryIntegralOrderByTenantThreeYear(currentUser);
+            if(zkbIntegralOrders.size() >= 2){
+                WebUtil.addErrorMessage("超过可申请数量，申请失败！");
+                checkFlag = false;
+            }
+        }
+        String rs = checkScoreFlagValid(zkbContract, zkbIntegralOrder.getOrderType(), currentUser);
+        if(StrUtil.isNotEmpty(rs)){
+            WebUtil.addErrorMessage("积分申请不符合条件:" + rs);
+            checkFlag = false;
+        }
+        return checkFlag;
+    }
+
+    public void preSave(ZkbIntegralOrder zkbIntegralOrder, ZkbIntegralOrderStatusVo zkbIntegralOrderStatusVo){
+        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
+            zkbIntegralOrderStatusVo.setQuotaTips("此次申请扣除900积分！");
+        }else {
+            zkbIntegralOrderStatusVo.setQuotaTips("此次申请扣除200积分！");
+        }
+    }
+
+    public void create(ZkbIntegralOrder zkbIntegralOrder, UserAccount userAccount, ZkbContract zkbContract, List<V2_BlobObject> v2_blobObjectList){
         zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.Requested.name());
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
             zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.EngineerQualificationPending.name());
@@ -444,17 +626,13 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                 }else{
-                    if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbIntegralOrder.getRequestDate(),zkbContract.getEndDate()))){
-                        zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
-                    }else{
-                        zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-                    }
+                    zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
                 }
             }else{
                 zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.name());
             }
         }
-        zkbIntegralOrderRepository.save(zkbIntegralOrder);
+        tempSave(zkbIntegralOrder, userAccount, zkbContract, v2_blobObjectList);
 
         ZkbPartOrderStep zkbPartOrderStep = new ZkbPartOrderStep();
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
@@ -485,7 +663,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         List<String> strs = Arrays.asList(ZkbPartOrderStep.PartOrderStep.ManagePending.name(),ZkbPartOrderStep.PartOrderStep.EngineerQualificationPending.name(),ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
         if(strs.contains(zkbIntegralOrder.getCurrentStep())){
             sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
-            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
         }
     }
 
@@ -533,7 +711,6 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
-    @Async
     public void sendMessage(ZkbIntegralOrder zkbIntegralOrder,String token) {
         HashMap<String, Object> emailWrapperMap = null;
         try {
@@ -553,15 +730,14 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
-    @Async
-    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token){
+    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token, String url){
         try {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
             emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
-            String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
+            //String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
 
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);

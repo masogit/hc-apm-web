@@ -1,7 +1,6 @@
 package com.ge.apm.view.template;
 
 
-import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SystemTemplateRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
@@ -11,15 +10,14 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
@@ -154,15 +152,15 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
 
 
     public String getTemplateName(String code){
-        return SystemTemplate.SystemTemplateEnum.getName(code);
+        return SystemTemplateEnum.getName(code);
     }
 
     public String getBusinessName(String code){
-        return SystemTemplate.SystemTemplateBusinessEnum.getName(code);
+        return SystemTemplateEnum.SystemTemplateBusinessEnum.getName(code);
     }
 
-    public List<SystemTemplate.SystemTemplateBusinessEnum> getBusinessTypes(){
-        return Arrays.asList(SystemTemplate.SystemTemplateBusinessEnum.values());
+    public List<SystemTemplateEnum.SystemTemplateBusinessEnum> getBusinessTypes(){
+        return Arrays.asList(SystemTemplateEnum.SystemTemplateBusinessEnum.values());
     }
 
 
@@ -273,7 +271,7 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
 
     //处理当前组织如果是第一次添加子模板需要把他上级组织的模板添加到他的组织下面
     public void handlerSubSystemTemplate(){
-        if(!SystemTemplate.SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode().equals(selected.getTemplateType())){
+        if(!SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode().equals(selected.getTemplateType())){
             return;
         }
         List<SystemTemplate> byKeyAndSiteForUseParent = systemTemplateService.findByKeyAndSiteForUseParent(selected.getTemplateType(), selectedOrg.getSiteUID(),selectedOrg.getHospitalUID(),selectedOrg.getInstitutionUID(),selectedOrg.getTenantUID());

@@ -106,8 +106,7 @@
                     <p:graphicImage  width="165" height="38" name="#{workOrderMgrMvsController.getStepImg(item)}"/>
                 </p:column>
                 <!--当前处理步骤 for 全部-->
-                <p:column rendered="#{workOrderMgrMvsController.queryIndex eq 11 and !userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
-
+                <p:column rendered="#{workOrderMgrMvsController.queryIndex eq 11 }" headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrMvsController.stepFileter}"  rendered="#{workOrderMgrMvsController.queryIndex eq 0 || workOrderMgrMvsController.queryIndex eq 11}">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -120,19 +119,6 @@
                         </p:selectOneMenu>
                     </f:facet>
                     <p:graphicImage  width="165" height="38" name="#{workOrderMgrMvsController.getStepImg(item)}"/>
-                </p:column>
-                <!--当前处理步骤 for 全部 云阜-->
-                <p:column rendered="#{workOrderMgrMvsController.queryIndex eq 11 and userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}" filterMatchMode="EQ" >
-
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrMvsController.stepFileter}"  rendered="#{workOrderMgrMvsController.queryIndex eq 0 || workOrderMgrMvsController.queryIndex eq 11}">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
-                            <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
-                            <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 9)}" itemValue="#{fieldMsg.fieldValue('woSteps', 9)}" />
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText  value="#{workOrderMgrMvsController.getStepName(item)}"/>
                 </p:column>
                 <p:column width="90" headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>

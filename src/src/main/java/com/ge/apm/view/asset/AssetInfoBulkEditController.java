@@ -45,6 +45,7 @@ import org.springframework.data.domain.PageRequest;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.GenerateOrderNumUtil;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -103,6 +104,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private QrCodeLib createRequest;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private AssetScrapService assetScrapService;
+    private GenerateOrderNumUtil generateOrderNumUtil;
     //******* filter start
 
     @Getter @Setter
@@ -248,6 +250,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetScrapService= WebUtil.getBean(AssetScrapService.class);
         assetDepartmentConvertService= WebUtil.getBean(AssetDepartmentConvertService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        generateOrderNumUtil = WebUtil.getBean(GenerateOrderNumUtil.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         assetTypeGroupTreeComponentController.registerController(this);
 
@@ -1628,14 +1631,20 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public void checkedIfNessesaryBeforeCommitBulkEditSite() {
-        unCheckedNursiteMaintainList  = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets.getTarget());
-        if(!unCheckedNurseSite && !toDeleteNurseMaintainSite && CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList)) {
-            unCheckedNurseSite = true;
+        try {
+            unCheckedNursiteMaintainList  = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets.getTarget());
+            if(!unCheckedNurseSite && !toDeleteNurseMaintainSite && CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList)) {
+                unCheckedNurseSite = true;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
+                requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
+            } else {
+                commitBulkEditSite();
+            }
+        } catch (Exception e) {
             RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
-            requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
-        } else {
-            commitBulkEditSite();
+            requestContext.addCallbackParam("errFlag", true);
+            logger.error("bath asset department convert checked err {} ", e.getMessage(), e);
         }
     }
 
@@ -1700,24 +1709,25 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             requestContext.addCallbackParam("errFlag", errFlag);
         }
 
-       /*try {
+        try {
+            String convertNo = generateOrderNumUtil.autoGenerateOutBoundOrderNum(selected.getClinicalDeptOrg().getUid());
             Map<String, Object> param = MapUtil.newHashMap();
             param.put("assetUids", selectedAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
             param.put("inDeptUid", selected.getClinicalDeptOrg().getUid());
             param.put("inDeptName", selected.getClinicalDeptOrg().getName());
             param.put("auditSignature", signatureId);
             param.put("applyReason", applyReason);
+            param.put("convertNo", convertNo);
+            param.put("flag", false);
             assetDepartmentConvertService.apply(param);
-//            assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
-
+            assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
             assets.setSource(new ArrayList<>());
             assets.setTarget(new ArrayList<>());
             selected = new AssetInfo();
-        } catch(Exception e) {
+        } catch (Exception e) {
             WebUtil.addErrorMessage(e.getMessage());
             logger.error(e.getMessage(), e);
-        }*/
-
+        }
     }
 
     public void applyAssetApplication() {

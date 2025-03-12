@@ -20,6 +20,8 @@ public class ZkbIntegralOrderStatusVo {
 
     private long pendingOrderQty = 0;
 
+    private long pendingCompleteQty = 0;
+
     private boolean showStatusBtn = true;
 
     private String quotaTips;

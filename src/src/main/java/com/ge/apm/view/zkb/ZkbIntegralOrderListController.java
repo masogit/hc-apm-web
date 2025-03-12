@@ -158,9 +158,7 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
                                 userConfigPredicates.add(pre3);
                             }else if(!"all".equals(queryStatus)){
                                 Predicate pre1 = builder.equal(root.get("currentStep"), queryStatus);
-                                Predicate pre2 = builder.notEqual(root.get("orderType"), ZkbPartOrder.OrderType.Probe.toString());
-                                Predicate pre3 = builder.and(pre1, pre2);
-                                userConfigPredicates.add(pre3);
+                                userConfigPredicates.add(pre1);
                             }
                         }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                             if(StringUtils.isEmpty(queryStatus)){
@@ -184,10 +182,15 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
                     }
                     if(userConfigPredicates.size() > 0){
                         predicates.add(builder.or(userConfigPredicates.toArray(new Predicate[0])));
+                    }else{
+                        if(StringUtils.isEmpty(queryStatus)){
+                            predicates.add(builder.isFalse(builder.literal(true)));
+                        }else if(!"all".equals(queryStatus)){
+                            predicates.add(builder.equal(root.get("currentStep"), queryStatus));
+                        }
                     }
                 } else {
-                    return null;
-                    //predicates.add(builder.isNull(root.get("currentStep")));
+                    predicates.add(builder.isFalse(builder.literal(true)));
                 }
             }
 
@@ -212,7 +215,12 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
     public void doubleClick(SelectEvent event){
         selected = (ZkbIntegralOrder) event.getObject();
         String str = "action=Edit&selectedId=".concat(selected.getId())+"&queryStatus="+queryStatus;
-        String url = "Audit.xhtml?str="+ UrlParamUtil.encodeUrlQueryString(str);
+        String url = "";
+        if(StringUtils.isEmpty(selected.getCurrentStep())){
+            url = "Edit.xhtml?str="+ UrlParamUtil.encodeUrlQueryString(str);
+        }else {
+            url = "Audit.xhtml?str="+ UrlParamUtil.encodeUrlQueryString(str);
+        }
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
@@ -221,7 +229,11 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
         return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo)+"&queryStatus="+queryStatus);
     }
     public String editAction() {
-        return UrlEncryptController.encodeUrlParam("Audit?action=Edit&selectedId=".concat(selected.getId())+"&queryStatus="+queryStatus);
+        if(StringUtils.isEmpty(selected.getCurrentStep())){
+            return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedId=".concat(selected.getId())+"&queryStatus="+queryStatus);
+        }else{
+            return UrlEncryptController.encodeUrlParam("Audit?action=Edit&selectedId=".concat(selected.getId())+"&queryStatus="+queryStatus);
+        }
     }
 
     @Override

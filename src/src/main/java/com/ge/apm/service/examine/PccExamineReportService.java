@@ -13,6 +13,10 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
+import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.policy.RenderPolicy;
+import com.ge.apm.service.WordExportServiceUtil;
+import com.ge.apm.service.nurseSite.WordReportExportService;
 import org.apache.http.client.utils.DateUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
@@ -414,7 +418,7 @@ public class PccExamineReportService {
 		if (listPicture != null && listPicture.size() > 0) {
 			for (int i = 0; i < listPicture.size(); ++i) {
 				ApmStreamedContent tempContent = listPicture.get(i);
-				PictureRenderData tempPic = new PictureRenderData(200, 160, tempContent.getName(), tempContent.gettBytes());
+				PictureRenderData tempPic = new PictureRenderData(200, 160, PictureType.PNG, tempContent.gettBytes());
 				if (tempContent.getMark().equals("picture1")) {
 					data.put("picture1", tempPic);
 				} else if (tempContent.getMark().equals("picture2")) {
@@ -424,8 +428,10 @@ public class PccExamineReportService {
 				} else if (tempContent.getMark().equals("picture4")) {
 					data.put("picture4", tempPic);
 				} else if (tempContent.getMark().equals("pictureTail")) {
-					tempPic.setWidth(600);
-					tempPic.setHeight(600);
+//					tempPic.setWidth(600);
+//					tempPic.setHeight(600);
+				    tempPic = new PictureRenderData(600, 600, PictureType.PNG, tempContent.gettBytes());
+
 					data.put("pictureTail", tempPic);
 				}
 			}
@@ -453,23 +459,26 @@ public class PccExamineReportService {
 	}
 
 	private byte[] renderDocx(Map<String, Object> datas, byte[] templateBytes) throws IOException {
-		byte[] bytes;
-		XWPFTemplate template = null;
-		try (ByteArrayOutputStream out = new ByteArrayOutputStream(); InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
-			template = XWPFTemplate.compile(inputStream);
-			template.render(datas);
-			template.write(out);
-			bytes = out.toByteArray();
-		} finally {
-			try {
-				if (template != null) {
-					template.close();
-				}
-			} catch (Exception ignore) {
+//		byte[] bytes;
+//		XWPFTemplate template = null;
+//		try (ByteArrayOutputStream out = new ByteArrayOutputStream(); InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
+//			template = XWPFTemplate.compile(inputStream);
+//			template.render(datas);
+//			template.write(out);
+//			bytes = out.toByteArray();
+//		} finally {
+//			try {
+//				if (template != null) {
+//					template.close();
+//				}
+//			} catch (Exception ignore) {
+//
+//			}
+//		}
+//		return bytes;
 
-			}
-		}
-		return bytes;
+		Map<String, RenderPolicy> bindings = new HashMap<>();
+		return WordExportServiceUtil.generate(datas, templateBytes, bindings);
 	}
 
 	public Boolean exportData(ExcelDocument doc, List<Map<String, Object>> data) {

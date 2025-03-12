@@ -18,6 +18,7 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -500,7 +501,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     private void downloadFile(List<Map<String, Object>> data, List<String> fields) {
         try {//.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx")
 //            InputStream stream = AssetArrivedItemsController.class.getClassLoader().getResourceAsStream("/template/APM_AssetArrivalItem_Template.xlsx");
-            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM.getCode(),SystemTemplate.SystemTemplateEnum.ARRIVAL_ITEM.getFileType());
+            InputStream stream =fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.ARRIVAL_ITEM.getCode(), SystemTemplateEnum.ARRIVAL_ITEM.getFileType());
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = exportData(doc, data, fields);
             if (Boolean.TRUE.equals(exportFlag)) {

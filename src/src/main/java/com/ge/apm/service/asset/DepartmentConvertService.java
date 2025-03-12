@@ -1,14 +1,16 @@
 package com.ge.apm.service.asset;
 
-
-import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
+import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.AssetDepartmentConvertRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,14 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import webapp.framework.context.LocaleHolder;
+
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,7 +57,7 @@ public class DepartmentConvertService {
         byte[] templateBytes = null;
 
         FileDownloadService   fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-        templateBytes=fileDownloadService.getTemplateFileByte(SystemTemplate.SystemTemplateEnum.DEPARTMENT_CONVERT.getCode(), SystemTemplate.SystemTemplateEnum.DEPARTMENT_CONVERT.getFileType());
+        templateBytes=fileDownloadService.getTemplateFileByte(SystemTemplateEnum.DEPARTMENT_CONVERT.getCode(), SystemTemplateEnum.DEPARTMENT_CONVERT.getFileType());
 
         return templateBytes;
     }
@@ -96,17 +96,9 @@ public class DepartmentConvertService {
 
     private byte[] generate(AssetDepartmentConvert assetDepartmentConvert, byte[] templateBytes) {
         Map<String, Object> datas = getData(assetDepartmentConvert);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XWPFTemplate template = XWPFTemplate.compile(new ByteArrayInputStream(templateBytes));
-        template.registerPolicy("list", new DepartmentConvertRenderPolicy());
-        template.render(datas);
-        try {
-            template.write(out);
-        } catch (IOException e) {
-            logger.error("调拨单导出失败 generate error:", e);
-            return null;
-        }
-        return out.toByteArray();
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        bindings.put("list", new DepartmentConvertRenderPolicy());
+        return  WordExportServiceUtil.generate(datas,templateBytes, bindings);
     }
 
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
@@ -148,7 +140,7 @@ public class DepartmentConvertService {
                 continue;
             }
             byte[] levelSignatureBytes = getSignatureBytes(levelApprovals.get(i-1).getAuditSignature());
-            map.put(signature.name()+i, new PictureRenderData(100, 80, "signature.png", levelSignatureBytes));
+            map.put(signature.name()+i, new PictureRenderData(100, 80, PictureType.PNG, levelSignatureBytes));
         }
 
         for(MultiLevelApproval multiLevelApproval : multiLevelApprovals){

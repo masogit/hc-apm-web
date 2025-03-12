@@ -80,6 +80,14 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
         return selected;
     }
 
+    public ZkbContract queryZkbContract(String cid){
+        return zkbContractRepository.findById(cid);
+    }
+
+    public List<V2_BlobObject> queryBlobObjectByIntegralId(String id){
+        return blobObjectRepository.findByBoUuid(id);
+    }
+
     /**
      *
      * @param currentUser
@@ -260,24 +268,26 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
             zkbIntegralOrder.setManageAuditerUid(userAccount.getUid());
             if(flag){
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.ManageAccept.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
             }else{
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.ManageReject.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.name());
             }
-            if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbIntegralOrder.getRequestDate(),zkbContract.getEndDate()))){
+           /* if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbIntegralOrder.getRequestDate(),zkbContract.getEndDate()))){
                 zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
-            }else {
-                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
-            }
+            }else {*/
+            //}
         }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.name().equals(zkbIntegralOrder.getCurrentStep())){
             zkbIntegralOrder.setCommercialAuditDate(new Date());
             zkbIntegralOrder.setCommercialAuditer(userAccount.getName());
             zkbIntegralOrder.setCommercialAuditerUid(userAccount.getUid());
             if(flag){
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.CommercialAccept.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
             }else{
                 zkbIntegralOrder.setStatus(ZkbIntegralOrder.IntegralOrderStatusEnum.CommercialReject.name());
+                zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.name());
             }
-            zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.name());
         }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.name().equals(zkbIntegralOrder.getCurrentStep())){
             zkbIntegralOrder.setOrderedDate(new Date());
             zkbIntegralOrder.setOrderedAuditer(userAccount.getName());
@@ -318,10 +328,13 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
         }else{
             //如果当前步骤是commercial则需要推送短信
             if(ZkbPartOrderStep.PartOrderStep.CommercialPending.name().equals(zkbIntegralOrder.getCurrentStep())){
-                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
                 zkbIntegralOrderApplyService.sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
-            }else{
-                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken());
+            }else if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.Complete.name().equals(zkbIntegralOrder.getCurrentStep())){
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_GE_ADMIN_EMAIL));
+            }else if(!ZkbPartOrderStep.PartOrderStep.Complete.name().equals(zkbIntegralOrder.getCurrentStep())){
+                zkbIntegralOrderApplyService.sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
+
             }
         }
 

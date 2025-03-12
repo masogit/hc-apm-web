@@ -187,6 +187,11 @@
                            <p:menuitem  value="模板管理" outcome="/portal/budget/purchaseTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMPLATE_EDIT')}"/>
                        </p:submenu>
                    </c:when>
+                   <c:when test="#{item eq 'TRAIN_MANAGE'}">
+                       <p:submenu label="#{msg.trainManage}" icon="fa fa-dot-circle-o fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('TRAIN_MANAGE_')}">
+                           <p:menuitem  value="#{msg.trainManage}" outcome="/portal/train/trainMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('TRAIN_MANAGE_EDIT')}"/>
+                       </p:submenu>
+                   </c:when>
                    <c:when test="#{item eq 'MEASURE'}">
                        <!-- 计量 -->
                        <p:submenu id="um5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-adjust fa-fw" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('MEASURE_')}">
@@ -257,6 +262,7 @@
                            <p:menuitem id="um526" value="#{msg.BuildManagement}" outcome="/portal/config/buildManagement/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_BUILDING_EDIT')}"/>
                            <p:menuitem id="um527" value="#{msg.AssetClassificationManagement}" outcome="/portal/assetTypeGroup/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}"/>
                            <p:menuitem id="um528" value="系统模板配置" outcome="/portal/config/sysTemplate/systemTemplate.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_SYSTEM_TEMPLATE')}"/>
+                           <p:menuitem id="um529" value="大屏版本管理" outcome="/portal/config/largeScreen/managementList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_NATIONAL_EXAMINATION_MANAGEMENT')}"/>
 
                        </p:submenu>
                    </c:when>

@@ -6,6 +6,7 @@ import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbIntegralOrderAuditService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -56,6 +58,9 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
     @Getter @Setter
     List<ZkbPartOrderCat> zkbPartOrderCatList = new ArrayList<>();
 
+    @Getter @Setter
+    List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();
+
     private String queryStatus;
 
     @Override
@@ -73,10 +78,7 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
         queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
         if(StringUtils.isNotEmpty(selectedId)){
             selected = zkbIntegralOrderAuditService.queryInitData(selectedId, zkbContractList, v2_listHashMap);
-            if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
-                zkbContract = zkbContractList.get(0);
-            }
-
+            zkbContract = zkbIntegralOrderAuditService.queryZkbContract(selected.getContractId());
             if(selected == null || StrUtil.isEmpty(selected.getId())){
                 WebUtil.addErrorMessage("数据不存在！");
                 return;
@@ -85,11 +87,24 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
             zkbIntegralOrderAuditService.fieldRendered(currentUser, zkbIntegralOrderStatusVo, selected);
             zkbIntegralOrderAuditService.initPageData(selected, zkbContract, zkbIntegralOrderStatusVo);
             zkbPartOrderCatList = zkbIntegralOrderAuditService.queryCatList();
+            if(ZkbContract.ContractType.CCS.name().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.name().equals(zkbContract.getContractType())){
+                v2_blobObjectList = zkbIntegralOrderAuditService.queryBlobObjectByIntegralId(selectedId);
+            }
 
             if(userContextService.isZkbUser()) {
                 if(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name().equals(selected.getStatus())){
                     if(CopyByInvok.F.equals(selected.getEngineerQualificationsFlag())){
                         WebUtil.addErrorMessage("申请人无资质，需有资质的工程师提交申请！","");
+                    }
+                }
+            }
+            if(ZkbPartOrderStep.PartOrderStep.OrderPending.name().equals(selected.getCurrentStep())){
+                if(zkbIntegralOrderStatusVo.isCanEditFlag()){
+                    if(ZkbIntegralOrder.OrderTypeEnum.EngineerOnSiteMaintenance.name().equals(selected.getOrderType())){
+                        Date date1 = DateUtil.parse("2024/11/22");
+                        if(date1.after(zkbContract.getCreatedDate())){
+                            WebUtil.addErrorMessage("该合同需要联系OTR添加 PM active entitlement；","");
+                        }
                     }
                 }
             }

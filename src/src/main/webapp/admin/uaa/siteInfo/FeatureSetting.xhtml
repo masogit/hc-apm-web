@@ -665,7 +665,6 @@
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
                         </p:fieldset>
-
                             <p:fieldset id="biReport" legend="BI报表">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <p:selectBooleanCheckbox
@@ -679,7 +678,19 @@
                                     <p:outputLabel></p:outputLabel>
                                 </p:panelGrid>
                             </p:fieldset>
-
+                            <p:fieldset id="trainManage" legend="培训管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['TRAIN_MANAGE']}"
+                                            itemLabel="培训管理">
+                                        <p:ajax update="trainManage"
+                                                listener="#{featureSettingController.featureChange('TRAIN_MANAGE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>培训管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
 
 
                         </p:tab>
