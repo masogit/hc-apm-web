@@ -111,54 +111,107 @@ public class VenderCompany implements Serializable {
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
     @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'license'")
     private List<V2_BlobObject> licenseAttachments = new ArrayList<>();
+    // 维修资质附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'maintenanceQualification'")
+    private List<V2_BlobObject> maintenanceQualificationAttachments = new ArrayList<>();
 
-    // 营业许可证编码
+    // 医疗器械经营许可证编码
     @Column(name = "permit_code")
     private String permitCode;
-    // 营业许可证开始日期
+    // 医疗器械经营许可证开始日期
     @Column(name = "permit_start_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date permitStartDate;
-    // 营业许可证结束日期
+    // 医疗器械经营许可证结束日期
     @Column(name = "permit_end_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date permitEndDate;
-    // 营业许可证附件
+    // 医疗器械经营许可证附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
     @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'permit'")
     private List<V2_BlobObject> permitAttachments = new ArrayList<>();
-    // 售后服务承诺附件
+    // 医疗器械经营许可证售后服务承诺附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
     @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'afterSaleService'")
     private List<V2_BlobObject> afterSaleServiceAttachments = new ArrayList<>();
-    // 授权书附件
+    // 医疗器械经营许可证授权书附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
     @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'authorization'")
     private List<V2_BlobObject> authorizationAttachments = new ArrayList<>();
 
-    // 生产许可证编码
+    // 医疗器械经营备案凭证编码
+    @Column(name = "business_filing_code")
+    private String businessFilingCode;
+    // 医疗器械经营备案凭证开始日期
+    @Column(name = "business_filing_start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date businessFilingStartDate;
+    // 医疗器械经营备案凭证结束日期
+    @Column(name = "business_filing_end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date businessFilingEndDate;
+    // 医疗器械经营备案凭证附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'businessFiling'")
+    private List<V2_BlobObject> businessFilingAttachments = new ArrayList<>();
+    // 医疗器械经营备案凭证售后服务承诺附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'businessFilingAfterSaleService'")
+    private List<V2_BlobObject> businessFilingAfterSaleServiceAttachments = new ArrayList<>();
+    // 医疗器械经营备案凭证授权书附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'businessFilingAuthorization'")
+    private List<V2_BlobObject> businessFilingAuthorizationAttachments = new ArrayList<>();
+
+    // 医疗器械生产许可证编码
     @Column(name = "manufacturing_permit_code")
     private String manufacturingPermitCode;
-    // 生产许可证开始日期
+    // 医疗器械生产许可证开始日期
     @Column(name = "manufacturing_permit_start_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date manufacturingPermitStartDate;
-    // 生产许可证结束日期
+    // 医疗器械生产许可证结束日期
     @Column(name = "manufacturing_permit_end_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date manufacturingPermitEndDate;
-    // 生产许可证附件
+    // 医疗器械生产许可证附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
     @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'manufacturingPermit'")
     private List<V2_BlobObject> manufacturingPermitAttachments = new ArrayList<>();
+
+    // 医疗器械生产备案凭证编码
+    @Column(name = "manufacturing_filing_code")
+    private String manufacturingFilingCode;
+    // 医疗器械生产备案凭证开始日期
+    @Column(name = "manufacturing_filing_start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date manufacturingFilingStartDate;
+    // 医疗器械生产备案凭证结束日期
+    @Column(name = "manufacturing_filing_end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date manufacturingFilingEndDate;
+    // 医疗器械生产备案凭证附件
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'VenderCompany' and bo_sub_type = 'manufacturingFiling'")
+    private List<V2_BlobObject> manufacturingFilingAttachments = new ArrayList<>();
 
     // 产品注册证编号
     @Column(name = "product_registration_code")
@@ -574,6 +627,95 @@ public class VenderCompany implements Serializable {
 
     public void setProductRegistrationAttachments(List<V2_BlobObject> productRegistrationAttachments) {
         this.productRegistrationAttachments = productRegistrationAttachments;
+    }
+
+
+    public List<V2_BlobObject> getMaintenanceQualificationAttachments() {
+        return maintenanceQualificationAttachments;
+    }
+
+    public void setMaintenanceQualificationAttachments(List<V2_BlobObject> maintenanceQualificationAttachments) {
+        this.maintenanceQualificationAttachments = maintenanceQualificationAttachments;
+    }
+
+    public String getBusinessFilingCode() {
+        return businessFilingCode;
+    }
+
+    public void setBusinessFilingCode(String businessFilingCode) {
+        this.businessFilingCode = businessFilingCode;
+    }
+
+    public Date getBusinessFilingStartDate() {
+        return businessFilingStartDate;
+    }
+
+    public void setBusinessFilingStartDate(Date businessFilingStartDate) {
+        this.businessFilingStartDate = businessFilingStartDate;
+    }
+
+    public Date getBusinessFilingEndDate() {
+        return businessFilingEndDate;
+    }
+
+    public void setBusinessFilingEndDate(Date businessFilingEndDate) {
+        this.businessFilingEndDate = businessFilingEndDate;
+    }
+
+    public List<V2_BlobObject> getBusinessFilingAttachments() {
+        return businessFilingAttachments;
+    }
+
+    public void setBusinessFilingAttachments(List<V2_BlobObject> businessFilingAttachments) {
+        this.businessFilingAttachments = businessFilingAttachments;
+    }
+
+    public List<V2_BlobObject> getBusinessFilingAfterSaleServiceAttachments() {
+        return businessFilingAfterSaleServiceAttachments;
+    }
+
+    public void setBusinessFilingAfterSaleServiceAttachments(List<V2_BlobObject> businessFilingAfterSaleServiceAttachments) {
+        this.businessFilingAfterSaleServiceAttachments = businessFilingAfterSaleServiceAttachments;
+    }
+
+    public List<V2_BlobObject> getBusinessFilingAuthorizationAttachments() {
+        return businessFilingAuthorizationAttachments;
+    }
+
+    public void setBusinessFilingAuthorizationAttachments(List<V2_BlobObject> businessFilingAuthorizationAttachments) {
+        this.businessFilingAuthorizationAttachments = businessFilingAuthorizationAttachments;
+    }
+
+    public String getManufacturingFilingCode() {
+        return manufacturingFilingCode;
+    }
+
+    public void setManufacturingFilingCode(String manufacturingFilingCode) {
+        this.manufacturingFilingCode = manufacturingFilingCode;
+    }
+
+    public Date getManufacturingFilingStartDate() {
+        return manufacturingFilingStartDate;
+    }
+
+    public void setManufacturingFilingStartDate(Date manufacturingFilingStartDate) {
+        this.manufacturingFilingStartDate = manufacturingFilingStartDate;
+    }
+
+    public Date getManufacturingFilingEndDate() {
+        return manufacturingFilingEndDate;
+    }
+
+    public void setManufacturingFilingEndDate(Date manufacturingFilingEndDate) {
+        this.manufacturingFilingEndDate = manufacturingFilingEndDate;
+    }
+
+    public List<V2_BlobObject> getManufacturingFilingAttachments() {
+        return manufacturingFilingAttachments;
+    }
+
+    public void setManufacturingFilingAttachments(List<V2_BlobObject> manufacturingFilingAttachments) {
+        this.manufacturingFilingAttachments = manufacturingFilingAttachments;
     }
 
     public Boolean getRelation() {
