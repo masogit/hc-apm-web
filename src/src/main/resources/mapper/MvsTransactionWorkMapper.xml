@@ -53,6 +53,18 @@
                 #{item}
             </foreach>
         </if>
+        <if test="woNum != null ">
+            and (wo_context::jsonb) ->> 'woNum' like concat('%', #{woNum}, '%')
+        </if>
+        <if test="ownerName != null ">
+            and (wo_context::jsonb) ->> 'ownerName' like concat('%', #{ownerName}, '%')
+        </if>
+        <if test="faultDesc != null ">
+            and (sr_context::jsonb) ->> 'faultDesc' like concat('%', #{faultDesc}, '%')
+        </if>
+        <if test="customerName != null ">
+            and (sr_context::jsonb) ->> 'customerName' like concat('%', #{customerName}, '%')
+        </if>
     </select>
 
 </mapper>

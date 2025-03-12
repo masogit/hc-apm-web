@@ -43,19 +43,19 @@
                                 <h:outputText value="#{fieldMsg.fieldValues('workOrderEhome', dynamicKey)}"/>
                              </p:column>
 
-                            <p:column headerText="SR编号" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <p:column headerText="SR编号" filterBy="#{item.srNum}"   filterMatchMode="LIKE">
                                 <h:outputText value="#{item.srNum}"/>
                             </p:column>
 
-                            <p:column headerText="工单编号"  >
+                            <p:column headerText="工单编号" filterBy="#{item.workOrderDTO.workOrderNumber}"  filterMatchMode="LIKE" >
                                 <h:outputText value="#{item.workOrderDTO.workOrderNumber}"/>
                             </p:column>
 
-                            <p:column headerText="工单Owner"  >
+                            <p:column headerText="工单Owner" filterBy="#{item.workOrderDTO.ownerName}"  filterMatchMode="LIKE" >
                                 <h:outputText value="#{item.workOrderDTO.ownerName}"/>
                             </p:column>
 
-                            <p:column headerText="故障描述"  >
+                            <p:column headerText="故障描述" filterBy="#{item.maintenanceOrderDTO.faultDesc}"  filterMatchMode="LIKE"  >
                                 <h:outputText value="#{item.maintenanceOrderDTO.faultDesc}"/>
                             </p:column>
                             <p:column headerText="接单时间">
@@ -63,7 +63,7 @@
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="客户姓名" >
+                            <p:column headerText="客户姓名" filterBy="#{item.maintenanceOrderDTO.customerName}"  filterMatchMode="LIKE" >
                                <h:outputText value="#{item.maintenanceOrderDTO.customerName}"/>
                             </p:column>
                             <p:column headerText="报修时间">
