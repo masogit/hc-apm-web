@@ -149,16 +149,16 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
                     params.put("typeKey", filter.value);  // 对类型字段进行业务语义映射
                     break;
                 case "workOrderDTO.ownerName":
-                    params.put("workOrderDTO.ownerName", filter.value);
+                    params.put("ownerName", filter.value);
                     break;
                 case "maintenanceOrderDTO.faultDesc":
-                    params.put("maintenanceOrderDTO.faultDesc", filter.value);
+                    params.put("faultDesc", filter.value);
                     break;
                 case "maintenanceOrderDTO.customerName":
-                    params.put("maintenanceOrderDTO.customerName", filter.value);
+                    params.put("customerName", filter.value);
                     break;
                 case "workOrderDTO.workOrderNumber":
-                    params.put("workOrderDTO.workOrderNumber", filter.value);
+                    params.put("woNum", filter.value);
                     break;
                 case "srNum":
                     params.put("srNum", filter.value);
