@@ -66,6 +66,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private boolean propagateSelectionUp = true;
     private TreeNode accessOrgTree;
     private TreeNode[] selectedAccessOrgNodes;
+    private Integer state = -1;
 
     @Override
     protected ReminderRuleRepository getDAO() {
@@ -105,6 +106,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     }
 
     public void save(String actionName) {
+        selected.setState(state);
         if ("Create".equals(crudActionName)) {
             selected.setState(-1);
             selected.setTenantUid(loginUser.getTenantUID());
@@ -267,6 +269,40 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         }
     }
 
+    public void initWechatTemplate() {
+        switch (selected.getType()) {
+            case "AssetLifecycle":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_LIFECYCLE_MSG, WechatParam.class));
+                break;
+            case "ContractOverdue":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.CONTRACT_OVERDUE_MSG, WechatParam.class));
+                break;
+            case "NurseSiteMaintainItem":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.NURSE_SITE_MSG, WechatParam.class));
+                break;
+            case "UnattendedOverdue":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.UNATTENDED_OVERDUE_MSG, WechatParam.class));
+                break;
+            case "SupplierReview":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.SUPPLIER_REVIEW_MSG, WechatParam.class));
+                break;
+            case "UnattendedApproval":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.UNATTENDED_APPROVAL_MSG, WechatParam.class));
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void prepareSitting() {
+        crudActionName = "Edit";
+        if (selected.getState() >= 0) {
+            state = selected.getState();
+        } else {
+            state = 1;
+        }
+    }
+
     public List<OrgInfo> getHospitalList(String orgLevel) {
         return orgInfoService.getHospitalList(orgLevel);
     }
@@ -307,8 +343,6 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         this.roles = roles;
     }
 
-
-
     public Boolean getApm() {
         return isApm;
     }
@@ -323,5 +357,13 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     public void setApmRuleList(List<ReminderRule> apmRuleList) {
         this.apmRuleList = apmRuleList;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }

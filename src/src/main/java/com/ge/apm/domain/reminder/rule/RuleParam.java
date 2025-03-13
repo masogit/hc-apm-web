@@ -17,7 +17,7 @@ public class RuleParam {
 
     private Boolean afterReminder;
 
-    private Integer pushDateValue;
+    private Integer pushDateValue = 0;
 
     private String content;
 
@@ -35,11 +35,11 @@ public class RuleParam {
 
     private String messageType;
 
-    private Integer pushType;
+    private Integer pushType = 1;
 
-    private Integer pushCycle;
+    private Integer pushCycle = 0;
 
-    private Integer pushNum;
+    private Integer pushNum = 0;
 
     private List<Integer> assetInfoIds;
 
