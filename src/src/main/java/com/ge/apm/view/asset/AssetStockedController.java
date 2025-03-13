@@ -413,11 +413,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }
-        rootNode.setExpanded(true);
-        TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, org);
-        if (null != selectedOrgNode) {
-            TreeNodeUtil.expandParentsNodes(selectedOrgNode);
-        }
+        TreeNodeUtil.expandTreeNode(orgTree);
         return orgTree;
     }
 

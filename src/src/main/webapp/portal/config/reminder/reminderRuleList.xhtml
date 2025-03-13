@@ -103,13 +103,11 @@
 						</p:column>
 						<f:facet name="{Toolbar}">
 							<p:commandButton id="createButton" actionListener="#{reminderRuleController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()"/>
-<!--							<p:commandButton id="createButton" actionListener="#{reminderRuleController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":reminderRuleCreateDlg" oncomplete="PF('reminderRuleCreateDialog').show()"/>-->
 							<p:commandButton id="editButton" actionListener="#{reminderRuleController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()" disabled="#{empty reminderRuleController.selected}"/>
-<!--							<p:commandButton id="orgButton" actionListener="#{reminderRuleController.prepareUserScope}" icon="ui-icon-person" process="@this" title="分配访问组织"  update=":reminderRuleAssignOrgEditDlg" oncomplete="PF('reminderRuleAssignOrgEditDialog').show()" disabled="#{empty reminderRuleController.selected}"/>-->
 							<p:commandButton id="deleteButton" actionListener="#{reminderRuleController.delete}" icon="ui-icon-close" title="#{msg.Delete}" update="datalist" disabled="#{empty reminderRuleController.selected}">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 							</p:commandButton>
-							<p:commandButton id="ruleSettingButton" actionListener="#{reminderRuleController.prepareEdit}" icon="ui-icon-settings" title="#{msg.ReminderConfiguration}" update=":reminderRuleSettingDlg" oncomplete="PF('reminderRuleSettingDialog').show()" disabled="#{empty reminderRuleController.selected}"/>
+							<p:commandButton id="ruleSettingButton" actionListener="#{reminderRuleController.prepareSitting}" icon="ui-icon-settings" title="#{msg.ReminderConfiguration}" update=":reminderRuleSettingDlg" oncomplete="PF('reminderRuleSettingDialog').show()" disabled="#{empty reminderRuleController.selected}"/>
 						</f:facet>
 					</p:dataTable>
 				</h:form>

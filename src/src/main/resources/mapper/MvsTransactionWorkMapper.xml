@@ -2,31 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ge.apm.dao.mapper.MvsTransactionWorkMapper">
 
-<!-- 完整字段映射配置 -->
-<resultMap id="eHomeTransactionWorkOrderMap" type="com.ge.apm.domain.EHomeTransactionWorkOrder">
-    <id property="id" column="id"/>
-    <result property="ucmId" column="ucm_id"/>
-    <result property="srId" column="sr_id"/>
-    <result property="srNum" column="sr_num"/>
-    <result property="totalManHour" column="total_man_hour"/>
-    <result property="patProblems" column="pat_problems"/>
-    <result property="patActions" column="pat_actions"/>
-    <result property="patTests" column="pat_tests"/>
-    <result property="status" column="status"/>
-    <result property="currentPersonName" column="current_person_name"/>
-    <result property="typeKey" column="type_key"/>
-    <result property="parentKey" column="parent_key"/>
-    <result property="closeTime" column="close_time"/>
-    <result property="comment" column="comment"/>
-    <result property="srContext" column="sr_context"/>
-    <result property="woContext" column="wo_context"/>
-    <result property="attachments" column="attachments_context"/>
-    <result property="parts" column="parts_context"/>
-    <result property="hours" column="hours_context"/>
-    <result property="createdBy" column="created_by"/>
-    <result property="createdDate" column="created_date"/>
-    <result property="modifiedDate" column="modified_date"/>
-</resultMap>
+    <!-- 完整字段映射配置 -->
+    <resultMap id="eHomeTransactionWorkOrderMap" type="com.ge.apm.domain.EHomeTransactionWorkOrder">
+        <id property="id" column="id"/>
+        <result property="ucmId" column="ucm_id"/>
+        <result property="srId" column="sr_id"/>
+        <result property="srNum" column="sr_num"/>
+        <result property="totalManHour" column="total_man_hour"/>
+        <result property="patProblems" column="pat_problems"/>
+        <result property="patActions" column="pat_actions"/>
+        <result property="patTests" column="pat_tests"/>
+        <result property="status" column="status"/>
+        <result property="currentPersonName" column="current_person_name"/>
+        <result property="typeKey" column="type_key"/>
+        <result property="parentKey" column="parent_key"/>
+        <result property="closeTime" column="close_time"/>
+        <result property="comment" column="comment"/>
+        <result property="srContext" column="sr_context"/>
+        <result property="woContext" column="wo_context"/>
+        <result property="attachments" column="attachments_context"/>
+        <result property="parts" column="parts_context"/>
+        <result property="hours" column="hours_context"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="modifiedDate" column="modified_date"/>
+    </resultMap>
     <!-- 查询优化建议 -->
     <select id="loadData" resultMap="eHomeTransactionWorkOrderMap">
         SELECT
@@ -41,7 +41,7 @@
         <if test="srNum != null">
             and sr_Num like concat('%', #{srNum}, '%')
         </if>
-        <if test="status != null ">
+        <if test="status!= null ">
             and status = #{status}
         </if>
         <if test="typeKey != null ">
@@ -65,6 +65,15 @@
         <if test="customerName != null ">
             and (sr_context::jsonb) ->> 'customerName' like concat('%', #{customerName}, '%')
         </if>
+
+        <if test="umids != null and umids.length > 0">
+            and  ucm_id IN
+            <foreach item="item" index="index" collection="umids" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+
     </select>
 
 </mapper>

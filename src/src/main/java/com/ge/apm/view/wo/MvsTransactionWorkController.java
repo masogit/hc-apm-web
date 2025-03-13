@@ -7,12 +7,14 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.EHomeTransactionWorkOrderRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.*;
 import com.ge.apm.service.mvstransaction.MvsTransactionWorkService;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,7 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
     protected static final Logger LOGGER = LoggerFactory.getLogger(MvsTransactionWorkController.class);
     private static final ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+    OrgInfoRepository orgInfoRepository;
 
     private EHomeTransactionWorkOrderRepository dao;
     private MvsTransactionWorkService mvsTransactionWorkService;
@@ -61,6 +64,7 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
     }
     @Override
     protected void init() {
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         user = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(EHomeTransactionWorkOrderRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
@@ -111,8 +115,14 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
         if(value == null || StringUtils.isBlank(value.getValue())){
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
-
+        List<OrgInfo> list = orgInfoRepository.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID());
+        String[] strs = list.stream().filter(t -> StrUtil.isNotEmpty(t.getHospitalUcmid())).map(OrgInfo::getHospitalUcmid).toArray(String[]::new);
         Map<String, Object> params = new HashMap<>();
+        if(strs!=null && strs.length>0){
+            params.put("umids",strs);
+        }else{
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         String[] msgKeyArray = i18nMessageListWorkOrderType.stream()
                 .map(I18nMessage::getMsgKey)   // 提取 msgKey
                 .filter(Objects::nonNull)      // 过滤 null 值（可选）
@@ -228,6 +238,7 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
         return eHomeTransactionWorkOrders;
     }
     public void onSelectWorkOrder() {
+        if (selected == null) return;
         if(!CollectionUtils.isEmpty(selected.getAttachmentDTOS())){
             List<AttachmentDTO> attachmentDTOS = this.selected.getAttachmentDTOS();
             Set<String> objectIds = attachmentDTOS.stream()
