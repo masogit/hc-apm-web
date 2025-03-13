@@ -19,6 +19,13 @@ public class ReminderRule implements Serializable {
 
     private static final long serialVersionUID = 8492409962179388085L;
 
+    public static final String ASSET_LIFECYCLE_MSG = "{'first':'即将达到使用年限的设备提醒','keyword1':'设备名称:{name},设备编号:{departNum},出场序列号:{serialNum}'}";
+    public static final String CONTRACT_OVERDUE_MSG = "{'first':'合同应到货日期逾期提醒','keyword1':'{name}合同已逾期，请尽快处理！'}";
+    public static final String NURSE_SITE_MSG = "{'first':'临床完成日常检查情况','keyword1':'{deptName}，当日应检查设备{count}台，未检查设备{unfinished}台'}";
+    public static final String UNATTENDED_OVERDUE_MSG = "{'first':'无人值守借用超期提醒','keyword1':'检测到{clinicalDeptName}已借用设备{assetName}({assetNumber})已超过{chargingDays}天，请尽快归还！'}";
+    public static final String SUPPLIER_REVIEW_MSG = "{'first':'供应商关联审核提醒','keyword1':'{name}({type})'}";
+    public static final String UNATTENDED_APPROVAL_MSG = "{'first':'无人值守审批提醒','keyword1':'{clinicalDeptName}申请借用{assetName},调剂编码:{swapIndex},申请时间:{applyTime},请及时处理！'}";
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -68,5 +75,25 @@ public class ReminderRule implements Serializable {
 
     @Column(name = "push_date_unit")
     private Integer pushDateUnit;
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof ReminderRule)) {
+            return false;
+        }
+        ReminderRule other = (ReminderRule) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
 
 }
