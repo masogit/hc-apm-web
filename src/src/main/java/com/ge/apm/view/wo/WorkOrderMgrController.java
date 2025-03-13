@@ -84,6 +84,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -2583,33 +2584,42 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
-
     public void handleFileUpload(FileUploadEvent event) {
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
+        synchronized (picList){
+            if(picList != null && picList.size() >= 5){
+                WebUtil.addWarnMessage("上传图片数量不能超过5个！");
+                return;
+            }
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                picList.add(blobObject);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
         }
+
 
     }
 
     public void handleFileUploadPDF(FileUploadEvent event) {
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            attachList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
+        synchronized (attachList){
+            if(attachList != null && attachList.size() >= 5){
+                WebUtil.addErrorMessage("上传文件数量不能超过5个！");
+                return;
+            }
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                attachList.add(blobObject);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
         }
-
     }
 
     public void submitWorkOrder() {
