@@ -65,15 +65,42 @@
         <if test="customerName != null ">
             and (sr_context::jsonb) ->> 'customerName' like concat('%', #{customerName}, '%')
         </if>
-
         <if test="umids != null and umids.length > 0">
             and  ucm_id IN
             <foreach item="item" index="index" collection="umids" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
-
-
+        <if test="startDate != null">
+            AND TO_TIMESTAMP(
+            (sr_context::jsonb ->> 'acceptanceTime')::bigint / 1000
+            ) >= TO_TIMESTAMP(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null">
+            AND TO_TIMESTAMP(
+            (sr_context::jsonb ->> 'acceptanceTime')::bigint / 1000
+            ) &lt;= TO_TIMESTAMP(#{endDate}, 'YYYY-MM-DD') + INTERVAL '1 DAY'
+        </if>
+        <if test="startDateOpen != null">
+            AND TO_TIMESTAMP(
+            (wo_context::jsonb ->> 'createdDate')::bigint / 1000
+            ) >= TO_TIMESTAMP(#{startDateOpen}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDateOpen != null">
+            AND TO_TIMESTAMP(
+            (wo_context::jsonb ->> 'createdDate')::bigint / 1000
+            ) &lt;= TO_TIMESTAMP(#{endDateOpen}, 'YYYY-MM-DD') + INTERVAL '1 DAY'
+        </if>
+        <if test="startDateClose != null">
+            AND TO_TIMESTAMP(
+            (wo_context::jsonb ->> 'closeTime')::bigint / 1000
+            ) >= TO_TIMESTAMP(#{startDateClose}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDateClose != null">
+            AND TO_TIMESTAMP(
+            (wo_context::jsonb ->> 'closeTime')::bigint / 1000
+            ) &lt;= TO_TIMESTAMP(#{endDateClose}, 'YYYY-MM-DD') + INTERVAL '1 DAY'
+        </if>
     </select>
 
 </mapper>
