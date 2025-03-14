@@ -297,6 +297,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
                 break;
             case 3:
             case 8:
+            case 9:
                 str="有问题";
                 break;
             case 4:
