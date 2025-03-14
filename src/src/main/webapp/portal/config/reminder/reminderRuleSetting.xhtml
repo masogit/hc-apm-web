@@ -34,9 +34,7 @@
                         <h:panelGroup>
                             <label class="label">周期单位<span style="color:red">*</span></label >
                             <p:selectOneMenu value="#{reminderRuleController.selected.pushDateUnit}">
-                                <f:selectItem   itemLabel="天" itemValue="0"/>
-                                <f:selectItem  itemLabel="小时" itemValue="1"/>
-                                <f:selectItem   itemLabel="分钟" itemValue="2"/>
+                                <f:selectItems value="#{reminderRuleController.getDateUnitList()}" var="item" itemLabel="#{item.label}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -49,7 +47,7 @@
                             <label class="label">#{msg.pushSetting}</label>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
-                                    <label class="label">（提前/延迟）天数<span style="color:red">*</span></label>
+                                    <label class="label">（提前/延迟）周期<span style="color:red">*</span></label>
                                     <p:inputNumber id="pushDateValue" value="#{reminderRuleController.selected.ruleParam.pushDateValue}" maxValue="365" minValue="0" decimalPlaces="0" />
                                 </h:panelGroup>
                             </p:panelGrid>
@@ -81,7 +79,7 @@
                                     <p:inputText id="first" value="#{reminderRuleController.selected.wechatParam.first}" style="width: 95%;"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">keyword1</label>
+                                    <label class="label">keyword1<span style="color:red">*</span></label>
                                     <p:inputTextarea id="keyword1" value="#{reminderRuleController.selected.wechatParam.keyword1}" style="width: 95%;"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
