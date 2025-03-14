@@ -24,12 +24,7 @@
                                 <label class="label">Account开单类型</label>
                                 <h:outputLabel value="#{fieldMsg.fieldValues('reportTypeAcctEhome', mvsTransactionWorkController.selected.maintenanceOrderDTO.reportTypeAcct)}"/>
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">报修时间</label>
-                                <h:outputText value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.requestTime}">
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                                </h:outputText>
-                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">服务内容/故障描述</label>
                                 <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.faultDesc}" />
@@ -42,18 +37,24 @@
                                 <label class="label">客户电话</label>
                                 <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.customerTel}" />
                             </h:panelGroup>
+                            <h:panelGroup styleClass="field-group">
+                                <label class="label">开单时间</label>
+                                <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.creationTime}">
+                                    <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">接单时间</label>
                                 <h:outputText value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.acceptanceTime}">
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                    <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
                                 </h:outputText>
                              </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">验收时间</label>
-                                <h:outputText value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.acceptanceCheckTime}">
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                                </h:outputText>
-                             </h:panelGroup>
+                            <h:panelGroup styleClass="field-group">
+                                <label class="label">关单时间</label>
+                                <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.closeTime}">
+                                    <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <p:fieldset legend="#{msg.CurrentWorkorder }" toggleable="false" >
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" columnClasses="col-field,col-field,col-field">
@@ -86,21 +87,10 @@
                                     <label class="label">创建人</label>
                                     <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.ownerName}"
                                                    styleClass="value"/>
-                                </h:panelGroup> <h:panelGroup styleClass="field-group">
-                                    <label class="label">开单时间</label>
-                                    <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.creationTime}">
-                                        <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
-                                    </p:outputLabel>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="field-group">
                                     <label class="label">到场时间</label>
                                     <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.signInTime}">
-                                        <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
-                                    </p:outputLabel>
-                                </h:panelGroup>
-                                <h:panelGroup styleClass="field-group">
-                                    <label class="label">关单时间</label>
-                                    <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.closeTime}">
                                         <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
                                     </p:outputLabel>
                                 </h:panelGroup>
@@ -207,12 +197,12 @@
                                     </p:column>
                                     <p:column headerText="开始时间">
                                         <h:outputText value="#{coWorkerItem.startTime}">
-                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                            <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="结束时间">
                                         <h:outputText value="#{coWorkerItem.endTime}">
-                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                            <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
                                          </h:outputText>
                                     </p:column>
                                  <p:column headerText="工时(小时)">
@@ -242,6 +232,7 @@
                     </c:otherwise>
                 </c:choose>
             </p:dialog>
+
         </div>
     </ui:composition>
 </html>
