@@ -5709,3 +5709,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- 工时类型 - 商务确认
       INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
       VALUES ('workOrderHoursTypeEhome', '7', '商务确认', 'Business Confirmation', NULL, -1);
+-- 日常检查状态新增
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('nurseSiteMaintainStatus','9','有问题','Has Issue',NULL,-1);
