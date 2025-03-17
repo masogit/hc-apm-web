@@ -461,7 +461,7 @@
                 <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " style="float:left" rendered="#{zkbContractEditController.createHide}"/>
                     <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.editHide}"/>
                     <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
-                    <p:commandButton immediate="true" value="积分清零" icon="ui-icon-arrow-back" action="#{zkbContractEditController.resetZeroScore}" style="float:right;">
+                    <p:commandButton immediate="true" value="积分清零" icon="fa fa-columns" action="#{zkbContractEditController.resetZeroScore}" style="float:right;">
                         <p:confirm header="#{msg.DeleteConformation}" message="积分是否确认要清零？" icon="ui-icon-warning"/>
                     </p:commandButton>
 
