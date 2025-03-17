@@ -121,8 +121,11 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
         if(value == null || StringUtils.isBlank(value.getValue())){
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
-        List<OrgInfo> list = orgInfoRepository.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID());
-        String[] strs = list.stream().filter(t -> StrUtil.isNotEmpty(t.getHospitalUcmid())).map(OrgInfo::getHospitalUcmid).toArray(String[]::new);
+        OrgInfo orgInfo = orgInfoRepository.findByUid(UserContextService.getCurrentUserAccount().getHospitalUID());
+        String[] strs = Optional.ofNullable(orgInfo)
+                .filter(info -> StrUtil.isNotEmpty(info.getHospitalUcmid()))
+                .map(info -> new String[]{info.getHospitalUcmid()})
+                .orElse(new String[0]);
         Map<String, Object> params = new HashMap<>();
         if(strs!=null && strs.length>0){
             params.put("umids",strs);
