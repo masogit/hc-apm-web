@@ -92,6 +92,9 @@ public class EHomeTransactionWorkOrder implements Serializable {
     private String courseName;
 
     @Transient
+    private String engineer;
+
+    @Transient
     private MaintenanceOrderDTO maintenanceOrderDTO;
 
     @Transient
