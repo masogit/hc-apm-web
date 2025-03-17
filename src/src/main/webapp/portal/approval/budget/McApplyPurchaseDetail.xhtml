@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:fieldset legend="#{msg.MaintenanceContractApplyInfo}" rendered="#{multiLevelApprovalController.businessTypeFlag eq 20 }">
+        <p:dataTable id="mcApplyPurchase" value="#{multiLevelApprovalController.primaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="#{msg.ApplicationNum}">
+                <h:outputText value="#{item.applicationNum}"/>
+            </p:column>
+            <p:column headerText="#{msg.Applicant}">
+                <h:outputText value="#{item.applicantName}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationDept}">
+                <h:outputText value="#{item.applicationDeptName}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationDate}">
+                <h:outputText value="#{item.applicationDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat14()}"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="病区代码">
+                <h:outputText value="#{item.wardCode}"/>
+            </p:column>
+        </p:dataTable>
+        <p:dataTable id="mcApplyPurchaseAsset" value="#{multiLevelApprovalController.secondaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="设备名称">
+                <h:outputText value="#{item.assetInfo.name}"/>
+            </p:column>
+            <p:column headerText="品牌/制造商简称">
+                <h:outputText value="#{item.assetInfo.makerShortName}"/>
+            </p:column>
+            <p:column headerText="设备型号">
+                <h:outputText value="#{item.assetInfo.functionType}"/>
+            </p:column>
+            <p:column headerText="制造商序列号">
+                <h:outputText value="#{item.assetInfo.serialNum}"/>
+            </p:column>
+            <p:column headerText="资产编号">
+                <h:outputText value="#{item.assetInfo.financingNum}"/>
+            </p:column>
+            <p:column headerText="采购价格">
+                <h:outputText value="#{item.assetInfo.purchasePrice}"/>
+            </p:column>
+            <p:column headerText="使用日期">
+                <h:outputText value="#{item.assetInfo.installDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat14()}"/>
+                </h:outputText>
+            </p:column>
+        </p:dataTable>
+        <p:fieldset legend="附件信息"  >
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <p:dataList id="mcApplyPurchaseAttachList"
+                                value="#{multiLevelApprovalController.attachList}"
+                                var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                        <f:facet name="header">附件详情</f:facet>
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                    </p:dataList>
+                </h:panelGroup>
+            </p:panelGrid>
+        </p:fieldset>
+    </p:fieldset>
+</ui:composition>
+</html>

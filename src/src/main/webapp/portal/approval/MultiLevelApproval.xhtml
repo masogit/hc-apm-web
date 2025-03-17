@@ -73,17 +73,15 @@
                     </p:column>
                     <p:column headerText="#{msg.Actions}" rendered="#{multiLevelApprovalListController.pendingApprovalByMe}">
                         <!--17 为采购-->
-                                <p:commandButton value="审批" rendered="#{item.businessType eq 17}"
-                                                 action="#{multiLevelApprovalListController.promptApproval(item)}"
-                                                 update="MultiLevelApprovalClaimPurDialog"
-                                                 oncomplete="PF('MultiLevelApprovalClaimPurDialog').show()"  />
-
+                        <p:commandButton value="审批" rendered="#{item.businessType eq 17}"
+                                         action="#{multiLevelApprovalListController.promptApproval(item)}"
+                                         update="MultiLevelApprovalClaimPurDialog"
+                                         oncomplete="PF('MultiLevelApprovalClaimPurDialog').show()"  />
                         <!--17 为采购-->
-                                <p:commandButton value="审批" rendered="#{item.businessType ne 17}"
-                                                 action="#{multiLevelApprovalListController.promptApproval(item)}"
-                                                 update="MultiLevelApprovalClaimDialog"
-                                                 oncomplete="PF('MultiLevelApprovalClaimDialog').show()"  />
-
+                        <p:commandButton value="审批" rendered="#{item.businessType ne 17}"
+                                         action="#{multiLevelApprovalListController.promptApproval(item)}"
+                                         update="MultiLevelApprovalClaimDialog"
+                                         oncomplete="PF('MultiLevelApprovalClaimDialog').show()"  />
                     </p:column>
 
                     <f:facet name="{Toolbar}">

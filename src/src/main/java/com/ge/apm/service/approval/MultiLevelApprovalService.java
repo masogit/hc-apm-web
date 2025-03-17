@@ -7,9 +7,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.budget.BudgetApplication;
-import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.domain.budget.PurchaseOrderInfo;
+import com.ge.apm.domain.budget.*;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetInfoBulkEditService;
@@ -93,7 +91,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private BudgetApplicationAssetRepository budgetApplicationAssetRepository;
     @Autowired
     private AssetScrapRepository assetScrapDao;
-
+    @Autowired
+    private MaintenanceContractApplyPurchaseRepository maintenanceContractApplyPurchaseRepository;
     @Autowired
     private AssetInfoRepository assetInfoDao;
 
@@ -177,6 +176,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.APPROVAL_PURCHASE_MANAGEMENT;
             case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
                 return ApprovalConstant.APPROVAL_ASSET_EQUIPMENT_ADJUSTMENT;
+            case ApprovalConstant.BUSINESS_TYPE_MAINTENANCE_CONTRACT_APPLY_PURCHASE:
+                return ApprovalConstant.APPROVAL_MAINTENANCE_CONTRACT_APPLY_PURCHASE;
             default:
                 return null;
         }
@@ -592,8 +593,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 this.sendWxMsg(sendUserUids,message,"审批失败","",MSGEvent.MULTI_LEVEL_APPROVAL_REFUSED,multiLevelApproval);
                 break;
         }
-
-
     }
 
     public void doWorkDetailByIsAgreeType(String id, int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList,MultiLevelApproval multiLevelApproval) {
@@ -1380,6 +1379,227 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void maintenanceContractApplyPurchaseAgree(MultiLevelApproval multiLevelApprovalNew, String approvalOpinion, MaintenanceContractApplyPurchaseVo applyPurchaseVo) throws Exception {
+        MaintenanceContractApplyPurchase applyPurchase = maintenanceContractApplyPurchaseRepository.findById(multiLevelApprovalNew.getBusinessUid());
+
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalNew;
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
+        List<UserAccount> userAccounts=new ArrayList<>();
+
+        if (multiLevelApprovalConfig != null) {
+            multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+            multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
+            multiLevelApproval.setActualApproverName(userAccount.getName());
+            multiLevelApproval.setActualApproverDate(new Date());
+            multiLevelApproval.setActualApproverUid(userAccount.getUid());
+            multiLevelApproval.setApprovalOpinion(approvalOpinion);
+            multiLevelApproval.setApprovalIng(true);
+            int approvalLevel = multiLevelApproval.getApprovalLevel();
+            int level = approvalLevel + 1;
+            multiLevelApproval.setApprovalLevelNow(level);
+            //更新审批数据
+            multiLevelApprovalRepository.save(multiLevelApproval);
+            saveBlobFile(multiLevelApproval);
+            //更新审批进度
+            if (level > 2) {
+                List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
+                if (null != list) {
+                    for (int i = 0; i < list.size(); i++) {
+                        MultiLevelApproval multi = list.get(i);
+                        if (multi != null && multi.getApprovalLevelNow() != level) {
+                            multi.setApprovalLevelNow(level);
+                            multiLevelApprovalRepository.save(multi);
+                        }
+                    }
+                }
+            }
+            String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+            if (null != approvalItem) {
+                List<String> sendUserUids = ListUtil.newArrayList();
+                List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
+                });
+                if (approvalNodes != null) {
+                    MultiLevelApproval date = multiLevelApprovalNew;
+                    int maxNodeId = approvalNodes.size();
+
+                    List<MultiLevelApproval> multiLevelApprovalList=null;
+                    if (level > maxNodeId) {//最后一个人审批通过 更新审批状态为通过 业务状态为审批通过
+                        multiLevelApprovalList = this.getMultiLevelApproval(multiLevelApproval);
+                        //发起人UID
+                        String initiateApproverUid = null;
+                        String businessTypeName = this.getBusinessType(multiLevelApproval.getBusinessType());
+                        if (null != multiLevelApprovalList) {
+                            for (int i = 0; i < multiLevelApprovalList.size(); i++) {
+                                MultiLevelApproval multi = multiLevelApprovalList.get(i);
+                                if (null != multi.getInitiateApproverUid() && !"".equals(multi.getInitiateApproverUid())) {
+                                    initiateApproverUid = multi.getInitiateApproverUid();
+                                }
+                                multi.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
+                                multi.setApprovalLevelNow(ApprovalConstant.APPROVAL_NOW_AGREE);
+                                multiLevelApprovalRepository.save(multi);
+                            }
+                            //微信通知发起人审批通过
+                            UserAccount user = userAccountRepository.getByUid(initiateApproverUid);
+                            if(ObjectUtil.isNotEmpty(user) && !ObjectUtil.isAllEmpty(user.getUid())){
+                                sendUserUids.add(user.getUid());
+                            }
+                            String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessTypeName + ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
+                            if(multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP
+                                    && multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT
+                                    && multiLevelApproval.getBusinessType()!=ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT) {
+                                this.sendWxMsg(sendUserUids, message,"审批通过","",MSGEvent.MULTI_LEVEL_APPROVAL_PASS,multiLevelApproval);
+                            }
+                        }
+                        updateMaintenanceContractApplyPurchase(applyPurchaseVo, applyPurchase, approvalLevel, userAccount, approvalOpinion,true);                        mqUtils.sendApprovalMessage(userAccount,multiLevelApproval.getBusinessType(),multiLevelApproval.getBusinessUid(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
+                    } else {
+                        ApprovalNode node = approvalNodes.get(approvalLevel);
+                        if (node != null) {
+                            boolean usingRole = node.getUsingRole();
+                            if (usingRole) {//角色审批，根据角色拉取用户进行审批
+                                List<Integer> nodeRoleUids = node.getRoleUids();
+                                if (nodeRoleUids != null) {
+                                    userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
+                                    List<String> uids = userAccounts.stream().filter(item -> StringUtils.isNotBlank(item.getUid())).map(UserAccount::getUid).collect(Collectors.toList());
+                                    sendUserUids.addAll(uids);
+
+                                    //保存角色到审批流中
+                                    date.setApprovalType(ApprovalConstant.ROLE_APPROVAL_TYPE);
+                                    Object[] objects = nodeRoleUids.toArray();
+                                    String str = StringUtils.join(objects, ",");
+                                    date.setApprovalUid(str);
+                                }
+                            } else {//用户审批
+                                List<String> userUids = node.getUserUids();
+                                if(CollectionUtils.isEmpty(userUids)){
+                                    userUids=new ArrayList<>();
+                                }
+                                List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
+                                if(CollectionUtils.isNotEmpty(uids)){
+                                    userUids.addAll(uids);
+                                    userUids = userUids.stream().distinct().collect(Collectors.toList());
+                                }
+                                List<String> strings = generationAdjustment(approvalNodes, node,multiLevelApproval.getBusinessUid(),multiLevelApproval.getBusinessType());
+                                if(CollectionUtils.isNotEmpty(strings)){
+                                    userUids = strings;
+                                }
+                                userAccounts = userAccountRepository.findByUidIn(userUids);
+                                sendUserUids.addAll(userUids);
+                                date.setApprovalType(ApprovalConstant.USER_APPROVAL_TYPE);
+                                Object[] objects = userUids.toArray();
+                                String str = StringUtils.join(objects, ",");
+                                date.setApprovalUid(str);
+                            }
+                            date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+                            date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+                            date.setApprovalLevel(level);
+                            date.setCreatedBy(userAccount.getLoginName());
+                            date.setApprovalIng(false);
+                            date.setApprovalLevelNow(level);
+                            date.setInitiateApproverUid(null);
+                            date.setCreatedDate(new Date());
+                            date.setId(null);
+                            date.setActualApproverName(null);
+                            date.setActualApproverDate(null);
+                            date.setApprovalOpinion(null);
+                            //生成下条待审批数据
+                            MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
+                            String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                            extracted(multiLevelApproval, userAccount, userAccounts, sendUserUids, date, node, linkUrl);
+                            updateMaintenanceContractApplyPurchase(applyPurchaseVo, applyPurchase, approvalLevel, userAccount, approvalOpinion,true);
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void maintenanceContractApplyPurchaseByDisagree(MultiLevelApproval multiLevelApproval, String approvalOpinion, MaintenanceContractApplyPurchaseVo applyPurchaseVo){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        MaintenanceContractApplyPurchase applyPurchase = maintenanceContractApplyPurchaseRepository.findById(multiLevelApproval.getBusinessUid());
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
+        multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE);
+        multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE);
+        multiLevelApproval.setActualApproverName(userAccount.getName());
+        multiLevelApproval.setActualApproverDate(new Date());
+        multiLevelApproval.setActualApproverUid(userAccount.getUid());
+        multiLevelApproval.setApprovalOpinion(approvalOpinion);
+        multiLevelApproval.setApprovalIng(true);
+        //更新审批数据
+        multiLevelApprovalRepository.save(multiLevelApproval);
+        saveBlobFile(multiLevelApproval);
+        //更新审批状态为不通过 业务状态为审批不通过
+        List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
+        //发起人UID
+        String initiateApproverUid = null;
+        String businessType = this.getBusinessType(multiLevelApproval.getBusinessType());
+        String businessNumber = multiLevelApproval.getBusinessNumber();
+        if (null != list) {
+            for (int i = 0; i < list.size(); i++) {
+                MultiLevelApproval multi = list.get(i);
+                if (null != multi.getInitiateApproverUid() && !"".equals(multi.getInitiateApproverUid())) {
+                    initiateApproverUid = multi.getInitiateApproverUid();
+                }
+                multi.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE);
+                multi.setApprovalLevelNow(ApprovalConstant.APPROVAL_NOW_DISAGREE);
+                multiLevelApprovalRepository.save(multi);
+            }
+        }
+        updateMaintenanceContractApplyPurchase(applyPurchaseVo, applyPurchase, multiLevelApproval.getApprovalLevel(), userAccount, approvalOpinion,false);
+        //审批不同意时 给发起人发送微信
+        UserAccount user = userAccountRepository.getByUid(initiateApproverUid);
+        List<String> sendUserUids = new ArrayList<>(1);
+        if(user!=null && StringUtils.isNotBlank(user.getUid())){
+            sendUserUids.add(user.getUid());
+        }
+        ArrayList<UserAccount> userAccounts = new ArrayList<>();
+        userAccounts.add(user);
+        String message = ApprovalConstant.WX_MESSAGE_DISAGREE_1+businessType+ApprovalConstant.WX_MESSAGE_DISAGREE_2+businessNumber+ApprovalConstant.WX_MESSAGE_DISAGREE_3;
+        this.sendWxMsg(sendUserUids,message,"审批失败","",MSGEvent.MULTI_LEVEL_APPROVAL_REFUSED,multiLevelApproval);
+    }
+
+    public void updateMaintenanceContractApplyPurchase(MaintenanceContractApplyPurchaseVo maintenanceContractApplyPurchaseVo, MaintenanceContractApplyPurchase maintenanceContractApplyPurchase, int level, UserAccount userAccount,String opinion, boolean flag){
+        if(level == 1){ //待审核
+            maintenanceContractApplyPurchase.setTechAnalysisDiscussion(maintenanceContractApplyPurchaseVo.getTechAnalysisDiscussion());
+            maintenanceContractApplyPurchase.setTechAuditDate(new Date());
+            maintenanceContractApplyPurchase.setTechComment(opinion);
+            maintenanceContractApplyPurchase.setTechAuditer(userAccount.getName());
+            if(flag){
+                maintenanceContractApplyPurchase.setApplicationStep(MaintenanceContractApplyPurchase.ApplicationStepEnum.MeetingReasoningPending.name());
+                maintenanceContractApplyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.ApprovalAccept.name());
+            }else{
+                maintenanceContractApplyPurchase.setApplicationStep(MaintenanceContractApplyPurchase.ApplicationStepEnum.Complete.name());
+                maintenanceContractApplyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.ApprovalReject.name());
+            }
+        }else if(level == 2){
+            maintenanceContractApplyPurchase.setMeetAuditComment(maintenanceContractApplyPurchaseVo.getMeetAuditComment());
+            maintenanceContractApplyPurchase.setMeetAuditDate(maintenanceContractApplyPurchaseVo.getMeetAuditDate());
+            maintenanceContractApplyPurchase.setMeetAuditRemark(maintenanceContractApplyPurchaseVo.getMeetAuditRemark());
+            maintenanceContractApplyPurchase.setMeetReasoningResult(maintenanceContractApplyPurchaseVo.getMeetReasoningResult());
+            maintenanceContractApplyPurchase.setRecordPersonName(maintenanceContractApplyPurchaseVo.getRecordPersonName());
+            if(flag){
+                maintenanceContractApplyPurchase.setApplicationStep(MaintenanceContractApplyPurchase.ApplicationStepEnum.PurchaseConfirmationPending.name());
+                maintenanceContractApplyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.MeetingReasoningAccept.name());
+            }else{
+                maintenanceContractApplyPurchase.setApplicationStep(MaintenanceContractApplyPurchase.ApplicationStepEnum.Complete.name());
+                maintenanceContractApplyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.MeetingReasoningReject.name());
+            }
+        }else if(level == 3){
+            maintenanceContractApplyPurchase.setPurchaseConfirmComment(opinion);
+            maintenanceContractApplyPurchase.setPurchaseConfirmDate(new Date());
+            maintenanceContractApplyPurchase.setPurchaseConfirmer(userAccount.getName());
+            maintenanceContractApplyPurchase.setApplicationStep(MaintenanceContractApplyPurchase.ApplicationStepEnum.Complete.name());
+            if(flag){
+                maintenanceContractApplyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.PurchaseConfirmationAccept.name());
+            }else{
+                maintenanceContractApplyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.PurchaseConfirmationReject.name());
+            }
+        }
+        maintenanceContractApplyPurchaseRepository.save(maintenanceContractApplyPurchase);
+    }
 
     private void updateAssetScrap(MultiLevelApproval multiLevelApproval, Integer status, UserAccount userAccount, String approvalOpinion) {
         AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
@@ -1517,6 +1737,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT_NAME;
             case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
                 return ApprovalConstant.BUSINESS_TYPE_ASSET_EQUIPMENT_ADJUSTMENT_NAME;
+            case ApprovalConstant.BUSINESS_TYPE_MAINTENANCE_CONTRACT_APPLY_PURCHASE:
+                return ApprovalConstant.APPROVAL_MAINTENANCE_CONTRACT_APPLY_PURCHASE_CHI;
             default:
                 break;
         }
@@ -1547,6 +1769,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT;
             case ApprovalConstant.APPROVAL_ASSET_EQUIPMENT_ADJUSTMENT:
                 return ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT;
+            case ApprovalConstant.APPROVAL_MAINTENANCE_CONTRACT_APPLY_PURCHASE:
+                return ApprovalConstant.BUSINESS_TYPE_MAINTENANCE_CONTRACT_APPLY_PURCHASE;
             default:
                 break;
         }
