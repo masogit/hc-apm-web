@@ -32,6 +32,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.List;
@@ -67,6 +68,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private TreeNode accessOrgTree;
     private TreeNode[] selectedAccessOrgNodes;
     private Integer state = -1;
+    private String type;
 
     @Override
     protected ReminderRuleRepository getDAO() {
@@ -106,6 +108,12 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     }
 
     public void save(String actionName) {
+        WechatParam wechatParam = selected.getWechatParam();
+        if (ObjectUtil.isEmpty(wechatParam.getFirst()) || ObjectUtil.isEmpty(wechatParam.getKeyword1())) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessageKey("微信模板不能为空！");
+            return;
+        }
         selected.setState(state);
         if ("Create".equals(crudActionName)) {
             selected.setState(-1);
@@ -118,7 +126,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         }
         if (!verifyEmpty(actionName)) return;
         JSONObject parameters = JSON.parseObject(JSON.toJSONString(selected.getRuleParam()));
-        WechatParam wechatParam = selected.getWechatParam();
+
         wechatParam.setTemplateId(ReminderType.getWechatTemplateId(selected.getType()));
         parameters.putAll(JSON.parseObject(JSON.toJSONString(wechatParam)));
         selected.setParameters(JSON.toJSONString(parameters));
@@ -301,6 +309,17 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         } else {
             state = 1;
         }
+        type = selected.getType();
+    }
+
+    public List<SelectItem> getDateUnitList() {
+        List<SelectItem> resultList = ListUtil.newArrayList();
+        resultList.add(new SelectItem("0" , "天"));
+        if ("UnattendedApproval".equals(type)) {
+            resultList.add(new SelectItem("1" , "小时"));
+            resultList.add(new SelectItem("2" , "分钟"));
+        }
+        return resultList;
     }
 
     public List<OrgInfo> getHospitalList(String orgLevel) {
@@ -365,5 +384,13 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
