@@ -49,6 +49,12 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
             .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
     OrgInfoRepository orgInfoRepository;
 
+
+    private String open = null;
+    private String close = null;
+    private String accept = null;
+
+
     private EHomeTransactionWorkOrderRepository dao;
     private MvsTransactionWorkService mvsTransactionWorkService;
     private FileDownloadService fileDownloadService;
@@ -155,6 +161,33 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
     private void processSearchFilters(Map<String, Object> params, List<SearchFilter> filters) {
         for (SearchFilter filter : filters) {
              switch (filter.fieldName) {
+                 case "accept": //
+                     String[] dates = filter.value.toString().split("~");
+                     if (dates.length > 0 && !dates[0].isEmpty()) {
+                         params.put("startDate", dates[0].trim()); // 开始日期
+                     }
+                     if (dates.length > 1 && !dates[1].isEmpty()) {
+                         params.put("endDate", dates[1].trim()); // 结束日期
+                     }
+                     break;
+                 case "open": //
+                     String[] open = filter.value.toString().split("~");
+                     if (open.length > 0 && !open[0].isEmpty()) {
+                         params.put("startDateOpen", open[0].trim()); // 开始日期
+                     }
+                     if (open.length > 1 && !open[1].isEmpty()) {
+                         params.put("endDateOpen", open[1].trim()); // 结束日期
+                     }
+                     break;
+                 case "close": //
+                     String[] close = filter.value.toString().split("~");
+                     if (close.length > 0 && !close[0].isEmpty()) {
+                         params.put("startDateClose", close[0].trim()); // 开始日期
+                     }
+                     if (close.length > 1 && !close[1].isEmpty()) {
+                         params.put("endDateClose", close[1].trim()); // 结束日期
+                     }
+                     break;
                 case "typeKey":
                     params.put("typeKey", filter.value);  // 对类型字段进行业务语义映射
                     break;
@@ -289,5 +322,30 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
     public void setI18nMessageListWorkOrderType(List<I18nMessage> i18nMessageListWorkOrderType) {
         this.i18nMessageListWorkOrderType = i18nMessageListWorkOrderType;
     }
+
+    public String getOpen() {
+        return open;
+    }
+
+    public void setOpen(String open) {
+        this.open = open;
+    }
+
+    public String getClose() {
+        return close;
+    }
+
+    public void setClose(String close) {
+        this.close = close;
+    }
+
+    public String getAccept() {
+        return accept;
+    }
+
+    public void setAccept(String accept) {
+        this.accept = accept;
+    }
+
 }
 

@@ -210,6 +210,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
         List<EfficiencyEquipmentInfo> efficiencyEquipmentInfos = efficiencyEquipmentMapper.selectList(param);
         Long count = efficiencyEquipmentMapper.selectListCount(param);
+        currentPageAssets=efficiencyEquipmentInfos;
         return  new PageImpl<>(efficiencyEquipmentInfos, pageRequest, count);
     }
 
@@ -402,6 +403,10 @@ protected boolean numberField(String fieldName, String filterVal) {
                 case "serialNum":
                     param.put("serialNum", searchFilter.value);
                     break;
+                case "displayName":
+                    param.put("displayName", searchFilter.value);
+                    break;
+
                 case "assetGroup":
                     try {
                         param.put("assetGroup", Integer.parseInt(searchFilter.value.toString()));
