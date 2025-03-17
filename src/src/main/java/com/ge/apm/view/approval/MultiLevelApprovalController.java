@@ -5,9 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.budget.BudgetApplication;
-import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.domain.budget.PurchaseOrderInfo;
+import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
@@ -66,7 +64,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private VenderInfoRepository venderInfoRepository;
     private UaaService uaaService;
     private SharedAssetRequestRepository sharedAssetRequestRepository;
-
+    private MaintenanceContractApplyPurchaseRepository maintenanceContractApplyPurchaseRepository;
+    private MaintenanceContractApplyPurchaseAssetRepository maintenanceContractApplyPurchaseAssetRepository;
 
     private UserAccountRepository userAccountRepository;
     private WorkflowService workflowService;
@@ -132,6 +131,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private BudgetApplicationAsset confirmBudget;
     @Getter @Setter
     private PurchaseOrderInfo purchaseOrderInfo;
+    @Getter @Setter
+    private MaintenanceContractApplyPurchaseVo applyPurchaseVo;
     @Getter  @Setter
     private OrgInfo org;
     @Getter  @Setter
@@ -182,11 +183,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         sharedAssetRequestRepository = WebUtil.getBean(SharedAssetRequestRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        maintenanceContractApplyPurchaseRepository = WebUtil.getBean(MaintenanceContractApplyPurchaseRepository.class);
+        maintenanceContractApplyPurchaseAssetRepository = WebUtil.getBean(MaintenanceContractApplyPurchaseAssetRepository.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         org = orgDao.findById(account.getOrgInfoId());
         orgTree = initOrgTree(treeNode);
         this.confirmBudget = new BudgetApplicationAsset();
         this.purchaseOrderInfo = new PurchaseOrderInfo();
+        applyPurchaseVo = new MaintenanceContractApplyPurchaseVo();
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -323,6 +327,12 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 primaryApprovalData = sharedAssetRequest;
                 secondaryApprovalData =sharedAssetRequest;
                 break;
+            case ApprovalConstant.BUSINESS_TYPE_MAINTENANCE_CONTRACT_APPLY_PURCHASE:
+                MaintenanceContractApplyPurchase maintenanceContractApplyPurchase = maintenanceContractApplyPurchaseRepository.findById(multiLevelApproval.getBusinessUid());
+                primaryApprovalData = maintenanceContractApplyPurchase;
+                secondaryApprovalData =maintenanceContractApplyPurchaseAssetRepository.findByApplicationId(maintenanceContractApplyPurchase.getId());
+                attachList = blobObjectRepository.findByBoUuid(maintenanceContractApplyPurchase.getId());
+                break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
         }
@@ -373,7 +383,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApproval.setAttachments(attachList);
-        multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
+        if(businessTypeFlag == 20){
+            multiLevelApprovalService.maintenanceContractApplyPurchaseAgree(multiLevelApproval, applyPurchaseVo.getMeetAuditComment(), applyPurchaseVo);
+            approvalOpinion = "";
+            applyPurchaseVo = new MaintenanceContractApplyPurchaseVo();
+        }else{
+            multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
+        }
         selected = null;
         this.needSignature = false;
         this.resetSignature();
@@ -516,7 +532,11 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApproval.setAttachments(attachList);
-        multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
+        if(businessTypeFlag == 20){
+            multiLevelApprovalService.maintenanceContractApplyPurchaseByDisagree(multiLevelApproval, approvalOpinion, applyPurchaseVo);
+        }else{
+            multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
+        }
         selected = null;
         this.needSignature = false;
         this.resetSignature();
@@ -921,6 +941,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     }
 
     public Integer approvaLevelPurchase() {
+        if(this.selected == null){
+            return null;
+        }
         return this.selected.getApprovalLevel();
     }
 

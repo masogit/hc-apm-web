@@ -108,6 +108,8 @@ public interface ApprovalConstant {
     String APPROVAL_ADVERSE_EVENTS = "adverseEvents"; // 不良事件上报
     String APPROVAL_BUDGET_MANAGEMENT = "budgetManagement"; // 预算管理
     String APPROVAL_PURCHASE_MANAGEMENT = "purchaseManagement"; // 采购管理
+    String APPROVAL_MAINTENANCE_CONTRACT_APPLY_PURCHASE = "maintenanceContractApplyPurchase"; // 维保合同申购
+    String APPROVAL_MAINTENANCE_CONTRACT_APPLY_PURCHASE_CHI = "维保合同申购"; //
     String APPROVAL_ASSET_SCRAP = "assetScrap"; // 资产报废流程
     String APPROVAL_ASSET_DEPARTMENT_CONVERT = "assetDepartmentConvert"; // 资产转科流程
     String APPROVAL_BATH_ASSET_DEPARTMENT_CONVERT = "bathAssetDepartmentConvert"; // 批量设备转科
@@ -135,6 +137,7 @@ public interface ApprovalConstant {
     int BUSINESS_TYPE_PURCHASE_MANAGEMENT = 17; // 采购管理
     int BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT = 18; // 设备调剂
     int BUSINESS_TYPE_BATH_ASSET_DEPARTMENT_CONVERT = 19; // 批量资产转科
+    int BUSINESS_TYPE_MAINTENANCE_CONTRACT_APPLY_PURCHASE = 20; //维保合同申购管理
 
     String BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME = "申购管理"; // 预算管理
     String BUSINESS_TYPE_PURCHASE_MANAGEMENT_NAME = "采购管理"; // 预算管理

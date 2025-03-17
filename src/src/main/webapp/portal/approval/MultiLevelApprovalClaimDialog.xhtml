@@ -5,7 +5,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition >
     <p:dialog class="MultiLevelApprovalClaimDialog" id="MultiLevelApprovalClaimDialog" widgetVar="MultiLevelApprovalClaimDialog" modal="true" height="600" width="1200"  resizable="false" draggable="true" appendTo="@(body)" header="审批">
@@ -52,10 +52,16 @@
 
                 <!-- 预算审核页面-->
                 <ui:include src="budget/BudgetDetail.xhtml"/>
+                <!-- 维保合同申购 -->
+                <ui:include src="budget/McApplyPurchaseDetail.xhtml"/>
                 <!-- 设备调剂-->
                 <ui:include src="content/EquipmentAdjustmentApproval.xhtml"/>
 
                 <ui:include src="content/MultiLevelApprovalAttachmentxhtml.xhtml"/>
+
+                <c:if test="#{multiLevelApprovalController.businessTypeFlag == 20}">
+                    <ui:include src="budget/McApplyPurchaseAudit.xhtml" />
+                </c:if>
 
                 <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
                     <label class="label" style="font-size: medium; font-weight: bold">审核结果</label>
@@ -64,11 +70,10 @@
                         <f:selectItem itemLabel="同意不上报" itemValue="2"/>
                     </p:selectOneRadio>
                 </h:panelGroup>
-                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{multiLevelApprovalController.businessTypeFlag ne 20}">
                     <h:panelGroup >
                         <label class="label">审批意见</label>
-                        <p:inputText id="unitPrice" name="unitPrice" placeholder="审批意见"
-                                     value="#{multiLevelApprovalController.approvalOpinion}"/>
+                        <p:inputText id="unitPrice" name="unitPrice" placeholder="审批意见" value="#{multiLevelApprovalController.approvalOpinion}"/>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 14 and multiLevelApprovalController.signatureNurseRendered}">
                         <label class="label">手术室护士长是否已签名</label>
@@ -77,8 +82,9 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
+
             </p:panelGrid>
-            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14 and multiLevelApprovalController.businessTypeFlag != 15 and multiLevelApprovalController.businessTypeFlag != 16 and multiLevelApprovalController.businessTypeFlag != 18 and multiLevelApprovalController.businessTypeFlag != 19}">
+            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14 and multiLevelApprovalController.businessTypeFlag != 15 and multiLevelApprovalController.businessTypeFlag != 16 and multiLevelApprovalController.businessTypeFlag != 18 and multiLevelApprovalController.businessTypeFlag != 19 and  multiLevelApprovalController.businessTypeFlag != 20}">
                 <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update=":approvalForm:approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                 <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="不同意" update=":approvalForm:approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
             </h:panelGroup>
@@ -119,6 +125,11 @@
                 <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getApprovalNode()}"  value="退回" update=":approvalForm:approvalList ItemDetailViewForm returnDlg" icon="ui-icon-check"    oncomplete="PF('returnDlg').show();"   />
                 <p:commandButton validateClient="true" rendered="#{multiLevelApprovalController.getReturn()}" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(4)}"  value="直送" update=":approvalForm:approvalList ItemDetailViewForm " icon="ui-icon-check"   oncomplete="handleComplete2(xhr, status, args);"   />
                 <p:commandButton style="display: none"   id="openSignature2" actionListener="#{multiLevelApprovalController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
+            </h:panelGroup>
+            <!-- 维保合同申购 -->
+            <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 20}">
+                <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getBudgetMultiLevelApprovalPersonByAgree()}" value="审核通过" update=":approvalForm:approvalList ItemDetailViewForm" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="审核不通过" update=":approvalForm:approvalList ItemDetailViewForm" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
             </h:panelGroup>
         </h:form>
     </p:dialog>

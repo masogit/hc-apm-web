@@ -1,0 +1,150 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <style>
+            .zoom-06 {
+                zoom: 0.6;
+            }
+
+            .zoom-08 {
+                zoom: 0.8;
+            }
+
+            .wrap-text {
+                word-break: break-word;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+
+            .width-pct-100 {
+                min-width: 50% !important;
+                max-width: 100% !important;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="设备保养采购申请"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.AdvancedSearch}">
+                        <p:panelGrid id="searchPanel" columns="4" layout="grid"
+                                     styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.ApplicationNum}"/>
+                                <p:inputText value="#{mcApplyPurchaseListController.searchForm.applicationNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.ApplicationDept}</label>
+                                <p:inputText id="dept" readonly="true"
+                                             value="#{mcApplyPurchaseListController.searchForm.dept}"/>
+                                <p:commandButton id="org" process="@this" icon="fa fa-angle-down"
+                                                 class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade"
+                                                style="position: absolute; left: 0; top: 0; width: 300px;"
+                                                dynamic="false" modal="false" dismissable="true">
+                                    <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                        <p:inputText id="searchDeptName" value="#{mcApplyPurchaseListController.searchDeptName}"  />
+                                        <p:commandButton process=":searchForm:searchDeptName @this" partialSubmit="true" icon="ui-icon-search" update="orgTree" actionListener="#{mcApplyPurchaseListController.treeSeachCondition('list')}" value="检索"/>
+                                        <p:tree id="orgTree" value="#{mcApplyPurchaseListController.orgTree}" var="node"
+                                                selectionMode="single" class="tree" style="width:98%; border:0">
+                                            <p:ajax process="@this" event="select" update="searchForm:dept"
+                                                    listener="#{mcApplyPurchaseListController.onSearchTreeNode}"
+                                                    oncomplete="PF('varOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.ApplicationDate}(#{msg.From})"/>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{mcApplyPurchaseListController.searchForm.dateStart}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            readonlyInput="true" showButtonPanel="true"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.ApplicationDate}(#{msg.To})"/>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{mcApplyPurchaseListController.searchForm.dateEnd}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            readonlyInput="true" showButtonPanel="true"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.hasAnyRole('AssetHead,DeptHead')}">
+                                <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
+                                <p:inputText value="#{mcApplyPurchaseListController.searchForm.applicantName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup style="display: flex;">
+                                <p:commandButton value="#{msg.Search}" actionListener="#{mcApplyPurchaseListController.search}" update="budgetTabView"/>
+                                <p:commandButton value="#{msg.Reset}" actionListener="#{mcApplyPurchaseListController.resetSearch}" update="searchForm budgetTabView"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:form>
+
+                <p:tabView class="ui-g-12" id="budgetTabView" dynamic="true" cache="false"
+                           activeIndex="#{mcApplyPurchaseListController.tabIndex}">
+                    <p:ajax event="tabChange" listener="#{mcApplyPurchaseListController.onTabChange}"/>
+                    <p:tab id="s0" title="待提交">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s1" title="待审核">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s2" title="待过会论证">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s3" title="采购信息确认">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                 <!--   <p:tab id="s2" title="待完成">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>-->
+                    <p:tab id="s4" title="完成">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+
+                    <p:tab id="s5" title="#{msg.All}">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+
+            </div>
+        </div>
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
+        <script type="text/javascript">
+            function selectTab(index) {
+                if(typeof tabWidget != 'undefined') {
+                    tabWidget.select(index);
+                } else {
+                    alert("Can't select tab " + index);
+                }
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>
