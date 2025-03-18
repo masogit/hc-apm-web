@@ -896,6 +896,11 @@
                                     </f:facet>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'locationNotes'}">
+                                <p:column headerText="#{msg.locationNotes}" filterBy="#{item.locationNotes}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.locationNotes}"/>
+                                </p:column>
+                            </c:if>
 
                             <c:if test="#{columnItem eq 'spare01'}">
                                 <p:column headerText="#{msg.spare01}" sortBy="#{item.spare01}">
