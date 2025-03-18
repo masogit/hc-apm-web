@@ -304,6 +304,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 }
                 assetScrap.setCreatedBy(user.getName());
                 AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
+                attachList= blobObjectRepository.findByBoUuid(assetScrap.getId());
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
                 jsonObject.put("assetInfo",asset);
                 jsonObject.put("lifecycleInYear",asset.getLifecycleInYear());
@@ -384,7 +385,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApproval.setAttachments(attachList);
         if(businessTypeFlag == 20){
-            multiLevelApprovalService.maintenanceContractApplyPurchaseAgree(multiLevelApproval, applyPurchaseVo.getMeetAuditComment(), applyPurchaseVo);
+            multiLevelApprovalService.maintenanceContractApplyPurchaseAgree(multiLevelApproval, approvalOpinion, applyPurchaseVo);
             approvalOpinion = "";
             applyPurchaseVo = new MaintenanceContractApplyPurchaseVo();
         }else{

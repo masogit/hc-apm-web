@@ -2,6 +2,7 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "asset_scrap")
@@ -128,6 +130,10 @@ public class AssetScrap implements Serializable , ApprovableTarget {
 
     @Column(name = "custom_disposal_method")
     private String customDisposalMethod;
+
+    @Transient
+    @JsonProperty
+    private List<V2_BlobObject> attachments;
 
     public AssetScrap() {
     }
@@ -418,5 +424,13 @@ public class AssetScrap implements Serializable , ApprovableTarget {
 
     public void setCustomDisposalMethod(String customDisposalMethod) {
         this.customDisposalMethod = customDisposalMethod;
+    }
+
+    public List<V2_BlobObject> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<V2_BlobObject> attachments) {
+        this.attachments = attachments;
     }
 }

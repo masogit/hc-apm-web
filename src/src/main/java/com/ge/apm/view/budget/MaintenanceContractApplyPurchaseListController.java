@@ -7,6 +7,7 @@ import com.ge.apm.domain.budget.MaintenanceContractApplyPurchase;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.MaintenanceContractApplyPurchaseService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -14,6 +15,7 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -98,7 +100,10 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
     }
 
     public void doubleClick(){
-
+        String str = "action=" + MaintenanceContractApplyPurchaseService.EDIT_ACTION + "&selectedId=" + this.selected.getId()+"&tabIndex="+tabIndex;
+        String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void onSearchTreeNode(NodeSelectEvent event) {
@@ -135,12 +140,12 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
         String url = "";
         if(MaintenanceContractApplyPurchaseService.CREATE_ACTION.equals(action)){
             if(mcApplyPurchaseService.checkYearStart(userAccount)){
-                url = UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.CREATE_ACTION+"&tabIndex="+tabIndex);
+                url = UrlEncryptController.encodeUrlParam("Edit?action=" + MaintenanceContractApplyPurchaseService.CREATE_ACTION+"&tabIndex="+tabIndex);
             }else{
                 WebUtil.addSuccessMessage("年度采购入口未开启，请检查后重试！");
             }
         }else if(MaintenanceContractApplyPurchaseService.EDIT_ACTION.equals(action)){
-            return UrlEncryptController.encodeUrlParam("Edit?action=" + BudgetApplicationBapController.EDIT_ACTION
+            return UrlEncryptController.encodeUrlParam("Edit?action=" + MaintenanceContractApplyPurchaseService.EDIT_ACTION
                     + "&selectedId=" + this.selected.getId()+"&tabIndex="+tabIndex);
         }
 
@@ -180,7 +185,6 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
         }else if(tabIndex == 5){//全部
             //searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, Arrays.asList(1, 2, 3,4,5,6)));
         }
-
     }
 
     public void search(){
@@ -241,7 +245,6 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
             logger.error(ex.getMessage());
         }
     }
-
 
     @Override
     protected GenericRepositoryUUID<MaintenanceContractApplyPurchase> getDAO() {
