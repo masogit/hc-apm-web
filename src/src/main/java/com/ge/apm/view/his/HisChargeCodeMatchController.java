@@ -214,9 +214,9 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
                 return;
             }
         }else{
-            List<HisAssetGroupAssetMatch> collect = startList.stream().filter(item -> item.getGroupRate() != 100.0).collect(Collectors.toList());
+            List<HisAssetGroupAssetMatch> collect = startList.stream().filter(item -> item.getGroupRate() > 100.0).collect(Collectors.toList());
             if(CollectionUtils.isNotEmpty(collect)){
-                WebUtil.addErrorMessageKey("多设备分组必须都是100%！");
+                WebUtil.addErrorMessageKey("多相同的设备分组每组不能大于100%！");
                 return;
             }
         }
