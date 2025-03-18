@@ -101,6 +101,7 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
             selectedDept = null;
             selected = new MaintenanceContractApplyPurchase();
             mcApplyPurchaseService.initCreateObject(selected, account);
+            v2_blobObjectList = new ArrayList<>();
         } else if (MaintenanceContractApplyPurchaseService.EDIT_ACTION.equals(applyPurchaseStatusVo.getActionName())) {
             selected = dao.findById(selectedId);
             v2_blobObjectList = blobService.findBlobObjectsByBoUid(selected.getId());

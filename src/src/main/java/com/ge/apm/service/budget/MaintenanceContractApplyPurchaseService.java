@@ -2,21 +2,29 @@ package com.ge.apm.service.budget;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +33,16 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import javax.annotation.PostConstruct;
+import java.io.*;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service("mcApplyPurchaseService")
 public class MaintenanceContractApplyPurchaseService {
@@ -38,6 +52,10 @@ public class MaintenanceContractApplyPurchaseService {
 
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
+
+    public static final String FILE_NAME_ROOT_MC = "医疗设备维保项目申请表";
+
+    public static final String ATTACHMENT = "附件";
 
     @Autowired
     PurchaseBudgetConfigRepository purchaseBudgetConfigRepository;
@@ -61,45 +79,55 @@ public class MaintenanceContractApplyPurchaseService {
     @Autowired
     private UserAccountRepository userDao;
 
+    private MicroServiceUtil msService;
+
+    private FileDownloadService fileDownloadService;
+
+    @PostConstruct
+    protected void init() {
+        msService = WebUtil.getBean(MicroServiceUtil.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+    }
+
     public boolean checkYearStart(UserAccount account) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<PurchaseBudgetConfig> purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
-                account.getSiteUID(),sdf.parse(sdf.format(new Date())));
-        if(CollectionUtils.isEmpty(purchaseBudgetConfigList)){
+                account.getSiteUID(), sdf.parse(sdf.format(new Date())));
+        if (CollectionUtils.isEmpty(purchaseBudgetConfigList)) {
             return false;
         }
         return true;
     }
 
 
-    public List<AssetInfo> queryAssetByCondition(UserAccount userAccount, BudgetAssetSearchForm assetSearchForm){
+    public List<AssetInfo> queryAssetByCondition(UserAccount userAccount, BudgetAssetSearchForm assetSearchForm) {
         List<AssetInfo> assetInfos = new ArrayList<>();
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
-        if(StrUtil.isNotEmpty(assetSearchForm.getApplicationDeptId())){
+        if (StrUtil.isNotEmpty(assetSearchForm.getApplicationDeptId())) {
             filters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, assetSearchForm.getApplicationDeptId()));
         }
-        if(StrUtil.isNotEmpty(assetSearchForm.getAssetName())){
+        if (StrUtil.isNotEmpty(assetSearchForm.getAssetName())) {
             filters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetName()));
         }
-        if(StrUtil.isNotEmpty(assetSearchForm.getAssetBrand())){
+        if (StrUtil.isNotEmpty(assetSearchForm.getAssetBrand())) {
             filters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, assetSearchForm.getAssetBrand()));
         }
-        if(StrUtil.isNotEmpty(assetSearchForm.getAssetModel())){
+        if (StrUtil.isNotEmpty(assetSearchForm.getAssetModel())) {
             filters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, assetSearchForm.getAssetModel()));
         }
-        if(StrUtil.isNotEmpty(assetSearchForm.getSerialNum())){
+        if (StrUtil.isNotEmpty(assetSearchForm.getSerialNum())) {
             filters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, assetSearchForm.getSerialNum()));
         }
-        if(StrUtil.isNotEmpty(assetSearchForm.getFinancingNum())){
+        if (StrUtil.isNotEmpty(assetSearchForm.getFinancingNum())) {
             filters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, assetSearchForm.getFinancingNum()));
         }
         assetInfos = assetInfoRepository.findBySearchFilter(filters);
         return assetInfos;
     }
 
-    public void saveSelectedAsset(AssetInfo assetInfo, List<MaintenanceContractApplyPurchaseAsset> subscribeAssetList){
+    public void saveSelectedAsset(AssetInfo assetInfo, List<MaintenanceContractApplyPurchaseAsset> subscribeAssetList) {
         MaintenanceContractApplyPurchaseAsset maintenanceContractSubscribeAsset = new MaintenanceContractApplyPurchaseAsset();
         maintenanceContractSubscribeAsset.setAssetUid(assetInfo.getUid());
         maintenanceContractSubscribeAsset.setAssetInfo(assetInfo);
@@ -107,9 +135,9 @@ public class MaintenanceContractApplyPurchaseService {
         subscribeAssetList.add(maintenanceContractSubscribeAsset);
     }
 
-    public void initCreateObject(MaintenanceContractApplyPurchase applyPurchase, UserAccount account){
+    public void initCreateObject(MaintenanceContractApplyPurchase applyPurchase, UserAccount account) {
         OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
-        if(orgInfo.getOrgType()==4){
+        if (orgInfo.getOrgType() == 4) {
             applyPurchase.setApplicationDeptName(orgInfo.getName());
             applyPurchase.setApplicationDept(orgInfo);
         }
@@ -123,17 +151,17 @@ public class MaintenanceContractApplyPurchaseService {
         applyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.TempSave.name());
     }
 
-    public OrgInfo getCourtyardAreaOrg(OrgInfo orgInfo){
-        if(orgInfo!=null&& orgInfo.getOrgLevel()==orgInfo.getOrgType()){
+    public OrgInfo getCourtyardAreaOrg(OrgInfo orgInfo) {
+        if (orgInfo != null && orgInfo.getOrgLevel() == orgInfo.getOrgType()) {
             return orgInfo;
         }
         return getCourtyardAreaOrg(orgInfo.getParentOrg());
     }
 
     @Transactional
-    public void saveData(MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList, List<V2_BlobObject> blobObjects, List<String> removeBoIds, UserAccount userAccount,String actionName){
+    public void saveData(MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList, List<V2_BlobObject> blobObjects, List<String> removeBoIds, UserAccount userAccount, String actionName) {
 
-        if(StrUtil.isEmpty(applyPurchase.getId())){
+        if (StrUtil.isEmpty(applyPurchase.getId())) {
             applyPurchase.setCreatedBy(userAccount.getName());
             applyPurchase.setCreatedByUid(userAccount.getUid());
             applyPurchase.setCreatedDate(new Date());
@@ -149,25 +177,25 @@ public class MaintenanceContractApplyPurchaseService {
         applyPurchase.setIsDeleted(0);
         maintenanceContractApplyPurchaseRepository.save(applyPurchase);
 
-        if(EDIT_ACTION.equals(actionName)){
+        if (EDIT_ACTION.equals(actionName)) {
             maintenanceContractApplyPurchaseAssetRepository.deleteByApplicationId(applyPurchase.getId());
         }
 
-        for(MaintenanceContractApplyPurchaseAsset ma : applyPurchaseAssetList){
+        for (MaintenanceContractApplyPurchaseAsset ma : applyPurchaseAssetList) {
             ma.setApplicationId(applyPurchase.getId());
         }
         maintenanceContractApplyPurchaseAssetRepository.save(applyPurchaseAssetList);
 
-        if(blobObjects != null){
-            for(V2_BlobObject b : blobObjects){
+        if (blobObjects != null) {
+            for (V2_BlobObject b : blobObjects) {
                 b.setBoUuid(applyPurchase.getId());
             }
             blobObjectRepository.save(blobObjects);
         }
 
 
-        if(CollectionUtils.isNotEmpty(removeBoIds)){
-            for(String id : removeBoIds){
+        if (CollectionUtils.isNotEmpty(removeBoIds)) {
+            for (String id : removeBoIds) {
                 blobFileService.deleteBlobFileById(id);
             }
         }
@@ -175,13 +203,14 @@ public class MaintenanceContractApplyPurchaseService {
 
     /**
      * 生成ApplicationNum
+     *
      * @return
      */
     private String genApplicationNum() {
         String prefix = "BAW" + DateUtil.format(new Date(), "yyyyMMdd");
-        String o = maintenanceContractApplyPurchaseRepository.getMaxNum(prefix );
+        String o = maintenanceContractApplyPurchaseRepository.getMaxNum(prefix);
         int index = 1;
-        if(StrUtil.isNotEmpty(o)){
+        if (StrUtil.isNotEmpty(o)) {
             o = o.replace(prefix, "");
             index = Integer.valueOf(o);
             index++;
@@ -193,19 +222,20 @@ public class MaintenanceContractApplyPurchaseService {
 
     /**
      * 提交审批
+     *
      * @param applyPurchase
      * @param applyPurchaseAssetList
      * @param blobObjectList
      * @param removeBoIds
      * @param userAccount
      */
-    public void submitAudit(MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList, List<V2_BlobObject> blobObjectList, List<String> removeBoIds, UserAccount userAccount, String actionName){
+    public void submitAudit(MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList, List<V2_BlobObject> blobObjectList, List<String> removeBoIds, UserAccount userAccount, String actionName) {
         applyPurchase.setApplicationStep(MaintenanceContractApplyPurchase.ApplicationStepEnum.ApprovalPending.name());
         applyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.Requested.name());
         saveData(applyPurchase, applyPurchaseAssetList, blobObjectList, removeBoIds, userAccount, actionName);
 
         MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(applyPurchase, false);
-        MultiLevelApproval approval = generateApproval(applyPurchase, approvalConfig,userAccount);
+        MultiLevelApproval approval = generateApproval(applyPurchase, approvalConfig, userAccount);
         if (approval == null) {
             // 无可用的审批流
             logger.info("budget message 001: new budget application, but no approval configuration is available");
@@ -219,7 +249,7 @@ public class MaintenanceContractApplyPurchaseService {
         }
     }
 
-    public boolean checkMultiLevelApproval (MaintenanceContractApplyPurchase applyPurchase, UserAccount account){
+    public boolean checkMultiLevelApproval(MaintenanceContractApplyPurchase applyPurchase, UserAccount account) {
         boolean result = true;
         MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(applyPurchase, false);
         MultiLevelApproval approval = generateApproval(applyPurchase, approvalConfig, account);
@@ -230,17 +260,17 @@ public class MaintenanceContractApplyPurchaseService {
         return result;
     }
 
-    public boolean checkRequiredField(MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList){
+    public boolean checkRequiredField(MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList) {
         boolean flag = true;
-        if(applyPurchase.getApplicationDeptId() == null){
+        if (applyPurchase.getApplicationDeptId() == null) {
             WebUtil.addErrorMessage("申请科室 不能为空！");
             flag = false;
         }
-        if(StrUtil.isEmpty(applyPurchase.getWardCode())){
+        if (StrUtil.isEmpty(applyPurchase.getWardCode())) {
             WebUtil.addErrorMessage("病区代码 不能为空！");
             flag = false;
         }
-        if(CollectionUtils.isEmpty(applyPurchaseAssetList)){
+        if (CollectionUtils.isEmpty(applyPurchaseAssetList)) {
             WebUtil.addErrorMessage("保养设备 不能为空！");
             flag = false;
         }
@@ -289,7 +319,7 @@ public class MaintenanceContractApplyPurchaseService {
         return approval.get();
     }
 
-    private void sendMsg(MaintenanceContractApplyPurchase application, MultiLevelApprovalConfig config,  MultiLevelApproval approval) {
+    private void sendMsg(MaintenanceContractApplyPurchase application, MultiLevelApprovalConfig config, MultiLevelApproval approval) {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
                 Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
                 })).flatMap(nodes -> Optional.ofNullable(nodes.get(0)))).ifPresent(node -> {
@@ -308,31 +338,151 @@ public class MaintenanceContractApplyPurchaseService {
             // 发送消息
             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
                     + application.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-            approvalService.sendWxMsg(sendUserUids, message, "待审批","", MSGEvent.MULTI_LEVEL_APPROVAL_TO_BE_APPROVED,approval);
+            approvalService.sendWxMsg(sendUserUids, message, "待审批", "", MSGEvent.MULTI_LEVEL_APPROVAL_TO_BE_APPROVED, approval);
         });
     }
 
-    public List<MaintenanceContractApplyPurchaseAsset> queryPurchaseAssetById(String applicationId){
+    public List<MaintenanceContractApplyPurchaseAsset> queryPurchaseAssetById(String applicationId) {
         return maintenanceContractApplyPurchaseAssetRepository.findByApplicationId(applicationId);
     }
 
-    public void fieldRender(MaintenanceContractApplyPurchaseStatusVo applyPurchaseStatusVo, MaintenanceContractApplyPurchase applyPurchase){
-        if(MaintenanceContractApplyPurchase.ApplicationStepEnum.MeetingReasoningPending.name().equals(applyPurchase.getApplicationStep())){
+    public void fieldRender(MaintenanceContractApplyPurchaseStatusVo applyPurchaseStatusVo, MaintenanceContractApplyPurchase applyPurchase) {
+        if (MaintenanceContractApplyPurchase.ApplicationStepEnum.MeetingReasoningPending.name().equals(applyPurchase.getApplicationStep())) {
             applyPurchaseStatusVo.setShowTech(true);
-        }else if(MaintenanceContractApplyPurchase.ApplicationStepEnum.PurchaseConfirmationPending.name().equals(applyPurchase.getApplicationStep())){
+        } else if (MaintenanceContractApplyPurchase.ApplicationStepEnum.PurchaseConfirmationPending.name().equals(applyPurchase.getApplicationStep())) {
             applyPurchaseStatusVo.setShowTech(true);
             applyPurchaseStatusVo.setShowMeetReasoning(true);
-        }else if(MaintenanceContractApplyPurchase.ApplicationStepEnum.Complete.name().equals(applyPurchase.getApplicationStep())){
-            if(MaintenanceContractApplyPurchase.StatusEnum.ApprovalReject.name().equals(applyPurchase.getApplicationStatus())){
+        } else if (MaintenanceContractApplyPurchase.ApplicationStepEnum.Complete.name().equals(applyPurchase.getApplicationStep())) {
+            if (MaintenanceContractApplyPurchase.StatusEnum.ApprovalReject.name().equals(applyPurchase.getApplicationStatus())) {
                 applyPurchaseStatusVo.setShowTech(true);
-            }else if(MaintenanceContractApplyPurchase.StatusEnum.MeetingReasoningReject.name().equals(applyPurchase.getApplicationStatus())){
+            } else if (MaintenanceContractApplyPurchase.StatusEnum.MeetingReasoningReject.name().equals(applyPurchase.getApplicationStatus())) {
                 applyPurchaseStatusVo.setShowTech(true);
                 applyPurchaseStatusVo.setShowMeetReasoning(true);
-            }else{
+            } else {
                 applyPurchaseStatusVo.setShowTech(true);
                 applyPurchaseStatusVo.setShowMeetReasoning(true);
                 applyPurchaseStatusVo.setShowPurchaseConfirm(true);
             }
         }
+    }
+
+
+    public StreamedContent exportZip(String id) throws IOException {
+        MaintenanceContractApplyPurchase applyPurchase = maintenanceContractApplyPurchaseRepository.findById(id);
+        List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList = maintenanceContractApplyPurchaseAssetRepository.findByApplicationId(id);
+        List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(id);
+        StreamedContent streamedContent = null;
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ZipOutputStream zout = new ZipOutputStream(bout);
+        generateSingleApply(zout, applyPurchase, applyPurchaseAssetList, blobObjects);
+        zout.close();
+        String name = this.buildFileName();
+        streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", name+".zip");
+        return streamedContent;
+    }
+
+    public void generateSingleApply(ZipOutputStream zout, MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList, List<V2_BlobObject> blobObjects) throws IOException {
+        Map<String, Object> data = createReportData(applyPurchase, applyPurchaseAssetList, blobObjects);
+        byte[] templateBytes = fileDownloadService.getTemplateFileByte(SystemTemplateEnum.BUDGET_MAINTENANCE_CONTRACT_APPLY_PURCHASE_DOCX.getCode(), SystemTemplateEnum.BUDGET_MAINTENANCE_CONTRACT_APPLY_PURCHASE_DOCX.getFileType());
+        byte[] bytes = this.renderDocx(data, templateBytes);
+
+        String fileName = applyPurchase.getApplicationNum() + ".docx";
+        zout.putNextEntry(new ZipEntry( FILE_NAME_ROOT_MC+ "/" + fileName));
+        IOUtils.write(bytes, zout);
+        zout.closeEntry();
+        HashMap<String,Integer> nameMap = new HashMap<>();
+        if(blobObjects != null && blobObjects.size() > 0) {
+            getFileBufferedInputStream(zout, blobObjects);
+        }
+    }
+
+    public Map<String, Object> createReportData(MaintenanceContractApplyPurchase applyPurchase, List<MaintenanceContractApplyPurchaseAsset> applyPurchaseAssetList, List<V2_BlobObject> blobObjects) {
+        Map<String, Object> mm = new HashMap<>();
+        mm.put("courtyardArea", applyPurchase.getCourtyardArea());
+        mm.put("deptName", applyPurchase.getApplicationDeptName());
+        mm.put("equipmentDescription", applyPurchase.getEquipmentDescription());
+        mm.put("remark", applyPurchase.getRemark());
+        mm.put("techAnalysisDiscussion", applyPurchase.getTechAnalysisDiscussion());
+        mm.put("meetAuditComment", applyPurchase.getMeetReasoningResult());
+
+        String assetNames = applyPurchaseAssetList.stream().filter(t -> t.getAssetInfo() != null && StrUtil.isNotEmpty(t.getAssetInfo().getName())).map(pa -> pa.getAssetInfo().getName()).collect(Collectors.joining("、"));
+        String makerShortNames = applyPurchaseAssetList.stream().filter(t -> t.getAssetInfo() != null && StrUtil.isNotEmpty(t.getAssetInfo().getMakerShortName())).map(pa -> pa.getAssetInfo().getMakerShortName()).collect(Collectors.joining("、"));
+        String functionTypes = applyPurchaseAssetList.stream().filter(t -> t.getAssetInfo() != null && StrUtil.isNotEmpty(t.getAssetInfo().getFunctionType())).map(pa -> pa.getAssetInfo().getFunctionType()).collect(Collectors.joining("、"));
+        String serialNums = applyPurchaseAssetList.stream().filter(t -> t.getAssetInfo() != null && StrUtil.isNotEmpty(t.getAssetInfo().getSerialNum())).map(pa -> pa.getAssetInfo().getSerialNum()).collect(Collectors.joining("、"));
+        String financingNums = applyPurchaseAssetList.stream().filter(t -> t.getAssetInfo() != null && StrUtil.isNotEmpty(t.getAssetInfo().getFinancingNum())).map(pa -> pa.getAssetInfo().getFinancingNum()).collect(Collectors.joining("、"));
+        String installDates = applyPurchaseAssetList.stream().filter(t -> t.getAssetInfo() != null &&t.getAssetInfo().getInstallDate() != null).map(pa -> DateUtil.format(pa.getAssetInfo().getInstallDate(), "yyyy-MM-dd")).collect(Collectors.joining("、"));
+        String purchasePrices = applyPurchaseAssetList.stream().filter(t -> t.getAssetInfo() != null && t.getAssetInfo().getPurchasePrice() != null).map(pa -> pa.getAssetInfo().getPurchasePrice().toString()).collect(Collectors.joining("、"));
+
+        mm.put("assetNames", assetNames);
+        mm.put("makerShortNames", makerShortNames);
+        mm.put("functionTypes", functionTypes);
+        mm.put("serialNums", serialNums);
+        mm.put("financingNums", financingNums);
+        mm.put("installDates", installDates);
+        mm.put("purchasePrices", purchasePrices);
+
+        return mm;
+    }
+
+    private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
+        Map<String, RenderPolicy> bindings = new HashMap<>();
+        return  WordExportServiceUtil.generate(data, templateBytes, bindings);
+    }
+
+    private String buildFileName(){
+        String reportTypeTitle = FILE_NAME_ROOT_MC;
+        return reportTypeTitle + "-" + DateUtil.format(new Date(), "yyyyMMddHHmmss");
+    }
+
+    private String encoding(String fileName) {
+        try {
+            return URLEncoder.encode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return fileName;
+        }
+    }
+
+    public void getFileBufferedInputStream(ZipOutputStream zout, List<V2_BlobObject> blobObjects) throws IOException{
+        HashMap<String,Integer> nameMap = new HashMap<>();
+        for (V2_BlobObject v : blobObjects) {
+            String fn = v.getObjectName();
+            String newFileName = handleRepeatFileName(nameMap, fn);
+            StreamedContent sf = null;
+            try{
+                sf = msService.downloadSingleFile(v.getObjectStorageId());
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.error("file download fail", e);
+                continue;
+            }
+            zout.putNextEntry(new ZipEntry(ATTACHMENT + "/" + newFileName));
+            byte[] bys = new byte[1024 * 5];
+            try( BufferedInputStream bufferStream = new BufferedInputStream(sf.getStream())){
+                int rd = 0;
+                while ((rd = bufferStream.read(bys)) != -1) {
+                    zout.write(bys, 0, rd);
+                }
+                zout.closeEntry();
+            }
+        }
+    }
+
+    public String handleRepeatFileName(HashMap<String,Integer> nameMap, String fileName){
+        String newFileName = fileName;
+        if(nameMap.containsKey(fileName)){
+            Integer next = nameMap.get(fileName) + 1;
+            int lo = fileName.lastIndexOf(".");
+            if(lo >-1){
+                String pre = fileName.substring(0,lo);
+                pre += "(" + next +")";
+                newFileName = pre + fileName.substring(lo);
+                //递归检查新的fileName是否重复
+                newFileName = handleRepeatFileName(nameMap, newFileName);
+            }
+            nameMap.put(fileName, next);
+        }else{
+            nameMap.put(fileName, 0);
+        }
+        return newFileName;
     }
 }
