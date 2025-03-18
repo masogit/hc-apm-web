@@ -256,9 +256,9 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         //区域经理块显示
         List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = new ArrayList<ZkbPartOrderUserConfig>();
         if(userAccount.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContainsAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getZone(),ZkbPartOrder.DATA_TYPE_TEST);
         }else{
-            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getZone(),ZkbPartOrder.DATA_TYPE_TEST);
         }
         Optional<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = zkbPartOrderUserConfigs.stream().findFirst();
         if(zkbPartOrderUserConfig.isPresent()){
