@@ -13,49 +13,76 @@
         <div class="ui-g-12 card">
             <h:form id="woMvsMgrDetailForm">
                 <p:fieldset legend="SR内容" rendered="#{not empty mvsTransactionWorkController.selected}">
-                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                             <h:panelGroup>
-                                <label class="label">SR编号</label>
-                                <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.srNum}" />
-                            </h:panelGroup><h:panelGroup>
-                                <label class="label">销售姓名</label>
-                                <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.salesName}" />
-                            </h:panelGroup><h:panelGroup>
-                                <label class="label">Account开单类型</label>
-                                <h:outputLabel value="#{fieldMsg.fieldValues('reportTypeAcctEhome', mvsTransactionWorkController.selected.maintenanceOrderDTO.reportTypeAcct)}"/>
-                            </h:panelGroup>
+                        <div class="ui-g">
+                            <div class="ui-g-10 ui-g-nopad">
+                                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                     <h:panelGroup>
+                                        <label class="label">SR编号</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.srNum}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">WF#/IOU#</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.crcWf}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">医院</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.accountName}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">合同号</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.contractNo}" />
+                                    </h:panelGroup>
+                                   <!-- <h:panelGroup>
+                                        <label class="label">故障类别</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.getFaultTypeName(mvsTransactionWorkController.selected.maintenanceOrderDTO.faultType)}"/>
+                                    </h:panelGroup>-->
+                                    <h:panelGroup>
+                                        <label class="label">销售姓名</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.salesName}" />
+                                    </h:panelGroup><h:panelGroup>
+                                        <label class="label">Account开单类型</label>
+                                        <h:outputLabel value="#{fieldMsg.fieldValues('reportTypeAcctEhome', mvsTransactionWorkController.selected.maintenanceOrderDTO.reportTypeAcct)}"/>
+                                    </h:panelGroup>
 
-                            <h:panelGroup>
-                                <label class="label">工单描述</label>
-                                <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.faultDesc}" />
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">客户姓名</label>
-                                <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.customerName}" />
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">客户电话</label>
-                                <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.customerTel}" />
-                            </h:panelGroup>
-                            <h:panelGroup styleClass="field-group">
-                                <label class="label">开单时间</label>
-                                <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.creationTime}">
-                                    <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
-                                </p:outputLabel>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">接单时间</label>
-                                <h:outputText value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.acceptanceTime}">
-                                    <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
-                                </h:outputText>
-                             </h:panelGroup>
-                            <h:panelGroup styleClass="field-group">
-                                <label class="label">关单时间</label>
-                                <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.closeTime}">
-                                    <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
-                                </p:outputLabel>
-                            </h:panelGroup>
-                        </p:panelGrid>
+                                    <h:panelGroup>
+                                        <label class="label">工单描述</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.faultDesc}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">客户姓名</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.customerName}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">客户电话</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.customerTel}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup styleClass="field-group">
+                                        <label class="label">开单时间</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.creationTime}">
+                                            <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
+                                        </p:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">接单时间</label>
+                                        <h:outputText value="#{mvsTransactionWorkController.selected.maintenanceOrderDTO.acceptanceTime}">
+                                            <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
+                                        </h:outputText>
+                                     </h:panelGroup>
+                                    <h:panelGroup styleClass="field-group">
+                                        <label class="label">关单时间</label>
+                                        <p:outputLabel value="#{mvsTransactionWorkController.selected.workOrderDTO.closeTime}">
+                                            <f:convertDateTime pattern="yyyy.MM.dd, HH:mm:ss" timeZone="GMT+8"/>
+                                        </p:outputLabel>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </div>
+                            <div class="ui-g-2">
+                                <h:outputText value="验收人签名：" />
+                                <div class="container-fluid" style="height: 200px; width: 200px;">
+                                    <p:graphicImage rendered="#{not empty mvsTransactionWorkController.ackSignature}" value="#{fileDownloadService.getFile(mvsTransactionWorkController.ackSignature)}" stream="false" style="max-width: 100%;height: auto"/>
+                                </div>
+                            </div>
+                        </div>
                         <p:fieldset legend="#{msg.CurrentWorkorder }" toggleable="false" >
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" columnClasses="col-field,col-field,col-field">
                                 <!-- 基础信息列 -->
@@ -134,15 +161,15 @@
                                 <p:panel style="text-align:center"
                                          rendered="#{woAttachItemE.boType == 'IMG'}">
                                     <h:panelGrid columns="1" style="width:100%">
-                                        <p:ajax  event="click" update=":previewedDlgEhome" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(mvsTransactionWorkController,woAttachItemE.objectStorageId)}"/>
+                                        <p:ajax  event="click" update=":previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(mvsTransactionWorkController,woAttachItemE.objectStorageId)}"/>
                                         <p:graphicImage value="#{fileDownloadService.getFile(woAttachItemE.objectStorageId)}"
                                                         height="80" width="100" stream="false"/>
-                                        <p:commandLink validateClient="false" immediate="true" process="@this"
-                                                       value="#{woAttachItemE.objectName}"
-                                                       action="#{fileDownloadService.downloadFileForEhome(woAttachItemE.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                                     </h:panelGrid>
+                                    <p:commandLink validateClient="false" immediate="true" process="@this" value="#{woAttachItemE.objectName}" action="#{fileDownloadService.downloadFileForEhome(woAttachItemE.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/>
                                 </p:panel>
-                            </p:dataGrid>
+                              </p:dataGrid>
+
+
                               <h:panelGroup rendered="#{not empty mvsTransactionWorkController.selected.partsContextData}">
                                 <label class="label">#{msg.UsedPart}</label>
                                 <p:dataTable id="x3" class="cl3" value="#{mvsTransactionWorkController.selected.partsContextData}" var="detailItem">
@@ -219,7 +246,7 @@
                 </p:fieldset>
 
             </h:form>
-            <p:dialog id="previewedDlgEhome" width="1000" height="800"  widgetVar="previewedDlg" modal="true" howEffect="fade"  maximizable="true" appendTo="@this">
+            <p:dialog id="previewedDlg" width="1000" height="800"  widgetVar="previewedDlg" modal="true" howEffect="fade"  maximizable="true" appendTo="@this">
                 <c:choose>
                     <c:when test="#{preViewerBean.type eq 0}">
                         <p:graphicImage value="#{fileDownloadService.getFile(preViewerBean.getObjectId())}" stream="false"   width="100%" height="780px" />

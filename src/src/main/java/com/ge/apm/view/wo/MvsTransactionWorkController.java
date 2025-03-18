@@ -10,6 +10,7 @@ import com.ge.apm.dao.EHomeTransactionWorkOrderRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.*;
+import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.mvstransaction.MvsTransactionWorkService;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -49,10 +50,12 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
             .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
     OrgInfoRepository orgInfoRepository;
 
+    private AssetFaultTypeService assetFaultTypeService;
 
     private String open = null;
     private String close = null;
     private String accept = null;
+    private String ackSignature;
 
 
     private EHomeTransactionWorkOrderRepository dao;
@@ -70,6 +73,7 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
     }
     @Override
     protected void init() {
+        assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         user = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(EHomeTransactionWorkOrderRepository.class);
@@ -273,13 +277,43 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
         }
         return eHomeTransactionWorkOrders;
     }
+
+    public String getFaultTypeName(Integer id) {
+        return assetFaultTypeService.getFaultName(id);
+    }
     public void onSelectWorkOrder() {
         if (selected == null) return;
         if(!CollectionUtils.isEmpty(selected.getAttachmentDTOS())){
+            attachListEhome = new ArrayList<>();
+            ackSignature = new String();
             List<AttachmentDTO> attachmentDTOS = this.selected.getAttachmentDTOS();
-            Set<String> objectIds = attachmentDTOS.stream()
-                    .map(AttachmentDTO::getBusinessObjectId)  // 使用方法引用
-                    .collect(Collectors.toSet());
+            // 初始化结果集合
+            Set<String> objectIds = new HashSet<>();
+            for (AttachmentDTO dto : attachmentDTOS) {
+                // 获取附件类型字符串（便于调试时观察具体值）
+                String attachmentType = dto.getAttachmentType() != null
+                        ? dto.getAttachmentType().toString()
+                        : null;
+
+                // 排除类型为 "customerSignature" 的元素
+                if (!AttachmentDTO.AttachmentType.CUSTOMER_SIGNATURE.toString().equals(attachmentType)) {
+                    // 提取业务对象ID
+                    String businessObjectId = dto.getBusinessObjectId();
+                    // 将非空ID加入集合
+                    if (businessObjectId != null) {
+                        objectIds.add(businessObjectId);
+                    }
+                }
+            }
+            // 遍历附件列表
+            for (AttachmentDTO dto : attachmentDTOS) {
+                // 检查类型是否为 customerSignature
+                if (AttachmentDTO.AttachmentType.CUSTOMER_SIGNATURE.toString().equals(dto.getAttachmentType().toString())) {
+                    // 找到第一个匹配项时，提取ID并立即终止循环
+                    ackSignature = dto.getBusinessObjectId();
+                    break;
+                }
+            }
             List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(objectIds);
             List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif");
             if (fileInfoResults == null) {
@@ -350,5 +384,12 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
         this.accept = accept;
     }
 
+    public String getAckSignature() {
+        return ackSignature;
+    }
+
+    public void setAckSignature(String ackSignature) {
+        this.ackSignature = ackSignature;
+    }
 }
 
