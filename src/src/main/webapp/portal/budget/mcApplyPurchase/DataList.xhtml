@@ -43,8 +43,8 @@
             </p:column>
             <f:facet name="{Toolbar}">
                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{mcApplyPurchaseListController.pageForward('Create')}"/>
-                <p:commandButton id="editButton" icon="#{(mcApplyPurchaseListController.tabIndex eq 0  or mcApplyPurchaseListController.tabIndex eq 2 or mcApplyPurchaseListController.tabIndex eq 4 ) ? 'ui-icon-pencil' : 'ui-icon-web'}" class="btn btn-sm btn-gray" title="#{(mcApplyPurchaseListController.tabIndex eq 0  or mcApplyPurchaseListController.tabIndex eq 2 or mcApplyPurchaseListController.tabIndex eq 4 ) ? '修改' : '查看'}" action="#{mcApplyPurchaseListController.pageForward('Edit')}" disabled="#{empty mcApplyPurchaseListController.selected }"/>
-                <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}" actionListener="#{mcApplyPurchaseListController.delete}" >
+                <p:commandButton id="editButton" icon="#{(mcApplyPurchaseListController.tabIndex eq 0) ? 'ui-icon-pencil' : 'ui-icon-web'}" class="btn btn-sm btn-gray" title="#{(mcApplyPurchaseListController.tabIndex eq 0  or mcApplyPurchaseListController.tabIndex eq 2 or mcApplyPurchaseListController.tabIndex eq 4 ) ? '修改' : '查看'}" action="#{mcApplyPurchaseListController.pageForward('Edit')}" disabled="#{empty mcApplyPurchaseListController.selected }"/>
+                <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" update="datalist" title="#{msg.Delete}" actionListener="#{mcApplyPurchaseListController.delete}"  disabled="#{empty mcApplyPurchaseListController.selected or !(mcApplyPurchaseListController.selected.applicationStatus eq 'TempSave')}">
                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                 </p:commandButton>
                 <p:commandButton id="exportZipButton" ajax="false" title="下载压缩文件" actionListener="#{mcApplyPurchaseListController.exportAll}"

@@ -79,6 +79,17 @@
                          paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                          rows="10" pageLinks="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
+                <p:column width="36" id="checkBoxColumn">
+                    <p:selectBooleanCheckbox value="#{mcApplyPurchaseEditController.selectedMap[item.uid]}"  class="selectCheckBox">
+                        <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox2();"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header"  >
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{mcApplyPurchaseEditController.onSelectAllOfPage}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox2();"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+
                 <p:column headerText="#{msg.EquipmentName}">
                     <h:outputText value="#{item.name}"/>
                 </p:column>
@@ -111,6 +122,31 @@
             <p:commandButton immediate="true" value="#{msg.Cancel}"
                              onclick="PF('AssetSelectDlg').hide()"/>
         </h:form>
+
+        <script>
+            //<![CDATA[
+
+            function updateSelectAllCheckBox2() {
+                var checkboxlist = $("#assetSelectForm").find(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetSelectDlg\\:assetSelectForm\\:assetDatalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $("#assetSelectForm").find(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                    $("#assetSelectForm").find(".selectCheckBoxHeader")[0].children[1].children[0].classList.add("ui-icon-check");
+                    $("#assetSelectForm").find(".selectCheckBoxHeader")[0].children[1].children[0].classList.remove("ui-icon-blank");
+                } else {
+                    $("#assetSelectForm").find(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                    $("#assetSelectForm").find(".selectCheckBoxHeader")[0].children[1].children[0].classList.remove("ui-icon-check");
+                    $("#assetSelectForm").find(".selectCheckBoxHeader")[0].children[1].children[0].classList.add("ui-icon-blank");
+                }
+            }
+            //]]>
+
+
+        </script>
     </p:dialog>
 
 </ui:composition>
