@@ -4,6 +4,7 @@ import com.ge.apm.dao.MaintenanceContractApplyPurchaseRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.MaintenanceContractApplyPurchase;
+import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.budget.MaintenanceContractApplyPurchaseService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
@@ -16,7 +17,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -26,15 +30,19 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @ViewScoped
 @ManagedBean(name = "mcApplyPurchaseListController")
 public class MaintenanceContractApplyPurchaseListController extends GenericCRUDUUIDController<MaintenanceContractApplyPurchase> {
+
+    private static Logger logger = LoggerFactory.getLogger(MaintenanceContractApplyPurchaseListController.class);
 
     private MaintenanceContractApplyPurchaseRepository dao;
     private MaintenanceContractApplyPurchaseService mcApplyPurchaseService;
@@ -50,7 +58,8 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
     private OrgInfo org;
     @Getter @Setter
     private String searchDeptName;
-
+    @Getter @Setter
+    private StreamedContent exportFile;
     UserAccount userAccount;
 
     @Override
@@ -224,6 +233,15 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
             updateSearchFilter(new SearchFilter("orgUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
+
+    public void exportAll()  {
+        try {
+            exportFile = mcApplyPurchaseService.exportZip(selected.getId());
+        }catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }
+    }
+
 
     @Override
     protected GenericRepositoryUUID<MaintenanceContractApplyPurchase> getDAO() {

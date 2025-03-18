@@ -86,6 +86,9 @@ public class MaintenanceContractApplyPurchase implements ApprovableTarget, Seria
     @Column(name = "remark")
     private String remark;
 
+    @Column(name = "equipment_description")
+    private String equipmentDescription;
+
     // 审批流id
     @Column(name = "approval_config_id")
     private String approvalConfigId;
