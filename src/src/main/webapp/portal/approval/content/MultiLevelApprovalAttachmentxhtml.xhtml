@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
     <h:outputStylesheet>
@@ -30,8 +31,11 @@
                         <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
                     </p:column>
                     <p:column headerText="操作"  >
-                        <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
-                        <p:commandLink  value="预览" ajax="true"  update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <c:if test="#{fileitem.boSubType.contains('Image')}">
+                            &nbsp;&nbsp;
+                            <p:commandLink  value="预览" ajax="true" rendered="#{fileitem.boSubType.contains('Image')}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        </c:if>
                     </p:column>
                 </p:dataTable>
             </p:tab>
