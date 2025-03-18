@@ -384,7 +384,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApproval.setAttachments(attachList);
         if(businessTypeFlag == 20){
-            multiLevelApprovalService.maintenanceContractApplyPurchaseAgree(multiLevelApproval, applyPurchaseVo.getMeetAuditComment(), applyPurchaseVo);
+            multiLevelApprovalService.maintenanceContractApplyPurchaseAgree(multiLevelApproval, approvalOpinion, applyPurchaseVo);
             approvalOpinion = "";
             applyPurchaseVo = new MaintenanceContractApplyPurchaseVo();
         }else{

@@ -123,7 +123,6 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
         orgTreeSearch = initOrgTree(treeNodeSearch);
     }
 
-
     public TreeNode initOrgTree(TreeNode treeNode) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
@@ -170,8 +169,6 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
             assetSearchForm.setDeptName(selected.getApplicationDept().getName());
         }
     }
-
-
 
     public void deleteApplyPurchaseAsset(){
         if(selectedApplyPurchaseAsset != null){

@@ -1575,7 +1575,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 maintenanceContractApplyPurchase.setApplicationStatus(MaintenanceContractApplyPurchase.StatusEnum.ApprovalReject.name());
             }
         }else if(level == 2){
-            maintenanceContractApplyPurchase.setMeetAuditComment(maintenanceContractApplyPurchaseVo.getMeetAuditComment());
+            maintenanceContractApplyPurchase.setMeetAuditComment(opinion);
             maintenanceContractApplyPurchase.setMeetAuditDate(maintenanceContractApplyPurchaseVo.getMeetAuditDate());
             maintenanceContractApplyPurchase.setMeetAuditRemark(maintenanceContractApplyPurchaseVo.getMeetAuditRemark());
             maintenanceContractApplyPurchase.setMeetReasoningResult(maintenanceContractApplyPurchaseVo.getMeetReasoningResult());
