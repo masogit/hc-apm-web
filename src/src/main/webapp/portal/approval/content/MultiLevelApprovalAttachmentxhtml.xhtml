@@ -19,19 +19,21 @@
      <label class="label">附件</label>
         <p:accordionPanel id="accordion" activeIndex="false" multiple="false" var="o" value="#{multiLevelApprovalController.multiLevelApprovals}">
             <p:tab title="#{o.approvalLevel}级审批" >
-                <p:dataGrid id="contractListData" var="fileitem" value="#{o.attachments}" columns="5" layout="grid">
-                    <f:facet name="header">#{msg.Attachment}信息</f:facet>
-                    <p:panel  style="text-align:center">
-                        <h:panelGrid columns="1" style="width:100%" >
-                            <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}"/>
-                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
-
-                        </h:panelGrid>
-                        <p:commandLink validateClient="false" immediate="true" process="@this"
-                                       value="#{fileitem.objectName}"
-                                       action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
-                    </p:panel>
-                </p:dataGrid>
+                <p:dataTable id="contractListData" widgetVar="varDataList" value="#{o.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
+                    <p:column headerText="名称" >
+                        <h:outputText value="#{fileitem.objectName}"/>
+                    </p:column>
+                    <p:column headerText="类型"  >
+                        <h:outputText value="#{fileitem.boSubType}"/>
+                    </p:column>
+                    <p:column headerText="预览"  >
+                        <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
+                    </p:column>
+                    <p:column headerText="操作"  >
+                        <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
+                        <p:commandLink  value="预览" ajax="true"  update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                    </p:column>
+                </p:dataTable>
             </p:tab>
         </p:accordionPanel>
     </h:panelGroup>

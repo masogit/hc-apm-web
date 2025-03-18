@@ -112,6 +112,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private List<V2_BlobObject> attachList;
 
     @Getter
+    @Setter
+    private List<V2_BlobObject> fixedAttachList;
+
+    @Getter
     private Object primaryApprovalData;
 
     @Getter
@@ -304,7 +308,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 }
                 assetScrap.setCreatedBy(user.getName());
                 AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
-                attachList= blobObjectRepository.findByBoUuid(assetScrap.getId());
+                fixedAttachList= blobObjectRepository.findByBoUuid(assetScrap.getId());
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
                 jsonObject.put("assetInfo",asset);
                 jsonObject.put("lifecycleInYear",asset.getLifecycleInYear());
