@@ -6,7 +6,6 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.MaintenanceContractApplyPurchase;
 import com.ge.apm.domain.budget.MaintenanceContractApplyPurchaseAsset;
 import com.ge.apm.domain.budget.MaintenanceContractApplyPurchaseStatusVo;
@@ -33,7 +32,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ViewScoped
@@ -80,6 +81,11 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
     private MaintenanceContractApplyPurchaseStatusVo applyPurchaseStatusVo;
     @Getter  @Setter
     private Integer tabIndex = 0;
+    @Getter
+    @Setter
+    private Map<String, Boolean> selectedMap = new HashMap<>();;
+
+
     @Override
     protected void init() {
         super.init();
@@ -186,7 +192,12 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
     }
 
     public void saveSelectedAsset(){
-        mcApplyPurchaseService.saveSelectedAsset(selectedAssetInfo, applyPurchaseAssetList);
+        if(selectedMap.isEmpty()){
+            WebUtil.addErrorMessage("请选择设备！");
+            return;
+        }
+
+        mcApplyPurchaseService.saveSelectedAsset(selectedMap, applyPurchaseAssetList);
         System.out.println(applyPurchaseAssetList.size());
     }
 
@@ -233,6 +244,13 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
         assetSearchForm.setDept(orgInfo);
         assetSearchForm.setApplicationDeptId(orgInfo.getUid());
         assetSearchForm.setDeptName(orgInfo.getName());
+    }
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !assetInfoList.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        for (AssetInfo item : assetInfoList) {
+            selectedMap.put(item.getUid(), !isSelectedAll);
+        }
     }
 
     public String backList(){

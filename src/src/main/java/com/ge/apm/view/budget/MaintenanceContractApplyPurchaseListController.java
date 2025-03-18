@@ -149,7 +149,7 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
 
     @Override
     public void delete() {
-        super.delete();
+        mcApplyPurchaseService.deleteApply(selected.getId());
         selected = null;
     }
 

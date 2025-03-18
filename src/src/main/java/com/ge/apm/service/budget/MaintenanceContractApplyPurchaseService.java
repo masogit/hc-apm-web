@@ -127,12 +127,35 @@ public class MaintenanceContractApplyPurchaseService {
         return assetInfos;
     }
 
-    public void saveSelectedAsset(AssetInfo assetInfo, List<MaintenanceContractApplyPurchaseAsset> subscribeAssetList) {
-        MaintenanceContractApplyPurchaseAsset maintenanceContractSubscribeAsset = new MaintenanceContractApplyPurchaseAsset();
-        maintenanceContractSubscribeAsset.setAssetUid(assetInfo.getUid());
-        maintenanceContractSubscribeAsset.setAssetInfo(assetInfo);
-        maintenanceContractSubscribeAsset.setId(UUID.randomUUID().toString());
-        subscribeAssetList.add(maintenanceContractSubscribeAsset);
+    public void saveSelectedAsset(Map<String, Boolean> selectedMap, List<MaintenanceContractApplyPurchaseAsset> subscribeAssetList) {
+        List<AssetInfo> assetInfoList = new ArrayList<>();
+        for (String key : selectedMap.keySet()){
+            boolean v = selectedMap.get(key);
+            if(v){
+                AssetInfo assetInfo = assetInfoRepository.findByUid(key);
+                assetInfoList.add(assetInfo);
+
+            }
+        }
+
+        List<AssetInfo> addAsset = assetInfoList.stream().filter(t -> {
+            boolean r = true;
+            for (MaintenanceContractApplyPurchaseAsset pa : subscribeAssetList){
+                if(pa.getAssetInfo().getUid().equals(t.getUid())){
+                    r = false;
+                    break;
+                }
+            }
+            return r;
+        }).collect(Collectors.toList());
+
+        for(AssetInfo assetInfo : addAsset){
+            MaintenanceContractApplyPurchaseAsset maintenanceContractSubscribeAsset = new MaintenanceContractApplyPurchaseAsset();
+            maintenanceContractSubscribeAsset.setAssetUid(assetInfo.getUid());
+            maintenanceContractSubscribeAsset.setAssetInfo(assetInfo);
+            maintenanceContractSubscribeAsset.setId(UUID.randomUUID().toString());
+            subscribeAssetList.add(maintenanceContractSubscribeAsset);
+        }
     }
 
     public void initCreateObject(MaintenanceContractApplyPurchase applyPurchase, UserAccount account) {
@@ -484,5 +507,15 @@ public class MaintenanceContractApplyPurchaseService {
             nameMap.put(fileName, 0);
         }
         return newFileName;
+    }
+
+    @Transactional
+    public void deleteApply(String id){
+        maintenanceContractApplyPurchaseAssetRepository.deleteByApplicationId(id);
+        maintenanceContractApplyPurchaseRepository.delete(id);
+        List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(id);
+        for(V2_BlobObject b : blobObjects){
+            blobFileService.deleteBlobFile(b);
+        }
     }
 }
