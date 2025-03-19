@@ -27,13 +27,13 @@
                     <p:column headerText="类型"  >
                         <h:outputText value="#{fileitem.boSubType}"/>
                     </p:column>
-                    <p:column headerText="预览"  >
-                        <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
-                    </p:column>
+<!--                    <p:column headerText="预览"  >-->
+<!--                        <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />-->
+<!--                    </p:column>-->
                     <p:column headerText="操作"  >
                         <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                             &nbsp;&nbsp;
-                        <p:commandLink  value="预览" ajax="true" rendered="#{fileitem.objectType.contains('image') or fileitem.objectType.contains('pdf')}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <p:commandLink  value="预览" ajax="true" rendered="#{multiLevelApprovalController.isPreview(fileitem)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                     </p:column>
                 </p:dataTable>
             </p:tab>

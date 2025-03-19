@@ -45,6 +45,8 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -159,6 +161,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private boolean isReturnApproval=false;
 
     private boolean isDirectDelivery=false;
+
+    Pattern pattern = Pattern.compile("^(.*\\.(?i)(jpg|jpeg|png|gif|bmp|tiff|pdf|JPG|JPEG|PNG|GIF|BMP|TIFF|PDF))$");
 
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
@@ -981,5 +985,11 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachList = attachList.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+
+    public boolean  isPreview(V2_BlobObject fileitem){
+        String objectName = fileitem.getObjectName();
+        Matcher matcher = pattern.matcher(objectName);
+        return matcher.matches();
     }
 }
