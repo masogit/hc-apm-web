@@ -285,6 +285,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             case "ContractOverdue":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.CONTRACT_OVERDUE_MSG, WechatParam.class));
                 break;
+            case "ContractACK":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.CONTRACT_ACK_MSG, WechatParam.class));
+                break;
             case "NurseSiteMaintainItem":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.NURSE_SITE_MSG, WechatParam.class));
                 break;
