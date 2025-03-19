@@ -115,6 +115,9 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
             if(!MaintenanceContractApplyPurchase.ApplicationStepEnum.SubmitPending.name().equals(selected.getApplicationStep())){
                 applyPurchaseStatusVo.setCanEdit(false);
             }
+            if(!account.getUid().equals(selected.getCreatedByUid())){
+                applyPurchaseStatusVo.setCanEdit(false);
+            }
             mcApplyPurchaseService.fieldRender(applyPurchaseStatusVo, selected);
         }
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
