@@ -76,8 +76,8 @@
             </p:column>
         </p:dataTable>
     </h:panelGroup>
-    <h:panelGroup rendered="#{multiLevelApprovalController.attachList.size() > 0}">
-        <p:dataGrid id="pictureList" var="fileitem" value="#{multiLevelApprovalController.attachList}" columns="5" layout="grid">
+    <h:panelGroup rendered="#{multiLevelApprovalController.fixedAttachList.size() > 0}">
+        <p:dataGrid id="pictureList" var="fileitem" value="#{multiLevelApprovalController.fixedAttachList}" columns="5" layout="grid">
             <f:facet name="header">#{msg.Attachment}信息</f:facet>
             <p:panel  style="text-align:center">
                 <h:panelGrid columns="1" style="width:100%" >
