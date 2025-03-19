@@ -283,9 +283,10 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
     }
     public void onSelectWorkOrder() {
         if (selected == null) return;
+        attachListEhome = new ArrayList<>();
+        ackSignature = new String();
         if(!CollectionUtils.isEmpty(selected.getAttachmentDTOS())){
-            attachListEhome = new ArrayList<>();
-            ackSignature = new String();
+
             List<AttachmentDTO> attachmentDTOS = this.selected.getAttachmentDTOS();
             // 初始化结果集合
             Set<String> objectIds = new HashSet<>();
