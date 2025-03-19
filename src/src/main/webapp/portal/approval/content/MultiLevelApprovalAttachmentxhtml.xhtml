@@ -32,10 +32,8 @@
                     </p:column>
                     <p:column headerText="操作"  >
                         <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                        <c:if test="#{fileitem.boSubType.contains('Image')}">
                             &nbsp;&nbsp;
-                            <p:commandLink  value="预览" ajax="true" rendered="#{fileitem.boSubType.contains('Image')}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                        </c:if>
+                        <p:commandLink  value="预览" ajax="true" rendered="#{fileitem.objectType.contains('image') or fileitem.objectType.contains('pdf')}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                     </p:column>
                 </p:dataTable>
             </p:tab>
