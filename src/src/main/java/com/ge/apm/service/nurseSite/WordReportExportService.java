@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopColumnTableRenderPolicy;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
 import com.deepoove.poi.policy.RenderPolicy;
@@ -611,8 +609,8 @@ public class WordReportExportService {
             int num = itemDetails.size();
             List<String> checkItems = itemDetails.stream().map(obj -> ((JSONObject) obj).getString("name")).collect(Collectors.toList());
 //            checkItems.add(0,"日期");
-            checkItems.add("检查者");
-            checkItems.add("备注");
+//            checkItems.add("检查者");
+//            checkItems.add("备注");
             List<Object> itemTitleList = new ArrayList<>();
             for (String checkItem : checkItems) {
                 Map<String, String> itemTitleMap = new HashMap<>();
@@ -623,6 +621,8 @@ public class WordReportExportService {
             objects1 = new ArrayList<>();
             objects1.add("日期");
             objects1.addAll(checkItems);
+            objects1.add("检查者");
+            objects1.add("备注");
             checkItemMap.put("checkItems",itemTitleList);
 
             AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
