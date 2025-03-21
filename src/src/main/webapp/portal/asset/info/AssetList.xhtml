@@ -902,6 +902,118 @@
                                 </p:column>
                             </c:if>
 
+                            <c:if test="#{columnItem eq 'UCMID'}">
+                                <p:column headerText="#{msg.UCMID}" filterBy="#{item.UCMID}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.UCMID}"/>
+                                </p:column>
+                            </c:if>
+<!--                            <c:if test="#{columnItem eq 'orgPath'}">-->
+<!--                                <p:column headerText="#{msg.orgPath}" filterBy="#{item.orgPath}" filterMatchMode="LIKE">-->
+<!--                                    <h:outputText value="#{item.orgPath}"/>-->
+<!--                                </p:column>-->
+<!--                            </c:if>-->
+                            <c:if test="#{columnItem eq 'currentId'}">
+                                <p:column headerText="#{msg.currentId}" filterBy="#{item.currentId}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.currentId}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'powerOnThreshold'}">
+                                <p:column headerText="#{msg.powerOnThreshold}" filterBy="#{item.powerOnThreshold}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.powerOnThreshold}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'monitorRate'}">
+                                <p:column headerText="#{msg.monitorRate}" sortBy="#{item.monitorRate}" filterBy="#{item.monitorRate}" filterMatchMode="GTE">
+                                    <h:outputText value="#{item.monitorRate}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'unitPriceElectricity'}">
+                                <p:column headerText="#{msg.unitPriceElectricity}" sortBy="#{item.unitPriceElectricity}" filterBy="#{item.unitPriceElectricity}" filterMatchMode="GTE">
+                                    <h:outputText value="#{item.unitPriceElectricity}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'lastPmDate'}">
+                                <p:column headerText="#{msg.lastPmDate}" sortBy="#{item.lastPmDate}">
+                                    <h:outputText value="#{item.lastPmDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'lastQaDate'}">
+                                <p:column headerText="#{msg.lastQaDate}" sortBy="#{item.lastQaDate}">
+                                    <h:outputText value="#{item.lastQaDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'lastMeteringDate'}">
+                                <p:column headerText="#{msg.lastMeteringDate}" sortBy="#{item.lastMeteringDate}">
+                                    <h:outputText value="#{item.lastMeteringDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'nextMeteringDate'}">
+                                <p:column headerText="#{msg.nextMeteringDate}" sortBy="#{item.nextMeteringDate}">
+                                    <h:outputText value="#{item.nextMeteringDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'otherPower'}">
+                                <p:column headerText="#{msg.otherPower}" sortBy="#{item.otherPower}" filterBy="#{item.otherPower}" filterMatchMode="GTE">
+                                    <h:outputText value="#{item.otherPower}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'warranty'}">
+                                <p:column headerText="#{msg.isWarrantyNotice}" sortBy="#{item.isWarranty}" filterBy="#{item.isWarranty}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{item.warranty?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'isValid'}">
+                                <p:column headerText="#{msg.isValid}" >
+<!--                                    <f:facet name="filter">-->
+<!--                                        <p:selectOneMenu onchange="PF('varDataList').filter()">-->
+<!--                                            <f:converter converterId="javax.faces.Boolean" />-->
+<!--                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" />-->
+<!--                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />-->
+<!--                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />-->
+<!--                                        </p:selectOneMenu>-->
+<!--                                    </f:facet>-->
+                                    <h:outputText value="#{item.isValid?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'assetDisposalResults'}">
+                                <p:column id="assetDisposalResults" headerText="#{msg.assetDisposalResults}" sortBy="#{item.assetDisposalResults}" filterBy="#{item.assetDisposalResults}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetDisposalResults', item.assetDisposalResults)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetDisposalResultsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+
+
                             <c:if test="#{columnItem eq 'spare01'}">
                                 <p:column headerText="#{msg.spare01}" sortBy="#{item.spare01}">
 
