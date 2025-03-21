@@ -902,9 +902,32 @@
                                 </p:column>
                             </c:if>
 
+
+
+                            <c:if test="#{columnItem eq 'measuringOwner'}">
+                                <p:column headerText="#{msg.measuringOwner}" filterBy="#{item.measuringOwnerName}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.measuringOwnerName}"/>
+                                </p:column>
+                            </c:if>
+
                             <c:if test="#{columnItem eq 'UCMID'}">
                                 <p:column headerText="#{msg.UCMID}" filterBy="#{item.UCMID}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.UCMID}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'accountingDeptName'}">
+                                <p:column headerText="#{msg.accountingDeptName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.accountingDeptName}"/><br/>
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAccountingDeptOrgOrg}" appendTo="@(Body)"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAccountingDeptOrgNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist" oncomplete="afterLoadRender()"/>
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onAccountingDeptOrgNameFilterChange}" update=":AssetInfoListForm:datalist"  oncomplete="afterLoadRender()"/>
+
+                                        </p:autoComplete>
+                                    </f:facet>
+                                    <h:outputText value="#{item.accountingDeptOrg.shortName}"/>
                                 </p:column>
                             </c:if>
 <!--                            <c:if test="#{columnItem eq 'orgPath'}">-->

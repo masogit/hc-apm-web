@@ -91,7 +91,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     //选定科室过滤
     private String filterClinicalDeptOrg;
     private String filterAssetDeptOrg;
-
+    private String filterAccountingDeptOrgOrg;
+    private Set<String> accountingDeptOrgUidSet;
     private Set<String> clinicalDeptOrgUidSet;
     private String filterSpare01;
 
@@ -391,7 +392,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(AssetInfo::getClinicalDeptUID).collect(Collectors.toSet());
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(AssetInfo::getAssetDeptUID).collect(Collectors.toSet());
+        Set<String> orgUids3 = currentPageAssets.stream().filter(item -> item.getAccountingDeptUID() != null).map(AssetInfo::getAccountingDeptUID).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
+        orgUids.addAll(orgUids3);
 
         if (orgUids.isEmpty()) {
             return;
@@ -414,6 +417,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 OrgInfo found = orgInfoMap.get((item.getAssetDeptUID()));
                 if (found != null) {
                     item.setAssetDeptOrg(found);
+                }
+
+            }
+            if (item.getAccountingDeptUID() != null) {
+                OrgInfo found = orgInfoMap.get((item.getAccountingDeptUID()));
+                if (found != null) {
+                    item.setAccountingDeptOrg(found);
                 }
 
             }
@@ -501,6 +511,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
+        if (accountingDeptOrgUidSet != null && !accountingDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("accountingDeptUID", SearchFilter.Operator.IN, new ArrayList<>(accountingDeptOrgUidSet), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "accountingDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
         if (null != selectSite) {
@@ -1158,6 +1174,27 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+
+    public void onAccountingDeptOrgNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAccountingDeptOrgOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterAccountingDeptOrgOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAccountingDeptOrgOrg.equals(item.getName()))) {
+            filterAccountingDeptOrgOrg = null;
+        }
+
+        if (filterAccountingDeptOrgOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAccountingDeptOrgOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            accountingDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            accountingDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
     public void onSpare01FilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
@@ -1749,5 +1786,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public List<AssetInfo> getResultList() {
         return resultList;
+    }
+
+    public String getFilterAccountingDeptOrgOrg() {
+        return filterAccountingDeptOrgOrg;
+    }
+
+    public void setFilterAccountingDeptOrgOrg(String filterAccountingDeptOrgOrg) {
+        this.filterAccountingDeptOrgOrg = filterAccountingDeptOrgOrg;
     }
 }
