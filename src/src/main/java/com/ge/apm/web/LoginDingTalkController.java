@@ -94,7 +94,7 @@ public class LoginDingTalkController {
                     responseBody
             );
         } catch (Exception ex) {
-            log.info("ssoLogin err: {}" + ex.getMessage());
+            log.info("ssoLogin err: {}" ,ex);
             return ResponseEntity.badRequest().body(new ImmutableMap.Builder<String, Object>()
                     .put("message", ex.getMessage())
                     .put("bizStatusCode", "ERROR")
