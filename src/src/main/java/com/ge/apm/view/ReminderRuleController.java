@@ -109,7 +109,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     public void save(String actionName) {
         WechatParam wechatParam = selected.getWechatParam();
-        if (ObjectUtil.isEmpty(wechatParam.getFirst()) || ObjectUtil.isEmpty(wechatParam.getKeyword1())) {
+        if (ObjectUtil.isNotEmpty(selected.getId()) && (ObjectUtil.isEmpty(wechatParam.getFirst()) || ObjectUtil.isEmpty(wechatParam.getKeyword1()))) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessageKey("微信模板不能为空！");
             return;
@@ -284,6 +284,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
                 break;
             case "ContractOverdue":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.CONTRACT_OVERDUE_MSG, WechatParam.class));
+                break;
+            case "ContractAck":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.CONTRACT_ACK_MSG, WechatParam.class));
                 break;
             case "NurseSiteMaintainItem":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.NURSE_SITE_MSG, WechatParam.class));

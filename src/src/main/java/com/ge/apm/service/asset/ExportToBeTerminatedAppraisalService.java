@@ -159,7 +159,7 @@ public class ExportToBeTerminatedAppraisalService {
 //                        byte[] bytes = generate(map, templateBytes);
 
                         Map<String, RenderPolicy> bindings = new HashMap<>();
-                        byte[] bytes = WordExportServiceUtil.generate(datas, templateBytes, bindings);
+                        byte[] bytes = WordExportServiceUtil.generate(map, templateBytes, bindings);
 
                         if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
                             String name = o.toString() + "-" + "资产报废鉴定表" + ".docx";

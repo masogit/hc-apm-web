@@ -101,6 +101,7 @@
             (wo_context::jsonb ->> 'closeTime')::bigint / 1000
             ) &lt;= TO_TIMESTAMP(#{endDateClose}, 'YYYY-MM-DD') + INTERVAL '1 DAY'
         </if>
-    </select>
+        order by sr_num desc
+        </select>
 
 </mapper>

@@ -283,20 +283,21 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
     }
     public void onSelectWorkOrder() {
         if (selected == null) return;
+        attachListEhome = new ArrayList<>();
+        ackSignature = new String();
         if(!CollectionUtils.isEmpty(selected.getAttachmentDTOS())){
-            attachListEhome = new ArrayList<>();
-            ackSignature = new String();
+
             List<AttachmentDTO> attachmentDTOS = this.selected.getAttachmentDTOS();
             // 初始化结果集合
             Set<String> objectIds = new HashSet<>();
             for (AttachmentDTO dto : attachmentDTOS) {
                 // 获取附件类型字符串（便于调试时观察具体值）
-                String attachmentType = dto.getAttachmentType() != null
-                        ? dto.getAttachmentType().toString()
+                String attachmentType = dto.getType() != null
+                        ? dto.getType()
                         : null;
 
                 // 排除类型为 "customerSignature" 的元素
-                if (!AttachmentDTO.AttachmentType.CUSTOMER_SIGNATURE.toString().equals(attachmentType)) {
+                if (!"customerSignature".equals(attachmentType)) {
                     // 提取业务对象ID
                     String businessObjectId = dto.getBusinessObjectId();
                     // 将非空ID加入集合
@@ -308,7 +309,7 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
             // 遍历附件列表
             for (AttachmentDTO dto : attachmentDTOS) {
                 // 检查类型是否为 customerSignature
-                if (AttachmentDTO.AttachmentType.CUSTOMER_SIGNATURE.toString().equals(dto.getAttachmentType().toString())) {
+                if ("customerSignature".equals(dto.getType())) {
                     // 找到第一个匹配项时，提取ID并立即终止循环
                     ackSignature = dto.getBusinessObjectId();
                     break;
