@@ -15,7 +15,7 @@ public class AttachmentDTO {
     private String originalFileName;
 
     @JsonProperty("boType")
-    private FileType fileType;
+    private String boType;
 
     @JsonProperty("createdBy")
     private String creatorId;
@@ -31,17 +31,8 @@ public class AttachmentDTO {
     private String relatedObjectId;
 
     @JsonProperty("type")
-    private AttachmentType attachmentType;
+    private String type;
 
-    public enum FileType {
-        @JsonProperty(".docx") DOCX,
-        @JsonProperty("pdf") PDF,
-        @JsonProperty("jpg") JPG
-    }
-    public enum AttachmentType {
-        @JsonProperty("workOrderFormReport") WORK_ORDER_REPORT,
-        @JsonProperty("workOrderFormReport-pdf") WORK_ORDER_PDF,
-        @JsonProperty("customerSignature") CUSTOMER_SIGNATURE
-    }
+
 
 }

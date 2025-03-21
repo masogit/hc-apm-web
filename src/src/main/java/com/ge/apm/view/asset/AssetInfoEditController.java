@@ -1769,6 +1769,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
                 inDeptUid = clinicalDept.getUid();
                 inDeptName = clinicalDept.getName();
+            case "accountingDept":
+                clinicalDept = (OrgInfo) selectedObjectMap.get("accountingDept");
+                selected.setAccountingDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                break;
         }
 
     }
