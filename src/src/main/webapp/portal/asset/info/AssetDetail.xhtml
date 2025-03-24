@@ -305,7 +305,7 @@
                                     <h:outputText value="#{item.currentPersonName}"/>
                                 </p:column>
                                 <p:column headerText="类型" >
-                                    <h:outputText value="#{(item.ruleLevel == 2 || item.ruleLevel == 3) ? '保养' : item.ruleLevel == 4 ? '质控' : ''}"/>
+                                    <h:outputText value="#{(item.ruleLevel == 2 || item.ruleLevel == 3) ? '保养' : item.ruleLevel == 4 ? '质控' : '巡检'}"/>
                                 </p:column>
                                 <p:column headerText="完成时间" >
                                     <h:outputText value="#{item.endTime}">

@@ -5,3 +5,9 @@ UPDATE config_item SET validation = '[{"key":"现场维修","value":"XCWX"},{"ke
 
 ALTER TABLE system_event_audit DROP COLUMN IF EXISTS method_path;
 ALTER TABLE system_event_audit DROP COLUMN IF EXISTS operator_data_uid;
+
+-- YHAAO-24508
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 65 from i18n_message  where msg_type='riskGradeNew';
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 542 from i18n_message  where msg_type='riskGradeNew';
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 51 from i18n_message  where msg_type='riskGradeNew';
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 390 from i18n_message  where msg_type='riskGradeNew';
