@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dataList value="#{systemConfigItemController.configItemList}" var="configItem" varStatus="configItemIndex" type="definition" >
+            <p:fieldset legend="#{configItem.name}">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class="label">#{msg.ConfigItemKey}</label>
+                        <h:outputText value="#{configItem.key}"/>
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class="label">#{msg.ConfigItemDesc}</label>
+                        <h:outputText value="#{configItem.description}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.key eq 'setAssetOutStockDept'}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:autoComplete id="clinicalDeptName" dropdown="true"
+                                        value="#{systemConfigItemController.selectedObjectMap['assetOutStockDept']}"
+                                        scrollHeight="300" forceSelection="true"
+                                        completeMethod="#{systemConfigItemController.autoCompleteDept}"
+                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter"
+                                        class="SiteUIDChange">
+                            <p:ajax event="itemSelect" listener="#{systemConfigItemController.onDeptChange('assetOutStockDept')}"/>
+                            <p:ajax listener="#{systemConfigItemController.onDeptChange('assetOutStockDept')}"/>
+                        </p:autoComplete>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.key eq 'systemLogo'}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <img src="#{configItem.showValue}" style="width:60px; height:50px;margin: 0px 5px 0px 5px;"/>
+                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{systemConfigItemController.uploadImg}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="500000000" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" update="configItemForm"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 1 and !systemConfigItemController.textAloneHandleType.contains(configItem.key)}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:inputTextarea id="valueStr" value="#{configItem.showValue}" readonly="" class="#{configItem.key}"
+                                         rows="5" cols="50"  style="width: 95%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                            <f:validateRegex disabled="#{empty configItem.validation}" pattern="#{configItem.validation}"/>
+                        </p:inputTextarea>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 2}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:inputNumber id="valueNum" value="#{configItem.showValue}"
+                                        style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 3}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:selectOneRadio id="valueBool" value="#{configItem.showValue}"
+                                           style="width: 15%;">
+                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 4}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:calendar id="valueDate" value="#{configItem.showValue}"
+                                    pattern="yyyy-MM-dd" showOn="button" showButtonPanel="true" navigator="true"
+                                    mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59" style="width: 95%;"
+                                    timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 5}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:calendar id="valueTime" value="#{configItem.showValue}"
+                                    pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true"
+                                    mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59" style="width: 95%;"
+                                    timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 6}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:calendar id="valueDateTime" value="#{configItem.showValue}"
+                                    pattern="yyyy-MM-dd HH:mm:ss" showOn="button" showButtonPanel="true" navigator="true"
+                                    mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59" style="width: 95%;"
+                                    timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 7}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:selectOneMenu value="#{configItem.showValue}" style="width: 95%;">
+                            <f:selectItems value="#{configItem.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{configItem.valueType eq 8}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:selectManyMenu value="#{systemConfigItemController.multiSelected}" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 95%;">
+                            <f:selectItems value="#{configItem.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"  itemDisabled="#{item.get('value') eq 'MaintenanceFee'}"/>
+                        </p:selectManyMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.Operation}</label>
+<!--                        update="#{'@(.'.concat(configItem.key).concat(')')}}"-->
+                        <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(configItem)}" update="configItemForm" />
+                        <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(configItem)}" update="configItemForm" style="padding:10px" disabled="#{configItem.configItemValue == null}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+        </p:dataList>
+    </ui:composition>
+
+</html>
