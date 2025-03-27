@@ -3504,6 +3504,12 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_spareArtificail_total','备件+人工+保养总额','spareArtificailTotal',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_spareArtificail_apply','备件+人工+保养申请名额','spareArtificailApply',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_spareArtificail_use','备件+人工+保养已使用名额','spareArtificailUse',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_consumableQuota','耗材剩余名额','consumableQuota',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_consumableQuota_total','耗材总额','consumableQuotaTotal',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_consumableQuota_apply','耗材申请名额','consumableQuotaApply',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_consumableQuota_use','耗材已使用名额','consumableQuotaUse',NULL,-1);
+
+
 
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principal','负责人','principal',NULL,-1);
@@ -4579,6 +4585,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOrderType','Probe','探头名额','Probe',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOrderType','PartsHigh','备件高值名额','PartsHigh',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOrderType','CssbMaintenance','保养名额','CssbMaintenance',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOrderType','Consumable','耗材名额','Consumable',NULL,-1);
 
 
 

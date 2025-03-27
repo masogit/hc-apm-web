@@ -133,6 +133,12 @@ public class ZkbContractService {
             zkbContractDataMap.put("备件高值申请中名额", isEmptyInteger(zkbContract.getPartHighQuotaApply()));
             zkbContractDataMap.put("备件高值已使用名额", isEmptyInteger(zkbContract.getPartHighQuotaUse()));
 
+            zkbContractDataMap.put("耗材总额", isEmptyInteger(zkbContract.getConsumableQuotaTotal()));
+            zkbContractDataMap.put("耗材剩余名额", isEmptyInteger(zkbContract.getConsumableQuota()));
+            zkbContractDataMap.put("耗材申请中名额", isEmptyInteger(zkbContract.getConsumableQuotaApply()));
+            zkbContractDataMap.put("耗材已使用名额", isEmptyInteger(zkbContract.getConsumableQuotaUse()));
+            zkbContractDataMap.put("耗材增幅", isEmptyInteger(zkbContract.getConsumeGrowth()));
+
             /*zkbContractDataMap.put("探头高值总额", isEmptyInteger(zkbContract.getProbeQuotaHighTotal()));
             zkbContractDataMap.put("探头高值剩余名额", isEmptyInteger(zkbContract.getProbeQuotaHigh()));
             zkbContractDataMap.put("探头高值申请名额", isEmptyInteger(zkbContract.getProbeQuotaHighApply()));
@@ -578,6 +584,7 @@ public class ZkbContractService {
         sb.append(StringAppendQuota("备件名额",nullToZero(zkbContract.getSpareQuotaTotal()),nullToZero(zkbContract.getSpareQuotaApply()),nullToZero(zkbContract.getSpareQuota()),nullToZero(zkbContract.getSpareQuotaUse())));
         sb.append(StringAppendQuota("联合名额",nullToZero(zkbContract.getSpareArtificailTotal()),nullToZero(zkbContract.getSpareArtificailApply()),nullToZero(zkbContract.getSpareArtificail()),nullToZero(zkbContract.getSpareArtificailUse())));
         sb.append(StringAppendQuota("人工名额",nullToZero(zkbContract.getGeArtificialSupportTimesTotal()),nullToZero(zkbContract.getGeArtificialSupportTimesApply()),nullToZero(zkbContract.getGeArtificialSupportTimes()),nullToZero(zkbContract.getGeArtificialSupportTimesUse())));
+        sb.append(StringAppendQuota("耗材名额",nullToZero(zkbContract.getConsumableQuotaTotal()),nullToZero(zkbContract.getConsumableQuotaApply()),nullToZero(zkbContract.getConsumableQuota()),nullToZero(zkbContract.getConsumableQuotaUse())));
         if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
             sb.append(StringAppendQuota("探头任意名额",nullToZero(zkbContract.getProbeQuotaTotal()),nullToZero(zkbContract.getProbeQuotaApply()),nullToZero(zkbContract.getProbeQuota()),nullToZero(zkbContract.getProbeQuotaUse())));
             sb.append(StringAppendQuota("探头普通名额",nullToZero(zkbContract.getProbeQuotaNormalTotal()),nullToZero(zkbContract.getProbeQuotaNormalApply()),nullToZero(zkbContract.getProbeQuotaNormal()),nullToZero(zkbContract.getProbeQuotaNormalUse())));
@@ -606,6 +613,7 @@ public class ZkbContractService {
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),currentUser);
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),currentUser);
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Consumable.toString(),currentUser);
             if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),currentUser);
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),currentUser);
@@ -619,11 +627,16 @@ public class ZkbContractService {
             if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString(),currentUser);
             }
+            if(zkbContract.getConsumeGrowthDate() == null){
+                zkbContract.setConsumeGrowthDate(zkbContract.getStartDate());
+            }
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate",null,null,reason,currentUser,null,getQuotaString(zkbContract));
             zkbContract = contractRepository.save(zkbContract);
         }else {
+            zkbContract.setConsumeGrowthDate(zkbContract.getStartDate());
             zkbContract = contractRepository.save(zkbContract);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Consumable.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
@@ -791,6 +804,19 @@ public class ZkbContractService {
                 f = true;
             }
             if(nullToZero(oldContract.getPartHighQuotaUse()) - nullToZero(zkbContract.getPartHighQuotaUse()) != 0){
+                f = true;
+            }
+        } else if(ZkbContractQuotaLog.OrderTypeEnum.Consumable.toString().equals(orderType)){
+            if(nullToZero(oldContract.getConsumableQuota()) - nullToZero(zkbContract.getConsumableQuota()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getConsumableQuotaTotal()) - nullToZero(zkbContract.getConsumableQuotaTotal()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getConsumableQuotaApply()) - nullToZero(zkbContract.getConsumableQuotaApply()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getConsumableQuotaUse()) - nullToZero(zkbContract.getConsumableQuotaUse()) != 0){
                 f = true;
             }
         }
