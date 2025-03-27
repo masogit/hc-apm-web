@@ -4,12 +4,23 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.Base64Utils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -17,11 +28,14 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by 503266962
@@ -33,13 +47,20 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private ConfigItemRepository dao;
     private ConfigItemValueRepository configItemValueRepository;
     private OrgInfoRepository orgInfoRepository;
+    private UaaService uaaService;
 
     private OrgInfo selectSite;
     private UserAccount user;
     private Boolean superAdminEdit = false;
 
-    private Map<Integer, String> categoryMap;
+    private LinkedHashMap<Integer, String> categoryMap;
     private List<String> multiSelected;
+    private List<ConfigItem> configItemList;
+    private Map<String, ConfigItem> configItemMap;
+    private OrgInfo assetOutStockDept;
+    private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
+    private List<OrgInfo> deptList;
+    private final List<String> textAloneHandleType = ListUtil.newArrayList("setAssetOutStockDept", "systemLogo");
 
     private static final String VALUE ="value";
 
@@ -48,10 +69,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         dao = WebUtil.getBean(ConfigItemRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         user = UserContextService.getCurrentUserAccount();
 
-        selectSite = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        categoryMap = new HashMap<>();
+        selectSite = orgInfoRepository.getByUid(user.getSiteUID());
+        loadClinicalDept();
+        categoryMap = new LinkedHashMap<>();
         categoryMap.put(1,"设备档案");
         categoryMap.put(2,"设备调剂");
         categoryMap.put(3,"到货安装");
@@ -126,6 +149,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }else{
                     configItem.setShowValue(configItem.getDefaultValue());
                 }
+                if (3 == configItem.getValueType()) {
+                    configItem.setShowValue(Optional.ofNullable(configItem.getShowValue()).map(String::toLowerCase).orElse(""));
+                }
                 if((7 == configItem.getValueType() || 8 == configItem.getValueType())
                         && StringUtils.isNotEmpty(configItem.getValidation())){
                     String validation = configItem.getValidation();
@@ -151,6 +177,29 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         }
     }
 
+    public void onTabChange(TabChangeEvent event) {
+        if (!"basicInfo".equals(event.getTab().getId())) {
+            String category = event.getTab().getId().substring(2);
+            this.searchFilters = ListUtil.newArrayList(new SearchFilter("category", SearchFilter.Operator.EQ, category));
+            Page<ConfigItem> configItemPage = loadData(new PageRequest(0, 5000));
+            configItemList = configItemPage.getContent();
+            configItemMap = configItemList.stream().collect(Collectors.toMap(ConfigItem::getKey, item -> item));
+            if (category.equals("3")) {
+                ConfigItem configItem = configItemMap.get("setAssetOutStockDept");
+                selectedObjectMap.put("assetOutStockDept", orgInfoRepository.getByUid(configItem.getShowValue()));
+                assetOutStockDept = orgInfoRepository.getByUid(configItem.getShowValue());
+            }
+            this.searchFilters = null;
+        } else {
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("url", "configItemList.xhtml");
+        }
+    }
+
+    public Set<Map.Entry<Integer, String>> getCategoryEntrySet() {
+        return categoryMap.entrySet();
+    }
+
     @Override
     public void prepareEdit() {
         if(8 == this.selected.getValueType()){
@@ -167,9 +216,31 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         super.prepareEdit();
     }
 
-    public void saveConfig(){
+    public void deleteConfig(ConfigItem configItem) {
         if(this.selectSite != null){
-            if( selected.getValueType()!=8 &&  !regularCheck()){
+            ConfigItemValue configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), this.selectSite.getSiteUID());
+            if (ObjectUtil.isNotEmpty(configItemValue)) {
+                configItemValueRepository.delete(configItemValue);
+                configItem.setConfigItemValue(null);
+                if ("setAssetOutStockDept".equals(configItem.getKey())) {
+                    selectedObjectMap.remove("assetOutStockDept");
+                }
+                if ("systemLogo".equals(configItem.getKey())) {
+                    configItem.setShowValue(configItem.getDefaultValue());
+                }
+            }
+            WebUtil.addErrorMessage("删除成功！");
+        }
+    }
+
+    public void saveConfig() {
+        saveConfig(this.selected);
+    }
+
+    public void saveConfig(ConfigItem configItem){
+        this.selected = configItem;
+        if(this.selectSite != null){
+            if(this.selected.getValueType()!=8 &&  !regularCheck()){
                 logger.info("配置项保存，正则校验不通过：");
                 WebUtil.addErrorMessage("配置项保存失败，正则校验不通过！");
                 return;
@@ -185,6 +256,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 configItemValue.setHospitalUid(selectSite.getHospitalUID());
                 configItemValue.setSiteUid(selectSite.getSiteUID());
                 configItemValue.setKey(this.selected.getKey());
+            }
+
+            if ("setAssetOutStockDept".equals(this.selected.getKey())) {
+                this.selected.setShowValue(Optional.ofNullable(assetOutStockDept).map(OrgInfo::getUid).orElse(null));
             }
 
             if(4 == this.selected.getValueType() || 5 == this.selected.getValueType() || 6 == this.selected.getValueType()){
@@ -211,9 +286,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             }else{
                 configItemValue.setValue(this.selected.getShowValue());
             }
-
             configItemValueRepository.save(configItemValue);
+            this.selected.setConfigItemValue(configItemValue);
         }
+        WebUtil.addErrorMessage("保存成功！");
     }
     public boolean regularCheck(){
         if(selected == null) return Boolean.FALSE;
@@ -283,6 +359,50 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         return "";
     }
 
+    private void loadClinicalDept(){
+        if(null == selectSite){
+            deptList = Collections.EMPTY_LIST;
+        }else{
+            deptList = uaaService.findAccessClinicalUidByUserUid(user.getUid(), selectSite.getSiteUID());
+            if(null != assetOutStockDept && !assetOutStockDept.getSiteUID().equals(selectSite.getSiteUID()) ){
+                assetOutStockDept = null;
+            }
+        }
+    }
+
+    public List<OrgInfo> autoCompleteDept(String query) {
+        if (deptList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.deptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public void onDeptChange(String idx) {
+        switch (idx) {
+            case "assetOutStockDept":
+                assetOutStockDept = (OrgInfo) selectedObjectMap.get("assetOutStockDept");
+                ConfigItem stockDeptItem = configItemMap.get("setAssetOutStockDept");
+                System.out.println(stockDeptItem);
+                break;
+        }
+    }
+
+    public void uploadImg(FileUploadEvent event) throws Exception {
+        InputStream inputStream = event.getFile().getInputstream();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte[] buffer = new byte[inputStream.available()];
+        int n = 0;
+        while (-1 != (n = inputStream.read(buffer))) {
+            output.write(buffer, 0, n);
+        }
+        String base64 = Base64Utils.encodeToString(buffer);
+        ConfigItem stockDeptItem = configItemMap.get("systemLogo");
+        stockDeptItem.setShowValue("data:image/jpeg;base64," + base64);
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
@@ -291,11 +411,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         this.selectSite = selectSite;
     }
 
-    public Map<Integer, String> getCategoryMap() {
+    public LinkedHashMap<Integer, String> getCategoryMap() {
         return categoryMap;
     }
 
-    public void setCategoryMap(Map<Integer, String> categoryMap) {
+    public void setCategoryMap(LinkedHashMap<Integer, String> categoryMap) {
         this.categoryMap = categoryMap;
     }
 
@@ -305,5 +425,41 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public void setMultiSelected(List<String> multiSelected) {
         this.multiSelected = multiSelected;
+    }
+
+    public List<ConfigItem> getConfigItemList() {
+        return configItemList;
+    }
+
+    public void setConfigItemList(List<ConfigItem> configItemList) {
+        this.configItemList = configItemList;
+    }
+
+    public Map<String, ConfigItem> getConfigItemMap() {
+        return configItemMap;
+    }
+
+    public void setConfigItemMap(Map<String, ConfigItem> configItemMap) {
+        this.configItemMap = configItemMap;
+    }
+
+    public OrgInfo getAssetOutStockDept() {
+        return assetOutStockDept;
+    }
+
+    public void setAssetOutStockDept(OrgInfo assetOutStockDept) {
+        this.assetOutStockDept = assetOutStockDept;
+    }
+
+    public Map<String, Object> getSelectedObjectMap() {
+        return selectedObjectMap;
+    }
+
+    public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
+        this.selectedObjectMap = selectedObjectMap;
+    }
+
+    public List<String> getTextAloneHandleType() {
+        return textAloneHandleType;
     }
 }
