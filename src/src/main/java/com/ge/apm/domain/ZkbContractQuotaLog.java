@@ -22,7 +22,7 @@ public class ZkbContractQuotaLog implements Serializable {
     }
 
     public enum OrderTypeEnum{
-        Spare,SpareArtificial,ProbeAny,ProbeNormal,ProbeSpecial,Artificial,Probe,PartsHigh,CssbMaintenance
+        Spare,SpareArtificial,ProbeAny,ProbeNormal,ProbeSpecial,Artificial,Probe,PartsHigh,CssbMaintenance,Consumable
     }
 
     @Id

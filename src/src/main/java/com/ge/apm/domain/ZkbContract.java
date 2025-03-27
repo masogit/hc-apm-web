@@ -264,6 +264,20 @@ public class ZkbContract implements ChineseName, Serializable {
     @Column(name = "ccsb_maintenance_quota_total")
     private Integer ccsbMaintenanceQuotaTotal = 0;
 
+    //耗材名额
+    @Column(name = "consumable_quota")
+    private Integer consumableQuota = 0;
+    @Column(name = "consumable_quota_use")
+    private Integer consumableQuotaUse = 0;
+    @Column(name = "consumable_quota_apply")
+    private Integer consumableQuotaApply = 0;
+    @Column(name = "consumable_quota_total")
+    private Integer consumableQuotaTotal = 0;
+    @Column(name = "consume_growth")
+    private Integer consumeGrowth = 0;
+    @Column(name = "consume_growth_date")
+    private Date consumeGrowthDate;
+
     /**
      * 负责人
      */
@@ -962,6 +976,54 @@ public class ZkbContract implements ChineseName, Serializable {
 
     public void setAdminAddress(String adminAddress) {
         this.adminAddress = adminAddress;
+    }
+
+    public Integer getConsumableQuota() {
+        return consumableQuota;
+    }
+
+    public void setConsumableQuota(Integer consumableQuota) {
+        this.consumableQuota = consumableQuota;
+    }
+
+    public Integer getConsumableQuotaUse() {
+        return consumableQuotaUse;
+    }
+
+    public void setConsumableQuotaUse(Integer consumableQuotaUse) {
+        this.consumableQuotaUse = consumableQuotaUse;
+    }
+
+    public Integer getConsumableQuotaApply() {
+        return consumableQuotaApply;
+    }
+
+    public void setConsumableQuotaApply(Integer consumableQuotaApply) {
+        this.consumableQuotaApply = consumableQuotaApply;
+    }
+
+    public Integer getConsumableQuotaTotal() {
+        return consumableQuotaTotal;
+    }
+
+    public void setConsumableQuotaTotal(Integer consumableQuotaTotal) {
+        this.consumableQuotaTotal = consumableQuotaTotal;
+    }
+
+    public Integer getConsumeGrowth() {
+        return consumeGrowth;
+    }
+
+    public void setConsumeGrowth(Integer consumeGrowth) {
+        this.consumeGrowth = consumeGrowth;
+    }
+
+    public Date getConsumeGrowthDate() {
+        return consumeGrowthDate;
+    }
+
+    public void setConsumeGrowthDate(Date consumeGrowthDate) {
+        this.consumeGrowthDate = consumeGrowthDate;
     }
 
     @Override
