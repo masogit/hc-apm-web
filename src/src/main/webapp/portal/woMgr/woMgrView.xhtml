@@ -200,7 +200,7 @@
                         </p:panel>
                     </p:dataGrid>
                     <c:forEach items="#{workOrderMgrController.selectedWorkOrderList}" var="woItem" varStatus="rowIndex" >
-                        <p:fieldset legend="#{woItem.id==workOrderMgrController.selected.id? msg.CurrentWorkorder:msg.WorkOrder}" toggleable="false" >
+                        <p:fieldset legend="#{woItem.id==workOrderMgrController.selected.id? msg.CurrentWorkorder:msg.WorkOrder} #{empty woItem.parentWoId?'(主工单)':''}" toggleable="false" >
                             <div class="ui-g">
                                 <div class="ui-g-10 ui-g-nopad">
                                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">

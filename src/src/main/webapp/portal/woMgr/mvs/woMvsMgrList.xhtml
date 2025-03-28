@@ -133,7 +133,17 @@
                 <p:column headerText="#{msg.requestReason}">
                     <h:outputText value="#{workOrderMgrMvsController.getRequestReasonInShort(item.serviceRequest.requestReason)}"  title="#{item.serviceRequest.requestReason}"/>
                 </p:column>
-
+                <p:column headerText="主工单"  filterBy="#{item.parentWoId}">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                            <f:converter converterId="javax.faces.Boolean" />
+                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{empty item.parentWoId?msg.True2Yes:msg.False2No}" />
+                </p:column>
                 <f:facet name="{Toolbar}">
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                         <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
