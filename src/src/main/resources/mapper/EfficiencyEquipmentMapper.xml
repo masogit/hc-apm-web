@@ -456,7 +456,12 @@
             </foreach>
             )
         </if>
-
+        <if test="clinicalDeptUids != null and clinicalDeptUids.size > 0">
+            AND ai.clinical_dept_uid IN
+            <foreach item="item" collection="clinicalDeptUids" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
         <if test="assetUids != null and assetUids.size() > 0">
             and   e.asset_uid IN
             <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
