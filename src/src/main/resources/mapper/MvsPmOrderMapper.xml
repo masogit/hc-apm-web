@@ -75,6 +75,7 @@
         t.pm_type,
         t.rule_level,
         t.owner_name,
+        t.parent_wo_id,
         a.name AS asset_name,
         a.serial_num as asset_serial_num,
         a.depart_num as asset_depart_num,
