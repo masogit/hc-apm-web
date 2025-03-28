@@ -72,8 +72,11 @@
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
 
                     </p:column>
-
-
+                    <p:column headerText="分摊比例(%)">
+                        <h:outputText value="#{item.scaleAssessment}">
+                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                        </h:outputText>
+                    </p:column>
                 </p:dataTable>
             </h:form>
 

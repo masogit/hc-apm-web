@@ -110,7 +110,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private Integer intExtType;
 
     @Column(name = "parent_wo_id")
-    private Integer parentWoId;
+    private String parentWoId;
 
     @Column(name = "feedback_rating")
     private Integer feedbackRating;
@@ -624,11 +624,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
         this.intExtType = intExtType;
     }
 
-    public Integer getParentWoId() {
+    public String getParentWoId() {
         return parentWoId;
     }
 
-    public void setParentWoId(Integer parentWoId) {
+    public void setParentWoId(String parentWoId) {
         this.parentWoId = parentWoId;
     }
 
