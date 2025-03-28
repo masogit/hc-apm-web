@@ -382,6 +382,55 @@ public class ContractInfo implements Serializable {
     @Column(name = "vender_company_id")
     private String venderCompanyId;
 
+    // 合同签订日期
+    @Column(name = "signing_date")
+    @Temporal(TemporalType.DATE)
+    private Date signingDate;
+
+    // 维保年限(月)
+    @Column(name = "maintenance_period")
+    private Integer maintenancePeriod;
+
+    // 交付时间
+    @Column(name = "delivery_time")
+    private String deliveryTime;
+
+    // 交付地点
+    @Column(name = "delivery_location")
+    private String deliveryLocation;
+
+    public Date getSigningDate() {
+        return signingDate;
+    }
+
+    public void setSigningDate(Date signingDate) {
+        this.signingDate = signingDate;
+    }
+
+    public Integer getMaintenancePeriod() {
+        return maintenancePeriod;
+    }
+
+    public void setMaintenancePeriod(Integer maintenancePeriod) {
+        this.maintenancePeriod = maintenancePeriod;
+    }
+
+    public String getDeliveryTime() {
+        return deliveryTime;
+    }
+
+    public void setDeliveryTime(String deliveryTime) {
+        this.deliveryTime = deliveryTime;
+    }
+
+    public String getDeliveryLocation() {
+        return deliveryLocation;
+    }
+
+    public void setDeliveryLocation(String deliveryLocation) {
+        this.deliveryLocation = deliveryLocation;
+    }
+
     public String getVenderCompanyId() {
         return venderCompanyId;
     }
