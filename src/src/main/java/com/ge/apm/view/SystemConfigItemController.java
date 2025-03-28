@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -56,7 +55,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private LinkedHashMap<Integer, String> categoryMap;
     private List<String> multiSelected;
     private List<ConfigItem> configItemList;
-    private Map<String, ConfigItem> configItemMap;
+    private Map<String, ConfigItem> configItemMap = MapUtil.newHashMap();
     private OrgInfo assetOutStockDept;
     private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
     private List<OrgInfo> deptList;
@@ -183,7 +182,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             this.searchFilters = ListUtil.newArrayList(new SearchFilter("category", SearchFilter.Operator.EQ, category));
             Page<ConfigItem> configItemPage = loadData(new PageRequest(0, 5000));
             configItemList = configItemPage.getContent();
-            configItemMap = configItemList.stream().collect(Collectors.toMap(ConfigItem::getKey, item -> item));
+            configItemMap.putAll(configItemList.stream().collect(Collectors.toMap(ConfigItem::getKey, item -> item)));
             if (category.equals("3")) {
                 ConfigItem configItem = configItemMap.get("setAssetOutStockDept");
                 selectedObjectMap.put("assetOutStockDept", orgInfoRepository.getByUid(configItem.getShowValue()));
@@ -225,8 +224,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 if ("setAssetOutStockDept".equals(configItem.getKey())) {
                     selectedObjectMap.remove("assetOutStockDept");
                 }
-                if ("systemLogo".equals(configItem.getKey())) {
-                    configItem.setShowValue(configItem.getDefaultValue());
+                configItem.setShowValue(configItem.getDefaultValue());
+                if (3 == configItem.getValueType()) {
+                    configItem.setShowValue(Optional.ofNullable(configItem.getShowValue()).map(String::toLowerCase).orElse(""));
                 }
             }
             WebUtil.addErrorMessage("删除成功！");
