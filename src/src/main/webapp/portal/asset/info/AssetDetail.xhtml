@@ -26,7 +26,7 @@
 
         </div>
 
-        <div class="ui-g-12 card" >
+<!--        <div class="ui-g-12 card" >-->
             <p:tabView dynamic="true" id="assetDetail" cache="true">
                 <p:ajax event="tabChange" listener="#{inspectionServiceController.onTabChange}" />
                 <p:tab title="#{msg.BasicInfo}">
@@ -192,7 +192,13 @@
                             </p:tab>
                         </p:tabView>
                     </h:form>
-
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                            <p:commandButton rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4) and assetInfoEditController.assetScrapEnable }" value="报废申请" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetOrderDetailDialog :growl" style="float:right;" oncomplete="handleAssetScrapSubmit(xhr, status, args);" />
+                            <p:commandButton value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:tab>
                 <p:tab title="#{msg.EventRecord}" id="EventRecordTab">
                     <h:form id="EventRecord">
@@ -580,26 +586,48 @@
                             <ui:include src="ImportantFieldsView.xhtml"/>
                         </p:dataTable>
                     </p:panel>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                            <p:commandButton rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4) and assetInfoEditController.assetScrapEnable }" value="报废申请" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetOrderDetailDialog :growl" style="float:right;" oncomplete="handleAssetScrapSubmit(xhr, status, args);" />
+                            <p:commandButton value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:tab>
 
 
                 <p:tab title="#{msg.specialAsset}" rendered="#{userContextService.accessContainsApmFeature('SPECIAL_ASSET')  and assetInfoDetailController.selected.specialAsset }">
                     <ui:include src="SpecialAssetInfoDetail.xhtml"/>
-
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                            <p:commandButton rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4) and assetInfoEditController.assetScrapEnable }" value="报废申请" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetOrderDetailDialog :growl" style="float:right;" oncomplete="handleAssetScrapSubmit(xhr, status, args);" />
+                            <p:commandButton value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:tab>
 
                 <p:tab title="#{msg.AssetArrivalListItemMgmt}" rendered="#{assetInfoDetailController.show(assetInfoDetailController.selected.uid)}">
                     <ui:include src="ItemView.xhtml"/>
                     <ui:include src="ItemDetailView.xhtml"/>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                            <p:commandButton rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4) and assetInfoEditController.assetScrapEnable }" value="报废申请" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetOrderDetailDialog :growl" style="float:right;" oncomplete="handleAssetScrapSubmit(xhr, status, args);" />
+                            <p:commandButton value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:tab>
-
+<!--                <br/>-->
+                <!--<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup id="buttonGroup">
+                        <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                        <p:commandButton id="preInactiveEnable" rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4) and assetInfoEditController.assetScrapEnable }" value="报废申请" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetOrderDetailDialog :growl" style="float:right;" oncomplete="handleAssetScrapSubmit(xhr, status, args);" />
+                        <p:commandButton id="departmentCovert" value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
+                    </h:panelGroup>
+                </p:panelGrid>-->
             </p:tabView>
-            <br/>
-            <h:panelGroup >
-                <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                <p:commandButton id="preInactiveEnable" rendered="#{assetInfoDetailController.selected.isValid and !(assetInfoDetailController.selected.status eq 4) and assetInfoEditController.assetScrapEnable }" value="报废申请" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetOrderDetailDialog :growl" style="float:right;" oncomplete="handleAssetScrapSubmit(xhr, status, args);" />
-                <p:commandButton id="departmentCovert" value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
-            </h:panelGroup>
+
             <ui:include src="AssetScrap.xhtml"/>
             <ui:include src="AssetDepartmentConvert.xhtml"/>
 
@@ -648,7 +676,7 @@
                     <p:commandButton immediate="true" process="@this" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('sharedAssetConfigDialog').hide()"/>
                 </h:form>
             </p:dialog>
-        </div>
+<!--        </div>-->
         <p:dialog id="nurseSiteMaintainDialog" widgetVar="nurseSiteMaintainDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="日常检查记录-下载">
             <p:ajax event="open" listener="#{assetDetailExportController.initOpenDialog}" update="nurseSiteMaintainForm" onsuccess="window.location.hash='#header'"></p:ajax>
             <p:ajax event="close" listener="#{assetDetailExportController.closeOpenDialog}" update="nurseSiteMaintainForm"  onsuccess="window.location.hash='returnButton'"></p:ajax>
