@@ -395,15 +395,26 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public boolean scoreFlagRender(){
-        /*if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(CopyByInvok.T.equals(selected.getMaintainFlag())){
-                return true;
-            }else{
-                if(!CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())){
+                if(StringUtils.isNotEmpty(selected.getScoreFlag())){
                     return true;
                 }
+            }else{
+                if(!CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())){
+                    if(StringUtils.isNotEmpty(selected.getScoreFlag())){
+                        return true;
+                    }
+                }
+                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && "t".equals(zkbContract.getFirstYearFlag())){
+                    return false;
+                }else{
+                    if(StringUtils.isNotEmpty(selected.getScoreFlag())){
+                        return true;
+                    }
+                }
             }
-        }*/
+        }
         return false;
     }
 

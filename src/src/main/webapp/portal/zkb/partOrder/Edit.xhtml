@@ -305,7 +305,7 @@
                             </c:if>
                             <p:outputLabel id="cscore" value="#{zkbPartOrderEditController.currentScoreText}" disabled="true"  style="margin-left: 10px;color: red;font-size: larger"/>
                         </h:panelGroup>
-                        <h:panelGroup id="exchangeTypeGroup" rendered="#{zkbPartOrderEditController.selected.orderType eq 'Artificial'}">
+                        <h:panelGroup id="exchangeTypeGroup" rendered="false">
                             <h:panelGroup rendered="#{zkbPartOrderEditController.selected.scoreFlag eq 't'}">
                                 <label class="label">兑换类型*</label>
                                 <p:selectOneMenu value="#{zkbPartOrderEditController.selected.exchangeType}" required="true" requiredMessage="兑换类型 #{msg.ValidationRequire}">

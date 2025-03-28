@@ -81,7 +81,7 @@
                         <p:column headerText="申请编号" filterBy="#{item.partOrderNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
-                        <p:column headerText="申请类型" filterBy="#{item.scoreFlag}"  filterMatchMode="LIKE">
+                       <!-- <p:column headerText="申请类型" filterBy="#{item.scoreFlag}"  filterMatchMode="LIKE">
                             <h:outputText value="#{zkbPartOrderController.scoreFlagField(item.scoreFlag)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -90,7 +90,7 @@
                                     <f:selectItem itemLabel="名额申请" itemValue="f"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                        </p:column>
+                        </p:column>-->
                          <p:column headerText="订单类型" filterBy="#{item.orderType}"  filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPartOrderType',item.orderType)}"/>
                              <f:facet name="filter">
@@ -100,16 +100,6 @@
                                  </p:selectOneMenu>
                              </f:facet>
                         </p:column>
-
-                        <!--<p:column headerText="区域" filterBy="#{item.region}"  filterMatchMode="EQ">
-                            <h:outputText value="#{item.region}"/>
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                        </p:column>-->
                         <p:column headerText="zone" filterBy="#{item.zone}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.zone}" />
                         </p:column>

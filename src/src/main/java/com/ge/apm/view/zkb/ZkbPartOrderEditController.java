@@ -107,6 +107,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         queryWorkFlow.setServiceRequest(new V2_ServiceRequest());
         if("Create".equals(actionName)){
             this.selected = new ZkbPartOrder();
+            selected.setScoreFlag(null);
             selected.setRequestDate(new Date());
             selected.setRequestUser(currentUser.getName());
             selected.setRequestPhone(currentUser.getTelephone());
@@ -258,7 +259,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
-            editCurrentScoreFlag();
+            //editCurrentScoreFlag();
             handleQtyByOrderType();
 
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
@@ -825,7 +826,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void maintainFlagChange(){
-        if(ZkbContract.ContractType.CCS.name().equals(selectedContract.getContractType()) ||
+       /* if(ZkbContract.ContractType.CCS.name().equals(selectedContract.getContractType()) ||
                 ZkbContract.ContractType.Biomed.name().equals(selectedContract.getContractType())){
             if(CopyByInvok.T.equals(selected.getMaintainFlag())){
                 selected.setScoreFlag(CopyByInvok.T);
@@ -834,12 +835,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 currentScoreFlag = false;
             }
             scoreFlagChange();
-        }
+        }*/
     }
 
     public void ssaKeyFlagChange(){
         calcRemainQty();
-        if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+       /* if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
             currentScoreFlag = true;
             currentScoreText = "";
             selected.setScoreFlag(CopyByInvok.F);
@@ -848,7 +849,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else{
             currentScoreFlag = false;
             editCurrentScoreFlag();
-        }
+        }*/
     }
 
     public void tenantNewCatFlagChange(){

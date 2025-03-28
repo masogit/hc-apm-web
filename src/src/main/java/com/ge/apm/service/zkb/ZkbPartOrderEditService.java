@@ -332,7 +332,7 @@ public class ZkbPartOrderEditService {
                 selected.setProvideNewContract(CopyByInvok.T);
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            selected.setScoreFlag(CopyByInvok.F);
+            //selected.setScoreFlag(CopyByInvok.F);
             selected.setMaintainFlag(CopyByInvok.F);
         }
     }
