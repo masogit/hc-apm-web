@@ -467,6 +467,9 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                         params.put("planTimeLTE", searchFilter.value);
                     }
                     break;
+                case "parentWoId":
+                    Boolean value =(Boolean) searchFilter.value;
+                    params.put("parentWoId", value?"IS NULL":"IS NOT NULL");
                 default:
                     break;
             }

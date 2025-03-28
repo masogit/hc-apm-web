@@ -31,6 +31,7 @@
         <result property="ruleLevel" column="rule_level"/>
         <result property="ownerName" column="owner_name"/>
         <result property="ackSignature" column="ack_signature"/>
+        <result property="parentWoId" column="parent_wo_id"/>
 
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>
@@ -87,8 +88,8 @@
         a.id as asset_id,
         a.status as asset_status,
         a.uid AS asset_uid
-        FROM v2_pm_order T
-        JOIN mvs_ib_mapping m1 ON T.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
+        FROM v2_pm_order t
+        JOIN mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
         JOIN asset_info a ON m1.ib_id = a.id
         JOIN user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
         WHERE 1=1
@@ -105,7 +106,7 @@
             and t.is_finished = #{isFinished}
         </if>
         <if test="currentStepName != null and currentStepName.length > 0">
-            and T.current_step_name IN
+            and t.current_step_name IN
             <foreach item="item" index="index" collection="currentStepName" open="(" separator="," close=")">
                 #{item}
             </foreach>
@@ -132,7 +133,7 @@
             and a.site_uid = #{assetInfoSiteUID}
         </if>
         <if test="pmIdList != null and pmIdList.length > 0">
-            and T.id IN
+            and t.id IN
             <foreach item="item" index="index" collection="pmIdList" open="(" separator="," close=")">
                 #{item}
             </foreach>
@@ -166,6 +167,9 @@
         </if>
         <if test="functionType != null">
             AND a.function_type  like CONCAT('%', #{functionType}, '%')
+        </if>
+        <if test="parentWoId != null">
+            AND t.parent_wo_id  ${parentWoId}
         </if>
               AND a.is_valid
               AND NOT a.is_deleted

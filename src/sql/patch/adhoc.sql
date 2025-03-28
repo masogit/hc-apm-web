@@ -1,13 +1,2 @@
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 2, 'false', '调剂中心归还是否需要消杀', 'disinfectionAllocationCenter', '调剂中心归还是否需要消杀', 'f', 't', 3 where not exists(select * from config_item where key = 'disinfectionAllocationCenter');
-ALTER TABLE config_item ALTER COLUMN validation TYPE VARCHAR(2000);
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 16, '', 'MVS院级工单显示类型', 'mvsLevelWorkOrder', 'MVS院级工单显示类型', 'f','t',8 where not exists(select * from config_item where key = 'mvsLevelWorkOrder');
-UPDATE config_item SET validation = '[{"key":"现场维修","value":"XCWX"},{"key":"远程支持","value":"YCZC"},{"key":"技术支持","value":"JSZC"},{"key":"维修陪同","value":"WXPT"},{"key":"转包/外采","value":"ZBWC"},{"key":"维修OJT","value":"WX-OJT"},{"key":"入保前评估","value":"RBQPG-1"},{"key":"入保前评估OJT","value":"RBQPG-JT"},{"key":"销售支持","value":"XSZC-1"},{"key":"客户支持-巡检","value":"KHZC-XJ"},{"key":"客户支持-质控","value":"KHZC-ZK"},{"key":"客户支持-保养","value":"KHZC-BY"},{"key":"标准保养","value":"BZBY"},{"key":"深度保养","value":"SDBY"},{"key":"保养OJT","value":"BY-OJT"},{"key":"巡检","value":"XJ-1"},{"key":"巡检OJT","value":"XJ-OJT"},{"key":"质控","value":"ZK-1"},{"key":"质控OJT","value":"ZK-OJT"},{"key":"非维修类事务","value":"BWZC"},{"key":"GE FE支持","value":"GEFEZC"},{"key":"APM支持","value":"APMZC"},{"key":"盘点","value":"PD"},{"key":"其他","value":"QT-2"},{"key":"强检","value":"QJ"},{"key":"计量OJT","value":"JL-OJT"},{"key":"应用培训","value":"YYPX"},{"key":"医师巡检培训","value":"YSXJPX"},{"key":"EHS检查","value":"EHSAQJC"},{"key":"EHS培训","value":"EHSLLJJ"},{"key":"培训OJT","value":"PX-OJT"},{"key":"客户拜访","value":"KHBF"},{"key":"服务报告","value":"FWBG"},{"key":"PMO管理OJT","value":"PMOGL-OJT"},{"key":"其他","value":"QT-1"},{"key":"其他OJT","value":"QT-OJT"},{"key":"巡场","value":"XC-1"}]' WHERE key = 'mvsLevelWorkOrder';
-
-ALTER TABLE system_event_audit DROP COLUMN IF EXISTS method_path;
-ALTER TABLE system_event_audit DROP COLUMN IF EXISTS operator_data_uid;
-
--- YHAAO-24508
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 65 from i18n_message  where msg_type='riskGradeNew';
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 542 from i18n_message  where msg_type='riskGradeNew';
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 51 from i18n_message  where msg_type='riskGradeNew';
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) select 'riskGrade', msg_key, value_zh, value_en, value_tw, 390 from i18n_message  where msg_type='riskGradeNew';
+-- YHAAO-24071
+ALTER TABLE v2_work_order ALTER COLUMN parent_wo_id TYPE VARCHAR(32);
