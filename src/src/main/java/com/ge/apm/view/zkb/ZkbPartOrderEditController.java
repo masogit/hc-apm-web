@@ -396,7 +396,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public boolean scoreFlagRender(){
-        if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+        /*if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(CopyByInvok.T.equals(selected.getMaintainFlag())){
                 return true;
             }else{
@@ -409,7 +409,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     return true;
                 }
             }
-        }
+        }*/
         return false;
     }
 
