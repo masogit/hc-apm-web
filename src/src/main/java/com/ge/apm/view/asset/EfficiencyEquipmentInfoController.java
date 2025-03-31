@@ -665,6 +665,7 @@ protected boolean numberField(String fieldName, String filterVal) {
     }
     public void  editBatch1(){
         this.positiveRate=null;
+        this.displayName=null;
     }
     public void  editBatch(){
         if(positiveRate!=null){
@@ -689,6 +690,7 @@ protected boolean numberField(String fieldName, String filterVal) {
         }
         this.selectedMap = new HashMap<>();
         this.positiveRate=null;
+        this.displayName=null;
     }
 
 
