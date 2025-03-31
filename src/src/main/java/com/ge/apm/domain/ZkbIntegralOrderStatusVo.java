@@ -60,4 +60,6 @@ public class ZkbIntegralOrderStatusVo {
     @Setter
     private String maintainTips = "";
 
+    private boolean canEdit = true;
+
 }
