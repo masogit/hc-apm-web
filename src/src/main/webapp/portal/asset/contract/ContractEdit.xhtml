@@ -50,13 +50,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">项目名称*</label>
+                                <label class="label">#{msg.AssetContractName}*</label>
                                 <p:inputText value="#{contractInfoEditController.selected.name}" required="true" requiredMessage="#{msg.AssetContractName} #{msg.ValidationRequire}">
                                     <p:ajax process="@this" />
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">合同编号/档案号</label>
+                                <label class="label">#{msg.contractNum}</label>
                                 <p:inputText value="#{contractInfoEditController.selected.contractNum}">
                                     <p:ajax process="@this" />
                                 </p:inputText>
@@ -129,7 +129,7 @@
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">项目编号</label>
+                                <label class="label">#{msg.ReportNumber}</label>
                                 <p:inputText value="#{contractInfoEditController.selected.reportNum}" >
                                     <p:ajax process="@this" />
                                 </p:inputText>
