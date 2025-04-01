@@ -149,7 +149,7 @@
                 <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.pmNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.CurrentProcessingStep}"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                <p:column headerText="#{msg.CurrentProcessingStep}" filterBy="#{item.currentStepName}" filterMatchMode="EQ" rendered="#{v2PmOrderController.queryIndex != 7}">
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
@@ -161,6 +161,9 @@
                 </p:column>
                 <p:column headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                </p:column>
+                <p:column headerText="#{msg.pmComment}" filterBy="#{item.comments}" filterMatchMode="LIKE" rendered="#{v2PmOrderController.queryIndex == 7}">
+                    <h:outputText value="#{item.comments}"/>
                 </p:column>
                 <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}" filterBy="#{item.planTime}" filterMatchMode="GTE" >
                     <f:facet name="filter">
