@@ -75,19 +75,19 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.vendor}" sortBy="#{item.supplier.name}" filterBy="#{item.supplier.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.supplier.name}"/>
+                        <p:column headerText="#{msg.vendor}" sortBy="#{item.supplierName}" filterBy="#{item.supplierName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.supplierName}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.plannedArriveDate}" sortBy="#{item.expectArrivalDate}">
+                        <p:column headerText="#{msg.plannedArriveDate}" filterBy="#{item.expectArrivalDate}" filterMatchMode="GET"    sortBy="#{item.expectArrivalDate}">
                             <f:facet name="filter">
-                                <p:inputText id="filterExpectArrivalDate" widgetVar="varfilterExpectArrivalDate"/>
+                                <p:inputText id="filterExpectArrivalDate" widgetVar="varfilterExpectArrivalDate"  value="#{contractInfoController.filterObject['expectArrivalDate']}"/>
                             </f:facet>
                             <h:outputText value="#{item.expectArrivalDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.startTime}" sortBy="#{item.startDate}" >
+                        <p:column headerText="#{msg.startTime}" filterBy="#{item.startDate}" filterMatchMode="GET"    sortBy="#{item.startDate}" >
                             <f:facet name="filter">
                                 <p:inputText id="filterStartTime" widgetVar="varFilterStartTime"/>
                             </f:facet>
@@ -95,7 +95,7 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.endTime}" sortBy="#{item.endDate}">
+                        <p:column headerText="#{msg.endTime}"  filterBy="#{item.endDate}" filterMatchMode="GET"     sortBy="#{item.endDate}">
                             <f:facet name="filter">
                                 <p:inputText id="filterEndTime" widgetVar="varFilterEndTime"/>
                             </f:facet>
@@ -103,16 +103,37 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.amount}" >
-                            <!-- <h:outputText  value="#{item.contractAmount}"/> -->
+                        <!--                        <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.amount}" >-->
+                        <!--                            &lt;!&ndash; <h:outputText  value="#{item.contractAmount}"/> &ndash;&gt;-->
+                        <!--                            <p:inputNumber value="#{(item.amount + item.supplementaryAmount) > 0 ? (item.amount + item.supplementaryAmount) : null}" readonly="true"> </p:inputNumber>-->
+                        <!--                        </p:column>-->
+
+                        <p:column headerText="#{msg.AssetContractAmount}"  filterBy="#{item.assetContractAmount}" filterMatchMode="GET"  sortBy="#{item.assetContractAmount}">
+                            <f:facet name="filter">
+                                <p:inputText id="filterAssetContractAmount" widgetVar="varFilterAssetContractAmount" value="#{contractInfoController.filterObject['assetContractAmount']}"/>
+                            </f:facet>
                             <p:inputNumber value="#{(item.amount + item.supplementaryAmount) > 0 ? (item.amount + item.supplementaryAmount) : null}" readonly="true"> </p:inputNumber>
                         </p:column>
-                        <p:column headerText="#{msg.PaymentProgress}">
+
+                        <p:column headerText="#{msg.PaymentProgress}"     sortBy="#{item.paymentProgress}">
                             <h:outputText value="#{item.paymentProgress}"/>
                         </p:column>
                         <p:column headerText="完成情况">
                             <h:outputText value="#{item.completion}"/>
                         </p:column>
+
+                        <p:column headerText="是否已完成验收"  filterBy="#{item.contractStatus}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" />
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.contractStatus eq 'COMPLETE'?msg.True2Yes:msg.False2No}"/>
+                        </p:column>
+
                         <p:column headerText="#{msg.Actions}">
                             <p:commandButton value="#{msg.ContractComplete}"
                                              rendered="#{item.contractType == 'Equipment' and (item.status == null or item.status == 4)}"
@@ -137,6 +158,60 @@
                         </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton" immediate="true"/>
+
+                    <p:overlayPanel widgetVar="panelFilterAssetContractAmount" for="AssetContractListForm:datalist:filterAssetContractAmount" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <!--                            <p:outputLabel value="#{msg.From}"/>-->
+                            <!--                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varAssetContractAmountFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />-->
+                            <!--                            <p:outputLabel value="#{msg.To}"/>-->
+                            <!--                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varAssetContractAmountTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />-->
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varAssetContractAmountFrom" >
+                            </p:inputNumber>
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varAssetContractAmountTo">
+                            </p:inputNumber>
+                        </h:panelGrid>
+                        <p:commandButton onclick="setNumberFilter('varDataList', 'varFilterAssetContractAmount', 'varAssetContractAmountFrom', 'varAssetContractAmountTo'); PF('panelFilterAssetContractAmount').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterAssetContractAmount').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+
+
+                    <p:overlayPanel widgetVar="panelFilterExpectArrivalDate" for="AssetContractListForm:datalist:filterExpectArrivalDate" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varExpectArrivalDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varExpectArrivalDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varfilterExpectArrivalDate', 'varExpectArrivalDateFrom', 'varExpectArrivalDateTo'); PF('panelFilterExpectArrivalDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterExpectArrivalDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel widgetVar="panelFilterStartTime" for="AssetContractListForm:datalist:filterStartTime" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varStartTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varStartTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterStartTime', 'varStartTimeFrom', 'varStartTimeTo'); PF('panelFilterStartTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterStartTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+
+                    <p:overlayPanel widgetVar="panelFilterEndTime" for="AssetContractListForm:datalist:filterEndTime" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varEndTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varEndTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterEndTime', 'varEndTimeFrom', 'varEndTimeTo'); PF('panelFilterEndTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterEndTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
                 </h:form>
             </div>
         </div>
@@ -185,7 +260,32 @@
                 window.document.body.innerHTML = '加载中...';
                 window.location.href = args.url;
             }
+            function setNumberFilter(dataTableWidgetVar, inputWidgetVar, fromDateWidgetVar, toDateWidgetVar) {
+                var input = document.getElementById(PF(inputWidgetVar).id);
+                var oldValue = input.value;
 
+
+                var dateFrom = PF(fromDateWidgetVar).getValue();
+                var dateTo = PF(toDateWidgetVar).getValue();
+
+                var value = "";
+                if (dateFrom !== null)
+                    value = dateFrom;
+                if (dateTo !== null)
+                    value = value + "~" + dateTo;
+
+                if(oldValue===value) return;
+
+                input.value = value;
+                PF(dataTableWidgetVar).filter();
+            }
+            function handleSubmitDigital(args, dialog) {
+                if (args.validationFailed) {
+                    PF(dialog).show();
+                } else {
+                    PF(dialog).hide();
+                }
+            }
         </script>
     </ui:define>
 

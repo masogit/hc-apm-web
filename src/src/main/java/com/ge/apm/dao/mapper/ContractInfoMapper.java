@@ -1,5 +1,6 @@
 package com.ge.apm.dao.mapper;
 
+import com.ge.apm.domain.ContractInfo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -17,4 +18,8 @@ public interface ContractInfoMapper {
                 "</foreach>"+
                 "</script>"})
     List<Map<String, Object>> findDateByAssetUidList(@Param("assetUidList") Collection<String> assetUidList);
+
+    List<ContractInfo> pageList(Map<String, Object> paramMap);
+    Long pageListCount(Map<String, Object> paramMap);
+
 }
