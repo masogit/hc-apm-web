@@ -268,6 +268,11 @@ public class ContractInfo implements Serializable {
     @Transient
     private int lineNum;
 
+    @Transient
+    private Double  assetContractAmount;
+    @Transient
+    private String  supplierName;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -1088,5 +1093,19 @@ public class ContractInfo implements Serializable {
         }
     }
 
+    public Double getAssetContractAmount() {
+        return assetContractAmount;
+    }
 
+    public void setAssetContractAmount(Double assetContractAmount) {
+        this.assetContractAmount = assetContractAmount;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
 }

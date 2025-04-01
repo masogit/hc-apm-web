@@ -2,10 +2,12 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.ContractInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -15,16 +17,19 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,11 +45,17 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
     private ArrivalListItemRepository arrivalListItemRepository;
     private ContractInfoItemRepository contractInfoItemRepository;
     private ConfigItemValueRepository configItemValueRepository;
+    private ContractInfoMapper contractInfoMapper;
     private String assetUid;
     private UserAccount currentUser;
     @Getter @Setter
     Integer contractExpirationReminderDays = 0;
 
+    @Getter
+    @Setter
+    public Map<String, Object> filterObject;
+
+    private Sort lastPageSort;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ContractInfoRepository.class);
@@ -54,6 +65,7 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
         contractInfoItemRepository = WebUtil.getBean(ContractInfoItemRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         assetUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "assetUid");
@@ -61,6 +73,7 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         if (ObjectUtil.isNotEmpty(configItemValue)) {
             contractExpirationReminderDays = Integer.parseInt(configItemValue.getValue());
         }
+        filterObject=new HashMap<>();
     }
 
     @Override
@@ -82,29 +95,181 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         if (searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        if(!this.hasFilterOnField("contractType")){
-            List<String> contractTypeList = Arrays.asList(ContractInfo.ContractType.values()).stream().map(item -> item.name()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractTypeList, "1*"));
-        }
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("page", pageRequest.getPageSize());
+
+        paramMap.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+//        if(!this.hasFilterOnField("contractType")){
+//            List<String> contractTypeList = Arrays.asList(ContractInfo.ContractType.values()).stream().map(item -> item.name()).collect(Collectors.toList());
+//            searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractTypeList, "1*"));
+//        }
 
         if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            if (ObjectUtil.isNotEmpty(orgUidList)) {
+                paramMap.put("orgUidList", orgUidList);
+            }
         }
 
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IsNull, null, "1*3+"));
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2, "1*3+"));
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 4, "1*3+"));
+//        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IsNull, null, "1*3+"));
+//        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2, "1*3+"));
+//        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 4, "1*3+"));
 
-        Page<ContractInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
-        List<ContractInfo> list = page.getContent();
+
+
+
+        covQueryCondition(searchFilters,paramMap);
+
+
+        lastPageSort = pageRequest.getSort();
+        StringBuilder orderBy = new StringBuilder();
+        for (Sort.Order order : lastPageSort) {
+            String property = order.getProperty();
+            boolean ascending = order.isAscending();
+            switch (property){
+                case "supplierName":
+                    orderBy.append("supplier.name").append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                case "assetContractAmount":
+                    orderBy.append("assetContractAmount").append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                case "paymentProgress":
+                    orderBy.append("paymentProgress").append(ascending ? " ASC" : " DESC").append(",");
+                    break;
+                default:
+                    orderBy.append("c."+ ZipUtil.camelToUnderline(property)).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+            }
+        }
+        paramMap.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
+
+
+        List<ContractInfo> list= contractInfoMapper.pageList(paramMap);
+        Long count= contractInfoMapper.pageListCount(paramMap);
+        list.forEach(item->item.setPaymentProgress(item.getPaymentProgress()+"%"));
+
+//        Page<ContractInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+//        List<ContractInfo> list = page.getContent();
         list.forEach(this::getCompletion);
-        calcPercentage(list);
-        return page;
+//        calcPercentage(list);
+        return new PageImpl<>(list, pageRequest, count);
     }
+
+    @Override
+    public void onFilter(FilterEvent event) {
+        onFilterCustom(event, this::numberField);
+    }
+    protected boolean numberField(String fieldName, String filterVal) {
+        if (isNumberField(fieldName)) {
+            processNumberFiled(filterVal, fieldName);
+            return true;
+        }
+        if(isDateTimeField(fieldName)){
+            processTimeFiled(filterVal,fieldName);
+        }
+        return false;
+    }
+    private Map<String, Boolean> numberFields = null;
+
+    protected boolean isNumberField(String fieldName){
+        if(numberFields==null){
+            numberFields = new HashMap<String, Boolean>();
+            Class a = getBeanClass();
+            for(Field f: a.getDeclaredFields()){
+                if(f.getType()==Double.class ||  f.getType()== BigDecimal.class  ||  f.getType()==Integer.class       )
+                    numberFields.put(f.getName(), Boolean.TRUE);
+            }
+        }
+        return numberFields.get(fieldName)!=null;
+    }
+
+    protected void processNumberFiled(String filterVal, String fieldName) {
+        String[] values = filterVal.split("~");
+        if (values.length > 0) {
+            Optional.ofNullable((values[0])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, var)));
+        }
+        if (values.length > 1) {
+            Optional.ofNullable((values[1])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, var)));
+        }
+    }
+    public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        for (SearchFilter searchFilter :searchFilters) {
+            String fieldName = searchFilter.fieldName;
+            switch (fieldName) {
+                case "name":
+                    param.put("name", searchFilter.value);
+                    break;
+                case "contractNum":
+                    param.put("contractNum", searchFilter.value);
+                    break;
+                case "reportNum":
+                    param.put("reportNum", searchFilter.value);
+                    break;
+                case "contractType":
+                    param.put("contractType", searchFilter.value);
+                    break;
+                case "supplierName":
+                    param.put("supplierName", searchFilter.value);
+                    break;
+                case "assetContractAmount":
+                    try {
+                        double num = Double.parseDouble(searchFilter.value.toString());
+                        String pararName;
+                        if (searchFilter.operator.name().equals("GTE")) {
+                            pararName= fieldName+"GTE";
+                            param.put(pararName, num);
+                        } else {
+                            pararName=fieldName+"LTE";
+                            param.put(pararName, num);
+                        }
+                    }catch (Exception e){
+                        logger.error("合同价格区间搜索数值转换异常 e:",e);
+                    }
+                    break;
+
+                case "expectArrivalDate":
+                case "startDate":
+                case "endDate":
+                    try {
+                        Date date = (Date) searchFilter.value;
+                        String pararName;
+                        if (searchFilter.operator.name().equals("GTE")) {
+                            pararName= fieldName+"GTE";
+                            param.put(pararName, date);
+                        } else {
+                            pararName=fieldName+"LTE";
+                            param.put(pararName, date);
+                        }
+                    }catch (Exception e){
+                        logger.error("合同时间区间搜索数值转换异常 e:",e);
+                    }
+                    break;
+
+                case "contractStatus":
+                    param.put("contractStatus", searchFilter.value);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void calcPercentage(List<ContractInfo> list){
         for (ContractInfo contractInfo : list) {
@@ -242,7 +407,7 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
             contractInfo.setContractAlertStatus(contractExpirationReminderDays);
         }
     }
-    
+
     public String createAction() {
         return UrlEncryptController.encodeUrlParam("ContractEdit?action=Create");
     }
