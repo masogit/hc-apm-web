@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.ContractInfoMapper">
+
+
+    <select id="pageList" resultType="com.ge.apm.domain.ContractInfo">
+
+        SELECT
+            DISTINCT c.*,  supplier.name  as supplierName,
+                 CASE
+                    when  (COALESCE(c.amount, 0) + COALESCE(c.supplementary_amount, 0))>0
+                     then  (COALESCE(c.amount, 0) + COALESCE(c.supplementary_amount, 0))
+        else null end as  assetContractAmount,
+
+
+                     COALESCE(SUM(cd.payment_price) OVER (PARTITION BY c.id), 0) AS total_detail_amount,
+                     CASE
+                         WHEN COALESCE(c.amount, 0) = 0 OR COALESCE(SUM(cd.payment_price) OVER (PARTITION BY c.id), 0) = 0 THEN 0
+                         ELSE ROUND(CAST((COALESCE(SUM(cd.payment_price) OVER (PARTITION BY c.id), 0) / COALESCE(c.amount, 0)) * 100 AS numeric ),2)
+                         END AS paymentProgress
+        FROM
+            contract_info c
+                left join supplier   on supplier.uid= c.supplier_uid
+                LEFT JOIN
+            contract_info_item cd ON c.id = cd.contract_id
+
+            <where>
+                <if test="orgUidList != null and orgUidList.size > 0">
+                    AND (
+                    c.institution_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR c.hospital_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR c.site_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                    OR c.tenant_uid IN
+                    <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+
+                    )
+                </if>
+                <if test="name!=null and name!=''  ">
+                    and   c.name like concat('%',#{name},'%')
+                </if>
+                <if test="reportNum!=null and reportNum!=''  ">
+                    and   c.report_num like concat('%',#{reportNum},'%')
+                </if>
+                <if test="contractType!=null and contractType!=''  ">
+                    and   c.contract_type =#{contractType}
+                </if>
+                <if test="supplierName!=null and supplierName!=''  ">
+                    and   supplier.name like concat('%',#{supplierName},'%')
+                </if>
+                <if test="contractNum!=null and contractNum!=''  ">
+                    and   c.contract_num like concat('%',#{contractNum},'%')
+                </if>
+
+                <if test="contractStatus != null">
+                    <choose>
+                        <when test="contractStatus">
+                            and  c.contract_status = 'COMPLETE'
+                        </when>
+                        <otherwise>
+                            and (  c.contract_status  != 'COMPLETE' or c.contract_status  is null  )
+                        </otherwise>
+                    </choose>
+                </if>
+
+                <if test="assetContractAmountGTE!=null ">
+                   and   COALESCE(c.amount, 0) + COALESCE(c.supplementary_amount, 0) >=#{assetContractAmountGTE}
+                </if>
+                <if test="assetContractAmountLTE!=null ">
+                   and  COALESCE(c.amount, 0) + COALESCE(c.supplementary_amount, 0)  <![CDATA[<=]]>  #{assetContractAmountLTE}
+                </if>
+
+                <if test="expectArrivalDateGTE!=null ">
+                    and   c.expect_arrival_date >= #{expectArrivalDateGTE}
+                </if>
+                <if test="expectArrivalDateLTE!=null ">
+                    and c.expect_arrival_date <![CDATA[<=]]>   #{expectArrivalDateGTE}
+                </if>
+                <if test="startDateGTE!=null ">
+                    and   c.start_date >= #{startDateGTE}
+                </if>
+                <if test="startDateLTE!=null ">
+                    and c.start_date <![CDATA[<=]]>   #{startDateLTE}
+                </if>
+                <if test="endDateGTE!=null ">
+                    and   c.end_date >= #{endDateGTE}
+                </if>
+                <if test="endDateLTE!=null ">
+                    and c.end_date <![CDATA[<=]]>   #{endDateLTE}
+                </if>
+
+            </where>
+        <if test="orderBy != null">
+            ORDER BY ${orderBy}
+        </if>
+        LIMIT #{page} OFFSET #{offset}
+
+    </select>
+
+
+    <select id="pageListCount" resultType="java.lang.Long">
+
+        SELECT
+
+            count(*) from
+        contract_info c
+        left join supplier   on supplier.uid= c.supplier_uid
+
+        <where>
+            <if test="orgUidList != null and orgUidList.size > 0">
+                AND (
+                c.institution_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR c.hospital_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR c.site_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+                OR c.tenant_uid IN
+                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+
+                )
+            </if>
+            <if test="name!=null and name!=''  ">
+                and   c.name like concat('%',#{name},'%')
+            </if>
+            <if test="reportNum!=null and reportNum!=''  ">
+                and   c.report_num like concat('%',#{reportNum},'%')
+            </if>
+            <if test="contractType!=null and contractType!=''  ">
+                and   c.contract_type =#{contractType}
+            </if>
+            <if test="supplierName!=null and supplierName!=''  ">
+                and   supplier.name like concat('%',#{supplierName},'%')
+            </if>
+            <if test="contractNum!=null and contractNum!=''  ">
+                and   c.contract_num like concat('%',#{contractNum},'%')
+            </if>
+
+            <if test="contractStatus != null">
+                <choose>
+                    <when test="contractStatus">
+                        and  c.contract_status = 'COMPLETE'
+                    </when>
+                    <otherwise>
+                        and (  c.contract_status  != 'COMPLETE' or c.contract_status  is null  )
+                    </otherwise>
+                </choose>
+            </if>
+
+            <if test="assetContractAmountGTE!=null ">
+                and   COALESCE(c.amount, 0) + COALESCE(c.supplementary_amount, 0) >=#{assetContractAmountGTE}
+            </if>
+            <if test="assetContractAmountLTE!=null ">
+                and  COALESCE(c.amount, 0) + COALESCE(c.supplementary_amount, 0)  <![CDATA[<=]]>  #{assetContractAmountLTE}
+            </if>
+
+            <if test="expectArrivalDateGTE!=null ">
+                and   c.expect_arrival_date >= #{expectArrivalDateGTE}
+            </if>
+            <if test="expectArrivalDateLTE!=null ">
+                and c.expect_arrival_date <![CDATA[<=]]>   #{expectArrivalDateGTE}
+            </if>
+            <if test="startDateGTE!=null ">
+                and   c.start_date >= #{startDateGTE}
+            </if>
+            <if test="startDateLTE!=null ">
+                and c.start_date <![CDATA[<=]]>   #{startDateLTE}
+            </if>
+            <if test="endDateGTE!=null ">
+                and   c.end_date >= #{endDateGTE}
+            </if>
+            <if test="endDateLTE!=null ">
+                and c.end_date <![CDATA[<=]]>   #{endDateLTE}
+            </if>
+
+        </where>
+    </select>
+    
+</mapper>
