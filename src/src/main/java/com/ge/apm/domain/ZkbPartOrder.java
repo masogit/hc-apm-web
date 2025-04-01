@@ -54,7 +54,7 @@ public class ZkbPartOrder implements Serializable {
     }
 
     public enum RadiationQuotaTypeEnum{
-        SpareArtificial,PartsHigh
+        SpareArtificial,PartsHigh,Part,Consumable
     }
 
     @Id
