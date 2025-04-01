@@ -195,12 +195,11 @@
                                 <f:selectItem itemLabel="XR" itemValue="XR"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1 and (zkbPartOrderAuditController.zkbContract.contractType eq 'DI' or zkbPartOrderAuditController.zkbContract.contractType eq 'PCB')}">
-                            <label class="label">放射名额扣除类型*</label>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and not empty zkbPartOrderAuditController.selected.radiationQuotaType}">
+                            <label class="label">名额扣除类型*</label>
                             <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.radiationQuotaType}" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}"  disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItem itemLabel="联合名额" itemValue="SpareArtificial"/>
-                                <f:selectItem itemLabel="高值备件名额" itemValue="PartsHigh"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoPartQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
 

@@ -11,6 +11,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -77,6 +78,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String faultUnClosedSr;
     private List<I18nMessage> exchangeTypeList = new ArrayList<>();
     private List<I18nMessage> zkbPoProbeQuotaTypeList = new ArrayList<>();
+
+    @Getter@Setter
+    private List<I18nMessage> zkbPoPartQuotaTypeList = new ArrayList<>();
     private I18nMessageRepository i18nMessageRepository;
     private String notGeAsset;
     private String listNg;
@@ -261,40 +265,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             //editCurrentScoreFlag();
             handleQtyByOrderType();
-
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
-            //判断是否是放射类以及合同类型是否是DI或者PCB
-            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType())){
-                if(assetInfo.getAssetGroup().equals(1)){
-                    radiationQuotaTypeFlag = true;
-                    Integer q = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
-                    if(q<= 0){
-                        selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
-                        spareArtificialFlag = true;
-                    }
-                }else{
-                    radiationQuotaTypeFlag = false;
-                    selected.setRadiationQuotaType(null);
-                }
-            }else if(ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
-                if(assetInfo.getAssetGroup().equals(1)){
-                    if(zkbPartOrderEditService.checkPcbMvsTotal(selectedContract)){
-                        radiationQuotaTypeFlag = true;
-                        selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
-                        spareArtificialFlag = true;
-                    }else{
-                        radiationQuotaTypeFlag = true;
-                        Integer q = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
-                        if(q<= 0){
-                            selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
-                            spareArtificialFlag = true;
-                        }
-                    }
-                }else{
-                    radiationQuotaTypeFlag = false;
-                    selected.setRadiationQuotaType(null);
-                }
-            }
+            initRadiationQuotaTypeList();
         }
 
         initZknPartCat(selectedContract.getStartDate());
@@ -307,13 +279,47 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         calcRemainQty();
     }
 
+    public void initRadiationQuotaTypeList() {
+        //重新初始化
+        radiationQuotaTypeFlag = true;
+        spareArtificialFlag = false;
+        List<I18nMessage> removeList = new ArrayList<>();
+        zkbPoPartQuotaTypeList = i18nMessageRepository.findI18nByType("ZkbPoPartQuotaType");
+        if (ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) ||
+            ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType()) ||
+            "PCB MVS".equals(selectedContract.getContractType())
+        ) {
+            for(I18nMessage i18nMessage : zkbPoPartQuotaTypeList){
+                if(i18nMessage.getMsgKey().equals("Part")){
+                    removeList.add(i18nMessage);
+                }
+            }
+            if(assetInfo.getAssetGroup().equals(1)){
+                if(zkbPartOrderEditService.checkPcbMvsTotal(selectedContract)){
+                    selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
+                    spareArtificialFlag = true;
+                }
+            }else{
+                for(I18nMessage i18nMessage : zkbPoPartQuotaTypeList){
+                    if(i18nMessage.getMsgKey().equals("PartsHigh")){
+                        removeList.add(i18nMessage);
+                    }
+                }
+            }
+        }else if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+            for(I18nMessage i18nMessage : zkbPoPartQuotaTypeList){
+                if(i18nMessage.getMsgKey().equals("SpareArtificial") || i18nMessage.getMsgKey().equals("PartsHigh")){
+                    removeList.add(i18nMessage);
+                }
+            }
+        }
+        if(CollectionUtils.isNotEmpty(removeList)){
+            zkbPoPartQuotaTypeList.removeAll(removeList);
+        }
+    }
     public void workOrderView(String id){
-        String url = "actionName=View&selectedid="
-                + id
-                + "&queryIndex=0"
-                ;
+        String url = "actionName=View&selectedid=" + id + "&queryIndex=0";
         url = "../../woMgr/workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
-
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
@@ -508,35 +514,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 this.selected.setRemainQty(null);
                 return;
             }
-            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
-                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) &&
-                        (ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) &&
-                        assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
-                    if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
-                        Integer contractCount = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
-                        Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else {
-                        this.selected.setRemainQty(null);
-                    }
-                }else if(!CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())) {
-                    if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
-                        Integer contractCount = selectedContract.getSpareQuota() == null ? 0 : selectedContract.getSpareQuota();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else{
-                        Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }
-                }else {
-                    if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
-                        Integer contractCount = selectedContract.getSpareQuota() == null ? 0 : selectedContract.getSpareQuota();
-                        this.selected.setRemainQty(contractCount);
-                    }else{
-                        Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
-                        this.selected.setRemainQty(contractCount);
-                    }
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                    Integer contractCount = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                    Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.Part.toString().equals(selected.getRadiationQuotaType())){
+                    Integer contractCount = selectedContract.getSpareQuota() == null ? 0 : selectedContract.getSpareQuota();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(selected.getRadiationQuotaType())){
+                    Integer contractCount = selectedContract.getConsumableQuota() == null ? 0 : selectedContract.getConsumableQuota();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                 if(StringUtils.isNotEmpty(selectedContract.getQuotaDeductType())){
@@ -653,6 +643,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         }
                         this.selected.setRemainQty(contractCount);
                     }
+                }
+            }else if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
+                if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                    Integer contractCount = selectedContract.getSpareQuota() == null ? 0 : selectedContract.getSpareQuota();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }else{
+                    Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
                 }
             }
         }
