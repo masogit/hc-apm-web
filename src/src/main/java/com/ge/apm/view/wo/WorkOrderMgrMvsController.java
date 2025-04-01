@@ -458,6 +458,10 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                 case "serviceRequest.casePriority":
                     params.put("casePriority", searchFilter.value);
                     break;
+                case "parentWoId":
+                    Boolean parentWoId = (Boolean)searchFilter.value;
+                    params.put("parentWoId", parentWoId?"IS NULL":"IS NOT NULL");
+                    break;
                 default:
                     break;
             }
@@ -1022,13 +1026,6 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                 stepIds = stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList());
             }
             searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
-            return true;
-        }else if("parentWoId".equals(fieldName)){
-            if(Boolean.TRUE.toString().equals(filterVal)){
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IsNull,null));
-            }else{
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IsNotNull,null));
-            }
             return true;
         }
         return false;

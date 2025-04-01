@@ -7,9 +7,11 @@ import com.ge.apm.domain.dto.AssetCostDTO;
 import com.ge.apm.domain.dto.DepreciationResultData;
 import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.common.I18nMessageService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -17,11 +19,13 @@ import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DualListModel;
@@ -39,6 +43,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -103,6 +108,13 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
 
+
+    @Getter @Setter
+    private String filterClinicalDeptOrg;
+    @Getter @Setter
+    private Set<String> clinicalDeptOrgUidSet;
+
+    private OrgInfoTreeService orgInfoTreeService;
     private AssetDepreciationMapper assetDepreciationMapper;
 
     private I18nMessageRepository i18nMessageRepository;
@@ -165,9 +177,11 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         assetDepreciationMapper = WebUtil.getBean(AssetDepreciationMapper.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
         this.selectedMap = new HashMap<>();
         filterObject=new HashMap<>();
+        loadClinicalDeptList();
     }
 
 
@@ -187,6 +201,10 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         }
         if (null != selectSite) {
             param.put("selectedOrgUid",selectSite.getUid());
+        }
+
+        if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
+            param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
         }
         param.put("startDate",startDate);
         param.put("endDate",endDate);
@@ -647,6 +665,7 @@ protected boolean numberField(String fieldName, String filterVal) {
     }
     public void  editBatch1(){
         this.positiveRate=null;
+        this.displayName=null;
     }
     public void  editBatch(){
         if(positiveRate!=null){
@@ -671,6 +690,50 @@ protected boolean numberField(String fieldName, String filterVal) {
         }
         this.selectedMap = new HashMap<>();
         this.positiveRate=null;
+        this.displayName=null;
     }
 
+
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != selectSite) {
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+        }
+    }
+
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
 }

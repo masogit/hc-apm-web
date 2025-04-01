@@ -133,7 +133,7 @@
                 <p:column headerText="#{msg.requestReason}">
                     <h:outputText value="#{workOrderMgrMvsController.getRequestReasonInShort(item.serviceRequest.requestReason)}"  title="#{item.serviceRequest.requestReason}"/>
                 </p:column>
-                <p:column headerText="主工单"  filterBy="#{item.parentWoId}">
+                <p:column headerText="主工单"  filterBy="#{item.parentWoId}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()">
                             <f:converter converterId="javax.faces.Boolean" />

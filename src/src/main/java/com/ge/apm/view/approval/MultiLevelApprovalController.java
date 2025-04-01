@@ -27,6 +27,8 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Decoder;
@@ -43,6 +45,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -116,6 +119,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     @Getter
     @Setter
     private List<V2_BlobObject> fixedAttachList;
+    @Getter
+    @Setter
+    private List<Map<String, List<V2_BlobObject>>> workParts;
 
     @Getter
     private Object primaryApprovalData;
@@ -200,6 +206,15 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.purchaseOrderInfo = new PurchaseOrderInfo();
         applyPurchaseVo = new MaintenanceContractApplyPurchaseVo();
     }
+    private Map<String, List<V2_BlobObject>> initBlob(){
+        Map<String, List<V2_BlobObject>> objectObjectHashMap = new HashMap<>();
+        List<V2_BlobObject> blobObjects = new ArrayList<>();
+        Page<V2_BlobObject> all = blobObjectRepository.findAll(new PageRequest(1, 10));
+        blobObjects.addAll(all.getContent());
+        String key = "123";
+        objectObjectHashMap.put(key, blobObjects);
+        return objectObjectHashMap;
+    }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
 
@@ -224,8 +239,17 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 V2_WorkOrder work = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 List<V2_WorkOrder> workOrderLists = new ArrayList<V2_WorkOrder>();
                 workOrderLists.add(work);
+                fixedAttachList= blobObjectRepository.findByBoUuid(work.getId());
                 primaryApprovalData = workOrderLists;
-                secondaryApprovalData = woService.getWorkOrderDetails(work.getId());
+                List<V2_WorkOrder_Detail> workOrderDetails = woService.getWorkOrderDetails(work.getId());
+                workParts = workOrderDetails.stream().filter(item -> !CollectionUtils.isEmpty(item.getAttachments()))
+                        .map(item->{
+                            Map<String, List<V2_BlobObject>> objectObjectHashMap = new HashMap<>();
+                            objectObjectHashMap.put(item.getParts(), item.getAttachments());
+                            return objectObjectHashMap;
+                        })
+                        .collect(Collectors.toList());
+                secondaryApprovalData = workOrderDetails;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
                 V2_PmOrder byId = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());

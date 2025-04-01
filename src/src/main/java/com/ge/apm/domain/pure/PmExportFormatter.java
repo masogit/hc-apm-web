@@ -90,6 +90,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.PMNUM.getChinese(), this.getPmNum());
             map.put(ExportFields.CURRENTSTEP.getChinese(), this.getCurrentStep());
             map.put(ExportFields.ORDERTYPE.getChinese(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
+            map.put(ExportFields.ORDERCOMMENTS.getChinese(), this.getComments());
             map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getChinese(), this.getActualCompletionTime());
@@ -115,6 +116,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.PMNUM.getEnglish(), this.getPmNum());
             map.put(ExportFields.CURRENTSTEP.getEnglish(), this.getCurrentStep());
             map.put(ExportFields.ORDERTYPE.getEnglish(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
+            map.put(ExportFields.ORDERCOMMENTS.getEnglish(), this.getComments());
             map.put(ExportFields.PLANTIME.getEnglish(), this.getPlanTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getEnglish(), this.getActualCompletionTime());
@@ -160,6 +162,10 @@ public class PmExportFormatter<T> {
 
     public void setPmNum(String pmNum) {
         this.pmNum = v2_pmOrder.getPmNum();
+    }
+
+    public String getComments() {
+        return v2_pmOrder.getComments();
     }
 
     public String getCurrentStep() {
