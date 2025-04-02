@@ -115,7 +115,6 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
                 selectedWorkFlow = v2_listHashMap.get(0);
             }
             if(!currentUser.getTenantUID().equals(selected.getTenantUID())){
-                zkbIntegralOrderStatusVo.setCanEdit(false);
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
             }
         }
