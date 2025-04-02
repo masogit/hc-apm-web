@@ -70,7 +70,7 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
         currentUser = UserContextService.getCurrentUserAccount();
         queryStatus = WebUtil.getRequestParameter("queryStatus") == null ? "" : WebUtil.getRequestParameter("queryStatus");
         if(userContextService.isZkbUser()) {
-            queryStatus = StrUtil.isEmpty(queryStatus) ? "all" : queryStatus;
+            //queryStatus = StrUtil.isEmpty(queryStatus) ? "all" : queryStatus;
             this.selectionTenantInfo = currentUser.getTenantUID();
         }
         zkbIntegralOrderStatusVo = new ZkbIntegralOrderStatusVo();
@@ -125,7 +125,7 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
                     predicates.add(builder.equal(root.get("tenantUID"), selectionTenantInfo));
                 }
                 if(StringUtils.isEmpty(queryStatus)){
-
+                    predicates.add(builder.isNull(root.get("currentStep")));
                 }else if(!"all".equals(queryStatus)){
                     predicates.add(builder.equal(root.get("currentStep"), queryStatus));
                 }
@@ -146,7 +146,7 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
                                     Predicate pre3 = builder.and(pre1, pre2);
                                     userConfigPredicates.add(pre3);
                                 }else{
-                                    Predicate pre1 = builder.isNull(root.get("currentStep"));
+                                    Predicate pre1 = builder.isFalse(root.get("currentStep"));
                                     userConfigPredicates.add(pre1);
                                 }
                             }
@@ -158,6 +158,9 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
                                 userConfigPredicates.add(pre3);
                             }else if(!"all".equals(queryStatus)){
                                 Predicate pre1 = builder.equal(root.get("currentStep"), queryStatus);
+                                userConfigPredicates.add(pre1);
+                            }else if("all".equals(queryStatus)){
+                                Predicate pre1 = builder.isNotNull(root.get("currentStep"));
                                 userConfigPredicates.add(pre1);
                             }
                         }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){

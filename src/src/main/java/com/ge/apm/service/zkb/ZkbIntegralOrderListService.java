@@ -60,13 +60,13 @@ public class ZkbIntegralOrderListService {
 
 
     public void calcPendQty(boolean isZkbUser, UserAccount currentUser, ZkbIntegralOrderStatusVo zkbIntegralOrderStatusVo, List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList) {
-        if (!isZkbUser) {
+        //if (!isZkbUser) {
             Specification<ZkbIntegralOrder> specification = buildPendingSpecification(currentUser, zkbPartOrderUserConfigList);
             if (specification != null) {
                 long q = zkbIntegralOrderRepository.count(specification);
                 zkbIntegralOrderStatusVo.setPendingQty(q);
             }
-        }
+        //}
     }
 
     public void calcStepQty(boolean isZkbUser, UserAccount currentUser, ZkbIntegralOrderStatusVo zkbIntegralOrderStatusVo){
