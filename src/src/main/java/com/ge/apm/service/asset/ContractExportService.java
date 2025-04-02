@@ -1,29 +1,24 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.ContractInfoItemRepository;
-import com.ge.apm.dao.ContractInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.domain.ContractInfo;
-import com.ge.apm.domain.ContractInfoItem;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.Supplier;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2018/9/20.
@@ -44,6 +39,14 @@ public class ContractExportService {
     private SupplierRepository supplierDao;
     @Autowired
     private OrgInfoRepository orgInfoDao;
+    @Autowired
+    private ContractInfoService contractService;
+    @Autowired
+    private ArrivalListRepository arrivalListRepository;
+    @Autowired
+    private ArrivalListItemRepository arrivalListItemRepository;
+    @Autowired
+    private ContractInfoItemRepository contractInfoItemRepository;
 
 
     public List<Map<String, Object>> createContractData(OrgInfo selectedOrg, String contractType, Date startDateFilter, Date endDateFilter){
@@ -94,7 +97,8 @@ public class ContractExportService {
                     supplierName = supplier.getName();
                 }
             }
-
+            calcPercentage(contractInfo);
+            getCompletion(contractInfo);
             Map<String, Object> contractInfoMap = new HashedMap();
             contractInfoMap.put("合同UID", contractInfo.getId());
             contractInfoMap.put("名称", contractInfo.getName());
@@ -110,6 +114,10 @@ public class ContractExportService {
             contractInfoMap.put("结束时间", formatDate(contractInfo.getEndDate()));
             contractInfoMap.put("合同时间(月)", contractInfo.getEndMonths());
             contractInfoMap.put("endMonths", contractInfo.getEndMonths());
+            contractInfoMap.put("应到货时间", formatDate(contractInfo.getExpectArrivalDate()));
+            contractInfoMap.put("是否完成验收","COMPLETE".equals(contractInfo.getContractStatus())?"是":"否" );
+            contractInfoMap.put("付款进度", contractInfo.getPaymentProgress());
+            contractInfoMap.put("完成情况", contractInfo.getCompletion());
 
             contractResultList.add(contractInfoMap);
         }
@@ -117,6 +125,83 @@ public class ContractExportService {
         return contractResultList;
 
     }
+    public void getCompletion(ContractInfo contractInfo) {
+        String completion = "";
+        if (ContractInfo.ContractType.Equipment.toString().equals(contractInfo.getContractType())) {
+            List<ContractInfoItem> purchases = contractInfoItemRepository.findByContractIdAndItemType(contractInfo.getId(), "Purchase");
+            List<ArrivalList> arrivalLists = arrivalListRepository.findByContractItemIdIn(purchases.stream().map(ContractInfoItem::getId).collect(Collectors.toList()));
+            if (ObjectUtil.isNotEmpty(arrivalLists)) {
+                Set<Integer> arrivalStatus = arrivalLists.stream().map(ArrivalList::getStatus).collect(Collectors.toSet());
+                List<ArrivalListItem> arrivalListItems = Optional.ofNullable(arrivalListItemRepository.findByArrivalListIdIn(arrivalLists.stream().map(ArrivalList::getId).collect(Collectors.toList()))).orElse(new ArrayList<>());
+                Set<String> arrivalItemStatus = arrivalListItems.stream().map(ArrivalListItem::getInstallStatus).collect(Collectors.toSet());
+                Map<String, Integer> contractItemMap = purchases.stream().collect(Collectors.toMap(ContractInfoItem::getId, ContractInfoItem::getContractAssetQuantity));
+                Map<String, List<ArrivalList>> arrivalMap = arrivalLists.stream().collect(Collectors.groupingBy(ArrivalList::getContractItemId));
+                int isFinished = 0;
+                for (Map.Entry<String, Integer> item : contractItemMap.entrySet()) {
+                    Integer quantity = item.getValue();
+                    List<ArrivalList> lists = arrivalMap.get(item.getKey());
+                    if (ObjectUtil.isNotEmpty(lists)) {
+                        int sum = lists.stream().mapToInt(ArrivalList::getQuantity).sum();
+                        if (sum >= quantity) {
+                            isFinished++;
+                        }
+                    }
+                }
+                boolean arrival = arrivalItemStatus.isEmpty() || (arrivalItemStatus.size() == 1 && arrivalItemStatus.contains("new"));
+                if (isFinished == contractItemMap.size()) {
+                    // 到货完成
+                    if (arrival) {
+                        // 未安装
+                        completion = "到货完成 未安装";
+                    } else {
+                        if (arrivalStatus.size() == 1 && arrivalStatus.contains(3)) {
+                            completion = "到货完成 验收完成";
+                        } else {
+                            completion = "到货完成 验收中";
+                        }
+                    }
+                } else {
+                    if (arrival) {
+                        completion =  "到货中 未安装";
+                    } else {
+                        completion =  "到货中 验收中";
+                    }
+                }
+            } else {
+                completion = "未到货";
+            }
+        }
+        contractInfo.setCompletion(completion);
+    }
+    public void calcPercentage(ContractInfo contractInfo){
+
+            double totalPaymentPrice = 0.0;
+            List<ContractInfoItem> itemList = contractService.getContractItems(contractInfo.getId());
+            if(CollectionUtils.isNotEmpty(itemList)){
+                for (ContractInfoItem contractInfoItem : itemList) {
+                    if(contractInfoItem.getPaymentPrice() != null){
+                        totalPaymentPrice += contractInfoItem.getPaymentPrice();
+                    }
+                }
+                if(totalPaymentPrice > 0){
+                    if(contractInfo.getAmount() != null){
+                        totalPaymentPrice = totalPaymentPrice / contractInfo.getAmount() * 100;
+                        String percentage = new BigDecimal(totalPaymentPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
+                        contractInfo.setPaymentProgress(percentage);
+                    }else{
+                        contractInfo.setPaymentProgress("0%");
+                    }
+                }else{
+                    contractInfo.setPaymentProgress("0%");
+
+                }
+            }else{
+                contractInfo.setPaymentProgress("0%");
+            }
+
+    }
+
+
 
     public List<Map<String, Object>> createContractItemData(List<Map<String, Object>> contractResultList){
 
