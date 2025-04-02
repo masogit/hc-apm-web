@@ -3,7 +3,6 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.MultiLevelApproval;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
@@ -39,6 +38,9 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
 
     @Query(value = "select count(m.id) from multi_level_approval m  where m.workflow_config_approve_uid = ?1 and ( m.approval_status = 0 or m.approval_status = 1   ) ",nativeQuery = true)
     int getIncompleteApprovalConfig(String id);
+
+    @Query(value = "select count(m.id) from multi_level_approval m  where m.business_uid = ?1 and ( m.approval_status = 0 or m.approval_status = 1 ) ",nativeQuery = true)
+    int getIncompleteApprovalBusiness(String businessUid);
 
 
     @Query(value = "select   count(ma.*) from multi_level_approval ma left join asset_scrap  scrap on ma.business_number=scrap.business_number \n" +

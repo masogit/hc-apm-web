@@ -223,16 +223,15 @@
                 <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
                     <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}" title="#{item.serviceRequest.requestReason}"/>
                 </p:column>
-                <p:column headerText="主工单"  filterBy="#{item.parentWoId}">
+                <p:column headerText="主工单"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()">
-                            <f:converter converterId="javax.faces.Boolean" />
                             <f:selectItem itemLabel="#{msg.All}" itemValue="" />
-                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
-                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="main" />
+                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="sub" />
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{empty item.parentWoId?msg.True2Yes:msg.False2No}" />
+                    <h:outputText value="#{'main'.equals(item.mainSub)?msg.True2Yes:msg.False2No}" />
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CANCEL')}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
@@ -255,13 +254,14 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and (userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
                     <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') and workOrderMgrController.initCheckInBtn()}"/>
-                    <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'? '':'transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
-                    <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'@(.x0) @(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}">
+                    <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'? '':'transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                    <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'@(.x0) @(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}">
                         <p:confirm  header="维修提示"  message="未查询到维保合同信息，请确认是否继续维修！" disabled="#{workOrderMgrController.repairTip(item)}" icon="ui-icon-alert"/>
                     </p:commandButton>
                     <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'woTab:newWorkorderDlgForm  :growl'}"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
                     <!--报修后，被接单的工单 医工主任有权限能够取消 -->
-                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
+<!--                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>-->
+                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="handleCancelOrderSubmit(xhr, status, args);"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==10 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_APPROVE')}"><!--审批-->
                     <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
@@ -363,7 +363,7 @@
     </p:dialog>
     <p:dialog id="cancelDialog" widgetVar="cancelDialog" modal="true" width="500"  resizable="true" draggable="true" header="#{msg.cancelWorkOrder}">
         <h:form id="cancelDialogForm" >
-            <h:panelGroup id="display1" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
+            <h:panelGroup id="display1">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup>
                         <label class="label">#{msg.deviceStatus}*</label>
@@ -489,6 +489,14 @@
                 $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
             } else {
                 $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+            }
+        }
+
+        function handleCancelOrderSubmit(xhr, status, args) {
+            var approvalProcessIsComplete = args.approvalProcessIsComplete;
+            if (approvalProcessIsComplete === false) {
+            } else {
+                PF('cancelDialog').show();
             }
         }
     </script>

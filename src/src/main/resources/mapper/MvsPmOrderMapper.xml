@@ -32,6 +32,7 @@
         <result property="ownerName" column="owner_name"/>
         <result property="ackSignature" column="ack_signature"/>
         <result property="parentWoId" column="parent_wo_id"/>
+        <result property="mainSub" column="main_sub"/>
 
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>
@@ -76,6 +77,7 @@
         t.rule_level,
         t.owner_name,
         t.parent_wo_id,
+        t.main_sub,
         a.name AS asset_name,
         a.serial_num as asset_serial_num,
         a.depart_num as asset_depart_num,
@@ -169,8 +171,8 @@
         <if test="functionType != null">
             AND a.function_type  like CONCAT('%', #{functionType}, '%')
         </if>
-        <if test="parentWoId != null">
-            AND t.parent_wo_id  ${parentWoId}
+        <if test="mainSub != null">
+            AND t.main_sub = #{mainSub}
         </if>
               AND a.is_valid
               AND NOT a.is_deleted

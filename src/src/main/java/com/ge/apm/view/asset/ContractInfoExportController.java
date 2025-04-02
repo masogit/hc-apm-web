@@ -3,7 +3,9 @@ package com.ge.apm.view.asset;
 import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.asset.ContractExportService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FileDownloadService;
@@ -22,9 +24,11 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -55,16 +59,16 @@ public class ContractInfoExportController {
 
     private Date startDateFilter;
     private Date endDateFilter;
+    private UserAccount user;
 
-    private FileDownloadService fileDownloadService;
-
+    private SystemTemplateService systemTemplateService;
     @PostConstruct
     protected void init() {
 
         contractExportService = WebUtil.getBean(ContractExportService.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
-
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        user = UserContextService.getCurrentUserAccount();
         this.initOrgTree();
 
     }
@@ -73,13 +77,17 @@ public class ContractInfoExportController {
         try {
 //            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/contract/contractExport/APM_Contract_Export_Template.xlsx");
 
-            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.CONTRACT_EXPORT.getCode(), SystemTemplateEnum.CONTRACT_EXPORT.getFileType());
+//            InputStream stream = fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.CONTRACT_EXPORT.getCode(), SystemTemplateEnum.CONTRACT_EXPORT.getFileType());
+//
+//            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+//            Boolean exportFlag = contractExportService.exportData(doc, contractData, contractItemData);
 
-            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = contractExportService.exportData(doc, contractData, contractItemData);
-            if (exportFlag) {
-                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ContractInfoData.xlsx");
-            }
+            byte[] templateFileByte =systemTemplateService.getTemplateFileByte(SystemTemplateEnum.CONTRACT_EXPORT,user);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("Contract List",contractData);
+            map.put("ContractItem List",contractItemData);
+            byte[] bytes = EasyExcelExportUtil.exportExcel(templateFileByte, map, new HashMap<>());
+            exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/vnd.ms-excel", "ContractInfoData.xlsx");
         } catch (IOException ex) {
             Logger.getLogger(ContractInfoExportController.class.getName()).log(Level.SEVERE, null, ex);
         }
