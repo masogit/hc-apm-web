@@ -1331,8 +1331,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             selectedWorkOrder.setRepairType(Integer.valueOf(repairTypeValue));
         }
     }
-    public void prepareAct(String woid) {
-        selectedWorkOrder = dao.findById(woid);
+
+    public void prepareAct(String woId) {
+        selectedWorkOrder = dao.findById(woId);
+        // 维修中
+        if (selectedWorkOrder.getStatus() == 1 && selectedWorkOrder.getCurrentStepId() == 4) {
+            if (multiLevelApprovalRepository.getIncompleteApprovalBusiness(woId) > 0) {
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("approvalProcessIsComplete", false);
+                WebUtil.addErrorMessage("当前工单有备件审批未完成，请完成后再取消工单！");
+                return;
+            }
+        }
         currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
         confirmedUpDate = null;
         confirmedDownTime = null;
@@ -3935,13 +3945,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 stepIds = stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList());
             }
             searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
-            return true;
-        }else if("parentWoId".equals(fieldName)){
-            if(Boolean.TRUE.toString().equals(filterVal)){
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IsNull,null));
-            }else{
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IsNotNull,null));
-            }
             return true;
         }
         return false;
