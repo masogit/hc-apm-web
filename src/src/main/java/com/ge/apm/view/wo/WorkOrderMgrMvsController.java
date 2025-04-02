@@ -458,9 +458,8 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                 case "serviceRequest.casePriority":
                     params.put("casePriority", searchFilter.value);
                     break;
-                case "parentWoId":
-                    Boolean parentWoId = (Boolean)searchFilter.value;
-                    params.put("parentWoId", parentWoId?"IS NULL":"IS NOT NULL");
+                case "mainSub":
+                    params.put("mainSub", searchFilter.value);
                     break;
                 default:
                     break;

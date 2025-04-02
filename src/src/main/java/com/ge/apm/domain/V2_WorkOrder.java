@@ -112,6 +112,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "parent_wo_id")
     private String parentWoId;
 
+    @Column(name = "main_sub")
+    private String mainSub;
+
     @Column(name = "feedback_rating")
     private Integer feedbackRating;
 
@@ -630,6 +633,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setParentWoId(String parentWoId) {
         this.parentWoId = parentWoId;
+    }
+
+    public String getMainSub() {
+        return mainSub;
+    }
+
+    public void setMainSub(String mainSub) {
+        this.mainSub = mainSub;
     }
 
     public Integer getFeedbackRating() {
