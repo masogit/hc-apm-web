@@ -508,11 +508,11 @@ public class ZkbPartOrderEditService {
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(v2_blobObjectList == null || v2_blobObjectList.size() == 0){
-                //errorLog.append("附件不能为空！");
+                errorLog.append("附件不能为空！");
             }
         }else{
             if(CopyByInvok.F.equals(selected.getSsaKeyFlag()) && checkPcbMvsTotal(selectedContract)){
-                if(CopyByInvok.F.equals(selected.getScoreFlag())){
+                if(CopyByInvok.F.equals(selected.getScoreFlag()) || StrUtil.isEmpty(selected.getScoreFlag())){
                     errorLog.append("该合同只支持积分申请！");
                 }
             }

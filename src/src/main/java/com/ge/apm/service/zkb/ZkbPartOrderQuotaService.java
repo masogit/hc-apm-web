@@ -39,6 +39,10 @@ public class ZkbPartOrderQuotaService {
 
     @Autowired
     private V2_WorkOrderRepository v2_workOrderRepository;
+    
+    public enum HandQuotaType{
+        apply, use, returned
+    }
 
     //region 申请名额处理
     /**
@@ -79,39 +83,39 @@ public class ZkbPartOrderQuotaService {
             zkbContractAssetRepository.save(zkbContractAsset);
         }else{
             /*if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
             }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                 AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                 if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
                     if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                     }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                     }else{
                         //兼容老数据
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                     }
                 }else{
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }
             }else{
-                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
             }*/
             if(StrUtil.isEmpty(zkbPartOrder.getRadiationQuotaType())){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }else{
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }
             }else{
                 if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }else if(ZkbPartOrder.RadiationQuotaTypeEnum.Part.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }else if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Consumable.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Consumable.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }
             }
         }
@@ -122,21 +126,21 @@ public class ZkbPartOrderQuotaService {
         //region 探头名额处理
         if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType()) || StringUtils.isEmpty(zkbContract.getQuotaDeductType())){
             if(StringUtils.isEmpty(zkbPartOrder.getHighCatFlag())){
-                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString());
             }else if(CopyByInvok.F.equals(zkbPartOrder.getHighCatFlag())){
-                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString());
             }else if(CopyByInvok.T.equals(zkbPartOrder.getHighCatFlag())){
                 ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                 if(zkbContractCat != null) {
                     if(StrUtil.isEmpty(zkbPartOrder.getNotGeAsset())){
                         if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
-                            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                             handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString());
                         }
                     }else{
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                         handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString());
                     }
                     if(acceptFlag){
@@ -151,24 +155,24 @@ public class ZkbPartOrderQuotaService {
             }
         }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
             if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.Any.toString());
             }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.Normal.toString());
             }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.Special.toString());
             }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                 ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                 if(zkbContractCat != null){
                     if(StrUtil.isEmpty(zkbPartOrder.getNotGeAsset())){
                         if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
-                            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                             handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.Normal.toString());
                         }
                     }else{
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                         handleQuotaHistory(zkbContract,zkbPartOrder,qty,userAccount, ZkbContractCatQuotaHistory.ProbeTypeStatus.Normal.toString());
                     }
                     if(acceptFlag){
@@ -180,19 +184,6 @@ public class ZkbPartOrderQuotaService {
                     zkbContractCat.setLastModifiedBy(userAccount.getName());
                     zkbContractCatRepository.save(zkbContractCat);
                 }
-            }
-            if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){
-                if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                    ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
-                    if(zkbContractCat != null) {
-                        if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
-                            return;
-                        }
-                    }else{
-                        return;
-                    }
-                }
-                //插入历史数据
             }
         }
         //endregion
@@ -210,7 +201,7 @@ public class ZkbPartOrderQuotaService {
             }else{
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
                 if(CopyByInvok.F.equals(zkbContractAsset.getSupportMaintainFlag())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                 }else {
                     if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
                         if(qty > 0){
@@ -224,7 +215,7 @@ public class ZkbPartOrderQuotaService {
                             zkbContractAssetRepository.save(zkbContractAsset);
                         }
                     }else {
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                         if(qty > 0){
                             V2_WorkOrder v = v2_workOrderRepository.findById(zkbPartOrder.getWorkOrderId());
                             if(v != null && v.getServiceRequest() != null){
@@ -249,7 +240,7 @@ public class ZkbPartOrderQuotaService {
                         }else{
                             AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                             if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Artificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Artificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                             }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
                             }
                         }
@@ -257,7 +248,7 @@ public class ZkbPartOrderQuotaService {
                         if(remindQty >= 1){
                             AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                             if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Artificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Artificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                             }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
                             }
                         }
@@ -269,7 +260,7 @@ public class ZkbPartOrderQuotaService {
                         }else{
                             AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                             if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                             }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
                             }
                         }
@@ -277,7 +268,7 @@ public class ZkbPartOrderQuotaService {
                         if(remindQty >= 1){
                             AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                             if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                             }
                         }
                     }
@@ -301,14 +292,14 @@ public class ZkbPartOrderQuotaService {
                 AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                 if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1){ //内修
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Artificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Artificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                     }else{
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                     }
                 }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2){ //外修
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     }else{
-                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+                        handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
                     }
                 }
             }
@@ -319,91 +310,91 @@ public class ZkbPartOrderQuotaService {
     public void subApplyQtyForTool(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder, int qty, UserAccount userAccount, boolean acceptFlag, String opType){
         if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) ||
                 ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
         }else{
-            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "apply", qty, zkbContract, zkbPartOrder,userAccount, opType);
+            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.apply.name(), qty, zkbContract, zkbPartOrder,userAccount, opType);
         }
     }
 
     public void handleQuotaByType(String type, String businessType,int qty, ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,UserAccount userAccount, String opType){
         if(ZkbContractQuotaLog.OrderTypeEnum.Spare.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) - qty);
                 zkbContract.setSpareQuotaApply((zkbContract.getSpareQuotaApply() == null ? 0 : zkbContract.getSpareQuotaApply()) + qty);
-            }else if("use".equals(businessType)){
+            }else if(HandQuotaType.use.name().equals(businessType)){
                 zkbContract.setSpareQuotaUse((zkbContract.getSpareQuotaUse() == null ? 0 : zkbContract.getSpareQuotaUse()) + qty);
                 zkbContract.setSpareQuotaApply((zkbContract.getSpareQuotaApply() == null ? 0 : zkbContract.getSpareQuotaApply()) - qty);
-            }else if("return".equals(businessType)){
+            }else if(HandQuotaType.returned.name().equals(businessType)){
                 zkbContract.setSpareQuotaUse((zkbContract.getSpareQuotaUse() == null ? 0 : zkbContract.getSpareQuotaUse()) - qty);
                 zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
                 zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + qty);
-            }else if("use".equals(businessType)){
+            }else if(HandQuotaType.use.name().equals(businessType)){
                 zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) + qty);
                 zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) - qty);
-            }else if("return".equals(businessType)){
+            }else if(HandQuotaType.returned.name().equals(businessType)){
                 zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) - qty);
                 zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) + qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.name().equals(type) || ZkbContractQuotaLog.OrderTypeEnum.Probe.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) - qty);
                 zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) + qty);
-            }else if("return".equals(businessType)){
+            }else if(HandQuotaType.returned.name().equals(businessType)){
                 zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
                 zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setProbeQuotaNormal((zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal()) - qty);
                 zkbContract.setProbeQuotaNormalApply((zkbContract.getProbeQuotaNormalApply() == null ? 0 : zkbContract.getProbeQuotaNormalApply()) + qty);
-            }else if("return".equals(businessType)){
+            }else if(HandQuotaType.returned.name().equals(businessType)){
                 zkbContract.setProbeQuotaNormalUse((zkbContract.getProbeQuotaNormalUse() == null ? 0 : zkbContract.getProbeQuotaNormalUse()) - qty);
                 zkbContract.setProbeQuotaNormal((zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal()) + qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) - qty);
                 zkbContract.setProbeQuotaSpecialApply((zkbContract.getProbeQuotaSpecialApply() == null ? 0 : zkbContract.getProbeQuotaSpecialApply()) + qty);
-            }else if("return".equals(businessType)){
+            }else if(HandQuotaType.returned.name().equals(businessType)){
                 zkbContract.setProbeQuotaSpecialUse((zkbContract.getProbeQuotaSpecialUse() == null ? 0 : zkbContract.getProbeQuotaSpecialUse()) - qty);
                 zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) + qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.Artificial.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
                 zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
-            }else if("use".equals(businessType)){
+            }else if(HandQuotaType.use.name().equals(businessType)){
                 zkbContract.setGeArtificialSupportTimesUse((zkbContract.getGeArtificialSupportTimesUse() == null ? 0 : zkbContract.getGeArtificialSupportTimesUse()) + qty);
                 zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) - qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setPartHighQuota((zkbContract.getPartHighQuota() == null ? 0 : zkbContract.getPartHighQuota()) - qty);
                 zkbContract.setPartHighQuotaApply((zkbContract.getPartHighQuotaApply() == null ? 0 : zkbContract.getPartHighQuotaApply()) + qty);
-            }else if("return".equals(businessType)){
+            }else if(HandQuotaType.returned.name().equals(businessType)){
                 zkbContract.setPartHighQuotaUse((zkbContract.getPartHighQuotaUse() == null ? 0 : zkbContract.getPartHighQuotaUse()) - qty);
                 zkbContract.setPartHighQuota((zkbContract.getPartHighQuota() == null ? 0 : zkbContract.getPartHighQuota()) + qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setCcsbMaintenanceQuota((zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota()) - qty);
                 zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) + qty);
-            }else if("use".equals(businessType)){
+            }else if(HandQuotaType.use.name().equals(businessType)){
                 zkbContract.setCcsbMaintenanceQuotaUse((zkbContract.getCcsbMaintenanceQuotaUse() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaUse()) + qty);
                 zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) - qty);
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.Consumable.name().equals(type)){
-            if("apply".equals(businessType)){
+            if(HandQuotaType.apply.name().equals(businessType)){
                 zkbContract.setConsumableQuota((zkbContract.getConsumableQuota() == null ? 0 : zkbContract.getConsumableQuota()) - qty);
                 zkbContract.setConsumableQuotaApply((zkbContract.getConsumableQuotaApply() == null ? 0 : zkbContract.getConsumableQuotaApply()) + qty);
-            }else if("use".equals(businessType)){
+            }else if(HandQuotaType.use.name().equals(businessType)){
                 zkbContract.setConsumableQuotaApply((zkbContract.getConsumableQuotaApply() == null ? 0 : zkbContract.getConsumableQuotaApply()) - qty);
                 zkbContract.setConsumableQuotaUse((zkbContract.getConsumableQuotaUse() == null ? 0 : zkbContract.getConsumableQuotaUse()) + qty);
-            }else if("return".equals(businessType)){
+            }else if(HandQuotaType.returned.name().equals(businessType)){
                 zkbContract.setConsumableQuota((zkbContract.getConsumableQuota() == null ? 0 : zkbContract.getConsumableQuota()) + qty);
                 zkbContract.setConsumableQuotaUse((zkbContract.getConsumableQuotaUse() == null ? 0 : zkbContract.getConsumableQuotaUse()) - qty);
             }
@@ -723,19 +714,19 @@ public class ZkbPartOrderQuotaService {
         }else {
             if(StrUtil.isEmpty(zkbPartOrder.getRadiationQuotaType())){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 }else {
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 }
             }else{
                 if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 }else if(ZkbPartOrder.RadiationQuotaTypeEnum.Part.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 }else if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(zkbPartOrder.getRadiationQuotaType())){
-                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Consumable.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+                    handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Consumable.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 }
             }
             /*if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())
@@ -781,28 +772,19 @@ public class ZkbPartOrderQuotaService {
     public void subReturnQtyForProbe(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount){
         if(StringUtils.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())) {
             if(StringUtils.isEmpty(zkbPartOrder.getHighCatFlag()) || CopyByInvok.F.equals(zkbPartOrder.getHighCatFlag())){
-                zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
-                zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
-                zkbContractRepository.save(zkbContract);
-                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
             }else{
                 if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                     if(zkbContractCat != null){
                         if(StrUtil.isEmpty(zkbPartOrder.getNotGeAsset())){
                             if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
-                                zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
-                                zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
-                                zkbContractRepository.save(zkbContract);
-                                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
+                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                             }
                         }else{
-                            zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
-                            zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
-                            zkbContractRepository.save(zkbContract);
-                            zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Probe.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                             zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
                         }
 
@@ -819,22 +801,13 @@ public class ZkbPartOrderQuotaService {
             }
         }else{
             if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
-                zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
-                zkbContractRepository.save(zkbContract);
-                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
             }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                zkbContract.setProbeQuotaNormalUse((zkbContract.getProbeQuotaNormalUse() == null ? 0 : zkbContract.getProbeQuotaNormalUse()) - qty);
-                zkbContract.setProbeQuotaNormal((zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal()) + qty);
-                zkbContractRepository.save(zkbContract);
-                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
             }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                zkbContract.setProbeQuotaSpecialUse((zkbContract.getProbeQuotaSpecialUse() == null ? 0 : zkbContract.getProbeQuotaSpecialUse()) - qty);
-                zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) + qty);
-                zkbContractRepository.save(zkbContract);
-                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
             }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                 if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())) {
@@ -842,17 +815,11 @@ public class ZkbPartOrderQuotaService {
                     if (zkbContractCat != null) {
                         if(StrUtil.isEmpty(zkbPartOrder.getNotGeAsset())) {
                             if (CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
-                                zkbContract.setProbeQuotaNormalUse((zkbContract.getProbeQuotaNormalUse() == null ? 0 : zkbContract.getProbeQuotaNormalUse()) - qty);
-                                zkbContract.setProbeQuotaNormal((zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal()) + qty);
-                                zkbContractRepository.save(zkbContract);
-                                zkbContractQuotaLogService.saveData(zkbContract, zkbPartOrder, null, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(), ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(), ZkbPartOrder.class.getSimpleName(), userAccount, WebUtil.getFieldValueMessage("zkbPoStatus", zkbPartOrder.getStatus()));
+                                handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(), qty);
                             }
                         }else{
-                            zkbContract.setProbeQuotaNormalUse((zkbContract.getProbeQuotaNormalUse() == null ? 0 : zkbContract.getProbeQuotaNormalUse()) - qty);
-                            zkbContract.setProbeQuotaNormal((zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal()) + qty);
-                            zkbContractRepository.save(zkbContract);
-                            zkbContractQuotaLogService.saveData(zkbContract, zkbPartOrder, null, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(), ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(), ZkbPartOrder.class.getSimpleName(), userAccount, WebUtil.getFieldValueMessage("zkbPoStatus", zkbPartOrder.getStatus()));
+                            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
                             zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(), qty);
                         }
                         if(qty >0){
@@ -871,9 +838,9 @@ public class ZkbPartOrderQuotaService {
 
     public void subReturnQtyForTool(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount){
         if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.Spare.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
         }else{
-            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), "return", qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
+            handleQuotaByType(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.name(), HandQuotaType.returned.name(), qty, zkbContract, zkbPartOrder,userAccount, ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString());
         }
     }
 
