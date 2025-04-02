@@ -139,11 +139,7 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
     public String pageForward(String action) throws ParseException {
         String url = "";
         if(MaintenanceContractApplyPurchaseService.CREATE_ACTION.equals(action)){
-            if(mcApplyPurchaseService.checkYearStart(userAccount)){
-                url = UrlEncryptController.encodeUrlParam("Edit?action=" + MaintenanceContractApplyPurchaseService.CREATE_ACTION+"&tabIndex="+tabIndex);
-            }else{
-                WebUtil.addSuccessMessage("年度采购入口未开启，请检查后重试！");
-            }
+            url = UrlEncryptController.encodeUrlParam("Edit?action=" + MaintenanceContractApplyPurchaseService.CREATE_ACTION+"&tabIndex="+tabIndex);
         }else if(MaintenanceContractApplyPurchaseService.EDIT_ACTION.equals(action)){
             return UrlEncryptController.encodeUrlParam("Edit?action=" + MaintenanceContractApplyPurchaseService.EDIT_ACTION
                     + "&selectedId=" + this.selected.getId()+"&tabIndex="+tabIndex);
