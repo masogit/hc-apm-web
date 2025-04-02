@@ -282,6 +282,8 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     @Column(name="parent_wo_id")
     private String parentWoId;
+    @Column(name="main_sub")
+    private String mainSub;
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {

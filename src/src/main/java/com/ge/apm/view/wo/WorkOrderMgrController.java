@@ -3946,13 +3946,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
             searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
             return true;
-        }else if("parentWoId".equals(fieldName)){
-            if(Boolean.TRUE.toString().equals(filterVal)){
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IsNull,null));
-            }else{
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IsNotNull,null));
-            }
-            return true;
         }
         return false;
     }

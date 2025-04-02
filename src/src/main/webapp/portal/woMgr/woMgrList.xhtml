@@ -223,16 +223,15 @@
                 <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
                     <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}" title="#{item.serviceRequest.requestReason}"/>
                 </p:column>
-                <p:column headerText="主工单"  filterBy="#{item.parentWoId}">
+                <p:column headerText="主工单"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()">
-                            <f:converter converterId="javax.faces.Boolean" />
                             <f:selectItem itemLabel="#{msg.All}" itemValue="" />
-                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
-                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="main" />
+                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="sub" />
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{empty item.parentWoId?msg.True2Yes:msg.False2No}" />
+                    <h:outputText value="#{'main'.equals(item.mainSub)?msg.True2Yes:msg.False2No}" />
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CANCEL')}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>

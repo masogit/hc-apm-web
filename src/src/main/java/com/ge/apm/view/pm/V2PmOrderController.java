@@ -528,10 +528,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
          periodObj = filters.get("period");
         removeFilterOnField("ruleName");
         removeFilterOnField("period");
-        if(filters.containsKey("parentWoId")){
-            Boolean parentWoId =(Boolean) filters.get("parentWoId");
-            updateSearchFilter(new SearchFilter("parentWoId", parentWoId?SearchFilter.Operator.IsNull:SearchFilter.Operator.IsNotNull,null));
-        }
         selectedMap.clear();
     }
 
