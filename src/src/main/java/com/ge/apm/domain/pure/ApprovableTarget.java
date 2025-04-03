@@ -39,4 +39,9 @@ public interface ApprovableTarget {
         return false;
     }
 
+    //多及审批开启需要找设备的院区的配置
+    default String getAssetSiteUid(){
+        return null;
+    }
+
 }

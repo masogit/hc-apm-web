@@ -273,7 +273,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
         List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = new ArrayList<>();
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(user.getSiteUID(), switchBusyTypeToString(approvableTarget.getBusinessType()));
+//        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(user.getSiteUID(), switchBusyTypeToString(approvableTarget.getBusinessType()));
+        List<MultiLevelApprovalConfig> configList =   getApproveConfigByBusinessCorrelationAsset(approvableTarget,user.getSiteUID());
 
 
         boolean enableAssetType = user.isEnableAssetTypeGroup();
@@ -318,6 +319,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         map.put("list",multiLevelApprovalConfigs);
         return map;
     }
+
+
+
 
     @Transactional
     public MultiLevelApproval getMultiLevelApprovalSubmit(ApprovableTarget approvableTarget, Integer level, MultiLevelApprovalConfig multiLevelApprovalConfig, UserAccount userAccount) {
@@ -745,7 +749,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         if (StringUtils.isEmpty(busiType)) {
             return null;
         }
-        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+//        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+        List<MultiLevelApprovalConfig> configList =   getApproveConfigByBusinessCorrelationAsset(approvableTarget,orgUid);
+
         UserAccount user = UserContextService.getCurrentUserAccount();
 
         boolean enableAssetType= user.isEnableAssetTypeGroup();
@@ -768,7 +774,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         if (StringUtils.isEmpty(busiType)) {
             return null;
         }
-        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+//        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+        List<MultiLevelApprovalConfig> configList =   getApproveConfigByBusinessCorrelationAsset(approvableTarget,orgUid);
         UserAccount user = UserContextService.getCurrentUserAccount();
         boolean enableAssetType= user.isEnableAssetTypeGroup();
         if(approvableTarget.getApprovalAssetInfo()!=null){
@@ -784,6 +791,28 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
         return null;
     }
+    public  List<MultiLevelApprovalConfig>   getApproveConfigByBusinessCorrelationAsset(ApprovableTarget approvableTarget,String orgUid){
+     boolean isCorrelationAsset;
+        switch (approvableTarget.getBusinessType()) {
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
+            case ApprovalConstant.BUSINESS_TYPE_EQUIPMENT_ADJUSTMENT:
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                isCorrelationAsset= true;
+                break;
+            default:
+                isCorrelationAsset= false;
+                break;
+        }
+        if(isCorrelationAsset){
+            orgUid=approvableTarget.getApprovalAssetInfo()!=null?approvableTarget.getApprovalAssetInfo().getSiteUID():approvableTarget.getAssetSiteUid()!=null?approvableTarget.getAssetSiteUid():orgUid;
+        }
+        return   multiApprovalConfigDao.getConfigByCondition(orgUid,switchBusyTypeToString(approvableTarget.getBusinessType()));
+    }
+
+
+
     public List<MultiLevelApprovalConfig> filterConfigs(List<MultiLevelApprovalConfig> configList, ApprovableTarget approvableTarget, boolean enableAssetType) {
         List<MultiLevelApprovalConfig> collect = configList.stream()
                 .filter(config -> config.getConfigration() != null)
