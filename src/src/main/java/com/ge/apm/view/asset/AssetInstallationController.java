@@ -340,7 +340,10 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
         return "";
     }
-
+    public boolean isChangeDept(){
+        String stockDeptUid = Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("setAssetOutStockDept", loginUser.getSiteUID())).map(ConfigItemValue::getValue).orElse("");
+        return StringUtils.isNotEmpty(stockDeptUid);
+    }
     public void initGbTree() {
         TreeNode treeNode = gbCodeService.buildGbTree();
         gbTree = new DefaultTreeNode("root", null, null);

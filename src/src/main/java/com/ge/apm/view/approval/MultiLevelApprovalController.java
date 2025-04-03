@@ -5,9 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.budget.BudgetApplication;
-import com.ge.apm.domain.budget.BudgetApplicationAsset;
-import com.ge.apm.domain.budget.PurchaseOrderInfo;
+import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
@@ -47,6 +45,8 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -66,7 +66,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private VenderInfoRepository venderInfoRepository;
     private UaaService uaaService;
     private SharedAssetRequestRepository sharedAssetRequestRepository;
-
+    private MaintenanceContractApplyPurchaseRepository maintenanceContractApplyPurchaseRepository;
+    private MaintenanceContractApplyPurchaseAssetRepository maintenanceContractApplyPurchaseAssetRepository;
 
     private UserAccountRepository userAccountRepository;
     private WorkflowService workflowService;
@@ -113,6 +114,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private List<V2_BlobObject> attachList;
 
     @Getter
+    @Setter
+    private List<V2_BlobObject> fixedAttachList;
+
+    @Getter
     private Object primaryApprovalData;
 
     @Getter
@@ -132,6 +137,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private BudgetApplicationAsset confirmBudget;
     @Getter @Setter
     private PurchaseOrderInfo purchaseOrderInfo;
+    @Getter @Setter
+    private MaintenanceContractApplyPurchaseVo applyPurchaseVo;
     @Getter  @Setter
     private OrgInfo org;
     @Getter  @Setter
@@ -154,6 +161,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private boolean isReturnApproval=false;
 
     private boolean isDirectDelivery=false;
+
+    Pattern pattern = Pattern.compile("^(.*\\.(?i)(jpg|jpeg|png|gif|bmp|tiff|pdf|JPG|JPEG|PNG|GIF|BMP|TIFF|PDF))$");
 
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
@@ -182,11 +191,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         sharedAssetRequestRepository = WebUtil.getBean(SharedAssetRequestRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        maintenanceContractApplyPurchaseRepository = WebUtil.getBean(MaintenanceContractApplyPurchaseRepository.class);
+        maintenanceContractApplyPurchaseAssetRepository = WebUtil.getBean(MaintenanceContractApplyPurchaseAssetRepository.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         org = orgDao.findById(account.getOrgInfoId());
         orgTree = initOrgTree(treeNode);
         this.confirmBudget = new BudgetApplicationAsset();
         this.purchaseOrderInfo = new PurchaseOrderInfo();
+        applyPurchaseVo = new MaintenanceContractApplyPurchaseVo();
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -300,6 +312,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 }
                 assetScrap.setCreatedBy(user.getName());
                 AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
+                fixedAttachList= blobObjectRepository.findByBoUuid(assetScrap.getId());
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
                 jsonObject.put("assetInfo",asset);
                 jsonObject.put("lifecycleInYear",asset.getLifecycleInYear());
@@ -322,6 +335,12 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                   SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(multiLevelApproval.getBusinessUid());
                 primaryApprovalData = sharedAssetRequest;
                 secondaryApprovalData =sharedAssetRequest;
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_MAINTENANCE_CONTRACT_APPLY_PURCHASE:
+                MaintenanceContractApplyPurchase maintenanceContractApplyPurchase = maintenanceContractApplyPurchaseRepository.findById(multiLevelApproval.getBusinessUid());
+                primaryApprovalData = maintenanceContractApplyPurchase;
+                secondaryApprovalData =maintenanceContractApplyPurchaseAssetRepository.findByApplicationId(maintenanceContractApplyPurchase.getId());
+                attachList = blobObjectRepository.findByBoUuid(maintenanceContractApplyPurchase.getId());
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
@@ -373,7 +392,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApproval.setAttachments(attachList);
-        multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
+        if(businessTypeFlag == 20){
+            multiLevelApprovalService.maintenanceContractApplyPurchaseAgree(multiLevelApproval, approvalOpinion, applyPurchaseVo);
+            approvalOpinion = "";
+            applyPurchaseVo = new MaintenanceContractApplyPurchaseVo();
+        }else{
+            multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
+        }
         selected = null;
         this.needSignature = false;
         this.resetSignature();
@@ -516,7 +541,11 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }
         multiLevelApproval.setSignatureNurse(this.signatureNurse);
         multiLevelApproval.setAttachments(attachList);
-        multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
+        if(businessTypeFlag == 20){
+            multiLevelApprovalService.maintenanceContractApplyPurchaseByDisagree(multiLevelApproval, approvalOpinion, applyPurchaseVo);
+        }else{
+            multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
+        }
         selected = null;
         this.needSignature = false;
         this.resetSignature();
@@ -921,6 +950,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     }
 
     public Integer approvaLevelPurchase() {
+        if(this.selected == null){
+            return null;
+        }
         return this.selected.getApprovalLevel();
     }
 
@@ -953,5 +985,11 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachList = attachList.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+
+    public boolean  isPreview(V2_BlobObject fileitem){
+        String objectName = fileitem.getObjectName();
+        Matcher matcher = pattern.matcher(objectName);
+        return matcher.matches();
     }
 }

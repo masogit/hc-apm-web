@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>auto login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        iframe {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div style="width:100%;height:100vh;overflow: hidden;">
+</div>
+<script src="../js/axios.min.js"></script>
+<script src="../../resources/wechat/jquery-2.0.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://g.alicdn.com/aplus/aplus/2.1.22/aplus.js"></script>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.0.25/dingtalk.open.js"></script>
+<script>
+    var ticket;
+    var corpId;
+    var agentId;
+    var userId;
+    function getTicket() {
+          $.ajax({
+             type: "GET",
+             async: false,
+             url: origin+"/gateway/api/apm/security/userAccounts/dingTalk/jsApiTicket",
+             success:function(res) {
+                 ticket= res.ticket;
+                 corpId= res.corpId;
+                 agentId= res.agentId;
+             }
+          })
+    }
+    function getUserid(authCode) {
+          $.ajax({
+             type: "GET",
+             async: false,
+             url: origin+"/gateway/api/apm/security/userAccounts/dingTalk/userInfo?code="+authCode,
+             success:function(res) {
+                userId = res.data.userid;
+             }
+          })
+    }
+    function toPage() {
+                 axios.post( origin+"/geapm/web/dingTalk/ssoLogin",{
+                    userId: userId
+                 }).then(res=>{
+                 let jsessionid = res.headers.jsessionid
+                 document.cookie = "JSESSIONID="+jsessionid;
+                 window.location.href=origin+"/geapm/portal/homeNurse1.xhtml";
+                });
+
+    }
+     var origin = location.origin;
+     var search = location.search;
+     var params = new URLSearchParams(search)
+     var signature;
+     var nonceStr = (Math.random() + 1).toString(36).substring(7);
+     var time = Math.floor(Date.now() / 1000);
+     var cfgUrl = window.location.href;
+     getTicket();
+     signature="jsapi_ticket="+ticket+"&noncestr="+nonceStr+"&timestamp="+time+"&url="+cfgUrl;
+     signature = CryptoJS.SHA1(signature).toString(CryptoJS.enc.Hex);
+     dd.config({
+       agentId: agentId,
+       corpId: corpId,
+       timeStamp: time,
+       nonceStr: nonceStr,
+       signature: signature,
+       jsApiList: ['runtime.info', 'biz.util.getAuthCode']
+     });
+      dd.ready(function() {
+          dd.runtime.permission.requestAuthCode({
+              corpId: corpId,
+              onSuccess: function(result) {
+                 var authCode = result.code;
+                 console.log('authCode:', authCode);
+                 getUserid(authCode);
+                 toPage();
+              }
+          });
+      });
+      dd.error(function(err) {
+          console.log('dd error: ' + JSON.stringify(err));
+      });
+</script>
+</body>
+</html>

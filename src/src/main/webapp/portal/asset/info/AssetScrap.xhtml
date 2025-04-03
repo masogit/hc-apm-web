@@ -53,6 +53,23 @@
                         <p:outputLabel value="#{assetInfoEditController.customDisposalMethod}" />
                     </h:panelGroup>
                 </h:panelGroup>
+                <h:panelGroup>
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap')}" columns="5" layout="grid">
+                        <f:facet name="header">#{msg.Attachment}<p:outputLabel value="(图片数量最多上传5份！)" style="color: red"></p:outputLabel></f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="pictureList :nodeForm:typeScrap" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </p:dataGrid>
+                    <p:fileUpload id="typeScrap" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="true" sizeLimit="10000000" fileLimit="#{5-assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size()}" fileLimitMessage="图片数量最多上传5份！" update="pictureList @this" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size() ge 5}"/>
+                </h:panelGroup>
             </p:panelGrid>
 
             <p:commandButton id="scrapButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSignature()}" value="确定"  icon="ui-icon-check" update="signatureDlg" oncomplete="PF('signatureDlg').show();"/>

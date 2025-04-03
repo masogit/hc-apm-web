@@ -28,7 +28,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.reminderType}<span style="color:red">*</span></label >
                         <p:selectOneMenu value="#{reminderRuleController.selected.reminderType}" required="true">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
+<!--                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>-->
                             <f:selectItems value="#{fieldMsg.getFieldValueList('reminderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>

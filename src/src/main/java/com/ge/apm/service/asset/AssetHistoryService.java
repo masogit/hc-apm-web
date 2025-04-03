@@ -15,6 +15,8 @@ import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,11 +94,20 @@ public class AssetHistoryService {
     }
 
     public List<JSONObject> getAssetChangeHistoryByJSON(String assetUid) {
-//        List<AssetHistory> resultList = assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
+        return getAssetChangeHistoryByJSON(assetUid, null, null);
+    }
+
+    public List<JSONObject> getAssetChangeHistoryByJSON(String assetUid, Date startTime, Date endTime) {
         List<SearchFilter> searchFilters =new ArrayList<> ();
-        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,assetUid));
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, assetUid));
+        if (ObjectUtil.isNotEmpty(startTime)) {
+            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, startTime));
+        }
+        if (ObjectUtil.isNotEmpty(endTime)) {
+            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LTE, endTime));
+        }
         List<String> assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
-        searchFilters.add(new SearchFilter("json_data", SearchFilter.Operator.CONTAINS,assetsImportantFieldsAll));
+        searchFilters.add(new SearchFilter("json_data", SearchFilter.Operator.CONTAINS, assetsImportantFieldsAll));
         Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), 0, 5);
         List<AssetHistory> resultList = assetHistoryPage.getContent();
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -106,12 +117,6 @@ public class AssetHistoryService {
             assetHistory.setJsonData(JSONArray.toJSONString(assetHistoryInfos));
             return assetHistoryInfos.size() > 0;
         }).collect(Collectors.toList());
-
-        /*ListIterator<AssetHistory> assetHistoryList = resultList.listIterator();
-        while(assetHistoryList.hasNext()){
-            AssetHistory assetHistory = assetHistoryList.next();
-            assetHistory
-        }*/
         return parseFieldsByJson(resultList);
     }
 

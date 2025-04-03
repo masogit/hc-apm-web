@@ -84,6 +84,9 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @Column(name = "positive_rate")
     private BigDecimal positiveRate;
 
+    @Column(name = "display_name")
+    private String displayName;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
@@ -302,6 +305,14 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
     public void setAssetGroupName(String assetGroupName) {
         this.assetGroupName = assetGroupName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     @Override

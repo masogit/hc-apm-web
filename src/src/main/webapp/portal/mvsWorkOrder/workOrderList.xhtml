@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+         <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="MVS院级工单"/>
+            </div>
+            <div class="ui-g-12 ">
+                <div class="ui-g-12 card">
+                    <h:form id="woMvsMgrListForm">
+                        <p:dataTable id="datalist"  var="item" value="#{mvsTransactionWorkController.lazyModel}" widgetVar="varDataList" selectionMode="single"
+                                     lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"  selection="#{mvsTransactionWorkController.selected}"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500" >
+                            <p:ajax event="rowSelect" listener="#{mvsTransactionWorkController.onSelectWorkOrder}" update = ":woMvsMgrDetailForm" />
+                            <p:ajax event="filter" listener="#{mvsTransactionWorkController.onFilter}" />
+                            <p:column headerText="工单状态" filterBy="#{item.status}" filterMatchMode="EQ">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()"    >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('woStatusEhome')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{fieldMsg.fieldValues('woStatusEhome', item.status)}"/>
+                            </p:column>
+                            <p:column headerText="工单类型"    filterBy="#{item.typeKey}" filterMatchMode="EQ">
+                                <f:facet name="filter" >
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{mvsTransactionWorkController.i18nMessageListWorkOrderType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <c:set var="dynamicKey" value="#{item.typeKey}"/>
+                                <h:outputText value="#{fieldMsg.fieldValues('workOrderEhome', dynamicKey)}"/>
+                             </p:column>
+                            <p:column headerText="工单编号" filterBy="#{item.workOrderDTO.workOrderNumber}"  filterMatchMode="LIKE" >
+                                <h:outputText value="#{item.workOrderDTO.workOrderNumber}"/>
+                            </p:column>
+
+                            <p:column headerText="工单责任人" filterBy="#{item.workOrderDTO.ownerName}"  filterMatchMode="LIKE" >
+                                <h:outputText value="#{item.workOrderDTO.ownerName}"/>
+                            </p:column>
+
+                            <p:column headerText="工单描述" filterBy="#{item.maintenanceOrderDTO.faultDesc}"  filterMatchMode="LIKE"  >
+                                <h:outputText value="#{item.maintenanceOrderDTO.faultDesc}"/>
+                            </p:column>
+                            <p:column headerText="接单时间" filterBy="#{mvsTransactionWorkController.accept}" filterMatchMode="LIKE">
+                                <f:facet name="filter">
+                                    <p:inputText id="acceptTime"  widgetVar="varFilterApplyTimeAcceptTime" value="#{mvsTransactionWorkController.accept}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.maintenanceOrderDTO.acceptanceTime}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="开单时间" filterBy="#{mvsTransactionWorkController.open}" filterMatchMode="LIKE">
+                                <f:facet name="filter">
+                                    <p:inputText id="openTime" widgetVar="varFilterApplyTimeOpenTime" value="#{mvsTransactionWorkController.open}"/>
+                                </f:facet>
+                               <h:outputText value="#{item.workOrderDTO.creationTime}">
+                                   <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                           <p:column headerText="关单时间" filterBy="#{mvsTransactionWorkController.close}" filterMatchMode="LIKE">
+                               <f:facet name="filter">
+                                   <p:inputText  id="closeTime" widgetVar="varFilterApplyTimeCloseTime" value="#{mvsTransactionWorkController.close}"/>
+                               </f:facet>
+                               <h:outputText value="#{item.workOrderDTO.closeTime}">
+                                   <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                               </h:outputText>
+                           </p:column>
+                         </p:dataTable>
+                    </h:form>
+                    <ui:include src="woMvsMgrView.xhtml"/>
+                    <p:overlayPanel  widgetVar="panelFilterApplyTimeOpenTime" for="woMvsMgrListForm:datalist:openTime" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel for="cal1" />
+                            <p:calendar id="cal1OpenTime" widgetVar="varApplyTimeFromOpenTime" effect="fold"
+                                        pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                            <p:outputLabel for="cal2"/>
+                            <p:calendar id="cal2OpenTime" widgetVar="varApplyTimeToOpenTime" effect="fold"
+                                        pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                        </h:panelGrid>
+                        <p:commandButton onclick="PF('panelFilterApplyTimeOpenTime').hide();setDateFilter('varDataList', 'varFilterApplyTimeOpenTime', 'varApplyTimeFromOpenTime', 'varApplyTimeToOpenTime'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterApplyTimeOpenTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                    <p:overlayPanel  widgetVar="panelFilterApplyTimeCloseTime" for="woMvsMgrListForm:datalist:closeTime" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel for="cal1" />
+                            <p:calendar   widgetVar="varApplyTimeFromCloseTime" effect="fold"
+                                        pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                            <p:outputLabel for="cal2"/>
+                            <p:calendar   widgetVar="varApplyTimeToCloseTime" effect="fold"
+                                        pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                        </h:panelGrid>
+                        <p:commandButton onclick="PF('panelFilterApplyTimeCloseTime').hide();setDateFilter('varDataList', 'varFilterApplyTimeCloseTime', 'varApplyTimeFromCloseTime', 'varApplyTimeToCloseTime'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterApplyTimeCloseTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel  widgetVar="panelFilterApplyTimeAcceptTime" for="woMvsMgrListForm:datalist:acceptTime" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel for="cal1" />
+                            <p:calendar  id="cal1" widgetVar="varApplyTimeFromAcceptTime" effect="fold"
+                                          pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                            <p:outputLabel for="cal2"/>
+                            <p:calendar  id="cal2" widgetVar="varApplyTimeToAcceptTime" effect="fold"
+                                          pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                        </h:panelGrid>
+                        <p:commandButton onclick="PF('panelFilterApplyTimeAcceptTime').hide();setDateFilter('varDataList', 'varFilterApplyTimeAcceptTime', 'varApplyTimeFromAcceptTime', 'varApplyTimeToAcceptTime'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterApplyTimeAcceptTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

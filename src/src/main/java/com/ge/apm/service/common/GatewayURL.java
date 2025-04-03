@@ -12,6 +12,7 @@ public enum GatewayURL {
 
 
     // Security
+    GET_AUTHENTICATE_BY_DINGTALK_ID("/api/apm/security/userAccounts/dingTalk/authenticate"),
     GET_AUTHENTICATE_BY_OPEN_ID("/api/apm/security/userAccounts/authenticateWeChat"),
     GET_AUTHENTICATE_BY_USER_PASSWORD("/api/apm/security/userAccounts/authenticateBasic"),
     GET_AUTHENTICATE_BY_USER_PASSWORD_ENCRYPTED("/api/apm/security/userAccounts/authenticateInternal"),

@@ -536,6 +536,7 @@ public class WorkOrderExportService {
             part.put(WebUtil.getMessage("EstimatedPrice_xlsx"), workOrderDetail.getPartsPrice());
             part.put(WebUtil.getMessage("Vendor"), workOrderDetail.getSupplier());
             part.put(WebUtil.getMessage("Remark"), workOrderDetail.getComment());
+            part.put(WebUtil.getMessage("PartsPrice_xlsx"), workOrderDetail.getPartsPrice());
             if (workOrderDetail.getArrived() == null) {
                 part.put(WebUtil.getMessage("Arrival"), null);
             } else {

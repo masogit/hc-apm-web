@@ -278,7 +278,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
 
-                    <p:panelGrid id="uploadGrip">
+                    <h:panelGroup id="uploadGrip">
                         <h:panelGroup rendered="#{(zkbIntegralOrderEditController.selectedContract.contractType eq 'CCS' or zkbIntegralOrderEditController.selectedContract.contractType eq 'Biomed') and zkbIntegralOrderEditController.selected.orderType eq 'ToolBox'}">
                             <p:dataList id="uploadList" value="#{zkbIntegralOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">合同附件上传</f:facet>
@@ -294,7 +294,7 @@
                                 <p:commandLink validateClient="false" immediate="false" process="@this" value="查看示例" oncomplete="PF('showSampleDlg').show()" />
                             </p:panel>
                         </h:panelGroup>
-                    </p:panelGrid>
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset id="regionalManagerFieldset" legend="区域经理信息" rendered="#{zkbIntegralOrderEditController.showBodyForm() and zkbIntegralOrderEditController.showRegionalManager}" >
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">

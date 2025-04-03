@@ -232,7 +232,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">工程师学员号*</label>
-                            <p:inputText  value="#{zkbIntegralOrderAuditController.selected.zkbEngineerPhone}" disabled="true" required="false"  requiredMessage="工程师电话 #{msg.ValidationRequire}" />
+                            <p:inputText  value="#{zkbIntegralOrderAuditController.selected.engineerNo}" disabled="true" required="false"  requiredMessage="工程师电话 #{msg.ValidationRequire}" />
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -335,6 +335,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="orderedFieldset" legend="400派工" rendered="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.showOrder}">
+                    <p:outputLabel style="color: red;font-weight:bold;margin-left: 12px;font-size: small" value="#{zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.maintainTips}"/>
                     <p:panelGrid id="orderedGrid" columns="#{zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox' ? 2 :3}" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <c:if test="#{!(zkbIntegralOrderAuditController.selected.status eq 'OrderedReject') and !(zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox')}">
                             <h:panelGroup >

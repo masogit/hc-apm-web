@@ -10,6 +10,8 @@ public class ZkbContractVO extends ZkbContract {
 
     private String supplierName;
 
+    public String resetZeroScoreFlag;
+
     public String getSupplierName() {
         return supplierName;
     }
@@ -26,6 +28,13 @@ public class ZkbContractVO extends ZkbContract {
         this.lineNum = lineNum;
     }
 
+    public String getResetZeroScoreFlag() {
+        return resetZeroScoreFlag;
+    }
+
+    public void setResetZeroScoreFlag(String resetZeroScoreFlag) {
+        this.resetZeroScoreFlag = resetZeroScoreFlag;
+    }
 
     public boolean isNull() {
         boolean flag = false;

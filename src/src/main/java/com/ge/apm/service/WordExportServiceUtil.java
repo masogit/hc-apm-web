@@ -36,15 +36,13 @@ public class WordExportServiceUtil {
         if (bindings == null) {
             bindings = new HashMap<>();
         }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (XWPFTemplate template = compileTemplate(templateBytes, bindings)) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+             XWPFTemplate template = compileTemplate(templateBytes, bindings)) {
             template.render(datas);
             template.write(out);
             return out.toByteArray();
         } catch (IOException e) {
             logger.error("WordExportServiceUtil error:",e);
-
             return new byte[0];
         }
     }

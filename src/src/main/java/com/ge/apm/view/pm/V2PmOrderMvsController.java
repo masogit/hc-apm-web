@@ -68,6 +68,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private List<String> pmFieldsExport= new ArrayList<>();
     @Setter @Getter
     List<UnstructuredDataCollection> reportList;
+    private String messageTip;
+
     //选定的院区
     private OrgInfo selectSite;
     private List<OrgInfo> clinicalDeptList;
@@ -987,7 +989,22 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }
         return null;
     }
-
+    /**
+     * Generate maintenance report.
+     */
+    public void doExportWorkOrderReport() {
+        maintenanceWorkReport = null;
+        try {
+            maintenanceWorkReport = pmReportService.generateEhome(selectedMap, loginUser);
+        } catch (BusinessException e) {
+            logger.error("downLoad pm_word BusinessException ",e);
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            logger.error("downLoad pm_word Exception",e);
+            java.util.logging.Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("FailedToGenerateTheMaintenanceReport"));
+        }
+    }
     public List<V2_BlobObject> getAttachListEhome() {
         return attachListEhome;
     }
@@ -1025,5 +1042,22 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     public void setAttachListEhomeFile(List<V2_BlobObject> attachListEhomeFile) {
         this.attachListEhomeFile = attachListEhomeFile;
+    }
+
+    public String getMessageTip() {
+        return  pmReportService.generateMessageTip(selectedMap);
+    }
+    private StreamedContent maintenanceWorkReport;
+
+    public StreamedContent getMaintenanceWorkReport() {
+        return maintenanceWorkReport;
+    }
+
+    public void setMaintenanceWorkReport(StreamedContent maintenanceWorkReport) {
+        this.maintenanceWorkReport = maintenanceWorkReport;
+    }
+
+    public void setMessageTip(String messageTip) {
+        this.messageTip = messageTip;
     }
 }

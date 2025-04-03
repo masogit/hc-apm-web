@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
     <h:outputStylesheet>
@@ -19,20 +20,22 @@
      <label class="label">附件</label>
         <p:accordionPanel id="accordion" activeIndex="false" multiple="false" var="o" value="#{multiLevelApprovalController.multiLevelApprovals}">
             <p:tab title="#{o.approvalLevel}级审批" >
-                        <p:dataTable id="contractListData" widgetVar="varDataList" value="#{o.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="名称" >
-                                <h:outputText value="#{fileitem.objectName}"/>
-                            </p:column>
-                            <p:column headerText="类型"  >
-                                <h:outputText value="#{fileitem.boSubType}"/>
-                            </p:column>
-                            <p:column headerText="预览"  >
-                                <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />
-                            </p:column>
-                            <p:column headerText="操作"  >
-                                <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                            </p:column>
-                        </p:dataTable>
+                <p:dataTable id="contractListData" widgetVar="varDataList" value="#{o.attachments}" var="fileitem"  emptyMessage="#{msg.noRecordFound}">
+                    <p:column headerText="名称" >
+                        <h:outputText value="#{fileitem.objectName}"/>
+                    </p:column>
+                    <p:column headerText="类型"  >
+                        <h:outputText value="#{fileitem.boSubType}"/>
+                    </p:column>
+<!--                    <p:column headerText="预览"  >-->
+<!--                        <p:graphicImage  url="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt="不支持预览" style="width: 10%" />-->
+<!--                    </p:column>-->
+                    <p:column headerText="操作"  >
+                        <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                            &nbsp;&nbsp;
+                        <p:commandLink  value="预览" ajax="true" rendered="#{multiLevelApprovalController.isPreview(fileitem)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                    </p:column>
+                </p:dataTable>
             </p:tab>
         </p:accordionPanel>
     </h:panelGroup>

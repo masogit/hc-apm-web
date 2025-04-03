@@ -551,7 +551,9 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }
     }
 
-
+    public void resetZeroScore(){
+        zkbContractService.resetZeroScore(selected, currentUser);
+    }
 
     public String getActionAssetName() {
         return actionAssetName;

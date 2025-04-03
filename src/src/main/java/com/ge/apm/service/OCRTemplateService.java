@@ -102,6 +102,7 @@ public class OCRTemplateService extends MicroServiceInvoker {
             element.put("TextValue", text);
             element.put("SerialNumber",i);
             element.put("FieldKey","");
+            element.put("Box",box);
             element.put("PositionX",Math.ceil(topLeft[0]));
             element.put("PositionY",Math.ceil(topLeft[1]));
             element.put("Width",Math.abs(Math.ceil(lowerRight[0]) - Math.ceil(topLeft[0])));

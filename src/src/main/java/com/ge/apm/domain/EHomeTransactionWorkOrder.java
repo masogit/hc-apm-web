@@ -1,11 +1,13 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ge.apm.domain.dto.*;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -88,4 +90,45 @@ public class EHomeTransactionWorkOrder implements Serializable {
 
     @Transient
     private String courseName;
+
+    @Transient
+    private String engineer;
+
+    @Transient
+    private MaintenanceOrderDTO maintenanceOrderDTO;
+
+    @Transient
+    private List<AttachmentDTO> attachmentDTOS;
+
+    @Transient
+    private List<HoursContextDTO> hoursContextData;
+
+    // 转换后的DTO集合（不持久化到数据库）
+    @Transient
+    private List<PartContextDTO> partsContextData;
+
+    @Transient
+    private WorkOrderDTO workOrderDTO;
+
+    @Override
+    public int hashCode() {
+        Integer hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof EHomeTransactionWorkOrder)) {
+            return false;
+        }
+        EHomeTransactionWorkOrder other = (EHomeTransactionWorkOrder) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+
 }

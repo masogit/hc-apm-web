@@ -8,6 +8,7 @@ import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.primefaces.ultima.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +68,9 @@ public class ZkbContractService {
 
     @Autowired
     private ZkbContractQuotaLogService zkbContractQuotaLogService;
+
+    @Autowired
+    private ZkbIntegralService zkbIntegralService;
 
     public List<TenantInfo> getSourceTenantInfoList(){
 
@@ -997,5 +1001,10 @@ public class ZkbContractService {
     public void deleteCat(ZkbContractCat zkbContractCat,ZkbContract zkbContract,UserAccount currentUser,String reason){
         zkbContractCatRepository.delete(zkbContractCat);
         zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"catDelete","","",reason,currentUser,zkbContractCat.getSnNo(),getQuotaString(zkbContract));
+    }
+
+
+    public void resetZeroScore(ZkbContract zkbContract, UserAccount userAccount){
+        zkbIntegralService.resetZeroScore(zkbContract.getTenantUID(), userAccount, ZkbIntegralRecord.RecordType.ContractEdit.name(), "合同编辑积分清零");
     }
 }

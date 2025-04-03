@@ -1485,7 +1485,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
         if ("scrap".equals(action)) {
-            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId);
+            List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals("Scrap")).collect(Collectors.toList());
+            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId,collect);
         } else if ("departmentCovert".equals(action)) {
             Map<String, Object> param = MapUtil.newHashMap();
             param.put("assetUids", bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
@@ -1768,6 +1769,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
                 inDeptUid = clinicalDept.getUid();
                 inDeptName = clinicalDept.getName();
+            case "accountingDept":
+                clinicalDept = (OrgInfo) selectedObjectMap.get("accountingDept");
+                selected.setAccountingDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                break;
         }
 
     }
