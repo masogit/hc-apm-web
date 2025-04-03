@@ -22,10 +22,18 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500" >
-
                 <p:ajax event="rowSelect" listener="#{workOrderMgrMvsController.onSelectWorkOrder}" update = "woTab:woMvsMgrDetailForm" />
                 <p:ajax event="filter" listener="#{workOrderMgrMvsController.onFilterWo}" update="datalist"/>
-
+                <p:column width="36" visible="#{workOrderMgrMvsController.queryIndex==8}" exportable="false">
+                    <p:selectBooleanCheckbox  value="#{workOrderMgrMvsController.selectedMap[item.id]}"  class="selectCheckBox">
+                        <p:ajax process="@this" listener="#{workOrderMgrMvsController.pick(item.id)}" update="@(.selectCheckBoxHeader)  @(.btn-export-maintenance-report)  @(.downloadConfirm) " oncomplete="updateSelectAllCheckBox();" />
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
+                            <p:ajax  listener="#{workOrderMgrMvsController.onSelectAllOfPage}" update=" @(.selectCheckBox) @(.btn-export-maintenance-report)   @(.downloadConfirm) " oncomplete="updateSelectAllCheckBox();"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
                 <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -35,7 +43,6 @@
                     </f:facet>
                     <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                 </p:column>
-
                 <p:column headerText="#{msg.assetName}" filterBy="#{item.mvsIbMapping.assetInfo.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.name}"/>
                 </p:column>
@@ -64,9 +71,7 @@
                         <p:autoComplete dropdown="true" value="#{workOrderMgrMvsController.fileterOrgNameMVS}" appendTo="@(Body)"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrMvsController.autoCompleteDeptNameMVS}" size="5">
                             <p:ajax event="itemSelect" listener="#{workOrderMgrMvsController.onClinicalDeptNameFilterChangeMVS}" process="@this"  update="woTab:woMvsMgrListForm:datalist" />
-
                             <p:ajax process="@this" listener="#{workOrderMgrMvsController.onClinicalDeptNameFilterChangeMVS}" update="woTab:woMvsMgrListForm:datalist" />
-
                         </p:autoComplete>
                     </f:facet>
                     <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
@@ -89,7 +94,9 @@
 
                 <p:column headerText="#{msg.Assignee}" rendered="#{workOrderMgrMvsController.queryIndex==8}">
                     <!--6 表示 step_name 是待关单-->
-                    <h:outputText value="#{workOrderMgrMvsController.getRepairResponer(item.id,6)}"/>
+                    <h:outputText value="#{empty item.currentPersonName ?
+                    workOrderMgrMvsController.getRepairResponer(item.id,4) :
+                    item.currentPersonName}"/>
                 </p:column>
                 <!--当前处理步骤 for 待办-->
                 <p:column rendered="#{workOrderMgrMvsController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
@@ -131,10 +138,33 @@
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                         <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
                     </p:commandButton>
+                    <ui:fragment rendered="true">
+                        <p:commandButton  icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="btn-export-maintenance-report" title="批量下载附件工单" rendered="#{workOrderMgrMvsController.queryIndex==8}" disabled="#{not workOrderMgrMvsController.isTargetSelected()}" ajax="false"/>
+                     </ui:fragment>
+                    <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
+                                     message="#{workOrderMgrMvsController.messageTip}"
+                                     header="确认下载"
+                                     severity="warn" class="downloadConfirm"
+                                      >
+                        <p:commandButton value="确定" ajax="false"
+                                         actionListener="#{workOrderMgrMvsController.doExportWorkOrderReport()}"
+                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton" icon="ui-icon-check"
+                                          >
+                            <p:fileDownload value="#{workOrderMgrMvsController.maintenanceReport}" oncomplete="PF('downloadConfirm').hide()" />
+                        </p:commandButton>
+
+                        <!-- 取消按钮 -->
+                        <p:commandButton value="取消" type="button"
+                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton" icon="ui-icon-close"
+                                           />
+                    </p:confirmDialog>
                 </f:facet>
+
             </p:dataTable>
         </h:form>
-            <ui:include src="woMvsMgrView.xhtml"/>
+        <!-- 确认对话框 -->
+        <ui:include src="woMvsMgrView.xhtml"/>
+
     </div>
 
     <script>

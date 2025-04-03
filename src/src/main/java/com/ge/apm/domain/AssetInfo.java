@@ -166,6 +166,11 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "accounting_dept_uid", columnDefinition = "CHAR(32)")
     private String accountingDeptUID;//账号科室
 
+    @Transient
+    @TableField(exist = false)
+    private OrgInfo accountingDeptOrg;
+
+
     @Column(name = "modality_type")
     private String modalityType;
 
@@ -3336,5 +3341,13 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setScaleAssessment(BigDecimal scaleAssessment) {
         this.scaleAssessment = scaleAssessment;
+    }
+
+    public OrgInfo getAccountingDeptOrg() {
+        return accountingDeptOrg;
+    }
+
+    public void setAccountingDeptOrg(OrgInfo accountingDeptOrg) {
+        this.accountingDeptOrg = accountingDeptOrg;
     }
 }

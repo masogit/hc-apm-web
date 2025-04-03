@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <h:form>
+
+
+        <p:overlayPanel widgetVar="panelFilterPurchasePrice" for="EfficiencyEquipmentInfoListForm:datalist:filterPurchasePrice" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varPurchasePriceFrom" >
+                </p:inputNumber>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varPurchasePriceTo">
+                </p:inputNumber>
+            </h:panelGrid>
+            <p:commandButton onclick="setNumberFilter('varDataList', 'varFilterPurchasePrice', 'varPurchasePriceFrom', 'varPurchasePriceTo'); PF('panelFilterPurchasePrice').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterPurchasePrice').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+
+        <p:overlayPanel widgetVar="panelFilterIncome" for="EfficiencyEquipmentInfoListForm:datalist:filterIncome" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varIncomeFrom" >
+                </p:inputNumber>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varIncomeTo">
+                </p:inputNumber>
+            </h:panelGrid>
+            <p:commandButton onclick="setNumberFilter('varDataList', 'varFilterIncome', 'varIncomeFrom', 'varIncomeTo'); PF('panelFilterIncome').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterIncome').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+
+        <p:overlayPanel widgetVar="panelFilterCost" for="EfficiencyEquipmentInfoListForm:datalist:filterCost" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varCostFrom" >
+                </p:inputNumber>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varCostTo">
+                </p:inputNumber>
+            </h:panelGrid>
+            <p:commandButton onclick="setNumberFilter('varDataList', 'varFilterCost', 'varCostFrom', 'varCostTo'); PF('panelFilterCost').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterCost').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel widgetVar="panelFilterProfits" for="EfficiencyEquipmentInfoListForm:datalist:filterProfits" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varProfitsFrom" >
+                </p:inputNumber>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varProfitsTo">
+                </p:inputNumber>
+            </h:panelGrid>
+            <p:commandButton onclick="setNumberFilter('varDataList', 'varFilterProfits', 'varProfitsFrom', 'varProfitsTo'); PF('panelFilterProfits').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterProfits').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+
+        <p:overlayPanel widgetVar="panelFilterProfitsRate" for="EfficiencyEquipmentInfoListForm:datalist:filterProfitsRate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varProfitsRateFrom" >
+                </p:inputNumber>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varProfitsRateTo">
+                </p:inputNumber>
+            </h:panelGrid>
+            <p:commandButton onclick="setNumberFilter('varDataList', 'varFilterProfitsRate', 'varProfitsRateFrom', 'varProfitsRateTo'); PF('panelFilterProfitsRate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterProfitsRate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel widgetVar="panelFilterPositiveRate" for="EfficiencyEquipmentInfoListForm:datalist:filterPositiveRate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varPositiveRateFrom" >
+                </p:inputNumber>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varPositiveRateTo">
+                </p:inputNumber>
+            </h:panelGrid>
+            <p:commandButton onclick="setNumberFilter('varDataList', 'varFilterPositiveRate', 'varPositiveRateFrom', 'varPositiveRateTo'); PF('panelFilterPositiveRate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterPositiveRate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+    </h:form>
+
+    <script type="text/javascript">
+
+        function setNumberFilter(dataTableWidgetVar, inputWidgetVar, fromDateWidgetVar, toDateWidgetVar) {
+            var input = document.getElementById(PF(inputWidgetVar).id);
+            var oldValue = input.value;
+
+
+            var dateFrom = PF(fromDateWidgetVar).getValue();
+            var dateTo = PF(toDateWidgetVar).getValue();
+
+            var value = "";
+            if (dateFrom !== null)
+                value = dateFrom;
+            if (dateTo !== null)
+                value = value + "~" + dateTo;
+
+            if(oldValue===value) return;
+
+            input.value = value;
+            PF(dataTableWidgetVar).filter();
+        }
+        function handleSubmitDigital(args, dialog) {
+            if (args.validationFailed) {
+                PF(dialog).show();
+            } else {
+                PF(dialog).hide();
+            }
+        }
+    </script>
+
+</ui:composition>
+</html>

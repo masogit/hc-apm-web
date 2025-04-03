@@ -11,6 +11,7 @@ import com.ge.apm.domain.OrgInfo;
 public class BudgetAssetSearchForm {
     // 科室
     private OrgInfo dept;
+    private String deptName;
     // 设备分类
     private Integer assetGroup;
     // 设备二级分类
@@ -32,6 +33,33 @@ public class BudgetAssetSearchForm {
     //申请科室
     private String applicationDeptId;
 
+    private String serialNum;
+
+    private String financingNum;
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getSerialNum() {
+        return serialNum;
+    }
+
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
+    }
+
+    public String getFinancingNum() {
+        return financingNum;
+    }
+
+    public void setFinancingNum(String financingNum) {
+        this.financingNum = financingNum;
+    }
 
     public String getApplicationDeptId() {
         return applicationDeptId;

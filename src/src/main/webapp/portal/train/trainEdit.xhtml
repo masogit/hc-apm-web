@@ -121,21 +121,21 @@
                     <p:column headerText="附件">
                         <ui:repeat value="#{trainInSiteController.queryFileByDetailId(item.id)}" var="f" varStatus="status">
                             <!--<ui:repeat value="#{item.blobObjectList}" var="f" varStatus="status">-->
-                                <p:commandLink value="#{f.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(f.objectStorageId)}" styleClass="p-mr-2"/><br/>
-                            </ui:repeat>
-                        </p:column>
+                            <p:commandLink value="#{f.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(f.objectStorageId)}" styleClass="p-mr-2"/><br/>
+                        </ui:repeat>
+                    </p:column>
 
-                        <f:facet name="{Toolbar}">
-                            <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trainInSiteController.prepareItemCreate}" update=":growl trainTab:detailEditDialog" oncomplete="PF('detailEditDialog').show()"  rendered="#{trainInSiteController.canEdit}"/>
-                            <p:commandButton immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{trainInSiteController.prepareItemEdit}" update=":growl trainTab:detailEditDialog"  oncomplete="PF('detailEditDialog').show()" disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}"/>
-                            <p:commandButton immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteItem}" update=":growl trainTab:editForm:detailDatalist " disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                            </p:commandButton>
-                        </f:facet>
-                    </p:dataTable>
-                </h:panelGroup>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trainInSiteController.prepareItemCreate}" update=":growl trainTab:detailEditDialog" oncomplete="PF('detailEditDialog').show()"  rendered="#{trainInSiteController.canEdit}"/>
+                        <p:commandButton immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{trainInSiteController.prepareItemEdit}" update=":growl trainTab:detailEditDialog"  oncomplete="PF('detailEditDialog').show()" disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}"/>
+                        <p:commandButton immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteItem}" update=":growl trainTab:editForm:detailDatalist " disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:panelGroup>
 
-                <p:fieldset legend="合同信息" >
+            <p:fieldset legend="合同信息" >
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">合同号</label>
@@ -155,10 +155,10 @@
                     </p:panelGrid>
                 </p:fieldset>
 
-                <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trainInSiteController.saveData}" oncomplete="PF('createDialog').hide()" update=":growl trainTab:trainInsiteListForm:datalist" icon="ui-icon-check" rendered="#{trainInSiteController.canEdit}"/>
-                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('createDialog').hide()"/>
-            </h:form>
-        </p:dialog>
-        <ui:include src="trainDetailEdit.xhtml"/>
-    </ui:composition>
-    </html>
+            <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trainInSiteController.saveData}" oncomplete="PF('createDialog').hide()" update=":growl trainTab:trainInsiteListForm:datalist" icon="ui-icon-check" rendered="#{trainInSiteController.canEdit}"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('createDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+    <ui:include src="trainDetailEdit.xhtml"/>
+</ui:composition>
+</html>

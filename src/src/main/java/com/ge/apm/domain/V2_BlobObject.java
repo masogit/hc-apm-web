@@ -131,6 +131,10 @@ public class V2_BlobObject implements Serializable {
 
     public static final String BO_TYPE_TRAIN_DETAIL = "TrainDetail";
 
+    public static final String BO_TYPE_MC_SUBSCRIBE = "MC_SUBSCRIBE";
+    public static final String BO_TYPE_MC_SUBSCRIBE_APPLY = "MC_SUBSCRIBE_APPLY";
+
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")

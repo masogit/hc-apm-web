@@ -342,6 +342,12 @@ public class ZkbIntegralService {
                 return "名额返还";
             case "ScoreEdit" :
                 return "编辑修改";
+            case "ContractEdit" :
+                return "合同编辑";
+            case "ContractImport" :
+                return "合同导入";
+            case "ScheduleClear" :
+                return "定时任务清理";
             default:
                 return "";
         }
@@ -365,4 +371,21 @@ public class ZkbIntegralService {
 
     }
 
+    public void resetZeroScore(String tenantUid, UserAccount userAccount, String recordType, String remark){
+        ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUid);
+        if(zkbIntegral == null) {
+            return ;
+        }
+        int score = zkbIntegral.getIntegralTotal();
+        zkbIntegral.setIntegralTotal(0);
+        zkbIntegralRepository.save(zkbIntegral);
+        ZkbIntegralRecord zkbIntegralRecord = new ZkbIntegralRecord();
+        zkbIntegralRecord.setRecordType(recordType);
+        zkbIntegralRecord.setScore(-score);
+        zkbIntegralRecord.setZkbIntegralId(zkbIntegral.getId());
+        zkbIntegralRecord.setCreatedBy(userAccount.getName());
+        zkbIntegralRecord.setCreatedDate(new Date());
+        zkbIntegralRecord.setRemark(remark);
+        zkbIntegralRecordRepository.save(zkbIntegralRecord);
+    }
 }

@@ -1,5 +1,6 @@
 package com.ge.apm.service.asset;
 
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
@@ -23,14 +24,15 @@ public class AssetScrapService  extends MicroServiceInvoker {
 
     protected static final   Logger logger = LoggerFactory.getLogger(MicroServiceInvoker.class);
 
-    public void apply(Integer assetId,String applyReason,String approvalReason,String equipmentDisposalMethod,String customDisposalMethod,String signatureId) {
-        HashMap<String, String> map = new HashMap<>();
+    public void apply(Integer assetId, String applyReason, String approvalReason, String equipmentDisposalMethod, String customDisposalMethod, String signatureId, List<V2_BlobObject> attachments) {
+        HashMap<String, Object> map = new HashMap<>();
         map.put("assetId",String.valueOf(assetId));
         map.put("applyReason",applyReason);
         map.put("reviewReason",approvalReason);
         map.put("equipmentDisposalMethod",equipmentDisposalMethod);
         map.put("customDisposalMethod",customDisposalMethod);
         map.put("auditSignature",signatureId);
+        map.put("attachments",attachments);
         String token = UserContextService.getAccessToken();
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ASSET_SCRAP_APPLY);

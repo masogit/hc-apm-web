@@ -84,6 +84,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -961,7 +962,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 logger.info("workordermgrmvsfilter "+JSONObject.toJSONString(filters));
                 pageResult = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = pageResult.getContent();
-                loadMVSClinicalDeptList();
+                //loadMVSClinicalDeptList();
             }else{
                 pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
                 bySearchFilterInternal = pageResult.getContent();
@@ -2583,33 +2584,42 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
-
     public void handleFileUpload(FileUploadEvent event) {
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
+        synchronized (picList){
+            if(picList != null && picList.size() >= 5){
+                WebUtil.addWarnMessage("上传图片数量不能超过5个！");
+                return;
+            }
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                picList.add(blobObject);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
         }
+
 
     }
 
     public void handleFileUploadPDF(FileUploadEvent event) {
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            attachList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
+        synchronized (attachList){
+            if(attachList != null && attachList.size() >= 5){
+                WebUtil.addErrorMessage("上传文件数量不能超过5个！");
+                return;
+            }
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                attachList.add(blobObject);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
         }
-
     }
 
     public void submitWorkOrder() {
@@ -3835,28 +3845,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return orgList;
     }
 
-    public List<OrgInfo> LoadSiteNameListMVS() {
-        if (CollectionUtils.isEmpty(orgListMVS)) {
-            if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                orgListMVS = bySearchFilterMVS.stream()
-                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
-                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                        .map(info -> Optional.ofNullable(info.getSiteUID())
-                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
-                                        .orElse(null))
-                                .orElse(null))
-                        .filter(Objects::nonNull) // 过滤掉所有 null 值
-                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                        .stream()
-                        .map(val -> cacheService.findOrgByUid(val))
-                        .collect(Collectors.toList());
-            }
-            if (!CollectionUtils.isEmpty(orgListMVS)) {
-                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
-            }
-        }
-        return orgListMVS;
-    }
+
 
     public boolean getHospitalShow() {
         return hospitalShow;
@@ -3870,26 +3859,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return null;
     }
 
-    private void loadMVSClinicalDeptList() {
-        try {
-            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                clinicalDeptListMVS = bySearchFilterMVS.stream()
-                        .map(item -> Optional.ofNullable(item.getMvsIbMapping())
-                                .map(mapping -> Optional.ofNullable(mapping.getAssetInfo())
-                                        .map(info -> Optional.ofNullable(info.getClinicalDeptUID())
-                                                .orElse(null)) // 如果 getSiteUID() 为 null，则使用 null
-                                        .orElse(null))
-                                .orElse(null))
-                        .filter(Objects::nonNull) // 过滤掉所有 null 值
-                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                        .stream()
-                        .map(val -> cacheService.findOrgByUid(val))
-                        .collect(Collectors.toList());
-            }
-        } catch (Exception e) {
-            logger.info("暂无MVS列表");
-        }
-    }
+
 
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
         this.workHoursList = workHoursList;
@@ -3915,9 +3885,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             if(StringUtils.isNotBlank(tenantUID) && tenantUID.equals(workOrder.getTenantUID())){
                 workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
             }else if(StringUtils.isNotBlank(tenantUID) && !tenantUID.equals(workOrder.getTenantUID())){
-                if(workOrder.getMvsIbMapping() != null  && workOrder.getMvsIbMapping().getAssetInfo() != null){
+               /* if(workOrder.getMvsIbMapping() != null  && workOrder.getMvsIbMapping().getAssetInfo() != null){
                     workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getMvsIbMapping().getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
-                }
+                }*/
             }
             workOrder.setRepairName(ObjectUtils.isEmpty(workOrder_step)?"":workOrder_step.getOwnerName());
             workOrder.setRepairPersonId(ObjectUtils.isEmpty(workOrder_step)?null:workOrder_step.getOwnerId());

@@ -188,14 +188,14 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
             WebUtil.addErrorMessage("当前申请需要扣除" +deductScore+ "，积分不够！");
         }
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(selected.getOrderType())){
-            List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByCreatedBy(currentUser);
+           /* List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByCreatedBy(currentUser);
             if(CollectionUtils.isNotEmpty(zkbIntegralOrders) && zkbIntegralOrders.size() >=1){
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
                 WebUtil.addErrorMessage("超过可申请数量，申请失败！");
                 return;
-            }
+            }*/
 
-            zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByTenantThreeYear(currentUser);
+            List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderApplyService.queryIntegralOrderByTenantThreeYear(currentUser);
             if(zkbIntegralOrders.size() >= 2){
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
                 WebUtil.addErrorMessage("超过可申请数量，申请失败！");
@@ -204,11 +204,11 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
             if(CollectionUtils.isEmpty(zkbPartOrderCatList)){
                 zkbPartOrderCatList = zkbIntegralOrderApplyService.queryPartOrderCatByContract(currentUser);
             }
-            String rs = zkbIntegralOrderApplyService.checkScoreFlagValid(selectedContract, selected.getOrderType(), currentUser);
+           /* String rs = zkbIntegralOrderApplyService.checkScoreFlagValid(selectedContract, selected.getOrderType(), currentUser);
             if(StrUtil.isNotEmpty(rs)){
                 WebUtil.addErrorMessage("积分申请不符合条件:"+rs);
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
-            }
+            }*/
             selectedContract = null;
             contractList = zkbIntegralOrderApplyService.queryContractByTenantUid(currentUser);
         }else{

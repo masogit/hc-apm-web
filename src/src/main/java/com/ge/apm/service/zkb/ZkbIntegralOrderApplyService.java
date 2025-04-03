@@ -192,10 +192,10 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         return zkbContractList;
     }
 
-    public List<ZkbIntegralOrder> queryIntegralOrderByCreatedBy(UserAccount userAccount){
+    public List<ZkbIntegralOrder> queryIntegralOrderByCreatedBy(UserAccount userAccount,String engineerNo){
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbIntegralOrder.OrderTypeEnum.ToolBox.name()));
-        filters.add(new SearchFilter("createdBy", SearchFilter.Operator.EQ,userAccount.getUid()));
+        filters.add(new SearchFilter("engineerNo", SearchFilter.Operator.EQ, engineerNo));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.OrderedReject.name()));
         List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderRepository.findBySearchFilter(filters);
@@ -209,7 +209,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbIntegralOrder.IntegralOrderStatusEnum.OrderedReject.name()));
         Date dt = DateUtils.addYears(new Date(), -3);
-        filters.add(new SearchFilter("status", SearchFilter.Operator.GTE, dt));
+        filters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, dt));
 
         List<ZkbIntegralOrder> zkbIntegralOrders = zkbIntegralOrderRepository.findBySearchFilter(filters);
         return zkbIntegralOrders;
@@ -256,9 +256,9 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         //区域经理块显示
         List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = new ArrayList<ZkbPartOrderUserConfig>();
         if(userAccount.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContainsAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getZone(),ZkbPartOrder.DATA_TYPE_TEST);
         }else{
-            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getZone(),ZkbPartOrder.DATA_TYPE_TEST);
         }
         Optional<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = zkbPartOrderUserConfigs.stream().findFirst();
         if(zkbPartOrderUserConfig.isPresent()){
@@ -274,23 +274,24 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
     public String checkScoreFlagValid(ZkbContract zkbContract,String orderType,UserAccount userAccount){
         StringBuilder sb = new StringBuilder();
-        List<String> ids = new ArrayList<>();
-        List<ZkbContract> zkbContractList = new ArrayList<>();
+        //List<String> ids = new ArrayList<>();
+       /* List<ZkbContract> zkbContractList = new ArrayList<>();
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
             zkbContractList = zkbContractRepository.queryByTenantAndDate(userAccount.getTenantUID(), new Date());
             if(CollectionUtils.isEmpty(zkbContractList)){
                 return sb.append("不存在有效期内合同！").toString();
             }
             ids = zkbContractList.stream().map(ZkbContract::getId).collect(Collectors.toList());
-        }
+        }*/
         List<SearchFilter> filters = new ArrayList<>();
         List<String> orderTypes = Arrays.asList("Parts","Probe","Tool");
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.IN, orderTypes));
-        if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
+        filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
+       /* if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
             filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
         }else{
             filters.add(new SearchFilter("contractId", SearchFilter.Operator.IN, ids));
-        }
+        }*/
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Closed.toString()));
@@ -307,7 +308,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
         int a = 0;
         int b = 0;
-        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
+        /*if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
             for(ZkbContract c : zkbContractList){
                 b += c.getProbeQuotaTotal() == null ? 0 : c.getProbeQuotaTotal();
                 b += c.getProbeQuotaNormalTotal() == null ? 0 : c.getProbeQuotaNormalTotal();
@@ -323,7 +324,13 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
             b += zkbContract.getSpareQuotaTotal() == null ? 0 :  zkbContract.getSpareQuotaTotal();
             b += zkbContract.getSpareArtificailTotal() == null ? 0 :  zkbContract.getSpareArtificailTotal();
             b += zkbContract.getPartHighQuotaTotal() == null ? 0 :  zkbContract.getPartHighQuotaTotal();
-        }
+        }*/
+        b += zkbContract.getProbeQuotaTotal() == null ? 0 : zkbContract.getProbeQuotaTotal();
+        b += zkbContract.getProbeQuotaNormalTotal() == null ? 0 : zkbContract.getProbeQuotaNormalTotal();
+        b += zkbContract.getProbeQuotaSpecialTotal() == null ? 0 : zkbContract.getProbeQuotaSpecialTotal();
+        b += zkbContract.getSpareQuotaTotal() == null ? 0 :  zkbContract.getSpareQuotaTotal();
+        b += zkbContract.getSpareArtificailTotal() == null ? 0 :  zkbContract.getSpareArtificailTotal();
+        b += zkbContract.getPartHighQuotaTotal() == null ? 0 :  zkbContract.getPartHighQuotaTotal();
 
         List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
         int qty = 0;
@@ -357,11 +364,12 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
         List<SearchFilter> partFilters = new ArrayList<>();
         partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Parts.toString()));
-        if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)) {
+        /*if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)) {
             partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
         }else{
             partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.IN, ids));
-        }
+        }*/
+        partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
         partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1*2+"));
         partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Returned.toString(),"1*2+"));
         List<ZkbPartOrder> partReturnZkbPartOrders =  zkbPartOrderRepository.findBySearchFilter(partFilters);
@@ -407,11 +415,12 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
             if(suxDate != null){
                 filters = new ArrayList<>();
                 filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Parts.toString()));
-                if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
+                /*if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
                     filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
                 }else{
                     filters.add(new SearchFilter("contractId", SearchFilter.Operator.IN, ids));
-                }
+                }*/
+                filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
                 filters.add(new SearchFilter("orderedDate", SearchFilter.Operator.LT, suxDate));
                 filters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Ordered.toString()));
                 List<ZkbPartOrder> threeMonthList = zkbPartOrderRepository.findBySearchFilter(filters);
@@ -589,7 +598,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
     public boolean checkLogic(ZkbIntegralOrder zkbIntegralOrder, UserAccount currentUser, ZkbContract zkbContract){
         boolean checkFlag = true;
         if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
-            List<ZkbIntegralOrder> zkbIntegralOrders = queryIntegralOrderByCreatedBy(currentUser);
+            List<ZkbIntegralOrder> zkbIntegralOrders = queryIntegralOrderByCreatedBy(currentUser, zkbIntegralOrder.getEngineerNo());
             if(CollectionUtils.isNotEmpty(zkbIntegralOrders) && zkbIntegralOrders.size() >=1){
                 WebUtil.addErrorMessage("超过可申请数量，申请失败！");
                 checkFlag = false;
@@ -662,8 +671,8 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
         List<String> strs = Arrays.asList(ZkbPartOrderStep.PartOrderStep.ManagePending.name(),ZkbPartOrderStep.PartOrderStep.EngineerQualificationPending.name(),ZkbPartOrderStep.PartOrderStep.CommercialPending.name());
         if(strs.contains(zkbIntegralOrder.getCurrentStep())){
-            sendMessage(zkbIntegralOrder, UserContextService.getAccessToken());
-            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL));
+            sendMessage(zkbIntegralOrder, UserContextService.getAccessToken(), WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
+            sendEmail(zkbIntegralOrder, UserContextService.getAccessToken(), getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL), WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
         }
     }
 
@@ -711,15 +720,16 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
-    public void sendMessage(ZkbIntegralOrder zkbIntegralOrder,String token) {
+    @Async
+    public void sendMessage(ZkbIntegralOrder zkbIntegralOrder,String token, String subject) {
         HashMap<String, Object> emailWrapperMap = null;
         try {
             emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
             emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
-            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
-
+            //emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType",zkbIntegralOrder.getOrderType()) + "申请");
+            emailWrapperMap.put("subject", subject);
             String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_MESSAGE);
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
@@ -730,14 +740,15 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
     }
 
-    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token, String url){
+    @Async
+    public void sendEmail(ZkbIntegralOrder zkbIntegralOrder,String token, String url,String subject){
         try {
             HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbIntegralOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbIntegralOrder.getId());
             emailWrapperMap.put("url", "/zkbnewapply?ordernum=" + zkbIntegralOrder.getId());
-            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
-            //String url = getGatewayURL(GatewayURL.INTEGRAL_ORDER_SEND_EMAIL);
+            //emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbIntegralOrderType", zkbIntegralOrder.getOrderType()));
+            emailWrapperMap.put("subject", subject);
 
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);

@@ -53,12 +53,16 @@ public class TrainMvsController extends GenericCRUDUUIDController<EHomeTransacti
             if(o != null){
                 e.setCourseName(o.toString());
             }
+            Object o1 = JSONPath.read(e.getWoContext(), "$.engineer").toString();
+            if(o != null){
+                e.setEngineer(o1.toString());
+            }
         }
         return page;
     }
 
     public void setSearchFilterSiteUid(){
-        List<OrgInfo> list = orgInfoRepository.getOrgInfosByParentId(loginUser.getSiteUID());
+        List<OrgInfo> list = orgInfoRepository.getOrgInfosByParentId(loginUser.getHospitalUID());
         List<String> strs = list.stream().filter(t -> StrUtil.isNotEmpty(t.getHospitalUcmid())).map(OrgInfo::getHospitalUcmid).collect(Collectors.toList());
         updateSearchFilter(new SearchFilter("ucmId", SearchFilter.Operator.IN, strs));
     }

@@ -76,6 +76,19 @@
             </p:column>
         </p:dataTable>
     </h:panelGroup>
-
+    <h:panelGroup rendered="#{multiLevelApprovalController.fixedAttachList.size() > 0}">
+        <p:dataGrid id="pictureList" var="fileitem" value="#{multiLevelApprovalController.fixedAttachList}" columns="5" layout="grid">
+            <f:facet name="header">#{msg.Attachment}信息</f:facet>
+            <p:panel  style="text-align:center">
+                <h:panelGrid columns="1" style="width:100%" >
+                    <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  listener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}"/>
+                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                </h:panelGrid>
+                <p:commandLink validateClient="false" immediate="true" process="@this"
+                               value="#{fileitem.objectName}"
+                               action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+            </p:panel>
+        </p:dataGrid>
+    </h:panelGroup>
 </ui:composition>
 </html>

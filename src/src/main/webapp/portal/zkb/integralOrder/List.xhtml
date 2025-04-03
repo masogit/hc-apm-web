@@ -110,13 +110,13 @@
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbIntegralOrderListController.createAction}"  disabled="#{empty zkbIntegralOrderListController.selectionTenantInfo}" rendered="#{userContextService.zkbUser}"/>
-                            <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbIntegralOrderListController.editAction}" disabled="#{empty zkbIntegralOrderListController.selected.id}"/>
-                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbIntegralOrderListController.delete}" update=":zkbIntegralOrderListForm:datalist, :growl"  >
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbIntegralOrderListController.editAction}" disabled="#{empty zkbIntegralOrderListController.selected.id}"/>
+                         <!--   <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbIntegralOrderListController.delete}" update=":zkbIntegralOrderListForm:datalist, :growl"  >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
-                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbIntegralOrderListController.exportAll}" icon="ui-icon-arrowstop-1-s">
-                                <p:fileDownload value="#{zkbIntegralOrderListController.exportFile}"/>
-                            </p:commandButton>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="Train_info_Export"/>
+                            </p:commandButton>-->
                         </f:facet>
                     </p:dataTable>
                 </h:form>

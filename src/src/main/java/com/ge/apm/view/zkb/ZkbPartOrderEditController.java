@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -303,6 +304,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             FacesContext.getCurrentInstance().addMessage(null, message2);
         }
         calcRemainQty();
+    }
+
+    public void workOrderView(String id){
+        String url = "actionName=View&selectedid="
+                + id
+                + "&queryIndex=0"
+                ;
+        url = "../../woMgr/workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public boolean highCatFlagDisabledCheck(){

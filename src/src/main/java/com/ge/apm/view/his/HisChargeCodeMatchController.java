@@ -209,14 +209,14 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
         Map<String,List<HisAssetGroupAssetMatch>> map = startList.stream().collect(Collectors.groupingBy(HisAssetGroupAssetMatch::getAssetGroupName));
         if(map.size()>1){
             Double rate = startList.stream().mapToDouble(HisAssetGroupAssetMatch::getGroupRate).sum();
-            if(rate != 100.0){
-                WebUtil.addErrorMessageKey("分摊必须是100%！");
+            if(rate > 100.0){
+                WebUtil.addErrorMessageKey("分摊比例不能大于100%！");
                 return;
             }
         }else{
-            List<HisAssetGroupAssetMatch> collect = startList.stream().filter(item -> item.getGroupRate() != 100.0).collect(Collectors.toList());
+            List<HisAssetGroupAssetMatch> collect = startList.stream().filter(item -> item.getGroupRate() > 100.0).collect(Collectors.toList());
             if(CollectionUtils.isNotEmpty(collect)){
-                WebUtil.addErrorMessageKey("多设备分组必须都是100%！");
+                WebUtil.addErrorMessageKey("多相同的设备分组每组不能大于100%！");
                 return;
             }
         }

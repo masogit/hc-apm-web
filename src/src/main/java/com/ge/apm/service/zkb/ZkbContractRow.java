@@ -3,6 +3,7 @@ package com.ge.apm.service.zkb;
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.ZkbContractVO;
 import com.ge.apm.service.utils.ExcelDocument;
 
 import java.lang.reflect.Method;
@@ -18,11 +19,11 @@ import java.util.regex.Pattern;
 public class ZkbContractRow {
     public static final String DELETE_MARK = "#";
 
-    private ZkbContract ZkbContract;
+    private ZkbContractVO zkbContractVO;
     private Map<String, Object> rowMap;
 
-    public ZkbContractRow(ZkbContract ZkbContract, Map<String, Object> rowMap) {
-        this.ZkbContract = ZkbContract;
+    public ZkbContractRow(ZkbContractVO zkbContractVO, Map<String, Object> rowMap) {
+        this.zkbContractVO = zkbContractVO;
         this.rowMap = rowMap;
     }
 
@@ -30,14 +31,14 @@ public class ZkbContractRow {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
             this.rowMap.put(fieldName, fieldValueOfString);
-            Method method = ZkbContract.class.getMethod(methodName, String.class);
+            Method method = ZkbContractVO.class.getMethod(methodName, String.class);
 
             if (!StringUtils.isEmpty(fieldValueOfString)) {
                 String emptyString = null;
                 if (DELETE_MARK.equals(fieldValueOfString)) {
-                    method.invoke(ZkbContract, emptyString);
+                    method.invoke(zkbContractVO, emptyString);
                 } else {
-                    method.invoke(ZkbContract, fieldValueOfString);
+                    method.invoke(zkbContractVO, fieldValueOfString);
                 }
             }
 
@@ -56,17 +57,17 @@ public class ZkbContractRow {
                 fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
                 this.rowMap.put(fieldName, fieldValueOfInteger);
             }
-            Method method = ZkbContract.class.getMethod(methodName, Integer.class);
+            Method method = ZkbContractVO.class.getMethod(methodName, Integer.class);
 
-            if (StringUtils.isEmpty(ZkbContract.getId())) {
-                method.invoke(ZkbContract, fieldValueOfInteger);
+            if (StringUtils.isEmpty(zkbContractVO.getId())) {
+                method.invoke(zkbContractVO, fieldValueOfInteger);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
                     if (DELETE_MARK.equals(fieldValueOfString)) {
                         Integer nullInteger = null;
-                        method.invoke(ZkbContract, nullInteger);
+                        method.invoke(zkbContractVO, nullInteger);
                     } else {
-                        method.invoke(ZkbContract, fieldValueOfInteger);
+                        method.invoke(zkbContractVO, fieldValueOfInteger);
                     }
                 }
 
@@ -91,17 +92,17 @@ public class ZkbContractRow {
                 fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
                 this.rowMap.put(fieldName, fieldValueOfInteger);
             }
-            Method method = ZkbContract.class.getMethod(methodName, Integer.class);
+            Method method = ZkbContractVO.class.getMethod(methodName, Integer.class);
 
-            if (StringUtils.isEmpty(ZkbContract.getId())) {
-                method.invoke(ZkbContract, fieldValueOfInteger);
+            if (StringUtils.isEmpty(zkbContractVO.getId())) {
+                method.invoke(zkbContractVO, fieldValueOfInteger);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
                     if (DELETE_MARK.equals(fieldValueOfString)) {
                         Integer nullInteger = null;
-                        method.invoke(ZkbContract, nullInteger);
+                        method.invoke(zkbContractVO, nullInteger);
                     } else {
-                        method.invoke(ZkbContract, fieldValueOfInteger);
+                        method.invoke(zkbContractVO, fieldValueOfInteger);
                     }
                 }
 
@@ -121,17 +122,17 @@ public class ZkbContractRow {
                 this.rowMap.put(fieldName, fieldValueOfDouble);
             }
 
-            Method method = ZkbContract.class.getMethod(methodName, Double.class);
+            Method method = ZkbContractVO.class.getMethod(methodName, Double.class);
 
-            if (StringUtils.isEmpty(ZkbContract.getId())) {
-                method.invoke(ZkbContract, fieldValueOfDouble);
+            if (StringUtils.isEmpty(zkbContractVO.getId())) {
+                method.invoke(zkbContractVO, fieldValueOfDouble);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
                     if (DELETE_MARK.equals(fieldValueOfString)) {
                         Double empty = null;
-                        method.invoke(ZkbContract, empty);
+                        method.invoke(zkbContractVO, empty);
                     } else {
-                        method.invoke(ZkbContract, fieldValueOfDouble);
+                        method.invoke(zkbContractVO, fieldValueOfDouble);
                     }
                 }
 
@@ -154,17 +155,17 @@ public class ZkbContractRow {
                 validateDate(fieldName, fieldValueOfString);
             }
 
-            Method method = ZkbContract.class.getMethod(methodName, Date.class);
+            Method method = ZkbContractVO.class.getMethod(methodName, Date.class);
 
-            if (StringUtils.isEmpty(ZkbContract.getId())) {
-                method.invoke(ZkbContract, fieldValueOfDate);
+            if (StringUtils.isEmpty(zkbContractVO.getId())) {
+                method.invoke(zkbContractVO, fieldValueOfDate);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
                     if (DELETE_MARK.equals(fieldValueOfString)) {
                         Date nullDate = null;
-                        method.invoke(ZkbContract, nullDate);
+                        method.invoke(zkbContractVO, nullDate);
                     } else {
-                        method.invoke(ZkbContract, fieldValueOfDate);
+                        method.invoke(zkbContractVO, fieldValueOfDate);
                     }
                 }
 
@@ -177,7 +178,7 @@ public class ZkbContractRow {
     public void setFieldDropdownValue(String fieldName, String methodName, List<I18nMessage> msgList, Map map, Integer defaultValue) {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
-            Method method = ZkbContract.class.getMethod(methodName, Integer.class);
+            Method method = ZkbContractVO.class.getMethod(methodName, Integer.class);
 
             Integer selectedOption = null;
             if (!StringUtils.isEmpty(fieldValueOfString) && !DELETE_MARK.equals(fieldValueOfString)) {
@@ -189,15 +190,15 @@ public class ZkbContractRow {
                 selectedOption = defaultValue;
             }
 
-            if (StringUtils.isEmpty(ZkbContract.getId())) {
-                method.invoke(ZkbContract, selectedOption);
+            if (StringUtils.isEmpty(zkbContractVO.getId())) {
+                method.invoke(zkbContractVO, selectedOption);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
                     if (DELETE_MARK.equals(fieldValueOfString)) {
                         Integer nullInteger = null;
-                        method.invoke(ZkbContract, nullInteger);
+                        method.invoke(zkbContractVO, nullInteger);
                     } else {
-                        method.invoke(ZkbContract, selectedOption);
+                        method.invoke(zkbContractVO, selectedOption);
                     }
                 }
 
@@ -221,17 +222,17 @@ public class ZkbContractRow {
                 fieldValueOfBoolean = defaultValue;
             }
 
-            Method method = ZkbContract.class.getMethod(methodName, Boolean.class);
+            Method method = ZkbContractVO.class.getMethod(methodName, Boolean.class);
 
-            if (StringUtils.isEmpty(ZkbContract.getId())) {
-                method.invoke(ZkbContract, fieldValueOfBoolean);
+            if (StringUtils.isEmpty(zkbContractVO.getId())) {
+                method.invoke(zkbContractVO, fieldValueOfBoolean);
             } else {
                 if (!StringUtils.isEmpty(fieldValueOfString)) {
                     if (DELETE_MARK.equals(fieldValueOfString)) {
                         Boolean empty = null;
-                        method.invoke(ZkbContract, empty);
+                        method.invoke(zkbContractVO, empty);
                     } else {
-                        method.invoke(ZkbContract, fieldValueOfBoolean);
+                        method.invoke(zkbContractVO, fieldValueOfBoolean);
                     }
                 }
 

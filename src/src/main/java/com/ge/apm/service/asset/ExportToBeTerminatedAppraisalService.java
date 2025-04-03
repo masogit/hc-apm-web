@@ -159,7 +159,7 @@ public class ExportToBeTerminatedAppraisalService {
 //                        byte[] bytes = generate(map, templateBytes);
 
                         Map<String, RenderPolicy> bindings = new HashMap<>();
-                        byte[] bytes = WordExportServiceUtil.generate(datas, templateBytes, bindings);
+                        byte[] bytes = WordExportServiceUtil.generate(map, templateBytes, bindings);
 
                         if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
                             String name = o.toString() + "-" + "资产报废鉴定表" + ".docx";
@@ -175,6 +175,7 @@ public class ExportToBeTerminatedAppraisalService {
 
 
             });
+            zout.finish();
             return new ApmStreamedContent(new ByteArrayInputStream(out.toByteArray()), "application/zip", "报废鉴定.zip");
         } catch (Exception e) {
             logger.error("报废鉴定表导出失败 e:", e);
