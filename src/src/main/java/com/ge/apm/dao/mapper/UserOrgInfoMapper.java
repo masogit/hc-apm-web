@@ -41,11 +41,10 @@ public interface UserOrgInfoMapper {
 
 	@Select({
 			"<script>" +
-					"select o.*,oi.uid as orgInfoUid  from user_org o, org_info oi where o.user_uid in " +
+					"select o.*,oi.uid as orgInfoUid  from user_org o left join  org_info oi on  o.org_uid in (oi.tenant_uid,oi.institution_uid,oi.hospital_uid,oi.site_uid,oi.uid)   where o.user_uid in " +
 					"<foreach item = 'item' index = 'index' collection = 'userUids' open='(' separator=',' close=')'>" +
 					"#{item}" +
 					"</foreach>"+
-					"and o.org_uid in (oi.tenant_uid,oi.institution_uid,oi.hospital_uid,oi.site_uid,oi.uid) "+
 					"</script>"})
 	List<UserOrgInfoDto> findAccessUidByUserUids(@Param("userUids") List<String> userUids);
 
