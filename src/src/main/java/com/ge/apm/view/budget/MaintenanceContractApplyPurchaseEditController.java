@@ -207,9 +207,9 @@ public class MaintenanceContractApplyPurchaseEditController extends GenericCRUDU
     }
 
     public String submitAudit(){
-        boolean resultMultiLevelApproval = mcApplyPurchaseService.checkMultiLevelApproval(selected,account);
-        if(!resultMultiLevelApproval){
-            WebUtil.addSuccessMessage("失败:无可用的审批流,请检查后重试！");
+        String resultMultiLevelApproval = mcApplyPurchaseService.checkMultiLevelApproval(selected,account);
+        if(StrUtil.isNotEmpty(resultMultiLevelApproval)){
+            WebUtil.addSuccessMessage(resultMultiLevelApproval);
             return "";
         }
         if(!mcApplyPurchaseService.checkRequiredField(selected, applyPurchaseAssetList)){
