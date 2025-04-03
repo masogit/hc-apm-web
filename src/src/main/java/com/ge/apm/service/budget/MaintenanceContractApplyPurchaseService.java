@@ -272,14 +272,20 @@ public class MaintenanceContractApplyPurchaseService {
         }
     }
 
-    public boolean checkMultiLevelApproval(MaintenanceContractApplyPurchase applyPurchase, UserAccount account) {
-        boolean result = true;
+    public String checkMultiLevelApproval(MaintenanceContractApplyPurchase applyPurchase, UserAccount account) {
+        String result = "";
         MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(applyPurchase, false);
         MultiLevelApproval approval = generateApproval(applyPurchase, approvalConfig, account);
         if (approval == null) {
-            result = false;
+            result = "失败:无可用的审批流,请检查后重试！";
             logger.info("MaintenanceContractApplyPurchase MultiLevelApproval Failure");
+        }else{
+            List<ApprovalNode> approvalNodes = JSON.parseObject(approvalConfig.getApprovalItem(), new TypeReference<List<ApprovalNode>>() {});
+            if(approvalNodes.size() != 3){
+                result = "失败:多级审批节点设置有误，请重新设置！";
+            }
         }
+
         return result;
     }
 
