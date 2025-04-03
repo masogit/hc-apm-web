@@ -11,6 +11,8 @@ import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -174,11 +176,20 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 this.selectSite = orgInfoRepository.getByUid(user.getSiteUID());
             }
         }
+        onTabChange(tabId);
     }
 
+    @Getter @Setter
+    private String tabId;
+
     public void onTabChange(TabChangeEvent event) {
-        if (!"basicInfo".equals(event.getTab().getId())) {
-            String category = event.getTab().getId().substring(2);
+        tabId = event.getTab().getId();
+        onTabChange(tabId);
+    }
+
+    public void onTabChange(String tabId) {
+        if (ObjectUtil.isNotEmpty(tabId) && !"basicInfo".equals(tabId)) {
+            String category = tabId.substring(2);
             this.searchFilters = ListUtil.newArrayList(new SearchFilter("category", SearchFilter.Operator.EQ, category));
             Page<ConfigItem> configItemPage = loadData(new PageRequest(0, 5000));
             configItemList = configItemPage.getContent();
