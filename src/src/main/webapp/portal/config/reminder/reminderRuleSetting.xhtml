@@ -10,7 +10,7 @@
         <p:dialog id="reminderRuleSettingDlg" widgetVar="reminderRuleSettingDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ReminderConfiguration}" >
             <h:form id="reminderRuleSettingForm">
                 <h:panelGroup>
-                    <p:panelGrid style="height: 630px; width: 550px; overflow: auto;" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid style="width: 550px; overflow: auto;" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.noticeType eq msg.noticeTypeRole}">
                             <label class="label">#{msg.noticeSetting}<span style="color:red">*</span></label>
                             <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.noticeUser}" filter="true" filterMatchMode="contains" updateLabel="true"
