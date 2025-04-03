@@ -9,6 +9,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetTypeGroupDto;
 import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.dto.UserOrgInfoDto;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
@@ -57,6 +58,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private UserOrgInfoMapper userOrgInfoMapper;
 
     private AssetTypeGroupMapper assetTypeGroupMapper;
+
+    private ConfigCacheService configCacheService;
 
     @Setter@Getter
     private ApprovalNode approvalNode;
@@ -119,6 +122,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         assetTypeGroupMapper = WebUtil.getBean(AssetTypeGroupMapper.class);
         userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         buildApproveUserList();
         partsTypes = i18nMessageService.getByMsgType("partsType");
     }
@@ -147,7 +151,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
 
     public List<UserAccount> getUsers4Approval(){
-        selectAssetClinicalDeptChange();
+
         if(selectedUserOrg != null){
             return approveUserList.stream().filter(user -> user.getOrgInfoUID().equals(selectedUserOrg.getUid())).collect(Collectors.toList());
         }
@@ -196,6 +200,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         if("assetRepair".equals(selected.getBusinessType())){
             setSelectAssetPartsCheck();
         }
+        selectAssetClinicalDeptChange();
     }
 
     public void preCreate() {
@@ -716,7 +721,12 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
 
     public String getNameWithOrgName(UserAccount user) {
-        OrgInfo org = orgInfoDao.getByUid(user.getOrgInfoUID());
+        OrgInfo org = configCacheService.findOrgByUid(user.getOrgInfoUID());
+//        OrgInfo org = orgInfoDao.getByUid(user.getOrgInfoUID());
+        if (org == null) {
+            return user.getName();
+
+        }
         if(4 == org.getOrgType()){
             return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
         }
@@ -724,7 +734,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
 
     public String getOrgFullName(String orgUid) {
-        OrgInfo org = orgInfoDao.findByUid(orgUid);
+        OrgInfo org = configCacheService.findOrgByUid(orgUid);
+//        OrgInfo org = orgInfoDao.findByUid(orgUid);
         if (null == org || org.getId() == -1) {
             return null;
         }
@@ -830,7 +841,10 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         List<String> uids = approveUserList.stream().map(item -> item.getUid()).collect(Collectors.toList());
 
         if(CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && CollectionUtils.isNotEmpty(approveUserList)){
+            long s = System.currentTimeMillis();
             List<UserOrgInfoDto> userOrgInfos=  userOrgInfoMapper.findAccessUidByUserUids(uids);
+            long e = System.currentTimeMillis();
+            logger.info("selectAssetClinicalDeptChange 查询消耗时间:{}",e-s);
             Map<String, List<UserOrgInfoDto>> userOrgListMap = userOrgInfos.stream().collect(Collectors.groupingBy(UserOrgInfoDto::getUserUid));
             List<String> validUser=new ArrayList<>();
             userOrgListMap.forEach((k, list) -> {
