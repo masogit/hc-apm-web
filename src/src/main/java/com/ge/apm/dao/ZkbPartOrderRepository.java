@@ -145,6 +145,10 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     List<String> getZkbTestName();
 
     @Query(value = "SELECT * from zkb_part_order where sr_no = ?1 and current_step in ('CompletePending', 'CompleteAuditPending') and id != ?2 ", nativeQuery = true)
+    List<ZkbPartOrder> queryBySrNoExceptStatus(String srNo, String partOrderId);
+
+
+    @Query(value = "SELECT * from zkb_part_order where sr_no = ?1 and id != ?2 ", nativeQuery = true)
     List<ZkbPartOrder> queryBySrNo(String srNo, String partOrderId);
 }
 
