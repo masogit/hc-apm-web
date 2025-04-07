@@ -126,8 +126,9 @@ public class AssetImport implements Serializable {
     @ExcelProperty(value = "assetClass")
     private String assetClassStr;//资产分类Str
 
-    @ExcelProperty(value = "assetGroupSecondary", converter = AssetImportIntegerConverter.class)
-    private Integer assetGroupSecondary;//设备分类2级
+    private Integer assetGroupSecondary;//
+    @ExcelProperty(value = "assetGroupSecondary")
+    private String assetGroupSecondaryStr;//设备分类2级
 
     private Integer assetDeptId;//使用设备科
 
@@ -3278,5 +3279,13 @@ public class AssetImport implements Serializable {
         this.setConnectToInsite(3);
         this.setIbDeviceStatus(5);
         this.setVisibleStatus(1);
+    }
+
+    public String getAssetGroupSecondaryStr() {
+        return assetGroupSecondaryStr;
+    }
+
+    public void setAssetGroupSecondaryStr(String assetGroupSecondaryStr) {
+        this.assetGroupSecondaryStr = assetGroupSecondaryStr;
     }
 }
