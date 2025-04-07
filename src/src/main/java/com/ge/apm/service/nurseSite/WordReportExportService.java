@@ -639,7 +639,9 @@ public class WordReportExportService {
                 paramMap.put("日期",dateStr);
                 Map<String, Map<String, String>> assetUidMap = stringMap.get(date);
                 Map<String, String> itemMap = assetUidMap.get(assetUid);
-                paramMap.putAll(itemMap);
+                if(itemMap!=null){
+                    paramMap.putAll(itemMap);
+                }
                 for (int m = 1; m <= 2; m++) {
                     if (m==1) {
                         Map<String, String> map = updateByMapMap.get(date);
