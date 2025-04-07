@@ -291,4 +291,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query(value = "select * from user_account where tenant_uid=?1 and name=?2 and (is_deleted = false or is_deleted is null) ", nativeQuery = true)
     List<UserAccount> findByTenantUIDAndNameAndValid(String tenantUID, String assetOwnerName);
+
+
+    @Query(value="select distinct u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=?2 and o.orgUid in ?1")
+    public List<UserAccount> findByUserOrgAndRoleId(List<String> uid,int roleId);
 }
