@@ -516,6 +516,11 @@ public class ZkbPartOrderEditService {
                     errorLog.append("该合同只支持积分申请！");
                 }
             }
+            if(CopyByInvok.T.equals(selected.getMaintainFlag())){
+                if(ZkbContract.ContractType.CCS.name().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.name().equals(selectedContract.getContractType())){
+                    errorLog.append("CCS或Biomed合同保养申请时只能使用积分申请！");
+                }
+            }
             if("t".equals(selected.getScoreFlag())){
                 boolean r = zkbIntegralService.checkScoreFlag(selectionTenantInfo,selected.getQty());
                 if(!r){
