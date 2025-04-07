@@ -13,6 +13,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -751,11 +752,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         //推送工程师、系统激活专用角色微信
         if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
             if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
-                zkbPartOrderService.sendEmailToEngineer(zkbPartOrder,UserContextService.getAccessToken());
+                List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.queryBySrNo(zkbPartOrder.getSrNo(), zkbPartOrder.getId());
+                if(CollectionUtils.isEmpty(zkbPartOrders)){
+                    zkbPartOrderService.sendEmailToEngineer(zkbPartOrder,UserContextService.getAccessToken());
+                }
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())){
-                zkbPartOrderService.sendEmailToEngineer(zkbPartOrder,UserContextService.getAccessToken());
+                List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.queryBySrNo(zkbPartOrder.getSrNo(), zkbPartOrder.getId());
+                if(CollectionUtils.isEmpty(zkbPartOrders)){
+                    zkbPartOrderService.sendEmailToEngineer(zkbPartOrder,UserContextService.getAccessToken());
+                }
             }
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);

@@ -154,6 +154,9 @@
         <if test="assetName != null">
             AND a.name like CONCAT('%', #{assetName}, '%')
         </if>
+        <if test="locationName != null">
+            AND a.location_name like CONCAT('%', #{locationName}, '%')
+        </if>
         <if test="assetSerialNum != null">
             AND a.serial_num like CONCAT('%', #{assetSerialNum}, '%')
         </if>
@@ -263,6 +266,9 @@
         </if>
         <if test="assetName != null">
             AND a.name like CONCAT('%', #{assetName}, '%')
+        </if>
+        <if test="locationName != null">
+            AND a.location_name like CONCAT('%', #{locationName}, '%')
         </if>
         <if test="assetSerialNum != null">
             AND a.serial_num like CONCAT('%', #{assetSerialNum}, '%')

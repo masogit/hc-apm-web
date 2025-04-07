@@ -1023,7 +1023,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      * @param zkbPartOrder
      */
     public void updateCompleteAuditBySrNum(ZkbPartOrder zkbPartOrder){
-        List<ZkbPartOrder> zkbPartOrderList = zkbPartOrderRepository.queryBySrNo(zkbPartOrder.getSrNo(), zkbPartOrder.getId());
+        List<ZkbPartOrder> zkbPartOrderList = zkbPartOrderRepository.queryBySrNoExceptStatus(zkbPartOrder.getSrNo(), zkbPartOrder.getId());
         if(zkbPartOrderList != null && zkbPartOrderList.size() > 0){
             for(ZkbPartOrder p : zkbPartOrderList){
                 Integer dataFlag = p.getDataFlag() == null ? 0 : p.getDataFlag();
@@ -2095,6 +2095,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             return false;
         }
         return true;
+    }
+
+    public boolean checkSrNumExist(ZkbPartOrder zkbPartOrder){
+
+        return false;
     }
 
     public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){
