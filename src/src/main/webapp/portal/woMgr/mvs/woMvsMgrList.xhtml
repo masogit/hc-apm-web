@@ -75,10 +75,10 @@
                         </p:autoComplete>
                     </f:facet>
                     <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
-                </p:column>
+                </p:column><!--
                 <p:column headerText="#{msg.locationName}" filterBy="#{item.mvsIbMapping.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{workOrderMgrMvsController.showLocationName()}">
                     <h:outputText value="#{item.mvsIbMapping.assetInfo.locationName}"/>
-                </p:column>
+                </p:column>-->
                 <p:column headerText="#{msg.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.serviceRequest.srNum}"/>
                 </p:column>
