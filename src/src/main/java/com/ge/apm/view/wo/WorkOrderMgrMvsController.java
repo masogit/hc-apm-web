@@ -458,6 +458,9 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                 case "serviceRequest.casePriority":
                     params.put("casePriority", searchFilter.value);
                     break;
+                case "mvsIbMapping.assetInfo.locationName":
+                    params.put("locationName", searchFilter.value);
+                    break;
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
                     break;
