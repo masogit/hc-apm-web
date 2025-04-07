@@ -207,7 +207,7 @@
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <p:dataList id="businessFilingAuthorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFilingAuthorizationAttachments')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataList id="businessFilingAuthorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFilingAuthorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">授权书附件</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
