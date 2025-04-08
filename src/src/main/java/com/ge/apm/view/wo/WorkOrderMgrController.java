@@ -1332,7 +1332,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
 
-    public void prepareAct(String woId) {
+    public void prepareActCancel(String woId) {
         selectedWorkOrder = dao.findById(woId);
         // 维修中
         if (selectedWorkOrder.getStatus() == 1 && selectedWorkOrder.getCurrentStepId() == 4) {
@@ -1343,6 +1343,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 return;
             }
         }
+        prepareAct(woId);
+    }
+
+    public void prepareAct(String woId) {
+        selectedWorkOrder = dao.findById(woId);
         currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
         confirmedUpDate = null;
         confirmedDownTime = null;
