@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('enableInsertUsePlace').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableInsertUsePlace').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableInsertUsePlace').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableInsertUsePlace'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableInsertUsePlace'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('enableInsertUsePlace').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('setAdverseEventProductType').name.concat('(').concat(systemConfigItemController.configItemMap.get('setAdverseEventProductType').key).concat(')')}</label>
+                <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('setAdverseEventProductType').showValue}" style="width: 50%;">
+                    <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
+                    <f:selectItems value="#{systemConfigItemController.configItemMap.get('setAdverseEventProductType').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('setAdverseEventProductType'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('setAdverseEventProductType'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('setAdverseEventProductType').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportClientId').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportClientId').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportClientId'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportClientId'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportClientId').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportClientId').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportClientId'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportClientId'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportClientId').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportUserName').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportUserName').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportUserName').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportUserName').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportUserName').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportUserName'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportUserName'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportUserName').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportPassword').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportPassword').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportPassword').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportPassword').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportPassword').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportPassword'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportPassword'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportPassword').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportAppKey').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportAppKey').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportAppKey').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportAppKey').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportAppKey').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportAppKey'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportAppKey'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportAppKey').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportAccount').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportAccount').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccount').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportAccount').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccount').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportAccount'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportAccount'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccount').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').configItemValue == null}"/>
+            </h:panelGroup>
+        </p:panelGrid>
+    </ui:composition>
+
+</html>

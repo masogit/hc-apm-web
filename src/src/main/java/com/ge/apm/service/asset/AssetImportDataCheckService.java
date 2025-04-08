@@ -81,6 +81,7 @@ public class AssetImportDataCheckService {
     public Map<String, String> proprietaryClassList = i18nMap(FieldValueMessageController.getFieldValueList("proprietaryClass", siteId));
     public Map<String, String> assetQualityList = i18nMap(FieldValueMessageController.getFieldValueList("assetQuality", siteId));
     public Map<String, String> productSegmentList = i18nMap(FieldValueMessageController.getFieldValueList("productSegment", siteId));
+    public Map<String, String> assetGroupSecondary = new HashMap<>();
     public Map<String, String> asset68 = new HashMap<>();
 
     @Autowired
@@ -554,6 +555,12 @@ public class AssetImportDataCheckService {
                 setErrorMsg(assetImport, "assetGroup", assetImport.getAssetGroupStr());
             } else {
                 assetImport.setAssetGroup(Integer.parseInt(value));
+                if (!StringUtils.isEmpty(assetImport.getAssetGroupSecondaryStr())) {
+                    String secondaryValue = assetGroupSecondary(Integer.parseInt(value), siteId, assetImport.getAssetGroupSecondaryStr());
+                    if (Objects.nonNull(secondaryValue)) {
+                        assetImport.setAssetGroupSecondary(Integer.parseInt(secondaryValue));
+                    }
+                }
             }
         }
         if (!StringUtils.isEmpty(assetImport.getAssetClassStr())) {
@@ -769,7 +776,7 @@ public class AssetImportDataCheckService {
                 if (Objects.isNull(asset.getIsPm())) {
                     asset.setIsPm(true);
                 }
-                if(Objects.isNull(asset.getRepairFormStr())){
+                if (Objects.isNull(asset.getRepairFormStr())) {
                     asset.setRepairForm(1);
                 }
                 if (Objects.isNull(asset.getIsChecked())) {
@@ -886,5 +893,24 @@ public class AssetImportDataCheckService {
                 item.put("status", orgInfo == null ? AssetFileImportBaseService.ImportStatus.New : AssetFileImportBaseService.ImportStatus.Exist);
             });
         }
+    }
+
+    public String assetGroupSecondary(Integer assetGroup, Integer siteId, String assetGroupSecondaryStr) {
+        String msgType = "assetGroupSecondary_" + assetGroup;
+        String mappingKey = assetGroup + "_" + assetGroupSecondaryStr;
+        String assetGroupSecondaryValue = assetGroupSecondary.get(mappingKey);
+        if (Objects.isNull(assetGroupSecondaryValue)) {
+            List<I18nMessage> assetGroupSecondaryTmp = FieldValueMessageController.getFieldValueList(msgType, siteId);
+            if (CollectionUtils.isNotEmpty(assetGroupSecondaryTmp)) {
+                assetGroupSecondaryTmp.forEach(e -> {
+                    assetGroupSecondary.put(assetGroup+"_"+e.getValueZh(), e.getMsgKey());
+                    assetGroupSecondary.put(assetGroup+"_"+e.getValueEn(), e.getMsgKey());
+                });
+            }
+            return assetGroupSecondary.get(mappingKey);
+
+        }
+        return null;
+
     }
 }

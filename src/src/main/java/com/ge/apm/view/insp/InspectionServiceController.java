@@ -171,11 +171,14 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         Pagination pagination = new Pagination(0, 1000);
         Wrapper wrapper = getWrapper("aor.asset_uid", null, ListUtil.newArrayList(this.assetInfo.getUid()), null, "aor.start_date");
         List<AssetOptRecord> eventRecords = assetOptRecordMapper.getEventRecord(pagination, wrapper);
-        eventRecords.forEach(item -> item.setCostTime(DateUtil.generateCostTime(item.getStartDate(), item.getEndDate())));
+        eventRecords.forEach(item -> item.setCostTime(DateUtil.generateCostTime(item.getStartDate()==null?new Date():item.getStartDate(), item.getEndDate()==null?new Date():item.getEndDate())));
         return eventRecords;
     }
 
     public List<AdverseEvents> getAdverseEventList() {
+        if (ObjectUtil.isEmpty(this.assetInfo.getDepartNum())) {
+            return ListUtil.empty();
+        }
         Pagination pagination = new Pagination(0, 1000);
         Wrapper wrapper = getWrapper("device_num", this.assetInfo.getDepartNum(), null, null, "report_date");
         return adverseEventsMapper.getEventRecord(pagination, wrapper);
