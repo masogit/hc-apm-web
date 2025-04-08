@@ -2619,8 +2619,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
-
 
     public boolean checkQuotaHistory(String type, ZkbContract zkbContract, ZkbPartOrder zkbPartOrder, ZkbContractAsset zkbContractAsset, String probeType){
         if("apply".equals(type)){

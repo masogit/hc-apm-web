@@ -42,7 +42,7 @@
     <h:panelGroup rendered="#{!multiLevelApprovalListController.display}">
                 <p:dataList id="contractList" value="#{multiLevelApprovalController.getAttachList()}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">#{msg.Attachment}</f:facet>
-                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                    <p:commandLink immediate="true" value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                     <p:commandButton actionListener="#{multiLevelApprovalController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                     </p:commandButton>
