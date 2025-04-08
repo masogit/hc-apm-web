@@ -176,6 +176,9 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     }
 
     public List<AdverseEvents> getAdverseEventList() {
+        if (ObjectUtil.isEmpty(this.assetInfo.getDepartNum())) {
+            return ListUtil.empty();
+        }
         Pagination pagination = new Pagination(0, 1000);
         Wrapper wrapper = getWrapper("device_num", this.assetInfo.getDepartNum(), null, null, "report_date");
         return adverseEventsMapper.getEventRecord(pagination, wrapper);
