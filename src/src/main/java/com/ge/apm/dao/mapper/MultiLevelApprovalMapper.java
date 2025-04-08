@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface MultiLevelApprovalMapper {
-    @Select("select ma.* from multi_level_approval ma left join asset_scrap  scrap on ma.business_number=scrap.business_number " +
+    @Select("select ma.approva_number approvalNumber, ma.* from multi_level_approval ma left join asset_scrap  scrap on ma.business_number=scrap.business_number " +
             "left join asset_department_convert adc   on ma.business_number=adc.business_number " +
             "left join v2_service_request sr on ma.business_number=sr.sr_num " +
             "left join v2_pm_order po on ma.business_uid=po.id " +
