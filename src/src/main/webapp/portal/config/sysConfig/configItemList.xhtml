@@ -89,11 +89,53 @@
                                 </f:facet>
                             </p:dataTable>
                         </p:tab>
+                        <p:tab title="#{msg.AssetMDM}" id="id1">
+                            <ui:include src="configItemAssetMDM.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.EquipmentSwap}" id="id2">
+                            <ui:include src="configItemEquipmentSwap.xhtml"/>
+                        </p:tab>
                         <p:tab title="#{msg.arrivalInstallation}" id="id3">
                             <ui:include src="configItemArrivalInstallation.xhtml"/>
                         </p:tab>
+                        <p:tab title="#{msg.WorkOrderMgmt}" id="id4">
+                            <ui:include src="configItemRepair.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.PreventiveMaintainceMgmt}" id="id5">
+                            <ui:include src="configItemMaintain.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.BudgetMgr}" id="id6">
+                            <ui:include src="configItemBudgetMgr.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.DeviceMetrologyMgmt}" id="id7">
+                            <ui:include src="configItemMeasure.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.ClinicalAssistant}" id="id8">
+                            <ui:include src="configItemNurse.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.AssetKnowledgeBaseMgmt}" id="id9">
+                            <ui:include src="configItemKnowledge.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.DeviceKPIAnalysis}" id="id10">
+                            <ui:include src="configItemPerformance.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.review}" id="id11">
+                            <ui:include src="configItemReview.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.InventoryWorkorder}" id="id12">
+                            <ui:include src="configItemInventory.xhtml"/>
+                        </p:tab>
                         <p:tab title="#{msg.SysAdmin}" id="id13">
                             <ui:include src="configItemSysAdmin.xhtml"/>
+                        </p:tab>
+                        <p:tab title="不良事件" id="id14">
+                            <ui:include src="configItemAdverseEvents.xhtml"/>
+                        </p:tab>
+                        <p:tab title="#{msg.trainManage}" id="id15">
+                            <ui:include src="configItemTrainManage.xhtml"/>
+                        </p:tab>
+                        <p:tab title="MVS院级工单" id="id16">
+                            <ui:include src="configItemSiteOrderMVS.xhtml"/>
                         </p:tab>
 <!--                        <c:forEach items="#{systemConfigItemController.getCategoryEntrySet()}" var="entryItem">-->
 <!--                            <p:tab title="#{entryItem.getValue()}" id="#{'id'.concat(entryItem.getKey())}">-->
