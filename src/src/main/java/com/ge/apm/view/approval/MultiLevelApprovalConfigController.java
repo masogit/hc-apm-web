@@ -837,27 +837,43 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         if(selected==null){
             return;
         }
+
+        int roleId = roleDao.getIdByName(ApprovalConstant.MULTILEVEL_AUDITOR);
         List<String> selectAssetClinicalDeptUids = selected.getSelectAssetClinicalDeptUids();
         List<String> uids = approveUserList.stream().map(item -> item.getUid()).collect(Collectors.toList());
 
         if(CollectionUtils.isNotEmpty(selectAssetClinicalDeptUids) && CollectionUtils.isNotEmpty(approveUserList)){
+
+            ArrayList<String> orgUids = new ArrayList<>();
+
+            OrgInfo org = configCacheService.findOrgByUid(selected.getHierOrgUid());
+
+            orgUids.add(org.getSiteUID());
+            orgUids.add(org.getHospitalUID());
+            orgUids.add(org.getInstitutionUID());
+            orgUids.add(org.getTenantUID());
+            orgUids.addAll(selectAssetClinicalDeptUids);
+
+
+
             long s = System.currentTimeMillis();
-            List<UserOrgInfoDto> userOrgInfos=  userOrgInfoMapper.findAccessUidByUserUids(uids);
+//            List<UserOrgInfoDto> userOrgInfos=  userOrgInfoMapper.findAccessUidByUserUids(uids);
+            approveUserList= userAccountDao.findByUserOrgAndRoleId(orgUids,roleId);
             long e = System.currentTimeMillis();
             logger.info("selectAssetClinicalDeptChange 查询消耗时间:{}",e-s);
-            Map<String, List<UserOrgInfoDto>> userOrgListMap = userOrgInfos.stream().collect(Collectors.groupingBy(UserOrgInfoDto::getUserUid));
-            List<String> validUser=new ArrayList<>();
-            userOrgListMap.forEach((k, list) -> {
-                List<String> collect = list.stream().map(UserOrgInfoDto::getOrgInfoUid).collect(Collectors.toList());
-                if(collect.containsAll(selectAssetClinicalDeptUids)){
-                    validUser.add(k);
-                }
-            });
-            if(CollectionUtils.isNotEmpty(validUser)){
-                approveUserList=approveUserList.stream().filter(item->validUser.contains(item.getUid())).collect(Collectors.toList());
-            }else{
-                approveUserList=new ArrayList<>();
-            }
+//            Map<String, List<UserOrgInfoDto>> userOrgListMap = userOrgInfos.stream().collect(Collectors.groupingBy(UserOrgInfoDto::getUserUid));
+//            List<String> validUser=new ArrayList<>();
+//            userOrgListMap.forEach((k, list) -> {
+//                List<String> collect = list.stream().map(UserOrgInfoDto::getOrgInfoUid).collect(Collectors.toList());
+//                if(collect.containsAll(selectAssetClinicalDeptUids)){
+//                    validUser.add(k);
+//                }
+//            });
+//            if(CollectionUtils.isNotEmpty(validUser)){
+//                approveUserList=approveUserList.stream().filter(item->validUser.contains(item.getUid())).collect(Collectors.toList());
+//            }else{
+//                approveUserList=new ArrayList<>();
+//            }
         }
 
         List<String> selectAssetTypes = selected.getSelectAssetTypes();

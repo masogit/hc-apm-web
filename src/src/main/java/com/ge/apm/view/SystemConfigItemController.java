@@ -226,6 +226,19 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         super.prepareEdit();
     }
 
+    public List<String> getMultiEum(ConfigItem configItem) {
+        List<String> multiEum = new ArrayList<>();
+        String showValue = configItem.getShowValue();
+        if(StringUtils.isNotEmpty(showValue)){
+            List<Map<String, String>> valueList = JSON.parseObject(showValue, List.class);
+
+            for (Map<String, String> valueMap : valueList) {
+                multiEum.add(valueMap.get(VALUE));
+            }
+        }
+        return multiEum;
+    }
+
     public void deleteConfig(ConfigItem configItem) {
         if(this.selectSite != null){
             ConfigItemValue configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), this.selectSite.getSiteUID());
