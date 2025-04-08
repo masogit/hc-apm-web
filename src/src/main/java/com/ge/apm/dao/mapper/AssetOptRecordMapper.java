@@ -22,7 +22,7 @@ public interface AssetOptRecordMapper extends BaseMapper<AssetOptRecord>{
 	@SelectProvider(type = AssetOptRecordProvider.class,method = "getAllCount")
 	Integer getAllCount(@Param("filters") Set<SearchFilter> filters);
 
-	@Select("SELECT aor.create_date createDate, aor.end_date endDate, ua1.name createByName, ua2.name modifyByName FROM asset_opt_record aor LEFT JOIN user_account ua1 ON aor.create_by = ua1.uid LEFT JOIN user_account ua2 ON aor.modify_by = ua2.uid WHERE 1=1 ${ew.sqlSegment} ")
+	@Select("SELECT aor.start_date as startDate,aor.create_date createDate, aor.end_date endDate, ua1.name createByName, ua2.name modifyByName FROM asset_opt_record aor LEFT JOIN user_account ua1 ON aor.create_by = ua1.uid LEFT JOIN user_account ua2 ON aor.modify_by = ua2.uid WHERE 1=1 ${ew.sqlSegment} ")
 	List<AssetOptRecord> getEventRecord(Pagination pagination, @Param("ew") Wrapper wrapper);
 
 }
