@@ -59,11 +59,11 @@
                 </h:outputText>
             </p:column>
         </p:dataTable>
-        <p:fieldset legend="附件信息"  rendered="false">
+        <p:fieldset legend="附件信息" >
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
                     <p:dataList id="mcApplyPurchaseAttachList"
-                                value="#{multiLevelApprovalController.attachList}"
+                                value="#{multiLevelApprovalController.mcApplyPurchaseBlobList}"
                                 var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
                                 paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                         <f:facet name="header">附件详情</f:facet>
