@@ -118,6 +118,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     @Getter
     @Setter
+    private List<V2_BlobObject> mcApplyPurchaseBlobList;
+
+    @Getter
+    @Setter
     private List<V2_BlobObject> fixedAttachList;
     @Getter
     @Setter
@@ -364,7 +368,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 MaintenanceContractApplyPurchase maintenanceContractApplyPurchase = maintenanceContractApplyPurchaseRepository.findById(multiLevelApproval.getBusinessUid());
                 primaryApprovalData = maintenanceContractApplyPurchase;
                 secondaryApprovalData =maintenanceContractApplyPurchaseAssetRepository.findByApplicationId(maintenanceContractApplyPurchase.getId());
-                attachList = blobObjectRepository.findByBoUuid(maintenanceContractApplyPurchase.getId());
+                mcApplyPurchaseBlobList = blobObjectRepository.findByBoUuid(maintenanceContractApplyPurchase.getId());
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
