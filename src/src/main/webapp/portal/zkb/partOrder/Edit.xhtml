@@ -681,7 +681,7 @@
                 </p:fieldset>
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderEditController.saveTips}"/><br/>
                 <!--<p:commandButton validateClient="true" value="#{msg.Submit}" action="#{zkbPartOrderEditController.saveEntity}" update=":growl" icon="ui-icon-check" />-->
-                <p:commandButton value="提交" icon="ui-icon-check" validateClient="true"  update=":growl :zkbConfirmDlg" actionListener="#{zkbPartOrderEditController.preSave}" oncomplete="PF('zkbConfirmDlg').show()" />
+                <p:commandButton value="提交" icon="ui-icon-check" validateClient="true"  update=":growl :zkbConfirmDlg" action="#{zkbPartOrderEditController.preSave}" oncomplete="validShow(args, 'zkbConfirmDlg');"/>
 
                 <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderEditController.backList}" />
             </h:form>
@@ -717,6 +717,17 @@
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
             }
+
+            function validShow(args, dialog) {
+                debugger;
+                var jqDialog = jQuery('#' + dialog);
+                if (args.validationFailed) {
+                    PF(dialog).hide();
+                } else {
+                    PF(dialog).show();
+                }
+            }
+
         </script>
     </ui:define>
 </ui:composition>
