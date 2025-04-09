@@ -193,6 +193,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             this.searchFilters = ListUtil.newArrayList(new SearchFilter("category", SearchFilter.Operator.EQ, category));
             Page<ConfigItem> configItemPage = loadData(new PageRequest(0, 5000));
             configItemList = configItemPage.getContent();
+            for (ConfigItem configItem : configItemList) {
+                if (8 == configItem.getValueType()) {
+                    multiSelected = getMultiEum(configItem);
+                }
+            }
             configItemMap.putAll(configItemList.stream().collect(Collectors.toMap(ConfigItem::getKey, item -> item)));
             if (category.equals("3")) {
                 ConfigItem configItem = configItemMap.get("setAssetOutStockDept");
@@ -251,6 +256,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 configItem.setShowValue(configItem.getDefaultValue());
                 if (3 == configItem.getValueType()) {
                     configItem.setShowValue(Optional.ofNullable(configItem.getShowValue()).map(String::toLowerCase).orElse(""));
+                }
+                if (8 == configItem.getValueType()) {
+                    multiSelected = getMultiEum(configItem);
                 }
             }
             WebUtil.addErrorMessage("删除成功！");
