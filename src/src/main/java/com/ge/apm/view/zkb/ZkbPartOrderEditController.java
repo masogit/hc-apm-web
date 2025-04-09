@@ -727,19 +727,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
-        quotaTips = zkbPartOrderEditService.preSave(selected,selectedContract,assetInfo);
 
-    }
-
-
-    /**
-     * 保存方法
-     */
-    public String saveData(){
         String errorLog = zkbPartOrderEditService.saveCheck(selected, selectedContract, faultUnClosedSr, v2_listHashMap, contractList, assetInfo, v2_blobObjectList, v2_probe_blobObjectList, selectionTenantInfo);
         if(StrUtil.isNotEmpty(errorLog)){
             WebUtil.addErrorMessage(errorLog);
-            return "";
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return ;
         }
 
         //region 实时获取合同进行校验数量
@@ -750,10 +743,20 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             FacesContext.getCurrentInstance().addMessage(null, message);
             contractList = new ArrayList<>();
             contractList.add(zkbContract);
-            return "";
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return ;
         }
         //endregion
+        quotaTips = zkbPartOrderEditService.preSave(selected,selectedContract,assetInfo);
 
+    }
+
+
+    /**
+     * 保存方法
+     */
+    public String saveData(){
+        ZkbContract zkbContract = zkbPartOrderService.getZkbContractRepository().findById(selectedContract.getId());
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
