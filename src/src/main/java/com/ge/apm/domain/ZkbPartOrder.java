@@ -632,7 +632,7 @@ public class ZkbPartOrder implements Serializable {
     private Integer dataFlag = 0;
 
     @Column(name = "score_flag")
-    private String scoreFlag = "f";
+    private String scoreFlag;
 
     @Column(name = "high_cat_flag")
     private String highCatFlag;

@@ -671,6 +671,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
             }
+            zkbPartOrder.setScoreFlag(null);
         }else if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
