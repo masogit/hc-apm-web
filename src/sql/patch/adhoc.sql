@@ -8,3 +8,7 @@ update shared_asset_request  set clinical_dept_name='肝胆外一科',clinical_d
 delete from  shared_asset_req_detail  where id='2c9b858295666aac0195ad7ba5407fc2';
 delete from shared_asset_req_type where shared_id in ('2c9b858295666aac0195ad7b9c777fc0','2c9b858295d27afc0196149f277912e5');
 delete from  shared_asset_request where id in ('2c9b858295666aac0195ad7b9c777fc0','2c9b858295d27afc0196149f277912e5');
+
+
+
+ALTER TABLE zkb_part_order ALTER COLUMN score_flag DROP DEFAULT;
