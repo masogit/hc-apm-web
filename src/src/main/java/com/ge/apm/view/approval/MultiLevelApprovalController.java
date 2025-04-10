@@ -1017,7 +1017,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     public boolean  isPreview(V2_BlobObject fileitem){
         String objectName = fileitem.getObjectName();
+        String objectType = fileitem.getObjectType();
         Matcher matcher = pattern.matcher(objectName);
-        return matcher.matches();
+        return matcher.matches() || objectType.toLowerCase().contains("image");
     }
 }
