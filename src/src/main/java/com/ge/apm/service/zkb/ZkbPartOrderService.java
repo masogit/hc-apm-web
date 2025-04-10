@@ -815,7 +815,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
-    public boolean checkPartConsumable(ZkbPartOrder zkbPartOrder){
+    public boolean  checkPartConsumable(ZkbPartOrder zkbPartOrder){
         if(ZkbPartOrder.OrderType.Parts.name().equals(zkbPartOrder.getOrderType())){
             if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.name().equals(zkbPartOrder.getRadiationQuotaType())){
                 return false;
@@ -862,8 +862,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         }
                     }
                 }else{
-                    zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
-                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                    if(checkPartConsumable(zkbPartOrder)){
+                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                    }else{
+                        zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                    }
                 }
             }else{
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString());
