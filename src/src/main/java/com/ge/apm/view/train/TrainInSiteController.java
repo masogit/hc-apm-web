@@ -312,21 +312,30 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         }
     }
     public void onSignerFilterChange(AjaxBehaviorEvent event) {
+        UserAccount userAccount = null;
         if (event instanceof SelectEvent) {
-            filterSigner = (String) ((SelectEvent) event).getObject();
+            userAccount = (UserAccount) ((SelectEvent) event).getObject();
         }
-        if (!Strings.isNullOrEmpty(filterSigner) && !clinicalOwnerList.stream().anyMatch(item -> filterSigner.equals(item.getName()))) {
+        if(userAccount == null){
+            filterSigner = null;
+        }else{
+            selectedTrainDetailSign.setSignerUid(userAccount.getUid());
+            selectedTrainDetailSign.setSignerName(userAccount.getName());
+            filterSigner = userAccount.getUid();
+        }
+        /*if (!Strings.isNullOrEmpty(filterSigner) && !clinicalOwnerList.stream().anyMatch(item -> filterSigner.equals(item.getName()))) {
             filterSigner = null;
         }else{
             UserAccount us = clinicalOwnerList.stream().filter(item -> filterSigner.equals(item.getName())).findFirst().get();
             selectedTrainDetailSign.setSignerUid(us.getUid());
             selectedTrainDetailSign.setSignerName(us.getName());
-        }
+        }*/
     }
 
     public void prepareSignCreate(){
         loadClinicalDeptList();
         selectedTrainDetailSign = new TrainDetailSign();
+        selectedTrainDetailSign.setSignDate(new Date());
         selectedTrainDetailSign.setDetailId(selectedTrainDetail.getId());
     }
 
@@ -336,7 +345,8 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     }
 
     public void deleteSign(){
-
+        trainManageService.deleteSign(selectedTrainDetailSign);
+        trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetailSign.getDetailId());
     }
 
     public void saveSign(){
