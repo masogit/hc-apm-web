@@ -1138,24 +1138,10 @@ public class ZkbPartOrderStatusService {
             if(ZkbContract.YOrNEnum.Y.toString().equals(c.getFiveNineNineFlag()) && "highMachine".equals(zkbContractAsset.getAssetType())){
 
             }else {
-                if (ZkbContract.ContractType.CCS.toString().equals(c.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(c.getContractType())) {
-                    if(c.getSpareQuotaApply() < selected.getQty()){
-                        return "备件申请名额不足，请联系供应商！";
-                    }
-                }else if(ZkbContract.ContractType.DI.toString().equals(c.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(c.getContractType())){
-                    if(selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup().equals(1)){
-                        if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
-                            if(c.getPartHighQuotaApply() < selected.getQty()){
-                                return "高值备件申请名额不足，请联系供应商！";
-                            }
-                        }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
-                            if(c.getSpareArtificailApply() < selected.getQty()){
-                                return "联合申请名额不足，请联系供应商！";
-                            }
-                        }else{
-                            if(c.getSpareArtificailApply() < selected.getQty()){
-                                return "联合申请名额不足，请联系供应商！";
-                            }
+                if(StrUtil.isEmpty(selected.getRadiationQuotaType())){
+                    if(ZkbContract.ContractType.CCS.toString().equals(c.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(c.getContractType())){
+                        if(c.getSpareQuotaApply() < selected.getQty()){
+                            return "备件申请名额不足，请联系供应商！";
                         }
                     }else{
                         if(c.getSpareArtificailApply() < selected.getQty()){
@@ -1163,8 +1149,18 @@ public class ZkbPartOrderStatusService {
                         }
                     }
                 }else{
-                    if(c.getSpareArtificailApply() < selected.getQty()){
-                        return "联合申请名额不足，请联系供应商！";
+                    if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                        if(c.getPartHighQuotaApply() < selected.getQty()){
+                            return "高值备件申请名额不足，请联系供应商！";
+                        }
+                    }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                        if(c.getSpareArtificailApply() < selected.getQty()){
+                            return "联合申请名额不足，请联系供应商！";
+                        }
+                    }else{
+                        if(c.getSpareArtificailApply() < selected.getQty()){
+                            return "联合申请名额不足，请联系供应商！";
+                        }
                     }
                 }
             }

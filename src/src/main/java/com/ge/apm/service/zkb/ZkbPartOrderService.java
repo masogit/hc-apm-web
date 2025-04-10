@@ -847,18 +847,22 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     if(checkPartSeventyPercent(c,zkbPartOrder) && checkPartConsumable(zkbPartOrder)){
                         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                     }else{
-                        boolean r = checkApplyNumValid(zkbPartOrder,c);
-                        if(!r){
-                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
-                        }else{
-                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
-                        }
-                        if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
-                            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
-                        }else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
-                            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
-                        }else{
+                        if(!checkPartConsumable(zkbPartOrder)){
                             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                        }else{
+                            boolean r = checkApplyNumValid(zkbPartOrder,c);
+                            if(!r){
+                                zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                            }else{
+                                zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                            }
+                            if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
+                                zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                            }else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
+                                zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                            }else{
+                                zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                            }
                         }
                     }
                 }else{
