@@ -206,6 +206,7 @@
         LEFT JOIN depreciation d ON ai.id = d.asset_id
 
         where ai.tenant_uid=#{tenantUid}
+          and ai.is_valid =true
 
         <if test="selectedOrgUid != null">
             AND ( ai.institution_uid = #{selectedOrgUid} OR ai.hospital_uid = #{selectedOrgUid} OR ai.site_uid = #{selectedOrgUid} )
@@ -427,7 +428,7 @@
         LEFT JOIN depreciation d ON ai.id = d.asset_id
 
         where ai.tenant_uid=#{tenantUid}
-
+        and ai.is_valid =true
         <if test="selectedOrgUid != null">
             AND ( ai.institution_uid = #{selectedOrgUid} OR ai.hospital_uid = #{selectedOrgUid} OR ai.site_uid = #{selectedOrgUid} )
         </if>
