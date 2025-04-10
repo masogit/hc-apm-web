@@ -1159,7 +1159,7 @@ public class ZkbPartOrderStatusService {
                         }
                     }else if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(selected.getRadiationQuotaType())){
                         if(c.getConsumableQuotaApply() < selected.getQty()){
-                            return "联合申请名额不足，请联系供应商！";
+                            return "耗材申请名额不足，请联系供应商！";
                         }
                     }else{
                         if(c.getSpareArtificailApply() < selected.getQty()){
