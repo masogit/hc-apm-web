@@ -815,6 +815,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    public boolean checkPartConsumable(ZkbPartOrder zkbPartOrder){
+        if(ZkbPartOrder.OrderType.Parts.name().equals(zkbPartOrder.getOrderType())){
+            if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.name().equals(zkbPartOrder.getRadiationQuotaType())){
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void auditNext(ZkbPartOrder zkbPartOrder,boolean nextFlag,UserAccount userAccount, ZkbPartOrderCloseInfo zkbPartOrderCloseInfo){
         String oldStep = zkbPartOrder.getCurrentStep();
@@ -835,7 +844,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     }
                 }
                 if(isNewPartChange){
-                    if(checkPartSeventyPercent(c,zkbPartOrder)){
+                    if(checkPartSeventyPercent(c,zkbPartOrder) && checkPartConsumable(zkbPartOrder)){
                         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                     }else{
                         boolean r = checkApplyNumValid(zkbPartOrder,c);
