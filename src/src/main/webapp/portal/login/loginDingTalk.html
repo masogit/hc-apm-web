@@ -55,11 +55,14 @@
                  axios.post( origin+"/geapm/web/dingTalk/ssoLogin",{
                     userId: userId
                  }).then(res=>{
-                 let jsessionid = res.headers.jsessionid
-                 document.cookie = "JSESSIONID="+jsessionid;
-                 window.location.href=origin+"/geapm/portal/homeNurse1.xhtml";
+                    if(res.data.data.jwtToken.loginId!=0){
+                        let jsessionid = res.headers.jsessionid
+                        document.cookie = "JSESSIONID="+jsessionid;
+                        window.location.href=origin+"/geapm/portal/homeNurse1.xhtml";
+                    }else{
+                        window.location.href=origin+"/geapm/login.xhtml";
+                    }
                 });
-
     }
      var origin = location.origin;
      var search = location.search;
