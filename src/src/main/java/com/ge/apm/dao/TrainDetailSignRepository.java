@@ -10,6 +10,8 @@ public interface TrainDetailSignRepository extends GenericRepositoryUUID<TrainDe
 
     List<TrainDetailSign> findByDetailId(String detailId);
 
-    @Query("select max(signOrder) from TrainDetailSign where detailId = ?1 order by signOrder desc")
+    @Query("select max(signOrder) from TrainDetailSign where detailId = ?1 ")
     Object queryMaxOrderByDetailId(String detailId);
+
+    TrainDetailSign findFirstByDetailIdAndSignerName(String detailId, String signerName);
 }

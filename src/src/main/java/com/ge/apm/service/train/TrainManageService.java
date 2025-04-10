@@ -346,6 +346,10 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     public void saveSign(TrainDetailSign trainDetailSign){
+        TrainDetailSign existSign = trainDetailSignRepository.findFirstByDetailIdAndSignerName(trainDetailSign.getDetailId(), trainDetailSign.getSignerName());
+        if(existSign != null){
+            return;
+        }
         if(StrUtil.isEmpty(trainDetailSign.getId())){
             Object index = trainDetailSignRepository.queryMaxOrderByDetailId(trainDetailSign.getDetailId());
             if(index != null){
@@ -357,6 +361,10 @@ public class TrainManageService extends MicroServiceInvoker {
             }
         }
         trainDetailSignRepository.save(trainDetailSign);
+    }
+
+    public void deleteSign(TrainDetailSign trainDetailSign){
+        trainDetailSignRepository.delete(trainDetailSign);
     }
 
     public List<TrainDetailSign> queryDetailSignByDetailId(String detailId){
