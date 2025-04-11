@@ -78,8 +78,8 @@
                   </h:outputText>
                </p:column>
                <f:facet name="{Toolbar}">
-                  <p:commandButton immediate="false" process="@this" id="createSignButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trainInSiteController.prepareSignCreate}" update=":growl trainTab:signDlg" oncomplete="PF('signDlg').show()"  rendered="#{trainInSiteController.canEdit}"/>
-                  <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteSign}" update=":growl trainTab:detailEditForm:signDatalist " disabled="#{empty trainInSiteController.selectedTrainDetailSign}" rendered="#{trainInSiteController.canEdit}">
+                  <p:commandButton immediate="false" process="@this" id="createSignButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trainInSiteController.prepareSignCreate}" update=":growl trainTab:signDlg" oncomplete="PF('signDlg').show()"  rendered="#{trainInSiteController.canEdit and trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
+                  <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteSign}" update=":growl trainTab:detailEditForm:signDatalist " disabled="#{empty trainInSiteController.selectedTrainDetailSign}" rendered="#{trainInSiteController.canEdit and trainInSiteController.selectedTrainDetail.status eq 'Planned'}">
                      <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                   </p:commandButton>
                </f:facet>
