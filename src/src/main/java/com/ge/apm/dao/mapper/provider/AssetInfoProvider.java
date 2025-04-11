@@ -164,6 +164,7 @@ public class AssetInfoProvider {
 		StringBuilder sb = new StringBuilder();
 		sb.append("select  ai.* from asset_info ai  left join  efficiency_equipment_info eei on ai.uid=eei.asset_uid  where");
 		sb.append(" ai.tenant_uid = '"+tenantUid+"'");
+		sb.append(" ai.is_valid =true ");
 		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in  "+orgUidList+")");
 		sb.append(" and ai.clinical_dept_uid = '"+clinicalDeptUid+"'");
 		sb.append(" and eei.uid is null ");
