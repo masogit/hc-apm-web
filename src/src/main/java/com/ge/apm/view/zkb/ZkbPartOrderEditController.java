@@ -293,6 +293,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 if(i18nMessage.getMsgKey().equals("Part")){
                     removeList.add(i18nMessage);
                 }
+                if("PCB MVS".equals(selectedContract.getContractType())){
+                    if(i18nMessage.getMsgKey().equals("PartsHigh")){
+                        removeList.add(i18nMessage);
+                    }
+                }
             }
             if(assetInfo.getAssetGroup().equals(1)){
                 if(zkbPartOrderEditService.checkPcbMvsTotal(selectedContract)){
