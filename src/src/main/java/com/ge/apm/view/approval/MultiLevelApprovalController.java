@@ -172,8 +172,6 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     private boolean isDirectDelivery=false;
 
-    Pattern pattern = Pattern.compile("^(.*\\.(?i)(jpg|jpeg|png|gif|bmp|tiff|pdf|JPG|JPEG|PNG|GIF|BMP|TIFF|PDF))$");
-
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
         return multiLevelApprovalRepository;
@@ -1015,9 +1013,4 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         attachList = attachList.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
-    public boolean  isPreview(V2_BlobObject fileitem){
-        String objectName = fileitem.getObjectName();
-        Matcher matcher = pattern.matcher(objectName);
-        return matcher.matches();
-    }
 }

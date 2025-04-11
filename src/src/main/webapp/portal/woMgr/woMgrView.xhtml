@@ -146,7 +146,7 @@
                         <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
-                                    <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                    <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
                                     <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
                                     </p:graphicImage>
                                 </h:panelGrid>
@@ -158,7 +158,7 @@
                     <p:dataGrid id="woPicItem" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
-                                <p:ajax  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
                                 </p:graphicImage>
                             </h:panelGrid>
@@ -591,8 +591,8 @@
                                 <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                                 <p:panel  style="text-align:center">
                                     <h:panelGrid columns="1" style="width:100%" >
-                                        <p:ajax    event="click" update="previewedDlg" oncomplete="handlePreview(args, 'previewedDlg');"    listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
-                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                                        <p:ajax  disabled="#{!preViewerBean.isPreview(fileitem)}"  event="click" update="previewedDlg" oncomplete="handlePreview(args, 'previewedDlg');"    listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                        <p:graphicImage value="#{fileitem.objectType.toLowerCase().contains('image')?fileDownloadService.getFile(fileitem.objectStorageId):(fileitem.getObjectName().toLowerCase().contains('pdf')?'/images/icons/pdf.png':fileitem.getObjectName().toLowerCase().contains('docx')?'/images/icons/word.png':'/images/icons/file.png')}" height="80" width="100" stream="false" >
                                         </p:graphicImage>
                                     </h:panelGrid>
                                     <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
