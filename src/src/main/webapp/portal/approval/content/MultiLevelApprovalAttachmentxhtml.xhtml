@@ -33,7 +33,7 @@
                     <p:column headerText="操作"  >
                         <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                             &nbsp;&nbsp;
-                        <p:commandLink  value="预览" ajax="true" rendered="#{multiLevelApprovalController.isPreview(fileitem)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <p:commandLink  value="预览" ajax="true" rendered="#{preViewerBean.isPreview(fileitem)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  actionListener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                     </p:column>
                 </p:dataTable>
             </p:tab>
