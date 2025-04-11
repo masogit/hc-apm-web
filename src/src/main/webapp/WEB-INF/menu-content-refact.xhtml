@@ -137,8 +137,7 @@
                    <c:when test="#{item eq 'HISPERFORMANCE'}">
                        <!-- his绩效分析 -->
                        <p:submenu label="#{msg.hisPerform}" icon="fa fa-line-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_')}">
-                           <p:menuitem id="his011" value="综合效益科室汇总"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipmentDeptAssetDetail.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_EQUIPMENT')}"/>
-
+                           <p:menuitem id="his011" value="综合效益科室汇总"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipmentDeptAssetDetail.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_DEPARTMENT')}"/>
                            <p:menuitem id="his009" value="设备综合效益分析"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_EQUIPMENT')}"/>
                            <p:menuitem id="his010" value="数据录入"  outcome="/portal/his/dataEntry/dataEntry.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DATA_ENTRY')}"/>
                            <p:menuitem id="his001" value="#{msg.deviceMatching}" outcome="/portal/his/hisAsset/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DEVICE_MATCHING')}"/>
