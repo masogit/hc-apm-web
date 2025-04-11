@@ -23,12 +23,16 @@ import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ManagedBean
 @ViewScoped
 public class PreViewerBean implements ServerEventInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(PreViewerBean.class);
+
+    Pattern pattern = Pattern.compile("^(.*\\.(?i)(jpg|jpeg|png|gif|bmp|tiff|pdf|JPG|JPEG|PNG|GIF|BMP|TIFF|PDF))$");
 
     private V2_BlobObject blobObject;
     private Integer type;  // 0 图片, 1 pdf    -1 其他
@@ -121,5 +125,17 @@ public class PreViewerBean implements ServerEventInterface {
 
     public String getObjectId() {
         return objectId;
+    }
+
+    /**
+     *  是否支持预览
+     * @param fileitem
+     * @return
+     */
+    public boolean  isPreview(V2_BlobObject fileitem){
+        String objectName = fileitem.getObjectName();
+        String objectType = fileitem.getObjectType();
+        Matcher matcher = pattern.matcher(objectName);
+        return matcher.matches() || objectType.toLowerCase().contains("image");
     }
 }

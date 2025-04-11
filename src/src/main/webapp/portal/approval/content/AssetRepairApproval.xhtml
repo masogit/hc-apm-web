@@ -130,7 +130,7 @@
                     <f:facet name="header">#{item.keySet().toArray()[0]}--#{msg.Attachment}信息</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
-                            <p:ajax disabled="#{!multiLevelApprovalController.isPreview(fileitem)}"  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  listener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}"/>
+                            <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}"  event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()"  listener="#{preViewerBean.onServerEvent(multiLevelApprovalController,fileitem.objectStorageId)}"/>
                             <p:graphicImage value="#{fileitem.objectType.toLowerCase().contains('image')?fileDownloadService.getFile(fileitem.objectStorageId):(fileitem.getObjectName().toLowerCase().contains('pdf')?'/images/icons/pdf.png':fileitem.getObjectName().toLowerCase().contains('docx')?'/images/icons/word.png':'/images/icons/file.png')}"  height="80" width="100" stream="false"/>
                         </h:panelGrid>
                         <p:commandLink validateClient="false" immediate="true" process="@this"
