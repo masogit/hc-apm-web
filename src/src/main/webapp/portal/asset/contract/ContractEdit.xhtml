@@ -216,7 +216,7 @@
                             </p:dataList>
 
                         </h:panelGroup>
-                        <p:fieldset id="amount" legend="#{msg.PaymentPlan} 合同总额：#{(contractInfoEditController.selected.amount + contractInfoEditController.selected.supplementaryAmount)}（合同总额=合同金额+补充协议金额）">
+                        <p:fieldset id="amount" legend="#{msg.PaymentPlan} 合同总额：#{contractInfoEditController.getBigDecimal(contractInfoEditController.selected.amount + contractInfoEditController.selected.supplementaryAmount)}（合同总额=合同金额+补充协议金额）">
                             <h:panelGroup >
                                 <p:dataTable id="paymentList"  value="#{contractInfoEditController.getPaymentList()}" var="item" 
                                              rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
@@ -224,7 +224,7 @@
                                              rowsPerPageTemplate="20,50,100,500"  rows="20" emptyMessage="#{msg.noRecordFound}">
                                     <p:ajax event="rowSelect" />
                                     <p:column headerText="#{msg.PaymentAmount}">
-                                        <h:outputText value="#{item.paymentPrice}"/>
+                                        <h:outputText value="#{contractInfoEditController.getBigDecimal(item.paymentPrice)}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.PaymentTime}">
                                         <h:outputText value="#{item.paymentDate}">
@@ -267,7 +267,7 @@
                                     <h:outputText value="#{item.invoiceNum}"/>
                                 </p:column>
                                 <p:column headerText="发票金额">
-                                    <h:outputText value="#{item.invoicePrice}"/>
+                                    <h:outputText value="#{contractInfoEditController.getBigDecimal(item.invoicePrice)}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.InvoicingTime}">
                                     <h:outputText  value="#{item.invoiceTime}">
