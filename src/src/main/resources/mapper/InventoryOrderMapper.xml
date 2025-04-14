@@ -65,7 +65,7 @@
                 AND t.status = #{status}
             </if>
             <if test="startDate != null and endDate != null">
-                AND t.lastModifiedDate BETWEEN #{startDate} AND #{endDate}
+                AND t.lastModifiedDate BETWEEN #{startDate} AND #{endDate} AND t.status = 1
             </if>
             <if test="clinicalDeptUids != null and clinicalDeptUids.size > 0">
                 AND t.clinicalDeptUid IN
