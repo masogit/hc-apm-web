@@ -22,6 +22,7 @@ import com.google.common.base.Strings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -832,6 +833,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             throw new RuntimeException(e);
         }
 
+    }
+
+    public BigDecimal getBigDecimal(Double amount){
+        return BigDecimal.valueOf(amount);
     }
 
     public Map<String, Object> getSelectedObjectMap() {
