@@ -274,7 +274,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
             }
             param.put("tenantUid", currentUser.getTenantUID());
-            param.put("page", 5000);
+            param.put("page", 50000);
             param.put("offset", 0);
             if (ObjectUtil.isNotEmpty(orderIdList)) {
                 param.put("orderIdList", orderIdList);
