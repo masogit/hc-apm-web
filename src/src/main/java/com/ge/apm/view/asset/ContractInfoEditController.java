@@ -463,7 +463,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public String getUserNameByUid(String orgUid) {
         UserAccount user = userDao.getByUid(orgUid);
-        return user == null ? null : user.getName();
+        return user == null ? orgUid : user.getName();
     }
 
     public String getSupplierName(String supplierUid) {

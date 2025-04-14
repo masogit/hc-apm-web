@@ -401,7 +401,7 @@
                                 <h:outputText value="#{item.contractAssetQuantity}"/>
                             </p:column>
                             <p:column headerText="单价">
-                                <h:outputText value="#{item.contractAssetPrice}"/>
+                                <h:outputText value="#{contractInfoEditController.getBigDecimal(item.contractAssetPrice)}"/>
                             </p:column>
                             <p:column headerText="#{msg.manufacture}">
                                 <h:outputText value="#{contractInfoEditController.getSupplierName(item.manufacturer)}"/>
