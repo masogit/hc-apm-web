@@ -332,13 +332,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }
-
-            if(assetInfo.getAssetGroup().equals(1)){
-                if(partHighQuota<= 0){
-                    selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
-                    spareArtificialFlag = true;
-                }
-            }
         }
 
         if(CollectionUtils.isNotEmpty(removeList)){
