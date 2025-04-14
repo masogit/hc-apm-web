@@ -293,20 +293,25 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             spareArtificialFlag = true;
             selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
         }else if(ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
-            if(assetInfo.getAssetGroup().equals(1) && zkbPartOrderEditService.checkPcbMvsTotal(selectedContract)){
-                selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
-                spareArtificialFlag = true;
-            }else{
-                for(I18nMessage i18nMessage : zkbPoPartQuotaTypeList){
-                    if(i18nMessage.getMsgKey().equals("Consumable") || i18nMessage.getMsgKey().equals("Part")){
-                        removeList.add(i18nMessage);
-                    }
-                }
-                int partHighQuota = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
-                if(partHighQuota<= 0){
+            if(assetInfo.getAssetGroup().equals(1)){
+                if(zkbPartOrderEditService.checkPcbMvsTotal(selectedContract)){
                     selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
                     spareArtificialFlag = true;
+                }else{
+                    for(I18nMessage i18nMessage : zkbPoPartQuotaTypeList){
+                        if(i18nMessage.getMsgKey().equals("Part") || i18nMessage.getMsgKey().equals("Consumable")){
+                            removeList.add(i18nMessage);
+                        }
+                    }
+                    int partHighQuota = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
+                    if(partHighQuota<= 0){
+                        selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
+                        spareArtificialFlag = true;
+                    }
                 }
+            }else{
+                spareArtificialFlag = true;
+                selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
             }
         }else if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType())){
             int partHighQuota = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
