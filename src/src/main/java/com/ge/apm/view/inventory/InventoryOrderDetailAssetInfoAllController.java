@@ -24,6 +24,8 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -45,7 +47,10 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDController<InventoryOrderDetail> implements Serializable, ServerEventInterface {
 
-	private UserAccount currentUser;
+
+    private static final Logger log = LoggerFactory.getLogger(InventoryOrderDetailAssetInfoAllController.class);
+
+    private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
     private InventoryOrderService inventoryOrderService;
     private UserAccountRepository userAccountRepository;
@@ -259,11 +264,12 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 
         byte[] templateFileByte = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.INVENTORY_ORDER_LIST, currentUser);
         List<InventoryOrderDetail> resultList ;
+        Map<String, Object> param = MapUtil.newHashMap();
         //before
         if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
             resultList =new ArrayList<>();
         }else{
-            Map<String, Object> param = MapUtil.newHashMap();
+
             List<SearchFilter> searchFilters = this.searchFilters;
             if (searchFilters == null) {
                 searchFilters = new ArrayList<>();
@@ -294,48 +300,84 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
             }
             inventoryOrderService.covQueryCondition(searchFilters, param);
-            List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-            Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
-            List<Map<String, Object>> mapList = ListUtil.newArrayList();
-            Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
-            Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
-            Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
-            Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
-            Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
-            resultList = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+//            List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
+//            Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
+//            List<Map<String, Object>> mapList = ListUtil.newArrayList();
+//            Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
+//            Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
+//            Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
+//            Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
+//            Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
+//            resultList = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
 
         }
 
-        double totalPrice = resultList.stream()
-                .map(item -> Optional.ofNullable(item.getPurchasePrice()).orElse(0.0))
-                .mapToDouble(Double::doubleValue)
-                .sum();
-        Map<String, Object> map = MapUtils.newHashMap();
+//        double totalPrice = resultList.stream()
+//                .map(item -> Optional.ofNullable(item.getPurchasePrice()).orElse(0.0))
+//                .mapToDouble(Double::doubleValue)
+//                .sum();
+//        Map<String, Object> map = MapUtils.newHashMap();
 //        Map<String, Object> map =  new HashMap<>();
         OrgInfo orgInfo = orgInfoRepository.getByUid(currentUser.getSiteUID());
 
-        map.put("totalPrice", totalPrice);
-        map.put("sum", resultList.size());
-        map.put("hospitalName", orgInfo.getName());
+//        map.put("totalPrice", totalPrice);
+//        map.put("sum", resultList.size());
+//        map.put("hospitalName", orgInfo.getName());
 
-        byte[] bytes = EasyExcelExportUtil.exportExcel(templateFileByte, resultList, map);
+//        byte[] bytes = EasyExcelExportUtil.exportExcel(templateFileByte, resultList, map);
+        EasyExcelExportUtil.DataSupplier dataSupplier = new EasyExcelExportUtil.DataSupplier() {
+            double totalPrice=0.0;
+
+            @Override
+            public Map<String, Object> getParamMap() {
+                if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+                    return null;
+                }
+                Long count = inventoryOrderMapper.findJoinAssetCount(param);
+                Map<String, Object> map = MapUtils.newHashMap();
+                map.put("hospitalName", orgInfo.getName());
+                map.put("totalPrice", totalPrice);
+                map.put("sum", count);
+                return map;
+            }
+
+            @Override
+            public List<?> getData(int pageNum, int pageSize) {
+                if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+                   return null;
+                }
+                param.put("page", pageSize);
+                param.put("offset", (pageNum-1)*pageSize);
+                List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
+                Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
+                List<Map<String, Object>> mapList = ListUtil.newArrayList();
+                Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
+                Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
+                Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
+                Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
+                Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
+                List<InventoryOrderDetail> collect=new ArrayList<>();
+                for (Map<String, Object> stringObjectMap : mapList) {
+                    try {
+                        InventoryOrderDetail javaObject = JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(stringObjectMap)), InventoryOrderDetail.class);
+                        collect.add(javaObject);
+                    }catch (Exception e){
+                        log.error("盘点转换对象异常 map:{}",JSON.toJSONString(stringObjectMap));
+                    }
+
+                }
+
+//                List<InventoryOrderDetail> collect = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+                totalPrice+=collect.stream()
+                        .map(item -> Optional.ofNullable(item.getPurchasePrice()).orElse(0.0))
+                        .mapToDouble(Double::doubleValue)
+                        .sum();
+                return collect;
+            }
+        };
+        HashMap<String, EasyExcelExportUtil.DataSupplier> dataSupplierMap = new HashMap<>();
+        dataSupplierMap.put("dataList",dataSupplier);
+        byte[] bytes = EasyExcelExportUtil.exportExcel(templateFileByte, dataSupplierMap);
         excelFile = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/vnd.ms-excel", "InventoryOrderDetailAssetInfo.xlsx");
-
-//        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-//            ExcelWriter excelWriter = EasyExcel.write(baos).withTemplate(new ByteArrayInputStream(templateFileByte)).build();
-//            WriteSheet writeSheet = EasyExcel.writerSheet().build();
-//            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
-//            excelWriter.fill(resultList, fillConfig, writeSheet);
-//            excelWriter.fill(map, writeSheet);
-//            excelWriter.finish();
-//
-//            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(baos.toByteArray());
-//            excelFile = new DefaultStreamedContent(byteArrayInputStream, "application/vnd.ms-excel", "InventoryOrderDetailAssetInfo.xlsx");
-////            baos.close();
-////            byteArrayInputStream.close();
-//        }catch (Exception e){
-//            logger.error("InventoryOrderDetailAssetInfoAllController exportExcel error:",e);
-//        }
-
     }
 }

@@ -82,4 +82,59 @@ public class EasyExcelExportUtil {
     }
 
 
+    public interface DataSupplier {
+
+
+        Map<String, Object> getParamMap();
+
+
+        List<?> getData(int  pageNum,int pageSize);
+    }
+    /**
+     * 公共的 Excel 导出方法，返回文件字节数组
+     *
+     * @param templateFileByte 模板文件的字节数组
+     * @param dataSupplierMap    key是sheetName    value是 填充列表数据
+     * @return 导出文件的字节数组
+     */
+    public static byte[] exportExcel(byte[] templateFileByte, HashMap<String,DataSupplier> dataSupplierMap) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();ExcelWriter excelWriter =EasyExcel.write(baos).withTemplate(new ByteArrayInputStream(templateFileByte)).build()) {
+
+            // 配置填充参数
+            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+            for (Map.Entry<String, DataSupplier> dataSupplierEntry : dataSupplierMap.entrySet()) {
+                String sheetName = dataSupplierEntry.getKey();
+                DataSupplier dataSupplier = dataSupplierEntry.getValue();
+                // 创建 ExcelWriter 并指定模板
+                // 创建写入工作表
+                ExcelWriterSheetBuilder sheetBuilder = EasyExcel.writerSheet().sheetName(sheetName);
+                WriteSheet writeSheet = sheetBuilder.build();
+                int pageNum = 1;
+                int pageSize = 10000;
+                List<?> resultList = dataSupplier.getData(pageNum, pageSize);
+                while (!resultList.isEmpty()) {
+                    excelWriter.fill(resultList, fillConfig, writeSheet);
+                    pageNum++;
+                    resultList = dataSupplier.getData(pageNum, pageSize);
+                    if (resultList.isEmpty()) {
+                        break;
+                    }
+                }
+                // 填充 Map 数据
+                Map<String, Object> paramMap = dataSupplier.getParamMap();
+                if (paramMap != null) {
+                    excelWriter.fill(paramMap, writeSheet);
+                }
+            }
+
+            excelWriter.finish();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            logger.error("EasyExcelExportUtil error: ",e);
+            return new byte[0];
+        }
+    }
+
+
+
 }
