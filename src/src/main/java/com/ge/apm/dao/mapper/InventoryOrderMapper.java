@@ -3,12 +3,13 @@ package com.ge.apm.dao.mapper;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryOrder;
+import com.ge.apm.domain.InventoryOrderDetail;
 
 import java.util.List;
 import java.util.Map;
 
 public interface InventoryOrderMapper extends BaseMapper<InventoryOrder> {
-    List<Map<String, Object>> findJoinAssetList(Map<String, Object> param);
+    List<InventoryOrderDetail> findJoinAssetList(Map<String, Object> param);
 
     Long findJoinAssetCount(Map<String, Object> param);
 

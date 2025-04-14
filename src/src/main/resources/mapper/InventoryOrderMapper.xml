@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ge.apm.dao.mapper.InventoryOrderMapper">
-    <select id="findJoinAssetList" resultType="map">
+    <select id="findJoinAssetList" resultType="com.ge.apm.domain.InventoryOrderDetail">
         SELECT * FROM
         <include refid="joinAssetCondition"/>
         <include refid="queryCondition"/>
@@ -94,9 +94,8 @@
                 ai.institution_uid institutionUid,
                 ai.hospital_uid hospitalUid,
                 ai.site_uid siteUid,
-                ai.purchase_price purchase_price,
-                ai.purchase_date purchase_date,
-                ai.purchase_date purchase_date,
+                ai.purchase_price purchasePrice,
+                ai.purchase_date purchaseDate,
                 ai.comments assetComments,
                 ai.make_short_name makerShortName,
                 u.name inventoryName,

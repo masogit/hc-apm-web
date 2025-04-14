@@ -1,16 +1,13 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
-import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.apm.service.adverseEvent.AdverseEventDateConverter;
 import com.ge.apm.service.utils.UrlParamUtil;

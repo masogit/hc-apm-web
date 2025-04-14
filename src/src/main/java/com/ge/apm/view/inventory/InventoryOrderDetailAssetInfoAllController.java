@@ -1,7 +1,6 @@
 package com.ge.apm.view.inventory;
 
 import com.alibaba.excel.util.MapUtils;
-import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.InventoryOrderMapper;
 import com.ge.apm.domain.*;
@@ -145,17 +144,29 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
         }
         inventoryOrderService.covQueryCondition(searchFilters, param);
-        List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-        Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
-        List<Map<String, Object>> mapList = ListUtil.newArrayList();
+        List<InventoryOrderDetail> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
+        Map<String, List<InventoryOrderDetail>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.getStatus().toString()));
+        List<InventoryOrderDetail> mapList = ListUtil.newArrayList();
         Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
         Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
         Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
         Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
         Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
         Long count = inventoryOrderMapper.findJoinAssetCount(param);
-        List<InventoryOrderDetail> resultList = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
-        return new PageImpl<>(resultList, pageRequest, count);
+
+//        List<InventoryOrderDetail> inventoryOrderDetailList = new ArrayList<>();
+//        for (Map<String, Object> map : mapList) {
+//            InventoryOrderDetail inventoryOrderDetail = new InventoryOrderDetail();
+//            try {
+//                BeanUtils.populate(inventoryOrderDetail, map);
+//            } catch (IllegalAccessException | InvocationTargetException e) {
+//                throw new RuntimeException(e);
+//            }
+//            inventoryOrderDetailList.add(inventoryOrderDetail);
+//        }
+
+//        List<InventoryOrderDetail> resultList = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
+        return new PageImpl<>(mapList, pageRequest, count);
     }
 
     public String  getUserName(String loginName){
@@ -348,31 +359,21 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 }
                 param.put("page", pageSize);
                 param.put("offset", (pageNum-1)*pageSize);
-                List<Map<String, Object>> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-                Map<String, List<Map<String, Object>>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.get("status").toString()));
-                List<Map<String, Object>> mapList = ListUtil.newArrayList();
+                List<InventoryOrderDetail> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
+                Map<String, List<InventoryOrderDetail>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.getStatus().toString()));
+                List<InventoryOrderDetail> mapList = ListUtil.newArrayList();
                 Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
                 Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
                 Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
                 Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
                 Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
-                List<InventoryOrderDetail> collect=new ArrayList<>();
-                for (Map<String, Object> stringObjectMap : mapList) {
-                    try {
-                        InventoryOrderDetail javaObject = JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(stringObjectMap)), InventoryOrderDetail.class);
-                        collect.add(javaObject);
-                    }catch (Exception e){
-                        log.error("盘点转换对象异常 map:{}",JSON.toJSONString(stringObjectMap));
-                    }
-
-                }
 
 //                List<InventoryOrderDetail> collect = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
-                totalPrice+=collect.stream()
+                totalPrice+=joinAssetList.stream()
                         .map(item -> Optional.ofNullable(item.getPurchasePrice()).orElse(0.0))
                         .mapToDouble(Double::doubleValue)
                         .sum();
-                return collect;
+                return joinAssetList;
             }
         };
         HashMap<String, EasyExcelExportUtil.DataSupplier> dataSupplierMap = new HashMap<>();
