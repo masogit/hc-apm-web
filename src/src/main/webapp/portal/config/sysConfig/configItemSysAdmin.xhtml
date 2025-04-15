@@ -9,6 +9,61 @@
     <ui:composition>
         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('systemHead').name.concat('(').concat(systemConfigItemController.configItemMap.get('systemHead').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('systemHead').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('systemHead').validation}" pattern="#{systemConfigItemController.configItemMap.get('systemHead').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('systemHead'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('systemHead'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('systemHead').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('systemLogo').name.concat('(').concat(systemConfigItemController.configItemMap.get('systemLogo').key).concat(')')}</label>
+                <img src="#{systemConfigItemController.configItemMap.get('systemLogo').showValue}" style="width:60px; height:50px;margin: 0px 5px 0px 5px;"/>
+                <p:fileUpload id="type1" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{systemConfigItemController.uploadImg}" mode="advanced" dragDropSupport="false" style="width:50%"
+                              multiple="true"  sizeLimit="500000000" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" update="configItemForm"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('systemLogo'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('systemLogo'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('systemLogo').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('displayExternalWorkOrder').name.concat('(').concat(systemConfigItemController.configItemMap.get('displayExternalWorkOrder').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('displayExternalWorkOrder').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('displayExternalWorkOrder'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('displayExternalWorkOrder'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('displayExternalWorkOrder').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('displayRemoteWorkOrder').name.concat('(').concat(systemConfigItemController.configItemMap.get('displayRemoteWorkOrder').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('displayRemoteWorkOrder').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('displayRemoteWorkOrder'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('displayRemoteWorkOrder'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('displayRemoteWorkOrder').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('synchronizeWorkOrder').name.concat('(').concat(systemConfigItemController.configItemMap.get('synchronizeWorkOrder').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('synchronizeWorkOrder').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
@@ -37,20 +92,6 @@
             </h:panelGroup>
 
             <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('systemHead').name.concat('(').concat(systemConfigItemController.configItemMap.get('systemHead').key).concat(')')}</label>
-                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('systemHead').showValue}"
-                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
-                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('systemHead').validation}" pattern="#{systemConfigItemController.configItemMap.get('systemHead').validation}"/>
-                </p:inputTextarea>
-            </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('systemHead'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('systemHead'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('systemHead').configItemValue == null}"/>
-            </h:panelGroup>
-
-            <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('enableUnattendedApproval').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableUnattendedApproval').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableUnattendedApproval').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
@@ -76,19 +117,6 @@
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('departmentSwitching'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('departmentSwitching'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('departmentSwitching').configItemValue == null}"/>
-            </h:panelGroup>
-
-            <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('systemLogo').name.concat('(').concat(systemConfigItemController.configItemMap.get('systemLogo').key).concat(')')}</label>
-                <img src="#{systemConfigItemController.configItemMap.get('systemLogo').showValue}" style="width:60px; height:50px;margin: 0px 5px 0px 5px;"/>
-                <p:fileUpload id="type1" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{systemConfigItemController.uploadImg}" mode="advanced" dragDropSupport="false" style="width:50%"
-                              multiple="true"  sizeLimit="500000000" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" update="configItemForm"/>
-            </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('systemLogo'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('systemLogo'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('systemLogo').configItemValue == null}"/>
             </h:panelGroup>
 
             <h:panelGroup>
