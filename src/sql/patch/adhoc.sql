@@ -1,7 +1,5 @@
 -- YHAAO-24071
 ALTER TABLE v2_work_order ALTER COLUMN parent_wo_id TYPE VARCHAR(32);
-update v2_pm_order  set parent_wo_id = null, main_sub=null;
-update v2_work_order  set parent_wo_id = null, main_sub=null;
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修工作台是否显示主子工单列', 'displayMainSubWorkOrder', '维修工作台是否显示主子工单列', 'f','t',3 where not exists(select * from config_item where key = 'displayMainSubWorkOrder');
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '保养工作台是否显示主子工单列', 'displayMainSubPmOrder', '保养工作台是否显示主子工单列', 'f','t',3 where not exists(select * from config_item where key = 'displayMainSubPmOrder');
 
