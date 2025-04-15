@@ -145,13 +145,13 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         }
         inventoryOrderService.covQueryCondition(searchFilters, param);
         List<InventoryOrderDetail> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-        Map<String, List<InventoryOrderDetail>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.getStatus().toString()));
-        List<InventoryOrderDetail> mapList = ListUtil.newArrayList();
-        Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
-        Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
+//        Map<String, List<InventoryOrderDetail>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.getStatus().toString()));
+//        List<InventoryOrderDetail> mapList = ListUtil.newArrayList();
+//        Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
+//        Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
+//        Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
+//        Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
+//        Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
         Long count = inventoryOrderMapper.findJoinAssetCount(param);
 
 //        List<InventoryOrderDetail> inventoryOrderDetailList = new ArrayList<>();
@@ -166,7 +166,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 //        }
 
 //        List<InventoryOrderDetail> resultList = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
-        return new PageImpl<>(mapList, pageRequest, count);
+        return new PageImpl<>(joinAssetList, pageRequest, count);
     }
 
     public String  getUserName(String loginName){
@@ -360,13 +360,13 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 param.put("page", pageSize);
                 param.put("offset", (pageNum-1)*pageSize);
                 List<InventoryOrderDetail> joinAssetList = inventoryOrderMapper.findJoinAssetList(param);
-                Map<String, List<InventoryOrderDetail>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.getStatus().toString()));
-                List<InventoryOrderDetail> mapList = ListUtil.newArrayList();
-                Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
-                Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
-                Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
-                Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
-                Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
+//                Map<String, List<InventoryOrderDetail>> listMap = joinAssetList.stream().collect(Collectors.groupingBy(map -> map.getStatus().toString()));
+//                List<InventoryOrderDetail> mapList = ListUtil.newArrayList();
+//                Optional.ofNullable(listMap.get("2")).map(mapList::addAll).orElse(false);
+//                Optional.ofNullable(listMap.get("3")).map(mapList::addAll).orElse(false);
+//                Optional.ofNullable(listMap.get("1")).map(mapList::addAll).orElse(false);
+//                Optional.ofNullable(listMap.get("0")).map(mapList::addAll).orElse(false);
+//                Optional.ofNullable(listMap.get("4")).map(mapList::addAll).orElse(false);
 
 //                List<InventoryOrderDetail> collect = mapList.stream().map(map -> JSON.toJavaObject(JSON.parseObject(JSON.toJSONString(map)), InventoryOrderDetail.class)).collect(Collectors.toList());
                 totalPrice+=joinAssetList.stream()
