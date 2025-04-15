@@ -142,15 +142,15 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
-                <p:column headerText="主工单"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
+                <p:column headerText="主子工单" rendered="#{!userContextService.isEnableBtnByKey('displayMainSubPmOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataListgl').filter()">
                             <f:selectItem itemLabel="#{msg.All}" itemValue="" />
-                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="main" />
-                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="sub" />
+                            <f:selectItem itemLabel="主工单" itemValue="main" />
+                            <f:selectItem itemLabel="子工单" itemValue="sub" />
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?msg.True2Yes:msg.False2No}" />
+                    <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
                 </p:column>
                 <f:facet name="{Toolbar}" >
                     <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderMvsController.exportExcel}" disabled="#{v2PmOrderMvsController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
