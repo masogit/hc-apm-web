@@ -10,7 +10,9 @@
         WHEN status = 2 THEN 1
         WHEN status = 3 THEN 2
         WHEN status = 1 THEN 3
-        END
+        WHEN status = 0 THEN 4
+        WHEN status = 4 THEN 5
+        END,assetId
         LIMIT #{page} OFFSET #{offset}
     </select>
 
