@@ -102,7 +102,7 @@
                             <f:selectItem itemLabel="否" itemValue="f"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}">
+                    <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending' or (zkbPartOrderUserConfigController.selected.configType eq 'TechnicalPending' and zkbPartOrderUserConfigController.selected.assetType eq 'US')}">
                         <label class="label">#{msg.zkbKeyUserConfig_region}*</label>
                         <p:selectOneMenu id="region" value="#{zkbPartOrderUserConfigController.selected.region}" required="true" requiredMessage="区域#{msg.ValidationRequire}">
                             <p:ajax  event="change" update=":zkbPartOrderUserConfigEditForm:zonePandlGroup" listener="#{zkbPartOrderUserConfigController.regionChange()}" />
@@ -111,8 +111,8 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
-                <p:panelGrid style="width:300px;" id="zonePandlGroup" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'ManagePending'}" >
-                    <h:panelGroup>
+                <p:panelGrid style="width:300px;" id="zonePandlGroup" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup rendered="#{not empty zkbPartOrderUserConfigController.selected.region}" >
                         <label class="label">zone*</label>
                         <p:selectManyMenu  styleClass="manymenu-advanced"  id="tenant" value="#{zkbPartOrderUserConfigController.selectedZoneStr}"   var="t" style="width:99%"  filter="true"   filterMatchMode="contains" showCheckbox="true"   >
                             <f:selectItems value="#{zkbPartOrderUserConfigController.zkbZoneList}" var="it" itemLabel="#{it.zone}" itemValue="#{it.zone}"     />
