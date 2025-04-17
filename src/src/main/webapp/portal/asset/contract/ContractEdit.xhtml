@@ -104,25 +104,25 @@
                                     </p:inputText>
                                 </h:panelGroup>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{contractInfoEditController.displayMaintenanceField}">
                                 <label class="label">合同签订日期*</label>
                                 <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.signingDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="合同签订日期 #{msg.ValidationRequire}">
 
                                 </p:calendar>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{contractInfoEditController.displayMaintenanceField}">
                                 <label class="label">维保年限(月)*</label>
-                                <p:inputNumber decimalPlaces="0" maxValue="99" value="#{contractInfoEditController.selected.maintenancePeriod}" required="true" requiredMessage="维保年限(月) #{msg.ValidationRequire}">
+                                <p:inputNumber decimalPlaces="0" maxValue="999" value="#{contractInfoEditController.selected.maintenancePeriod}" required="true" requiredMessage="维保年限(月) #{msg.ValidationRequire}">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{contractInfoEditController.displayMaintenanceField}">
                                 <label class="label">交付时间*</label>
                                 <p:inputText value="#{contractInfoEditController.selected.deliveryTime}"  required="true" requiredMessage="交付时间 #{msg.ValidationRequire}">
                                     <p:ajax process="@this" />
                                 </p:inputText>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{contractInfoEditController.displayMaintenanceField}">
                                 <label class="label">交付地点*</label>
                                 <p:inputText value="#{contractInfoEditController.selected.deliveryLocation}"  required="true" requiredMessage="交付地点 #{msg.ValidationRequire}">
                                     <p:ajax process="@this" />
