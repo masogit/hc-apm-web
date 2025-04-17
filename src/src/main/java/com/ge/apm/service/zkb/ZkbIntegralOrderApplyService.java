@@ -155,7 +155,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 return "ZKB FE不能申请deport类型设备，请联系管理人员！";
             }
 
-            boolean isCheckCcs2 = true;
+            /*boolean isCheckCcs2 = true;
             if ("2".equals(selected.getArtificialType())) {
                 if (ZkbContract.ContractType.CCS.toString().equals(ct.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(ct.getContractType())) {
                     if (assetInfo.getRepairForm() == null || assetInfo.getRepairForm() != 1) {
@@ -168,7 +168,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
             if (!isCheckCcs2) {
                 return "设备为超声高端机，请检查是否满足申请条件！";
-            }
+            }*/
             if(ZkbIntegralOrder.OrderTypeEnum.EngineerOnSiteMaintenance.name().equals(selected.getOrderType())){
                 if (!ZkbContract.ContractType.CCS.toString().equals(ct.getContractType()) && !ZkbContract.ContractType.Biomed.toString().equals(ct.getContractType())) {
                     return "兑换GE工程师现场保养合同类型只能是CCS或Biomed！";
@@ -274,24 +274,10 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
     public String checkScoreFlagValid(ZkbContract zkbContract,String orderType,UserAccount userAccount){
         StringBuilder sb = new StringBuilder();
-        //List<String> ids = new ArrayList<>();
-       /* List<ZkbContract> zkbContractList = new ArrayList<>();
-        if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
-            zkbContractList = zkbContractRepository.queryByTenantAndDate(userAccount.getTenantUID(), new Date());
-            if(CollectionUtils.isEmpty(zkbContractList)){
-                return sb.append("不存在有效期内合同！").toString();
-            }
-            ids = zkbContractList.stream().map(ZkbContract::getId).collect(Collectors.toList());
-        }*/
         List<SearchFilter> filters = new ArrayList<>();
         List<String> orderTypes = Arrays.asList("Parts","Probe","Tool");
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.IN, orderTypes));
         filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
-       /* if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
-            filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
-        }else{
-            filters.add(new SearchFilter("contractId", SearchFilter.Operator.IN, ids));
-        }*/
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Closed.toString()));
@@ -308,23 +294,6 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
         int a = 0;
         int b = 0;
-        /*if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
-            for(ZkbContract c : zkbContractList){
-                b += c.getProbeQuotaTotal() == null ? 0 : c.getProbeQuotaTotal();
-                b += c.getProbeQuotaNormalTotal() == null ? 0 : c.getProbeQuotaNormalTotal();
-                b += c.getProbeQuotaSpecialTotal() == null ? 0 : c.getProbeQuotaSpecialTotal();
-                b += c.getSpareQuotaTotal() == null ? 0 :  c.getSpareQuotaTotal();
-                b += c.getSpareArtificailTotal() == null ? 0 :  c.getSpareArtificailTotal();
-                b += c.getPartHighQuotaTotal() == null ? 0 :  c.getPartHighQuotaTotal();
-            }
-        }else{
-            b += zkbContract.getProbeQuotaTotal() == null ? 0 : zkbContract.getProbeQuotaTotal();
-            b += zkbContract.getProbeQuotaNormalTotal() == null ? 0 : zkbContract.getProbeQuotaNormalTotal();
-            b += zkbContract.getProbeQuotaSpecialTotal() == null ? 0 : zkbContract.getProbeQuotaSpecialTotal();
-            b += zkbContract.getSpareQuotaTotal() == null ? 0 :  zkbContract.getSpareQuotaTotal();
-            b += zkbContract.getSpareArtificailTotal() == null ? 0 :  zkbContract.getSpareArtificailTotal();
-            b += zkbContract.getPartHighQuotaTotal() == null ? 0 :  zkbContract.getPartHighQuotaTotal();
-        }*/
         b += zkbContract.getProbeQuotaTotal() == null ? 0 : zkbContract.getProbeQuotaTotal();
         b += zkbContract.getProbeQuotaNormalTotal() == null ? 0 : zkbContract.getProbeQuotaNormalTotal();
         b += zkbContract.getProbeQuotaSpecialTotal() == null ? 0 : zkbContract.getProbeQuotaSpecialTotal();
@@ -364,11 +333,6 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
         }
         List<SearchFilter> partFilters = new ArrayList<>();
         partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Parts.toString()));
-        /*if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)) {
-            partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
-        }else{
-            partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.IN, ids));
-        }*/
         partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
         partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1*2+"));
         partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Returned.toString(),"1*2+"));
@@ -415,11 +379,6 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
             if(suxDate != null){
                 filters = new ArrayList<>();
                 filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Parts.toString()));
-                /*if(!ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(orderType)){
-                    filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
-                }else{
-                    filters.add(new SearchFilter("contractId", SearchFilter.Operator.IN, ids));
-                }*/
                 filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
                 filters.add(new SearchFilter("orderedDate", SearchFilter.Operator.LT, suxDate));
                 filters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Ordered.toString()));
