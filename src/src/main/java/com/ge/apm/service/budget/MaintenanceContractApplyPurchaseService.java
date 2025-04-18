@@ -233,7 +233,7 @@ public class MaintenanceContractApplyPurchaseService {
      */
     private String genApplicationNum() {
         String prefix = "BAW" + DateUtil.format(new Date(), "yyyyMMdd");
-        String o = maintenanceContractApplyPurchaseRepository.getMaxNum(prefix);
+        String o = maintenanceContractApplyPurchaseRepository.getMaxNum(prefix + "%");
         int index = 1;
         if (StrUtil.isNotEmpty(o)) {
             o = o.replace(prefix, "");
