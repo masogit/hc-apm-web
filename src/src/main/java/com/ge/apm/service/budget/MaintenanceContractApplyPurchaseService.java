@@ -162,6 +162,7 @@ public class MaintenanceContractApplyPurchaseService {
         OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
         if (orgInfo.getOrgType() == 4) {
             applyPurchase.setApplicationDeptName(orgInfo.getName());
+            applyPurchase.setApplicationDeptId(orgInfo.getId());
             applyPurchase.setApplicationDept(orgInfo);
         }
         OrgInfo orgArea = getCourtyardAreaOrg(orgInfo);
@@ -193,6 +194,7 @@ public class MaintenanceContractApplyPurchaseService {
             applyPurchase.setInstitutionUID(curDept.getInstitutionUID());
             applyPurchase.setHospitalUID(curDept.getHospitalUID());
             applyPurchase.setSiteUID(curDept.getSiteUID());
+            applyPurchase.setOrgUid(curDept.getUid());
             applyPurchase.setApplicationNum(genApplicationNum());
         }
         applyPurchase.setLastModifiedBy(userAccount.getName());
