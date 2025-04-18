@@ -46,8 +46,6 @@ import java.util.stream.Collectors;
 public class MaintenanceContractApplyPurchaseListController extends GenericCRUDUUIDController<MaintenanceContractApplyPurchase> {
 
     private static Logger logger = LoggerFactory.getLogger(MaintenanceContractApplyPurchaseListController.class);
-    @Getter @Setter
-    private UserAccount account = UserContextService.getCurrentUserAccount();
     private MaintenanceContractApplyPurchaseRepository dao;
     private MaintenanceContractApplyPurchaseService mcApplyPurchaseService;
     private OrgInfoRepository orgDao;
@@ -75,7 +73,7 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
         mcApplyPurchaseService = WebUtil.getBean(MaintenanceContractApplyPurchaseService.class, "mcApplyPurchaseService");
         uaaService = WebUtil.getBean(UaaService.class);
         userAccount = UserContextService.getCurrentUserAccount();
-        org = orgDao.findById(account.getOrgInfoId());
+        org = orgDao.findById(userAccount.getOrgInfoId());
         TreeNode treeNode =  uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(userAccount.getOrgInfoUID(), userAccount.getUid());
         orgTree = initOrgTree(treeNode);
         String tabIndexStr = (String) WebUtil.getRequestParameter("tabIndex");
