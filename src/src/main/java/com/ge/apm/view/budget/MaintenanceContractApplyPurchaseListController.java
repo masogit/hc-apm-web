@@ -1,6 +1,7 @@
 package com.ge.apm.view.budget;
 
 import com.ge.apm.dao.MaintenanceContractApplyPurchaseRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.MaintenanceContractApplyPurchase;
@@ -45,9 +46,11 @@ import java.util.stream.Collectors;
 public class MaintenanceContractApplyPurchaseListController extends GenericCRUDUUIDController<MaintenanceContractApplyPurchase> {
 
     private static Logger logger = LoggerFactory.getLogger(MaintenanceContractApplyPurchaseListController.class);
-
+    @Getter @Setter
+    private UserAccount account = UserContextService.getCurrentUserAccount();
     private MaintenanceContractApplyPurchaseRepository dao;
     private MaintenanceContractApplyPurchaseService mcApplyPurchaseService;
+    private OrgInfoRepository orgDao;
     private UaaService uaaService;
     @Getter
     @Setter
@@ -68,9 +71,11 @@ public class MaintenanceContractApplyPurchaseListController extends GenericCRUDU
     protected void init() {
         super.init();
         dao = WebUtil.getBean(MaintenanceContractApplyPurchaseRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         mcApplyPurchaseService = WebUtil.getBean(MaintenanceContractApplyPurchaseService.class, "mcApplyPurchaseService");
         uaaService = WebUtil.getBean(UaaService.class);
         userAccount = UserContextService.getCurrentUserAccount();
+        org = orgDao.findById(account.getOrgInfoId());
         TreeNode treeNode =  uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(userAccount.getOrgInfoUID(), userAccount.getUid());
         orgTree = initOrgTree(treeNode);
         String tabIndexStr = (String) WebUtil.getRequestParameter("tabIndex");
