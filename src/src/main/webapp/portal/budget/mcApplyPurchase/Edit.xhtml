@@ -95,10 +95,10 @@
                             <p:column headerText="资产编号">
                                 <h:outputText value="#{item.assetInfo.financingNum}"/>
                             </p:column>
-                            <p:column headerText="采购价格">
+                            <p:column headerText="购置价格(元)">
                                 <h:outputText value="#{item.assetInfo.purchasePrice}"/>
                             </p:column>
-                            <p:column headerText="使用日期">
+                            <p:column headerText="启用日期">
                                 <h:outputText value="#{item.assetInfo.installDate}">
                                     <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat14()}"/>
                                 </h:outputText>
