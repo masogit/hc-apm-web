@@ -841,8 +841,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     }
 
-    public BigDecimal getBigDecimal(Double amount){
-        return BigDecimal.valueOf(amount);
+    public BigDecimal getBigDecimal(BigDecimal amount){
+//        return BigDecimal.valueOf(amount);
+        return amount;
     }
 
     public Map<String, Object> getSelectedObjectMap() {
