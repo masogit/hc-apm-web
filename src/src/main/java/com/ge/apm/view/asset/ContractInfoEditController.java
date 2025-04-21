@@ -74,6 +74,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private ContractInfoService contractService;
     private SupplierController supplierController;
     private ArrivalListRepository arrivalListRepository;
+    private ConfigItemValueRepository configItemValueRepository;
 
     private List<V2_BlobObject> attachements;
     private List<Supplier> supplierList = Collections.emptyList();
@@ -104,6 +105,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private Boolean canBeEdit;
 
     private Boolean terminate;
+    @Getter @Setter
+    private Boolean displayMaintenanceField;
+    private UserAccount currentUser;
 
     @Getter
     @Setter
@@ -137,15 +141,16 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         contractService = WebUtil.getBean(ContractInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         arrivalListRepository = WebUtil.getBean(ArrivalListRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
-
+        currentUser = UserContextService.getCurrentUserAccount();
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
-                selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
+                selectedObjectMap.put("selectedOrg", orgDao.findByUid(currentUser.getSiteUID()));
                 changeContractOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
                 attachements = new ArrayList();
                 allItemList = new ArrayList();
@@ -176,12 +181,13 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 parts = contractService.getAssetPartsInfo(selected.getContractNum(), selected.getTenantUID());
             }
         }
-
+        displayMaintenanceField = Boolean.valueOf(configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(),
+                currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "displayMaintenanceField"));
         if(selected!=null) clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
         // supplierList =
         // aimService.getSuplierListBySiteUid(selected.getTenantUID());
-        supplierList = supplierDao.findBySupplierTAndTenantUID(Boolean.TRUE, UserContextService.getCurrentUserAccount().getTenantUID());
-        manufactureList = supplierDao.findByManufacturerTAndTenantUID(Boolean.TRUE, UserContextService.getCurrentUserAccount().getTenantUID());
+        supplierList = supplierDao.findBySupplierTAndTenantUID(Boolean.TRUE, currentUser.getTenantUID());
+        manufactureList = supplierDao.findByManufacturerTAndTenantUID(Boolean.TRUE, currentUser.getTenantUID());
         initOrgTree();
         List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("contractAttachmentType");
         contractAttachmentTypeList =contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
@@ -267,7 +273,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void initOrgTree() {
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        UserAccount loginUser = currentUser;
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
@@ -671,7 +677,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public Boolean getCanBeEdit() {
         if(null == canBeEdit){
-            canBeEdit = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream()
+            canBeEdit = uaaService.getOrgListByUser(currentUser.getUid()).stream()
                 .map(item -> item.getSiteUID()).distinct().anyMatch(item-> Objects.equals(item, selected.getTenantUID()) ||
                         Objects.equals(item, selected.getInstitutionUID()) ||Objects.equals(item, selected.getHospitalUID()) ||
                         Objects.equals(item, selected.getSiteUID()));
@@ -684,7 +690,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public Boolean isYunNanFuWai(){
-        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(currentUser.getTenantUID());
         if("云南省阜外心血管病医院".equals(tenantInfo.getName().trim())){
             return Boolean.TRUE;
         }
@@ -714,7 +720,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public void approval() {
         this.selected.setApprovalTime(new Date());
-        this.selected.setAuditor(UserContextService.getCurrentUserAccount().getName());
+        this.selected.setAuditor(currentUser.getName());
         if (Boolean.TRUE.equals(this.selected.getApprovalStatus())) {
             this.selected.setStatus(4);
         } else {
@@ -724,7 +730,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void onBlur() {
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        UserAccount loginUser = currentUser;
         Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newSupplier.getName());
         if (!ObjectUtils.isEmpty(supplier)) {
             this.newSupplier = supplier;
@@ -742,7 +748,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void saveNewSupplier() {
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        UserAccount loginUser = currentUser;
         this.newSupplier.setSiteId(loginUser.getSiteId());
         this.newSupplier.setHospitalId(loginUser.getHospitalId());
         this.newSupplier.setTenantUID(loginUser.getTenantUID());
