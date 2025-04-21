@@ -324,7 +324,7 @@
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup rendered="#{!pmOrderGlobalController.isAutoAck()}">
                         <label class="label">验收人*</label>
-                        <p:selectOneMenu  value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.AcknowledgedBy} #{msg.ValidationRequire}">
+                        <p:selectOneMenu filter="true" filterMatchMode="contains" value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.AcknowledgedBy} #{msg.ValidationRequire}">
                             <f:selectItems value="#{pmOrderGlobalController.getAckerForMultiplePmOrders()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -510,7 +510,7 @@
                 <p:panelGrid  columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup >
                         <label class="label">#{msg.BatchMaintenanceProvider}*</label>
-                        <p:selectOneMenu  value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                        <p:selectOneMenu filter="true" filterMatchMode="contains" value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
                             <f:selectItems value="#{v2SupplierPmOrderController.getWorkerListBatch()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -605,7 +605,7 @@
                     <!--展现批量转单对话框的内容-->
                     <h:panelGroup rendered="#{v2SupplierPmOrderController.isChecked() eq true}">
                         <label class="label">#{msg.MaintenanceProvider}</label>
-                        <p:selectOneMenu  value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
+                        <p:selectOneMenu filter="true" filterMatchMode="contains" value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{v2SupplierPmOrderController.findRepairPersonBatch()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                         </p:selectOneMenu>
