@@ -193,7 +193,7 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{!pmOrderGlobalController.isAutoAck(v2SupplierPmOrderController.selectedPmOrder)}">
                             <label class="label">验收人*</label>
-                            <p:selectOneMenu  value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                            <p:selectOneMenu filter="true" filterMatchMode="contains" value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
                                 <f:selectItems value="#{pmOrderGlobalController.getAckerList(v2SupplierPmOrderController.selectedPmOrder.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
