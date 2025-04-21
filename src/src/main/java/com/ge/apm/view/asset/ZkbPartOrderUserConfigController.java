@@ -156,12 +156,22 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         }else {
             backUpUser =new ZkbPartOrderUserConfig();
         }
-        if("ManagePending".equals(selected.getConfigType())){
-            zkbZoneList = zkbZoneRepository.findByRegion(selected.getRegion());
+        if (showZone()) {
+            zkbZoneList = zkbZoneRepository.find();
             if(StringUtils.isNotEmpty(selected.getZone())){
                 selectedZoneStr = Arrays.asList(selected.getZone().split(","));
             }
         }
+    }
+
+    public boolean showZone(){
+        if(ZkbPartOrderStep.PartOrderStep.ManagePending.name().equals(this.selected.getConfigType())){
+            return true;
+        }
+        if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name().equals(this.selected.getConfigType()) && "US".equals(selected.getAssetType())){
+            return true;
+        }
+        return false;
     }
 
     private void initBackUpList(String configType) {
@@ -284,7 +294,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         } else {
             this.selected.setTestStatus("f");
         }
-        if ("ManagePending".equals(this.selected.getConfigType())) {
+        if (showZone()) {
             if (selectedZoneStr.size() == 0) {
                 WebUtil.addErrorMessage("zone不能为空！");
                 return;

@@ -141,13 +141,12 @@
                     <p:column headerText="#{msg.zkbContract_contractNo}" >
                         <h:outputText value="#{item.contractNo}"/>
                     </p:column>
-                    <p:column headerText="#{msg.zkbContract_region}">
+                    <!--<p:column headerText="#{msg.zkbContract_region}">
                         <h:outputText value="#{item.region}"/>
-                    </p:column>
+                    </p:column>-->
                     <p:column headerText="#{msg.zkbContract_contractType}">
                         <h:outputText value="#{item.contractType}"/>
                     </p:column>
-
                     <p:column headerText="#{msg.zkbContract_ibNumber}">
                         <h:outputText value="#{item.ibNumber}"/>
                     </p:column>
@@ -242,7 +241,7 @@
                                 <p:ajax event="change" update="zkbPartOrderEditForm:warmMessageCT"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.radiationQuotaTypeFlag}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Parts'}">
                             <label class="label">名额扣除类型*</label>
                             <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" disabled="#{zkbPartOrderEditController.spareArtificialFlag}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="partsHighTypeGroup zkbDetailDatalist remainQty" listener="#{zkbPartOrderEditController.calcRemainQty}"/>
@@ -349,13 +348,13 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                       <!-- <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">zone*</label>
                             <p:inputText value="#{zkbPartOrderEditController.selected.zone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" disabled="true" />
