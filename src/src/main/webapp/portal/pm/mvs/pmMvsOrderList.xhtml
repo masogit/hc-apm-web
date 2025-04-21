@@ -142,7 +142,7 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
-                <p:column width="90" headerText="主子工单" rendered="#{userContextService.isEnableBtnByKey('displayMainSubPmOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
+                <p:column width="90" headerText="主子工单" rendered="#{!userContextService.isEnableBtnByKey('displayMainSubPmOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataListgl').filter()">
                             <f:selectItem itemLabel="#{msg.All}" itemValue="" />
