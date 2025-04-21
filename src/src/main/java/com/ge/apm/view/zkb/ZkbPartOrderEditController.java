@@ -281,7 +281,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void initRadiationQuotaTypeList() {
         //重新初始化
-        radiationQuotaTypeFlag = true;
+        //radiationQuotaTypeFlag = true;
         spareArtificialFlag = false;
         selected.setRadiationQuotaType(null);
         List<I18nMessage> removeList = new ArrayList<>();
@@ -337,6 +337,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(CollectionUtils.isNotEmpty(removeList)){
             zkbPoPartQuotaTypeList.removeAll(removeList);
         }
+        radiationQuotaTypeFlag = zkbPoPartQuotaTypeList.stream().map(I18nMessage::getMsgKey).filter(t -> t.equals(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString())).findAny().isPresent();
+
     }
     public void workOrderView(String id){
         String url = "actionName=View&selectedid=" + id + "&queryIndex=0";

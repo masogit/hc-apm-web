@@ -274,7 +274,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if("US".equals(zkbPartOrderUserConfig.getAssetType())){
-                        mm.put("onlineEngineer", zkbPartOrderUserConfig.getId());
+                        if(StrUtil.isNotEmpty(zkbPartOrderUserConfig.getZone())){
+                            List<String> zones = Arrays.asList(zkbPartOrderUserConfig.getZone().split(","));
+                            mm.put("zone", zones);
+                        }
                         mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
                     }else {
                         mm.put("assetTypeDi", zkbPartOrderUserConfig.getAssetType());
@@ -438,10 +441,17 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         if (ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())) {//技术支持
                             if ("US".equals(zkbPartOrderUserConfig.getAssetType())) {
                                 if (StringUtils.isEmpty(queryStatus)) {
-                                    Predicate pre1 = builder.equal(root.get("onlineEngineer"), zkbPartOrderUserConfig.getId());
-                                    Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
-                                    Predicate pre3 = builder.and(pre2, pre1);
-                                    userConfigPredicates.add(pre3);
+                                    if(StrUtil.isNotEmpty(zkbPartOrderUserConfig.getZone())){
+                                        List<String> strs = Arrays.asList(zkbPartOrderUserConfig.getZone().split(","));
+                                        Expression<String> exp = root.get("zone");
+                                        Predicate pre1 = exp.in(strs);
+                                        Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+                                        Predicate pre4 = builder.isNull(root.get("assetTypeDi"));
+                                        Predicate pre3 = builder.and(pre1, pre2,pre4);
+                                        userConfigPredicates.add(pre3);
+                                    }else{
+                                        predicates.add(builder.isFalse(builder.literal(true)));
+                                    }
                                 } else if ("all".equals(queryStatus)) {
                                     userConfigPredicates.add(builder.equal(root.get("onlineEngineer"), zkbPartOrderUserConfig.getId()));
                                 }
