@@ -22,12 +22,20 @@
                         <label class="label">#{msg.ConfigItemUseParent}*</label>
                         <p:selectBooleanCheckbox id="isEnabled" value="#{superAdminConfigItemController.selected.userParentConfig}" disabled="true" label="启用" style="color: rgb(170, 170, 170)" />
                     </h:panelGroup>-->
-                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 1}">
+                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 1 and  superAdminConfigItemController.selected.key ne 'workOrderScript'}">
                         <label class="label">#{msg.ConfigItemValue}</label>
                         <p:inputTextarea id="valueStr" value="#{superAdminConfigItemController.selected.showValue}"
                                          rows="5" cols="50" required="true" style="width: 95%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
                             <f:validateRegex disabled="#{empty superAdminConfigItemController.selected.validation}" pattern="#{superAdminConfigItemController.selected.validation}"/>
                         </p:inputTextarea>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 1 and  superAdminConfigItemController.selected.key eq 'workOrderScript'}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:commandLink value="#{superAdminConfigItemController.selected.name}" ajax="false" actionListener="#{fileDownloadService.downloadFile( superAdminConfigItemController.uploadedFileObject ne null ?  superAdminConfigItemController.uploadedFileObject.objectStorageId:   superAdminConfigItemController.selected.defaultValue)}" styleClass="p-mr-2"/>
+
+                        <p:fileUpload id="type1"  allowTypes="/(\.|\/)(xls|xlsx|XLS|XLSX)$/" fileUploadListener="#{superAdminConfigItemController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:50%"
+                                      multiple="true"  sizeLimit="50000000" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}50M" label="#{msg.Add}" update="configItemEditForm"/>
+
                     </h:panelGroup>
                     <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 2}">
                         <label class="label">#{msg.ConfigItemValue}</label>
