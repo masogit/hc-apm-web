@@ -909,8 +909,8 @@ public class AssetImportDataCheckService {
             }
             return assetGroupSecondary.get(mappingKey);
 
+        }else{
+            return assetGroupSecondaryValue;
         }
-        return null;
-
     }
 }
