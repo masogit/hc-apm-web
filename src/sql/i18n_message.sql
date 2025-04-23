@@ -93,13 +93,13 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','issueDate','发行日期','Issue Date',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','submitDate','提交日期','Submit Date',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','submitWechatId','提交人','Submitted by',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AccountLocked','帐号被锁定，请24小时后再试!','The account is locked. Please try it again after 24 hours!',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AccountLocked','账号被锁定，请24小时后再试!','The account is locked. Please try it again after 24 hours!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SamePwd','新老密码不能相同!','The new password cannot be the same as the old one!',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','lockAccount','锁定帐号','Lock Account',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','lockAccountConfirm','您确定要锁定此帐号么?','Are you sure you want to lock this account?',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','unlockAccount','解锁帐号','Unlock Account',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','unlockAccountConfirm','您确定要解锁此帐号么?','Are you sure you want to unlock this account?',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AccountNotActivated','对不起，此帐号已经被冻结.','Sorry, this account is not activated.',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','lockAccount','锁定账号','Lock Account',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','lockAccountConfirm','您确定要锁定此账号么?','Are you sure you want to lock this account?',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','unlockAccount','解锁账号','Unlock Account',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','unlockAccountConfirm','您确定要解锁此账号么?','Are you sure you want to unlock this account?',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AccountNotActivated','对不起，此账号已经被冻结.','Sorry, this account is not activated.',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','HomePageHospitalHead','我的主页(院长)','Home Page (Hospital Head)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','HomePageDeptHead','我的主页(主任)','Home Page (Department Head)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','HomePageAssetHead','我的主页(设备科)','Home Page (Equipment Department)',NULL,-1);
@@ -196,7 +196,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SiteInfo','医联体/租户信息','Site/Tenant Information',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','TenantInfo','租户','Tenant',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','OrgInfo','组织机构信息','Organization Information',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','UserAccount','用户帐号信息','User Account Information',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','UserAccount','用户账号信息','User Account Information',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AssetInfo','资产信息','Asset Information',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','WorkOrder','维修工单','Workorder',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','WorkOrderStep','工单步骤','Workorder Step',NULL,-1);
@@ -740,7 +740,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','continue','继续','Continue',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','TerminatedAsset','报废资产','Terminated Asset',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','To','到','To',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Profile','我的帐号','My Account',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Profile','我的账号','My Account',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('month','4','四月','April',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','name','名称','Name',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','PmOrder','保养记录','PM Record',NULL,-1);
@@ -875,7 +875,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','WhenIsFinished','任务完成时，%s不能为空.','%s cannot be empty when the task is finished',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','ResetConformation','重置确认','Reset Conformation',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','ResetConformationMsg','您确定要重置选定用户的密码么?','Are you sure you want to reset the password of the selected user?',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','passwordResetTips','您使用的是系统初始密码。为保证您的帐号安全，建议您立即修改密码.','You are using the initial system password. To keep your account secure, we recommend that you change your password immediately.',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','passwordResetTips','您使用的是系统初始密码。为保证您的账号安全，建议您立即修改密码.','You are using the initial system password. To keep your account secure, we recommend that you change your password immediately.',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','AllHospitals','所有院区','All Sites',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','ViewHistoryWorkOrder','查看历史报修','View History Workorder',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','WarningForUpdateQRCode','此设备已绑定二维码，继续此操作会更新编码','This equipment is already bound to the QR code. If you continue this operation, the code will be updated.',NULL,-1);

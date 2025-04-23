@@ -5,14 +5,16 @@ import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.ConfigItemRepository;
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.ConfigItem;
-import com.ge.apm.domain.ConfigItemValue;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -47,11 +49,17 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     private List<String> multiSelected;
     private static final String VALUE ="value";
 
+    private UploadedFile file;
+    @Getter
+    @Setter
+    private V2_BlobObject uploadedFileObject;
+    private BlobFileService blobService;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ConfigItemRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         user = UserContextService.getCurrentUserAccount();
 
         selectSite = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -154,6 +162,12 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     }
 
     public void saveConfig(){
+        if("workOrderScript".equals(this.selected.getKey())){
+            saveConfigItem();
+            return;
+        }
+
+
         if(this.selectSite != null){
             if( selected.getValueType()!=8 &&  !regularCheck()){
                 logger.info("配置项保存，正则校验不通过：");
@@ -201,6 +215,16 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
             configItemValueRepository.save(configItemValue);
         }
     }
+
+    private void saveConfigItem() {
+        selected.setDefaultValue(uploadedFileObject.getObjectStorageId());
+        dao.save(selected);
+        uploadedFileObject = null;
+        file=null;
+        selected = null;
+        WebUtil.addSuccessMessage("保存成功");
+    }
+
     public boolean regularCheck(){
         if(selected == null) return Boolean.FALSE;
         String validation = selected.getValidation();
@@ -267,6 +291,12 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
             default:
         }
         return "";
+    }
+
+    public void uploadDataFile(FileUploadEvent event) {
+        this.file = event.getFile();
+        uploadedFileObject = blobService.uploadFile(file);
+        logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
     }
 
     public String getDefaultValue(String key) {

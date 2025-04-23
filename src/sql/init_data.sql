@@ -27,7 +27,7 @@ INSERT INTO sys_role(id,name,role_desc,home_page) values ('5', 'ITAdmin', '后�
 --INSERT INTO sys_role(id,name,role_desc,home_page) values ('6', 'MultiHospital', '多院区管理', '');
 INSERT INTO sys_role(id,name,role_desc,home_page) values ('7', 'ClinicalStaff', '临床科室人员', '/homeAssetStaff.xhtml');
 
-INSERT INTO sys_role(id,name,role_desc,home_page) values ('9', 'Guest', '临时报修帐号', '/homeAssetStaff.xhtml');
+INSERT INTO sys_role(id,name,role_desc,home_page) values ('9', 'Guest', '临时报修账号', '/homeAssetStaff.xhtml');
 
 
 INSERT INTO user_account(id,site_id,hospital_id,org_id,login_name,name,pwd_salt,password,email,telephone,is_super_admin,is_site_admin,is_local_admin,is_active,is_online,last_login_time) VALUES ('0', '1', '1', '1', 'ad341656e9bd67a165df', 'guest', 'e4c22e5a7207c3f9', 'd340ff7d7dee42ad341656e9bd67a165dfb67d0d6fb07e4ba856ee12c560ccd9', '90cd3b3d5546809287c0@qq.com', '00000000', 'f', 'f', 'f', 't', 'f', '2017-05-20 13:07:33');
