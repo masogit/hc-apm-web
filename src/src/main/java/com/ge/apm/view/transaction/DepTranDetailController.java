@@ -169,8 +169,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     }
     Integer totalSize;
     /*userId 有两种情况
-       1 当前登陆的用户是非科室主任,那么userId就是当前登陆的用户
-       2 或者创建科务的用户id(这种情况是当登陆用户以主任角登陆后选择某个科务汇总表数据时传过来的创建科务的那个userId)*/
+       1 当前登录的用户是非科室主任,那么userId就是当前登录的用户
+       2 或者创建科务的用户id(这种情况是当登录用户以主任角登录后选择某个科务汇总表数据时传过来的创建科务的那个userId)*/
     public List<DeptTransactionLog> refreshLoadData(DepTranForTrans dep){
         if(startTime==null){
             dep.setStartTime(TimeUtils.getCurrentStartYYMM());

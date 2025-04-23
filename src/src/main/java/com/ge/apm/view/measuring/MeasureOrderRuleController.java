@@ -120,7 +120,7 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
         //searchFilters.clear();
         //this.tenantUid = tenantUid;
         TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isInsulate()){
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());

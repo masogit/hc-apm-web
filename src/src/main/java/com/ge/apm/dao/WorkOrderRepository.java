@@ -23,7 +23,7 @@ public interface WorkOrderRepository extends GenericRepository<WorkOrder> {
     public List<WorkOrder> findByAssetIdOrderByIdDesc(Integer assetId);
 
 
-    /*1104_sql:取出登陆人所在的科室下的所有用户*/
+    /*1104_sql:取出登录人所在的科室下的所有用户*/
     /*@Query(value="select wo.* from work_order wo where wo.asset_id in(\n" +
             "select asinfo.id from asset_info asinfo where clinical_dept_id in ( select org_id from user_account where id = ?1 )) and status =?2 ", nativeQuery = true)*/
     @Query(value="select wo.* from work_order wo where from_dept_id in (select org_id from user_account where id = ?1) and status =?2 order by ?#{#pageable}",

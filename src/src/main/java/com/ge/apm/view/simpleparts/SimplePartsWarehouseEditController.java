@@ -48,7 +48,7 @@ public class SimplePartsWarehouseEditController extends GenericCRUDUUIDControlle
     private String treeNodeNameFilter;
 
     /**
-     * 当前登陆人可用的最大权限的TreeNode,仓库使用
+     * 当前登录人可用的最大权限的TreeNode,仓库使用
      */
     @Getter
     @Setter
@@ -144,7 +144,7 @@ public class SimplePartsWarehouseEditController extends GenericCRUDUUIDControlle
 
     public void rebuildSPTree() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.checkRole(SimplePartsConstant.PARTS_ADMIN_MANAGER)) {
             enableOrgTree = uaaService.getOrgTreeBySite(userAccount.getSiteUID());
         } else {
