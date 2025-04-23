@@ -129,7 +129,7 @@ public class ToBeTerminatedTemplateController extends GenericCRUDUUIDController<
 
     public void setTenantUid(String tenantUid) {
         TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isOnlyLocalITAdmin()) {
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());

@@ -443,7 +443,7 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
     }
 
     public void rebuildOrgTree() {
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isOnlyLocalITAdmin()) {
             orgTree = getOrgTreeBySite(user.getSiteUID());
         } else {

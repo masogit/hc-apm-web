@@ -138,7 +138,7 @@ public class AssetFinacingNumGenerateService {
      * @param 1、assetId 如果有assetId，后面的三个字段可以为null,nationalStardCode
      * @param 2、nationalStardCode 国标码
      * @param clinicalId 科室id
-     * @param user 当前登陆者，如果科室id为空，则user必输
+     * @param user 当前登录者，如果科室id为空，则user必输
      * @return
      */
 //    @Deprecated

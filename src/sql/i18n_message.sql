@@ -3274,7 +3274,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AlertSettingsList', '报警设置清单', 'Alert Settings List', NULL, '-1');
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WelcomeToTheGEAPMAssetCloudPlatform', '欢迎使用 GE APM 资产云平台', 'Welcome to the GE APM Asset Cloud Platform', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FirstUserLoginActivation', '用户首次登陆激活', 'First User Login Activation', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FirstUserLoginActivation', '用户首次登录激活', 'First User Login Activation', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AgreementAndConfirmToActivateTheAccountNotice', '我已阅读相关用户协议并确认激活账号', 'I have read the relevant user agreement and confirm to activate the account', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Lisence1', '当您勾选选择“已阅读相关用户协议并确认激活账号”，即表示您已经达成本协议，承诺并遵守本协议的规定， 正式激活用户账号，同意并接受全部服务条款及条件。', 'When you select "I have read the relevant user agreement and confirm to activate the account",  it means that you have reached this agreement; promised to abide by the provisions of this agreement; formally activate the user account; and agree and accept all the terms and conditions of service.', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Lisence2', '用户在使用本服务时，应当遵守《中华人民共和国宪法》、《中华人民共和国刑法》、《中华人民共和国民法通则》、《中华人民共和国合同法》、《中华人民共和国著作权法》、《中华人民共和国电信条例》、《互联网信息服务管理办法》、《互联网电子公告服务管理规定》、《计算机信息网络国际互联网安全保护管理办法》等相关规定。配套增值电信服务由上海理想信息产业（集团）有限公司直接向客户提供，客户同意由电信负责云运行。用户不得利用本服务产品从事违反法律法规、政策以及侵犯他人合法权益的行为，包括但不限于下列行为：', 'When using this service, users shall abide by the Constitution of the People''s Republic of China, the Criminal Law of the People''s Republic of China, the General Principles of the Civil Law of the People''s Republic of China, the Contract Law of the People''s Republic of China, the Copyright Law of the People''s Republic of China, the Regulations of the People''s Republic of China on Telecommunications, the Measures for the Administration of Internet Information Services, the Regulations on the Administration of Internet Electronic Announcement Services, and the Measures for the Administration of Internet Security of Computer Information Networks. The supporting value-added telecommunications services are provided directly by the Shanghai Ideal Information Industry (Group) Co., Ltd., and the customers agree that the telecommunications is responsible for the cloud operation. Users may not use this service product to engage in violations of laws, regulations, policies, and violations of the lawful rights and interests of others, including but not limited to the following:', NULL, '-1');
@@ -3283,7 +3283,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Lisence13', '1.3 进行任何危害计算机网络安全的行为，包括但不限于：使用未经许可的数据或进入未经许可的服务器/帐户; 未经允许进入公众计算机网络或者他人计算机系统并删除、修改、增加存储信息;未经许可，企图探查、扫描、测试本“软件”系统或网络的弱点或其它实施破坏网络安全的行为;企图干涉、破坏本“软件”系统或网站的正常运行，故意传播恶意程序或病毒以及其他破坏干扰正常网络信息服务的行为;伪造TCP/IP数据包名称或部分名称;自行或利用其他软件对本产品进行反向破解等违法行为。', '1.3 Have any act of endangering the computer network security, including but not limited to: use of unlicensed data or access to unlicensed servers/accounts; unauthorized access to public computer networks or others’ computer systems, and deletion, modification and addition of any stored information; attempt to probe, scan and test the weaknesses of the "software" system or network, or other actions that undermine network security; attempt to interfere with and disrupt the normal operation of the "software" system or website, and intentionally spread any malicious program or virus and other acts that disrupt or interfere with the normal network information services; falsifying the TCP/IP packet names or partial names; and illegally cracking the product by itself or by using any other software.', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Lisence14', '1.4 进行任何诸如发布广告、推广信息、销售商品的行为，或者进行任何非法的侵害服务提供商利益的行为。', '1.4 Have any act of advertising, information promotion, sales of goods, or any illegal infringement upon the service provider’s interests. ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Lisence15', '1.5 进行其他任何违法以及侵犯其他个人、公司、社会团体、组织的合法权益的行为或者法律、行政法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其他行为。', '1.5 Have any other act that violates the laws and infringes the lawful rights and interests of other individuals, companies, social groups or organizations, or are restricted or prohibited by the laws, administrative regulations, rules, regulations, and any legally binding norms.', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WelcomeToAPMManagementPlatform', '欢迎登陆APM管理平台！', 'Welcome to APM Management Platform!', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WelcomeToAPMManagementPlatform', '欢迎登录APM管理平台！', 'Welcome to APM Management Platform!', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CheckAndStore', '核对入库', 'Check and Store', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetOutStock', '资产出入库', 'Assets in and out of warehouse', NULL, '-1');
 
@@ -4419,7 +4419,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_222','其他','其他','',NULL,-1,99);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_223','WEB浏览只显示波形不显示字库','WEB浏览只显示波形不显示字库','',NULL,-1,1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_223','无法登陆客户端','无法登陆客户端','',NULL,-1,2);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_223','无法登录客户端','无法登录客户端','',NULL,-1,2);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_223','没有患者信息','没有患者信息','',NULL,-1,3);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_223','医生工作站无法浏览报告','医生工作站无法浏览报告','',NULL,-1,4);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_223','其他','其他','',NULL,-1,99);
@@ -4559,17 +4559,17 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','comment','备注','comment',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','isLocked','锁定？','is locked',NULL,-1);
 
--- menu菜单(日志审计： 用户修改记录， 资产修改记录， 登陆历史记录)
+-- menu菜单(日志审计： 用户修改记录， 资产修改记录， 登录历史记录)
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','logView','日志审计','log view',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','userModifyRecord','用户修改记录','user modify record',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetModifyRecord','资产修改记录','asset modify record',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginHistoryRecord','登陆历史记录','login record',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginHistoryRecord','登录历史记录','login record',NULL,-1);
 
--- '日志审计-登陆历史记录'页面的字段
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginName','登陆姓名','login name',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginUrl','登陆网址','login url',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginIp','登陆ip','login ip',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginTime','登陆时间','login time',NULL,-1);
+-- '日志审计-登录历史记录'页面的字段
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginName','登录姓名','login name',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginUrl','登录网址','login url',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginIp','登录ip','login ip',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginTime','登录时间','login time',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','logoutTime','登出时间','logout time',NULL,-1);
 --2021-05-24  end
 
