@@ -447,7 +447,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                                         Predicate pre1 = exp.in(strs);
                                         Predicate pre2 = builder.equal(root.get("currentStep"), ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
                                         Predicate pre4 = builder.isNull(root.get("assetTypeDi"));
-                                        Predicate pre3 = builder.and(pre1, pre2,pre4);
+                                        Predicate pre5 = builder.equal(root.get("assetTypeDi"), "");
+                                        Predicate pre6 = builder.or(pre4, pre5);
+                                        Predicate pre3 = builder.and(pre1, pre2,pre6);
                                         userConfigPredicates.add(pre3);
                                     }else{
                                         predicates.add(builder.isFalse(builder.literal(true)));

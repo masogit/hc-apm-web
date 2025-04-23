@@ -4,7 +4,6 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -312,8 +311,7 @@ public class ZkbPartOrderEditService {
                     }
                 } else if (assetInfo.getAssetGroup() == 1 && StrUtil.isNotEmpty(assetInfo.getMainDirectory())) {
                     String[] xrs = {"WIX MAMMO", "WIX SURGEY", "WIX RF", "WIX DXR", "WIX BMD"};
-                    List<String> xrList = Arrays.asList(xrs);
-                    ;
+                    List<String> xrList = Arrays.asList(xrs);;
                     if ("CT".equals(assetInfo.getMainDirectory())) {
                         selected.setAssetTypeDi("CT");
                     } else if (xrList.contains(assetInfo.getMainDirectory())) {
@@ -503,12 +501,12 @@ public class ZkbPartOrderEditService {
 
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType()) && !ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
-                errorLog.append("在线工程师不能为空！");
+                //errorLog.append("在线工程师不能为空！");
             }
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(v2_blobObjectList == null || v2_blobObjectList.size() == 0){
-                errorLog.append("附件不能为空！");
+                //errorLog.append("附件不能为空！");
             }
         }else{
             if(CopyByInvok.F.equals(selected.getSsaKeyFlag()) && checkPcbMvsTotal(selectedContract)){

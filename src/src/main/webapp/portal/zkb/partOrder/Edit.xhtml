@@ -525,7 +525,8 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:fieldset id="zkbPartOrderOnlineFieldset" legend="在线工程师" rendered="#{(zkbPartOrderEditController.selected.orderType eq 'Parts' or zkbPartOrderEditController.selected.orderType eq 'Probe') and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }" >
+                <!--<p:fieldset id="zkbPartOrderOnlineFieldset" legend="在线工程师" rendered="#{(zkbPartOrderEditController.selected.orderType eq 'Parts' or zkbPartOrderEditController.selected.orderType eq 'Probe') and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }" >-->
+                <p:fieldset id="zkbPartOrderOnlineFieldset" legend="在线工程师" rendered="false" >
                     <h:panelGroup>
                         <p:dataTable id="onlineList" value="#{zkbPartOrderEditController.zkbPartOrderUserConfigList}" var="item"
                                      widgetVar="onlineList"  selection="#{zkbPartOrderEditController.selected.onlineEngine}"

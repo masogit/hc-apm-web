@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,10 +68,11 @@ public class ZkbPartOrderStatusService {
             }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep())){
                 if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 2){
-                        ZkbPartOrderUserConfig zkbPartOrderUserConfig = selected.getOnlineEngine();
+                        /*ZkbPartOrderUserConfig zkbPartOrderUserConfig = selected.getOnlineEngine();
                         if(zkbPartOrderUserConfig != null){
                             zkbPartOrderUserConfigs.add(zkbPartOrderUserConfig);
-                        }
+                        }*/
+                        zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContains(selected.getCurrentStep(), selected.getZone());
                     }else if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 1){
                         zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(selected.getCurrentStep(),selected.getAssetTypeDi());
                     }
