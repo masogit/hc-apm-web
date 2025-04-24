@@ -1727,7 +1727,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
         orgList = new ArrayList<>();
         orgListMVS = new ArrayList<>();
-        //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
+        //如果是院长等管理层登录进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -1904,7 +1904,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return tagNoGroupAssets;
     }
 
-    //获取当前登陆人可看到的设备, 这个人需要在标签组里面
+    //获取当前登录人可看到的设备, 这个人需要在标签组里面
     private List<Integer> getTagGroupAssets() {
         if (tagGroupAssets == null) {
             tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());

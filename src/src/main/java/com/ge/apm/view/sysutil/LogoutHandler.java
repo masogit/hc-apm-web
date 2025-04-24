@@ -63,7 +63,7 @@ public class LogoutHandler extends SimpleUrlLogoutSuccessHandler implements Logo
             }
 
             LoginRecord newLoginRecord = oldLoginRecord;
-            //先删除旧的登陆记录，再更新登出时间
+            //先删除旧的登录记录，再更新登出时间
             loginRecordRepository.delete(oldLoginRecord);
             newLoginRecord.setIsDeleted(true);
             newLoginRecord.setLogoutTime(new Date());

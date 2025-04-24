@@ -222,7 +222,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     public void createQrCode() {
 
-        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        //判断是否有权限(只能操作当前登录用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedOrg.getSiteUID())) {
             return;
         }

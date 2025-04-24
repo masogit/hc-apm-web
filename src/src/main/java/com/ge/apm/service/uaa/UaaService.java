@@ -199,7 +199,7 @@ public class UaaService {
                 srVO.setRoleDesc(tempSysRole.getRoleDescEn());
             }*/
             srVO.setRoleType(0);
-            //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+            //判断登录用户是否是LocalITAdmin(本地后台运营管理)
             if(UserContextService.isOnlyLocalITAdmin()){
                 if("ITAdmin".equals(tempSysRole.getName())){
                     //srVO.setDisable(Boolean.TRUE);

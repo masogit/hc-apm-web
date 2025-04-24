@@ -412,7 +412,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void rebuildOrgTree() {
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isOnlyLocalITAdmin()) {
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         } else {
@@ -668,7 +668,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         /*TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
 
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
             List<String> disableRoleList = new ArrayList<>();
             disableRoleList.add("ITAdmin");
@@ -769,7 +769,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
-        //如果登陆用户角色是LocalITAdmin，修改用户角色保证有ITAdmin角色的用户，ITAdmin角色不丢失
+        //如果登录用户角色是LocalITAdmin，修改用户角色保证有ITAdmin角色的用户，ITAdmin角色不丢失
         if (UserContextService.isOnlyLocalITAdmin()) {
             List<UserRole> tempUserRole = selected.getUserRoleList().stream().filter(item -> item.getRole().getName().equals("ITAdmin")).collect(Collectors.toList());
             if (!tempUserRole.isEmpty()) {

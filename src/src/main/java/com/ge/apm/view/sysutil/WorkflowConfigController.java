@@ -210,7 +210,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     }
 
     public void setTenantUid(String tenantUid) {
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isInsulate()) {
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
         } else {
@@ -634,7 +634,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
         onBeforeSave(selected);
 
-        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        //判断是否有权限(只能操作当前登录用户级别以下的和自己相同siteuid的数据)
 //        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
 //            return;
 //        }
@@ -696,7 +696,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
     @Override
     public void delete() {
-        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        //判断是否有权限(只能操作当前登录用户级别以下的和自己相同siteuid的数据)
 //		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
 //			return;
 //		}
