@@ -97,6 +97,8 @@
                 <p:menuitem id="um321" value="#{msg.zkbKnowledgeMgmt} New" outcome="/portal/asset/fileAttachment/zkbFileAttachment/List.xhtml" rendered="#{userContextService.accessContains('knowledge.zkbMgt') and userContextService.zkbAdmin}"/>
                 <p:menuitem id="um322" value="#{msg.zkbKnowledgeView} New" outcome="/portal/asset/fileAttachment/zkbFileAttachment/ZkbUserList.xhtml" rendered="#{userContextService.accessContains('knowledge.zkbView') and userContextService.zkbUser}"/>
                 <p:menuitem id="um323" value="文档目录管理" outcome="/portal/zkb/fileDirectory/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>
+                <p:menuitem value="维修手册查看" url="https://www.gehealthcare.com/support/manuals" target="_blank" />
+
                 <p:menuitem id="um33" value="#{msg.AssetKMMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um34" value="#{msg.DeviceMgmtForum}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um35" value="#{msg.DeviceApplication}" rendered="false" style="color: orange;" outcome="/empty"/>

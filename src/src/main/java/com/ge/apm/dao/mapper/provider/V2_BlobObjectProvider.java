@@ -45,7 +45,7 @@ public class V2_BlobObjectProvider {
                 " where warranty_date>=to_date(to_char(now(),'yyyyMMdd'),'yyyyMMdd') and asset_group = '1' and is_deleted = false and is_valid = true and tenant_uid = '"+tenantUid+"' limit 1)) directory" +
                 " where directory.main_directory = bo.main_directory " +
                 " and directory.second_directory = bo.second_directory)" +
-                " and bo.bo_type ='"+boType+"'"+
+                " and bo.bo_type ='"+boType+"' and bo.bo_sub_type in ('OperationManual', 'OperationVideo')"+
                 " UNION" +
                         " SELECT" +
                         " bo. ID," +
@@ -66,7 +66,9 @@ public class V2_BlobObjectProvider {
                         " bo.main_directory, " +
                         " bo.second_directory " +
                         "FROM" +
-                        " v2_blob_object bo WHERE bo.bo_type = '"+boType+"' AND (bo.main_directory='ALL' AND bo.second_directory='ALL')) as bo where 1=1 ");
+                        " v2_blob_object bo WHERE bo.bo_type = '"+boType+"'" +
+                " and bo.bo_sub_type in ('OperationManual', 'OperationVideo') " +
+                " AND (bo.main_directory='ALL' AND bo.second_directory='ALL')) as bo where 1=1 ");
         String filter = buildFilter_V2_BlobObjectDetail(searchFilterList);
         sb.append(filter);
         return sb.toString();
