@@ -162,12 +162,6 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     }
 
     public void saveConfig(){
-        if("workOrderScript".equals(this.selected.getKey())){
-            saveConfigItem();
-            return;
-        }
-
-
         if(this.selectSite != null){
             if( selected.getValueType()!=8 &&  !regularCheck()){
                 logger.info("配置项保存，正则校验不通过：");
@@ -213,16 +207,14 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
             }
 
             configItemValueRepository.save(configItemValue);
+            clear();
         }
     }
 
-    private void saveConfigItem() {
-        selected.setDefaultValue(uploadedFileObject.getObjectStorageId());
-        dao.save(selected);
+    private void clear() {
         uploadedFileObject = null;
         file=null;
         selected = null;
-        WebUtil.addSuccessMessage("保存成功");
     }
 
     public boolean regularCheck(){
@@ -296,6 +288,9 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     public void uploadDataFile(FileUploadEvent event) {
         this.file = event.getFile();
         uploadedFileObject = blobService.uploadFile(file);
+        if(uploadedFileObject!=null){
+            selected.setShowValue(uploadedFileObject.getObjectStorageId());
+        }
         logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
     }
 

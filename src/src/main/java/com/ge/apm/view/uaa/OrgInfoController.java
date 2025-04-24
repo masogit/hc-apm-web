@@ -134,7 +134,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             orgTree = null;
             return;
         }
-        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        //判断登录用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isOnlyLocalITAdmin()) {
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         } else {
@@ -351,7 +351,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void saveSelectedOrg() {
-        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        //判断是否有权限(只能操作当前登录用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
             return;
         }
@@ -486,7 +486,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     private Boolean canDelete() {
-        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        //判断是否有权限(只能操作当前登录用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
             return false;
         }

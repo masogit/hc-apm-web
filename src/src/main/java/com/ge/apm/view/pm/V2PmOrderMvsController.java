@@ -297,7 +297,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
         orgListMVS = new ArrayList<>();
-        //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
+        //如果是院长等管理层登录进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
