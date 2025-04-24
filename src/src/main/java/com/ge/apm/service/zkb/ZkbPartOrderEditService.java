@@ -3,6 +3,8 @@ package com.ge.apm.service.zkb;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import com.sun.faces.util.CollectionsUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -500,13 +502,18 @@ public class ZkbPartOrderEditService {
         }
 
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType()) && !ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
-            if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
+            //超声类add校验
+            if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2){
+                List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndZoneContainsAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), selected.getZone(), "US");
+                if(CollectionUtils.isEmpty(zkbPartOrderUserConfigs)){
+                    errorLog.append("未匹配到相应的技术支持审批人员！");
+                }
                 //errorLog.append("在线工程师不能为空！");
             }
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             if(v2_blobObjectList == null || v2_blobObjectList.size() == 0){
-                //errorLog.append("附件不能为空！");
+                errorLog.append("附件不能为空！");
             }
         }else{
             if(CopyByInvok.F.equals(selected.getSsaKeyFlag()) && checkPcbMvsTotal(selectedContract)){
