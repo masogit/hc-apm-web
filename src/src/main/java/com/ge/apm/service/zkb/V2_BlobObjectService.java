@@ -34,34 +34,29 @@ public class V2_BlobObjectService {
      * @param tenantUid 用户ID
      * @return
      */
-    public List<V2_BlobObject> loadZkbOrderHistoryData(String mainDirectory,String secondDirectory,String objectName,String boSubType,String operationType,String tenantUid){
+    public List<V2_BlobObject> loadZkbOrderHistoryData(String mainDirectory, String secondDirectory, String objectName, String boSubType, String operationType, String tenantUid) {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-        if(mainDirectory!=null)
-        {
+        if (mainDirectory != null) {
             SearchFilter dataTypeFilter = new SearchFilter("mainDirectory", SearchFilter.Operator.LIKE, mainDirectory);
             searchFilters.add(dataTypeFilter);
         }
-        if(secondDirectory!=null)
-        {
+        if (secondDirectory != null) {
             SearchFilter secondDirectoryFilter = new SearchFilter("secondDirectory", SearchFilter.Operator.LIKE, secondDirectory);
             searchFilters.add(secondDirectoryFilter);
         }
-        if(objectName!=null)
-        {
+        if (objectName != null) {
             SearchFilter objectNameFilter = new SearchFilter("objectName", SearchFilter.Operator.LIKE, objectName);
             searchFilters.add(objectNameFilter);
         }
-        if(boSubType!=null)
-        {
+        if (boSubType != null) {
             SearchFilter boSubTypeFilter = new SearchFilter("boSubType", SearchFilter.Operator.EQ, boSubType);
             searchFilters.add(boSubTypeFilter);
         }
-        if(operationType!=null)
-        {
+        if (operationType != null) {
             SearchFilter operationTypeFilter = new SearchFilter("operationType", SearchFilter.Operator.EQ, operationType);
             searchFilters.add(operationTypeFilter);
         }
-        return v2_BlobObjectMapper.loadV2_BlobObject(searchFilters,tenantUid,V2_BlobObject.BO_TYPE_ZKB);
+        return v2_BlobObjectMapper.loadV2_BlobObject(searchFilters, tenantUid, V2_BlobObject.BO_TYPE_ZKB);
     }
 
 }
