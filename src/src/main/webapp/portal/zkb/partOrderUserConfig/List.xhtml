@@ -38,7 +38,7 @@
                         <p:column headerText="#{msg.zkbKeyUserConfig_sso}" filterBy="#{item.sso}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.sso}"/>
                         </p:column>
-                        <p:column headerText="#{msg.zkbKeyUserConfig_region}" filterBy="#{item.region}" filterMatchMode="LIKE">
+                       <!-- <p:column headerText="#{msg.zkbKeyUserConfig_region}" filterBy="#{item.region}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbContractRegion', item.region)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -46,7 +46,7 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                        </p:column>
+                        </p:column>-->
 
                         <p:column headerText="Zone" filterBy="#{item.zone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.zone}"/>
