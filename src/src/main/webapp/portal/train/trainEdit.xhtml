@@ -84,7 +84,7 @@
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.createdDate}"
                              paginatorTemplate="{Toolbar}" rows="200" emptyMessage="#{msg.noRecordFound}" >
 
-                    <p:ajax event="rowSelect" update="editDetailButton deleteDetailButton"/>
+                    <p:ajax event="rowSelect" update="editDetailButton deleteDetailButton qrCodeButton"/>
                     <p:column headerText="培训课程子名称" width="150">
                         <h:outputText value="#{item.name}"/>
                     </p:column>
@@ -131,6 +131,9 @@
                         <p:commandButton immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteItem}" update=":growl trainTab:editForm:detailDatalist " disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
+
+                        <p:commandButton id="qrCodeButton" immediate="false" process="@this"  icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{trainInSiteController.generateQrCode()}" update="trainTab:qrCodeDlg" oncomplete="PF('qrCodeDlg').show()"  disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}"/>
+
                     </f:facet>
                 </p:dataTable>
             </h:panelGroup>
@@ -160,5 +163,9 @@
         </h:form>
     </p:dialog>
     <ui:include src="trainDetailEdit.xhtml"/>
+
+    <p:dialog id="qrCodeDlg" widgetVar="qrCodeDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="410" header="签到二维码" height="410">
+        <img  style="border: 1px;border-color: grey;border-style: solid" src="#{trainInSiteController.qrCodeView()}"  width="400px" height="400px"/>
+    </p:dialog>
 </ui:composition>
 </html>

@@ -20,11 +20,17 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.xpath.operations.Bool;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.ultima.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +42,18 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TrainManageService extends MicroServiceInvoker {
 
+    @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
+    private String baseURL;
 
     @Autowired
     private TrainInfoRepository trainInfoRepository;
@@ -81,6 +93,11 @@ public class TrainManageService extends MicroServiceInvoker {
 
     @Autowired
     OrgInfoRepository orgInfoDao;
+
+    public String getBaseURL(){
+        return baseURL;
+    }
+
 
     public List<OrgDto> onCreateInventory(){
         List<OrgDto> orgDtoList = new ArrayList<>();
@@ -434,4 +451,22 @@ public class TrainManageService extends MicroServiceInvoker {
             return builder.and(predicates.toArray(new Predicate[0]));
         });
     }
+
+
+   public void generateQrCode(TrainDetail trainDetail){
+       if(trainDetail.getQrCodeGenerateDate() != null){
+           Date oldDate = trainDetail.getQrCodeGenerateDate();
+           oldDate = DateUtil.offsetMinute(oldDate, 30);
+           if(oldDate.compareTo(new Date()) > 0){
+               return;
+           }
+       }
+
+       trainDetail.setQrCodeGenerateDate(new Date());
+       StringBuilder sb = new StringBuilder();
+       sb.append("id=").append(trainDetail.getId());
+       sb.append("&time=").append(DateUtil.format(trainDetail.getQrCodeGenerateDate(), "yyyyMMddHHmmss"));
+       trainDetail.setQrCodeStr(sb.toString());
+       trainDetailRepository.save(trainDetail);
+   }
 }

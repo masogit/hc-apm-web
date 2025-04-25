@@ -80,6 +80,15 @@ public class TrainDetail implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
+
+    @Column(name = "qr_code_generate_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date qrCodeGenerateDate;
+
+    @Column(name = "qr_code_str")
+    private String qrCodeStr;
+
     @Transient
     List<V2_BlobObject> blobObjectList = new ArrayList<>();
 

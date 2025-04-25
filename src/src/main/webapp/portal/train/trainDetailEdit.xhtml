@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
    <p:dialog id="detailEditDialog" widgetVar="detailEditDialog" modal="true"  resizable="false" draggable="true" width="60%" height="650" appendTo="@(body)"  header="子课程" >
@@ -107,7 +107,6 @@
          <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{trainInSiteController.cancelDetail()}" oncomplete="PF('cancelDlg').hide();PF('detailEditDialog').hide();" update=":growl trainTab:editForm:detailDatalist" icon="ui-icon-check" />
          <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('cancelDlg').hide()"/>
       </h:form>
-
    </p:dialog>
 
    <p:dialog id="signDlg" widgetVar="signDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="300" header="签到信息" height="350">

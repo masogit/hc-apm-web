@@ -4,11 +4,14 @@ import com.ge.apm.dao.TrainInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.OrgDto;
 import com.ge.apm.domain.dto.TrainRoleDto;
+import com.ge.apm.service.asset.QrCodeDrawService;
+import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.train.TrainManageService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.qrcode.QrCodeSupportUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -86,6 +89,10 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     private String filterSigner;
     @Getter @Setter
     private List<UserAccount> clinicalOwnerList;
+
+    QrCodeDrawService qrCodeDrawService;
+
+
     @Override
     protected void init() {
         super.init();
@@ -94,6 +101,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         trainManageService = WebUtil.getBean(TrainManageService.class);
+        qrCodeDrawService = WebUtil.getBean(QrCodeDrawService.class);
         selectSite = userContextService.getLoginUserOrgInfo();
     }
 
@@ -353,6 +361,20 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         trainManageService.saveSign(selectedTrainDetailSign);
         trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetailSign.getDetailId());
         selectedTrainDetailSign = new TrainDetailSign();
+    }
+
+    public void generateQrCode(){
+        trainManageService.generateQrCode(selectedTrainDetail);
+    }
+
+    public String qrCodeView() throws Exception {
+        if(selectedTrainDetail != null && StrUtil.isNotEmpty(selectedTrainDetail.getQrCodeStr())){
+            String url = trainManageService.getBaseURL().replace("gateway","") + "/reports";
+            url = url + "?" + selectedTrainDetail.getQrCodeStr();
+            return  qrCodeDrawService.getImageBase64(QrCodeSupportUtil.createQrCodeWithoutLogo(selectedTrainDetail.getQrCodeStr(), url));
+        }else{
+            return "";
+        }
     }
     @Override
     protected GenericRepositoryUUID<TrainInfo> getDAO() {
