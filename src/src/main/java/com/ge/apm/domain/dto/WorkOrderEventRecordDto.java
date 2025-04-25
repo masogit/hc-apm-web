@@ -6,6 +6,7 @@ import java.util.Date;
 
 @Data
 public class WorkOrderEventRecordDto {
+    private String id;
     private Integer casePriority;
     private Date requestTime;
     private String requestReason;
