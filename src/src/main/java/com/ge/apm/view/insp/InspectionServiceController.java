@@ -14,13 +14,11 @@ import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.asset.AssetInfoDetailController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
-import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -29,10 +27,7 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.TabChangeEvent;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
