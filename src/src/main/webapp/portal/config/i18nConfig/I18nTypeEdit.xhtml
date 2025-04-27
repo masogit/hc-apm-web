@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="i18nTypeDlg" widgetVar="i18nTypeDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.i18nConfig}" max-height="600" width="850">
+        <p:dialog id="i18nTypeDlg" widgetVar="i18nTypeDlg" dynamic="true" cache="false" modal="true" resizable="true" draggable="true" appendTo="@(body)"  header="#{msg.i18nConfig}" max-height="600" width="850">
             <h:form id="i18nTypeForm">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
@@ -36,17 +36,47 @@
                             <f:selectItem itemLabel="否" itemValue="false"/>
                         </p:selectOneRadio>
                     </h:panelGroup>
+                    <h:panelGroup >
+                        <label class="label">是否可以新增</label>
+                        <p:selectOneRadio id="type" value="#{i18nTypeManageController.selected.type}" disabled="#{not userContextService.hasRole('SuperAdmin')}"  layout="lineDirection">
+                            <p:ajax event="change" update="i18nDatalist fileUpload" />
+                            <f:selectItem itemLabel="是" itemValue="1"/>
+                            <f:selectItem itemLabel="否" itemValue="-1"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class="label">是否管理员编辑</label>
+                        <p:selectOneRadio id="adminEdit" value="#{i18nTypeManageController.selected.adminEdit}"  disabled="#{not userContextService.hasRole('SuperAdmin')}"  layout="lineDirection">
+                            <f:selectItem itemLabel="是" itemValue="true"/>
+                            <f:selectItem itemLabel="否" itemValue="false"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.choseFileToUpload}(一键导入)</label>
+                        <h:outputText id="fileName" value="#{i18nTypeManageController.file.fileName}"
+                                      rendered="#{not empty i18nTypeManageController.file}"/>
+
+                        <p:fileUpload id="fileUpload" disabled="#{i18nTypeManageController.selected.type eq -1}"
+                                      fileUploadListener="#{i18nTypeManageController.uploadDataFile}"
+                                      value="#{i18nTypeManageController.file}" mode="advanced"
+                                      dragDropSupport="false" style="width:100%" process="@this"
+                                      multiple="false" sizeLimit="10000000"
+                                      update="i18nTypeForm" auto="true"
+                                      invalidSizeMessage="#{msg.invalidSizeMessage}10M"
+                                      allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"
+                        />
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemValue}*</label>
-                        <p:dataTable id="i18nDatalist" class="datalist" value="#{i18nTypeManageController.selected.i18nMessageList}" var="item" widgetVar="i18nDataList"
+                        <p:dataTable id="i18nDatalist"  class="datalist" value="#{i18nTypeManageController.selected.i18nMessageList}" var="item" widgetVar="varI18nDataList"
                              selectionMode="single" selection="#{i18nTypeManageController.selectedI18n}"
                              paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                              sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="5" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="5,10"
-                             lazy="true" rowKey="#{item.msgKey}">
+                             rowsPerPageTemplate="5,10" clientCache="false"
+                             lazy="false" rowKey="#{item.msgKey}">
 
                             <p:ajax event="rowSelect" update="editBtn deleteBtn" />
 
@@ -62,25 +92,27 @@
                             <p:column headerText="#{msg.ConfigItemName}-#{msg.Traditional}">
                                 <h:outputText value="#{item.valueTw}"/>
                             </p:column>
-                            <f:facet name="{Toolbar}">
+                            <f:facet name="{Toolbar}">#{empty i18nTypeManageController.selectedI18n}
                                 <p:commandButton id="addButton" icon="ui-icon-plus" actionListener="#{i18nTypeManageController.prepareAddI18n}" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":i18nCustomEditDlg" oncomplete="PF('i18nCustomEditDlg').show()" disabled="#{i18nTypeManageController.selected.type eq -1}"/>
                                 <p:commandButton id="editBtn" icon="ui-icon-pencil" actionListener="#{i18nTypeManageController.prepareEditI18n}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":i18nCustomEditDlg" oncomplete="PF('i18nCustomEditDlg').show()" disabled="#{empty i18nTypeManageController.selectedI18n}" />
                                 <p:commandButton id="deleteBtn" icon="ui-icon-close" actionListener="#{i18nTypeManageController.deleteI18n}" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="i18nDatalist" disabled="#{empty i18nTypeManageController.selectedI18n || i18nTypeManageController.selected.type eq -1}">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                                </p:commandButton>
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="i18nTypeForm:i18nDatalist" fileName="#{i18nTypeManageController.selected.msgType}"/>
                                 </p:commandButton>
                             </f:facet>
                         </p:dataTable>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{i18nTypeManageController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'i18nTypeDlg');" />
+                <p:commandButton  validateClient="true" value="#{msg.Save}" actionListener="#{i18nTypeManageController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'i18nTypeDlg');" />
                 <p:commandButton validateClient="true" value="重置" actionListener="#{i18nTypeManageController.reset()}" disabled="#{i18nTypeManageController.selected.defaultValue}" update=":growl @(.datalist)" oncomplete="PF('i18nTypeDlg').hide()" icon="ui-icon-check" >
                     <p:confirm header="重置确认" message="您确定要重置此i18n配置么？" icon="ui-icon-alert"/>
                 </p:commandButton>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('i18nTypeDlg').hide()"/>
             </h:form>
         </p:dialog>
-
     </ui:composition>
 
 </html>

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -64,6 +65,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private final List<String> textAloneHandleType = ListUtil.newArrayList("setAssetOutStockDept", "systemLogo");
 
     private static final String VALUE ="value";
+    private List<String> datePatternSelect = ListUtil.newArrayList("yyyy/MM/dd", "yyyy/MM/dd HH", "yyyy/MM/dd HH:mm", "yyyy/MM/dd HH:mm:ss");
 
     @Override
     protected void init() {
@@ -159,6 +161,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
                     configItem.setEnumList(mapList);
                 }
+                if (9 == configItem.getValueType()) {
+                    configItem.setFieldColumnDto(JSON.parseObject(configItem.getShowValue(), FieldColumnDto.class));
+                }
             }
         }
 
@@ -211,10 +216,6 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         }
     }
 
-    public Set<Map.Entry<Integer, String>> getCategoryEntrySet() {
-        return categoryMap.entrySet();
-    }
-
     @Override
     public void prepareEdit() {
         if(8 == this.selected.getValueType()){
@@ -259,6 +260,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
                 if (8 == configItem.getValueType()) {
                     multiSelected = getMultiEum(configItem);
+                }
+                if (9 == configItem.getValueType()) {
+                    configItem.setFieldColumnDto(JSON.parseObject(configItem.getDefaultValue(), FieldColumnDto.class));
                 }
             }
             WebUtil.addErrorMessage("删除成功！");
@@ -315,7 +319,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     }
                     configItemValue.setValue(JSON.toJSONString(maps));
                 }
-            }else{
+            } else if (9 == this.selected.getValueType()) {
+                configItemValue.setValue(JSON.toJSONString(this.selected.getFieldColumnDto()));
+            } else{
                 configItemValue.setValue(this.selected.getShowValue());
             }
             configItemValueRepository.save(configItemValue);
@@ -435,6 +441,15 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         stockDeptItem.setShowValue("data:image/jpeg;base64," + base64);
     }
 
+    public FieldColumnDto getFieldColumn(String key) {
+        return getFieldColumn(selectSite, key);
+    }
+
+    public FieldColumnDto getFieldColumn(OrgInfo orgInfo, String key) {
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(orgInfo.getSiteUID(), orgInfo.getHospitalUID(), orgInfo.getInstitutionUID(), orgInfo.getTenantUID(), key);
+        return JSON.parseObject(value, FieldColumnDto.class);
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
@@ -493,5 +508,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public List<String> getTextAloneHandleType() {
         return textAloneHandleType;
+    }
+
+    public List<String> getDatePatternSelect() {
+        return datePatternSelect;
+    }
+
+    public void setDatePatternSelect(List<String> datePatternSelect) {
+        this.datePatternSelect = datePatternSelect;
     }
 }
