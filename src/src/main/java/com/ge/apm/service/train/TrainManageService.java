@@ -465,7 +465,6 @@ public class TrainManageService extends MicroServiceInvoker {
        trainDetail.setQrCodeGenerateDate(new Date());
        StringBuilder sb = new StringBuilder();
        sb.append("id=").append(trainDetail.getId());
-       sb.append("&time=").append(DateUtil.format(trainDetail.getQrCodeGenerateDate(), "yyyyMMddHHmmss"));
        trainDetail.setQrCodeStr(sb.toString());
        trainDetailRepository.save(trainDetail);
    }
