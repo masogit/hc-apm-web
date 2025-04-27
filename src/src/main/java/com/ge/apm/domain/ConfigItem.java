@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.ge.apm.domain.dto.FieldColumnDto;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -42,7 +43,7 @@ public class ConfigItem implements Serializable {
     private String key;
 
     /**
-     * 值类型 1-text 2-number 3-boolean 4-date 5-time 6-datetime 7-enum 8-multi-enum
+     * 值类型 1-text 2-number 3-boolean 4-date 5-time 6-datetime 7-enum 8-multi-enum 9-字段配置
      * 类型为text时，如果需要做格式校验，需要在 validation 字段中定义正则表达式
      * 类型为enum时，需要在 validation 字段中定义key-value array
      */
@@ -92,4 +93,7 @@ public class ConfigItem implements Serializable {
 
     @Transient
     private List<Map<String, String>> enumList;
+
+    @Transient
+    private FieldColumnDto fieldColumnDto;
 }
