@@ -261,6 +261,7 @@
                            <p:menuitem id="um508" value="#{msg.Accountdash}" url="/account-dashboard/#/" target="_blank" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ACCOUNT_DASHBOARD_EDIT')}"/>
                            <p:menuitem id="um514" value="导出记录信息" outcome="/portal/export/tenant/TenantRecord.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_EXPORT_RECORD_EDIT')}"/>
                            <p:menuitem id="um523" value="#{msg.ConfigItemManage}" outcome="/portal/config/sysConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_CONFIG_ITEM_EDIT')}"/>
+                           <p:menuitem id="um524" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/I18nTypeManageList.xhtml" rendered="#{not userContextService.hasAnyRoleByApmRoles('SuperAdmin') and userContextService.accessContainsFunctionMenu('CONFIG_DICTIONARY_EDIT')}"/>
                            <p:menuitem id="um525" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/reminderRuleList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_REMINDER_EDIT')}"/>
                            <p:menuitem id="um526" value="#{msg.BuildManagement}" outcome="/portal/config/buildManagement/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_BUILDING_EDIT')}"/>
                            <p:menuitem id="um527" value="#{msg.AssetClassificationManagement}" outcome="/portal/assetTypeGroup/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}"/>
@@ -343,7 +344,7 @@
                 <p:menuitem id="um5023" value="#{msg.ConfigItemManage}" outcome="/portal/config/sysAdminConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_CONFIG_ITEM_EDIT')}"/>
                 <p:menuitem id="um5025" value="#{msg.IotDeviceBind}" outcome="/portal/iot/iotDeviceBind.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_IOT_DEVICE_BINDING')}"/>
                 <p:menuitem id="um5026" value="#{msg.SystemClientInfo}" outcome="/portal/iot/systemClientInfo.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_CHILD_ACCT_EDIT')}"/>
-                <p:menuitem id="um5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/I18nTypeManageList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_DICTIONARY_BINDING')}"/>
+                <p:menuitem id="um5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/I18nTypeManageList.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin') and userContextService.accessContainsFunctionMenu('PLATFORM_DICTIONARY_BINDING')}"/>
                 <p:menuitem id="um5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_JMREPORT_EDIT')}"   />
                 <p:menuitem id="um5029" value="系统模板管理" outcome="/portal/config/template/systemTemplate.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>
 

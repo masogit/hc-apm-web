@@ -17,20 +17,31 @@ public class I18nTypeManage  {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(name = "id",columnDefinition = "CHAR(32)")
     private String id;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "msg_type")
     private String msgType;
+
     @Column(name = "type")
     private Integer type;
+
     @Column(name = "description",columnDefinition = "text")
-    private String description; // 描述
+    private String description;
+    // 是否支持管理员修改
+    @Column(name = "admin_edit",columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean adminEdit = Boolean.FALSE;
+
     @Transient
     private boolean alone;
+
     @Transient
     private boolean defaultValue;
+
     @Transient
     private List<I18nMessage> i18nMessageList = new ArrayList<>();
+
     @Transient
     private List<I18nMessage> defaultMsgList = new ArrayList<>();
 
@@ -72,6 +83,14 @@ public class I18nTypeManage  {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getAdminEdit() {
+        return adminEdit;
+    }
+
+    public void setAdminEdit(Boolean adminEdit) {
+        this.adminEdit = adminEdit;
     }
 
     public boolean isAlone() {

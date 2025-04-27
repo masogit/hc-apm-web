@@ -29,7 +29,7 @@
 
             <div class="ui-g-12 card">
                 <h:form id="configItemForm">
-                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5" rendered="#{userContextService.hasRole('SuperAdmin')}">
                         <h:panelGroup>
                             <p:commandButton id="btnOrg" value="#{i18nTypeManageController.selectTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelSite" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
@@ -58,7 +58,7 @@
                         <p:column headerText="#{msg.msgType}" filterBy="#{item.msgType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.msgType}"/>
                         </p:column>
-                        <p:column headerText="是否可以新增" filterBy="#{item.type}" filterMatchMode="EQ">
+                        <p:column headerText="是否可以新增"  filterBy="#{item.type}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()">
                                     <f:selectItem itemLabel="#{msg.All}" itemValue="" />
@@ -68,11 +68,22 @@
                             </f:facet>
                             <h:outputText value="#{item.type == -1?'否':'是'}"/>
                         </p:column>
+                        <p:column headerText="是否管理员编辑" filterable="#{userContextService.hasRole('SuperAdmin')}" filterBy="#{item.adminEdit}" filterMatchMode="EQ" >
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                        <f:converter converterId="javax.faces.Boolean" />
+                                        <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            <h:outputText value="#{empty item.adminEdit or !item.adminEdit?'否':'是'}"/>
+                        </p:column>
                         <p:column headerText="#{msg.description}">
                             <h:outputText value="#{item.description}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" actionListener="#{i18nTypeManageController.prepareEdit}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":i18nTypeDlg" oncomplete="PF('i18nTypeDlg').show()" disabled="#{empty i18nTypeManageController.selected}" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" actionListener="#{i18nTypeManageController.prepareEdit}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":i18nTypeDlg :i18nTypeForm :i18nTypeForm:i18nDatalist" oncomplete="PF('i18nTypeDlg').show()" disabled="#{empty i18nTypeManageController.selected}" />
                         </f:facet>
                     </p:dataTable>
                 </h:form>
