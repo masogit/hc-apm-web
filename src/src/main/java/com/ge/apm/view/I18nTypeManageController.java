@@ -9,9 +9,16 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.I18nTypeManage;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetFileImportService;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +28,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.GenericDataTableModel;
 import webapp.framework.web.service.DbMessageSource;
 
 import javax.faces.bean.ManagedBean;
@@ -45,6 +53,10 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
 
     private I18nMessage selectedI18n;
 
+    private boolean supperAdmin;
+
+    private UploadedFile file;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(I18nTypeManageRepository.class);
@@ -55,6 +67,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         selectTenant = tenantInfoRepository.findByuid(currentUser.getTenantUID());
         selectTenantId = selectTenant.getId();
         this.searchFilters = new ArrayList<>();
+        supperAdmin = currentUser.getIsSuperAdmin();
     }
 
     @Override
@@ -64,14 +77,21 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
 
     @Override
     protected Page<I18nTypeManage> doLoadData(PageRequest pageRequest) {
+        if(!supperAdmin){
+            initParameter();
+        }
         Page<I18nTypeManage> result = super.loadData(pageRequest);
         return result;
+    }
+    private void initParameter(){
+        updateSearchFilter(new SearchFilter("adminEdit", SearchFilter.Operator.EQ,Boolean.TRUE));
     }
 
     @Override
     public void prepareEdit() {
         super.prepareEdit();
         this.selectedI18n = null;
+        this.file = null;
         prepareEditInit(this.selected,selectTenantId);
     }
 
@@ -148,17 +168,29 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         LOGGER.info("deleteI18n:{}", JSON.toJSONString(selectedI18n));
     }
     public void  reset(){
-        selected.setI18nMessageList(ListUtils.newArrayList());
-        LOGGER.info("reset:{},",selected.getMsgType());
-        saveConfig();
-        resetCache();
-        LOGGER.info("end reset:{}",selected.getMsgType());
+        try {
+            selected.setI18nMessageList(ListUtils.newArrayList());
+            LOGGER.info("reset:{},",selected.getMsgType());
+            saveConfig();
+            resetCache();
+            LOGGER.info("end reset:{}",selected.getMsgType());
+            WebUtil.addSuccessMessage("恢复默认值成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("恢复默认值失败！");
+        }
     }
     public void saveConfig(){
-        LOGGER.info("saveConfig:{}",selected.getMsgType());
-        doSaveI18nMessage();
-        resetCache();
-        LOGGER.info("end saveConfig:{}",selected.getMsgType());
+        try {
+            LOGGER.info("saveConfig:{}",selected.getMsgType());
+            doSaveI18nMessage();
+            resetCache();
+            LOGGER.info("end saveConfig:{}",selected.getMsgType());
+            WebUtil.addSuccessMessage("保存成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("保存失败");
+        }
     }
     public void doSaveI18nMessage(){
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
@@ -191,6 +223,46 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             i18nMessageRepository.delete(deleteI18nMessageList);
         }
         dao.save(selected);
+    }
+    public void uploadDataFile(FileUploadEvent event) {
+        // 配置键,名称-中文,名称-英文,名称-繁体
+        this.file = event.getFile();
+        try(ExcelDocument reader = new ExcelDocument(file.getInputstream(),ExcelDocument.parseTypeByFileName(file.getFileName()))){
+            List<Map<String, Object>> allDataRows = reader.getAllDataRows(0,1,2);
+            List<I18nMessage> dataList = allDataRows.stream().map(item -> {
+                I18nMessage i18nMessage = new I18nMessage();
+                i18nMessage.setMsgType(selected.getMsgType());
+                i18nMessage.setSiteId(selectTenantId);
+                ExcelDocument.ValueWrapper key = (ExcelDocument.ValueWrapper) item.get("配置键");
+                if (Objects.nonNull(key) && Objects.nonNull(key.getValue())) {
+                    i18nMessage.setMsgKey(key.getValue().toString());
+                }
+                ExcelDocument.ValueWrapper zh = (ExcelDocument.ValueWrapper) item.get("名称-中文");
+                if (Objects.nonNull(zh) && Objects.nonNull(zh.getValue())) {
+                    i18nMessage.setValueZh(zh.getValue().toString());
+                }
+                ExcelDocument.ValueWrapper en = (ExcelDocument.ValueWrapper) item.get("名称-英文");
+                if (Objects.nonNull(en) && Objects.nonNull(en.getValue())) {
+                    i18nMessage.setValueEn(en.getValue().toString());
+                }
+                ExcelDocument.ValueWrapper tw = (ExcelDocument.ValueWrapper) item.get("名称-繁体");
+                if (Objects.nonNull(tw) && Objects.nonNull(tw.getValue())) {
+                    i18nMessage.setValueTw(tw.getValue().toString());
+                }
+                return i18nMessage;
+            }).collect(Collectors.toList());
+            List<I18nMessage> msgKeyNull = dataList.stream().filter(item -> Objects.isNull(item.getMsgKey())).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(msgKeyNull)){
+                WebUtil.addErrorMessage("上传失败,配置键不能为空");
+                return;
+            }
+            selected.setI18nMessageList(dataList);
+            WebUtil.addErrorMessage("上传成功,列表已更新");
+        }catch (Exception e){
+           e.printStackTrace();
+            WebUtil.addErrorMessage("上传失败");
+        }
+
     }
     public void resetCache(){
         DbMessageSource.reLoadMessages();
@@ -231,4 +303,15 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         return selectActionName;
     }
 
+    public boolean isSupperAdmin() {
+        return supperAdmin;
+    }
+
+    public UploadedFile getFile() {
+        return file;
+    }
+
+    public void setFile(UploadedFile file) {
+        this.file = file;
+    }
 }
