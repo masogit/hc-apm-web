@@ -75,6 +75,41 @@
                             <f:selectItems value="#{systemConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"  itemDisabled="#{item.get('value') eq 'MaintenanceFee'}"/>
                         </p:selectManyMenu>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 9}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:fieldset>
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">是否显示</label>
+                                    <p:selectOneRadio value="#{systemConfigItemController.selected.fieldColumnDto.rendered}" style="width: 30%;">
+                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">标签名称</label>
+                                    <p:inputText value="#{systemConfigItemController.selected.fieldColumnDto.label}" maxlength="200"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">是否必填</label>
+                                    <p:selectOneRadio value="#{systemConfigItemController.selected.fieldColumnDto.required}" style="width: 30%;">
+                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">必填提示</label>
+                                    <p:inputText value="#{systemConfigItemController.selected.fieldColumnDto.requiredMessage}" maxlength="300"/>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{systemConfigItemController.selected.fieldColumnDto.type eq 'date'}">
+                                    <label class="label">日期格式</label>
+                                    <p:selectOneMenu value="#{systemConfigItemController.selected.fieldColumnDto.datePattern}">
+                                        <f:selectItems value="#{systemConfigItemController.datePatternSelect}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:fieldset>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{systemConfigItemController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
