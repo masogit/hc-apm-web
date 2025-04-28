@@ -391,6 +391,10 @@ public class ZkbContract implements ChineseName, Serializable {
     @Column(name = "company_code")
     private String companyCode;
 
+    //Y  N
+    @Column(name = "can_apply_toolbox")
+    private String canApplyToolbox;
+
     /**
      * 2022年起探头高低端名额分类
      * t:是
@@ -398,6 +402,14 @@ public class ZkbContract implements ChineseName, Serializable {
      */
     @Column(name = "asset_quota_type")
     private String assetQuotaType;
+
+    public String getCanApplyToolbox() {
+        return canApplyToolbox;
+    }
+
+    public void setCanApplyToolbox(String canApplyToolbox) {
+        this.canApplyToolbox = canApplyToolbox;
+    }
 
     public Integer getCcsbMaintenanceQuota() {
         return ccsbMaintenanceQuota;

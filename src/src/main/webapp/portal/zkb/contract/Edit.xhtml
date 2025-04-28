@@ -326,7 +326,14 @@
                             <label class="label">#{msg.zkbContract_adminAddress}</label>
                             <p:inputText id="address" value="#{zkbContractEditController.selected.adminAddress}" />
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">是否可以申请工具箱*</label>
+                            <p:selectOneMenu  value="#{zkbContractEditController.selected.canApplyToolbox}" required="true" requiredMessage="是否可以申请工具箱 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemValue="Y" itemLabel="是"/>
+                                <f:selectItem itemValue="N" itemLabel="否"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_remark}</label>
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
