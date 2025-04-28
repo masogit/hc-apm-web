@@ -85,7 +85,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.endTime}#{contractInfoEditController.selected.contractType ne 'Equipment'?'*':''}</label>
-                                <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM" value="#{contractInfoEditController.selected.endDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{contractInfoEditController.selected.contractType ne 'Equipment'?true:false}" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}">
+                                <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.endDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{contractInfoEditController.selected.contractType ne 'Equipment'?true:false}" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}">
                                     <p:ajax event="dateSelect" listener="#{contractInfoEditController.onChangeEndMonths}" update=":AssetContractEditForm:endMonths"></p:ajax>
                                     <p:ajax listener="#{contractInfoEditController.onChangeEndMonths}" update=":AssetContractEditForm:endMonths"></p:ajax>
                                 </p:calendar>
