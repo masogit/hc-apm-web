@@ -161,7 +161,7 @@ public class FileDownloadService {
         }
     }
 
-    private void exportFile(InputStream inputStream, String fileName) {
+    public void exportFile(InputStream inputStream, String fileName) {
         try {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
