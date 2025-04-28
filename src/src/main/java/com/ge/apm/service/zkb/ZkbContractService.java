@@ -173,6 +173,7 @@ public class ZkbContractService {
                 }
             }
             zkbContractDataMap.put("公司编码", zkbContract.getCompanyCode());
+            zkbContractDataMap.put("是否可以申请工具箱", zkbContract.getCanApplyToolbox());
             zkbContractDataMap.put("关联合同号", zkbContract.getLinkContractNo());
             if(StringUtils.isNotEmpty(zkbContract.getAssetQuotaType())){
                 if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){

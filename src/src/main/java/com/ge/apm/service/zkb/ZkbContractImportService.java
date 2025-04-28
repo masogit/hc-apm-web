@@ -5,6 +5,7 @@ import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -167,6 +168,7 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("关联合同号", "setLinkContractNo");
             contractRow.setFieldStringValue("2022年起探头高低端名额分类", "setAssetQuotaType");
             contractRow.setFieldStringValue("积分是否清零", "setResetZeroScoreFlag");
+            contractRow.setFieldStringValue("是否可以申请工具箱", "setCanApplyToolbox");
 
             if(contractInfoVO.isNull()){
                 break;
@@ -310,6 +312,9 @@ public class ZkbContractImportService {
             }
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             zkbContract.setLastModifiedDate(new Date());
+            if(StrUtil.isNotEmpty(contractInfoVO.getCanApplyToolbox())){
+                zkbContract.setCanApplyToolbox(contractInfoVO.getCanApplyToolbox());
+            }
             zkbContractRepository.save(zkbContract);
         }else{
             ZkbContract newZkbContract = new ZkbContract();
@@ -354,6 +359,9 @@ public class ZkbContractImportService {
                 newZkbContract.setAssetQuotaType(CopyByInvok.T);
             }else if("否".equals(contractInfoVO.getAssetQuotaType())){
                 newZkbContract.setAssetQuotaType(CopyByInvok.F);
+            }
+            if(StrUtil.isEmpty(contractInfoVO.getCanApplyToolbox())){
+                newZkbContract.setCanApplyToolbox("Y");
             }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
