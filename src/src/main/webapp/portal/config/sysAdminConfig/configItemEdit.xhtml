@@ -31,7 +31,9 @@
                     </h:panelGroup>
                     <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 1 and  superAdminConfigItemController.selected.key eq 'workOrderScript'}">
                         <label class="label">#{msg.ConfigItemValue}</label>
-                        <p:commandLink value="#{superAdminConfigItemController.selected.name}" ajax="false" actionListener="#{fileDownloadService.downloadFile( superAdminConfigItemController.uploadedFileObject ne null ?  superAdminConfigItemController.uploadedFileObject.objectStorageId:   superAdminConfigItemController.selected.showValue)}" styleClass="p-mr-2"/>
+                        <p:commandLink value="#{superAdminConfigItemController.selected.name}" ajax="false" actionListener="#{superAdminConfigItemController.downloadFile( superAdminConfigItemController.uploadedFileObject ne null ?  superAdminConfigItemController.uploadedFileObject.objectStorageId:   superAdminConfigItemController.selected.showValue)}" styleClass="p-mr-2"/>
+
+                        <p:commandLink value="下载配置模板" ajax="false" actionListener="#{superAdminConfigItemController.downloadConfigFile( )}" styleClass="p-mr-2" style="float: right;"/>
 
                         <p:fileUpload id="type1"  allowTypes="/(\.|\/)(xls|xlsx|XLS|XLSX)$/" fileUploadListener="#{superAdminConfigItemController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:50%"
                                       multiple="true"  sizeLimit="50000000" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}50M" label="#{msg.Add}" update="configItemEditForm"/>
