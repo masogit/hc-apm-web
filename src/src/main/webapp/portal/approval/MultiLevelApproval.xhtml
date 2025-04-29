@@ -63,6 +63,9 @@
                             <h:outputText value="#{item.applyUser.org.name}" rendered="#{item.applyUser.org.orgType eq 4}"/>
 <!--                        </c:if>-->
                     </p:column>
+                    <p:column headerText="发起人" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
+                        <h:outputText value="#{item.applyUser.name}"/>
+                    </p:column>
                     <p:column headerText="总审批进度" >
                         <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
                     </p:column>
