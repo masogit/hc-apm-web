@@ -265,6 +265,12 @@
                                             <h:outputText value="#{item.partsDescription}" />
                                         </p:column>
                                     </c:if>
+                                    <p:column headerText="附件">
+                                        <ui:repeat value="#{item.attachments}" var="attachments" varStatus="status">
+                                            <h:outputText value="#{attachments.objectName}"
+                                                          style="display:block; margin-bottom: #{status.last ? '0' : '7px'};"/>
+                                        </ui:repeat>
+                                    </p:column>
                                     <p:column headerText="#{msg.Actions}"><!--操作-->
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
                                         <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditAccDetail(item)}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />
