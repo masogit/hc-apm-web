@@ -77,9 +77,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
             String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
             ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
-            HttpHeaders responseHeader = response.getHeaders();
-            List<String> dispositions = responseHeader.get("content-disposition");
-            String disposition = dispositions.get(0);
+//            HttpHeaders responseHeader = response.getHeaders();
+//            List<String> dispositions = responseHeader.get("content-disposition");
+//            String disposition = dispositions.get(0);
             //String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
             //String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
             byte[] result = response.getBody();
