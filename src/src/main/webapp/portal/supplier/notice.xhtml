@@ -70,7 +70,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.vendor}<span style="color:red">*</span></label>
                         <p:autoComplete dropdown="true" value="#{venderNoticeController.venderCompany}" scrollHeight="300" forceSelection="true" converter="venderCompanyConverter" required="true" requiredMessage="供应商 #{msg.ValidationRequire}"
-                                        completeMethod="#{venderNoticeController.autoCompleteVenderCompany}" var="t" itemLabel="#{t.name}" itemValue="#{t}" disabled="#{venderNoticeController.crudActionName eq 'Edit'}">
+                                        completeMethod="#{venderNoticeController.autoCompleteVenderCompany}" var="t" itemLabel="#{t.name}" itemValue="#{t}" disabled="#{venderNoticeController.selected.id != null}">
                             <p:ajax event="itemSelect" process="@this" listener="#{venderNoticeController.onSelectedObjectChange}" />
                             <p:ajax listener="#{venderNoticeController.onSelectedObjectChange}" />
                         </p:autoComplete>
