@@ -44,10 +44,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -234,7 +231,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         //multi level approval status
         multiLevelApprovals = multiLevelApprovalService.getMultiLevelApproval(multiLevelApproval);
         businessTypeFlag = multiLevelApproval.getBusinessType();
-
+        setHandlerPerson(multiLevelApprovals);
         //multi level approval content
         switch (businessTypeFlag){
             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
@@ -370,6 +367,28 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
+        }
+    }
+
+    private void setHandlerPerson(List<MultiLevelApproval> multiLevelApprovals) {
+        for (MultiLevelApproval levelApproval : multiLevelApprovals) {
+            if ( levelApproval.getApprovalNodeStatus() == 0) {
+                String handlerPerson = Optional.ofNullable(levelApproval.getApprovalUid())
+                        .map(uidStr -> Arrays.stream(uidStr.split(","))
+                                .filter(s -> !s.isEmpty())
+                                .collect(Collectors.toList()))
+                        .filter(uids -> !uids.isEmpty())
+                        .map(userAccountRepository::findByUidIn)
+                        .map(userAccounts -> userAccounts.stream()
+                                .map(UserAccount::getName)
+                                .collect(Collectors.toList()))
+                        .map(names -> String.join(",", names))
+                        .orElse("");
+                levelApproval.setHandlerPerson(handlerPerson);
+            }else{
+                levelApproval.setHandlerPerson(levelApproval.getActualApproverName());
+
+            }
         }
     }
 
