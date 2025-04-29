@@ -178,6 +178,12 @@ public class MultiLevelApproval implements Serializable {
     @Transient
     private String  applicationDepartment ;
 
+    /**
+     * 处理人
+     */
+    @Transient
+    private String handlerPerson;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private UserAccount applyUser;
@@ -247,5 +253,13 @@ public class MultiLevelApproval implements Serializable {
 
     public void setApplyUser(UserAccount applyUser) {
         this.applyUser = applyUser;
+    }
+
+    public String getHandlerPerson() {
+        return handlerPerson;
+    }
+
+    public void setHandlerPerson(String handlerPerson) {
+        this.handlerPerson = handlerPerson;
     }
 }
