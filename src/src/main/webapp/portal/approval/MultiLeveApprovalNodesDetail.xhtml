@@ -20,8 +20,8 @@
                 <p:column headerText="业务类型" >
                     <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                 </p:column>
-                <p:column headerText="实际审批人">
-                    <h:outputText value="#{item.actualApproverName}"/>
+                <p:column headerText="处理人">
+                    <h:outputText value="#{item.handlerPerson}"/>
                 </p:column>
                 <p:column headerText="审批级别">
                     <h:outputText value="#{item.approvalLevel}级审批人"/>
