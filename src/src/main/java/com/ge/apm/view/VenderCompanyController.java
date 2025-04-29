@@ -3,14 +3,13 @@ package com.ge.apm.view;
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.VenderCompanyRepository;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.VenderCompany;
+import com.ge.apm.dao.VenderNoticeRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
@@ -39,7 +38,10 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private BlobFileService blobService;
     private SupplierRepository supplierRepository;
     private ConfigItemValueRepository configItemValueRepository;
+    private VenderNoticeRepository venderNoticeRepository;
     private SupplierController supplierController;
+    @Getter @Setter
+    private String noticeContent;
     @Getter @Setter
     private String supplierType;
     @Getter @Setter
@@ -57,6 +59,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         preViewerBean = WebUtil.getBean(PreViewerBean.class);
+        venderNoticeRepository = WebUtil.getBean(VenderNoticeRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         this.filterBySite = false;
     }
@@ -172,6 +175,22 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         }
         Supplier temp = supplierRepository.findByTenantUIDAndVenderCompanyId(currentUser.getTenantUID(), selected.getId());
         return ObjectUtil.isNotEmpty(temp);
+    }
+
+    public void sendNotice() {
+        VenderNotice venderNotice = new VenderNotice();
+        Date now = DateUtil.now();
+        venderNotice.setStatus(0);
+        venderNotice.setVenderCompanyId(selected.getId());
+        venderNotice.setNoticeContent(noticeContent);
+        venderNotice.setTenantUid(currentUser.getTenantUID());
+        venderNotice.setNoticeDate(now);
+        venderNotice.setNoticeUser(currentUser.getName());
+        venderNotice.setLastModifiedBy(currentUser.getName());
+        venderNotice.setLastModifiedDate(now);
+        venderNoticeRepository.save(venderNotice);
+        noticeContent = null;
+        WebUtil.addSuccessMessage("发送成功！");
     }
 
     public String getVenderCompanyLoginUrl() {
