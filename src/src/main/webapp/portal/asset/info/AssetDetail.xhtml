@@ -183,7 +183,10 @@
                                 <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
                                     <p:tab title="#{attachmentConfig.label}">
                                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <div class="ui-g">
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2" class="ui-g-3"/>
+                                                <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()" class="ui-g-2"/>
+                                            </div>
                                         </p:dataList>
                                     </p:tab>
                                 </c:forEach>
