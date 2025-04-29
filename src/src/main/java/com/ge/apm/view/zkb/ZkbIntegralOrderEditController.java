@@ -224,6 +224,12 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
         selectedContract = contractList.stream().filter(t -> t.getId().equals(event.getNewValue())).findAny().get();
         if(selectedContract != null){
             selected.setContractNo(selectedContract.getContractNo());
+            if(StrUtil.isEmpty(selectedContract.getCanApplyToolbox()) || !"Y".equals(selectedContract.getCanApplyToolbox())) {
+                zkbIntegralOrderStatusVo.setScoreCanApply(false);
+                WebUtil.addErrorMessage("该合同不能申请工具箱！");
+            }else{
+                zkbIntegralOrderStatusVo.setScoreCanApply(true);
+            }
         }
     }
 
