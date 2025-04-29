@@ -150,22 +150,34 @@
                             <p:tabView>
                                 <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
                                     <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <div class="ui-g">
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2" class="ui-g-3"/>
+                                            <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()" class="ui-g-2"/>
+                                        </div>
                                     </p:dataList>
                                 </p:tab>
                                 <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
                                     <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <div class="ui-g">
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2" class="ui-g-3"/>
+                                            <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()" class="ui-g-2"/>
+                                        </div>
                                     </p:dataList>
                                 </p:tab>
                                 <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
                                     <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <div class="ui-g">
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2" class="ui-g-3"/>
+                                            <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()" class="ui-g-2"/>
+                                        </div>
                                     </p:dataList>
                                 </p:tab>
                                 <p:tab title="#{fieldMsg.fieldValue('attachmentType', 4)}">
                                     <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,4)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <div class="ui-g">
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2" class="ui-g-3"/>
+                                            <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()" class="ui-g-2"/>
+                                        </div>
                                     </p:dataList>
                                 </p:tab>
                                 <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
@@ -676,6 +688,7 @@
                 </p:dialog>
             </div>
         </div>
+        <ui:include src="/portal/preview/view.xhtml" />
         <p:dialog id="nurseSiteMaintainDialog" widgetVar="nurseSiteMaintainDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="日常检查记录-下载">
             <p:ajax event="open" listener="#{assetDetailExportController.initOpenDialog}" update="nurseSiteMaintainForm" onsuccess="window.location.hash='#header'"></p:ajax>
             <p:ajax event="close" listener="#{assetDetailExportController.closeOpenDialog}" update="nurseSiteMaintainForm"  onsuccess="window.location.hash='returnButton'"></p:ajax>
