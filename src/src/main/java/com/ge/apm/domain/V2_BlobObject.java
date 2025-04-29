@@ -66,7 +66,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_PCCReport = "PccReport";
     public static final String BO_TYPE_PmRequest = "PmRequest";
     public static final String BO_TYPE_MultiLevelApproval = "MultiLevelApproval"; // 多级审批
-
+    public static final String BO_TYPE_PartAttachment="PartAttachment";
     public static final String BO_TYPE_PrePmOrder = "PrePmOrder"; //保养前照片
     public static final String BO_TYPE_PmOrder = "PmOrder"; //保养后照片
     public static final String BO_TYPE_PmReport = "PmReport"; //保养报告

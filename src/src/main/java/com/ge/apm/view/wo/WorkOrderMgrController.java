@@ -2637,6 +2637,24 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
 
+    public void handleFileUploadWorkDetail(FileUploadEvent event) {
+
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                itemDetail.getAttachments().add(blobObject);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_PartAttachment);
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
+
+    }
+
+    public void removeWorkDetailAttachmentBy(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        itemDetail.getAttachments().removeAll(itemDetail.getAttachments().stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
     public void submitWorkOrder() {
 
         String approverUid=this.selectedApproverUid;

@@ -291,6 +291,22 @@
                         <p:inputTextarea rows="1" cols="100" value="#{workOrderMgrController.itemDetail.comment}"/>
                     </h:panelGroup>
                 </p:panelGrid>
+                <p:dataGrid id="attachListWorkDetail" var="fileitem" value="#{workOrderMgrController.itemDetail.attachments}" columns="7" layout="grid">
+                    <f:facet name="header">添加附件</f:facet>
+                    <h:panelGrid columns="1" style="width:100%" >
+                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <p:commandButton actionListener="#{workOrderMgrController.removeWorkDetailAttachmentBy(fileitem.id)}" update="attachListWorkDetail" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                    </h:panelGrid>
+                    <!-- </p:panel>-->
+                </p:dataGrid>
+                <p:fileUpload  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{workOrderMgrController.handleFileUploadWorkDetail}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="10000000" update="attachListWorkDetail" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" />
+
+
+
                 <br/>
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList @(.cl3) :growl woTab:repairCompleteDialogForm:commandButtonId" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
