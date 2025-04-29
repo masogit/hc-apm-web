@@ -92,7 +92,7 @@
                             <p:column headerText="#{msg.ConfigItemName}-#{msg.Traditional}">
                                 <h:outputText value="#{item.valueTw}"/>
                             </p:column>
-                            <f:facet name="{Toolbar}">#{empty i18nTypeManageController.selectedI18n}
+                            <f:facet name="{Toolbar}">
                                 <p:commandButton id="addButton" icon="ui-icon-plus" actionListener="#{i18nTypeManageController.prepareAddI18n}" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":i18nCustomEditDlg" oncomplete="PF('i18nCustomEditDlg').show()" disabled="#{i18nTypeManageController.selected.type eq -1}"/>
                                 <p:commandButton id="editBtn" icon="ui-icon-pencil" actionListener="#{i18nTypeManageController.prepareEditI18n}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":i18nCustomEditDlg" oncomplete="PF('i18nCustomEditDlg').show()" disabled="#{empty i18nTypeManageController.selectedI18n}" />
                                 <p:commandButton id="deleteBtn" icon="ui-icon-close" actionListener="#{i18nTypeManageController.deleteI18n}" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="i18nDatalist" disabled="#{empty i18nTypeManageController.selectedI18n || i18nTypeManageController.selected.type eq -1}">

@@ -7,6 +7,7 @@ import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +26,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,6 +43,8 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     private ConfigItemRepository dao;
     private ConfigItemValueRepository configItemValueRepository;
     private OrgInfoRepository orgInfoRepository;
+
+    private FileDownloadService fileDownloadService;
 
     private OrgInfo selectSite;
     private UserAccount user;
@@ -60,6 +65,8 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+
         user = UserContextService.getCurrentUserAccount();
 
         selectSite = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -292,6 +299,20 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
             selected.setShowValue(uploadedFileObject.getObjectStorageId());
         }
         logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
+    }
+    public void downloadFile(String fileId) {
+        if(StringUtils.isNotEmpty(fileId)){
+            fileDownloadService.downloadFile(fileId);
+        }
+        WebUtil.addWarnMessage("没有上传文件");
+
+    }
+
+    public void downloadConfigFile( ) {
+        if( "workOrderScript".equals(selected.getKey())){
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("report/workOrderScript.xlsx");
+            fileDownloadService.exportFile(is, "维修脚本配置.xlsx");
+        }
     }
 
     public String getDefaultValue(String key) {
