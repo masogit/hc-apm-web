@@ -371,9 +371,8 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
 
     public String qrCodeView() throws Exception {
         if(selectedTrainDetail != null && StrUtil.isNotEmpty(selectedTrainDetail.getQrCodeStr())){
-            String url = trainManageService.getBaseURL().replace("gateway","") + "wx/traning/signin";
+            String url = trainManageService.getBaseURL().replace("gateway","") + "wx/training/signin";
             url = url + "?" + selectedTrainDetail.getQrCodeStr();
-            logger.info(url);
             return  qrCodeDrawService.getImageBase64(QrCodeSupportUtil.createQrCodeWithoutLogo(selectedTrainDetail.getQrCodeStr(), url, Color.WHITE));
         }else{
             return "";
