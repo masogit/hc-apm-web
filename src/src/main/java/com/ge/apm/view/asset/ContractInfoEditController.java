@@ -108,13 +108,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     @Getter @Setter
     private Boolean displayMaintenanceField;
     private UserAccount currentUser;
-
-    @Getter
-    @Setter
+    @Getter @Setter
+    private Boolean sortFlag = Boolean.TRUE;
+    @Getter @Setter
     private Supplier newSupplier;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private String newSupplierType;
 
     private List<I18nMessage> contractAttachmentTypeList;
@@ -841,6 +840,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     }
 
+    public void attachSort() {
+        sortFlag = !sortFlag;
+    }
+
     public BigDecimal getBigDecimal(BigDecimal amount){
 //        return BigDecimal.valueOf(amount);
         return amount;
@@ -855,7 +858,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public List<V2_BlobObject> getAttachements() {
-        return attachements;
+        for (V2_BlobObject att : attachements) {
+            att.setBoSubTypeValue(WebUtil.getFieldValueMessage("contractAttachmentType", att.getBoSubType()));
+        }
+        if (sortFlag) {
+            return attachements.stream().sorted(Comparator.comparing(V2_BlobObject::getBoSubTypeValue)).collect(Collectors.toList());
+        } else {
+            return attachements.stream().sorted(Comparator.comparing(V2_BlobObject::getBoSubTypeValue).reversed()).collect(Collectors.toList());
+        }
     }
 
     public List<Supplier> getSupplierList() {

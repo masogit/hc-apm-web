@@ -302,6 +302,13 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
+                    <p:fieldset columns="4" legend="发送通知">
+                        <h:panelGroup >
+                            <label class="label">通知内容</label>
+                            <p:inputTextarea id="noticeContent" value="#{venderCompanyController.noticeContent}" style="width: 25%" maxlength="256"/>
+                            <p:commandButton validateClient="true" actionListener="#{venderCompanyController.sendNotice()}" value="发送" update="noticeContent :growl" icon="ui-icon-check"/>
+                        </h:panelGroup>
+                    </p:fieldset>
                     <p:commandButton validateClient="true" actionListener="#{venderCompanyController.relation}" disabled="#{venderCompanyController.relationDisabled()}" value="添加供应商" update="supplierTab:VenderCompanyDetailForm supplierTab:VenderCompanyForm:datalist1  supplierTab:SupplierListForm:datalist :growl" icon="ui-icon-check"/>
                 </p:fieldset>
             </h:form>
