@@ -220,7 +220,7 @@
                         <h:panelGroup>
                             <label class="label">合同号*</label>
                             <p:selectOneMenu value="#{zkbIntegralOrderEditController.selected.contractId}" required="false" requiredMessage="合同号不能为空！" valueChangeListener="#{zkbIntegralOrderEditController.contractChange}" >
-                                <p:ajax event="change" update="uploadGrip"/>
+                                <p:ajax event="change" update="uploadGrip save"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbIntegralOrderEditController.contractList}" var="item" itemLabel="#{item.contractNo}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
@@ -279,7 +279,8 @@
                     </p:panelGrid>
 
                     <h:panelGroup id="uploadGrip">
-                        <h:panelGroup rendered="#{(zkbIntegralOrderEditController.selectedContract.contractType eq 'CCS' or zkbIntegralOrderEditController.selectedContract.contractType eq 'Biomed') and zkbIntegralOrderEditController.selected.orderType eq 'ToolBox'}">
+                        <!--<h:panelGroup rendered="#{(zkbIntegralOrderEditController.selectedContract.contractType eq 'CCS' or zkbIntegralOrderEditController.selectedContract.contractType eq 'Biomed') and zkbIntegralOrderEditController.selected.orderType eq 'ToolBox'}">-->
+                        <h:panelGroup rendered="#{false and zkbIntegralOrderEditController.selected.orderType eq 'ToolBox'}">
                             <p:dataList id="uploadList" value="#{zkbIntegralOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">合同附件上传</f:facet>
                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
@@ -312,7 +313,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:commandButton value="保存" icon="ui-icon-save" validateClient="false"  update=":growl :zkbIntegralOrderEditForm" action="#{zkbIntegralOrderEditController.tempSave()}" disabled="#{!(zkbIntegralOrderEditController.zkbIntegralOrderStatusVo.scoreCanApply)}" rendered="#{!(zkbIntegralOrderEditController.showBodyForm() eq '0')}"/>
+                <p:commandButton id="save" value="保存" icon="ui-icon-save" validateClient="false"  update=":growl :zkbIntegralOrderEditForm" action="#{zkbIntegralOrderEditController.tempSave()}" disabled="#{!(zkbIntegralOrderEditController.zkbIntegralOrderStatusVo.scoreCanApply)}" rendered="#{!(zkbIntegralOrderEditController.showBodyForm() eq '0')}"/>
                 <p:commandButton value="提交" icon="ui-icon-check" validateClient="true"  update=":growl :saveTipDlg" action="#{zkbIntegralOrderEditController.preSave}" oncomplete="validShow(args, 'saveTipDlg');" disabled="#{!(zkbIntegralOrderEditController.zkbIntegralOrderStatusVo.scoreCanApply)}" rendered="#{!(zkbIntegralOrderEditController.showBodyForm() eq '0')}"/>
                 <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbIntegralOrderEditController.backList}" />
             </h:form>

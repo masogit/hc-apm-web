@@ -30,7 +30,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -371,7 +373,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         if(selectedTrainDetail != null && StrUtil.isNotEmpty(selectedTrainDetail.getQrCodeStr())){
             String url = trainManageService.getBaseURL().replace("gateway","") + "/wx/traning/signin";
             url = url + "?" + selectedTrainDetail.getQrCodeStr();
-            return  qrCodeDrawService.getImageBase64(QrCodeSupportUtil.createQrCodeWithoutLogo(selectedTrainDetail.getQrCodeStr(), url));
+            return  qrCodeDrawService.getImageBase64(QrCodeSupportUtil.createQrCodeWithoutLogo(selectedTrainDetail.getQrCodeStr(), url, Color.WHITE));
         }else{
             return "";
         }
