@@ -207,6 +207,7 @@
                                                 <p:ajax listener="#{contractInfoEditController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />
                                             </p:selectBooleanCheckbox>
                                         </div>
+                                        <p:commandLink value="↑↓" actionListener="#{contractInfoEditController.attachSort()}" update="AttachList"/>
                                         <h:outputText value="#{msg.AttachmentType}" class="ui-g-2"/>
                                         <h:outputText value="#{msg.FileName}" class="ui-g-3"/>
                                         <h:outputText value="#{msg.UploadTime}" class="ui-g-2" />
@@ -221,7 +222,7 @@
                                             <p:ajax process="@this" listener="#{contractInfoEditController.pick(fileitem.id)}" update="@(.selectCheckBox) @(.selectCheckBox) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />
                                         </p:selectBooleanCheckbox>
                                     </div>
-                                    <h:outputText value="#{fieldMsg.fieldValue('contractAttachmentType', fileitem.boSubType)}" class="ui-g-2"/>
+                                    <h:outputText value="#{fileitem.boSubTypeValue}" class="ui-g-2"/>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="ui-g-3"/>
 <!--                                    <p:link href="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" class="ui-g-3" >#{fileitem.objectName}</p:link>-->
                                     <h:outputText value="#{fileitem.createdDate}" class="ui-g-2">
