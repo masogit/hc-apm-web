@@ -6,7 +6,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -206,6 +205,17 @@ public class V2_BlobObject implements Serializable {
 
     @Transient
     private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
+
+    @Transient
+    private String boSubTypeValue;
+
+    public String getBoSubTypeValue() {
+        return boSubTypeValue;
+    }
+
+    public void setBoSubTypeValue(String boSubTypeValue) {
+        this.boSubTypeValue = boSubTypeValue;
+    }
 
     public String getId() {
         return id;
