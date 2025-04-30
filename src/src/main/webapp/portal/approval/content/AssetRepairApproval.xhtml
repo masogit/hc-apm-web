@@ -60,6 +60,12 @@
                 <p:column headerText="#{msg.requestReason}">
                     <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                 </p:column>
+                <p:column headerText="#{msg.patProblems}">
+                    <h:outputText value="#{item.patProblems}"/>
+                </p:column>
+                <p:column headerText="#{msg.patActions}">
+                    <h:outputText value="#{item.patActions}"/>
+                </p:column>
             </p:dataTable>
         </h:panelGroup>
         <br/>
