@@ -128,22 +128,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 if(zkbPartOrderUserConfigList.size() == 2){
                     for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
                         if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(c.getConfigType())){
-                            isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
+                            isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? ZkbConstantUtil.F : zkbPartOrderUserConfig.getIsVacation();
                             vacationBtn = true;
                             break;
                         }
                     }
                 }else if(zkbPartOrderUserConfigList.size() == 1){
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
-                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
+                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? ZkbConstantUtil.F : zkbPartOrderUserConfig.getIsVacation();
                         vacationBtn = true;
                     }
                     if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && "US".equals(zkbPartOrderUserConfig.getAssetType())){
-                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
+                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? ZkbConstantUtil.F : zkbPartOrderUserConfig.getIsVacation();
                         vacationBtn = true;
                     }
                     if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && "US".equals(zkbPartOrderUserConfig.getAssetType())){
-                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
+                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? ZkbConstantUtil.F : zkbPartOrderUserConfig.getIsVacation();
                         vacationBtn = true;
                     }
                 }
@@ -160,7 +160,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(c.getConfigType()) ||
                         ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(c.getConfigType())
                     ){
-                        notGeAsset = CopyByInvok.T;
+                        notGeAsset = ZkbConstantUtil.T;
                         disableNotGeAsset = true;
                     }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(c.getConfigType()) ||
                             ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(c.getConfigType()) ||
@@ -182,9 +182,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             mm.put("tenantUid", selectionTenantInfo);
         }
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-            mm.put("testLogin", CopyByInvok.T);
+            mm.put("testLogin", ZkbConstantUtil.T);
         }else{
-            mm.put("testLogin", CopyByInvok.F);
+            mm.put("testLogin", ZkbConstantUtil.F);
         }
         return mm;
     }
@@ -263,9 +263,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 mm.put("tenantUid", selectionTenantInfo);
             }
             if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-                mm.put("testLogin", CopyByInvok.T);
+                mm.put("testLogin", ZkbConstantUtil.T);
             }else{
-                mm.put("testLogin", CopyByInvok.F);
+                mm.put("testLogin", ZkbConstantUtil.F);
             }
 
             if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
@@ -344,7 +344,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     }
                 }
                 if(is4ooRole) {
-                    mm.put("ordersRole", CopyByInvok.T);
+                    mm.put("ordersRole", ZkbConstantUtil.T);
                 }
                 if(isCommercialRole) {
                     List<String> currentSteps = new ArrayList<>();
@@ -381,7 +381,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             if(StrUtil.isEmpty(notGeAsset)){
                 predicates.add(builder.isNull(root.get("notGeAsset")));
             }else{
-                predicates.add(builder.equal(root.get("notGeAsset"), CopyByInvok.T));
+                predicates.add(builder.equal(root.get("notGeAsset"), ZkbConstantUtil.T));
             }
             if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
                 if(StringUtils.isEmpty(type)){
@@ -416,8 +416,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                     predicates.add(builder.equal(root.get("tenantUID"), selectionTenantInfo));
                 }
-                predicates.add(builder.equal(root.get("needLetterFlag"), CopyByInvok.T));
-                predicates.add(builder.equal(root.get("uploadLetterFlag"), CopyByInvok.F));
+                predicates.add(builder.equal(root.get("needLetterFlag"), ZkbConstantUtil.T));
+                predicates.add(builder.equal(root.get("uploadLetterFlag"), ZkbConstantUtil.F));
             }else if(userContextService.isZkbUser()) {
                 if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                     predicates.add(builder.equal(root.get("tenantUID"), selectionTenantInfo));
@@ -630,9 +630,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     public String scoreFlagField(String scoreFlag){
         if(StringUtils.isEmpty(scoreFlag)){
             return "名额申请";
-        }else if(CopyByInvok.T.equals(scoreFlag)){
+        }else if(ZkbConstantUtil.T.equals(scoreFlag)){
             return "积分申请";
-        }else if(CopyByInvok.F.equals(scoreFlag)){
+        }else if(ZkbConstantUtil.F.equals(scoreFlag)){
             return "名额申请";
         }else{
             return "名额申请";

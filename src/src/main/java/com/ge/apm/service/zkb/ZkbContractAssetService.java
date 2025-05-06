@@ -12,8 +12,6 @@ import webapp.framework.web.WebUtil;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -110,7 +108,7 @@ public class ZkbContractAssetService {
                 flag = false;
             }else */
             if(ZkbFePartOrderService.highArtificialTypeValue.equals(ArtificialType) &&
-                    ZkbFePartOrder.OrderType.SpareParts.toString().equals(orderType) && CopyByInvok.T.equals(zkbContract.getFirstYearFlag())){
+                    ZkbFePartOrder.OrderType.SpareParts.toString().equals(orderType) && ZkbConstantUtil.T.equals(zkbContract.getFirstYearFlag())){
                 //高端机备件申请时第一年进行总数的50%验证
                 if(assetUid != null){
                     Boolean halfAsset = checkHalfAsset(zkbContract.getId(),assetUid);

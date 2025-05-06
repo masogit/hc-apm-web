@@ -2,7 +2,7 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbIntegralOrderRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.zkb.CopyByInvok;
+import com.ge.apm.service.zkb.ZkbConstantUtil;
 import com.ge.apm.service.zkb.ZkbIntegralOrderAuditService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -93,7 +93,7 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
 
             if(userContextService.isZkbUser()) {
                 if(ZkbIntegralOrder.IntegralOrderStatusEnum.EngineerQualificationReject.name().equals(selected.getStatus())){
-                    if(CopyByInvok.F.equals(selected.getEngineerQualificationsFlag())){
+                    if(ZkbConstantUtil.F.equals(selected.getEngineerQualificationsFlag())){
                         WebUtil.addErrorMessage("工程师无资质，需有资质的工程师提交申请！","");
                     }
                 }
@@ -123,7 +123,7 @@ public class ZkbIntegralOrderAuditController extends GenericCRUDUUIDController<Z
     }
 
     public void engineerQualificationsFlagChange(){
-        if(CopyByInvok.F.equals(selected.getEngineerQualificationsFlag())){
+        if(ZkbConstantUtil.F.equals(selected.getEngineerQualificationsFlag())){
             zkbIntegralOrderStatusVo.setToolBoxAuditBtnFlag(false);
         }else {
             zkbIntegralOrderStatusVo.setToolBoxAuditBtnFlag(true);

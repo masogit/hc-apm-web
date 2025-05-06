@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -293,9 +292,9 @@ public class ZkbContractImportService {
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
                     if("599合同第一年".equals(contractInfoVO.getFirstYearFlag())){
-                        zkbContract.setFirstYearFlag(CopyByInvok.T);
+                        zkbContract.setFirstYearFlag(ZkbConstantUtil.T);
                     }else if("599合同第2和3年".equals(contractInfoVO.getFirstYearFlag())){
-                        zkbContract.setFirstYearFlag(CopyByInvok.F);
+                        zkbContract.setFirstYearFlag(ZkbConstantUtil.F);
                     }else{
                         zkbContract.setFirstYearFlag("");
                     }
@@ -306,9 +305,9 @@ public class ZkbContractImportService {
                 zkbContract.setCompanyCode(contractInfoVO.getCompanyCode());
             }
             if("是".equals(contractInfoVO.getAssetQuotaType())){
-                zkbContract.setAssetQuotaType(CopyByInvok.T);
+                zkbContract.setAssetQuotaType(ZkbConstantUtil.T);
             }else if("否".equals(contractInfoVO.getAssetQuotaType())){
-                zkbContract.setAssetQuotaType(CopyByInvok.F);
+                zkbContract.setAssetQuotaType(ZkbConstantUtil.F);
             }
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             zkbContract.setLastModifiedDate(new Date());
@@ -343,9 +342,9 @@ public class ZkbContractImportService {
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
                     newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
                     if("599合同第一年".equals(contractInfoVO.getFirstYearFlag())){
-                        newZkbContract.setFirstYearFlag(CopyByInvok.T);
+                        newZkbContract.setFirstYearFlag(ZkbConstantUtil.T);
                     }else if("599合同第2和3年".equals(contractInfoVO.getFirstYearFlag())){
-                        newZkbContract.setFirstYearFlag(CopyByInvok.F);
+                        newZkbContract.setFirstYearFlag(ZkbConstantUtil.F);
                     }else{
                         newZkbContract.setFirstYearFlag("");
                     }
@@ -356,12 +355,18 @@ public class ZkbContractImportService {
                 }
             }
             if("是".equals(contractInfoVO.getAssetQuotaType())){
-                newZkbContract.setAssetQuotaType(CopyByInvok.T);
+                newZkbContract.setAssetQuotaType(ZkbConstantUtil.T);
             }else if("否".equals(contractInfoVO.getAssetQuotaType())){
-                newZkbContract.setAssetQuotaType(CopyByInvok.F);
+                newZkbContract.setAssetQuotaType(ZkbConstantUtil.F);
             }
             if(StrUtil.isEmpty(contractInfoVO.getCanApplyToolbox())){
-                newZkbContract.setCanApplyToolbox("Y");
+                newZkbContract.setCanApplyToolbox(ZkbConstantUtil.NORMAL_Y);
+            }else{
+                if("是".equals(contractInfoVO.getCanApplyToolbox())){
+                    newZkbContract.setCanApplyToolbox(ZkbConstantUtil.NORMAL_Y);
+                }else if("否".equals(contractInfoVO.getCanApplyToolbox())){
+                    newZkbContract.setCanApplyToolbox(ZkbConstantUtil.NORMAL_N);
+                }
             }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
@@ -436,7 +441,7 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, "是否ZKB 599方案不能为空！");
             isValidateData = false;
         }else {
-            if(CopyByInvok.T.equals(contractInfoVO.getFiveNineNineFlag())){
+            if(ZkbConstantUtil.T.equals(contractInfoVO.getFiveNineNineFlag())){
                 if(StringUtils.isEmpty(contractInfoVO.getFirstYearFlag())){
                     item.put("status", ImportStatus.Failure);
                     ZkbContractRow.addErrMessage(item, "599合同年份不能为空！");

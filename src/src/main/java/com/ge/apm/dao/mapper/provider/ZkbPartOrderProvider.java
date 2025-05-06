@@ -1,8 +1,7 @@
 package com.ge.apm.dao.mapper.provider;
 
-import com.ge.apm.domain.PurchaseInfo;
 import com.ge.apm.domain.ZkbPartOrder;
-import com.ge.apm.service.zkb.CopyByInvok;
+import com.ge.apm.service.zkb.ZkbConstantUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -148,7 +147,7 @@ public class ZkbPartOrderProvider {
         if(StringUtils.isNotBlank(tenantUid)) {
             sql.append(" and tenant_uid = '" + tenantUid + "' ");
         }
-        if(CopyByInvok.T.equals(testLogin)){
+        if(ZkbConstantUtil.T.equals(testLogin)){
             sql.append(" and data_type = 'test.'" );
         }else{
             sql.append(" and data_type is null ");

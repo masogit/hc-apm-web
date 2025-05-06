@@ -1,7 +1,6 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbIntegralRecordRepository;
 import com.ge.apm.dao.ZkbIntegralRepository;
 import com.ge.apm.domain.*;
@@ -18,7 +17,6 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -221,7 +219,7 @@ public class ZkbIntegralService {
         if(zkbIntegral.getCoefficient().equals(initCoefficient)){
             return initCoefficient;
         }else if(zkbIntegral.getCoefficient() > initCoefficient){
-            int subDay = CopyByInvok.getBetweenDay(zkbIntegral.getValidityDate(),new Date());
+            int subDay = ZkbConstantUtil.getBetweenDay(zkbIntegral.getValidityDate(),new Date());
             if(subDay > 0){
                 return initCoefficient;
             }else{

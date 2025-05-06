@@ -130,7 +130,7 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
                 zkbIntegralOrderStatusVo.setShowOrder(true);
             }
         }else{
-            if(CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())){
+            if(ZkbConstantUtil.NORMAL_TWO.equals(selected.getArtificialType())){
                 if(ZkbIntegralOrder.IntegralOrderStatusEnum.Requested.toString().equals(selected.getStatus())  && zkbIntegralOrderStatusVo.isCanEditFlag()){
                     if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         zkbIntegralOrderStatusVo.setShowManage(true);
@@ -316,7 +316,7 @@ public class ZkbIntegralOrderAuditService extends MicroServiceInvoker {
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
 
         //如果审批不通过则需要归还积分,微信通知代理商
-        if(!flag || CopyByInvok.F.equals(zkbIntegralOrder.getWhetherDeduct())){
+        if(!flag || ZkbConstantUtil.F.equals(zkbIntegralOrder.getWhetherDeduct())){
             int score = 0;
             if(ZkbIntegralOrder.OrderTypeEnum.ToolBox.name().equals(zkbIntegralOrder.getOrderType())){
                 score = 900;

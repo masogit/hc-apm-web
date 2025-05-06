@@ -19,7 +19,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -311,7 +310,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 if("t".equals(o.getHighCatFlag())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(o.getContractCatId());
                     if(zkbContractCat != null) {
-                        if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                        if (!ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
                             continue;
                         }
                     }
@@ -319,7 +318,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 if("High".equals(o.getProbeQuotaType())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(o.getContractCatId());
                     if(zkbContractCat != null) {
-                        if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                        if (!ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
                             continue;
                         }
                     }
@@ -493,7 +492,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 WebUtil.addErrorMessage("是否为紧急订单 不能为空！");
                 rs = false;
             }else{
-                if(CopyByInvok.T.equals(zkbIntegralOrder.getUrgentOrder())){
+                if(ZkbConstantUtil.T.equals(zkbIntegralOrder.getUrgentOrder())){
                     if(StrUtil.isEmpty(zkbIntegralOrder.getUrgencyReasons())){
                         WebUtil.addErrorMessage("订单紧急的原因 不能为空！");
                         rs = false;
@@ -611,7 +610,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                 }else{
-                    if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbIntegralOrder.getRequestDate(),zkbContract.getEndDate()))){
+                    if("GT".equals(ZkbConstantUtil.compareDateByYyyyMMdd(zkbIntegralOrder.getRequestDate(),zkbContract.getEndDate()))){
                         zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
                     }else{
                         zkbIntegralOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());

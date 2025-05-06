@@ -8,7 +8,6 @@ import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.primefaces.ultima.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -166,19 +165,25 @@ public class ZkbContractService {
                 }
             }
             if(StringUtils.isNotEmpty(zkbContract.getFirstYearFlag())){
-                if(CopyByInvok.T.equals(zkbContract.getFirstYearFlag())){
+                if(ZkbConstantUtil.T.equals(zkbContract.getFirstYearFlag())){
                     zkbContractDataMap.put("599合同年份","599合同第一年");
-                }else if(CopyByInvok.F.equals(zkbContract.getFirstYearFlag())){
+                }else if(ZkbConstantUtil.F.equals(zkbContract.getFirstYearFlag())){
                     zkbContractDataMap.put("599合同年份","599合同第2和3年");
                 }
             }
             zkbContractDataMap.put("公司编码", zkbContract.getCompanyCode());
-            zkbContractDataMap.put("是否可以申请工具箱", zkbContract.getCanApplyToolbox());
+            if(StringUtils.isNotEmpty(zkbContract.getCanApplyToolbox())){
+                if(ZkbConstantUtil.NORMAL_Y.equals(zkbContract.getCanApplyToolbox())){
+                    zkbContractDataMap.put("是否可以申请工具箱","是");
+                }else if(ZkbConstantUtil.NORMAL_N.equals(zkbContract.getCanApplyToolbox())){
+                    zkbContractDataMap.put("是否可以申请工具箱","否");
+                }
+            }
             zkbContractDataMap.put("关联合同号", zkbContract.getLinkContractNo());
             if(StringUtils.isNotEmpty(zkbContract.getAssetQuotaType())){
-                if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){
+                if(ZkbConstantUtil.T.equals(zkbContract.getAssetQuotaType())){
                     zkbContractDataMap.put("2022年起探头高低端名额分类", "是");
-                }else  if(CopyByInvok.F.equals(zkbContract.getAssetQuotaType())){
+                }else  if(ZkbConstantUtil.F.equals(zkbContract.getAssetQuotaType())){
                     zkbContractDataMap.put("2022年起探头高低端名额分类", "否");
                 }
             }

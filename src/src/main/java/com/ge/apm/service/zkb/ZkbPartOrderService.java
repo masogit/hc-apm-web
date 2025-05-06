@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -30,7 +29,6 @@ import webapp.framework.web.WebUtil;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -302,7 +300,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
 
-        Integer days = CopyByInvok.getBetweenDay(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()) + 1;
+        Integer days = ZkbConstantUtil.getBetweenDay(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()) + 1;
         if(days > 7 || days < 1){
             return "";
         }else{
@@ -348,7 +346,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if("t".equals(o.getHighCatFlag())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(o.getContractCatId());
                     if(zkbContractCat != null) {
-                        if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                        if (!ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
                             continue;
                         }
                     }
@@ -356,7 +354,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if("High".equals(o.getProbeQuotaType())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(o.getContractCatId());
                     if(zkbContractCat != null) {
-                        if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                        if (!ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
                             continue;
                         }
                     }
@@ -522,7 +520,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if("t".equals(o.getHighCatFlag())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(o.getContractCatId());
                     if(zkbContractCat != null) {
-                        if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                        if (!ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
                             continue;
                         }
                     }
@@ -530,7 +528,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if("High".equals(zkbPartOrder.getProbeQuotaType())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(o.getContractCatId());
                     if(zkbContractCat != null) {
-                        if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                        if (!ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
                             continue;
                         }
                     }
@@ -601,7 +599,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public boolean checkContractLastDay(ZkbContract zkbContract,String orderType){
-        if(CopyByInvok.getBetweenDay(zkbContract.getEndDate(),new Date()) == 0){
+        if(ZkbConstantUtil.getBetweenDay(zkbContract.getEndDate(),new Date()) == 0){
             return true;
         }
         return false;
@@ -628,14 +626,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
-            if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && CopyByInvok.T.equals(zkbPartOrder.getNotGeAsset())){
+            if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset())){
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.TsePending.toString());
             }else{
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
-            if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && CopyByInvok.T.equals(zkbPartOrder.getNotGeAsset())){
+            if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset())){
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.TsePending.toString());
             }else{
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
@@ -646,7 +644,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
                 }else{
-                    if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()))){
+                    if("GT".equals(ZkbConstantUtil.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()))){
                         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
                     }else{
                         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
@@ -852,13 +850,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         }else{
                             boolean r = checkApplyNumValid(zkbPartOrder,c);
                             if(!r){
-                                zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                                zkbPartOrder.setCheckApplyNumFlag(ZkbConstantUtil.F);
                             }else{
-                                zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                                zkbPartOrder.setCheckApplyNumFlag(ZkbConstantUtil.T);
                             }
-                            if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
+                            if(ZkbConstantUtil.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
                                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
-                            }else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
+                            }else if("GT".equals(ZkbConstantUtil.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
                                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
                             }else{
                                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
@@ -893,28 +891,28 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     if(flag){
                         boolean r = checkApplyNumValid(zkbPartOrder,c);
                         if(!r){
-                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                            zkbPartOrder.setCheckApplyNumFlag(ZkbConstantUtil.F);
                         }else{
-                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                            zkbPartOrder.setCheckApplyNumFlag(ZkbConstantUtil.T);
                         }
                     }else{
-                        zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                        zkbPartOrder.setCheckApplyNumFlag(ZkbConstantUtil.T);
                     }
                 }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
                     boolean r = checkApplyNumValid(zkbPartOrder,c);
                     if(!r){
-                        zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                        zkbPartOrder.setCheckApplyNumFlag(ZkbConstantUtil.F);
                     }else{
-                        zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                        zkbPartOrder.setCheckApplyNumFlag(ZkbConstantUtil.T);
                     }
                 }
 
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
-                if(CopyByInvok.T.equals(zkbPartOrder.getNotGeAsset()) && ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())){
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset()) && ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-                } else if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
+                } else if(ZkbConstantUtil.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
-                } else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
+                } else if("GT".equals(ZkbConstantUtil.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
                 } else{
                     if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
@@ -933,7 +931,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setDirectorAuditer(userAccount.getName());
             if(nextFlag){
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.DirectorAccept.toString());
-                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
+                if("GT".equals(ZkbConstantUtil.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
                 }else{
                     if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
@@ -1117,10 +1115,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if(zkbUnrealList != null && zkbUnrealList.size() > 0){
                     ZkbUnreal u = zkbUnrealList.get(0);
                     v.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
-                    v.setCbStatus(CopyByInvok.F);
+                    v.setCbStatus(ZkbConstantUtil.F);
                 }else{
                     v.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
-                    v.setCbStatus(CopyByInvok.T);
+                    v.setCbStatus(ZkbConstantUtil.T);
                 }
                 zkbUnrealVos.add(v);
             }
@@ -1130,10 +1128,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, zkbPartOrder.getCatNo());
             if(zkbUnrealList != null && zkbUnrealList.size() > 0){
                 u.setUnrealPartName(zkbPartOrder.getCatNo());
-                u.setCbStatus(CopyByInvok.F);
+                u.setCbStatus(ZkbConstantUtil.F);
             }else{
                 u.setUnrealPartName(zkbPartOrder.getCatNo());
-                u.setCbStatus(CopyByInvok.T);
+                u.setCbStatus(ZkbConstantUtil.T);
             }
             zkbUnrealVos.add(u);
         }
@@ -1224,7 +1222,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Ordered.toString());
                 if(StrUtil.isEmpty(zkbPartOrder.getNotGeAsset())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
-                    zkbPartOrder.setUploadLetterFlag(CopyByInvok.F);
+                    zkbPartOrder.setUploadLetterFlag(ZkbConstantUtil.F);
                     probeOrderNewCatChangeCalcQty(zkbPartOrder, zkbContract);
                 }else {
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString());
@@ -1340,11 +1338,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
             if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
-                if(CopyByInvok.T.equals(zkbPartOrder.getWhetherDeduct())){
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getWhetherDeduct())){
                     zkbPartOrderQuotaService.subUseQty(zkbContract, zkbPartOrder, qty,userAccount);
                 }else {
                     //不扣除名额，那么申请中-1，剩余+1
-                    if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag()) && CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
+                    if(ZkbConstantUtil.T.equals(zkbPartOrder.getMaintainFlag()) && ZkbConstantUtil.T.equals(zkbPartOrder.getMaintainFirstFlag())){
 
                     }else{
                         zkbPartOrderQuotaService.subApplyQty(zkbContract,zkbPartOrder, -qty,userAccount,false);
@@ -1388,7 +1386,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }
         }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString())){
-            if(CopyByInvok.F.equals(zkbPartOrder.getTakeFlag())){
+            if(ZkbConstantUtil.F.equals(zkbPartOrder.getTakeFlag())){
                 zkbPartOrderQuotaService.subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getQty(),userAccount);
             }
         }
@@ -1400,15 +1398,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             return result;
         }
         if(selected.getNewCatFlag().equals(selected.getTenantNewCatFlag())){
-            if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+            if(ZkbConstantUtil.T.equals(selected.getNewCatFlag())){
                 if(selected.getProvideNewContractSecond().equals(selected.getProvideNewContract())){
                     //名额不发生变化
-                }else if(CopyByInvok.T.equals(selected.getProvideNewContractSecond()) && StrUtil.isEmpty(selected.getProvideNewContract())){
+                }else if(ZkbConstantUtil.T.equals(selected.getProvideNewContractSecond()) && StrUtil.isEmpty(selected.getProvideNewContract())){
                     //名额不发生变化
                 }else{
-                    if(CopyByInvok.T.equals(selected.getProvideNewContractSecond())){
+                    if(ZkbConstantUtil.T.equals(selected.getProvideNewContractSecond())){
                         //名额需要2 -->  1
-                    }else if(CopyByInvok.F.equals(selected.getProvideNewContractSecond())){
+                    }else if(ZkbConstantUtil.F.equals(selected.getProvideNewContractSecond())){
                         //名额需要1 -->  2
                         result = true;
                     }
@@ -1417,15 +1415,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 //名额不发生变化
             }
         }else {
-            if(CopyByInvok.T.equals(selected.getNewCatFlag())){
-                if(CopyByInvok.F.equals(selected.getProvideNewContractSecond())){
+            if(ZkbConstantUtil.T.equals(selected.getNewCatFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getProvideNewContractSecond())){
                     //名额需要1 -->  2
                     result = true;
                 }else {
                     //名额不发生变化
                 }
             }else{
-                if(CopyByInvok.F.equals(selected.getProvideNewContract())){
+                if(ZkbConstantUtil.F.equals(selected.getProvideNewContract())){
                     //名额需要2 -->  1
                 }
             }
@@ -1436,7 +1434,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void probeOrderNewCatChangeCalcQty(ZkbPartOrder zkbPartOrder, ZkbContract zkbContract){
         if(StrUtil.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
             if(!zkbPartOrder.getNewCatFlag().equals(zkbPartOrder.getTenantNewCatFlag())){
-                if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getNewCatFlag())){
                     zkbPartOrder.setQty(zkbPartOrder.getQty() * 2);
                 }else {
                     zkbPartOrder.setQty(zkbPartOrder.getQty() / 2);
@@ -1444,16 +1442,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }else if("New".equals(zkbContract.getQuotaDeductType())){
             if(zkbPartOrder.getNewCatFlag().equals(zkbPartOrder.getTenantNewCatFlag())){
-                if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getNewCatFlag())){
                     if(zkbPartOrder.getProvideNewContractSecond().equals(zkbPartOrder.getProvideNewContract())){
                         //名额不发生变化
-                    }else if(CopyByInvok.T.equals(zkbPartOrder.getProvideNewContractSecond()) && StrUtil.isEmpty(zkbPartOrder.getProvideNewContract())){
+                    }else if(ZkbConstantUtil.T.equals(zkbPartOrder.getProvideNewContractSecond()) && StrUtil.isEmpty(zkbPartOrder.getProvideNewContract())){
                         //名额不发生变化
                     }else{
-                        if(CopyByInvok.T.equals(zkbPartOrder.getProvideNewContractSecond())){
+                        if(ZkbConstantUtil.T.equals(zkbPartOrder.getProvideNewContractSecond())){
                             //名额需要2 -->  1
                             zkbPartOrder.setQty(zkbPartOrder.getQty() / 2);
-                        }else if(CopyByInvok.F.equals(zkbPartOrder.getProvideNewContractSecond())){
+                        }else if(ZkbConstantUtil.F.equals(zkbPartOrder.getProvideNewContractSecond())){
                             //名额需要1 -->  2
                             zkbPartOrder.setQty(zkbPartOrder.getQty() * 2);
                         }
@@ -1462,15 +1460,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     //名额不发生变化
                 }
             }else {
-                if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
-                    if(CopyByInvok.F.equals(zkbPartOrder.getProvideNewContractSecond())){
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getNewCatFlag())){
+                    if(ZkbConstantUtil.F.equals(zkbPartOrder.getProvideNewContractSecond())){
                         //名额需要1 -->  2
                         zkbPartOrder.setQty(zkbPartOrder.getQty() * 2);
                     }else {
                         //名额不发生变化
                     }
                 }else{
-                    if(CopyByInvok.F.equals(zkbPartOrder.getProvideNewContract())){
+                    if(ZkbConstantUtil.F.equals(zkbPartOrder.getProvideNewContract())){
                         //名额需要2 -->  1
                         zkbPartOrder.setQty(zkbPartOrder.getQty() / 2);
                     }
@@ -1643,7 +1641,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
         Integer qty = null;
         if(!oldZkbPartOrder.getSsaKeyFlag().equals(zkbPartOrder.getSsaKeyFlag())){
-            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+            if(ZkbConstantUtil.T.equals(zkbPartOrder.getSsaKeyFlag())){
                 qty = 0 - zkbPartOrder.getQty();
             }else{
                 qty = zkbPartOrder.getQty();
@@ -1657,11 +1655,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
         if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
-            if(CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+            if(ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                 return;
             }
         }
-        if(qty != null && !CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
+        if(qty != null && !ZkbConstantUtil.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
             String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
             if(qty > 0){
                 opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
@@ -1768,7 +1766,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         newZkbPartOrderStep.setPartOrderId(zkbPartOrder.getId());
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-        if(CopyByInvok.T.equals(zkbPartOrder.getWhetherDeduct())){
+        if(ZkbConstantUtil.T.equals(zkbPartOrder.getWhetherDeduct())){
             fourHundredCancelSubApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
         }
     }
@@ -1781,19 +1779,19 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString();
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //region  人工
-            if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){//是否保养
-                if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
+            if(ZkbConstantUtil.T.equals(zkbPartOrder.getMaintainFlag())){//是否保养
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getScoreFlag())){
                     zkbIntegralService.deductScore(zkbPartOrder.getTenantUID(),zkbPartOrder.getQty(),userAccount,ZkbIntegralRecord.RecordType.QuotaReturn.toString());
                 }else{
                     ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
-                    if(CopyByInvok.F.equals(zkbContractAsset.getSupportMaintainFlag())){//不是ge 第一次免费保养名额
+                    if(ZkbConstantUtil.F.equals(zkbContractAsset.getSupportMaintainFlag())){//不是ge 第一次免费保养名额
                         zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
                         zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) + qty);
                         zkbContractRepository.save(zkbContract);
                         zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                     }else {
                         //这段逻辑   1. 如果该设备享有GE每年一次的免费保养名额，则合同内每一年第一次申请时不扣除名额，当第二次申请后开始扣除名额
-                        if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
+                        if(ZkbConstantUtil.T.equals(zkbPartOrder.getMaintainFirstFlag())){
                             zkbContractAsset.setMaintainStartDate(null);
                             zkbContractAsset.setMaintainEndDate(null);
                             zkbContractAssetRepository.save(zkbContractAsset);
@@ -1806,7 +1804,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     }
                 }
             }else{
-                if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
+                if(ZkbConstantUtil.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                     if(!ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) && !ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                         return;
                     }
@@ -1837,14 +1835,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     }
                     return;
                 }
-                if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getSsaKeyFlag())){
                     return;
                 }
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
-                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                     return;
                 }
-                if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
+                if(ZkbConstantUtil.T.equals(zkbPartOrder.getScoreFlag())){
                     zkbIntegralService.deductScore(zkbPartOrder.getTenantUID(),zkbPartOrder.getQty(),userAccount,ZkbIntegralRecord.RecordType.QuotaReturn.toString());
                 }else{
                     AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
@@ -1930,13 +1928,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             if(StringUtils.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())) {
-                if(StringUtils.isEmpty(zkbPartOrder.getHighCatFlag()) || CopyByInvok.F.equals(zkbPartOrder.getHighCatFlag())){
+                if(StringUtils.isEmpty(zkbPartOrder.getHighCatFlag()) || ZkbConstantUtil.F.equals(zkbPartOrder.getHighCatFlag())){
                     arg = (zkbContract.getProbeQuota() + qty)<0? true:arg;
                 }else{
                     if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())){
                         ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                         if(zkbContractCat != null){
-                            if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                            if(ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
                                 arg = (zkbContract.getProbeQuota() + qty)<0? true:arg;
                             }
                         }
@@ -1953,7 +1951,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())) {
                         ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                         if (zkbContractCat != null) {
-                            if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                            if(ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
                                 arg = (zkbContract.getProbeQuotaNormal() + qty)<0? true:arg;
                             }
                         }
@@ -1978,9 +1976,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             String url = "";
             if(StringUtils.isEmpty(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
-            }else if(CopyByInvok.EMAIL_URL_TYPE_LASTDAY.equals(urlType)){
+            }else if(ZkbConstantUtil.EMAIL_URL_TYPE_LASTDAY.equals(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
-            }else if(CopyByInvok.EMAIL_URL_TYPE_UNORDER.equals(urlType)){
+            }else if(ZkbConstantUtil.EMAIL_URL_TYPE_UNORDER.equals(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_UN_ORDER);
             }
             HttpHeaders header = createHttpHeaders(token);
@@ -2273,8 +2271,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         for (ZkbPartOrderReturn r : auditReturnList){
             if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
                 if(ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
-                    if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && CopyByInvok.T.equals(zkbPartOrder.getNotGeAsset()) && "goodReturn".equals(r.getReturnType())){
-                        if(CopyByInvok.T.equals(r.getSevenReturnedFlag())){
+                    if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset()) && "goodReturn".equals(r.getReturnType())){
+                        if(ZkbConstantUtil.T.equals(r.getSevenReturnedFlag())){
                             v += (r.getQty() - 1);
                         }else{
                             v += r.getQty();
@@ -2577,7 +2575,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())){
             if(!oldWhetherDeduct.equals(zkbPartOrder.getWhetherDeduct())){
                 Integer q = zkbPartOrder.getQty();
-                if(CopyByInvok.F.equals(zkbPartOrder.getWhetherDeduct())){
+                if(ZkbConstantUtil.F.equals(zkbPartOrder.getWhetherDeduct())){
                     q =  -q;
                 }
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
