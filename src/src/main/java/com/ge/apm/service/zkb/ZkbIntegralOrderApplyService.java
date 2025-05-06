@@ -478,10 +478,10 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
 
             if(ZkbContract.ContractType.CCS.name().equals(zkbContract.getContractType()) ||
                     ZkbContract.ContractType.Biomed.name().equals(zkbContract.getContractType())){
-                if(CollectionUtils.isEmpty(v2_blobObjectList)){
+               /* if(CollectionUtils.isEmpty(v2_blobObjectList)){
                     WebUtil.addErrorMessage("合同附件 不能为空！");
                     rs = false;
-                }
+                }*/
             }
         }else {
             if(StrUtil.isEmpty(zkbIntegralOrder.getArtificialType())){
