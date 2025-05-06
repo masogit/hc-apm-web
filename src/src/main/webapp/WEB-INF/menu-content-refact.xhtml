@@ -364,6 +364,7 @@
     <script>
         function davinciToken() {
             var token = "#{userContextService.getAccessToken()}";
+            var davinciUrl = "#{userContextService.queryDavinciUrl()}";
             fetch('/geapm/web/davinci-access-token?token='+ encodeURIComponent(token))
                 .then(response => response.json())
                 .then(data => {
@@ -372,7 +373,7 @@
                     localStorage.setItem("TOKEN", token || '');
                     localStorage.setItem("TOKEN_EXPIRE", (Date.now() + 86400000).toString());
                     localStorage.setItem("loginUser", loginUser || '');
-                    window.open('/davinci#/projects','_blank');
+                    window.open(davinciUrl,'_blank');
                 })
                 .catch(error => {
                     console.error('Error fetching token:', error);

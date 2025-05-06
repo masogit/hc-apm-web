@@ -7,3 +7,4 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 -- YHAAO-24782 配置项增加维修脚本
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, '', '测试租户脚本维修文件', 'workOrderScript', '测试租户脚本维修文件', 't','f',1 where not exists(select * from config_item where key = 'workOrderScript');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text, '-', ''),17, '/davinci#/projects','IB报表链接','ibReportUrl','IB报表链接', 'f','t',1  where not exists(select * from config_item where key = 'ibReportUrl');
