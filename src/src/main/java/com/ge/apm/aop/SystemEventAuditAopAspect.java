@@ -127,7 +127,7 @@ public class SystemEventAuditAopAspect {
                                 break;
                         }
 
-                        Map<String, List<V2_BlobObject>> blobMap = blobList.stream().collect(Collectors.groupingBy(V2_BlobObject::getBoSubType));
+                        Map<String, List<V2_BlobObject>> blobMap = blobList.stream().collect(Collectors.groupingBy(blob -> blob.getBoSubType() == null ? "unknown" : blob.getBoSubType()));
                         HashMap<Object, Object> eventMap = new HashMap<>();
                         for (Map.Entry<String, List<V2_BlobObject>> stringListEntry : blobMap.entrySet()) {
                             List<V2_BlobObject> value = stringListEntry.getValue();
