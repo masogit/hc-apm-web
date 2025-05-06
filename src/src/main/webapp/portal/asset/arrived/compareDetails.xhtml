@@ -68,11 +68,11 @@
                 </div>
                 <div class="ui-g">
                     <h:outputText value="#{msg.clinicalDeptName}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['使用单位']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['使用科室']}" class="ui-g-3"/>
                     <h:outputText value="#{orgTreeController.getOrgInfoByUID(compareImportController.selectedItem['arrivalListItem'].clinicalDeptUID)}" class="ui-g-3"/>
                     <h:outputText id="clinicalDeptName" value="#{compareImportController.selectedAsset.clinicalDeptName}" class="ui-g-3"/>
                     <p:commandLink value="更新" class="ui-g-1" update="clinicalDeptName @this" actionListener="#{compareImportController.updateField('clinicalDeptName')}" 
-                                   disabled="#{compareImportController.selectedItem['使用单位'] eq compareImportController.selectedAsset.clinicalDeptName or empty compareImportController.selectedItem['使用单位'] and empty compareImportController.selectedAsset.clinicalDeptName}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                                   disabled="#{compareImportController.selectedItem['使用科室'] eq compareImportController.selectedAsset.clinicalDeptName or empty compareImportController.selectedItem['使用科室'] and empty compareImportController.selectedAsset.clinicalDeptName}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
                 </div>
                 <div class="ui-g">
                     <h:outputText value="#{msg.serialNum}" class="ui-g-2"/>

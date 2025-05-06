@@ -381,8 +381,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		prepareAssetRuleList();
 	}
 	private void filterAssetInfoList(){
-		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-		if(tempTenantInfo != null && "3".equals(tempTenantInfo.getCustomTenant())){
+//		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+//		if(tempTenantInfo != null && "3".equals(tempTenantInfo.getCustomTenant())){
 			boolean generate = queryAsset.getGenerate();  //true:已生成过/false:为生成过
 			assetInfoList=assetInfoList.stream()
 					.filter(ai->{
@@ -395,7 +395,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 						return generate? countByAssetId > 0:countByAssetId == 0;
 					})
 					.collect(Collectors.toList());
-		}
+//		}
 	}
 	public String findCustomTenant(){
 		String customTenant="";
