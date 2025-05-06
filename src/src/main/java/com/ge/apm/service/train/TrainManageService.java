@@ -385,7 +385,30 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     public List<TrainDetailSign> queryDetailSignByDetailId(String detailId){
-        return trainDetailSignRepository.findByDetailId(detailId);
+        List<TrainDetailSign> trainDetailSignList = trainDetailSignRepository.findByDetailId(detailId);
+
+        for(TrainDetailSign s : trainDetailSignList){
+            if(StrUtil.isEmpty(s.getSignDeptName())){
+                OrgInfo orgInfo = orgInfoDao.getByUid(s.getSignDeptUid());
+                if(orgInfo != null){
+                    s.setSignDeptName(orgInfo.getName());
+                }
+            }
+        }
+        return trainDetailSignList;
+    }
+
+    public List<OrgInfo> queryOrgToSign(String orgUidStr){
+        if(StrUtil.isEmpty(orgUidStr)){
+            return new ArrayList<>();
+        }
+        List<OrgInfo> orgInfoList = new ArrayList<>();
+        Arrays.asList(orgUidStr.split(",")).stream().forEach(t -> {
+            OrgInfo orgInfo = orgInfoDao.getByUid(t);
+            orgInfoList.add(orgInfo);
+        });
+
+        return orgInfoList;
     }
 
 

@@ -46,6 +46,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     private UaaService uaaService;
     private UserContextService userContextService;
     private TrainManageService trainManageService;
+    private QrCodeDrawService qrCodeDrawService;
 
     @Getter @Setter
     private StreamedContent exportFile;
@@ -91,9 +92,8 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     private String filterSigner;
     @Getter @Setter
     private List<UserAccount> clinicalOwnerList;
-
-    QrCodeDrawService qrCodeDrawService;
-
+    @Getter @Setter
+    private List<OrgInfo> orgInfoList;
 
     @Override
     protected void init() {
@@ -196,7 +196,6 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
 
     public void prepareItemEdit(){
         detailActionName = "Edit";
-
         blobObjectList = trainManageService.queryBlobByDetailId(selectedTrainDetail.getId());
         trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetail.getId());
     }
@@ -342,16 +341,28 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         }*/
     }
 
+    public void signDeptUidValueChage(){
+        String uid = selectedTrainDetailSign.getSignDeptUid();
+        if(StrUtil.isEmpty(uid)){
+            return;
+        }
+        OrgInfo orgInfo = orgInfoList.stream().filter(t -> t.getUid().equals(uid)).findFirst().get();
+        selectedTrainDetailSign.setSignDeptName(orgInfo.getName());
+    }
+
     public void prepareSignCreate(){
         loadClinicalDeptList();
         selectedTrainDetailSign = new TrainDetailSign();
         selectedTrainDetailSign.setSignDate(new Date());
         selectedTrainDetailSign.setDetailId(selectedTrainDetail.getId());
+        orgInfoList = trainManageService.queryOrgToSign(selected.getTrainingDeptUid());
     }
 
     public void prepareSignEdit(){
         loadClinicalDeptList();
         filterClinicalDeptOrg = selectedTrainDetailSign.getSignDeptUid();
+        orgInfoList = trainManageService.queryOrgToSign(selected.getTrainingDeptUid());
+
     }
 
     public void deleteSign(){
