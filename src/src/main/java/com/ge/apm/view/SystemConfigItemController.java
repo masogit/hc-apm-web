@@ -94,6 +94,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(14,"不良事件");
         categoryMap.put(15,"培训管理");
         categoryMap.put(16,"MVS院级工单");
+        categoryMap.put(17,"IB报表链接");
+
 
     }
 

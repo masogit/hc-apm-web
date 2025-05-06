@@ -284,6 +284,12 @@ public class UserContextService implements Serializable {
         return CollectionUtils.isNotEmpty(functions);
     }
 
+    public String queryDavinciUrl() {
+        ConfigItemValueRepository configItemValueRepository=WebUtil.getBean(ConfigItemValueRepository.class);
+        UserAccount currentUser = getCurrentUserAccount();
+        return configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "ibReportUrl");
+    }
+
     public boolean accessContainsApmFeature(String featureName) {
         Set<String> apmFeatures = getFeatureList();
         apmFeatures = apmFeatures.stream().filter(apmFeature -> apmFeature.startsWith(featureName)).collect(Collectors.toSet());
