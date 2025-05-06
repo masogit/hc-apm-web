@@ -59,7 +59,7 @@
          <p:fieldset legend="签到信息" rendered="#{not empty trainInSiteController.selectedTrainDetail.id}">
             <p:dataTable id="signDatalist" value="#{trainInSiteController.trainDetailSignList}" var="item"
                          widgetVar="signDatalist" selectionMode="single" selection="#{trainInSiteController.selectedTrainDetailSign}"
-                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.signDate}"
+                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.signDate}"
                          paginatorTemplate="{Toolbar}" rows="200" emptyMessage="#{msg.noRecordFound}" >
 
                <p:ajax event="rowSelect" update="deleteSignlButton"/>
@@ -69,6 +69,9 @@
                <p:column headerText="所属科室">
                   <h:outputText value="#{item.signDeptName}"/>
                </p:column>-->
+               <p:column headerText="所属科室">
+                  <h:outputText value="#{item.signDeptName}"/>
+               </p:column>
                <p:column headerText="签到人">
                   <h:outputText value="#{item.signerName}"/>
                </p:column>
@@ -112,15 +115,14 @@
    <p:dialog id="signDlg" widgetVar="signDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="300" header="签到信息" height="350">
       <h:form id="signForm">
          <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-            <!--<h:panelGroup>
+            <h:panelGroup>
                <label class="label">科室</label>
-               <p:autoComplete dropdown="true" value="#{trainInSiteController.filterClinicalDeptOrg}"
-                               scrollHeight="300"  forceSelection="true"  completeMethod="#{trainInSiteController.autoCompleteDeptName}"
-                               var="t" itemLabel="#{t}" itemValue="#{t}" class="siteFilterChange">
-                  <p:ajax event="itemSelect" listener="#{trainInSiteController.onClinicalDeptNameFilterChange}" process="@this"   />
-                  <p:ajax process="@this" listener="#{trainInSiteController.onClinicalDeptNameFilterChange}"  />
-               </p:autoComplete>
-            </h:panelGroup>-->
+               <p:selectOneMenu value="#{trainInSiteController.selectedTrainDetailSign.signDeptUid}" required="true" requiredMessage="培训科室不能为空！"  >
+                  <p:ajax listener="#{trainInSiteController.signDeptUidValueChage()}"/>
+                  <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                  <f:selectItems value="#{trainInSiteController.orgInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+               </p:selectOneMenu>
+            </h:panelGroup>
             <h:panelGroup>
                <label class="label">签到人</label>
                <p:inputText value="#{trainInSiteController.selectedTrainDetailSign.signerName}" required="true" requiredMessage="签到人 不能为空！" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}"/>
