@@ -3,7 +3,7 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
-import com.ge.apm.service.zkb.CopyByInvok;
+import com.ge.apm.service.zkb.ZkbConstantUtil;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -175,6 +175,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.selected.setGeArtificialSupportTimes(0);
         this.selected.setProbeQuota(0);
         this.selected.setMaintenanceQuota(0);
+        this.selected.setCanApplyToolbox(ZkbConstantUtil.NORMAL_Y);
         this.initCourseList();
         contractCourseList = new ArrayList<>();
         zkbContractAssetList = new ArrayList<>();
@@ -183,7 +184,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void fourInOneFlagChange(){
         if(fourInOneFlag){
-            zkbContractCatSelected.setSnNo(CopyByInvok.FOUR_TO_ONE);
+            zkbContractCatSelected.setSnNo(ZkbConstantUtil.FOUR_TO_ONE);
         }else{
             zkbContractCatSelected.setSnNo("");
         }
@@ -434,7 +435,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         actionCatName="Edit";
         this.reason = "";
         zkbContractCatSelected = zkbContractCatRepository.findById(zkbContractCatSelected.getId());
-        if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCatSelected.getSnNo())){
+        if(ZkbConstantUtil.FOUR_TO_ONE.equals(zkbContractCatSelected.getSnNo())){
             this.fourInOneFlag = true;
         }else{
             this.fourInOneFlag = false;

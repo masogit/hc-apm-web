@@ -10,7 +10,7 @@ import java.util.*;
  * @date : 2020/10/23
  * @description :
  */
-public class CopyByInvok {
+public class ZkbConstantUtil {
 
     public static final String EMAIL_URL_TYPE_LASTDAY = "lastDay";
     public static final String EMAIL_URL_TYPE_UNORDER = "unOrder";

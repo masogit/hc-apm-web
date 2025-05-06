@@ -106,13 +106,13 @@ public class ZkbPartOrderStatusService {
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && zkbPartOrderStatusVo.isCanEditFlag()){
                     if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowManage(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     } else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowCommercial(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     }else{
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(selected.getStatus())){
                     if(StringUtils.isNotEmpty(selected.getManageAuditer())){
@@ -121,7 +121,7 @@ public class ZkbPartOrderStatusService {
                     zkbPartOrderStatusVo.setShowCommercial(true);
                     if(zkbPartOrderStatusVo.isCanEditFlag()){
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialReject.toString().equals(selected.getStatus())){
                     if(StringUtils.isNotEmpty(selected.getManageAuditer())){
@@ -153,10 +153,10 @@ public class ZkbPartOrderStatusService {
                     if(zkbPartOrderStatusVo.isCanEditFlag()){
                         if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                             zkbPartOrderStatusVo.setShowCommercial(true);
-                            zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                            zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                         }else{
                             zkbPartOrderStatusVo.setShowOrder(true);
-                            zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                            zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                         }
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
@@ -170,11 +170,11 @@ public class ZkbPartOrderStatusService {
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowManage(true);
                     }
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                 }else if(ZkbPartOrder.PartOrderStatus.ProductAccept.toString().equals(selected.getStatus())){
                     zkbPartOrderStatusVo.setShowProduct(true);
                     zkbPartOrderStatusVo.setShowManage(true);
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                 }else if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(selected.getStatus())){
                     zkbPartOrderStatusVo.setShowProduct(true);
                 }else if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(selected.getStatus())){
@@ -185,10 +185,10 @@ public class ZkbPartOrderStatusService {
                     if(zkbPartOrderStatusVo.isCanEditFlag()){
                         if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                             zkbPartOrderStatusVo.setShowCommercial(true);
-                            zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                            zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                         }else{
                             zkbPartOrderStatusVo.setShowOrder(true);
-                            zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                            zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                         }
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
@@ -205,7 +205,7 @@ public class ZkbPartOrderStatusService {
                     zkbPartOrderStatusVo.setShowCommercial(true);
                     if(zkbPartOrderStatusVo.isCanEditFlag()){
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialReject.toString().equals(selected.getStatus())){
                     if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
@@ -249,7 +249,7 @@ public class ZkbPartOrderStatusService {
             //endregion
         }else{
             if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && zkbPartOrderStatusVo.isCanEditFlag()){
-                if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
+                if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && ZkbConstantUtil.T.equals(selected.getNotGeAsset())){
                     if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                         zkbPartOrderStatusVo.setShowOssc(true);
                     }else{
@@ -266,22 +266,22 @@ public class ZkbPartOrderStatusService {
                         }
                     }
                 }
-                zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
             } else if(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString().equals(selected.getStatus())){
                 zkbPartOrderStatusVo.setShowTech(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowManage(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     } else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowDirector(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowCommercial(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     }
 
                 }
@@ -291,7 +291,7 @@ public class ZkbPartOrderStatusService {
                 zkbPartOrderStatusVo.setShowTse(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     zkbPartOrderStatusVo.setShowOssc(true);
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                 }
             } else if(ZkbPartOrder.PartOrderStatus.TseReject.toString().equals(selected.getStatus())){
                 zkbPartOrderStatusVo.setShowTse(true);
@@ -306,16 +306,16 @@ public class ZkbPartOrderStatusService {
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowDirector(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowUnOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowCommercial(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     }
                 }
             } else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
@@ -332,12 +332,12 @@ public class ZkbPartOrderStatusService {
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowUnOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                 }
             } else if(ZkbPartOrder.PartOrderStatus.OsscReject.toString().equals(selected.getStatus())){
                 zkbPartOrderStatusVo.setShowTech(true);
@@ -356,13 +356,13 @@ public class ZkbPartOrderStatusService {
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowUnOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowCommercial(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                     }
                 }
             } else if(ZkbPartOrder.PartOrderStatus.DirectorReject.toString().equals(selected.getStatus())){
@@ -386,17 +386,17 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 zkbPartOrderStatusVo.setShowCommercial(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowUnOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
                         zkbPartOrderStatusVo.setShowOrder(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }
                 }
             }else if(ZkbPartOrder.PartOrderStatus.CommercialReject.toString().equals(selected.getStatus())){
@@ -409,7 +409,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 zkbPartOrderStatusVo.setShowCommercial(true);
@@ -427,7 +427,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -436,7 +436,7 @@ public class ZkbPartOrderStatusService {
                 zkbPartOrderStatusVo.setShowUnOrder(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     zkbPartOrderStatusVo.setShowOrder(true);
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                 }
             }else if(ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString().equals(selected.getStatus())) {
                 if(StrUtil.isNotEmpty(selected.getTechAuditerUid())){
@@ -451,7 +451,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -472,7 +472,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StrUtil.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -492,7 +492,7 @@ public class ZkbPartOrderStatusService {
                             zkbPartOrderStatusVo.setShowReturn(true);
                         }
                     }
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                 }
             } else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
                 if(StrUtil.isNotEmpty(selected.getTechAuditerUid())){
@@ -507,7 +507,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -530,7 +530,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -542,7 +542,7 @@ public class ZkbPartOrderStatusService {
                 zkbPartOrderStatusVo.setShowOrder(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     zkbPartOrderStatusVo.setShowReturn(true);
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                 }else {
                     List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
                     if(zkbPartOrderUserConfigs.size() > 0){
@@ -562,7 +562,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -575,7 +575,7 @@ public class ZkbPartOrderStatusService {
                 zkbPartOrderStatusVo.setShowReturn(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     zkbPartOrderStatusVo.setShowClosed(true);
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                 }
             } else if(ZkbPartOrder.PartOrderStatus.OsscReturned.toString().equals(selected.getStatus())){
                 zkbPartOrderStatusVo.setShowTse(true);
@@ -587,7 +587,7 @@ public class ZkbPartOrderStatusService {
                 zkbPartOrderStatusVo.setShowOsscReturn(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     zkbPartOrderStatusVo.setShowClosed(true);
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                 }
             }else if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus())){
                 if(StrUtil.isNotEmpty(selected.getTechAuditerUid())){
@@ -602,7 +602,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -640,7 +640,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -655,7 +655,7 @@ public class ZkbPartOrderStatusService {
                     zkbPartOrderStatusVo.setShowClosed(true);
                     if(zkbPartOrderStatusVo.isCanEditFlag()){
                         zkbPartOrderStatusVo.setShowComplete(true);
-                        zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                        zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                     }
                 }else {
                     if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
@@ -678,7 +678,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -693,7 +693,7 @@ public class ZkbPartOrderStatusService {
                 zkbPartOrderStatusVo.setShowComplete(true);
                 if(zkbPartOrderStatusVo.isCanEditFlag()){
                     zkbPartOrderStatusVo.setShowCompleteAudit(true);
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ZERO);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ZERO);
                 }
             }else if(ZkbPartOrder.PartOrderStatus.CloseApproved.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.CloseFailed.toString().equals(selected.getStatus())){
                 if(StrUtil.isNotEmpty(selected.getTechAuditerUid())){
@@ -708,7 +708,7 @@ public class ZkbPartOrderStatusService {
                 if(StrUtil.isNotEmpty(selected.getManageAuditer())){
                     zkbPartOrderStatusVo.setShowManage(true);
                 }
-                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                if(ZkbConstantUtil.F.equals(selected.getCheckApplyNumFlag())){
                     zkbPartOrderStatusVo.setShowDirector(true);
                 }
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
@@ -723,7 +723,7 @@ public class ZkbPartOrderStatusService {
                 zkbPartOrderStatusVo.setShowComplete(true);
                 zkbPartOrderStatusVo.setShowCompleteAudit(true);
                 if(ZkbPartOrder.PartOrderStatus.CloseFailed.toString().equals(selected.getStatus())){
-                    zkbPartOrderStatusVo.setShowBtn(CopyByInvok.NORMAL_ONE);
+                    zkbPartOrderStatusVo.setShowBtn(ZkbConstantUtil.NORMAL_ONE);
                 }
             }
         }
@@ -778,24 +778,24 @@ public class ZkbPartOrderStatusService {
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
                     selected.setRemainQty(zkbContract.getProbeQuotaSpecial());
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                    if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
+                    if(ZkbConstantUtil.FOUR_TO_ONE.equals(selected.getContractCatId())){
                         selected.setRemainQty(zkbContract.getProbeQuotaNormal());
                     }
                 }
             }else{
-                if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
+                if(StringUtils.isEmpty(selected.getHighCatFlag()) || ZkbConstantUtil.F.equals(selected.getHighCatFlag())){
                     selected.setRemainQty(zkbContract.getProbeQuota());
                 }else{
-                    if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
+                    if(ZkbConstantUtil.FOUR_TO_ONE.equals(selected.getContractCatId())){
                         selected.setRemainQty(zkbContract.getProbeQuota());
                     }
                 }
             }
-            if(CopyByInvok.T.equals(selected.getNotGeAsset())){
+            if(ZkbConstantUtil.T.equals(selected.getNotGeAsset())){
                 if(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString().equals(selected.getCurrentStep())){
-                    selected.setTakeFlag(CopyByInvok.T);
+                    selected.setTakeFlag(ZkbConstantUtil.T);
                 }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep())){
-                    selected.setRepairFlag(CopyByInvok.T);
+                    selected.setRepairFlag(ZkbConstantUtil.T);
                 }
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
@@ -811,7 +811,7 @@ public class ZkbPartOrderStatusService {
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
             selected.setReturnQty(selected.getQty());
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
-            selected.setNeedLetterFlag(CopyByInvok.F);
+            selected.setNeedLetterFlag(ZkbConstantUtil.F);
         }
     }
 
@@ -901,15 +901,15 @@ public class ZkbPartOrderStatusService {
         } else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
             if(StringUtils.isEmpty(c.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(c.getQuotaDeductType())) {
                 if(!selected.getNewCatFlag().equals(selected.getTenantNewCatFlag())){
-                    if (CopyByInvok.T.equals(selected.getNewCatFlag())) {
-                        if(CopyByInvok.T.equals(selected.getNewCatFlag()) && StringUtils.isEmpty(selected.getProbeQuotaType())){
+                    if (ZkbConstantUtil.T.equals(selected.getNewCatFlag())) {
+                        if(ZkbConstantUtil.T.equals(selected.getNewCatFlag()) && StringUtils.isEmpty(selected.getProbeQuotaType())){
                             if(c.getProbeQuota() < selected.getQty()){
                                 return "探头剩余名额不足，请联系供应商！";
                             }
                         }
                     }
-                    if(CopyByInvok.T.equals(c.getAssetQuotaType())){
-                        if (CopyByInvok.T.equals(selected.getNewCatFlag())) {
+                    if(ZkbConstantUtil.T.equals(c.getAssetQuotaType())){
+                        if (ZkbConstantUtil.T.equals(selected.getNewCatFlag())) {
                             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(c.getId(),selected.getAssetId());
                             boolean r = zkbPartOrderService.checkQuotaHistory("order",c, selected, zkbContractAsset, ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString());
                             if(!r){
@@ -940,7 +940,7 @@ public class ZkbPartOrderStatusService {
                         return "探头特殊申请名额不足，请联系供应商！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())) {
-                    if (CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())) {
+                    if (ZkbConstantUtil.FOUR_TO_ONE.equals(selected.getContractCatId())) {
                         if(c.getProbeQuotaNormalApply() < selected.getQty()){
                             return "探头高值名额不足，请联系供应商！";
                         }
@@ -948,7 +948,7 @@ public class ZkbPartOrderStatusService {
                 }
             }
         } else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString())){
-            if(CopyByInvok.F.equals(selected.getTakeFlag())){
+            if(ZkbConstantUtil.F.equals(selected.getTakeFlag())){
                 if(StrUtil.isEmpty(selected.getUnTakedReason())){
                     return "拒绝原因不能为空！";
                 }
