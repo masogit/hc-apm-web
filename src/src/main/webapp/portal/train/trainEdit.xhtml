@@ -164,8 +164,10 @@
     </p:dialog>
     <ui:include src="trainDetailEdit.xhtml"/>
 
-    <p:dialog id="qrCodeDlg" widgetVar="qrCodeDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="410" header="签到二维码" height="410">
-        <img  style="border: 1px;border-color: grey;border-style: solid" src="#{trainInSiteController.qrCodeView()}"  width="400px" height="400px"/>
+    <p:dialog id="qrCodeDlg" widgetVar="qrCodeDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" width="410" header="签到二维码" height="430">
+        <h:outputLabel style="color: red" value="请使用微信进行扫码签到"></h:outputLabel>
+
+        <img  style="border: 1px;border-color: grey;border-style: solid" src="#{trainInSiteController.qrCodeView()}"  width="400px" height="400px" alt=""/>
     </p:dialog>
 </ui:composition>
 </html>
