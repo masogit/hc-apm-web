@@ -34,32 +34,23 @@ public class SystemEventAuditAopAspect {
     @Autowired
     private MqUtils mqUtils;
 
-    @Pointcut("execution(* com.ge.apm.dao.ContractInfoRepository.save(..))")
-    public void contractInfoSystemEventAuditAopPointcut() {}
 
 
+//    @Around("execution(* com.ge.apm.dao.ContractInfoRepository.save(..))   || execution(* com.ge.apm.dao.ContractInfoRepository.delete(..))")
+//    public Object contractInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
+//        return repositorySystemEventAopPointcutAround(pjp,"contract_info");
+//    }
+//
+//
+//
+//    @Around("execution(* com.ge.apm.dao.BlobObjectRepository.delete(..)) || execution(* com.ge.apm.dao.BlobObjectRepository.save(..))")
+//    public Object blobObjectDeleteSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+//        return repositorySystemEventAopPointcutAround(pjp,"v2_blob_object");
+//    }
+//
 
-    @Around("contractInfoSystemEventAuditAopPointcut()")
-    public Object contractInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"contract_info","save");
-    }
-
-
-    @Around("execution(* com.ge.apm.dao.ContractInfoRepository.delete(..))")
-    public Object contractInfoDeleteSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"contract_info","delete");
-    }
-
-    @Around("execution(* com.ge.apm.dao.BlobObjectRepository.delete(..))")
-    public Object blobObjectDeleteSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"v2_blob_object","delete");
-    }
-    @Around("execution(* com.ge.apm.dao.BlobObjectRepository.save(..))")
-    public Object blobObjectSaveSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"v2_blob_object","save");
-    }
-
-    public Object repositorySystemEventAopPointcutAround(ProceedingJoinPoint pjp,String boType ,String operation) throws Throwable {
+    public Object repositorySystemEventAopPointcutAround(ProceedingJoinPoint pjp,String boType  ) throws Throwable {
+        String operation = pjp.getSignature().getName();
         boolean isSuccess = true;
         String exceptionMessage = null;
         Object result ;
@@ -153,7 +144,7 @@ public class SystemEventAuditAopAspect {
             throw e;
         } finally {
             try {
-                if(isSaveAudit){
+            if(isSaveAudit && systemEventAuditEnum!=null){
                     UserAccount userAccount = getUserAccount();
                     SystemEventAudit systemEventAudit = buildEventAudit(userAccount,systemEventAuditEnum, boUid, isSuccess, exceptionMessage,boType,eventData);
                     sendSystemAuditMessage(systemEventAudit);
