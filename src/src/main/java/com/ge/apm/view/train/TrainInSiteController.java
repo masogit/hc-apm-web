@@ -371,6 +371,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     }
 
     public void saveSign(){
+        selectedTrainDetailSign.setSignDate(new Date());
         trainManageService.saveSign(selectedTrainDetailSign);
         trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetailSign.getDetailId());
         selectedTrainDetailSign = new TrainDetailSign();

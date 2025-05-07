@@ -139,7 +139,7 @@
                   </p:column>
                </p:autoComplete>-->
             </h:panelGroup>
-            <h:panelGroup>
+            <h:panelGroup rendered="false">
                <label class="label">签到时间</label>
                <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd hh:mm:ss" value="#{trainInSiteController.selectedTrainDetailSign.signDate}" required="true" requiredMessage="计划培训日期 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
