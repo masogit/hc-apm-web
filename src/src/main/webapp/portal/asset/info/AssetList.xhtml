@@ -48,7 +48,7 @@
                 <p:outputLabel class="pageTitle" value=" #{assetInfoListController.terminate? msg.TerminateAssetInfo:msg.AssetInfo}"/>
             </div>
 
-            <div class="ui-g-12 card">
+            <div class="ui-g-12 card" style="height: 800px;">
 
                 <h:form id="searchForm">
                     <h:panelGrid id="filterType" columns="4" style="float: right">
@@ -110,11 +110,12 @@
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
-                <h:form id="AssetInfoListForm">
+                <h:form id="AssetInfoListForm" style="height: 700px; overflow: auto; position: absolute; left: auto">
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
                                  selectionMode="single" scrollable="false" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowStyleClass="#{item.warrantyAlertStatus}"
+                                 stickyHeader="true"
                                  rowKey="#{item.id}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -1381,6 +1382,8 @@
                     $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
+
+
 //]]>
         </script>
     </ui:define>
