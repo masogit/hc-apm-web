@@ -283,7 +283,7 @@ public class QrCodeService {
     private void qrCodeLibTOAsset(QrCodeLib qrCodeLib,AssetInfo assetInfo) {
 
         //Demo asset for preview
-
+        if(qrCodeLib == null) return;
         ArrivalListItem arrivalListItem=itemDao.findByQrCode(qrCodeLib.getQrCode());
         if(arrivalListItem==null){
             return;
