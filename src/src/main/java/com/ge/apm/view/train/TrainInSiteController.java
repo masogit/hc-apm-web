@@ -209,6 +209,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
             for(TrainDetail t : trainDetailList){
                 if(t.getId().equals(selectedTrainDetail.getId())){
                     trainDetailList.remove(t);
+                    trainManageService.deleteItem(selectedTrainDetail, selected);
                     selectedTrainDetail = null;
                     break;
                 }

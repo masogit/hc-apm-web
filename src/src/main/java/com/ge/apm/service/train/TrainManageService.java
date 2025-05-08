@@ -301,6 +301,12 @@ public class TrainManageService extends MicroServiceInvoker {
         }
     }
 
+    public void deleteItem(TrainDetail trainDetail,  TrainInfo trainInfo){
+        trainDetailRepository.delete(trainDetail);
+        int count = trainInfo.getTrainQty() == null ? 0 : trainInfo.getTrainQty();
+        trainInfo.setTrainQty(count - 1);
+        trainInfoRepository.save(trainInfo);
+    }
 
     public String generateCourseNo(){
         StringBuilder sb = new StringBuilder();
