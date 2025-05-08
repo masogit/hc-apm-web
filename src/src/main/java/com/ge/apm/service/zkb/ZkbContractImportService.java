@@ -312,7 +312,12 @@ public class ZkbContractImportService {
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             zkbContract.setLastModifiedDate(new Date());
             if(StrUtil.isNotEmpty(contractInfoVO.getCanApplyToolbox())){
-                zkbContract.setCanApplyToolbox(contractInfoVO.getCanApplyToolbox());
+                //zkbContract.setCanApplyToolbox(contractInfoVO.getCanApplyToolbox());
+                if("是".equals(contractInfoVO.getCanApplyToolbox())){
+                    zkbContract.setCanApplyToolbox(ZkbConstantUtil.NORMAL_Y);
+                }else if("否".equals(contractInfoVO.getCanApplyToolbox())){
+                    zkbContract.setCanApplyToolbox(ZkbConstantUtil.NORMAL_N);
+                }
             }
             zkbContractRepository.save(zkbContract);
         }else{
