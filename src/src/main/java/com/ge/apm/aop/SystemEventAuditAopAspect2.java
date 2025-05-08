@@ -1,19 +1,15 @@
 package com.ge.apm.aop;
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.aop.audit.AuditHandler;
-import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.SystemEventAudit;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
-import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,9 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -36,18 +30,9 @@ public class SystemEventAuditAopAspect2 {
 
 
 
+
     @Autowired(required = false)
-    private List<AuditHandler> handlers = new ArrayList<>();
-
     private Map<String, AuditHandler> handlerMap = new HashMap<>();
-
-
-    @PostConstruct
-    public void init() {
-        for (AuditHandler h : handlers) {
-            handlerMap.put(h.getBoType(), h);
-        }
-    }
 
     @Around("execution(* com.ge.apm.dao.ContractInfoRepository.save(..))   || execution(* com.ge.apm.dao.ContractInfoRepository.delete(..))")
     public Object contractInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
@@ -76,7 +61,7 @@ public class SystemEventAuditAopAspect2 {
         try {
             args= pjp.getArgs();
 
-            AuditHandler auditHandler = handlerMap.getOrDefault(boType, handlerMap.get("unknown"));
+            AuditHandler auditHandler = handlerMap.getOrDefault(boType, handlerMap.get("defaultAuditHandler"));
             systemEventAuditEnum= auditHandler.determineEventEnum(args, boType, operation);
             eventData = auditHandler.generateEventData(args );
             result = pjp.proceed();

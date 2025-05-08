@@ -3,11 +3,11 @@ package com.ge.apm.aop.audit;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("defaultAuditHandler")
 public class DefaultAuditHandler implements AuditHandler{
     @Override
     public String getBoType() {
-        return "unknown";
+        return "defaultAuditHandler";
     }
 
     @Override
