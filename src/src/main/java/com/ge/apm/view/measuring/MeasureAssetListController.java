@@ -1,27 +1,33 @@
 package com.ge.apm.view.measuring;
 
-import com.ge.apm.service.common.ConfigCacheService;
-import com.ge.apm.view.preview.PreViewerBean;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.healthcare.cn.common.utils.map.MapUtil;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.*;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.MeasuringService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.service.wo.WorkflowService;
+import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.wo.WorkOrderMgrController;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -93,6 +99,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
     private TenantInfo currentTenantInfo;
     private PreViewerBean preViewerBean;
+    private MeasuringService measuringService;
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     @Override
     protected void init() {
@@ -111,6 +119,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
         preViewerBean = WebUtil.getBean(PreViewerBean.class);
+        measuringService = WebUtil.getBean(MeasuringService.class);
+        systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
         measurementRepairVisible = woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair();
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -400,6 +410,21 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public String getFileNewWindowUrl(String objectId) {
         return "/portal/preview/view.xhtml?faces-redirect=true&amp;objectId=" + objectId;
+    }
+
+    public void delete(){
+        String uid = this.selected.getUid();
+        String boUuid = this.selected.getBoUuid();
+        if(Objects.isNull(boUuid)) return;
+        measuringCertificateDetailDao.delete(boUuid);
+        blobService.deleteBlobFileByBoUuid(boUuid);
+        WebUtil.addSuccessMessage("删除成功");
+        AssetInfo assetInfo = dao.findByUid(uid);
+        measuringService.updateMeasuringDate(assetInfo);
+        this.selected = null;
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(currentUser, SystemEventAuditEnum.MEASURE_DELETE, boUuid, Boolean.TRUE, "","measuring", "");
+        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+
     }
 
 }
