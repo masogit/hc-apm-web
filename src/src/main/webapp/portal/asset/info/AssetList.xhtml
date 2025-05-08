@@ -42,13 +42,20 @@
             th{font-size: 12px!important;}
             td{font-size: 12px!important;padding: 0px!important;}
             table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+
+            /* 同步表头与内容列宽度 */
+            .ui-datatable-scrollable-header th,
+            .ui-datatable-scrollable-body td {
+                width: calc(100% - 1px) !important;  /* 补偿边框误差 */
+                box-sizing: border-box;
+            }
         </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value=" #{assetInfoListController.terminate? msg.TerminateAssetInfo:msg.AssetInfo}"/>
             </div>
 
-            <div class="ui-g-12 card" style="height: 800px;">
+            <div class="ui-g-12 card">
 
                 <h:form id="searchForm">
                     <h:panelGrid id="filterType" columns="4" style="float: right">
@@ -110,12 +117,12 @@
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
-                <h:form id="AssetInfoListForm" style="height: 700px; overflow: auto; position: absolute; left: auto">
+                <h:form id="AssetInfoListForm">
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
-                                 selectionMode="single" scrollable="false" selection="#{assetInfoListController.selected}"
+                                 selectionMode="single" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowStyleClass="#{item.warrantyAlertStatus}"
-                                 stickyHeader="true"
+                                 scrollable="true" scrollHeight="700"
                                  rowKey="#{item.id}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -125,7 +132,7 @@
                         <p:ajax  event="rowSelect" listener="#{assetInfoListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>
                         <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                        <p:column width="36"  id="checkBoxColumn">
+                        <p:column id="checkBoxColumn">
                             <p:selectBooleanCheckbox value="#{assetInfoListController.selectedMap[item.uid]}"  class="selectCheckBox">
                                 <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
@@ -135,17 +142,17 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="操 作" exportable="false" width="60" id="operatorColumn">
+                        <p:column headerText="操 作" exportable="false" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
-                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                    <p:graphicImage name="icons/edit.png" style="height: 30px;"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
-                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:graphicImage name="icons/delete.png" style="height: 30px;"/>
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
                                     <p:link   target="_new1" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT') and !userContextService.isEnableBtnByKey('enableDeviceReplication')}" >
-                                        <p:graphicImage value="/images/icons/copyy.png" style="width: 30px; height: 30px;"/>
+                                        <p:graphicImage value="/images/icons/copyy.png" style="height: 30px;"/>
 <!--                                        <p:graphicImage name="icons/copy.png" style="width: 30px; height: 30px;"/>-->
                                     </p:link>
                         </h:panelGroup>
@@ -247,7 +254,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetTypeGroup'}">
-                                <p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true">
+                                <p:column headerText="#{msg.assetTypeGroup}" exportable="true">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.assetTypeGroup}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetTypeGroup}" appendTo="@(Body)"
@@ -386,7 +393,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'qrCode'}">
-                                <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                                <p:column headerText="#{msg.QRCode}" exportable="true" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.qrCode}"/>
                                 </p:column>
                             </c:if>
