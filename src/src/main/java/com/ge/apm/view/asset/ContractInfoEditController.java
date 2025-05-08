@@ -340,6 +340,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
         boolean isEdit = selected.getId() == null ? false : true;
         selected = dao.save(this.selected);
+        attachements= attachements.stream().filter(item->item.getBoUuid()==null).collect(Collectors.toList());
         attachements.stream().forEach(item -> {
             item.setBoUuid(selected.getId());
         });
