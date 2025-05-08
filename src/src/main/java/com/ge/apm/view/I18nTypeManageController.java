@@ -234,20 +234,20 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
                 i18nMessage.setMsgType(selected.getMsgType());
                 i18nMessage.setSiteId(selectTenantId);
                 ExcelDocument.ValueWrapper key = (ExcelDocument.ValueWrapper) item.get("配置键");
-                if (Objects.nonNull(key) && Objects.nonNull(key.getValue())) {
-                    i18nMessage.setMsgKey(key.getValue().toString());
+                if (Objects.nonNull(key) && Objects.nonNull(key.getRawValue())) {
+                    i18nMessage.setMsgKey(key.getRawValue());
                 }
                 ExcelDocument.ValueWrapper zh = (ExcelDocument.ValueWrapper) item.get("名称-中文");
-                if (Objects.nonNull(zh) && Objects.nonNull(zh.getValue())) {
-                    i18nMessage.setValueZh(zh.getValue().toString());
+                if (Objects.nonNull(zh) && Objects.nonNull(zh.getRawValue())) {
+                    i18nMessage.setValueZh(zh.getRawValue());
                 }
                 ExcelDocument.ValueWrapper en = (ExcelDocument.ValueWrapper) item.get("名称-英文");
-                if (Objects.nonNull(en) && Objects.nonNull(en.getValue())) {
-                    i18nMessage.setValueEn(en.getValue().toString());
+                if (Objects.nonNull(en) && Objects.nonNull(en.getRawValue())) {
+                    i18nMessage.setValueEn(en.getRawValue());
                 }
                 ExcelDocument.ValueWrapper tw = (ExcelDocument.ValueWrapper) item.get("名称-繁体");
-                if (Objects.nonNull(tw) && Objects.nonNull(tw.getValue())) {
-                    i18nMessage.setValueTw(tw.getValue().toString());
+                if (Objects.nonNull(tw) && Objects.nonNull(tw.getRawValue())) {
+                    i18nMessage.setValueTw(tw.getRawValue());
                 }
                 return i18nMessage;
             }).collect(Collectors.toList());
