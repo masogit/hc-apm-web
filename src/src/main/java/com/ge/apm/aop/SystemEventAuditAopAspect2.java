@@ -42,10 +42,19 @@ public class SystemEventAuditAopAspect2 {
 
 
     @Around("execution(* com.ge.apm.dao.BlobObjectRepository.delete(..)) || execution(* com.ge.apm.dao.BlobObjectRepository.save(..))")
-    public Object blobObjectDeleteSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+    public Object blobObjectSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
         return repositorySystemEventAopPointcutAround(pjp,"v2_blob_object");
     }
 
+    @Around("execution(* com.ge.apm.dao.SupplierRepository.delete(..)) || execution(* com.ge.apm.dao.SupplierRepository.save(..))")
+    public Object supplierSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp,"supplier");
+    }
+
+//    @Around("execution(* com.ge.apm.dao.TenantInfoRepository.save(..))   || execution(* com.ge.apm.dao.TenantInfoRepository.delete(..))")
+//    public Object tenantInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
+//        return repositorySystemEventAopPointcutAround(pjp,"tenant_info");
+//    }
 
     public Object repositorySystemEventAopPointcutAround(ProceedingJoinPoint pjp,String boType  ) throws Throwable {
         String operation = pjp.getSignature().getName();
