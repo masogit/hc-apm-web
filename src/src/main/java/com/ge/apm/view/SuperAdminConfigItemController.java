@@ -311,7 +311,7 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     public void downloadConfigFile( ) {
         if( "workOrderScript".equals(selected.getKey())){
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("report/workOrderScript.xlsx");
-            fileDownloadService.exportFile(is, "维修脚本配置.xlsx");
+            fileDownloadService.exportFile(is, "workOrderScript.xlsx");
         }
     }
 
