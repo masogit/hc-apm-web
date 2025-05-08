@@ -108,6 +108,7 @@ public class OCRTemplateService extends MicroServiceInvoker {
             element.put("Width",Math.abs(Math.ceil(lowerRight[0]) - Math.ceil(topLeft[0])));
             element.put("Height",Math.abs(Math.ceil(lowerRight[1]) - Math.ceil(topLeft[1])));
             element.put("Pattern", MatcherType.POSITION.getCode());
+            element.put("Format", "");
             elements.add(element);
         }
         return elements;
@@ -192,20 +193,7 @@ public class OCRTemplateService extends MicroServiceInvoker {
         File file = null;
         try {
             file = getFile(uploadedFile);
-            String token = UserContextService.getAccessToken();
-            HttpHeaders headers = new HttpHeaders();
-            MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
-            headers.setContentType(type);
-            headers.add("Authorization", token);
-            String name = file.getName();
-            headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name));
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            FileSystemResource resource = new FileSystemResource(file);
-            body.add("file", resource);
-            body.setAll(param);
-            HttpEntity<Map> requestEntity = new HttpEntity<Map>(body, headers);
-            String url = getGatewayURL(gatewayURL);
-            return getRemoteRequest(url,HttpMethod.POST,requestEntity,JSONObject.class);
+            return getJsonObject(gatewayURL, param, file);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -215,6 +203,24 @@ public class OCRTemplateService extends MicroServiceInvoker {
             }
         }
     }
+
+    public JSONObject getJsonObject(GatewayURL gatewayURL, Map<String, Object> param, File file) {
+        String token = UserContextService.getAccessToken();
+        HttpHeaders headers = new HttpHeaders();
+        MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
+        headers.setContentType(type);
+        headers.add("Authorization", token);
+        String name = file.getName();
+        headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name));
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        FileSystemResource resource = new FileSystemResource(file);
+        body.add("file", resource);
+        body.setAll(param);
+        HttpEntity<Map> requestEntity = new HttpEntity<Map>(body, headers);
+        String url = getGatewayURL(gatewayURL);
+        return getRemoteRequest(url, HttpMethod.POST, requestEntity, JSONObject.class);
+    }
+
     public <T> T getRemoteRequest(String url,HttpMethod method,HttpEntity<?> requestEntity,Class<T> responseType){
         T body = null;
         ResponseEntity<T> exchange = template.exchange(url, method, requestEntity, responseType);
@@ -229,14 +235,14 @@ public class OCRTemplateService extends MicroServiceInvoker {
         return tempFile;
     }
 
-    public V2_BlobObject saveTemplateFile(byte[] contents,String fileName,String contentType,String uid){
+    public V2_BlobObject saveTemplateFile(byte[] contents,String fileName,String contentType,String boType,String uid){
         if(contents == null) return null;
         List<V2_BlobObject> blobObjectsByBoUid = findBlobObjectsByBoUid(uid);
         ByteArrayInputStream bais = new ByteArrayInputStream(contents);
         V2_BlobObject v2BlobObject = blobService.uploadFile(bais,fileName);
         v2BlobObject.setBoUuid(uid);
         v2BlobObject.setObjectType(contentType);
-        v2BlobObject.setBoType("ocrTemplate");
+        v2BlobObject.setBoType(boType);
         blobObjectRepository.save(v2BlobObject);
         if(!CollectionUtils.isEmpty(blobObjectsByBoUid)){
             deleteTemplateFile(blobObjectsByBoUid);

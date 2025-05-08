@@ -162,7 +162,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         thisTemplate.setLastModifiedBy(currentUser.getUid());
         thisTemplate.setLastModifiedDate(new Date());
         dao.save(thisTemplate);
-        templateService.saveTemplateFile(contents,fileName,contentType,thisTemplate.getId());
+        templateService.saveTemplateFile(contents,fileName,contentType,"ocrTemplate",thisTemplate.getId());
         WebUtil.addSuccessMessage("配置模板保存成功");
     }
 
@@ -177,6 +177,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         }).map(item -> {
             JSONObject jsonObject = (JSONObject) item;
             Double positionX = jsonObject.getDouble("PositionX");
+            Double Format = jsonObject.getDouble("Format");
             positionX = Objects.isNull(positionX) ? 0 : positionX;
             Double positionY = jsonObject.getDouble("PositionY");
             positionY = Objects.isNull(positionY) ? 0 : positionY;
@@ -349,6 +350,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
             JSONObject jsonObject = null;
             Map<String, Object> params = new HashMap<>();
             params.put("templateId",id);
+            params.put("type", this.selected.getType());
             if(fileName.toLowerCase().endsWith("pdf")){
                  jsonObject = templateService.upload(file, GatewayURL.OCR_DOCUMENT,params);
                 JSONArray data = jsonObject.getJSONArray("data");

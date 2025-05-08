@@ -67,6 +67,10 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(name = "asset_sn")
     private String assetSN;
 
+    // 设备编号
+    @Column(name = "depart_num")
+    private String departNum;
+
     //财产编号
     @Column(name = "finance_no")
     private String financeNo;
@@ -235,6 +239,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setAssetModel(String assetModel) {
         this.assetModel = assetModel;
+    }
+
+    public String getDepartNum() {
+        return departNum;
+    }
+
+    public void setDepartNum(String departNum) {
+        this.departNum = departNum;
     }
 
     public String getFinanceNo() {
