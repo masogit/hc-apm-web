@@ -26,6 +26,17 @@ public interface AuditHandler {
                     }
                 }
                 break;
+            case "supplier":
+                if ("delete".equals(operation)) {
+                    systemEventAuditEnum = SystemEventAuditEnum.SUPPLIER_DELETE;
+                } else {
+                    if (uid != null) {
+                        systemEventAuditEnum = SystemEventAuditEnum.SUPPLIER_UPDATE;
+                    } else {
+                        systemEventAuditEnum = SystemEventAuditEnum.SUPPLIER_CREATE;
+                    }
+                }
+                break;
             default:
 
                 break;
@@ -45,14 +56,23 @@ public interface AuditHandler {
         Object entity = args[0];
         try {
             java.lang.reflect.Method method = entity.getClass().getMethod("getId");
-            return (String) method.invoke(entity);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+            Object idValue = method.invoke(entity);
+            if (idValue != null) {
+                return idValue.toString();
+            }
+            return null;
+        } catch (Exception e) {
+
         }
 
         try {
             java.lang.reflect.Method method = entity.getClass().getMethod("getUid");
-            return (String) method.invoke(entity);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+            Object uidValue = method.invoke(entity);
+            if (uidValue != null) {
+                return uidValue.toString();
+            }
+            return null;
+        } catch (Exception e) {
         }
 
         return null;
