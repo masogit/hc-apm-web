@@ -128,7 +128,7 @@
                     <f:facet name="{Toolbar}">
                         <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trainInSiteController.prepareItemCreate}" update=":growl trainTab:detailEditDialog" oncomplete="PF('detailEditDialog').show()"  rendered="#{trainInSiteController.canEdit}"/>
                         <p:commandButton immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{trainInSiteController.prepareItemEdit}" update=":growl trainTab:detailEditDialog"  oncomplete="PF('detailEditDialog').show()" disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}"/>
-                        <p:commandButton immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteItem}" update=":growl trainTab:editForm:detailDatalist " disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}">
+                        <p:commandButton immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteItem}" update=":growl trainTab:editForm:detailDatalist trainTab:editForm:trainQty" disabled="#{empty trainInSiteController.selectedTrainDetail}" rendered="#{trainInSiteController.canEdit}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
 
