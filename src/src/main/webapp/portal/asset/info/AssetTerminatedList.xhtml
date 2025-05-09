@@ -15,7 +15,7 @@
                     <p:commandButton id="btnOrg"
                                      value="#{empty assetInfoTerminatedListController.selectSite? msg.AllHospitals:assetInfoTerminatedListController.selectSite.name}"
                                      type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
+                    <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
                                     modal="false">
                         <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                         <p:commandButton partialSubmit="true" icon="ui-icon-search"
@@ -45,7 +45,7 @@
                     <p:commandButton id="btnTenant"
                                      value="#{empty assetInfoTerminatedListController.selectSite? msg.AllTenants:assetInfoTerminatedListController.selectSite.name}"
                                      type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false"
+                    <p:overlayPanel appendTo="searchForm" widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false"
                                     modal="false" style="text-align: left;">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:tree id="tenantTree" class="tree" style="width:98%;border:0;"
