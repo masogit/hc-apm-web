@@ -45,6 +45,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -195,13 +196,13 @@ public class MeasuringService {
             return null;
         }
     }
-    public void sendMq(AssetInfo assetInfo) {
+    public void sendMq(AssetInfo assetInfo,UserAccount userAccount) {
         MqContext mqContext = new MqContext();
         mqContext.setClassName("MeasuringService");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("handleExcel- operateMeasuringAndAssetInfo/operateMeasuringAndAssetInfo_For_ShaoYiFu");
         mqContext.setDescribe("计量导入修改设备信息");
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        UserAccount currentUserAccount = userAccount;
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
         mqUtils.sendAssetToMQ(assetInfo,currentUserAccount,mqContext);
@@ -308,40 +309,44 @@ public class MeasuringService {
             return null;
         }
     }
-    @Async
+
     public void updateMeasuringDate( AssetInfo tempAssetInfo) {
-        //目标设备的所有计量记录
-        List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), tempAssetInfo.getTenantUID());
-        if(CollectionUtils.isEmpty(allMcdList)) return;
-        //目标设备的所有计量记录中计量日期最大的记录
-        MeasuringCertificateDetail needUpdateAssetMcd = allMcdList.get(0);
-        Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
-        Date checkDate = needUpdateAssetMcd.getCheckDate();
-        TenantInfo tenantInfo = tenantInfoDao.findByuid(tempAssetInfo.getTenantUID());
-        if("4".equals(tenantInfo.getCustomTenant())){
-            if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
-                MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getSiteUID());
-                Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
-                if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
-                    nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        CompletableFuture.runAsync(()->{
+            //目标设备的所有计量记录
+            List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), tempAssetInfo.getTenantUID());
+            if(CollectionUtils.isEmpty(allMcdList)) return;
+            //目标设备的所有计量记录中计量日期最大的记录
+            MeasuringCertificateDetail needUpdateAssetMcd = allMcdList.get(0);
+            Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
+            Date checkDate = needUpdateAssetMcd.getCheckDate();
+            TenantInfo tenantInfo = tenantInfoDao.findByuid(tempAssetInfo.getTenantUID());
+            if("4".equals(tenantInfo.getCustomTenant())){
+                if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
+                    MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), currentUserAccount.getSiteUID());
+                    Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
+                    if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
+                        nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+                    }
                 }
             }
-        }
-        //更新设备台账
-        tempAssetInfo.setNextMeteringDate(nextMeteringDate);
-        tempAssetInfo.setLastMeteringDate(checkDate);
-        tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
-        // 上次检测单位
-        tempAssetInfo.setLastCheckCompany(needUpdateAssetMcd.getCheckCompany());
-        if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
-            tempAssetInfo.setUsageStatus(2);//停用
-            tempAssetInfo.setStatus(5);
-        }
+            //更新设备台账
+            tempAssetInfo.setNextMeteringDate(nextMeteringDate);
+            tempAssetInfo.setLastMeteringDate(checkDate);
+            tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
+            // 上次检测单位
+            tempAssetInfo.setLastCheckCompany(needUpdateAssetMcd.getCheckCompany());
+            if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
+                tempAssetInfo.setUsageStatus(2);//停用
+                tempAssetInfo.setStatus(5);
+            }
 
-        tempAssetInfo.setMeasuringType(needUpdateAssetMcd.getType());
+            tempAssetInfo.setMeasuringType(needUpdateAssetMcd.getType());
 
-        assetInfoDao.save(tempAssetInfo);
-        sendMq(tempAssetInfo);
+            assetInfoDao.save(tempAssetInfo);
+            sendMq(tempAssetInfo,currentUserAccount);
+        });
+
     }
 
 
