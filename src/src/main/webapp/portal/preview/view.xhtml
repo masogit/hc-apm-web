@@ -7,7 +7,7 @@
 
 <ui:composition>
     <p:dialog id="previewedDlg" width="1000" height="800" widgetVar="previewedDlg" modal="true" howEffect="fade"
-              maximizable="true" appendTo="@this">
+              maximizable="#{preViewerBean.type ne 0}" appendTo="@this">
         <c:choose>
             <c:when test="#{preViewerBean.type eq 0}">
                 <div class="row" id="imgDiv" style="width: auto">
