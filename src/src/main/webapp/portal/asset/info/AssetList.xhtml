@@ -55,7 +55,7 @@
                 <p:outputLabel class="pageTitle" value=" #{assetInfoListController.terminate? msg.TerminateAssetInfo:msg.AssetInfo}"/>
             </div>
 
-            <div class="ui-g-12 card">
+            <div class="ui-g-12 card" style="height: 70%">
 
                 <h:form id="searchForm">
                     <h:panelGrid id="filterType" columns="4" style="float: right">
@@ -122,7 +122,7 @@
                                  selectionMode="single" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowStyleClass="#{item.warrantyAlertStatus}"
-                                 scrollable="true" scrollHeight="75%"
+                                 scrollable="true" scrollHeight="70%"
                                  rowKey="#{item.id}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
