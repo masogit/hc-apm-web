@@ -447,6 +447,7 @@ public class MeasuringService {
             LOGGER.error("handle zip error:{}",e.getMessage());
             throw  new RuntimeException("handleZip error",e);
         }
+        resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         return resultList;
     }
     public MeasuringCertificateDetail handleOcr(ZipInputStream zis,ZipEntry entry){
@@ -454,6 +455,7 @@ public class MeasuringService {
         try {
             byte[] buffer = new byte[1024];
             File destDir = new File(System.getProperty("user.dir"));
+            if(entry.isDirectory()) return null;
             newFile = newFile(destDir, entry);
             // 写入文件内容
             try (FileOutputStream fos = new FileOutputStream(newFile)) {
@@ -616,7 +618,9 @@ public class MeasuringService {
         }
     }
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
+        String name = zipEntry.getName();
+        name = name.substring(name.lastIndexOf("/"));
+        File destFile = new File(destinationDir, name);
 
         String destDirPath = destinationDir.getCanonicalPath();
         String destFilePath = destFile.getCanonicalPath();

@@ -36,6 +36,7 @@ public class MeasureFromZipController {
         measuringService = WebUtil.getBean(MeasuringService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.MEASURE_INFO);
+        measuringService.setProgress(0);
     }
 
     public void handleZipFileUpload(FileUploadEvent event) throws IOException {

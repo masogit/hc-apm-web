@@ -44,7 +44,7 @@
                                               update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
                                               label="从zip导入" />
                                 <p:progressBar class="customProgressBar" labelTemplate="{value}%" widgetVar="progressBarId" ajax="false" id="pb" value="#{measureFromZipController.progress}"  />
-                                <p:poll interval="3" update="pb" />
+                                <p:poll interval="2" update="pb" />
                                 <p:growl id="messagesOCR" showDetail="true"/>
 <!--                                <p:progressBar id="pb" class="customProgressBar " value="50" displayOnly="true" />-->
                             </p:panelGrid>
