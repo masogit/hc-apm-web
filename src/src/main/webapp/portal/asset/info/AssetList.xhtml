@@ -385,7 +385,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'qrCode'}">
-                                <p:column headerText="#{msg.QRCode}" exportable="true" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                                <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.qrCode}"/>
                                 </p:column>
                             </c:if>
