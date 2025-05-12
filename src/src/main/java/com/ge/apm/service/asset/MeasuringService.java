@@ -52,6 +52,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static com.ge.apm.service.asset.AssetImportDataCheckService.beanNullProperty;
+
 /**
  * Created by 212605082 on 2017/11/7.
  */
@@ -522,19 +524,21 @@ public class MeasuringService {
         searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,result.getCertificateNo()));
         searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
         List<MeasuringCertificateDetail> measuringCertificateDetails = measuringCertificateDetailDao.findBySearchFilter(searchFilterList);
+        SystemEventAuditEnum eventAuditEnum = null;
         if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
-            String certificateNo = result.getCertificateNo();
-            result.setCertificateNo(certificateNo);
-            result.setErrorInfo(certificateNo + ",证书编号已存在");
-            result.setStatus(-1);
-            return result;
+            MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
+            BeanUtils.copyProperties(result, detail,beanNullProperty(result));
+            measuringCertificateDetailDao.save(detail);
+            eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
+        }else{
+            measuringCertificateDetailDao.save(collect);
+            eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
         }
-        measuringCertificateDetailDao.save(collect);
 
         templateService.saveTemplateFile(fileToByteArray(newFile), result.getCertificateNo().replaceAll("/", "-") + ".pdf", "application/pdf", V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, result.getId());
         // 更新设备计量日期
         updateMeasuringDate(assetInfos.get(0));
-        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.MEASURE_DELETE, result.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(result));
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(result));
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         return result;
     }
@@ -619,7 +623,9 @@ public class MeasuringService {
     }
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         String name = zipEntry.getName();
-        name = name.substring(name.lastIndexOf("/"));
+        if(name.contains("/")){
+            name = name.substring(name.lastIndexOf("/"));
+        }
         File destFile = new File(destinationDir, name);
 
         String destDirPath = destinationDir.getCanonicalPath();
