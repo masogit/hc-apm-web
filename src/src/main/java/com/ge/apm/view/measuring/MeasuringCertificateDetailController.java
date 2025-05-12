@@ -17,6 +17,7 @@ import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -31,6 +32,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static com.ge.apm.service.asset.AssetImportDataCheckService.beanNullProperty;
 
 @ManagedBean
 @ViewScoped
@@ -195,16 +199,20 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,certificateNo));
             searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,currentUser.getTenantUID()));
             List<MeasuringCertificateDetail> measuringCertificateDetails = dao.findBySearchFilter(searchFilterList);
+            SystemEventAuditEnum eventAuditEnum = null;
             if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage("证书编号已存在");
-                return;
+                MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
+                BeanUtils.copyProperties(selected, detail,beanNullProperty(selected));
+                dao.save(detail);
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
+            }else{
+                dao.save(selected);
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
             }
-            dao.save(selected);
             measuringService.updateMeasuringDate(assetInfo);
             templateService.saveTemplateFile(contents,fileName,contentType, V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,selected.getId());
             WebUtil.addSuccessMessage("保存成功");
-            SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,SystemEventAuditEnum.MEASURE_CREATE, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));
+            SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,eventAuditEnum, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));
             systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
         } catch (Exception e) {
             e.printStackTrace();
