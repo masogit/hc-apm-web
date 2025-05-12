@@ -6,26 +6,58 @@
       xmlns:p="http://primefaces.org/ui">
 
     <div class="ui-g">
+        <h:outputStylesheet>
+            /* 定义不同进度段的颜色 */
+            .customProgressBar  .ui-progressbar-value{ background-color: #008000 !important; }
+        </h:outputStylesheet>
         <div class="ui-g-12 card">
-            <h:form enctype="multipart/form-data" rendered="#{measureFromZipController.customRoleAuth.authSearch}">
-                <p:fieldset  legend="批量导入计量附件" id="uploaderFile">
-                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                        <p:fileUpload fileUploadListener="#{measureFromZipController.handleZipFileUpload}" mode="advanced"
-                                      dragDropSupport="false" multiple="false" auto="true"
-                                      invalidFileMessage="只支持zip格式的文件"
-                                      invalidSizeMessage="文件大小不得超过500M"
-                                      update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
-                                      label="从zip导入" cancelLabel="取消" uploadLabel="确认上传"/>
-                        <p:growl id="messages" showDetail="true"/>
-                    </p:panelGrid>
-                    <h:panelGroup>
-                        <p>说明</p>
-                        <p>1. 必须为 zip 格式文件</p>
-                        <p>2. zip 包内文件名必须为计量证书编号</p>
-                        <p>3. 上传文件进行导入</p>
-                    </h:panelGroup>
-                </p:fieldset>
-            </h:form>
+            <p:tabView>
+                <p:tab title="批量导入计量附件">
+                    <h:form enctype="multipart/form-data" rendered="#{measureFromZipController.customRoleAuth.authSearch}">
+                        <p:fieldset  legend="批量导入计量附件" id="uploaderFile">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <p:fileUpload fileUploadListener="#{measureFromZipController.handleZipFileUpload}" mode="advanced"
+                                              dragDropSupport="false" multiple="false" auto="true"
+                                              invalidFileMessage="只支持zip格式的文件"
+                                              invalidSizeMessage="文件大小不得超过500M"
+                                              update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
+                                              label="从zip导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                                <p:growl id="messages" showDetail="true"/>
+                            </p:panelGrid>
+                            <h:panelGroup>
+                                <p>说明</p>
+                                <p>1. 必须为 zip 格式文件</p>
+                                <p>2. zip 包内文件名必须为计量证书编号</p>
+                                <p>3. 上传文件进行导入</p>
+                            </h:panelGroup>
+                        </p:fieldset>
+                    </h:form>
+                </p:tab>
+                <p:tab title="批量OCR计量附件">
+                    <h:form enctype="multipart/form-data" >
+                        <p:fieldset  legend="批量OCR计量附件" id="uploaderFileOCR">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <p:fileUpload fileUploadListener="#{measureFromZipController.handleZipFileUploadOCR}" mode="advanced"
+                                              dragDropSupport="false" multiple="false" auto="true"
+                                              invalidFileMessage="只支持zip格式的文件"
+                                              invalidSizeMessage="文件大小不得超过500M"
+                                              update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
+                                              label="从zip导入" />
+                                <p:progressBar class="customProgressBar" labelTemplate="{value}%" widgetVar="progressBarId" ajax="false" id="pb" value="#{measureFromZipController.progress}"  />
+                                <p:poll interval="3" update="pb" />
+                                <p:growl id="messagesOCR" showDetail="true"/>
+<!--                                <p:progressBar id="pb" class="customProgressBar " value="50" displayOnly="true" />-->
+                            </p:panelGrid>
+                            <h:panelGroup>
+                                <p>说明</p>
+                                <p>1. 必须为 zip 格式文件</p>
+                                <p>2. zip 包内文件类型仅支持<span style="color:red"> PDF </span>格式</p>
+                                <p>3. 上传文件进行导入</p>
+                            </h:panelGroup>
+                        </p:fieldset>
+                    </h:form>
+                </p:tab>
+            </p:tabView>
         </div>
 
         <div class="ui-g-12 card">
