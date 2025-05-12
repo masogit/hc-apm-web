@@ -167,7 +167,7 @@ public class MeasuringService {
             if(mcdList == null || mcdList.isEmpty()){
                 mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
             }
-
+            SystemEventAuditEnum eventAuditEnum = null;
             //如果查询到具体的计量记录,做更新操作，否则新增计量记录
             if(mcdList != null && !mcdList.isEmpty()) {
                 MeasuringCertificateDetail tempMcd = mcdList.get(0);
@@ -176,13 +176,17 @@ public class MeasuringService {
                 measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
                 measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
                 measuringCertificateDetail.setLastModifiedDate(new Date());
+                eventAuditEnum =SystemEventAuditEnum.MEASURE_IMPORT_UPLOAD;
             } else {
                 measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
                 measuringCertificateDetail.setCreatedDate(new Date());
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
             }
 
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
             measuringCertificateDetailDao.save(measuringCertificateDetail);
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
             //目标设备的所有计量记录
             updateMeasuringDate( tempAssetInfo);
