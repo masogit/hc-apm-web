@@ -78,7 +78,7 @@ public class MeasuringService {
     private final String HEADER_FILE_NO = "存档记录";
     private final String HEADER_QR_CODE = "二维码";
     private static final String MEASURING_STATUS= "measuringStatus";
-
+    private int progress;
     private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 
     private Pattern pattern = Pattern.compile("\\d+");
@@ -167,7 +167,7 @@ public class MeasuringService {
             if(mcdList == null || mcdList.isEmpty()){
                 mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
             }
-
+            SystemEventAuditEnum eventAuditEnum = null;
             //如果查询到具体的计量记录,做更新操作，否则新增计量记录
             if(mcdList != null && !mcdList.isEmpty()) {
                 MeasuringCertificateDetail tempMcd = mcdList.get(0);
@@ -176,13 +176,17 @@ public class MeasuringService {
                 measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
                 measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
                 measuringCertificateDetail.setLastModifiedDate(new Date());
+                eventAuditEnum =SystemEventAuditEnum.MEASURE_IMPORT_UPLOAD;
             } else {
                 measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
                 measuringCertificateDetail.setCreatedDate(new Date());
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
             }
 
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
             measuringCertificateDetailDao.save(measuringCertificateDetail);
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
             //目标设备的所有计量记录
             updateMeasuringDate( tempAssetInfo);
@@ -402,14 +406,6 @@ public class MeasuringService {
             String errInfo = "";
             if (ObjectUtil.isEmpty(certificateDetails)) {
                 errInfo = "证书编号匹配不到计量证书";
-                List<MeasuringCertificateDetail> detailList = handleOcr(zipInputStream, entry);
-                if(CollectionUtils.isNotEmpty(detailList)){
-                    MeasuringCertificateDetail detail = detailList.get(0);
-                    resultDetail.setCertificateNo(certificateNo);
-                    resultDetail.setErrorInfo("");
-                    resultList.add(resultDetail);
-                    continue;
-                }
             } else if (certificateDetails.size() > 1) {
                 errInfo = "证书编号匹配到" + certificateDetails.size() + "个计量证书";
             } else {
@@ -434,12 +430,32 @@ public class MeasuringService {
         }
         return resultList;
     }
-
-    public List<MeasuringCertificateDetail> handleOcr(ZipInputStream zis,ZipEntry entry){
+    public List<MeasuringCertificateDetail> handleZipOCR(UploadedFile file,UserAccount account) throws IOException {
+        List<MeasuringCertificateDetail> resultList = Lists.newArrayList();
+        progress = 0;
+        // 获取压缩文件中的每个子文件
+        try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                MeasuringCertificateDetail detailList = handleOcr(zipInputStream, entry);
+                resultList.add(detailList);
+                progress ++;
+            }
+            progress = 100;
+        }catch (Exception e){
+            progress = 0;
+            LOGGER.error("handle zip error:{}",e.getMessage());
+            throw  new RuntimeException("handleZip error",e);
+        }
+        resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        return resultList;
+    }
+    public MeasuringCertificateDetail handleOcr(ZipInputStream zis,ZipEntry entry){
         File newFile = null;
         try {
             byte[] buffer = new byte[1024];
             File destDir = new File(System.getProperty("user.dir"));
+            if(entry.isDirectory()) return null;
             newFile = newFile(destDir, entry);
             // 写入文件内容
             try (FileOutputStream fos = new FileOutputStream(newFile)) {
@@ -448,6 +464,7 @@ public class MeasuringService {
                     fos.write(buffer, 0, len);
                 }
             }
+
             Map<String, Object> params = new HashMap<>();
             params.put("type", BusinessType.MEASURE.name());
             JSONObject jsonObject = templateService.getJsonObject(GatewayURL.OCR_DOCUMENT, params, newFile);
@@ -466,7 +483,8 @@ public class MeasuringService {
         return null;
     }
 
-    private List<MeasuringCertificateDetail> handleOcrResult(JSONArray data, File newFile) throws IOException {
+    private MeasuringCertificateDetail handleOcrResult(JSONArray data, File newFile) throws IOException {
+        MeasuringCertificateDetail result = new MeasuringCertificateDetail();
         JSONObject object= data.getJSONObject(0);
         String assetSN = object.getString("assetSN");
         String[] split = assetSN.split("/");
@@ -475,44 +493,50 @@ public class MeasuringService {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
         List<AssetInfo> assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
-        if(CollectionUtils.isNotEmpty(assetInfos)){
-            List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
-                MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
-                setObject(detail, object);
-                detail.setAssetUID(item.getUid());
-                detail.setAssetSN(item.getSerialNum());
-                detail.setQrCode(item.getQrCode());
-                detail.setSiteUID(item.getSiteUID());
-                detail.setHospitalUID(item.getHospitalUID());
-                detail.setInstitutionUID(item.getInstitutionUID());
-                detail.setTenantUID(item.getTenantUID());
-                return detail;
-            }).collect(Collectors.toList());
-            measuringCertificateDetailDao.save(collect);
-            MeasuringCertificateDetail detail = collect.get(0);
-            V2_BlobObject v2BlobObject = templateService.saveTemplateFile(fileToByteArray(newFile), detail.getCertificateNo().replaceAll("/", "-") + ".pdf", "application/pdf", V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, detail.getId());
-            if(collect.size() > 1){
-                List<MeasuringCertificateDetail> measuringCertificateDetails = collect.subList(1, collect.size());
-                for (MeasuringCertificateDetail item : measuringCertificateDetails) {
-                    V2_BlobObject blob = new V2_BlobObject();
-                    BeanUtils.copyProperties(v2BlobObject,blob);
-                    blob.setId(null);
-                    blob.setBoUuid(item.getId());
-                    blobDao.save(blob);
-                }
-            }
-            for (AssetInfo assetInfo : assetInfos) {
-                // 更新设备计量日期
-                updateMeasuringDate(assetInfo);
-            }
-            UserAccount currentUser= UserContextService.getCurrentUserAccount();
-            for (MeasuringCertificateDetail item : collect) {
-                SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(currentUser, SystemEventAuditEnum.MEASURE_DELETE, item.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(item));
-                systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
-            }
-            return collect;
+        if(CollectionUtils.isEmpty(assetInfos)){
+            result.setCertificateNo(object.getString("certificateNo"));
+            result.setErrorInfo(assetSN + ",未匹配到设备");
+            result.setStatus(-1);
+            return result;
         }
-        return null;
+        if(assetInfos.size() > 1){
+            result.setCertificateNo(object.getString("certificateNo"));
+            result.setErrorInfo(assetSN + ",匹配到"+assetInfos.size() +"台设备");
+            result.setStatus(-1);
+            return result;
+        }
+        List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
+            MeasuringCertificateDetail measureDetail = new MeasuringCertificateDetail();
+            setObject(measureDetail, object);
+            measureDetail.setAssetUID(item.getUid());
+            measureDetail.setAssetSN(item.getSerialNum());
+            measureDetail.setQrCode(item.getQrCode());
+            measureDetail.setSiteUID(item.getSiteUID());
+            measureDetail.setHospitalUID(item.getHospitalUID());
+            measureDetail.setInstitutionUID(item.getInstitutionUID());
+            measureDetail.setTenantUID(item.getTenantUID());
+            return measureDetail;
+        }).collect(Collectors.toList());
+        result = collect.get(0);
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,result.getCertificateNo()));
+        searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        List<MeasuringCertificateDetail> measuringCertificateDetails = measuringCertificateDetailDao.findBySearchFilter(searchFilterList);
+        if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
+            String certificateNo = result.getCertificateNo();
+            result.setCertificateNo(certificateNo);
+            result.setErrorInfo(certificateNo + ",证书编号已存在");
+            result.setStatus(-1);
+            return result;
+        }
+        measuringCertificateDetailDao.save(collect);
+
+        templateService.saveTemplateFile(fileToByteArray(newFile), result.getCertificateNo().replaceAll("/", "-") + ".pdf", "application/pdf", V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, result.getId());
+        // 更新设备计量日期
+        updateMeasuringDate(assetInfos.get(0));
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.MEASURE_DELETE, result.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(result));
+        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        return result;
     }
 
     public static byte[] fileToByteArray(File file) throws IOException {
@@ -594,7 +618,9 @@ public class MeasuringService {
         }
     }
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
+        String name = zipEntry.getName();
+        name = name.substring(name.lastIndexOf("/"));
+        File destFile = new File(destinationDir, name);
 
         String destDirPath = destinationDir.getCanonicalPath();
         String destFilePath = destFile.getCanonicalPath();
@@ -906,4 +932,11 @@ public class MeasuringService {
         return header;
     }
 
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
 }

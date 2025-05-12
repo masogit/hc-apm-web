@@ -123,7 +123,7 @@
 
             </p:fieldset>
             <h:panelGroup>
-                <p:commandButton id="saveButton" actionListener="#{measuringCertificateDetailController.save()}" value="确定"  icon="ui-icon-check" class="btn btn-sm btn-gray" oncomplete="handleSubmit(args, 'varMeasuringCreateDlg');"/>
+                <p:commandButton id="saveButton" actionListener="#{measuringCertificateDetailController.save()}" value="确定"  icon="ui-icon-check" class="btn btn-sm btn-gray" oncomplete="handleSubmit(args, 'varMeasuringCreateDlg');" update="measuringTab:measuringAssetListForm"/>
                 <p:commandButton  validateClient="false" immediate="true"  value="取消"  icon="ui-icon-check" class="btn btn-sm btn-gray" oncomplete="PF('varMeasuringCreateDlg').hide()"/>
             </h:panelGroup>
 
