@@ -29,6 +29,8 @@ import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -36,6 +38,7 @@ import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -52,7 +55,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static com.ge.apm.service.asset.AssetImportDataCheckService.beanNullProperty;
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -575,7 +577,19 @@ public class MeasuringService {
             return bytes;
         }
     }
-
+    public  String[] beanNullProperty(Object assetImport) {
+        final BeanWrapper src = new BeanWrapperImpl(assetImport);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        Set<String> nullProperty = new HashSet<>();
+        for (PropertyDescriptor item : pds) {
+            Object value = src.getPropertyValue(item.getName());
+            if (value == null) {
+                nullProperty.add(item.getName());
+            }
+        }
+        String[] properties = new String[nullProperty.size()];
+        return nullProperty.toArray(properties);
+    }
     public void setObject(MeasuringCertificateDetail detail,JSONObject object){
         detail.setCertificateNo(object.getString("certificateNo"));
         detail.setAssetManufacturer(object.getString("assetManufacturer"));

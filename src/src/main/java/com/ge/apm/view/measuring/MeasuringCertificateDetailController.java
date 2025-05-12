@@ -32,9 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.ge.apm.service.asset.AssetImportDataCheckService.beanNullProperty;
 
 @ManagedBean
 @ViewScoped
@@ -202,7 +199,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             SystemEventAuditEnum eventAuditEnum = null;
             if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
                 MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
-                BeanUtils.copyProperties(selected, detail,beanNullProperty(selected));
+                BeanUtils.copyProperties(selected, detail,measuringService.beanNullProperty(selected));
                 dao.save(detail);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
             }else{
