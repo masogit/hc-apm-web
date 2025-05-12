@@ -8,3 +8,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 -- YHAAO-24782 配置项增加维修脚本
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, '', '模拟维修场景生成维修流程数据', 'workOrderScript', '维修场景数据文件', 't','f',1 where not exists(select * from config_item where key = 'workOrderScript');
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text, '-', ''),17, '/davinci#/projects','IB报表链接，取域名后地址如https://xxxx/davinci/#/projects，配置值为/davinci/#/projects','ibReportUrl','IB报表链接', 'f','t',1  where not exists(select * from config_item where key = 'ibReportUrl');
+
+-- 修改合同签订日期类型为 timestamp
+ALTER TABLE contract_info ALTER COLUMN signing_date TYPE timestamp;
