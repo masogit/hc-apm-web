@@ -2,21 +2,21 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.aop.SystemEventAuditAopAspect;
-import com.ge.apm.service.OCRTemplateService;
-import com.ge.apm.service.common.GatewayURL;
-import com.ge.apm.service.common.I18nMessageService;
-import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
-import com.ge.healthcare.cn.common.mq.MqContext;
-import com.ge.apm.mq.MqUtils;
-import com.ge.healthcare.cn.common.ocr.support.BusinessType;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.MeasuringCertificateDetailMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.OCRTemplateService;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.ocr.support.BusinessType;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -30,16 +30,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
-import webapp.framework.web.WebUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -107,6 +107,9 @@ public class MeasuringService {
     private MqUtils mqUtils;
     @Autowired
     private SystemEventAuditAopAspect systemEventAuditAopAspect;
+
+    @Value("#{systemEnvironment['FILE_SCAN_FOLDER'] ?: urlProperties.FileScanFolder}")
+    private String FILE_SCAN_FOLDER;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -456,7 +459,7 @@ public class MeasuringService {
         File newFile = null;
         try {
             byte[] buffer = new byte[1024];
-            File destDir = new File(System.getProperty("user.dir"));
+            File destDir = new File(FILE_SCAN_FOLDER);
             if(entry.isDirectory()) return null;
             newFile = newFile(destDir, entry);
             // 写入文件内容
