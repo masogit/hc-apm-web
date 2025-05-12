@@ -41,6 +41,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     private UploadedFile file;
 
+    private String fileName;
+    private byte[] contents;
+    private String contentType;
+
     private UserAccount currentUser;
 
     private AssetInfo assetInfo;
@@ -79,12 +83,15 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         try {
             logger.info("uploadDataFile");
             file = event.getFile();
+            fileName = file.getFileName();
+            contentType = file.getContentType();
+            contents = file.getContents();
             List<OCRTemplate> ocrTemplates = getOCRTemplates();
             if(CollectionUtils.isEmpty(ocrTemplates)){
                 WebUtil.addSuccessMessage("计量报告上传成功");
                 return;
             }
-            String fileName = file.getFileName();
+
             Map<String, Object> params = new HashMap<>();
             params.put("type", BusinessType.MEASURE.name());
             if(fileName.toLowerCase().endsWith("pdf")){
@@ -184,9 +191,18 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 WebUtil.addErrorMessage("证书编号不能为空");
                 return;
             }
+            List<SearchFilter> searchFilterList = new ArrayList<>();
+            searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,certificateNo));
+            searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,currentUser.getTenantUID()));
+            List<MeasuringCertificateDetail> measuringCertificateDetails = dao.findBySearchFilter(searchFilterList);
+            if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessage("证书编号已存在");
+                return;
+            }
             dao.save(selected);
             measuringService.updateMeasuringDate(assetInfo);
-            templateService.saveTemplateFile(file.getContents(),file.getFileName(),file.getContentType(), V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,selected.getId());
+            templateService.saveTemplateFile(contents,fileName,contentType, V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,selected.getId());
             WebUtil.addSuccessMessage("保存成功");
             SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,SystemEventAuditEnum.MEASURE_CREATE, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));
             systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
@@ -218,6 +234,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         object.setSiteUID(currentUser.getSiteUID());
         this.assetInfo = null;
         this.file = null;
+        this.contents = null;
+        this.contentType = null;
+        this.fileName = null;
     }
 
     public void handleValueChangeAssetSN() {
@@ -312,6 +331,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     public void removeAttachment(){
         this.file = null;
+        this.contents = null;
+        this.contentType = null;
+        this.fileName = null;
     }
 
 }

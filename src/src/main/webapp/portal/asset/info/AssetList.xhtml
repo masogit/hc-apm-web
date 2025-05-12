@@ -30,32 +30,25 @@
 
         <style>
             .warrantyExpireSoon {
-            background-color: #fca752!important;
-            color: #000000!important;
+                background-color: #fca752!important;
+                color: #000000!important;
             }
             .warrantyExpired {
-            background-color: #f04134!important;
-            color: #000000!important;
+                background-color: #f04134!important;
+                color: #000000!important;
             }
             .btn+.btn { margin-left: 0 }
             .ui-column-resizer:before {content: none!important;}
             th{font-size: 12px!important;}
             td{font-size: 12px!important;padding: 0px!important;}
             table .ui-chkbox-icon, td img{ zoom: 0.7!important}
-
-            /* 同步表头与内容列宽度 */
-            .ui-datatable-scrollable-header th,
-            .ui-datatable-scrollable-body td {
-                width: calc(100% - 1px) !important;  /* 补偿边框误差 */
-                box-sizing: border-box;
-            }
         </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value=" #{assetInfoListController.terminate? msg.TerminateAssetInfo:msg.AssetInfo}"/>
             </div>
 
-            <div class="ui-g-12 card" style="height: 70%">
+            <div class="ui-g-12 card">
 
                 <h:form id="searchForm">
                     <h:panelGrid id="filterType" columns="4" style="float: right">
@@ -102,7 +95,7 @@
                                         <p:treeNode type="org">
                                             <h:outputText value="#{node.name}"/>
                                         </p:treeNode>
-										<p:treeNode type="hidden" rendered="false"/>
+                                        <p:treeNode type="hidden" rendered="false"/>
                                     </p:tree>
                                 </p:scrollPanel>
                             </p:overlayPanel>
@@ -119,10 +112,9 @@
                 </h:form>
                 <h:form id="AssetInfoListForm">
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
-                                 selectionMode="single" selection="#{assetInfoListController.selected}"
+                                 selectionMode="single" scrollable="false" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowStyleClass="#{item.warrantyAlertStatus}"
-                                 scrollable="true" scrollHeight="70%"
                                  rowKey="#{item.id}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -132,7 +124,7 @@
                         <p:ajax  event="rowSelect" listener="#{assetInfoListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>
                         <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                        <p:column id="checkBoxColumn">
+                        <p:column width="36"  id="checkBoxColumn">
                             <p:selectBooleanCheckbox value="#{assetInfoListController.selectedMap[item.uid]}"  class="selectCheckBox">
                                 <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
@@ -142,20 +134,20 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="操 作" exportable="false" id="operatorColumn">
+                        <p:column headerText="操 作" exportable="false" width="60" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
-                                    <p:graphicImage name="icons/edit.png" style="height: 30px;"/>
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
-                                    <p:graphicImage name="icons/delete.png" style="height: 30px;"/>
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
-                                    <p:link   target="_new1" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT') and !userContextService.isEnableBtnByKey('enableDeviceReplication')}" >
-                                        <p:graphicImage value="/images/icons/copyy.png" style="height: 30px;"/>
+                                <p:link   target="_new1" title="复制" outcome="#{assetInfoListController.getCopyPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT') and !userContextService.isEnableBtnByKey('enableDeviceReplication')}" >
+                                    <p:graphicImage value="/images/icons/copyy.png" style="width: 30px; height: 30px;"/>
 <!--                                        <p:graphicImage name="icons/copy.png" style="width: 30px; height: 30px;"/>-->
-                                    </p:link>
-                        </h:panelGroup>
+                                </p:link>
+                            </h:panelGroup>
                             <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
@@ -254,7 +246,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetTypeGroup'}">
-                                <p:column headerText="#{msg.assetTypeGroup}" exportable="true">
+                                <p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.assetTypeGroup}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetTypeGroup}" appendTo="@(Body)"
@@ -576,12 +568,12 @@
                             </c:if>
                             <c:if test="#{columnItem eq 'proprietaryClass'}">
                                 <p:column headerText="#{msg.proprietaryClass}" sortBy="#{item.proprietaryClass}" filterBy="#{item.proprietaryClass}" filterMatchMode="EQ" >
-                                <f:facet name="filter">
-                                    <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
-                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                        <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    </p:selectOneMenu>
-                                </f:facet>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('proprietaryClass',item.proprietaryClass)}"/>
                                 </p:column>
                             </c:if>
@@ -1316,22 +1308,22 @@
 
         <c:if test="#{assetInfoListController.isShowColumn('siteUID')}">
             <h:form id="dataTableFilterByHospital">
-            <p:overlayPanel appendTo="AssetInfoListForm" widgetVar="varPanelOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
+            <p:overlayPanel appendTo="dataTableFilterByHospital" widgetVar="varPanelOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
                     <p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="dataTableFilterByHospital:treeNodeNameFilter2 @this" update="dataTableFilterByHospital:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                            <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                    <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode2}" update=":AssetInfoListForm:datalist :searchForm :dataTableFilterByHospital" oncomplete="PF('varPanelOrg2').hide(); afterLoadRender()"/>
-                                    <p:ajax process="@this" event="expand"/>
-                                    <p:ajax process="@this" event="collapse"/>
-                                    <p:treeNode type="org">
-                                            <h:outputText value="#{node.name}"/>
-                                    </p:treeNode>
-                                    <p:treeNode type="hidden" rendered="false"/>
-                            </p:tree>
+                        <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                            <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode2}" update=":AssetInfoListForm:datalist :searchForm :dataTableFilterByHospital" oncomplete="PF('varPanelOrg2').hide(); afterLoadRender()"/>
+                            <p:ajax process="@this" event="expand"/>
+                            <p:ajax process="@this" event="collapse"/>
+                            <p:treeNode type="org">
+                                <h:outputText value="#{node.name}"/>
+                            </p:treeNode>
+                            <p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
                     </p:scrollPanel>
-            </p:overlayPanel>
-        </h:form>
+                </p:overlayPanel>
+            </h:form>
         </c:if>
 
         <script>
@@ -1389,9 +1381,7 @@
                     $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
-
-
-//]]>
+            //]]>
         </script>
     </ui:define>
 </ui:composition>
