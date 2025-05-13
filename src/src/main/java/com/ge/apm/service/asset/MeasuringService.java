@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 
@@ -494,6 +495,7 @@ public class MeasuringService {
         MeasuringCertificateDetail result = new MeasuringCertificateDetail();
         JSONObject object= data.getJSONObject(0);
         String assetSN = object.getString("assetSN");
+        if(StringUtils.isEmpty(assetSN)) return null;
         String[] split = assetSN.split("/");
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
