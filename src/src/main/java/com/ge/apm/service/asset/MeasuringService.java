@@ -536,6 +536,7 @@ public class MeasuringService {
             MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
             BeanUtils.copyProperties(result, detail,beanNullProperty(result));
             measuringCertificateDetailDao.save(detail);
+            result = detail;
             eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
         }else{
             measuringCertificateDetailDao.save(collect);
