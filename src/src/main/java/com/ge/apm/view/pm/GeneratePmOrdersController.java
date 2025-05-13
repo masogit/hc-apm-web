@@ -352,7 +352,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public List<SearchFilter> getAssetFilter() {
         List<SearchFilter> filter = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(selectedUserOrg)){
-            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList()),"1*"));
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList()),"1*2+"));
+            filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList()),"1*2+"));
         }else{
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
         }
