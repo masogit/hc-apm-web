@@ -188,7 +188,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     }
 
     public List<JSONObject> getAssetChangeList() {
-        return assetHistoryService.getAssetChangeHistoryByJSON(this.assetInfo.getUid(), this.startTime, this.endTime);
+        return assetHistoryService.getAssetChangeHistoryByJSON(this.assetInfo.getUid(), this.startTime, this.endTime, 0, 1000);
     }
 
     public List<InventoryOrderDetail> getInventoryOrderDetailList(Integer assetId){

@@ -17,6 +17,7 @@ import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -40,6 +41,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
     private MeasuringCertificateDetailRepository dao;
 
     private UploadedFile file;
+
+    private String fileName;
+    private byte[] contents;
+    private String contentType;
 
     private UserAccount currentUser;
 
@@ -79,12 +84,15 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         try {
             logger.info("uploadDataFile");
             file = event.getFile();
+            fileName = file.getFileName();
+            contentType = file.getContentType();
+            contents = file.getContents();
             List<OCRTemplate> ocrTemplates = getOCRTemplates();
             if(CollectionUtils.isEmpty(ocrTemplates)){
                 WebUtil.addSuccessMessage("计量报告上传成功");
                 return;
             }
-            String fileName = file.getFileName();
+
             Map<String, Object> params = new HashMap<>();
             params.put("type", BusinessType.MEASURE.name());
             if(fileName.toLowerCase().endsWith("pdf")){
@@ -172,23 +180,37 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
     @Override
     public void save() {
         try {
-            logger.info("save:"+selected.toString());
+            MeasuringCertificateDetail detail = selected;
+            logger.info("save:"+detail.toString());
             if(assetInfo == null){
                 WebUtil.addErrorMessage("请输入 设备序列号SN|资产编号|二维码|设备编号 绑定设备信息");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
-            String certificateNo = selected.getCertificateNo();
+            String certificateNo = detail.getCertificateNo();
             if(Objects.isNull(certificateNo)){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage("证书编号不能为空");
                 return;
             }
-            dao.save(selected);
+            List<SearchFilter> searchFilterList = new ArrayList<>();
+            searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,certificateNo));
+            searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,currentUser.getTenantUID()));
+            List<MeasuringCertificateDetail> measuringCertificateDetails = dao.findBySearchFilter(searchFilterList);
+            SystemEventAuditEnum eventAuditEnum = null;
+            if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
+                detail = measuringCertificateDetails.get(0);
+                BeanUtils.copyProperties(selected, detail,measuringService.beanNullProperty(selected));
+                dao.save(detail);
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
+            }else{
+                dao.save(detail);
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
+            }
             measuringService.updateMeasuringDate(assetInfo);
-            templateService.saveTemplateFile(file.getContents(),file.getFileName(),file.getContentType(), V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,selected.getId());
+            templateService.saveTemplateFile(contents,fileName,contentType, V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,detail.getId());
             WebUtil.addSuccessMessage("保存成功");
-            SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,SystemEventAuditEnum.MEASURE_CREATE, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));
+            SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,eventAuditEnum, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));
             systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,6 +240,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         object.setSiteUID(currentUser.getSiteUID());
         this.assetInfo = null;
         this.file = null;
+        this.contents = null;
+        this.contentType = null;
+        this.fileName = null;
     }
 
     public void handleValueChangeAssetSN() {
@@ -312,6 +337,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     public void removeAttachment(){
         this.file = null;
+        this.contents = null;
+        this.contentType = null;
+        this.fileName = null;
     }
 
 }
