@@ -260,7 +260,8 @@
                         </h:panelGroup>
                     </p:panelGrid>
 
-                    <h:panelGroup rendered="#{(zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed') and zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox'}">
+                    <h:panelGroup rendered="false">
+                    <!--<h:panelGroup rendered="#{(zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed') and zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox'}">-->
                         <p:dataList id="uploadList" value="#{zkbIntegralOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">合同附件上传</f:facet>
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
@@ -363,7 +364,8 @@
                             </h:panelGroup>
                         </c:if>
                         <c:if test="#{!(zkbIntegralOrderAuditController.selected.status eq 'OrderedReject') and zkbIntegralOrderAuditController.selected.orderType eq 'ToolBox'}">
-                            <c:if test="#{(zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed') and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}">
+                            <!--<c:if test="#{(zkbIntegralOrderAuditController.zkbContract.contractType eq 'CCS' or zkbIntegralOrderAuditController.zkbContract.contractType eq 'Biomed') and zkbIntegralOrderAuditController.zkbIntegralOrderStatusVo.canEditFlag}">-->
+                            <c:if test="false">
                                 <h:panelGroup>
                                     <p:outputLabel style="color: red; " value="请审核上传的附件是否符合订购要求，CCS和Biomed合同要求合同里注明积分兑换活动" />
                                     <p:commandLink validateClient="false" immediate="false" process="@this" value="查看示例" oncomplete="PF('showSampleDlg').show()" />
