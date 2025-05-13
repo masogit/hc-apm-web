@@ -388,6 +388,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
     public void changeSelectTenant(){
         if(selectTenantId != null && selectTenantId != -1){
             selectTenant = tenantInfoRepository.findById(selectTenantId);
+            selected = null;
         }
     }
     public String getCreateUrl(){
