@@ -596,11 +596,10 @@
                                  style="margin-bottom:20px;">
                             <p:dataTable var="item" value="#{inspectionServiceController.detailAssetChangeHistoryList}"
                                          lazy="true" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="true"
-                                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                          rows="20" emptyMessage="#{msg.noRecordFound}"
-                                         rowsPerPageTemplate="20,50,100,500"
-                            >
+                                         rowsPerPageTemplate="20,50,100,500">
                                 <ui:include src="ImportantFieldsView.xhtml"/>
                             </p:dataTable>
                         </p:panel>
