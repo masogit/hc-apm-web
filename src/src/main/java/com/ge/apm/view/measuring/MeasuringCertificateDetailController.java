@@ -180,13 +180,14 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
     @Override
     public void save() {
         try {
-            logger.info("save:"+selected.toString());
+            MeasuringCertificateDetail detail = selected;
+            logger.info("save:"+detail.toString());
             if(assetInfo == null){
                 WebUtil.addErrorMessage("请输入 设备序列号SN|资产编号|二维码|设备编号 绑定设备信息");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
-            String certificateNo = selected.getCertificateNo();
+            String certificateNo = detail.getCertificateNo();
             if(Objects.isNull(certificateNo)){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage("证书编号不能为空");
@@ -198,16 +199,16 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             List<MeasuringCertificateDetail> measuringCertificateDetails = dao.findBySearchFilter(searchFilterList);
             SystemEventAuditEnum eventAuditEnum = null;
             if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
-                MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
+                detail = measuringCertificateDetails.get(0);
                 BeanUtils.copyProperties(selected, detail,measuringService.beanNullProperty(selected));
                 dao.save(detail);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
             }else{
-                dao.save(selected);
+                dao.save(detail);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
             }
             measuringService.updateMeasuringDate(assetInfo);
-            templateService.saveTemplateFile(contents,fileName,contentType, V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,selected.getId());
+            templateService.saveTemplateFile(contents,fileName,contentType, V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,detail.getId());
             WebUtil.addSuccessMessage("保存成功");
             SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,eventAuditEnum, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));
             systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
