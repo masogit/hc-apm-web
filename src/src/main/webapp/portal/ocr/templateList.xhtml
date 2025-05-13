@@ -28,6 +28,17 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="templateListForm">
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5" rendered="#{userContextService.hasRole('SuperAdmin')}">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{ocrTemplateController.selectTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelSite" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
+                                <p:selectOneListbox value="#{ocrTemplateController.selectTenantId}" scrollHeight="500" style="border: none;" filter="true" filterMatchMode="contains">
+                                    <p:ajax process="@this" event="click" listener="#{ocrTemplateController.changeSelectTenant}" update="templateListForm" oncomplete="PF('varPanelSite').hide();"/>
+                                    <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                </p:selectOneListbox>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
                     <p:dataTable id="datalist" class="datalist" value="#{ocrTemplateController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{ocrTemplateController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -58,7 +69,7 @@
                             <h:outputText value="#{item.remark}" />
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon ui-icon-add" title="#{msg.Create}" class="btn btn-sm btn-gray" action="CreateTemplate.xhtml?faces-redirect=true&amp;action=Create" />
+                            <p:commandButton id="createButton" icon="ui-icon ui-icon-add" title="#{msg.Create}" class="btn btn-sm btn-gray" action="#{ocrTemplateController.getCreateUrl()}" />
                             <p:commandButton id="editButton" icon="ui-icon ui-icon-pencil" action="#{ocrTemplateController.getEditLink}" class="btn btn-sm btn-gray" title="#{msg.Edit}" disabled="#{empty ocrTemplateController.selected}" />
                             <p:commandButton id="deleteButton" icon="ui-icon ui-icon-delete" actionListener="#{ocrTemplateController.delete()}" class="btn btn-sm btn-gray" title="#{msg.Delete}" update=":templateListForm"  disabled="#{empty ocrTemplateController.selected}" >
                                 <p:confirm header="删除-#{item.name}" message="您确认要删除选中的配置吗？" icon="ui-icon-warning"/>
