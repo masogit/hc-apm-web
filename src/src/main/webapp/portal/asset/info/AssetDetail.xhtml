@@ -235,7 +235,7 @@
                                                     required="false" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"
                                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                                     </h:panelGroup>
-                                    <p:commandButton value="查询" validateClient="true" actionListener="#{inspectionServiceController.query(assetInfoDetailController.selected)}" update=":growl EventRecord"/>
+                                    <p:commandButton value="查询" validateClient="true" actionListener="#{inspectionServiceController.query(assetInfoDetailController.selected)}" update=":growl EventRecord :assetDetail:approvale :assetDetail:modifyRecordList"/>
                                 </p:panelGrid>
                             </p:fieldset>
 
@@ -595,7 +595,12 @@
                                  collapsed="#{inspectionServiceController.detailAssetChangeHistoryList.size() > 0 ? false : true}" widgetVar="panel"
                                  style="margin-bottom:20px;">
                             <p:dataTable var="item" value="#{inspectionServiceController.detailAssetChangeHistoryList}"
-                                         emptyMessage="#{msg.noRecordFound}" lazy="true">
+                                         lazy="true" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="true"
+                                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                                         rowsPerPageTemplate="20,50,100,500"
+                            >
                                 <ui:include src="ImportantFieldsView.xhtml"/>
                             </p:dataTable>
                         </p:panel>
