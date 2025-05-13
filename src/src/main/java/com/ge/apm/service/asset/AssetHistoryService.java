@@ -94,10 +94,10 @@ public class AssetHistoryService {
     }
 
     public List<JSONObject> getAssetChangeHistoryByJSON(String assetUid) {
-        return getAssetChangeHistoryByJSON(assetUid, null, null);
+        return getAssetChangeHistoryByJSON(assetUid, null, null, 0, 5);
     }
 
-    public List<JSONObject> getAssetChangeHistoryByJSON(String assetUid, Date startTime, Date endTime) {
+    public List<JSONObject> getAssetChangeHistoryByJSON(String assetUid, Date startTime, Date endTime, int pageNum, int pageSize) {
         List<SearchFilter> searchFilters =new ArrayList<> ();
         searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, assetUid));
         if (ObjectUtil.isNotEmpty(startTime)) {
@@ -108,7 +108,7 @@ public class AssetHistoryService {
         }
         List<String> assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
         searchFilters.add(new SearchFilter("json_data", SearchFilter.Operator.CONTAINS, assetsImportantFieldsAll));
-        Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), 0, 5);
+        Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), pageNum, pageSize);
         List<AssetHistory> resultList = assetHistoryPage.getContent();
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         resultList = resultList.stream().filter(assetHistory -> {

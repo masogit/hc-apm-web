@@ -1,6 +1,7 @@
 package com.ge.apm.view.uaa;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.UserAccountHistoryRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserAccountHistory;
@@ -61,7 +62,7 @@ public class UserAccountEsHistoryController extends GenericCRUDController<UserAc
             }
             list.add(userAccountHistory);
         }
-        return new PageImpl<>(list, pageRequest, list.size());
+        return new PageImpl<>(list, pageRequest, pgData.getTotalElements());
     }
 
     @Override

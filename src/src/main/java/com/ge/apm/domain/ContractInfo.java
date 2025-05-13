@@ -389,7 +389,6 @@ public class ContractInfo implements Serializable {
 
     // 合同签订日期
     @Column(name = "signing_date")
-    @Temporal(TemporalType.DATE)
     private Date signingDate;
 
     // 维保年限(月)

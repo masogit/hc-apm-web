@@ -10,23 +10,6 @@
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.AssetContractMgmt}"/>
             </div>
-
-            <style>
-                .contractExpiredSoon {
-                    background-color: #fca752!important;
-                    color: #000000!important;
-                }
-                .contractExpired {
-                    background-color: #f04134!important;
-                    color: #000000!important;
-                }
-                .btn+.btn { margin-left: 0 }
-                .ui-column-resizer:before {content: none!important;}
-                th{font-size: 12px!important;}
-                td{font-size: 12px!important;padding: 0px!important;}
-                table .ui-chkbox-icon, td img{ zoom: 0.7!important}
-            </style>
-
             <div class="ui-g-12 card">
                 <h:form>
                     <p:commandButton id="importButton" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" icon="ui-icon-extlink" value="#{msg.ContractImport}" title="#{msg.ContractImport}" action="#{contractInfoController.importAction}"/>
@@ -103,11 +86,6 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <!--                        <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.amount}" >-->
-                        <!--                            &lt;!&ndash; <h:outputText  value="#{item.contractAmount}"/> &ndash;&gt;-->
-                        <!--                            <p:inputNumber value="#{(item.amount + item.supplementaryAmount) > 0 ? (item.amount + item.supplementaryAmount) : null}" readonly="true"> </p:inputNumber>-->
-                        <!--                        </p:column>-->
-
                         <p:column headerText="#{msg.AssetContractAmount}"  filterBy="#{item.assetContractAmount}" filterMatchMode="GET"  sortBy="#{item.assetContractAmount}">
                             <f:facet name="filter">
                                 <p:inputText id="filterAssetContractAmount" widgetVar="varFilterAssetContractAmount" value="#{contractInfoController.filterObject['assetContractAmount']}"/>
@@ -159,7 +137,7 @@
                     </p:dataTable>
                     <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton" immediate="true"/>
 
-                    <p:overlayPanel widgetVar="panelFilterAssetContractAmount" for="AssetContractListForm:datalist:filterAssetContractAmount" dismissable="false">
+                    <p:overlayPanel appendTo="AssetContractListForm" widgetVar="panelFilterAssetContractAmount" for="AssetContractListForm:datalist:filterAssetContractAmount" dismissable="false">
                         <h:panelGrid columns="2">
                             <!--                            <p:outputLabel value="#{msg.From}"/>-->
                             <!--                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varAssetContractAmountFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />-->
@@ -176,9 +154,7 @@
                         <p:commandButton onclick="PF('panelFilterAssetContractAmount').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
                     </p:overlayPanel>
 
-
-
-                    <p:overlayPanel widgetVar="panelFilterExpectArrivalDate" for="AssetContractListForm:datalist:filterExpectArrivalDate" dismissable="false">
+                    <p:overlayPanel appendTo="AssetContractListForm" widgetVar="panelFilterExpectArrivalDate" for="AssetContractListForm:datalist:filterExpectArrivalDate" dismissable="false">
                         <h:panelGrid columns="2">
                             <p:outputLabel value="#{msg.From}"/>
                             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varExpectArrivalDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
@@ -189,7 +165,7 @@
                         <p:commandButton onclick="PF('panelFilterExpectArrivalDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
                     </p:overlayPanel>
 
-                    <p:overlayPanel widgetVar="panelFilterStartTime" for="AssetContractListForm:datalist:filterStartTime" dismissable="false">
+                    <p:overlayPanel appendTo="AssetContractListForm" widgetVar="panelFilterStartTime" for="AssetContractListForm:datalist:filterStartTime" dismissable="false">
                         <h:panelGrid columns="2">
                             <p:outputLabel value="#{msg.From}"/>
                             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varStartTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
@@ -201,7 +177,7 @@
                     </p:overlayPanel>
 
 
-                    <p:overlayPanel widgetVar="panelFilterEndTime" for="AssetContractListForm:datalist:filterEndTime" dismissable="false">
+                    <p:overlayPanel appendTo="AssetContractListForm" widgetVar="panelFilterEndTime" for="AssetContractListForm:datalist:filterEndTime" dismissable="false">
                         <h:panelGrid columns="2">
                             <p:outputLabel value="#{msg.From}"/>
                             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varEndTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
@@ -215,7 +191,21 @@
                 </h:form>
             </div>
         </div>
-
+        <style>
+            .contractExpiredSoon {
+                background-color: #fca752!important;
+                color: #000000!important;
+            }
+            .contractExpired {
+                background-color: #f04134!important;
+                color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
         <p:dialog id="ContractAuditDlg" class="ContractAuditDlgCls" width="300" widgetVar="ContractAuditDialog" modal="true" resizable="true"
                   draggable="true" appendTo="@this" header="#{msg.Supplier}">
             <h:form id="ContractAuditForm">
@@ -246,7 +236,6 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
         <script type="text/javascript">
             function start() {
                 PF('statusDialog').show();

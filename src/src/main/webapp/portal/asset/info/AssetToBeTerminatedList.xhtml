@@ -12,7 +12,7 @@
             <h:panelGrid id="searchPanel" columns="3">
                 <h:panelGroup rendered="#{!userContextService.hasAnyRoleByApmRoles('MVSAdmin', 'MVSFE')}">
                     <p:commandButton id="btnOrg" value="#{empty assetInfoToBeTerminatedListController.selectSite? msg.AllHospitals:assetInfoToBeTerminatedListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                    <p:overlayPanel appendTo="searchForm1" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                         <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                         <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":woTab:searchForm1:treeNodeNameFilter @this" update="searchForm1:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -30,7 +30,7 @@
                 </h:panelGroup>
                 <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('MVSAdmin', 'MVSFE')}">
                     <p:commandButton id="btnTenant" value="#{empty assetInfoToBeTerminatedListController.selectSite? msg.AllTenants:assetInfoToBeTerminatedListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
-                    <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
+                    <p:overlayPanel appendTo="searchForm1" widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
                                 <p:ajax process="@this" event="select" listener="#{assetInfoToBeTerminatedListController.onSelectSiteTreeNode}" update=":woTab:AssetInfoListForm1 :woTab:searchForm1" oncomplete="PF('varPanelTenant').hide();"/>
