@@ -327,7 +327,15 @@ public class MeasuringService {
         CompletableFuture.runAsync(()->{
             //目标设备的所有计量记录
             List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), tempAssetInfo.getTenantUID());
-            if(CollectionUtils.isEmpty(allMcdList)) return;
+            if(CollectionUtils.isEmpty(allMcdList)){
+                tempAssetInfo.setNextMeteringDate(null);
+                tempAssetInfo.setLastMeteringDate(null);
+                tempAssetInfo.setMeteringNO(null);
+                tempAssetInfo.setMeasuringType(null);
+                assetInfoDao.save(tempAssetInfo);
+                sendMq(tempAssetInfo,currentUserAccount);
+                return;
+            }
             //目标设备的所有计量记录中计量日期最大的记录
             MeasuringCertificateDetail needUpdateAssetMcd = allMcdList.get(0);
             Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
