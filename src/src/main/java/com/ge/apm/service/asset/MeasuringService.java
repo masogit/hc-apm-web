@@ -332,6 +332,7 @@ public class MeasuringService {
                 tempAssetInfo.setLastMeteringDate(null);
                 tempAssetInfo.setMeteringNO(null);
                 tempAssetInfo.setMeasuringType(null);
+                tempAssetInfo.setLastCheckCompany(null);
                 assetInfoDao.save(tempAssetInfo);
                 sendMq(tempAssetInfo,currentUserAccount);
                 return;
