@@ -149,7 +149,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         try {
             String validDateToStr = "";
             String validDateToVar = object.getString("validDateTo");
-            if(ObjectUtil.isNotEmpty(validDateToStr)){
+            if(ObjectUtil.isNotEmpty(validDateToVar)){
                 Matcher matcher = pattern.matcher(validDateToVar);
                 while (matcher.find()) {
                     validDateToStr += matcher.group();
