@@ -24,7 +24,7 @@
 
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('costType').name.concat('(').concat(systemConfigItemController.configItemMap.get('costType').key).concat(')')}</label>
-                <p:selectManyMenu value="#{systemConfigItemController.multiSelected}" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 95%;">
+                <p:selectManyMenu value="#{systemConfigItemController.multiSelectedMap.costType}" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 95%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('costType').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}" itemDisabled="#{item.get('value') eq 'MaintenanceFee'}"/>
                 </p:selectManyMenu>
             </h:panelGroup>
