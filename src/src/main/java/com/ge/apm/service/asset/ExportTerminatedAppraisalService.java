@@ -259,7 +259,10 @@ public class ExportTerminatedAppraisalService {
                 mm.put("actualApproverName", multiLevelApproval.getActualApproverName());
                 mm.put("approvalOpinion", multiLevelApproval.getApprovalOpinion());
                 mm.put("actualApproverDate", DateUtil.format(multiLevelApproval.getActualApproverDate(), "yyyy-MM-dd HH:mm:ss"));
-                byte[] levelSignatureBytes = getSignatureBytes(multiLevelApproval.getAuditSignature());
+                byte[] levelSignatureBytes = getDefaultSignatureBytes();
+                if(StringUtils.isNotBlank(multiLevelApproval.getAuditSignature())){
+                    levelSignatureBytes = getSignatureBytes(multiLevelApproval.getAuditSignature());
+                }
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(levelSignatureBytes);
                 mm.put("signature", inputStream);
                 list.add(mm);
