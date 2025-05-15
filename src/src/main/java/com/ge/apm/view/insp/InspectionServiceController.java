@@ -267,6 +267,9 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     }
 
     public void query(AssetInfo assetInfo) {
+        if (ObjectUtil.isNotEmpty(endTime)) {
+            endTime = com.ge.healthcare.cn.common.utils.date.DateUtil.endOfDay(endTime);
+        }
         this.assetInfo = assetInfo;
         detailMeasureAssetList = getMeasureAssetList(assetInfo.getId());
         detailWorkOrderList = getWorkOrderList(assetInfo.getId());
