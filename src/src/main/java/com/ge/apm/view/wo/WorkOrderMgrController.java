@@ -297,6 +297,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Boolean enableAuditGroupConfiguration;
     @Getter @Setter
     private boolean enableMaintenanceContract = false;
+    @Getter @Setter
+    boolean showLocationNameFlag;
+    @Getter @Setter
+    boolean enableSignNeedScanQrCode;
     @Override
     protected void init() {
         try {
@@ -396,11 +400,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             throw e;
         }
         initLoadInternalSiteNameList();
-    }
-
-    public boolean initCheckInBtn(){
-        String configItemValue = userContextService.getConfigItemValue("enableSignNeedScanQrCode");
-        return StringUtils.isEmpty(configItemValue) ? true : !Boolean.valueOf(configItemValue);
+        String showLocationNameFlagStr = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+        showLocationNameFlag = StrUtil.isNotEmpty(showLocationNameFlagStr) && "true".equals(showLocationNameFlagStr);
+        String enableSignNeedScanQrCodeStr = userContextService.getConfigItemValue("enableSignNeedScanQrCode");
+        enableSignNeedScanQrCode = StringUtils.isEmpty(enableSignNeedScanQrCodeStr) || !Boolean.parseBoolean(enableSignNeedScanQrCodeStr);
     }
 
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
@@ -408,7 +411,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll = !currentPageWorkOrder.stream().anyMatch(item -> !selectedBatchMap.containsKey(item.getId()) || !selectedBatchMap.get(item.getId()));
+        boolean isSelectedAll = currentPageWorkOrder.stream().noneMatch(item -> !selectedBatchMap.containsKey(item.getId()) || !selectedBatchMap.get(item.getId()));
         for (V2_WorkOrder item : currentPageWorkOrder) {
             selectedBatchMap.put(item.getId(), !isSelectedAll);
         }
@@ -1740,14 +1743,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         checkInDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         V2_WorkOrder checkInWorkOrder = dao.findById(woid);
         woService.checkIn(checkInWorkOrder);
-    }
-
-    public boolean showLocationName(){
-        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
-        if (StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue)) {
-            return true;
-        }
-        return false;
     }
 
     public void repairWorkOrder() {
