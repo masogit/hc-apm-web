@@ -1,10 +1,8 @@
 package com.ge.apm.aop.audit;
 
 
+import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
-
-import java.lang.reflect.InvocationTargetException;
-
 
 public interface AuditHandler {
 
@@ -36,6 +34,80 @@ public interface AuditHandler {
                         systemEventAuditEnum = SystemEventAuditEnum.SUPPLIER_CREATE;
                     }
                 }
+                break;
+            case "org_info":
+                if ("delete".equals(operation)) {
+                    systemEventAuditEnum = SystemEventAuditEnum.ORG_DELETE;
+                } else {
+                    if (uid != null) {
+                        systemEventAuditEnum = SystemEventAuditEnum.ORG_UPDATE;
+                    } else {
+                        systemEventAuditEnum = SystemEventAuditEnum.ORG_CREATE;
+                    }
+                }
+                break;
+            case "tenant_info":
+                if ("delete".equals(operation)) {
+                    systemEventAuditEnum = SystemEventAuditEnum.TENANT_DELETE;
+                } else {
+                    if (uid != null) {
+                        systemEventAuditEnum = SystemEventAuditEnum.TENANT_UPDATE;
+                    } else {
+                        systemEventAuditEnum = SystemEventAuditEnum.TENANT_CREATE;
+                    }
+                }
+                break;
+            case "admin_feature_active":
+                if ("save".equals(operation)) {
+                    systemEventAuditEnum = SystemEventAuditEnum.TENANT_ACTIVE;
+                }
+                break;
+            case "shared_asset_request":
+                SharedAssetRequest sharedAssetRequest = (SharedAssetRequest) args[0];
+                switch (sharedAssetRequest.getState()){
+                    case 1:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_REQUESTED;
+                        break;
+                    case 2:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_ACCEPTED;
+                        break;
+                    case 3:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_DELIVERED;
+                        break;
+                    case 4:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_CANCELED;
+                        break;
+                    case 5:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_SUSPENDED;
+                        break;
+                    case 6:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_CONFIRMED;
+                        break;
+                    case 7:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_REQUESTED;
+                        break;
+                    case 8:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_ACCEPTED;
+                        break;
+                    case 9:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_DELIVERED;
+                        break;
+                    case 10:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_CANCELED;
+                        break;
+                    case 11:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_SUSPENDED;
+                        break;
+                    case 12:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_CONFIRMED;
+                        break;
+                    case 13:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_EXPIRED;
+                        break;
+                    default:
+                        break;
+                }
+
                 break;
             default:
 
