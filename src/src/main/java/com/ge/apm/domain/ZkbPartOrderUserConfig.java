@@ -116,6 +116,22 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Column(name = "zone")
     private String zone;
 
+    /**
+     * 暂定给技术支持US删除使用。其他类型则直接删除
+     * 技术支持US历史数据绑定了外键所以不能直接删除
+     * f为删除 空为未删除
+     */
+    @Column(name = "deleted_flag")
+    private String deletedFlag;
+
+    public String getDeletedFlag() {
+        return deletedFlag;
+    }
+
+    public void setDeletedFlag(String deletedFlag) {
+        this.deletedFlag = deletedFlag;
+    }
+
     public String getZone() {
         return zone;
     }

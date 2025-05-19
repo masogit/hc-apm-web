@@ -137,6 +137,8 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
                 }
             }
         }
+
+        zkbZoneList = zkbZoneRepository.find();
     }
 
     @Override
@@ -396,12 +398,12 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     @Override
     public void delete() {
-        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByOnline(this.selected.getId());
+        /*List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByOnline(this.selected.getId());
         if(CollectionUtils.isNotEmpty(zkbPartOrderList))
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
             return;
-        }
+        }*/
         super.delete();
     }
 

@@ -48,7 +48,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_type}*</label>
                         <p:selectOneMenu id="configType" value="#{zkbPartOrderUserConfigController.selected.configType}"  required="true" requiredMessage="类型#{msg.ValidationRequire}">
-                            <p:ajax event="change" update="panelGrid" listener="#{zkbPartOrderUserConfigController.configTypeChange()}" />
+                            <p:ajax event="change" update="panelGrid zonePandlGroup" listener="#{zkbPartOrderUserConfigController.configTypeChange()}" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStepsRole')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
@@ -70,7 +70,7 @@
                     <h:panelGroup rendered="#{zkbPartOrderUserConfigController.selected.configType eq 'TsePending' or zkbPartOrderUserConfigController.selected.configType eq 'TechnicalPending'}">
                         <label class="label">#{msg.zkbKeyUserConfig_propertyType}</label>
                         <p:selectOneMenu id="assetType" value="#{zkbPartOrderUserConfigController.selected.assetType}" required="false" requiredMessage="资产类型#{msg.ValidationRequire}">
-                            <p:ajax  update="panelGrid" />
+                            <p:ajax  update="panelGrid zonePandlGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="US" itemValue="US"/>
                             <f:selectItem itemLabel="CT" itemValue="CT"/>
