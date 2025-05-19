@@ -207,6 +207,9 @@ public class V2_BlobObject implements Serializable {
     private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
 
     @Transient
+    private List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg");
+
+    @Transient
     private String boSubTypeValue;
 
     public String getBoSubTypeValue() {
@@ -388,6 +391,11 @@ public class V2_BlobObject implements Serializable {
     public boolean showPreview() {
         String type = objectName.substring(objectName.lastIndexOf(".") + 1);
         return showPreviewTypeList.contains(type.toLowerCase());
+    }
+
+    public boolean isImageType() {
+        String type = objectName.substring(objectName.lastIndexOf(".") + 1);
+        return imageTypeList.contains(type.toLowerCase());
     }
 
     @Override
