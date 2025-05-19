@@ -13,6 +13,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.SimplePartsInventory;
@@ -352,6 +353,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 enableMaintenanceContract = "true".equals(configItemValue.getValue());
             }
             selectedBatchMap = new HashMap<>();
+            selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
             enableAuditGroupConfiguration();
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1819,6 +1821,21 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
+
+        //判断如果工单分类必填
+        OrgInfo orgInfo = (OrgInfo)selectedObjectMap.get("selectedOrg");
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(orgInfo.getSiteUID(), orgInfo.getHospitalUID(), orgInfo.getInstitutionUID(), orgInfo.getTenantUID(), "showWorkOrderType");
+        if(StrUtil.isNotEmpty(value)){
+            FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
+            if(fieldColumnDto.getRequired()){
+                if(StrUtil.isEmpty(selectedWorkOrder.getWorkOrderType())){
+                    WebUtil.addErrorMessage(WebUtil.getMessage(fieldColumnDto.getRequiredMessage()));
+                    RequestContext.getCurrentInstance().addCallbackParam("workOrderType", true);
+                    valid = false;
+                }
+            }
+        }
+
 
         if (!valid) {
             return;

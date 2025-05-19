@@ -475,6 +475,7 @@ public class V2_WorkOrderService {
         formData.setOtherExpense(selectedWorkOrder.getOtherExpense());
         formData.setExternalExpense(selectedWorkOrder.getExternalExpense());
         formData.setAttachments(attachments);
+        formData.setWorkOrderType(selectedWorkOrder.getWorkOrderType());
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "保存"));
@@ -515,6 +516,7 @@ public class V2_WorkOrderService {
         formData.setAttachments(attachments);
         formData.setAssigneeId(assignId);
         formData.setEntryType(selectedWorkOrder.getEntryType());
+        formData.setWorkOrderType(selectedWorkOrder.getWorkOrderType());
         if(selectedWorkOrder.getEntryType() == 1){
             formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
         }

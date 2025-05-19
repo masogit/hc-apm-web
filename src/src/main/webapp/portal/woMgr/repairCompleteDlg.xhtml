@@ -92,6 +92,18 @@
                                 <p:ajax />
                             </p:inputTextarea>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').rendered}">
+                            <label class="label">
+                                #{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').label
+                                        .concat(systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').required ? '*' : '')}
+                            </label>
+                            <p:selectOneMenu id="workOrderType" value="#{workOrderMgrController.selectedWorkOrder.workOrderType}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('workOrderType')}" var="item"
+                                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.patActions}</label>
                             <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="3"  cols="40"  maxlength="500"  >

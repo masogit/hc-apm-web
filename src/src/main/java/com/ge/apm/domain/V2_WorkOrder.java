@@ -330,6 +330,12 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="entry_type")
     private Integer entryType;
 
+    /**
+     * 工单分类
+     */
+    @Column(name="work_order_type")
+    private String workOrderType;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
@@ -1069,6 +1075,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
         this.workHoursList = workHoursList;
+    }
+
+    public String getWorkOrderType() {
+        return workOrderType;
+    }
+
+    public void setWorkOrderType(String workOrderType) {
+        this.workOrderType = workOrderType;
     }
 
     @Transient

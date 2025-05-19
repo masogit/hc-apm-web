@@ -583,6 +583,16 @@ class WorkOrderActionForm {
     //维修中【最新进展】
     String comment;
 
+    String workOrderType;
+
+    public String getWorkOrderType() {
+        return workOrderType;
+    }
+
+    public void setWorkOrderType(String workOrderType) {
+        this.workOrderType = workOrderType;
+    }
+
     public String getComment() {
         return comment;
     }
