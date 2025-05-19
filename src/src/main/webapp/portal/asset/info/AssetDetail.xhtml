@@ -334,7 +334,7 @@
                                 </p:dataTable>
                             </p:panel>
 
-                            <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
+                            <p:panelGrid columns="2" style="margin-bottom:20px;" layout="grid" styleClass="ui-panelgrid-blank">
                                 <p:panel  header="盘点记录" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' ) and userContextService.hasCurrentTenantName('')}">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/inventory/inventoryOrderDetailAssetInfoMainAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
@@ -596,11 +596,9 @@
                                  style="margin-bottom:20px;">
                             <p:dataTable var="item" value="#{inspectionServiceController.detailAssetChangeHistoryList}"
                                          lazy="true" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="true"
-                                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                         rows="20" emptyMessage="#{msg.noRecordFound}"
-                                         rowsPerPageTemplate="20,50,100,500"
-                            >
+                                         rows="5" emptyMessage="#{msg.noRecordFound}">
                                 <ui:include src="ImportantFieldsView.xhtml"/>
                             </p:dataTable>
                         </p:panel>

@@ -5,13 +5,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ge.apm.dao.OCRTemplateRepository;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OCRTemplate;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.OCRTemplateService;
 import com.ge.apm.service.asset.QrCodeDrawService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.view.budget.BudgetApplicationBapController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.ocr.support.MatcherType;
@@ -56,6 +56,11 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
     private OCRTemplateRepository dao;
 
     private OCRTemplateService templateService;
+
+    private TenantInfoRepository tenantInfoRepository;
+
+    private TenantInfo selectTenant;
+    private Integer selectTenantId;
     @Override
     protected GenericRepositoryUUID<OCRTemplate> getDAO() {
         return dao;
@@ -83,10 +88,14 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
     private String actionName ;
     @Override
     protected void init() {
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(OCRTemplateRepository.class);
         templateService = WebUtil.getBean(OCRTemplateService.class);
         this.searchFilters = new ArrayList<>();
+        String tenantUid = WebUtil.getRequestParameter("uid");
+        selectTenant = tenantInfoRepository.findByuid(StringUtils.isEmpty(tenantUid)?currentUser.getTenantUID():tenantUid);
+        selectTenantId = selectTenant.getId();
         initActionData();
 //        List<I18nMessage> fieldName = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("field_name", currentUser.getSiteId());
 //        i18nMessages = fieldName.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,item->item));
@@ -97,7 +106,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         if(actionName == null) return;
         if("Create".equals(actionName)){
             thisTemplate = new OCRTemplate();
-            thisTemplate.setTenantUID(currentUser.getTenantUID());
+            thisTemplate.setTenantUID(selectTenant.getUid());
             thisTemplate.setCreatedBy(currentUser.getUid());
             thisTemplate.setWidth(DEFAULT_WIDTH);
             thisTemplate.setHeight(DEFAULT_HEIGHT);
@@ -137,7 +146,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
 
     @Override
     protected Page<OCRTemplate> doLoadData(PageRequest pageRequest) {
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, Arrays.asList(currentUser.getTenantUID(),"-1")));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, Arrays.asList(selectTenant.getUid(),"-1")));
         Page<OCRTemplate> templatePage = super.doLoadData(pageRequest);
         this.searchFilters.clear();
         return templatePage;
@@ -272,7 +281,7 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         this.templateJsonObject = templateJsonObject;
     }
     public String getEditLink() {
-        return "CreateTemplate.xhtml?faces-redirect=true&action=Edit&templateId=" + selected.getId();
+        return "CreateTemplate.xhtml?faces-redirect=true&action=Edit&templateId=" + selected.getId()+"&uid="+selectTenant.getUid();
     }
     public String getPreViewBase64(){
         Integer width = thisTemplate.getWidth();
@@ -376,6 +385,15 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         fileName = "";
         source="";
     }
+    public void changeSelectTenant(){
+        if(selectTenantId != null && selectTenantId != -1){
+            selectTenant = tenantInfoRepository.findById(selectTenantId);
+            selected = null;
+        }
+    }
+    public String getCreateUrl(){
+        return  "CreateTemplate.xhtml?faces-redirect=true&action=Create&uid=" +selectTenant.getUid();
+    }
 
     public String getSource() {
         return source;
@@ -403,5 +421,21 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
 
     public void setActionName(String actionName) {
         this.actionName = actionName;
+    }
+
+    public TenantInfo getSelectTenant() {
+        return selectTenant;
+    }
+
+    public void setSelectTenant(TenantInfo selectTenant) {
+        this.selectTenant = selectTenant;
+    }
+
+    public Integer getSelectTenantId() {
+        return selectTenantId;
+    }
+
+    public void setSelectTenantId(Integer selectTenantId) {
+        this.selectTenantId = selectTenantId;
     }
 }

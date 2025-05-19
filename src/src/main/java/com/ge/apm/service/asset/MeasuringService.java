@@ -327,7 +327,16 @@ public class MeasuringService {
         CompletableFuture.runAsync(()->{
             //目标设备的所有计量记录
             List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), tempAssetInfo.getTenantUID());
-            if(CollectionUtils.isEmpty(allMcdList)) return;
+            if(CollectionUtils.isEmpty(allMcdList)){
+                tempAssetInfo.setNextMeteringDate(null);
+                tempAssetInfo.setLastMeteringDate(null);
+                tempAssetInfo.setMeteringNO(null);
+                tempAssetInfo.setMeasuringType(null);
+                tempAssetInfo.setLastCheckCompany(null);
+                assetInfoDao.save(tempAssetInfo);
+                sendMq(tempAssetInfo,currentUserAccount);
+                return;
+            }
             //目标设备的所有计量记录中计量日期最大的记录
             MeasuringCertificateDetail needUpdateAssetMcd = allMcdList.get(0);
             Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
@@ -619,24 +628,28 @@ public class MeasuringService {
         try {
             String validDateToStr = "";
             String validDateToVar = object.getString("validDateTo");
-            Matcher matcher = pattern.matcher(validDateToVar);
-            while (matcher.find()) {
-                validDateToStr += matcher.group();
+            if(ObjectUtil.isNotEmpty(validDateToVar)){
+                Matcher matcher = pattern.matcher(validDateToVar);
+                while (matcher.find()) {
+                    validDateToStr += matcher.group();
+                }
+                Date validDateTo = format.parse(validDateToStr);
+                detail.setValidDateTo(validDateTo);
             }
-            Date validDateTo = format.parse(validDateToStr);
-            detail.setValidDateTo(validDateTo);
         } catch (ParseException e) {
             e.printStackTrace();
         }
         try {
             String checkDateStr = "";
             String checkDateVar = object.getString("checkDate");
-            Matcher matcher = pattern.matcher(checkDateVar);
-            while (matcher.find()) {
-                checkDateStr += matcher.group();
+            if(ObjectUtil.isNotEmpty(checkDateVar)) {
+                Matcher matcher = pattern.matcher(checkDateVar);
+                while (matcher.find()) {
+                    checkDateStr += matcher.group();
+                }
+                Date checkDate = format.parse(checkDateStr);
+                detail.setCheckDate(checkDate);
             }
-            Date checkDate = format.parse(checkDateStr);
-            detail.setCheckDate(checkDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }

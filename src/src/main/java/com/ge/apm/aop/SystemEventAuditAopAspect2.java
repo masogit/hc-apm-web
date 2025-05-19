@@ -51,10 +51,102 @@ public class SystemEventAuditAopAspect2 {
         return repositorySystemEventAopPointcutAround(pjp,"supplier");
     }
 
-//    @Around("execution(* com.ge.apm.dao.TenantInfoRepository.save(..))   || execution(* com.ge.apm.dao.TenantInfoRepository.delete(..))")
-//    public Object tenantInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
-//        return repositorySystemEventAopPointcutAround(pjp,"tenant_info");
-//    }
+    @Around("execution(* com.ge.apm.dao.TenantInfoRepository.save(..))   || execution(* com.ge.apm.dao.TenantInfoRepository.delete(..))")
+    public Object tenantInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp,"tenant_info");
+    }
+
+    @Around("execution(* com.ge.apm.dao.AdminFeatureActiveRepository.save(..))")
+    public Object orgInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, "admin_feature_active");
+    }
+    @Around("execution(* com.ge.apm.dao.OrgInfoRepository.delete(..)) || execution(* com.ge.apm.dao.OrgInfoRepository.save(..))")
+    public Object adminFeatureActiveSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, "org_info");
+    }
+
+
+//    @Around("execution(* com.ge.apm.dao.SharedAssetRequestRepository.save(..))")
+    public Object sharedAssetRequestSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, "shared_asset_request");
+    }
+
+
+
+//    @Around("execution(* com.ge.apm.dao.SharedAssetRequestRepository.updateState(..)) || execution(* com.ge.apm.dao.SharedAssetRequestRepository.updateStateAndOwner(..))")
+    public Object sharedAssetRequestUpdateStateAround(ProceedingJoinPoint pjp) throws Throwable {
+        boolean isSuccess = true;
+        String exceptionMessage = null;
+        Object result ;
+        Object[] args = null;
+        String boUid = null;
+        boolean isSaveAudit=true;
+        String eventData=null;
+        SystemEventAuditEnum systemEventAuditEnum=null;
+        try {
+            result = pjp.proceed();
+        } catch (Throwable e) {
+            isSuccess = false;
+            exceptionMessage = e.getMessage();
+            logger.error("sharedAssetRequestUpdateStateAround 目标方法执行失败 ,e: ", e);
+            throw e;
+        } finally {
+            try {
+//                MethodSignature signature = (MethodSignature) pjp.getSignature();
+//                String[] parameterNames = signature.getParameterNames();
+//
+//                HashMap<Object, Object> param = new HashMap<>();
+//                for (int i = 0; i < parameterNames.length; i++) {
+//                    param.put(parameterNames[i], args[i]);
+//                }
+                args= pjp.getArgs();
+                int  state = (int)args[1];
+                systemEventAuditEnum= null;
+                switch (state){
+//                    case 1:
+//                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_REQUESTED;
+//                        break;
+                    case 2:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_ACCEPTED;
+                        break;
+//                    case 3:
+//                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_DELIVERED;
+//                        break;
+                    case 4:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_CANCELED;
+                        break;
+//                    case 5:
+//                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_SUSPENDED;
+//                        break;
+                    case 6:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_CONFIRMED;
+                        break;
+
+                    case 8:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_ACCEPTED;
+                        break;
+                    case 12:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_CONFIRMED;
+                        break;
+                    default:
+                        break;
+                }
+
+                boUid =  (String) args[0];;
+
+                if(isSaveAudit && systemEventAuditEnum!=null){
+                    UserAccount userAccount = getUserAccount();
+                    SystemEventAudit systemEventAudit = buildEventAudit(userAccount,systemEventAuditEnum, boUid, isSuccess, exceptionMessage,"shared_asset_request",eventData);
+                    sendSystemAuditMessage(systemEventAudit);
+                }
+            } catch (Exception e) {
+                logger.error("sharedAssetRequestUpdateStateAround , error:", e);
+            }
+        }
+
+        return result;
+
+    }
 
     public Object repositorySystemEventAopPointcutAround(ProceedingJoinPoint pjp,String boType  ) throws Throwable {
         String operation = pjp.getSignature().getName();

@@ -14,6 +14,7 @@ import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
@@ -136,33 +137,42 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         this.selected.setCheckCompany(object.getString("checkCompany"));
         this.selected.setDepartment(object.getString("department"));
         String status = object.getString("status");
-        List<I18nMessage> byMsgType = i18nMessageService.getByMsgType(MEASURING_STATUS);
-        Optional<I18nMessage> first = byMsgType.stream().filter(item -> item.getValue().equals(status)).findFirst();
-        if(first.isPresent()){
-            I18nMessage i18nMessage = first.get();
-            this.selected.setStatus(Integer.valueOf(i18nMessage.getMsgKey()));
+        if(ObjectUtil.isNotEmpty(status)){
+            List<I18nMessage> byMsgType = i18nMessageService.getByMsgType(MEASURING_STATUS);
+            Optional<I18nMessage> first = byMsgType.stream().filter(item -> item.getValue().equals(status)).findFirst();
+            if(first.isPresent()){
+                I18nMessage i18nMessage = first.get();
+                this.selected.setStatus(Integer.valueOf(i18nMessage.getMsgKey()));
+            }
         }
+
         try {
             String validDateToStr = "";
             String validDateToVar = object.getString("validDateTo");
-            Matcher matcher = pattern.matcher(validDateToVar);
-            while (matcher.find()) {
-                validDateToStr += matcher.group();
+            if(ObjectUtil.isNotEmpty(validDateToVar)){
+                Matcher matcher = pattern.matcher(validDateToVar);
+                while (matcher.find()) {
+                    validDateToStr += matcher.group();
+                }
+                Date validDateTo = format.parse(validDateToStr);
+                this.selected.setValidDateTo(validDateTo);
             }
-            Date validDateTo = format.parse(validDateToStr);
-            this.selected.setValidDateTo(validDateTo);
+
+
         } catch (ParseException e) {
            e.printStackTrace();
         }
         try {
             String checkDateStr = "";
             String checkDateVar = object.getString("checkDate");
-            Matcher matcher = pattern.matcher(checkDateVar);
-            while (matcher.find()) {
-                checkDateStr += matcher.group();
+            if(ObjectUtil.isNotEmpty(checkDateVar)) {
+                Matcher matcher = pattern.matcher(checkDateVar);
+                while (matcher.find()) {
+                    checkDateStr += matcher.group();
+                }
+                Date checkDate = format.parse(checkDateStr);
+                this.selected.setCheckDate(checkDate);
             }
-            Date checkDate = format.parse(checkDateStr);
-            this.selected.setCheckDate(checkDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
