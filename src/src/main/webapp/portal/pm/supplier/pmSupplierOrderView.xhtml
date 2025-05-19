@@ -88,7 +88,8 @@
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
-                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+<!--                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>-->
+                                <img src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
                                 <p:commandLink value="#{msg.DownloadFile}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
 <!--                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > #{msg.DownloadFile}-->
 <!--                                </p:link>-->
