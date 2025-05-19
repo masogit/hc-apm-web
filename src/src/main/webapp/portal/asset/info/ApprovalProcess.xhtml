@@ -22,8 +22,7 @@
                  sortBy="#{item.createdDate}"
                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                 rows="20" emptyMessage="#{msg.noRecordFound}"
-                 rowsPerPageTemplate="20,50,100,500">
+                 rows="5" emptyMessage="#{msg.noRecordFound}">
 
         <p:ajax event="rowSelect" listener="#{multiLevelApprovalListController.onRowSelect}"
                 update="assetDetail:itemDetailViewForm3"/>

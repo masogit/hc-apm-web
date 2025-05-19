@@ -122,7 +122,7 @@
                     </f:facet>
                     <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                 </p:column>
-                <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderController.showLocationName()}">
+                <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderController.showLocationNameFlag}">
                     <h:outputText value="#{item.assetInfo.locationName}"/>
                 </p:column>
                 <p:column filterBy="#{item.ruleName}" filterMatchMode="LIKE">

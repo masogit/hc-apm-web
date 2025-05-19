@@ -357,6 +357,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public String siteName;
     @Getter @Setter
     private String requestAssetUid;
+    @Getter @Setter
+    boolean showLocationNameFlag;
     public boolean downloadButton(){
         if(queryIndex==10){
             return false;
@@ -1777,6 +1779,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
         loadRuleList();
+        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+        showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
     }
 
 
@@ -3840,11 +3844,4 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
-    public boolean showLocationName(){
-        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
-        if (StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue)) {
-            return true;
-        }
-        return false;
-    }
 }

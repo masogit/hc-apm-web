@@ -57,6 +57,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     private LinkedHashMap<Integer, String> categoryMap;
     private List<String> multiSelected;
+    private Map<String, List<String>> multiSelectedMap = MapUtil.newHashMap();
     private List<ConfigItem> configItemList;
     private Map<String, ConfigItem> configItemMap = MapUtil.newHashMap();
     private OrgInfo assetOutStockDept;
@@ -195,6 +196,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     }
 
     public void onTabChange(String tabId) {
+        crudActionName = null;
         if (ObjectUtil.isNotEmpty(tabId) && !"basicInfo".equals(tabId)) {
             String category = tabId.substring(2);
             this.searchFilters = ListUtil.newArrayList(new SearchFilter("category", SearchFilter.Operator.EQ, category));
@@ -203,6 +205,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             for (ConfigItem configItem : configItemList) {
                 if (8 == configItem.getValueType()) {
                     multiSelected = getMultiEum(configItem);
+                    multiSelectedMap.put(configItem.getKey(), getMultiEum(configItem));
                 }
             }
             configItemMap.putAll(configItemList.stream().collect(Collectors.toMap(ConfigItem::getKey, item -> item)));
@@ -225,7 +228,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             String showValue = this.selected.getShowValue();
             if(StringUtils.isNotEmpty(showValue)){
                 List<Map<String, String>> valueList = JSON.parseObject(showValue, List.class);
-
+                multiSelectedMap.put(this.selected.getKey(), valueList.stream().map(map -> map.get(VALUE)).collect(Collectors.toList()));
                 for (Map<String, String> valueMap : valueList) {
                     multiSelected.add(valueMap.get(VALUE));
                 }
@@ -262,6 +265,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
                 if (8 == configItem.getValueType()) {
                     multiSelected = getMultiEum(configItem);
+                    multiSelectedMap.put(configItem.getKey(), getMultiEum(configItem));
                 }
                 if (9 == configItem.getValueType()) {
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getDefaultValue(), FieldColumnDto.class));
@@ -309,10 +313,17 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     return;
                 }
             }else if(8 == this.selected.getValueType()){
-                if(CollectionUtils.isNotEmpty(this.multiSelected)){
+                List<String> multiSelected;
+                if ("Edit".equals(crudActionName)) {
+                    multiSelected = this.multiSelected;
+                } else {
+                    Object selectedObj = multiSelectedMap.get(this.selected.getKey());
+                    multiSelected = Arrays.asList((String[]) selectedObj);
+                }
+                if(CollectionUtils.isNotEmpty(multiSelected)){
                     List<Map<String, String>> maps = new ArrayList<>();
                     List<Map<String, String>> enumList = this.selected.getEnumList();
-                    for (String selectedVal : multiSelected) {
+                    for (Object selectedVal : multiSelected) {
                         for (Map<String, String> stringMap : enumList) {
                             if(stringMap.containsValue(selectedVal)){
                                 maps.add(stringMap);
@@ -452,6 +463,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         return JSON.parseObject(value, FieldColumnDto.class);
     }
 
+    public List<String> getMultiSelectedList(String key) {
+        return multiSelectedMap.get(key);
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
@@ -474,6 +489,14 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public void setMultiSelected(List<String> multiSelected) {
         this.multiSelected = multiSelected;
+    }
+
+    public Map<String, List<String>> getMultiSelectedMap() {
+        return multiSelectedMap;
+    }
+
+    public void setMultiSelectedMap(Map<String, List<String>> multiSelectedMap) {
+        this.multiSelectedMap = multiSelectedMap;
     }
 
     public List<ConfigItem> getConfigItemList() {

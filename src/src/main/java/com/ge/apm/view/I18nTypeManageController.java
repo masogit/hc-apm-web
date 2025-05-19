@@ -226,6 +226,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
     public void uploadDataFile(FileUploadEvent event) {
         // 配置键,名称-中文,名称-英文,名称-繁体
+        List<I18nMessage> dbI18nMessageList = i18nMessageRepository.getByMsgTypeAndSiteId(selected.getMsgType(), selectTenantId);
         this.file = event.getFile();
         try(ExcelDocument reader = new ExcelDocument(file.getInputstream(),ExcelDocument.parseTypeByFileName(file.getFileName()))){
             List<Map<String, Object>> allDataRows = reader.getAllDataRows(0,1,2);
@@ -255,6 +256,15 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             if(CollectionUtils.isNotEmpty(msgKeyNull)){
                 WebUtil.addErrorMessage("上传失败,配置键不能为空");
                 return;
+            }
+            if(CollectionUtils.isNotEmpty(dbI18nMessageList)){
+                dataList.stream().forEach(item-> {
+                    Optional<I18nMessage> first = dbI18nMessageList.stream().filter(i18n -> item.getMsgKey().equals(i18n.getMsgKey())).findFirst();
+                    if(first.isPresent()){
+                        I18nMessage i18nMessage = first.get();
+                        item.setId(i18nMessage.getId());
+                    }
+                });
             }
             selected.setI18nMessageList(dataList);
             WebUtil.addErrorMessage("上传成功,列表已更新");
