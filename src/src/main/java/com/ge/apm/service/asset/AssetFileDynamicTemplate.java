@@ -944,8 +944,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                 supliers.put(suplierList.get(i).getId(), suplierList.get(i).getTel());
             }
 
-            assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
-           /* encodedToAssetTypeGroupPath = new HashMap<>();
+           /* assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
+            encodedToAssetTypeGroupPath = new HashMap<>();
             for (Object obj : assetTypeGroupPaths) {
                 Object[] obj1 = (Object[]) obj;
                 String encoded = obj1[0].toString();
