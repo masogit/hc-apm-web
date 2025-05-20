@@ -543,7 +543,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         return writer;
     }
 
-    public int writeAsset1(ExcelDocumentStreamingWriter writer, List<AssetInfo> assetList, List<OrgInfo> sites, boolean siteFlag, int startRow) {
+    public int writeAsset1(ExcelDocumentStreamingWriter writer, List<AssetInfo> assetList, List<OrgInfo> sites, boolean siteFlag, int startRow,Map encodedToAssetTypeGroupPath) {
         boolean flag = this.crossSite;
         if (!flag && siteFlag) {
             flag = true;
@@ -553,14 +553,6 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map<String, List<String>> assetMap = getAllElement.getAssetMap();
         Map parentAssets = getAllElement.getParentAssets();
         Map supliers = getAllElement.getSupliers();
-        Map encodedToAssetTypeGroupPath = new HashMap<>();
-        List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
-         for (Object obj : assetTypeGroupPaths) {
-            Object[] obj1 = (Object[]) obj;
-            String encoded = obj1[0].toString();
-            String authGroupPaths = obj1[1].toString();
-            encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
-        }
 
 
 //        Set<String> loginNames = assetList.stream().map(AssetInfo::getCreatedBy).filter(Objects::nonNull).collect(Collectors.toSet());

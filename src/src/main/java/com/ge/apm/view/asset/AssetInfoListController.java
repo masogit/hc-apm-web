@@ -742,6 +742,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("export file: AssetInfo_export.xlsx successful.");
     }
 
+    public Map handEncodedToAssetTypeGroupPath(){
+        Map encodedToAssetTypeGroupPath = new HashMap<>();
+        List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
+        for (Object obj : assetTypeGroupPaths) {
+            Object[] obj1 = (Object[]) obj;
+            String encoded = obj1[0].toString();
+            String authGroupPaths = obj1[1].toString();
+            encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
+        }
+        return encodedToAssetTypeGroupPath ;
+    }
+
+
     public void writerAsset(AssetFileDynamicTemplate template, List<String> exportFields) {
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
@@ -750,6 +763,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
         int num = 5000;
         boolean siteFlag = exportFields.containsAll(ListUtil.newArrayList("医院", "集团"));
+        Map encodedToAssetTypeGroupPath = this.handEncodedToAssetTypeGroupPath();
         if (assetUids.isEmpty()) {
             if(CollectionUtils.isEmpty(searchFilters)){
                 this.setUserSearchFilters();
@@ -766,7 +780,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                     assetList =  orderByForParentAndChildren(assetList);
                 }
                 assetInfoService.setWarrantyStatus(currentPageAssets);
-                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow);
+                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow,encodedToAssetTypeGroupPath);
             }
         } else {
             List<AssetInfo> assetList = dao.findByUidIn(assetUids, lastPageSort);
@@ -775,7 +789,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             assetInfoService.setWarrantyStatus(currentPageAssets);
             ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
-            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW);
+            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW,encodedToAssetTypeGroupPath);
         }
         template.setFormula();
     }
