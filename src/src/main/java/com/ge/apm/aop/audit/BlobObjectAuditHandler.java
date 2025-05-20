@@ -1,9 +1,11 @@
 package com.ge.apm.aop.audit;
 
 import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +16,10 @@ import java.util.stream.Collectors;
 
 @Service("v2_blob_object")
 public class BlobObjectAuditHandler implements AuditHandler {
+    @Autowired
+    private BlobObjectRepository blobDao;
+
+
     @Override
     public String getBoType() {
         return "v2_blob_object";
@@ -27,8 +33,17 @@ public class BlobObjectAuditHandler implements AuditHandler {
             Iterable<V2_BlobObject> iterable = (Iterable<V2_BlobObject>) args[0];
             iterable.forEach(blobList::add);
         } else {
-            V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
-            blobList.add(v2BlobObject);
+            if(args[0] instanceof V2_BlobObject ){
+                V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
+                blobList.add(v2BlobObject);
+            }else  if(args[0] instanceof String ){
+                String id = (String) args[0];
+                V2_BlobObject byId = blobDao.findById(id);
+                if(byId!=null){
+                    blobList.add(byId);
+                }
+
+            }
         }
         blobList = blobList.stream().filter(item -> item.getId() != null).collect(Collectors.toList());
 
@@ -72,8 +87,17 @@ public class BlobObjectAuditHandler implements AuditHandler {
             Iterable<V2_BlobObject> iterable = (Iterable<V2_BlobObject>) args[0];
             iterable.forEach(blobList::add);
         } else {
-            V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
-            blobList.add(v2BlobObject);
+            if(args[0] instanceof V2_BlobObject ){
+                V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
+                blobList.add(v2BlobObject);
+            }else  if(args[0] instanceof String ){
+                String id = (String) args[0];
+                V2_BlobObject byId = blobDao.findById(id);
+                if(byId!=null){
+                    blobList.add(byId);
+                }
+
+            }
         }
         blobList = blobList.stream().filter(item -> item.getId() != null).collect(Collectors.toList());
 
@@ -98,8 +122,17 @@ public class BlobObjectAuditHandler implements AuditHandler {
             Iterable<V2_BlobObject> iterable = (Iterable<V2_BlobObject>) args[0];
             iterable.forEach(blobList::add);
         } else {
-            V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
-            blobList.add(v2BlobObject);
+            if(args[0] instanceof V2_BlobObject ){
+                V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
+                blobList.add(v2BlobObject);
+            }else  if(args[0] instanceof String ){
+                String id = (String) args[0];
+                V2_BlobObject byId = blobDao.findById(id);
+                if(byId!=null){
+                    blobList.add(byId);
+                }
+
+            }
         }
         blobList = blobList.stream().filter(item -> item.getId() != null).collect(Collectors.toList());
 
@@ -119,8 +152,17 @@ public class BlobObjectAuditHandler implements AuditHandler {
             Iterable<V2_BlobObject> iterable = (Iterable<V2_BlobObject>) args[0];
             iterable.forEach(blobList::add);
         } else {
-            V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
-            blobList.add(v2BlobObject);
+            if(args[0] instanceof V2_BlobObject ){
+                V2_BlobObject v2BlobObject = (V2_BlobObject) args[0];
+                blobList.add(v2BlobObject);
+            }else  if(args[0] instanceof String ){
+                String id = (String) args[0];
+                V2_BlobObject byId = blobDao.findById(id);
+                if(byId!=null){
+                    blobList.add(byId);
+                }
+
+            }
         }
         blobList = blobList.stream().filter(item -> item.getBoUuid() != null).collect(Collectors.toList());
 
