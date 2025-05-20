@@ -345,7 +345,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 secondaryApprovalData =objects;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
-                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getId());
+                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
                 primaryApprovalData = assetDepartmentConvert;
                 secondaryApprovalData = assetDepartmentConvert;
                 break;
