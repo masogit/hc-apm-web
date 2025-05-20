@@ -569,7 +569,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending') and !userContextService.zkbUser}">
                             <label class="label">技术支持审批人</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.techAuditer}" disabled="true" />
                         </h:panelGroup>
