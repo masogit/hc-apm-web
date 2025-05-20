@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbConstantUtil;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.service.zkb.ZkbPartOrderUserConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -178,9 +179,9 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     private void initBackUpList(String configType) {
         if (this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith)) {
-            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(configType, "US");
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndDeletedFlagIsNull(configType, "US");
         } else {
-            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameNotLike(configType, "US", ZkbFePartOrderService.testLoginNameStartWith + "%");
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameNotLikeAndDeletedFlagIsNull(configType, "US", ZkbFePartOrderService.testLoginNameStartWith + "%");
         }
     }
 
@@ -203,6 +204,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         if (!this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith)) {
             searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.EQ, "f"));
         }
+        searchFilters.add(new SearchFilter("deletedFlag", SearchFilter.Operator.IsNull, ""));
         zkbPartOrderUserConfigPage=zkbPartOrderUserConfigRepository.findBySearchFilter(searchFilters, pageRequest);
         return zkbPartOrderUserConfigPage;
     }
@@ -398,13 +400,16 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     @Override
     public void delete() {
-        /*List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByOnline(this.selected.getId());
-        if(CollectionUtils.isNotEmpty(zkbPartOrderList))
-        {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
+        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByOnline(this.selected.getId());
+        if(CollectionUtils.isNotEmpty(zkbPartOrderList)) {
+            /*WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
+            return;*/
+            this.selected.setDeletedFlag(ZkbConstantUtil.F);
+            zkbPartOrderUserConfigRepository.save(selected);
             return;
-        }*/
+        }
         super.delete();
+        this.selected = null;
     }
 
     public ZkbPartOrderUserConfig getBackUpUser() {

@@ -146,7 +146,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 initZknPartCat(selectedContract.getStartDate());
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending",ZkbPartOrder.CONFIG_US);
+                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndDeletedFlagIsNull("TechnicalPending",ZkbPartOrder.CONFIG_US);
             }
             calcRemainQty();
             orderAnnotationChange();
