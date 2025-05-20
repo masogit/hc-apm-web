@@ -455,7 +455,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                                         predicates.add(builder.isFalse(builder.literal(true)));
                                     }
                                 } else if ("all".equals(queryStatus)) {
-                                    userConfigPredicates.add(builder.equal(root.get("onlineEngineer"), zkbPartOrderUserConfig.getId()));
+                                    //userConfigPredicates.add(builder.equal(root.get("onlineEngineer"), zkbPartOrderUserConfig.getId()));
+                                    if(StrUtil.isNotEmpty(zkbPartOrderUserConfig.getZone())){
+                                        List<String> strs = Arrays.asList(zkbPartOrderUserConfig.getZone().split(","));
+                                        Expression<String> exp = root.get("zone");
+                                        Predicate pre1 = exp.in(strs);
+                                        userConfigPredicates.add(pre1);
+                                    }else{
+                                        predicates.add(builder.isFalse(builder.literal(true)));
+                                    }
                                 }
                             } else {
                                 if (StringUtils.isEmpty(queryStatus)) {

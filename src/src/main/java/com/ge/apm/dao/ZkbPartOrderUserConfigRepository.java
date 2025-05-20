@@ -20,16 +20,16 @@ public interface ZkbPartOrderUserConfigRepository extends GenericRepositoryUUID<
     List<ZkbPartOrderUserConfig> findByConfigTypeAndOrderTypeNull(String configType);
 
 
-    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetType(String configType,String assetType);
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetTypeAndDeletedFlagIsNull(String configType,String assetType);
 
-    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetTypeAndLoginNameNotLike(String configType,String assetType,String loginName);
-    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetTypeAndLoginNameContains(String configType,String assetType,String loginName);
-    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetTypeAndLoginNameIsNotContaining(String configType,String assetType,String loginName);
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetTypeAndLoginNameNotLikeAndDeletedFlagIsNull(String configType,String assetType,String loginName);
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetTypeAndLoginNameContainsAndDeletedFlagIsNull(String configType,String assetType,String loginName);
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetTypeAndLoginNameIsNotContainingAndDeletedFlagIsNull(String configType,String assetType,String loginName);
 
     List<ZkbPartOrderUserConfig> findByConfigTypeAndRegion(String configType,String region);
 
     List<ZkbPartOrderUserConfig> findByConfigTypeAndZoneContains(String configType,String zone);
-    List<ZkbPartOrderUserConfig> findByConfigTypeAndZoneContainsAndAssetType(String configType,String zone, String assetType);
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndZoneContainsAndAssetTypeAndDeletedFlagIsNull(String configType,String zone, String assetType);
 
     List<ZkbPartOrderUserConfig> findByLoginNameAndIdNot(String loginName,String id);
 
