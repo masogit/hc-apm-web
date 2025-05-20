@@ -1,30 +1,24 @@
 package com.ge.apm.aop;
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-
-import com.ge.apm.domain.ContractInfo;
+import com.ge.apm.aop.audit.AuditHandler;
 import com.ge.apm.domain.SystemEventAudit;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
-import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -36,18 +30,123 @@ public class SystemEventAuditAopAspect {
 
 
 
-//    @Around("execution(* com.ge.apm.dao.ContractInfoRepository.save(..))   || execution(* com.ge.apm.dao.ContractInfoRepository.delete(..))")
-//    public Object contractInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
-//        return repositorySystemEventAopPointcutAround(pjp,"contract_info");
-//    }
+
+    @Autowired(required = false)
+    private Map<String, AuditHandler> handlerMap = new HashMap<>();
+
+    @Around("execution(* com.ge.apm.dao.ContractInfoRepository.save(..))   || execution(* com.ge.apm.dao.ContractInfoRepository.delete(..))")
+    public Object contractInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp,"contract_info");
+    }
+
+
+
+    @Around("execution(* com.ge.apm.dao.BlobObjectRepository.delete(..)) || execution(* com.ge.apm.dao.BlobObjectRepository.save(..))")
+    public Object blobObjectSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp,"v2_blob_object");
+    }
+
+    @Around("execution(* com.ge.apm.dao.SupplierRepository.delete(..)) || execution(* com.ge.apm.dao.SupplierRepository.save(..))")
+    public Object supplierSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp,"supplier");
+    }
+
+    @Around("execution(* com.ge.apm.dao.TenantInfoRepository.save(..))   || execution(* com.ge.apm.dao.TenantInfoRepository.delete(..))")
+    public Object tenantInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp,"tenant_info");
+    }
+
+    @Around("execution(* com.ge.apm.dao.AdminFeatureActiveRepository.save(..))")
+    public Object orgInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, "admin_feature_active");
+    }
+    @Around("execution(* com.ge.apm.dao.OrgInfoRepository.delete(..)) || execution(* com.ge.apm.dao.OrgInfoRepository.save(..))")
+    public Object adminFeatureActiveSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, "org_info");
+    }
+
+
+//    @Around("execution(* com.ge.apm.dao.SharedAssetRequestRepository.save(..))")
+    public Object sharedAssetRequestSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, "shared_asset_request");
+    }
+
+
+
+//    @Around("execution(* com.ge.apm.dao.SharedAssetRequestRepository.updateState(..)) || execution(* com.ge.apm.dao.SharedAssetRequestRepository.updateStateAndOwner(..))")
+    public Object sharedAssetRequestUpdateStateAround(ProceedingJoinPoint pjp) throws Throwable {
+        boolean isSuccess = true;
+        String exceptionMessage = null;
+        Object result ;
+        Object[] args = null;
+        String boUid = null;
+        boolean isSaveAudit=true;
+        String eventData=null;
+        SystemEventAuditEnum systemEventAuditEnum=null;
+        try {
+            result = pjp.proceed();
+        } catch (Throwable e) {
+            isSuccess = false;
+            exceptionMessage = e.getMessage();
+            logger.error("sharedAssetRequestUpdateStateAround 目标方法执行失败 ,e: ", e);
+            throw e;
+        } finally {
+            try {
+//                MethodSignature signature = (MethodSignature) pjp.getSignature();
+//                String[] parameterNames = signature.getParameterNames();
 //
-//
-//
-//    @Around("execution(* com.ge.apm.dao.BlobObjectRepository.delete(..)) || execution(* com.ge.apm.dao.BlobObjectRepository.save(..))")
-//    public Object blobObjectDeleteSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-//        return repositorySystemEventAopPointcutAround(pjp,"v2_blob_object");
-//    }
-//
+//                HashMap<Object, Object> param = new HashMap<>();
+//                for (int i = 0; i < parameterNames.length; i++) {
+//                    param.put(parameterNames[i], args[i]);
+//                }
+                args= pjp.getArgs();
+                int  state = (int)args[1];
+                systemEventAuditEnum= null;
+                switch (state){
+//                    case 1:
+//                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_REQUESTED;
+//                        break;
+                    case 2:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_ACCEPTED;
+                        break;
+//                    case 3:
+//                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_DELIVERED;
+//                        break;
+                    case 4:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_CANCELED;
+                        break;
+//                    case 5:
+//                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_SUSPENDED;
+//                        break;
+                    case 6:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RENT_CONFIRMED;
+                        break;
+
+                    case 8:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_ACCEPTED;
+                        break;
+                    case 12:
+                        systemEventAuditEnum = SystemEventAuditEnum.SHARED_RETURN_CONFIRMED;
+                        break;
+                    default:
+                        break;
+                }
+
+                boUid =  (String) args[0];;
+
+                if(isSaveAudit && systemEventAuditEnum!=null){
+                    UserAccount userAccount = getUserAccount();
+                    SystemEventAudit systemEventAudit = buildEventAudit(userAccount,systemEventAuditEnum, boUid, isSuccess, exceptionMessage,"shared_asset_request",eventData);
+                    sendSystemAuditMessage(systemEventAudit);
+                }
+            } catch (Exception e) {
+                logger.error("sharedAssetRequestUpdateStateAround , error:", e);
+            }
+        }
+
+        return result;
+
+    }
 
     public Object repositorySystemEventAopPointcutAround(ProceedingJoinPoint pjp,String boType  ) throws Throwable {
         String operation = pjp.getSignature().getName();
@@ -60,96 +159,30 @@ public class SystemEventAuditAopAspect {
         String eventData=null;
 
         SystemEventAuditEnum systemEventAuditEnum=null;
+        args= pjp.getArgs();
+        AuditHandler auditHandler = handlerMap.getOrDefault(boType, handlerMap.get("defaultAuditHandler"));
         try {
-            args= pjp.getArgs();
-            switch (boType){
-                case  "contract_info":
-                    ContractInfo  contractInfo = (ContractInfo)args[0];
-                    if("delete".equals(operation)){
-                        systemEventAuditEnum=SystemEventAuditEnum.CONTRACT_DELETE;
-                    }else{
-                        if(contractInfo.getId()!=null){
-                            systemEventAuditEnum=SystemEventAuditEnum.CONTRACT_UPDATE;
-                        }else{
-                            systemEventAuditEnum=SystemEventAuditEnum.CONTRACT_CREATE;
-                        }
-                    }
-                    break;
-                case "v2_blob_object":
-                    List<V2_BlobObject> blobList = new ArrayList<>();
-                    if (args.length > 0 && args[0] instanceof Iterable) {
-                        Iterable<V2_BlobObject> iterable = (Iterable<V2_BlobObject>) args[0];
-                        iterable.forEach(blobList::add);
-                    }else{
-                        V2_BlobObject v2BlobObject=(V2_BlobObject)   args[0];
-                        blobList.add(v2BlobObject);
-                    }
-                    blobList = blobList.stream().filter(item -> item.getId() != null).collect(Collectors.toList());
-
-                    if(CollectionUtils.isEmpty(blobList)){
-                        isSaveAudit=false;
-                    }else{
-                        V2_BlobObject v2BlobObject = blobList.get(0);
-                        boUid=v2BlobObject.getBoUuid();
-                        switch (v2BlobObject.getBoType()){
-                            case V2_BlobObject.BO_TYPE_AssetContract:
-                                if("delete".equals(operation)){
-                                    systemEventAuditEnum=SystemEventAuditEnum.CONTRACT_ATTACHMENT_DELETE;
-                                }else{
-                                    systemEventAuditEnum=SystemEventAuditEnum.CONTRACT_ATTACHMENT_ADD;
-                                }
-                                break;
-                            case V2_BlobObject.BO_TYPE_ArrivalList:
-                                if("delete".equals(operation)){
-                                    systemEventAuditEnum=SystemEventAuditEnum.ARRIVAL_LIST_ATTACHMENT_DELETE;
-                                }else{
-                                    systemEventAuditEnum=SystemEventAuditEnum.ARRIVAL_LIST_ATTACHMENT_ADD;
-                                }
-                                break;
-                            case V2_BlobObject.BO_TYPE_ArrivalListItem:
-                                if("delete".equals(operation)){
-                                    systemEventAuditEnum=SystemEventAuditEnum.ARRIVAL_ITEM_ATTACHMENT_DELETE;
-                                }else{
-                                    systemEventAuditEnum=SystemEventAuditEnum.ARRIVAL_ITEM_ATTACHMENT_ADD;
-                                }
-                                break;
-                            default:
-                                isSaveAudit=false;
-                                break;
-                        }
-
-                        Map<String, List<V2_BlobObject>> blobMap = blobList.stream().collect(Collectors.groupingBy(blob -> blob.getBoSubType() == null ? "unknown" : blob.getBoSubType()));
-                        HashMap<Object, Object> eventMap = new HashMap<>();
-                        for (Map.Entry<String, List<V2_BlobObject>> stringListEntry : blobMap.entrySet()) {
-                            List<V2_BlobObject> value = stringListEntry.getValue();
-                            List<String> objectStorageIds = value.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toList());
-                            eventMap.put(stringListEntry.getKey(),objectStorageIds);
-                        }
-                        eventData= JSON.toJSONString(eventMap);
-                    }
-                    break;
-                default:
-                    break;
-            }
+            systemEventAuditEnum= auditHandler.determineEventEnum(args, boType, operation);
+            eventData = auditHandler.generateEventData(args );
+        } catch (Throwable e) {
+            logger.error("repositorySystemEventAopPointcutAround boType:{},operation:{}, 获取参数异常,e: ",boType,operation,e);
+        }
+        try {
             result = pjp.proceed();
-
-            if("contract_info".equals(boType)){
-                ContractInfo  contractInfo = (ContractInfo)args[0];
-                boUid=contractInfo.getId();
-            }
         } catch (Throwable e) {
             isSuccess = false;
             exceptionMessage = e.getMessage();
-            logger.error("repositorySystemEventAopPointcutAround 目标方法执行失败 boType:{},e: ", boType, e);
+            logger.error("repositorySystemEventAopPointcutAround 目标方法执行失败 boType:{},,operation:{},e: ", boType,operation, e);
             throw e;
         } finally {
             try {
-            if(isSaveAudit && systemEventAuditEnum!=null){
+                boUid = auditHandler.extractBoUid(args );
+                isSaveAudit = auditHandler.isSave(args, boType, operation);
+                 if(isSaveAudit && systemEventAuditEnum!=null){
                     UserAccount userAccount = getUserAccount();
                     SystemEventAudit systemEventAudit = buildEventAudit(userAccount,systemEventAuditEnum, boUid, isSuccess, exceptionMessage,boType,eventData);
                     sendSystemAuditMessage(systemEventAudit);
                 }
-
             } catch (Exception e) {
                 logger.error("repositorySystemEventAopPointcutAround boType:{}, error:",boType, e);
             }

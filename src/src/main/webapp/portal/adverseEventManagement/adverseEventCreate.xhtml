@@ -409,7 +409,8 @@
                                     <p:dataGrid id="harmPerformFile" var="fileitem" value="#{adverseEventManagementController.selected.harmPerformFile}" columns="5" layout="grid" rendered="#{adverseEventManagementController.selected.harmPerformFile ne null and !empty adverseEventManagementController.selected.harmPerformFile}">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
-                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
+<!--                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>-->
+                                                <img src="#{fileDownloadService.getImgBase64(fileitem.objectId)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
                                                 <p:commandLink  value="#{fileitem.objectName}" actionListener="#{adverseEventManagementController.exportFiled(fileitem)}" ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeHarmPerformFile(fileitem)}" update="harmPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -436,7 +437,8 @@
                                     <p:dataGrid id="deviceFaultPerformFile" var="fileitem" value="#{adverseEventManagementController.selected.deviceFaultPerformFile}" columns="5" layout="grid" rendered="#{adverseEventManagementController.selected.deviceFaultPerformFile ne null and !empty adverseEventManagementController.selected.deviceFaultPerformFile }">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
-                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>
+<!--                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false"/>-->
+                                                <img src="#{fileDownloadService.getImgBase64(fileitem.objectId)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
                                                 <p:commandLink  value="#{fileitem.objectName}" actionListener="#{adverseEventManagementController.exportFiled(fileitem)}"    ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeDeviceFaultPerformFile(fileitem)}" update="deviceFaultPerformFile" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>

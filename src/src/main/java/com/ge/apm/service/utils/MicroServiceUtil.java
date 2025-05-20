@@ -12,8 +12,9 @@ import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.image.ImageConstant;
 import com.ge.healthcare.cn.common.utils.token.TokenBuilder;
-import org.apache.commons.codec.binary.Base64;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.core.io.ByteArrayResource;
@@ -71,29 +72,43 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public String getImgBase64(String fileId) {
-        Base64 encoder = new Base64();
         String res = "data:image/jpeg;base64,";
         try {
+            List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(fileId);
+            if (ObjectUtil.isNotEmpty(allByObjectStorageId)) {
+                V2_BlobObject blobObject = allByObjectStorageId.get(0);
+                if (!blobObject.isImageType()) {
+                    String objectName = blobObject.getObjectName();
+                    String type = objectName.substring(objectName.lastIndexOf(".") + 1).toLowerCase();
+                    switch (type) {
+                        case "xlsx":
+                        case "xls":
+                            return ImageConstant.EXCEL_DEFAULT_BASE64;
+                        case "docx":
+                        case "doc":
+                            return ImageConstant.WORD_DEFAULT_BASE64;
+                        case "pptx":
+                        case "ppt":
+                            return ImageConstant.PPT_DEFAULT_BASE64;
+                        case "zip":
+                        case "rar":
+                            return ImageConstant.ZIP_DEFAULT_BASE64;
+                        case "pdf":
+                            return ImageConstant.PDF_DEFAULT_BASE64;
+                        case "txt":
+                            return ImageConstant.TXT_DEFAULT_BASE64;
+                        case "mp4":
+                            return ImageConstant.MP4_DEFAULT_BASE64;
+                        default:
+                            break;
+                    }
+                }
+            }
             HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
             String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
             ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
-//            HttpHeaders responseHeader = response.getHeaders();
-//            List<String> dispositions = responseHeader.get("content-disposition");
-//            String disposition = dispositions.get(0);
-            //String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
-            //String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
             byte[] result = response.getBody();
-
             res += Base64Utils.encodeToString(result);
-
-            /*InputStream inputStream = new ByteArrayInputStream(result);
-            BufferedImage image = ImageIO.read(inputStream);
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            ImageIO.write(image, suffix, byteOut);
-            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
-            byte[] bytes = new byte[byteIn.available()];
-            byteIn.read(bytes);
-            res += encoder.encodeToString(bytes);*/
         } catch (Exception e) {
             logger.error("encode image base64 error:{}",e);
             e.printStackTrace();

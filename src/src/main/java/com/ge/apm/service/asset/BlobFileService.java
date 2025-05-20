@@ -256,7 +256,7 @@ public class BlobFileService {
         if(blobList!=null && blobList.size()==1){
             return deleteBlobFile(blobObject);
         }else{
-            blobDao.delete(id);
+            blobDao.delete(blobObject);
             return true;
         }
     }

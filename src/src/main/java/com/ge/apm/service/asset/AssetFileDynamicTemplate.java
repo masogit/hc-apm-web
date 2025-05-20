@@ -492,8 +492,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map<String, List<String>> assetMap = getAllElement.getAssetMap();
         Map parentAssets = getAllElement.getParentAssets();
         Map supliers = getAllElement.getSupliers();
-        Map encodedToAssetTypeGroupPath = getAllElement.getEncodedToAssetTypeGroupPath();
-
+        Map encodedToAssetTypeGroupPath = new HashMap<>();
+        List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
+        for (Object obj : assetTypeGroupPaths) {
+            Object[] obj1 = (Object[]) obj;
+            String encoded = obj1[0].toString();
+            String authGroupPaths = obj1[1].toString();
+            encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
+        }
         for (AssetInfo assetInfo : assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites, this, assetDao, orgDao, supplierDao, userDao, authGroupDao);
@@ -537,7 +543,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         return writer;
     }
 
-    public int writeAsset1(ExcelDocumentStreamingWriter writer, List<AssetInfo> assetList, List<OrgInfo> sites, boolean siteFlag, int startRow) {
+    public int writeAsset1(ExcelDocumentStreamingWriter writer, List<AssetInfo> assetList, List<OrgInfo> sites, boolean siteFlag, int startRow,Map encodedToAssetTypeGroupPath) {
         boolean flag = this.crossSite;
         if (!flag && siteFlag) {
             flag = true;
@@ -547,7 +553,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map<String, List<String>> assetMap = getAllElement.getAssetMap();
         Map parentAssets = getAllElement.getParentAssets();
         Map supliers = getAllElement.getSupliers();
-        Map encodedToAssetTypeGroupPath = getAllElement.getEncodedToAssetTypeGroupPath();
+
 
 //        Set<String> loginNames = assetList.stream().map(AssetInfo::getCreatedBy).filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, String> userMap = MapUtil.newHashMap();
@@ -835,7 +841,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         private Map parentAssets;
         private Map supliers;
         private List<Object> assetTypeGroupPaths;
-        private Map<String, String> encodedToAssetTypeGroupPath;
+        //private Map<String, String> encodedToAssetTypeGroupPath;
         private Map<String, String> spare01;
 
         public GetAllElement(List<AssetInfo> assetList) {
@@ -854,9 +860,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             return supliers;
         }
 
-        public Map getEncodedToAssetTypeGroupPath() {
+       /* public Map getEncodedToAssetTypeGroupPath() {
             return encodedToAssetTypeGroupPath;
-        }
+        }*/
 
         public GetAllElement invoke() {
             List<String> uids = new ArrayList<>();
@@ -930,14 +936,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                 supliers.put(suplierList.get(i).getId(), suplierList.get(i).getTel());
             }
 
-            assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
+           /* assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
             encodedToAssetTypeGroupPath = new HashMap<>();
             for (Object obj : assetTypeGroupPaths) {
                 Object[] obj1 = (Object[]) obj;
                 String encoded = obj1[0].toString();
                 String authGroupPaths = obj1[1].toString();
                 encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
-            }
+            }*/
             return this;
         }
     }

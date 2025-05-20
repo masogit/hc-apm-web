@@ -284,8 +284,9 @@
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <p:ajax  event="click" update="previewedDlg" oncomplete="handlePreview(args, 'previewedDlg');" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
-                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >
-                                                </p:graphicImage>
+                                                <img src="#{fileDownloadService.getImgBase64(fileitem.objectId)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
+<!--                                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >-->
+<!--                                                </p:graphicImage>-->
                                             </h:panelGrid>
                                             <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectId)}" ajax="false"  styleClass="p-mr-2"/><br/>
 
@@ -311,8 +312,9 @@
                                             <h:panelGrid columns="1" style="width:100%" >
                                                 <h:panelGrid columns="1" style="width:100%" >
                                                     <p:ajax  event="click" update="previewedDlg" oncomplete="handlePreview(args, 'previewedDlg');" listener="#{preViewerBean.onServerEvent(adverseEventApproveController,fileitem.objectId)}"/>
-                                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >
-                                                    </p:graphicImage>
+                                                    <img src="#{fileDownloadService.getImgBase64(fileitem.objectId)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
+<!--                                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectId)}" height="80" width="100" stream="false" >-->
+<!--                                                    </p:graphicImage>-->
                                                 </h:panelGrid>
                                                 <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                                             </h:panelGrid>
