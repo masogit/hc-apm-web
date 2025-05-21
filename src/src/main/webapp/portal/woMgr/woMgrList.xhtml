@@ -234,16 +234,16 @@
                     <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CANCEL')}" exportable="false">
-                    <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
+                    <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
                     <p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
-                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}" oncomplete="PF('cancelDialog').show()"/>
+                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
                     <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:msg.CompeteOrder}" actionListener="#{workOrderMgrController.prepareActSetting(item.id)}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
-                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
+                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
 
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 120px" exportable="false" rendered="#{workOrderMgrController.queryIndex==13}">
@@ -287,7 +287,7 @@
 
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and workOrderMgrController.queryIndex==0}">
                     <!--待派工 待接单 待维修-->
-                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" disabled="#{workOrderMgrController.isStep(item)}" oncomplete="PF('cancelDialog').show()"/>
+                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" disabled="#{workOrderMgrController.isStep(item)}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
 
