@@ -493,13 +493,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map parentAssets = getAllElement.getParentAssets();
         Map supliers = getAllElement.getSupliers();
         Map encodedToAssetTypeGroupPath = new HashMap<>();
-        List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
+        /*List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
         for (Object obj : assetTypeGroupPaths) {
             Object[] obj1 = (Object[]) obj;
             String encoded = obj1[0].toString();
             String authGroupPaths = obj1[1].toString();
             encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
-        }
+        }*/
         for (AssetInfo assetInfo : assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites, this, assetDao, orgDao, supplierDao, userDao, authGroupDao);

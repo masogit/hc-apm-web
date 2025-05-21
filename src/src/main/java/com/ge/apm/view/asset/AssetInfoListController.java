@@ -744,13 +744,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public Map handEncodedToAssetTypeGroupPath(){
         Map encodedToAssetTypeGroupPath = new HashMap<>();
-        List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
+        /*List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
         for (Object obj : assetTypeGroupPaths) {
             Object[] obj1 = (Object[]) obj;
             String encoded = obj1[0].toString();
             String authGroupPaths = obj1[1].toString();
             encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
-        }
+        }*/
         return encodedToAssetTypeGroupPath ;
     }
 
