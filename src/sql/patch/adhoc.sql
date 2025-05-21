@@ -3,3 +3,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text,'-',''), 4, '{"rendered":false,"label":"工单分类","required":"false","requiredMessage":"工单分类必填！"}', '维修工单中工单分类字段配置', 'showWorkOrderType', '工单分类', 'f','t',9 where not exists(select * from config_item where key = 'showWorkOrderType');
 insert into i18n_type_manage (id,msg_type, name) select replace(uuid_generate_v4()::text,'-',''), 'workOrderType','工单分类' where not exists(select * from i18n_type_manage where msg_type = 'workOrderType');
+
+-- 保养节点步骤状态修改
+update v2_pm_order_step set step_id='Accept' where step_id='accept';
