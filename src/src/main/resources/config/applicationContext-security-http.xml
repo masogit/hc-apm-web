@@ -64,6 +64,12 @@
         <intercept-url pattern="/admin/sqlExprot.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
         <intercept-url pattern="/admin/TenantPasswordSetup.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
 
+        <!--日志审计-->
+        <intercept-url pattern="/portal/historyInfo/userList.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','GeOp','SiteAdmin')"/> <!-- 日志审计 -->
+        <intercept-url pattern="/portal/historyInfo/assetList.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','GeOp','SiteAdmin')"/> <!-- 日志审计 -->
+        <intercept-url pattern="/portal/historyInfo/loginList.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','GeOp','SiteAdmin')"/> <!-- 日志审计 -->
+        <intercept-url pattern="/portal/historyInfo/userEsList.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','GeOp','SiteAdmin')"/> <!-- 日志审计 -->
+
         <!-- 首页 -->
         <intercept-url pattern="/homeHead**" access="hasAnyRole('SuperAdmin','HospitalHead')"/>
         <intercept-url pattern="/homeAssetHead**" access="hasAnyRole('SuperAdmin','AssetHead')"/>
