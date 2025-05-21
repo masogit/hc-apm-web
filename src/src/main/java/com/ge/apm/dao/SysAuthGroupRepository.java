@@ -41,4 +41,18 @@ public interface SysAuthGroupRepository extends GenericRepository<SysAuthGroup> 
             "from cte  c inner join sys_auth_group k on c.parent_uid = k.uid)select name from cte where  parent_uid is null", nativeQuery = true)
     String listSysAuthGroupNamePathInHierarchyByClassificationCode(String classificationCode);
 
+
+
+
+    @Query(value = "with RECURSIVE cte as (" +
+            "select a.classification_code,a.parent_uid,cast(a.name as varchar(500)) from sys_auth_group a " +
+            "union all select c.classification_code,k.parent_uid,cast(k.name||' ->'||c.name as varchar(500)) as name from cte c " +
+            "inner join sys_auth_group k on c.parent_uid = k.uid)select classification_code,name from cte where  parent_uid is null " +
+            "AND classification_code IS NOT NULL", nativeQuery = true)
+    List<Object> listSysAuthGroupNamePathInHierarchy();
+
+
+
+
+
 }

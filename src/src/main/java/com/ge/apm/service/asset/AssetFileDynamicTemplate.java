@@ -6,6 +6,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.AssetTypeGroupRepository;
+import com.ge.apm.dao.SysAuthGroupRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
@@ -98,6 +99,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     @Autowired
     private AssetTypeGroupRepository assetTypeGroupRepository;
+
+    @Autowired
+    private SysAuthGroupRepository sysAuthGroupRepository;
 
 
     @Autowired
@@ -493,11 +497,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map parentAssets = getAllElement.getParentAssets();
         Map supliers = getAllElement.getSupliers();
         Map encodedToAssetTypeGroupPath = getAllElement.getEncodedToAssetTypeGroupPath();
+        Map listSysAuthGroupNamePathInHierarchyMap = getAllElement.getListSysAuthGroupNamePathInHierarchyMap();
 
         for (AssetInfo assetInfo : assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites, this, assetDao, orgDao, supplierDao, userDao, authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -548,7 +553,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map parentAssets = getAllElement.getParentAssets();
         Map supliers = getAllElement.getSupliers();
         Map encodedToAssetTypeGroupPath = getAllElement.getEncodedToAssetTypeGroupPath();
-
+        Map listSysAuthGroupNamePathInHierarchyMap = getAllElement.getListSysAuthGroupNamePathInHierarchyMap();
 //        Set<String> loginNames = assetList.stream().map(AssetInfo::getCreatedBy).filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, String> userMap = MapUtil.newHashMap();
 //        if (ObjectUtil.isNotEmpty(loginNames)) {
@@ -558,7 +563,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         for (AssetInfo assetInfo : assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites, this, assetDao, orgDao, supplierDao, userDao, authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap1(userMap, flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap1(userMap, flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -835,7 +840,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         private Map parentAssets;
         private Map supliers;
         private List<Object> assetTypeGroupPaths;
+        private List<Object> listSysAuthGroupNamePathInHierarchy;
         private Map<String, String> encodedToAssetTypeGroupPath;
+        private Map<String, String> listSysAuthGroupNamePathInHierarchyMap;
         private Map<String, String> spare01;
 
         public GetAllElement(List<AssetInfo> assetList) {
@@ -856,6 +863,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         public Map getEncodedToAssetTypeGroupPath() {
             return encodedToAssetTypeGroupPath;
+        }
+
+        public Map<String, String> getListSysAuthGroupNamePathInHierarchyMap() {
+            return listSysAuthGroupNamePathInHierarchyMap;
+        }
+
+        public void setListSysAuthGroupNamePathInHierarchyMap(Map<String, String> listSysAuthGroupNamePathInHierarchyMap) {
+            this.listSysAuthGroupNamePathInHierarchyMap = listSysAuthGroupNamePathInHierarchyMap;
         }
 
         public GetAllElement invoke() {
@@ -937,6 +952,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                 String encoded = obj1[0].toString();
                 String authGroupPaths = obj1[1].toString();
                 encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
+            }
+            listSysAuthGroupNamePathInHierarchy = sysAuthGroupRepository.listSysAuthGroupNamePathInHierarchy();
+            listSysAuthGroupNamePathInHierarchyMap = new HashMap<>();
+            for (Object obj : listSysAuthGroupNamePathInHierarchy) {
+                Object[] obj1 = (Object[]) obj;
+                String classificationCode = obj1[0].toString();
+                String name = obj1[1].toString();
+                listSysAuthGroupNamePathInHierarchyMap.put(classificationCode, name);
             }
             return this;
         }

@@ -899,7 +899,7 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap(boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers, Map encodedToAssetTypeGroupPath) {
+    public Map<String, Object> buildExcelColumnKeyValueMap(boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers, Map encodedToAssetTypeGroupPath,Map listSysAuthGroupNamePathInHierarchyMap ) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -1010,7 +1010,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
         map.put(getMessage("medicalApparatusClassification") + "编码", assetInfo.getMedicalApparatusClassification());
-        map.put(getMessage("medicalApparatusClassification"),this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
+        map.put(getMessage("medicalApparatusClassification"),listSysAuthGroupNamePathInHierarchyMap.get(assetInfo.getMedicalApparatusClassification()));
 
         map.put(getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
         map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
@@ -1032,7 +1032,7 @@ public class AssetInfoFormatter {
 
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap1(Map<String, String> userMap, boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers, Map encodedToAssetTypeGroupPath) {
+    public Map<String, Object> buildExcelColumnKeyValueMap1(Map<String, String> userMap, boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers, Map encodedToAssetTypeGroupPath,Map listSysAuthGroupNamePathInHierarchyMap) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -1150,7 +1150,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
         map.put(getMessage("medicalApparatusClassification") + "编码", assetInfo.getMedicalApparatusClassification());
-        map.put(getMessage("medicalApparatusClassification"),this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
+        map.put(getMessage("medicalApparatusClassification"),listSysAuthGroupNamePathInHierarchyMap.get(assetInfo.getMedicalApparatusClassification()));
 
         map.put(getMessage("createdBy"), assetInfo.getCreatedBy());
         map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
