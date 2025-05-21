@@ -80,6 +80,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private UserRoleRepository userRoleRepository;
     private CustomRoleRepository customRoleRepository;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private SysAuthGroupRepository sysAuthGroupRepository;
+
     private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
     private ContractInfoMapper contractInfoMapper;
@@ -228,6 +230,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        sysAuthGroupRepository = WebUtil.getBean(SysAuthGroupRepository.class);
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
@@ -721,6 +724,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+
         template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -750,6 +754,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
         int num = 5000;
         boolean siteFlag = exportFields.containsAll(ListUtil.newArrayList("医院", "集团"));
+        Map encodedToAssetTypeGroupPath = new HashMap<>();;
+        Map listSysAuthGroupNamePathInHierarchyMap = new HashMap<>();;
+        List<Object> assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
+        encodedToAssetTypeGroupPath = new HashMap<>();
+        for (Object obj : assetTypeGroupPaths) {
+            Object[] obj1 = (Object[]) obj;
+            String encoded = obj1[0].toString();
+            String authGroupPaths = obj1[1].toString();
+            encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
+        }
+        List<Object> listSysAuthGroupNamePathInHierarchy = sysAuthGroupRepository.listSysAuthGroupNamePathInHierarchy();
+        listSysAuthGroupNamePathInHierarchyMap = new HashMap<>();
+        for (Object obj : listSysAuthGroupNamePathInHierarchy) {
+            Object[] obj1 = (Object[]) obj;
+            String classificationCode = obj1[0].toString();
+            String name = obj1[1].toString();
+            listSysAuthGroupNamePathInHierarchyMap.put(classificationCode, name);
+        }
         if (assetUids.isEmpty()) {
             if(CollectionUtils.isEmpty(searchFilters)){
                 this.setUserSearchFilters();
@@ -766,7 +788,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                     assetList =  orderByForParentAndChildren(assetList);
                 }
                 assetInfoService.setWarrantyStatus(currentPageAssets);
-                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow);
+                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow,encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
             }
         } else {
             List<AssetInfo> assetList = dao.findByUidIn(assetUids, lastPageSort);
@@ -775,7 +797,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             assetInfoService.setWarrantyStatus(currentPageAssets);
             ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
-            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW);
+            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW,encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
         }
         template.setFormula();
     }
