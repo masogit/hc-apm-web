@@ -4,8 +4,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.component.tabview.TabView;
+import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -49,7 +51,19 @@ public class WorkOrderTabController {
             } else {
                 this.queryTab = 0;
             }
+        }
+        String tabIndex =  WebUtil.getRequestParameter("tabIndex");
+        loadTab(tabIndex);
 
+    }
+
+    public void loadTab(String tabIndex){
+        if(StrUtil.isNotEmpty(tabIndex)){
+            try {
+                this.queryTab = Integer.parseInt(tabIndex);
+            } catch (NumberFormatException e) {
+                setTabIndexByTabId(tabIndex);
+            }
         }
     }
 
@@ -66,13 +80,51 @@ public class WorkOrderTabController {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
         boolean innerWorkOrder = false;
-        if (!userContextService.isIBorUltraSoundIBEndUser() && !userContextService.isIBTenant()) {
+        int count = 0;
+        if (showInOrder && !userContextService.isZtbTenant()) {
             //内部工单显示了
             innerWorkOrder = true;
+            if("inWorkOrder".equals(tabId)){
+                this.queryTab = count;
+            }else {
+                count++;
+            }
         }
-
-
-        if ("outWorkOrder".equals(tabId)) {
+        if(userContextService.isYiMaiYangGuangTenant()){
+            //MVS工单显示了
+            if ("mvsWorkOrder".equals(tabId)) {
+                this.queryTab = count;
+            }else{
+                count++;
+            }
+        }
+        if(!userContextService.isZkbAccount()){
+            if((userContextService.enableDisplayExternalWorkOrder() && userContextService.accessContainsFunctionMenu("REPAIR_EXORDER_VIEW"))){
+                if ("outWorkOrder".equals(tabId)) {
+                    this.queryTab = count;
+                }else{
+                    count++;
+                }
+            }
+            if(userContextService.enableDisplayRemoteWorkOrder() &&  userContextService.accessContainsFunctionMenu("REPAIR_REMOTE_ORDER_VIEW")){
+                if ("outRemoteWorkOrder".equals(tabId)) {
+                    this.queryTab = count;
+                }else{
+                    count++;
+                }
+            }
+        }else{
+            if("outZkbWorkOrder".equals(tabId)){
+                this.queryTab = count;
+            }
+            count++;
+            if(!userContextService.isAccountEndUser() && userContextService.isLocale() || userContextService.isZtbTenant() || userContextService.isHaveIbDeviceUser() || userContextService.accessContainsFunctionMenu("REPAIR_REMOTE_ORDER_VIEW")){
+                if("outRemoteWorkOrder".equals(tabId)){
+                    this.queryTab = count;
+                }
+            }
+        }
+       /* if ("outWorkOrder".equals(tabId)) {
             //现场保养可能是第一页或者第二页，要看内部保养是不是显示
             if (innerWorkOrder) {
                 this.queryTab = 1;
@@ -80,7 +132,6 @@ public class WorkOrderTabController {
                 this.queryTab = 0;
             }
 
-        }
-
+        }*/
     }
 }

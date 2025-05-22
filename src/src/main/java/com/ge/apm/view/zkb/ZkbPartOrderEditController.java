@@ -339,12 +339,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         radiationQuotaTypeFlag = zkbPoPartQuotaTypeList.stream().map(I18nMessage::getMsgKey).filter(t -> t.equals(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString())).findAny().isPresent();
 
     }
-    public void workOrderView(String id){
-        String url = "actionName=View&selectedid=" + id + "&queryIndex=0";
-        url = "../../woMgr/workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
-        RequestContext requestContext = RequestContext.getCurrentInstance();
-        requestContext.addCallbackParam("url", url);
-    }
 
     public boolean highCatFlagDisabledCheck(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
