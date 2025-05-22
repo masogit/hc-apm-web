@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.ZkbPartOrderStatusService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -1420,7 +1421,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         closeBlobObjectList.remove(v2_blobObject);
         blobService.deleteBlobFile(v2_blobObject);
     }
-    //region get、set
+
+    public void workOrderView(String id){
+        String url = "actionName=View&selectedid=" + id + "&queryIndex=0";
+        url = "../../woMgr/workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
 
     public String backList(){
         return "List?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
@@ -1430,6 +1437,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         ZkbPartOrderItem zkbPartOrderItem = selected.getZkbPartOrderItems().stream().filter(t -> t.getId().equals(event.getNewValue())).findFirst().get();
         zkbPartOrderReturn.setPartNo(zkbPartOrderItem.getPartNo());
     }
+
+    //region get、set
 
     public String getModifyType() {
         return modifyType;

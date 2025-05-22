@@ -90,6 +90,10 @@
                     <p:column headerText="品牌">
                         <h:outputText value="#{item.makerShortName}"/>
                     </p:column>
+                    <p:column headerText="操作" exportable="false" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending'}">
+                        <p:commandLink  title="查看工单" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" value="查看" action="#{zkbPartOrderAuditController.workOrderView(item.id)}"  >
+                        </p:commandLink>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                     </f:facet>
                 </p:dataTable>
@@ -1645,6 +1649,15 @@
                 </h:form>
             </p:dialog>
         </div>
+        <script >
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+        </script>
     </ui:define>
 </ui:composition>
 
