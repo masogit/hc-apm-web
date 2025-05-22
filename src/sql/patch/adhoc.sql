@@ -6,3 +6,8 @@ insert into i18n_type_manage (id,msg_type, name) select replace(uuid_generate_v4
 
 -- 保养节点步骤状态修改
 update v2_pm_order_step set step_id='Accept' where step_id='accept';
+
+
+
+--YHAAO-25135
+update sys_role set home_page = '/portal/homeNurse1.xhtml' where  home_page = '/homeHead.xhtml';
