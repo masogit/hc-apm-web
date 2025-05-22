@@ -80,6 +80,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private UserRoleRepository userRoleRepository;
     private CustomRoleRepository customRoleRepository;
     private AssetTypeGroupRepository assetTypeGroupRepository;
+    private SysAuthGroupRepository sysAuthGroupRepository;
+
     private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
     private ContractInfoMapper contractInfoMapper;
@@ -198,7 +200,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String oneQrCodeStatus;
     private boolean countyArea = false;
     private UserAccount user;
-//    private Map<String, UserAccount> createdByMap;
+    //    private Map<String, UserAccount> createdByMap;
     private List<AssetInfo> resultList = new ArrayList<>();
     @Override
     protected AssetInfoRepository getDAO() {
@@ -228,6 +230,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        sysAuthGroupRepository = WebUtil.getBean(SysAuthGroupRepository.class);
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
@@ -245,15 +248,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         countyArea = userContextService.isCountyArea();
         logger.info("AssetInfoListController.init end time cost:{}ms",(System.currentTimeMillis()-l));
     }
-    
+
     private Integer getWarrantyAlertDaysConfig(){
         WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
         List<WorkflowConfig> wfConfigList = wfDao.findByTenantUID(user.getTenantUID());
-        
+
         WorkflowConfig alertSite=null, alertHospital=null, alertInstitution=null, alsertTenant=null;
         for(int i=0; i<wfConfigList.size(); i++){
             WorkflowConfig item = wfConfigList.get(i);
-            
+
             if(user.getSiteUID().equals(item.getSiteUID()))
                 alertSite = item;
             else if(user.getHospitalUID().equals(item.getSiteUID()))
@@ -263,7 +266,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             else if(user.getTenantUID().equals(item.getSiteUID()))
                 alsertTenant = item;
         }
-        
+
         if(alertSite!=null) return alertSite.getWarrantyRemindDays();
         if(alertHospital!=null) return alertHospital.getWarrantyRemindDays();
         if(alertInstitution!=null) return alertInstitution.getWarrantyRemindDays();
@@ -623,7 +626,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         loadClinicalDeptList();
     }
-    
+
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
@@ -702,7 +705,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void deleteAssetForever(AssetInfo asset){
 
         try {
-        aiMgrService.deleteAssetForever(asset);
+            aiMgrService.deleteAssetForever(asset);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -721,6 +724,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+
         template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -742,19 +746,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("export file: AssetInfo_export.xlsx successful.");
     }
 
-    public Map handEncodedToAssetTypeGroupPath(){
-        Map encodedToAssetTypeGroupPath = new HashMap<>();
-        List<Object> assetTypeGroupPaths  = assetTypeGroupRepository.flatternHierarchy();
-        for (Object obj : assetTypeGroupPaths) {
-            Object[] obj1 = (Object[]) obj;
-            String encoded = obj1[0].toString();
-            String authGroupPaths = obj1[1].toString();
-            encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
-        }
-        return encodedToAssetTypeGroupPath ;
-    }
-
-
     public void writerAsset(AssetFileDynamicTemplate template, List<String> exportFields) {
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
@@ -763,7 +754,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
         int num = 5000;
         boolean siteFlag = exportFields.containsAll(ListUtil.newArrayList("医院", "集团"));
-        Map encodedToAssetTypeGroupPath = this.handEncodedToAssetTypeGroupPath();
+        Map encodedToAssetTypeGroupPath = new HashMap<>();;
+        Map listSysAuthGroupNamePathInHierarchyMap = new HashMap<>();;
+        List<Object> assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
+        encodedToAssetTypeGroupPath = new HashMap<>();
+        for (Object obj : assetTypeGroupPaths) {
+            Object[] obj1 = (Object[]) obj;
+            String encoded = obj1[0].toString();
+            String authGroupPaths = obj1[1].toString();
+            encodedToAssetTypeGroupPath.put(encoded, authGroupPaths);
+        }
+        List<Object> listSysAuthGroupNamePathInHierarchy = sysAuthGroupRepository.listSysAuthGroupNamePathInHierarchy();
+        listSysAuthGroupNamePathInHierarchyMap = new HashMap<>();
+        for (Object obj : listSysAuthGroupNamePathInHierarchy) {
+            Object[] obj1 = (Object[]) obj;
+            String classificationCode = obj1[0].toString();
+            String name = obj1[1].toString();
+            listSysAuthGroupNamePathInHierarchyMap.put(classificationCode, name);
+        }
         if (assetUids.isEmpty()) {
             if(CollectionUtils.isEmpty(searchFilters)){
                 this.setUserSearchFilters();
@@ -780,7 +788,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                     assetList =  orderByForParentAndChildren(assetList);
                 }
                 assetInfoService.setWarrantyStatus(currentPageAssets);
-                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow,encodedToAssetTypeGroupPath);
+                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow,encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
             }
         } else {
             List<AssetInfo> assetList = dao.findByUidIn(assetUids, lastPageSort);
@@ -789,7 +797,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             assetInfoService.setWarrantyStatus(currentPageAssets);
             ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
-            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW,encodedToAssetTypeGroupPath);
+            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW,encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
         }
         template.setFormula();
     }
@@ -894,9 +902,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
-            if(isOrderByForParentAndChildren){
-                resultList =  orderByForParentAndChildren(resultList);
-            }
+        if(isOrderByForParentAndChildren){
+            resultList =  orderByForParentAndChildren(resultList);
+        }
         return resultList;
     }
 
@@ -908,7 +916,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 } else {
                     e.setBranchIds("" + e.getParentAssetId() + e.getId());
                 }
-        });
+            });
             return resultList.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
         }
         return resultList;
@@ -1060,7 +1068,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<OrgInfo> res = this.clinicalDeptList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                 .filter(distinctByOrgName(OrgInfo::getName)) //display unique clinical name only
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
@@ -1074,7 +1082,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<OrgInfo> res = this.clinicalDeptList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
