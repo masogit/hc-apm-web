@@ -125,9 +125,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         InputStream ins = new ByteArrayInputStream(result);
         DefaultStreamedContent fileStream = new DefaultStreamedContent(ins);
         fileStream.setContentType(responseHeader.getContentType().toString());
-//        List<String> dispositions = responseHeader.get("content-disposition");
-//        String disposition = dispositions.get(0);
-//        String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
+        List<String> dispositions = responseHeader.get("content-disposition");
+        String disposition = dispositions.get(0);
+        String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
         List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(fileId);
         if(!CollectionUtils.isEmpty(allByObjectStorageId)){
             try {
@@ -136,7 +136,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
                 logger.error("download file with  transforming chinese filename chart set error:{}",e);
             }
         }else{
-            fileStream.setName("");
+            fileStream.setName(fileName);
         }
         return fileStream;
     }
