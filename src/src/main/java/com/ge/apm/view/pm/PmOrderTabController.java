@@ -2,6 +2,7 @@ package com.ge.apm.view.pm;
 
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,6 +55,18 @@ public class PmOrderTabController {
                 this.queryTab = 0;
             }
 
+        }
+        String tabIndex = WebUtil.getRequestParameter("tabIndex");
+        loadTab(tabIndex);
+    }
+
+    public void loadTab(String tabIndex){
+        if(StrUtil.isNotEmpty(tabIndex)){
+            try {
+                this.queryTab = Integer.parseInt(tabIndex);
+            } catch (NumberFormatException e) {
+                setTabIndexByTabId(tabIndex);
+            }
         }
     }
 
