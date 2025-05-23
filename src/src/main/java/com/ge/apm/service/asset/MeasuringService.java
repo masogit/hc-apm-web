@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.PropertyFilter;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.aop.SystemEventAuditAopAspect;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -462,7 +464,6 @@ public class MeasuringService {
         }catch (Exception e){
             progress = 0;
             LOGGER.error("handle zip error:{}",e.getMessage());
-            throw  new RuntimeException("handleZip error",e);
         }
         resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         return resultList;
@@ -491,7 +492,6 @@ public class MeasuringService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
         }finally {
             if(newFile != null && newFile.exists()){
                 newFile.delete();
@@ -501,62 +501,71 @@ public class MeasuringService {
     }
 
     private MeasuringCertificateDetail handleOcrResult(JSONArray data, File newFile) throws IOException {
-        MeasuringCertificateDetail result = new MeasuringCertificateDetail();
+        MeasuringCertificateDetail result = null;
         JSONObject object= data.getJSONObject(0);
-        String assetSN = object.getString("assetSN");
-        if(StringUtils.isEmpty(assetSN)) return null;
-        String[] split = assetSN.split("/");
-        List<SearchFilter> searchFilters = new ArrayList<>();
-        searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
-        List<AssetInfo> assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
-        if(CollectionUtils.isEmpty(assetInfos)){
-            result.setCertificateNo(object.getString("certificateNo"));
-            result.setErrorInfo(assetSN + ",未匹配到设备");
-            result.setStatus(-1);
-            return result;
-        }
-        if(assetInfos.size() > 1){
-            result.setCertificateNo(object.getString("certificateNo"));
-            result.setErrorInfo(assetSN + ",匹配到"+assetInfos.size() +"台设备");
-            result.setStatus(-1);
-            return result;
-        }
-        List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
-            MeasuringCertificateDetail measureDetail = new MeasuringCertificateDetail();
-            setObject(measureDetail, object);
-            measureDetail.setAssetUID(item.getUid());
-            measureDetail.setAssetSN(item.getSerialNum());
-            measureDetail.setQrCode(item.getQrCode());
-            measureDetail.setSiteUID(item.getSiteUID());
-            measureDetail.setHospitalUID(item.getHospitalUID());
-            measureDetail.setInstitutionUID(item.getInstitutionUID());
-            measureDetail.setTenantUID(item.getTenantUID());
-            return measureDetail;
-        }).collect(Collectors.toList());
-        result = collect.get(0);
-        List<SearchFilter> searchFilterList = new ArrayList<>();
-        searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,result.getCertificateNo()));
-        searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
-        List<MeasuringCertificateDetail> measuringCertificateDetails = measuringCertificateDetailDao.findBySearchFilter(searchFilterList);
-        SystemEventAuditEnum eventAuditEnum = null;
-        if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
-            MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
-            BeanUtils.copyProperties(result, detail,beanNullProperty(result));
-            measuringCertificateDetailDao.save(detail);
-            result = detail;
-            eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
-        }else{
-            measuringCertificateDetailDao.save(collect);
-            eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
-        }
+        try {
+            result = new MeasuringCertificateDetail();
+            String assetSN = object.getString("assetSN");
+            if(StringUtils.isEmpty(assetSN)) return null;
+            String[] split = assetSN.split("/");
+            List<SearchFilter> searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
+            List<AssetInfo> assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
+            if(CollectionUtils.isEmpty(assetInfos)){
+                result.setCertificateNo(object.getString("certificateNo"));
+                result.setErrorInfo(assetSN + ",未匹配到设备");
+                result.setStatus(-1);
+                return result;
+            }
+            if(assetInfos.size() > 1){
+                result.setCertificateNo(object.getString("certificateNo"));
+                result.setErrorInfo(assetSN + ",匹配到"+assetInfos.size() +"台设备");
+                result.setStatus(-1);
+                return result;
+            }
+            List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
+                MeasuringCertificateDetail measureDetail = new MeasuringCertificateDetail();
+                setObject(measureDetail, object);
+                measureDetail.setAssetUID(item.getUid());
+                measureDetail.setAssetSN(item.getSerialNum());
+                measureDetail.setQrCode(item.getQrCode());
+                measureDetail.setSiteUID(item.getSiteUID());
+                measureDetail.setHospitalUID(item.getHospitalUID());
+                measureDetail.setInstitutionUID(item.getInstitutionUID());
+                measureDetail.setTenantUID(item.getTenantUID());
+                return measureDetail;
+            }).collect(Collectors.toList());
+            result = collect.get(0);
+            List<SearchFilter> searchFilterList = new ArrayList<>();
+            searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,result.getCertificateNo()));
+            searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+            List<MeasuringCertificateDetail> measuringCertificateDetails = measuringCertificateDetailDao.findBySearchFilter(searchFilterList);
+            SystemEventAuditEnum eventAuditEnum = null;
+            if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
+                MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
+                BeanUtils.copyProperties(result, detail,beanNullProperty(result));
+                measuringCertificateDetailDao.save(detail);
+                result = detail;
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
+            }else{
+                measuringCertificateDetailDao.save(collect);
+                eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
+            }
 
-        templateService.saveTemplateFile(fileToByteArray(newFile), result.getCertificateNo().replaceAll("/", "-") + ".pdf", "application/pdf", V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, result.getId());
-        // 更新设备计量日期
-        updateMeasuringDate(assetInfos.get(0));
-        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(result));
-        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+            templateService.saveTemplateFile(fileToByteArray(newFile), result.getCertificateNo().replaceAll("/", "-") + ".pdf", "application/pdf", V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, result.getId());
+            // 更新设备计量日期
+            updateMeasuringDate(assetInfos.get(0));
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(result,(PropertyFilter)(o,n,v)->!n.equals("assetInfo")));
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setCertificateNo(object.getString("certificateNo"));
+            result.setErrorInfo(e.getMessage());
+            result.setStatus(-1);
+            return result;
+        }
         return result;
     }
 
