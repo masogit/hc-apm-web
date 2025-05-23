@@ -11,3 +11,12 @@ update v2_pm_order_step set step_id='Accept' where step_id='accept';
 
 --YHAAO-25135
 update sys_role set home_page = '/portal/homeNurse1.xhtml' where  home_page = '/homeHead.xhtml';
+
+--YHAAO-25142
+ALTER TABLE public.v2_work_order_step ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+ALTER TABLE public.v2_work_order_coworker ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+ALTER TABLE public.v2_work_order_man_hours ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+ALTER TABLE public.v2_work_order_detail ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+
+ALTER TABLE public.v2_blob_object ALTER COLUMN bo_uuid TYPE bpchar(32) USING bo_uuid::bpchar;
+ALTER TABLE public.v2_blob_object ALTER COLUMN object_storage_id TYPE bpchar(24) USING object_storage_id::bpchar;
