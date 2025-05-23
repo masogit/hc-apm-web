@@ -4,6 +4,7 @@ package com.ge.apm.aop;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.aop.audit.AuditHandler;
 import com.ge.apm.domain.SystemEventAudit;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -180,6 +181,16 @@ public class SystemEventAuditAopAspect {
                 isSaveAudit = auditHandler.isSave(args, boType, operation);
                  if(isSaveAudit && systemEventAuditEnum!=null){
                     UserAccount userAccount = getUserAccount();
+                    if("tenant_info".equals(boType)){
+                        String uid = userAccount.getUid();
+                        userAccount=new UserAccount();
+                        userAccount.setUid(uid);
+                        TenantInfo  tenantInfo = (TenantInfo) args[0];
+                        userAccount.setTenantUID(tenantInfo.getUid());
+                        userAccount.setInstitutionUID(tenantInfo.getUid());
+                        userAccount.setHospitalUID(tenantInfo.getUid());
+                        userAccount.setSiteUID(tenantInfo.getUid());
+                    }
                     SystemEventAudit systemEventAudit = buildEventAudit(userAccount,systemEventAuditEnum, boUid, isSuccess, exceptionMessage,boType,eventData);
                     sendSystemAuditMessage(systemEventAudit);
                 }
