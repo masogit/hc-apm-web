@@ -86,7 +86,7 @@
                                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                                     </p:selectOneRadio>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{systemConfigItemController.selected.key != 'showWorkOrderType'}">
+                                <h:panelGroup>
                                     <label class="label">标签名称</label>
                                     <p:inputText value="#{systemConfigItemController.selected.fieldColumnDto.label}" maxlength="200"/>
                                 </h:panelGroup>

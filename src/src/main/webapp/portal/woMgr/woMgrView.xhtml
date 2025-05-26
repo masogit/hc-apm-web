@@ -246,10 +246,9 @@
                                             <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
                                         </h:panelGroup>
                                         <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').rendered}">
-                                            <label class="label">工单分类</label>
+                                            <label class="label"> #{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').label}</label>
                                             <p:outputLabel value="#{fieldMsg.fieldValue('workOrderType', woItem.workOrderType)}" />
                                         </h:panelGroup>
-
                                         <h:panelGroup>
                                             <label class="label">#{msg.patActions}</label>
                                             <p:outputLabel value="#{woItem.patActions}" style="word-wrap: break-word;"/>
