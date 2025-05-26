@@ -5,6 +5,7 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbIntegralOrderRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.zkb.ZkbConstantUtil;
 import com.ge.apm.service.zkb.ZkbIntegralOrderApplyService;
 import com.ge.apm.service.zkb.ZkbIntegralOrderAuditService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -224,7 +225,7 @@ public class ZkbIntegralOrderEditController extends GenericCRUDUUIDController<Zk
         selectedContract = contractList.stream().filter(t -> t.getId().equals(event.getNewValue())).findAny().get();
         if(selectedContract != null){
             selected.setContractNo(selectedContract.getContractNo());
-            if(StrUtil.isEmpty(selectedContract.getCanApplyToolbox()) || !"Y".equals(selectedContract.getCanApplyToolbox())) {
+            if(StrUtil.isNotEmpty(selectedContract.getCanApplyToolbox()) && ZkbConstantUtil.NORMAL_N.equals(selectedContract.getCanApplyToolbox())) {
                 zkbIntegralOrderStatusVo.setScoreCanApply(false);
                 WebUtil.addErrorMessage("该合同不能申请工具箱！");
             }else{
