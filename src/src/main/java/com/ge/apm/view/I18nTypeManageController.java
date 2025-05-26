@@ -4,20 +4,14 @@ import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.I18nTypeManageRepository;
+import com.ge.apm.dao.I18nTypeManageTenantRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.I18nTypeManage;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.asset.AssetFileImportService;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +22,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import webapp.framework.web.mvc.GenericDataTableModel;
 import webapp.framework.web.service.DbMessageSource;
 
 import javax.faces.bean.ManagedBean;
@@ -46,8 +39,10 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     private I18nTypeManageRepository dao;
     private TenantInfoRepository tenantInfoRepository;
     private ConfigCacheService configCacheService;
+    private I18nTypeManageTenantRepository typeManageTenantRepository;
     private TenantInfo selectTenant;
     private Integer selectTenantId;
+    private List<I18nTypeManageTenant> typeManageTenants;
 
     private String selectActionName;
 
@@ -64,10 +59,12 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        typeManageTenantRepository = WebUtil.getBean(I18nTypeManageTenantRepository.class);
         selectTenant = tenantInfoRepository.findByuid(currentUser.getTenantUID());
         selectTenantId = selectTenant.getId();
         this.searchFilters = new ArrayList<>();
         supperAdmin = currentUser.getIsSuperAdmin();
+        initI18nTypeManageTenant();
     }
 
     @Override
@@ -81,6 +78,21 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             initParameter();
         }
         Page<I18nTypeManage> result = super.loadData(pageRequest);
+        List<I18nTypeManage> content = result.getContent();
+        if(CollectionUtils.isNotEmpty(typeManageTenants)){
+            content.stream().forEach(item->{
+                String id = item.getId();
+                Optional<I18nTypeManageTenant> first = typeManageTenants.stream().filter(tenant -> id.equals(tenant.getTypeManageId())).findFirst();
+                if(first.isPresent()){
+                    I18nTypeManageTenant i18nTypeManageTenant = first.get();
+                    item.setType(i18nTypeManageTenant.getType());
+                    item.setAdminEdit(i18nTypeManageTenant.getAdminEdit());
+                }else{
+                    item.setType(-1);
+                    item.setAdminEdit(Boolean.FALSE);
+                }
+            });
+        }
         return result;
     }
     private void initParameter(){
@@ -98,6 +110,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     public void changeSelectTenant(){
         if(selectTenantId != null && selectTenantId != -1){
             selectTenant = tenantInfoRepository.findById(selectTenantId);
+            initI18nTypeManageTenant();
         }
     }
     private void prepareEditInit(I18nTypeManage selected,Integer siteId){
@@ -172,7 +185,6 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             selected.setI18nMessageList(ListUtils.newArrayList());
             LOGGER.info("reset:{},",selected.getMsgType());
             saveConfig();
-            resetCache();
             LOGGER.info("end reset:{}",selected.getMsgType());
             WebUtil.addSuccessMessage("恢复默认值成功！");
         } catch (Exception e) {
@@ -191,6 +203,29 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             e.printStackTrace();
             WebUtil.addErrorMessage("保存失败");
         }
+    }
+    public void doSaveI18nTypeMessageTenant(){
+        String id = selected.getId();
+        String uid = selectTenant.getUid();
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("typeManageId", SearchFilter.Operator.EQ,id));
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,uid));
+        List<I18nTypeManageTenant> i18nTypeManageTenants = typeManageTenantRepository.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isNotEmpty(i18nTypeManageTenants)){
+            I18nTypeManageTenant i18nTypeManageTenant = i18nTypeManageTenants.get(0);
+            i18nTypeManageTenant.setType(selected.getType());
+            i18nTypeManageTenant.setAdminEdit(selected.getAdminEdit());
+            typeManageTenantRepository.save(i18nTypeManageTenant);
+        }else{
+            I18nTypeManageTenant i18nTypeManageTenant = new I18nTypeManageTenant();
+            i18nTypeManageTenant.setTenantId(selectTenant.getId());
+            i18nTypeManageTenant.setType(selected.getType());
+            i18nTypeManageTenant.setAdminEdit(selected.getAdminEdit());
+            i18nTypeManageTenant.setTypeManageId(selected.getId());
+            i18nTypeManageTenant.setTenantUid(selectTenant.getUid());
+            typeManageTenantRepository.save(i18nTypeManageTenant);
+        }
+        initI18nTypeManageTenant();
     }
     public void doSaveI18nMessage(){
         List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
@@ -223,6 +258,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             i18nMessageRepository.delete(deleteI18nMessageList);
         }
         dao.save(selected);
+        doSaveI18nTypeMessageTenant();
     }
     public void uploadDataFile(FileUploadEvent event) {
         // 配置键,名称-中文,名称-英文,名称-繁体
@@ -285,6 +321,16 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         String o2Str = stringBuilder_o2.append(o2.getId()).append(o2.getMsgType()).append(o2.getMsgKey()).append(o2.getValueZh()).append(o2.getValueEn()).append(o1.getValueTw()).toString();
         return o1Str.equals(o2Str);
     }
+
+    public void initI18nTypeManageTenant(){
+        typeManageTenants = new ArrayList<>();
+        String uid = selectTenant.getUid();
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,uid));
+        typeManageTenants = typeManageTenantRepository.findBySearchFilter(searchFilters);
+    }
+
+
     public TenantInfo getSelectTenant() {
         return selectTenant;
     }

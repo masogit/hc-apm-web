@@ -24,13 +24,15 @@ public class I18nTypeManage  {
     @Column(name = "msg_type")
     private String msgType;
 
-    @Column(name = "type")
-    private Integer type;
+//    @Column(name = "type")
+    @Transient
+    private Integer type = -1;
 
     @Column(name = "description",columnDefinition = "text")
     private String description;
     // 是否支持管理员修改
-    @Column(name = "admin_edit",columnDefinition = "BOOLEAN DEFAULT FALSE")
+//    @Column(name = "admin_edit",columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Transient
     private Boolean adminEdit = Boolean.FALSE;
 
     @Transient
