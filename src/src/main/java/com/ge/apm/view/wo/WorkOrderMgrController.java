@@ -1824,7 +1824,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
             if(fieldColumnDto.getRequired()){
                 if(StrUtil.isEmpty(selectedWorkOrder.getWorkOrderType())){
-                    WebUtil.addErrorMessage(WebUtil.getMessage("工单分类不能为空！"));
+                    WebUtil.addErrorMessage(WebUtil.getMessage(fieldColumnDto.getRequiredMessage()));
                     RequestContext.getCurrentInstance().addCallbackParam("workOrderType", true);
                     valid = false;
                 }
