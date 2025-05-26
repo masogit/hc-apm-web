@@ -11,3 +11,15 @@ update v2_pm_order_step set step_id='Accept' where step_id='accept';
 
 --YHAAO-25135
 update sys_role set home_page = '/portal/homeNurse1.xhtml' where  home_page = '/homeHead.xhtml';
+
+--YHAAO-25142
+ALTER TABLE public.v2_work_order_step ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+ALTER TABLE public.v2_work_order_coworker ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+ALTER TABLE public.v2_work_order_man_hours ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+ALTER TABLE public.v2_work_order_detail ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
+
+ALTER TABLE public.v2_blob_object ALTER COLUMN bo_uuid TYPE bpchar(32) USING bo_uuid::bpchar;
+ALTER TABLE public.v2_blob_object ALTER COLUMN object_storage_id TYPE bpchar(24) USING object_storage_id::bpchar;
+
+
+insert into i18n_type_manage_tenant(id,type_manage_id,type,admin_edit,tenant_id,tenant_uid) select replace(uuid_generate_v4()::text,'-',''),id,type,admin_edit,tiid,uid  from (select  tm.id,tm.type,tm.admin_edit,ti.id as tiId,ti.uid,im.msg_type  from  i18n_type_manage  tm left join i18n_message im on tm.msg_type = im.msg_type left join tenant_info ti on im.site_id = ti.id  where tm.id is not null and im.site_id != -1 and (tm.type = 1 or tm.admin_edit = true) and ti.id is not null) t group by id,type,admin_edit,tiid,uid;
