@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.I18nTypeManageMapper">
+
+    <resultMap id="i18nTypeManageResult" type="com.ge.apm.domain.I18nTypeManage">
+        <id column="id" property="id"/>
+        <result column="msg_type" property="msgType"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="description" property="description"/>
+        <result column="admin_edit" property="adminEdit"/>
+    </resultMap>
+    <sql id="selectSql">
+        SELECT DISTINCT t1.id,t1.msg_type,t1.name,t1.description, COALESCE ( t2.admin_edit,false) AS admin_edit,COALESCE ( t2.type,-1) AS type
+        FROM i18n_type_manage t1  LEFT JOIN i18n_type_manage_tenant t2 on t1.id = t2.type_manage_id AND t2.tenant_uid = #{tenantUid}
+    </sql>
+    <select id="getTotalRowCount" resultType="int">
+            select count(distinct id) from (
+               <include refid="selectSql" />
+            ) t1
+          where 1=1
+         ${ew.sqlSegment}
+
+
+    </select>
+
+    <select id="loadSharedAssets" resultMap="i18nTypeManageResult">
+        select * from (
+          <include refid="selectSql" />
+        ) t1
+        where 1=1
+        ${ew.sqlSegment}
+
+
+    </select>
+
+</mapper>

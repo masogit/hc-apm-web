@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.WhereJoinTable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
