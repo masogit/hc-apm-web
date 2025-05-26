@@ -162,7 +162,7 @@ public class ZkbPartOrderProvider {
         if(StrUtil.isNotEmpty(assetTypeDi)){
             sql.append(" and asset_type_di = '" + assetTypeDi + "'");
         }else {
-            sql.append(" and (asset_type_di is null or asset_type_di = '') ");
+            //sql.append(" and (asset_type_di is null or asset_type_di = '') ");
         }
         List<String> zones = param.get("zone") == null ?  new ArrayList<>() : (List<String>)param.get("zone");
         if(CollectionUtils.isNotEmpty(zones)){
