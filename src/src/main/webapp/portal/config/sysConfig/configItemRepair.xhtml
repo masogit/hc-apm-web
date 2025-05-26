@@ -200,6 +200,34 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('displayMainSubWorkOrder'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('displayMainSubWorkOrder').configItemValue == null}"/>
             </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('showWorkOrderType').name.concat('(').concat(systemConfigItemController.configItemMap.get('showWorkOrderType').key).concat(')')}</label>
+                <p:fieldset>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">是否显示</label>
+                            <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('showWorkOrderType').fieldColumnDto.rendered}" style="width: 30%;">
+                                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否必填</label>
+                            <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('showWorkOrderType').fieldColumnDto.required}" style="width: 30%;">
+                                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('showWorkOrderType'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showWorkOrderType'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('showWorkOrderType').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 

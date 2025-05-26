@@ -86,7 +86,7 @@
                                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                                     </p:selectOneRadio>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{systemConfigItemController.selected.key != 'showWorkOrderType'}">
                                     <label class="label">标签名称</label>
                                     <p:inputText value="#{systemConfigItemController.selected.fieldColumnDto.label}" maxlength="200"/>
                                 </h:panelGroup>
@@ -97,7 +97,7 @@
                                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                                     </p:selectOneRadio>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{systemConfigItemController.selected.key != 'showWorkOrderType'}">
                                     <label class="label">必填提示</label>
                                     <p:inputText value="#{systemConfigItemController.selected.fieldColumnDto.requiredMessage}" maxlength="300"/>
                                 </h:panelGroup>

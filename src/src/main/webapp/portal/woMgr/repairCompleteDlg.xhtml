@@ -94,8 +94,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').rendered}">
                             <label class="label">
-                                #{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').label
-                                        .concat(systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').required ? '*' : '')}
+                                工单分类#{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').required ? '*' : ''}
                             </label>
                             <p:selectOneMenu id="workOrderType" value="#{workOrderMgrController.selectedWorkOrder.workOrderType}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
