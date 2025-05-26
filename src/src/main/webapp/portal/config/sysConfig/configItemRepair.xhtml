@@ -213,6 +213,10 @@
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">标签名称</label>
+                            <p:inputText value="#{systemConfigItemController.configItemMap.get('showWorkOrderType').fieldColumnDto.label}" maxlength="200"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">是否必填</label>
                             <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('showWorkOrderType').fieldColumnDto.required}" style="width: 30%;">
                                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
