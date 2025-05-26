@@ -31,6 +31,10 @@ public class I18nTypeManageTenant {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "type_manage_id", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private I18nTypeManage i18nTypeManage;
+
     public String getId() {
         return id;
     }
@@ -77,5 +81,13 @@ public class I18nTypeManageTenant {
 
     public void setTenantUid(String tenantUid) {
         this.tenantUid = tenantUid;
+    }
+
+    public I18nTypeManage getI18nTypeManage() {
+        return i18nTypeManage;
+    }
+
+    public void setI18nTypeManage(I18nTypeManage i18nTypeManage) {
+        this.i18nTypeManage = i18nTypeManage;
     }
 }

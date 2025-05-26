@@ -96,7 +96,8 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         return result;
     }
     private void initParameter(){
-        updateSearchFilter(new SearchFilter("adminEdit", SearchFilter.Operator.EQ,Boolean.TRUE));
+        updateSearchFilter(new SearchFilter("i18nTypeManageTenants.adminEdit", SearchFilter.Operator.EQ,Boolean.TRUE));
+        updateSearchFilter(new SearchFilter("i18nTypeManageTenants.tenantUid", SearchFilter.Operator.EQ,selectTenant.getUid()));
     }
 
     @Override
