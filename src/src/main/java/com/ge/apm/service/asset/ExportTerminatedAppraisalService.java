@@ -126,7 +126,7 @@ public class ExportTerminatedAppraisalService {
                         byte[] bytes = WordExportServiceUtil.generate(datas, templateBytes, bindings);
 
                         if (!Arrays.equals(bytes, new byte[0])) {
-                            String name = assetInfo.getName() + "-" + "资产报废单" + ".docx";
+                            String name = assetInfo.getName() + "-" +assetInfo.getQrCode()+"-"+ "资产报废单" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
                             zout.closeEntry();

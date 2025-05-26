@@ -58,7 +58,7 @@
                         <p:column headerText="#{msg.msgType}" filterBy="#{item.msgType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.msgType}"/>
                         </p:column>
-                        <p:column headerText="是否可以新增"  filterBy="#{item.type}" filterMatchMode="EQ">
+                        <p:column headerText="是否可以新增" >
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()">
                                     <f:selectItem itemLabel="#{msg.All}" itemValue="" />
@@ -66,9 +66,9 @@
                                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="-1" />
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{item.type == -1?'否':'是'}"/>
+                            <h:outputText value="#{empty item.type?'否':item.type == -1?'否':'是'}"/>
                         </p:column>
-                        <p:column headerText="是否管理员编辑" filterable="#{userContextService.hasRole('SuperAdmin')}" filterBy="#{item.adminEdit}" filterMatchMode="EQ" >
+                        <p:column headerText="是否管理员编辑"  >
                                 <f:facet name="filter">
                                     <p:selectOneMenu onchange="PF('varDataList').filter()">
                                         <f:converter converterId="javax.faces.Boolean" />

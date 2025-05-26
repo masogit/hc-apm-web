@@ -24,14 +24,19 @@ public class I18nTypeManage  {
     @Column(name = "msg_type")
     private String msgType;
 
-    @Column(name = "type")
-    private Integer type;
+//    @Column(name = "type")
+    @Transient
+    private Integer type = -1;
 
     @Column(name = "description",columnDefinition = "text")
     private String description;
     // 是否支持管理员修改
-    @Column(name = "admin_edit",columnDefinition = "BOOLEAN DEFAULT FALSE")
+//    @Column(name = "admin_edit",columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Transient
     private Boolean adminEdit = Boolean.FALSE;
+
+    @OneToMany(mappedBy = "i18nTypeManage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private  List<I18nTypeManageTenant> i18nTypeManageTenants;
 
     @Transient
     private boolean alone;
@@ -123,6 +128,14 @@ public class I18nTypeManage  {
 
     public void setDefaultMsgList(List<I18nMessage> defaultMsgList) {
         this.defaultMsgList = defaultMsgList;
+    }
+
+    public List<I18nTypeManageTenant> getI18nTypeManageTenants() {
+        return i18nTypeManageTenants;
+    }
+
+    public void setI18nTypeManageTenants(List<I18nTypeManageTenant> i18nTypeManageTenants) {
+        this.i18nTypeManageTenants = i18nTypeManageTenants;
     }
 
     @Override
