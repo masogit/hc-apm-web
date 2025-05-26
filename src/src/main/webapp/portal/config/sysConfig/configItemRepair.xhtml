@@ -223,6 +223,10 @@
                                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                             </p:selectOneRadio>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">必填提示</label>
+                            <p:inputText value="#{systemConfigItemController.configItemMap.get('showWorkOrderType').fieldColumnDto.requiredMessage}" maxlength="300" disabled="true"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
             </h:panelGroup>

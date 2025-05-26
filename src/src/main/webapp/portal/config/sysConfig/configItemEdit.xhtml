@@ -97,9 +97,9 @@
                                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                                     </p:selectOneRadio>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{systemConfigItemController.selected.key != 'showWorkOrderType'}">
+                                <h:panelGroup>
                                     <label class="label">必填提示</label>
-                                    <p:inputText value="#{systemConfigItemController.selected.fieldColumnDto.requiredMessage}" maxlength="300"/>
+                                    <p:inputText value="#{systemConfigItemController.selected.fieldColumnDto.requiredMessage}" maxlength="300" disabled="#{systemConfigItemController.selected.key eq 'showWorkOrderType'}"/>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{systemConfigItemController.selected.fieldColumnDto.type eq 'date'}">
                                     <label class="label">日期格式</label>
