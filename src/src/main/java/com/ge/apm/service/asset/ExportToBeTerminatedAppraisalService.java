@@ -52,7 +52,7 @@ public class ExportToBeTerminatedAppraisalService {
         financing_num, asset_name, function_type, install_date, manufacture, vendor,
         maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date,
         asset_dept_name,asset_dept_owner_name,salvage_value,termination_cause,comments,num,accumulated_depreciation,
-        application_date,clinical_dept_name,site,unit_price
+        application_date,clinical_dept_name,site,unit_price,qr_code
     }
 
     @Autowired
@@ -162,7 +162,9 @@ public class ExportToBeTerminatedAppraisalService {
                         byte[] bytes = WordExportServiceUtil.generate(map, templateBytes, bindings);
 
                         if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
-                            String name = o.toString() + "-" + "资产报废鉴定表" + ".docx";
+                            String qrCode = item.get(qr_code)!=null?item.get(qr_code).toString():"";
+
+                            String name = o.toString() + "-" +qrCode+"-"+ "资产报废鉴定表" + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
                             zout.closeEntry();
