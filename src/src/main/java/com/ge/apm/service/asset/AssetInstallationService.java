@@ -66,6 +66,9 @@ public class AssetInstallationService {
     @Autowired
     private AssetDepreciationService assetDepreciationService;
     @Autowired
+    private SupplierService supplierService;
+
+    @Autowired
     private V2_PmOrderService pmService;
     @Autowired
     private ContractInfoItemRepository contractItemDao;
@@ -74,7 +77,9 @@ public class AssetInstallationService {
     @Autowired
     private TenantInfoRepository tenantInfoDao;
 
-
+    public boolean activeSupplier(){
+        return supplierService.activeSupplier();
+    }
     public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid) {
         return supplierDao.findSupplierByTenantUID(tenantUid);
     }
@@ -209,6 +214,9 @@ public class AssetInstallationService {
         List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(temp.getId())).orElse(new ArrayList<>())
                 .stream().filter(item -> item.getBoSubType().contains("asset") || item.getBoSubType().contains("business") || item.getBoSubType().contains("clinical") || item.getBoSubType().contains("technical") || item.getBoSubType().contains("fixasset") || item.getBoSubType().contains("CustomizedAssetAttachmentCategory")).collect(Collectors.toList());
         assetPicList.addAll(getPicList(temp.getArrivalListId()));
+        if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
+            assetPicList.addAll(getPicList(temp.getArrivalList().getContractNum()));
+        }
         assetPicList.forEach(item -> {
             item.setId(null);
             item.setBoUuid(newAsset.getUid());
