@@ -219,6 +219,7 @@ public class ExportToBeTerminatedAppraisalService {
                 setValue(siteName, assetInfo.getSiteUID(), WebUtil.getMessage("SiteInconsistent"));
             }
             Map<ASSET_DETAIL, Object> map = new EnumMap<>(ASSET_DETAIL.class);
+            map.put(qr_code, assetInfo.getQrCode());
             map.put(financing_num, assetInfo.getFinancingNum());
             map.put(asset_name, assetInfo.getName());
             map.put(function_type, assetInfo.getFunctionType());
