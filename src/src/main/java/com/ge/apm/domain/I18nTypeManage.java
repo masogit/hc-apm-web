@@ -35,6 +35,9 @@ public class I18nTypeManage  {
     @Transient
     private Boolean adminEdit = Boolean.FALSE;
 
+    @OneToMany(mappedBy = "i18nTypeManage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private  List<I18nTypeManageTenant> i18nTypeManageTenants;
+
     @Transient
     private boolean alone;
 
@@ -125,6 +128,14 @@ public class I18nTypeManage  {
 
     public void setDefaultMsgList(List<I18nMessage> defaultMsgList) {
         this.defaultMsgList = defaultMsgList;
+    }
+
+    public List<I18nTypeManageTenant> getI18nTypeManageTenants() {
+        return i18nTypeManageTenants;
+    }
+
+    public void setI18nTypeManageTenants(List<I18nTypeManageTenant> i18nTypeManageTenants) {
+        this.i18nTypeManageTenants = i18nTypeManageTenants;
     }
 
     @Override
