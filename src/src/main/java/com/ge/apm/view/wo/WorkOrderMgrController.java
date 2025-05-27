@@ -2349,6 +2349,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
                 statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
             }
+            selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
@@ -2487,6 +2488,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setPartsDescription(null);
         saveCountyAreaAddressInfo();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
+        selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
     }
     //保存一个备件
     public void saveItem(){
