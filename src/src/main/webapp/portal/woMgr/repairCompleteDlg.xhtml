@@ -92,10 +92,10 @@
                                 <p:ajax />
                             </p:inputTextarea>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').rendered}">
+                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').rendered}">
                             <label class="label">
-                                #{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').label
-                                        .concat(systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').required ? '*' : '')}
+                                #{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').label
+                                        .concat(systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').required ? '*' : '')}
                             </label>
                             <p:selectOneMenu id="workOrderType" value="#{workOrderMgrController.selectedWorkOrder.workOrderType}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

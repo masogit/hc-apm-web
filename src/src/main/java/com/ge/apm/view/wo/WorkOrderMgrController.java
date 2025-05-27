@@ -302,6 +302,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     boolean showLocationNameFlag;
     @Getter @Setter
     boolean enableSignNeedScanQrCode;
+    @Getter @Setter
+    private OrgInfo currentUserOrgInfo;
     @Override
     protected void init() {
         try {
@@ -357,7 +359,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 enableMaintenanceContract = "true".equals(configItemValue.getValue());
             }
             selectedBatchMap = new HashMap<>();
-            selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
+            currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
             enableAuditGroupConfiguration();
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1818,8 +1820,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         //判断如果工单分类必填
-        OrgInfo orgInfo = (OrgInfo)selectedObjectMap.get("selectedOrg");
-        String value = configItemValueRepository.findByKeyAndSiteForUseParent(orgInfo.getSiteUID(), orgInfo.getHospitalUID(), orgInfo.getInstitutionUID(), orgInfo.getTenantUID(), "showWorkOrderType");
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserOrgInfo.getSiteUID(), currentUserOrgInfo.getHospitalUID(), currentUserOrgInfo.getInstitutionUID(), currentUserOrgInfo.getTenantUID(), "showWorkOrderType");
         if(StrUtil.isNotEmpty(value)){
             FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
             if(fieldColumnDto.getRequired()){
@@ -2488,7 +2489,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setPartsDescription(null);
         saveCountyAreaAddressInfo();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
-        selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
     }
     //保存一个备件
     public void saveItem(){
