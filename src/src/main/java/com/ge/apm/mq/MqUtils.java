@@ -112,7 +112,7 @@ public class MqUtils {
         }).collect(Collectors.toList());
         List<String> collect = fields2.stream().map(Field::getName).collect(Collectors.toList());
         filter.getExcludes().addAll(collect);
-        String str = JSON.toJSONString(assetInfo, filter, SerializerFeature.WriteDateUseDateFormat);
+        String str = JSON.toJSONString(assetInfo, filter, SerializerFeature.WriteDateUseDateFormat,SerializerFeature.IgnoreNonFieldGetter);
         jsonObject.put("assetInfo", str);
         mqContextDTO.setJsonObject(jsonObject);
         sendToMq(mqContextDTO);
