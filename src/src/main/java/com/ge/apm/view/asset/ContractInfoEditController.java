@@ -1,13 +1,9 @@
 package com.ge.apm.view.asset;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.exception.BusinessException;
-import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.ContractInfoService;
@@ -341,20 +337,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             }
         }
         boolean isEdit = selected.getId() == null ? false : true;
-        String contractBlobRequiredStr = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(),
-                currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "contractBlobRequired");
-        List<Map<String, String>> mapList = JSON.parseObject(contractBlobRequiredStr, new TypeReference<List<Map<String,String>>>(){});
-        List<String> contractBlobRequired = mapList.stream().map(map -> map.get("value")).collect(Collectors.toList());
-        List<String> contractBlobTypes = attachements.stream().map(V2_BlobObject::getBoSubType).distinct().collect(Collectors.toList());
-        boolean allMatch = new HashSet<>(contractBlobTypes).containsAll(contractBlobRequired);
-        if (!allMatch) {
-            String collect = mapList.stream().map(map -> map.get("key")).collect(Collectors.joining("，"));
-            WebUtil.addErrorMessage(collect + "附件类型必填！");
-            return;
-        }
         selected = dao.save(this.selected);
         attachements= attachements.stream().filter(item->item.getBoUuid()==null).collect(Collectors.toList());
-        attachements.forEach(item -> item.setBoUuid(selected.getId()));
+        attachements.stream().forEach(item -> {
+            item.setBoUuid(selected.getId());
+        });
         /*allItemList.stream().filter(item -> Strings.isNullOrEmpty(item.getContractId())).forEach(item -> {
             item.setContractId(selected.getId());
         });
@@ -461,7 +448,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         List<ContractInfoItem> removeList =allItemList.stream().filter(item-> Objects.equals(item.getAssetUid(),assetInfo.getUid())).collect(Collectors.toList());
         allItemList.removeAll(removeList);
         removedItemList.addAll(removeList.stream().filter(item-> StringUtils.isNotEmpty(item.getId())).collect(Collectors.toList()));
-        
+
     }
 
     public void remomveContractItem(ContractInfoItem item) {
@@ -689,9 +676,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public Boolean getCanBeEdit() {
         if(null == canBeEdit){
             canBeEdit = uaaService.getOrgListByUser(currentUser.getUid()).stream()
-                .map(item -> item.getSiteUID()).distinct().anyMatch(item-> Objects.equals(item, selected.getTenantUID()) ||
-                        Objects.equals(item, selected.getInstitutionUID()) ||Objects.equals(item, selected.getHospitalUID()) ||
-                        Objects.equals(item, selected.getSiteUID()));
+                    .map(item -> item.getSiteUID()).distinct().anyMatch(item-> Objects.equals(item, selected.getTenantUID()) ||
+                            Objects.equals(item, selected.getInstitutionUID()) ||Objects.equals(item, selected.getHospitalUID()) ||
+                            Objects.equals(item, selected.getSiteUID()));
         }
         return canBeEdit;
     }
