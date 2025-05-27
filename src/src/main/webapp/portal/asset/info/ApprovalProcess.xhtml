@@ -20,7 +20,7 @@
                  selectionMode="single" selection="#{multiLevelApprovalListController.selected}"
                  rowKey="#{item.id}" sortMode="single" sortOrder="descending"
                  sortBy="#{item.createdDate}"
-                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                  rows="5" emptyMessage="#{msg.noRecordFound}">
 
