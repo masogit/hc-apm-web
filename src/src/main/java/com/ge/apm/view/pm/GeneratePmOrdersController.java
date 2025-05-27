@@ -143,10 +143,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void initOrgTree() {
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
-//		treeNode.getChildren().forEach(node -> node.setSelected(true));
-//		if (isYmyg) {
-//			setTreeNodes(treeNode, true);
-//		}
 		OrgInfo rootOrg = new OrgInfo();
 		rootOrg.setId(-1);
 		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
@@ -156,7 +152,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			rootNode.getChildren().add(treeNode);
 		}
 		rootNode.setExpanded(true);
-//		setTreeNodes(treeNode, true);
 	}
 
 	public void onSelectOrgForUser(NodeSelectEvent event) {
