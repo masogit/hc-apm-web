@@ -2,13 +2,16 @@ package com.ge.apm.view;
 
 import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.I18nTypeManageRepository;
 import com.ge.apm.dao.I18nTypeManageTenantRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.i18n.I18nTypeManageService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.FileUploadEvent;
@@ -17,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -40,6 +44,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     private TenantInfoRepository tenantInfoRepository;
     private ConfigCacheService configCacheService;
     private I18nTypeManageTenantRepository typeManageTenantRepository;
+    private I18nTypeManageService i18nTypeManageService;
     private TenantInfo selectTenant;
     private Integer selectTenantId;
     private List<I18nTypeManageTenant> typeManageTenants;
@@ -60,6 +65,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         typeManageTenantRepository = WebUtil.getBean(I18nTypeManageTenantRepository.class);
+        i18nTypeManageService = WebUtil.getBean(I18nTypeManageService.class);
         selectTenant = tenantInfoRepository.findByuid(currentUser.getTenantUID());
         selectTenantId = selectTenant.getId();
         this.searchFilters = new ArrayList<>();
@@ -77,27 +83,21 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         if(!supperAdmin){
             initParameter();
         }
-        Page<I18nTypeManage> result = super.loadData(pageRequest);
-        List<I18nTypeManage> content = result.getContent();
-        if(CollectionUtils.isNotEmpty(typeManageTenants)){
-            content.stream().forEach(item->{
-                String id = item.getId();
-                Optional<I18nTypeManageTenant> first = typeManageTenants.stream().filter(tenant -> id.equals(tenant.getTypeManageId())).findFirst();
-                if(first.isPresent()){
-                    I18nTypeManageTenant i18nTypeManageTenant = first.get();
-                    item.setType(i18nTypeManageTenant.getType());
-                    item.setAdminEdit(i18nTypeManageTenant.getAdminEdit());
-                }else{
-                    item.setType(-1);
-                    item.setAdminEdit(Boolean.FALSE);
-                }
-            });
+        Wrapper<I18nTypeManage>  wrapper = i18nTypeManageService.buildDefaultFilters(searchFilters);
+        int totalRowCount = i18nTypeManageService.getTotalRowCount(wrapper,selectTenant.getUid());
+        List<I18nTypeManage> list = i18nTypeManageService.loadI18nTypes(pageRequest, wrapper,selectTenant.getUid());
+        Page<I18nTypeManage> result=null;
+        if (list== null) {
+            result=new PageImpl(new ArrayList(),pageRequest,totalRowCount);
+        } else {
+            result= new PageImpl(list,pageRequest,totalRowCount);
         }
+        searchFilters.clear();
         return result;
     }
     private void initParameter(){
-        updateSearchFilter(new SearchFilter("i18nTypeManageTenants.adminEdit", SearchFilter.Operator.EQ,Boolean.TRUE));
-        updateSearchFilter(new SearchFilter("i18nTypeManageTenants.tenantUid", SearchFilter.Operator.EQ,selectTenant.getUid()));
+        updateSearchFilter(new SearchFilter("admin_edit", SearchFilter.Operator.EQ,Boolean.TRUE));
+
     }
 
     @Override
