@@ -15,6 +15,10 @@
                 max-width: 200px;
                 max-height: 100px;
                 overflow-y: hidden;
+                .ui-panelgrid, .ui-panel {
+                    width: 100% !important;
+                    box-sizing: border-box;  /* 包含内边距 */
+                }
             }
         </style>
     </ui:define>
@@ -294,7 +298,7 @@
                                 </p:dataTable>
                             </p:panel>
 
-                            <p:panel header="#{msg.InternalMaintenanceRecord}" style="margin-bottom:20px;" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                            <p:panel header="#{msg.InternalMaintenanceRecord}" style="margin-bottom:20px; width: 100%" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                                 <f:facet name="actions">
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
@@ -334,15 +338,14 @@
                                 </p:dataTable>
                             </p:panel>
 
-                            <p:panelGrid columns="2" style="margin-bottom:20px;" layout="grid" styleClass="ui-panelgrid-blank">
-                                <p:panel  header="盘点记录" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' ) and userContextService.hasCurrentTenantName('')}">
+                            <h:panelGroup style="display: flex; flex-wrap: wrap; gap: 0.5rem; width: 100%" layout="grid" styleClass="ui-panelgrid-blank">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="盘点记录" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' ) and userContextService.hasCurrentTenantName('')}">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/inventory/inventoryOrderDetailAssetInfoMainAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
                                     <p:dataTable var="item" value="#{inspectionServiceController.detailInventoryOrderDetailList}" emptyMessage="#{msg.noRecordFound}">
                                         <p:column headerText="盘点状态" >
                                             <h:outputText value="#{item.status==0?msg.NonInventory:item.status==1?msg.Inventorized:item.status==2?msg.NonLedger:item.status==3?msg.HasIssue:item.status==4?msg.NoWorkOrder:item.status}" />
-
                                         </p:column>
                                         <p:column headerText="#{msg.InventoryChecker}" >
                                             <h:outputText value="#{assetInfoDetailController.getUserName(item.lastModifiedBy)}"/>
@@ -364,7 +367,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel  header="#{msg.ExternalMaintenanceRecord}4566" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.ExternalMaintenanceRecord}4566" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;queryTab=pmOrderListRemote&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -380,7 +383,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel  header="#{msg.ExternalMaintenanceRecord2}" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.ExternalMaintenanceRecord2}" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;queryTab=outWorkOrder&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -396,7 +399,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel  header="#{msg.OnSiteMaintenanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.OnSiteMaintenanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;queryTab=pmOrderListOut&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -412,7 +415,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel  header="日常检查记录" >
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="日常检查记录" >
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/maintainMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                         <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl nurseSiteMaintainForm" onclick="PF('nurseSiteMaintainDialog').show()"/>
@@ -441,7 +444,7 @@
                                 </p:panel>
                                 <c:choose>
                                     <c:when test="#{userContextService.accessContainsApmFeature('NURSESITE_USING')}">
-                                        <p:panel  header="使用登记记录" id="B">
+                                        <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="使用登记记录" id="B">
                                             <p:dataTable id="usingRecordeList" var="item" value="#{inspectionServiceController.detailAssetOperationRecordList}" emptyMessage="#{msg.noRecordFound}"
                                                          paginator="true" paginatorPosition="bottom" rows="5"
                                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Toolbar}"
@@ -475,7 +478,7 @@
                                         </p:panel>
                                     </c:when>
                                     <c:otherwise>
-                                        <p:panel  header="开关机记录" id="A">
+                                        <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="开关机记录" id="A">
                                             <f:facet name="actions">
                                                 <!--                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/assetOptRecordList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
                                                 <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
@@ -510,7 +513,7 @@
                                     </c:otherwise>
                                 </c:choose>
 
-                                <p:panel header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/measuring/measuringResultMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -535,7 +538,7 @@
                                     </p:dataTable >
                                 </p:panel>
 
-                                <p:panel  header="不良事件记录" >
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="不良事件记录" >
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" />
                                     </f:facet>
@@ -579,7 +582,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                            </p:panelGrid>
+                            </h:panelGroup>
                         </h:form>
                         <p:panel  id="approvale"
                                   header="设备流程记录"
