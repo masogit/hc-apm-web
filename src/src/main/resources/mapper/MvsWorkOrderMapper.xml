@@ -61,237 +61,116 @@
     </resultMap>
     <select id="loadData" resultMap="v2_WorkOrderMap">
 
-    select * FROM (
+        SELECT t.id,
+        t.dispatch_mode,
+        t.current_step_id,
+        t.sr_id,
+        t.site_id,
+        t.hospital_id,
+        t.current_person_id,
+        t.current_person_name,
+        t.current_step_name,
+        t.total_man_hour,
+        t.total_price,
+        t.status,
+        t.int_ext_type,
+        t.parent_wo_id,
+        t.main_sub,
+        t.ack_signature,
+        a.name AS asset_name,
+        a.serial_num as asset_serial_num,
+        a.depart_num as asset_depart_num,
+        a.function_type as asset_function_type,
+        a.site_uid as asset_site_uid,
+        a.clinical_dept_name as asset_clinical_dept_name,
+        a.clinical_dept_uid as asset_clinical_dept_uid,
+        a.location_name as asset_location_name,
+        a.mvs_equip as asset_mvs_equip,
+        a.id as asset_id,
+        a.status as asset_status,
+        vs.sr_num as sr_sr_num,
+        vs.from_dept_uid as sr_from_dept_uid,
+        vs.requestor_name as sr_requestor_name,
+        vs.request_time as sr_request_time,
+        vs.request_reason as sr_request_reason,
+        vs.case_priority as sr_case_priority,
+        vs.asset_location as sr_asset_location,
+        vs.confirmed_down_time as sr_confirmed_down_time,
+        vs.confirmed_up_time as sr_confirmed_up_time,
+        vs.equipment_taker as sr_equipment_taker,
+        vs.take_time as sr_take_time,
+        vs.cancel_person as sr_cancel_person,
+        vs.cancel_reason as sr_cancel_reason,
+        vs.customer_name as sr_customer_name,
+        vs.customer_tel as sr_customer_tel,
+        vs.customer_position as sr_customer_position,
+        vs.status as sr_status,
+        a.uid AS asset_uid
+        FROM v2_work_order t
+        left join v2_service_request vs on t.sr_id = VS.ID
+        left join mvs_ib_mapping m1 ON t.asset_uid in (m1.mvs_ib_uid,m1.e_home_ib_uid)
+        left join asset_info a ON m1.ib_id = a.id
+        left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
+        left join v2_work_order_detail ws ON t.id = ws.wo_id
+        WHERE   a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
+        <if test="srNum != null">
+            and vs.sr_Num like concat('%', #{srNum}, '%')
+        </if>
+        <if test="currentStepId != null and currentStepId.length > 0">
+            and t.current_step_id IN
+            <foreach item="item" index="index" collection="currentStepId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="casePriority != null">
+            and vs.case_priority = CAST(#{casePriority, jdbcType=INTEGER} AS INTEGER)
+        </if>
+        <if test="status != null">
+            and t.status = #{status}
+        </if>
+        <if test="mainSub != null">
+            and t.main_sub  = #{mainSub}
+        </if>
+        <if test="queryAssetUid != null">
+            and a.uid = #{queryAssetUid}
+        </if>
+        <if test="assetInfoSiteUID != null">
+            and a.site_uid = #{assetInfoSiteUID}
+        </if>
+        <if test="assetInfoClinicalDeptUID != null and assetInfoClinicalDeptUID.length > 0">
+            and a.clinical_dept_uid IN
+            <foreach item="item" index="index" collection="assetInfoClinicalDeptUID" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="userUid != null">
+            AND uo.user_uid = #{userUid}
+        </if>
+        <if test="tenantUid != null">
+            AND a.tenant_uid = #{tenantUid}
+        </if>
+        <if test="assetName != null">
+            AND a.name like CONCAT('%', #{assetName}, '%')
+        </if>
+        <if test="locationName != null">
+            AND a.location_name like CONCAT('%', #{locationName}, '%')
+        </if>
+        <if test="assetSerialNum != null">
+            AND a.serial_num like CONCAT('%', #{assetSerialNum}, '%')
+        </if>
+        <if test="departNum != null">
+            AND a.depart_num like CONCAT('%', #{departNum}, '%')
+        </if>
+        <if test="assetInfoAssetType != null and assetInfoAssetType.length > 0">
+            and a.asset_type IN
+            <foreach item="item" index="index" collection="assetInfoAssetType" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="functionType != null">
+            AND a.function_type  like CONCAT('%', #{functionType}, '%')
+        </if>
 
-        SELECT t.id,
-        t.dispatch_mode,
-        t.current_step_id,
-        t.sr_id,
-        t.site_id,
-        t.hospital_id,
-        t.current_person_id,
-        t.current_person_name,
-        t.current_step_name,
-        t.total_man_hour,
-        t.total_price,
-        t.status,
-        t.int_ext_type,
-        t.parent_wo_id,
-        t.main_sub,
-        t.ack_signature,
-        a.name AS asset_name,
-        a.serial_num as asset_serial_num,
-        a.depart_num as asset_depart_num,
-        a.function_type as asset_function_type,
-        a.site_uid as asset_site_uid,
-        a.clinical_dept_name as asset_clinical_dept_name,
-        a.clinical_dept_uid as asset_clinical_dept_uid,
-        a.location_name as asset_location_name,
-        a.mvs_equip as asset_mvs_equip,
-        a.id as asset_id,
-        a.status as asset_status,
-        vs.sr_num as sr_sr_num,
-        vs.from_dept_uid as sr_from_dept_uid,
-        vs.requestor_name as sr_requestor_name,
-        vs.request_time as sr_request_time,
-        vs.request_reason as sr_request_reason,
-        vs.case_priority as sr_case_priority,
-        vs.asset_location as sr_asset_location,
-        vs.confirmed_down_time as sr_confirmed_down_time,
-        vs.confirmed_up_time as sr_confirmed_up_time,
-        vs.equipment_taker as sr_equipment_taker,
-        vs.take_time as sr_take_time,
-        vs.cancel_person as sr_cancel_person,
-        vs.cancel_reason as sr_cancel_reason,
-        vs.customer_name as sr_customer_name,
-        vs.customer_tel as sr_customer_tel,
-        vs.customer_position as sr_customer_position,
-        vs.status as sr_status,
-        a.uid AS asset_uid
-        FROM v2_work_order t
-         JOIN v2_service_request vs on t.sr_id = VS.ID
-         JOIN mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid
-         JOIN asset_info a ON m1.ib_id = a.id
-        JOIN user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
-        left JOIN v2_work_order_detail ws ON t.id = ws.wo_id
-        WHERE 1=1
-        <if test="srNum != null">
-            and vs.sr_Num like concat('%', #{srNum}, '%')
-        </if>
-        <if test="currentStepId != null and currentStepId.length > 0">
-            and t.current_step_id IN
-            <foreach item="item" index="index" collection="currentStepId" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="casePriority != null">
-            and vs.case_priority = CAST(#{casePriority, jdbcType=INTEGER} AS INTEGER)
-        </if>
-        <if test="status != null">
-            and t.status = #{status}
-        </if>
-        <if test="mainSub != null">
-            and t.main_sub  = #{mainSub}
-        </if>
-        <if test="queryAssetUid != null">
-            and a.uid = #{queryAssetUid}
-        </if>
-        <if test="assetInfoSiteUID != null">
-            and a.site_uid = #{assetInfoSiteUID}
-        </if>
-        <if test="assetInfoClinicalDeptUID != null and assetInfoClinicalDeptUID.length > 0">
-            and a.clinical_dept_uid IN
-            <foreach item="item" index="index" collection="assetInfoClinicalDeptUID" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="userUid != null">
-            AND uo.user_uid = #{userUid}
-        </if>
-        <if test="tenantUid != null">
-            AND a.tenant_uid = #{tenantUid}
-        </if>
-        <if test="assetName != null">
-            AND a.name like CONCAT('%', #{assetName}, '%')
-        </if>
-        <if test="locationName != null">
-            AND a.location_name like CONCAT('%', #{locationName}, '%')
-        </if>
-        <if test="assetSerialNum != null">
-            AND a.serial_num like CONCAT('%', #{assetSerialNum}, '%')
-        </if>
-        <if test="departNum != null">
-            AND a.depart_num like CONCAT('%', #{departNum}, '%')
-        </if>
-        <if test="assetInfoAssetType != null and assetInfoAssetType.length > 0">
-            and a.asset_type IN
-            <foreach item="item" index="index" collection="assetInfoAssetType" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="functionType != null">
-            AND a.function_type  like CONCAT('%', #{functionType}, '%')
-        </if>
-              AND a.is_valid
-              AND NOT a.is_deleted
-              AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
-        union all
-        SELECT t.id,
-        t.dispatch_mode,
-        t.current_step_id,
-        t.sr_id,
-        t.site_id,
-        t.hospital_id,
-        t.current_person_id,
-        t.current_person_name,
-        t.current_step_name,
-        t.total_man_hour,
-        t.total_price,
-        t.status,
-        t.int_ext_type,
-        t.parent_wo_id,
-        t.main_sub,
-        t.ack_signature,
-        a.name AS asset_name,
-        a.serial_num as asset_serial_num,
-        a.depart_num as asset_depart_num,
-        a.function_type as asset_function_type,
-        a.site_uid as asset_site_uid,
-        a.clinical_dept_name as asset_clinical_dept_name,
-        a.clinical_dept_uid as asset_clinical_dept_uid,
-        a.location_name as asset_location_name,
-        a.mvs_equip as asset_mvs_equip,
-        a.id as asset_id,
-        a.status as asset_status,
-        vs.sr_num as sr_sr_num,
-        vs.from_dept_uid as sr_from_dept_uid,
-        vs.requestor_name as sr_requestor_name,
-        vs.request_time as sr_request_time,
-        vs.request_reason as sr_request_reason,
-        vs.case_priority as sr_case_priority,
-        vs.asset_location as sr_asset_location,
-        vs.confirmed_down_time as sr_confirmed_down_time,
-        vs.confirmed_up_time as sr_confirmed_up_time,
-        vs.equipment_taker as sr_equipment_taker,
-        vs.take_time as sr_take_time,
-        vs.cancel_person as sr_cancel_person,
-        vs.cancel_reason as sr_cancel_reason,
-        vs.customer_name as sr_customer_name,
-        vs.customer_tel as sr_customer_tel,
-        vs.customer_position as sr_customer_position,
-        vs.status as sr_status,
-        a.uid AS asset_uid
-        FROM v2_work_order t
-        JOIN v2_service_request vs on t.sr_id = VS.ID
-        JOIN mvs_ib_mapping m1 ON t.asset_uid=m1.e_home_ib_uid
-        JOIN asset_info a ON m1.ib_id = a.id
-        JOIN user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
-        left JOIN v2_work_order_detail ws ON t.id = ws.wo_id
-        WHERE 1=1
-        <if test="srNum != null">
-            and vs.sr_Num like concat('%', #{srNum}, '%')
-        </if>
-        <if test="currentStepId != null and currentStepId.length > 0">
-            and t.current_step_id IN
-            <foreach item="item" index="index" collection="currentStepId" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="casePriority != null">
-            and vs.case_priority = CAST(#{casePriority, jdbcType=INTEGER} AS INTEGER)
-        </if>
-        <if test="status != null">
-            and t.status = #{status}
-        </if>
-        <if test="mainSub != null">
-            and t.main_sub  = #{mainSub}
-        </if>
-        <if test="queryAssetUid != null">
-            and a.uid = #{queryAssetUid}
-        </if>
-        <if test="assetInfoSiteUID != null">
-            and a.site_uid = #{assetInfoSiteUID}
-        </if>
-        <if test="assetInfoClinicalDeptUID != null and assetInfoClinicalDeptUID.length > 0">
-            and a.clinical_dept_uid IN
-            <foreach item="item" index="index" collection="assetInfoClinicalDeptUID" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="userUid != null">
-            AND uo.user_uid = #{userUid}
-        </if>
-        <if test="tenantUid != null">
-            AND a.tenant_uid = #{tenantUid}
-        </if>
-        <if test="assetName != null">
-            AND a.name like CONCAT('%', #{assetName}, '%')
-        </if>
-        <if test="locationName != null">
-            AND a.location_name like CONCAT('%', #{locationName}, '%')
-        </if>
-        <if test="assetSerialNum != null">
-            AND a.serial_num like CONCAT('%', #{assetSerialNum}, '%')
-        </if>
-        <if test="departNum != null">
-            AND a.depart_num like CONCAT('%', #{departNum}, '%')
-        </if>
-        <if test="assetInfoAssetType != null and assetInfoAssetType.length > 0">
-            and a.asset_type IN
-            <foreach item="item" index="index" collection="assetInfoAssetType" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="functionType != null">
-            AND a.function_type  like CONCAT('%', #{functionType}, '%')
-        </if>
-        AND a.is_valid
-        AND NOT a.is_deleted
-        AND NOT EXISTS (
-        SELECT 1 FROM mvs_ib_mapping
-        WHERE T.asset_uid = mvs_ib_uid  -- 避免重复
-        )
-        AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
-         ) WORKERORDER ORDER BY sr_request_time desc
+        ORDER BY vs.request_time desc
     </select>
  </mapper>
