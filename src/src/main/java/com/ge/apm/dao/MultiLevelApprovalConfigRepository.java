@@ -16,4 +16,8 @@ public interface MultiLevelApprovalConfigRepository extends GenericRepositoryUUI
 
     public List<MultiLevelApprovalConfig>  findByHierOrgUidAndBusinessTypeAndEnable(String hierOrgUid,String businessType,Boolean enable);
 
+
+    @Query(value="select m.* from multi_level_approval_config m where m.id in ?1", nativeQuery = true)
+    public List<MultiLevelApprovalConfig> getByIds(List<String> uids);
+
 }

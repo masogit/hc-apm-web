@@ -305,6 +305,32 @@ public class WorkOrderDocxRenderService {
             target.put(entry.getKey(), source.get(entry.getValue()));
         }
 
+
+        if (source.containsKey("approvalMap")) {
+            HashMap<String, String> approvalMap= (HashMap<String, String>) source.get("approvalMap");
+            target.putAll(approvalMap);
+        }
+        if (source.containsKey("approvalMapKey")) {
+            List<String> approvalMapKey = (List<String>) source.get("approvalMapKey");
+            for (String approvalKey : approvalMapKey) {
+                if(target.get(approvalKey)!=null){
+                    String storageId = (String) target.get(approvalKey);
+
+                    byte[] blob = getBlobSignature( storageId);
+                    if (blob != null) {
+                        target.put(approvalKey, new PictureRenderData(100, 75, PictureType.PNG, blob));
+                    } else {
+                        target.put(approvalKey, EMPTY_PICTURE);
+                    }
+                }else{
+                    target.put(approvalKey, EMPTY_PICTURE);
+                }
+
+            }
+
+
+        }
+
         return target;
     }
 
