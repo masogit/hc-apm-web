@@ -523,6 +523,9 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairType','2','送到维修中心','To The Service Center',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairType','3','返厂维修','Return Factory For Repair',NULL,-1);
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','exceptionReason','异常原因','Exception Reason',NULL,-1);
+
+
 --县域新增维修类型“远程修复”
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairTypeCountyArea','1','上门维修','On-site Repair',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairTypeCountyArea','2','送到维修中心','To The Service Center',NULL,-1);

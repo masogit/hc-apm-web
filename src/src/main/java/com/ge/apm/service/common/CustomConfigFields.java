@@ -143,6 +143,7 @@ public enum CustomConfigFields {
     spare08(fieldName, "spare08" ,Text),  //备用字段08
     spare09(fieldName, "spare09" ,Text),  //备用字段09
     spare10(fieldName, "spare10" ,Text),  //备用字段10
+    exceptionReason(fieldName, "exceptionReason" ,Text),  //备用字段10
 
 
     ;
