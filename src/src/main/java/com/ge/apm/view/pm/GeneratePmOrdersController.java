@@ -152,7 +152,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			rootNode.getChildren().add(treeNode);
 		}
 		rootNode.setExpanded(true);
-
 	}
 
 	public void onSelectOrgForUser(NodeSelectEvent event) {

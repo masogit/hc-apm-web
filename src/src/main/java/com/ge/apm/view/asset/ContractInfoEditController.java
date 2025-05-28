@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.exception.BusinessException;
-import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.ContractInfoService;
@@ -450,7 +448,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         List<ContractInfoItem> removeList =allItemList.stream().filter(item-> Objects.equals(item.getAssetUid(),assetInfo.getUid())).collect(Collectors.toList());
         allItemList.removeAll(removeList);
         removedItemList.addAll(removeList.stream().filter(item-> StringUtils.isNotEmpty(item.getId())).collect(Collectors.toList()));
-        
+
     }
 
     public void remomveContractItem(ContractInfoItem item) {
@@ -678,9 +676,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public Boolean getCanBeEdit() {
         if(null == canBeEdit){
             canBeEdit = uaaService.getOrgListByUser(currentUser.getUid()).stream()
-                .map(item -> item.getSiteUID()).distinct().anyMatch(item-> Objects.equals(item, selected.getTenantUID()) ||
-                        Objects.equals(item, selected.getInstitutionUID()) ||Objects.equals(item, selected.getHospitalUID()) ||
-                        Objects.equals(item, selected.getSiteUID()));
+                    .map(item -> item.getSiteUID()).distinct().anyMatch(item-> Objects.equals(item, selected.getTenantUID()) ||
+                            Objects.equals(item, selected.getInstitutionUID()) ||Objects.equals(item, selected.getHospitalUID()) ||
+                            Objects.equals(item, selected.getSiteUID()));
         }
         return canBeEdit;
     }
