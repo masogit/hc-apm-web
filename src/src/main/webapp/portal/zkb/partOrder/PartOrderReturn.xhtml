@@ -44,7 +44,7 @@
                     <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
                         <h:panelGroup>
                             <label class="label">归还数量*</label>
-                            <p:spinner value="#{zkbPartOrderAuditController.zkbPartOrderReturn.qty}" min="1" max="1000"  disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}"/>
+                            <p:spinner value="#{zkbPartOrderAuditController.zkbPartOrderReturn.qty}" min="1" max="10000000"  disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
