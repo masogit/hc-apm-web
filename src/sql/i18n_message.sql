@@ -4585,6 +4585,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOpType','ZkbPartOrderReturn','ZKB返还','ZkbPartOrderReturn',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOpType','ZkbFePartOrderDeduct','GE扣除','ZkbFePartOrderDeduct',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOpType','ZkbFePartOrderReturn','GE返还','ZkbFePartOrderReturn',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOpType','AutoAdd','系统自动增加','AutoAdd',NULL,-1);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOrderType','Spare','备件名额','Spare',NULL,-1);
