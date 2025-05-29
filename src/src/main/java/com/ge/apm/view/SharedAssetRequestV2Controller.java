@@ -3,6 +3,7 @@ package com.ge.apm.view;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
@@ -20,6 +21,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import javaslang.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
@@ -128,6 +130,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String selectedSartId;
 
     private String workflowConfigJson;
+
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
 
     public String getFilterApplyTime() {
@@ -2503,6 +2507,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            if(selected.getSignatureId()!=null){
+                UserAccount userAccount = UserContextService.getCurrentUserAccount();
+                SystemEventAudit systemEventAudit =systemEventAuditAopAspect.buildEventAudit(userAccount, SystemEventAuditEnum.SHARED_RETURN_SIGNATURE, selected.getId(), true, null,"shared_asset_request",null);
+                systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
             }
             initSignatureContent();
     }
