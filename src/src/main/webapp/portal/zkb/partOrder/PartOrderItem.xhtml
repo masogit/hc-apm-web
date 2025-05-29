@@ -28,7 +28,7 @@
                             <label class="label">配件数量*</label>
                         </c:otherwise>
                     </c:choose>
-                    <p:spinner id="courseCount" value="#{zkbPartOrderEditController.zkbPartOrderItem.prePartQty}" min="1" max="1000" />
+                    <p:spinner id="courseCount" value="#{zkbPartOrderEditController.zkbPartOrderItem.prePartQty}" min="1" max="10000000" />
                 </h:panelGroup>
                 <c:if test="#{zkbPartOrderEditController.checkPcbMvsTotal()}">
                     <h:panelGroup>
