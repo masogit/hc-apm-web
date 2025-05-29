@@ -1,7 +1,9 @@
 package com.ge.apm.service.wo;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
@@ -22,6 +24,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.apache.fop.fonts.type1.AdobeStandardEncoding.a;
+import static org.apache.fop.fonts.type1.AdobeStandardEncoding.i;
 
 /**
  * Created by 212605082 on 2017/7/25.
@@ -90,6 +97,9 @@ public class WorkOrderExportService {
     private ExternalTempUserRepository externalTempUserDao;
     @Autowired
     private MicroServiceUtil microServiceUtil;
+
+    @Autowired
+    private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg, OrgInfo clinicalDepte) {
         String token = UserContextService.getAccessToken();
@@ -436,6 +446,31 @@ public class WorkOrderExportService {
             approvalsMap.get(i.getBusinessUid()).add(i);
         });
 
+        Map<String, List<MultiLevelApproval>> actualApprovalsMap = new HashMap<>();
+        HashSet<String> configApproveUids = new HashSet<>();
+
+        for (Map.Entry<String, List<MultiLevelApproval>> listEntry : approvalsMap.entrySet()) {
+            List<MultiLevelApproval> value = listEntry.getValue();
+            List<MultiLevelApproval> collect = value.stream().filter(item -> item.getApprovalStatus() == 2 || item.getApprovalStatus() == 1).collect(Collectors.toList());
+            Optional<MultiLevelApproval> maxMultiLevelApproval = collect.stream().max(Comparator.comparing(MultiLevelApproval::getCreatedDate));
+            if(maxMultiLevelApproval.isPresent()){
+                MultiLevelApproval multiLevelApproval = maxMultiLevelApproval.get();
+                Integer approvalLevelNow = multiLevelApproval.getApprovalLevelNow()==0?multiLevelApproval.getApprovalLevel():multiLevelApproval.getApprovalLevelNow();
+                List<MultiLevelApproval> collect1 = collect.stream().filter(item -> item.getApprovalNumber().equals(multiLevelApproval.getApprovalNumber())  &&  item.getApprovalLevel()<approvalLevelNow   ).collect(Collectors.toList());
+                List<MultiLevelApproval> collect2 = new ArrayList<>(collect1.stream().collect(Collectors.toMap(MultiLevelApproval::getApprovalLevel, Function.identity(), (o1, o2) -> o1.getCreatedDate().after(o2.getCreatedDate()) ? o1 : o2)).values());
+                actualApprovalsMap.putIfAbsent(multiLevelApproval.getBusinessUid(), new ArrayList<>());
+                collect2.add(multiLevelApproval);
+                actualApprovalsMap.get(multiLevelApproval.getBusinessUid()).addAll(collect2);
+                configApproveUids.add(multiLevelApproval.getWorkflowConfigApproveUid());
+            }
+        }
+//        approvalsMap= actualApprovalsMap;
+//        List<MultiLevelApprovalConfig> approvalConfigs = multiLevelApprovalConfigRepository.getByIds(new ArrayList<>(configApproveUids));
+//        Map<String, MultiLevelApprovalConfig> configMap = approvalConfigs.stream().collect(Collectors.toMap(MultiLevelApprovalConfig::getId, i -> i));
+//
+
+
+
         workOrderdata.stream().forEach(m -> {
             String woid = (String) m.get("woId");
             m.put(WebUtil.getMessage("OuterRepairOrgName"), Optional.ofNullable(externalTempUserDao.findByWoId(woid)).map(ExternalTempUser::getComName).orElse(null));
@@ -443,13 +478,13 @@ public class WorkOrderExportService {
             m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a -> a.getPurchasePrice() == null ? a.getPurchasePrice() : new BigDecimal(a.getPurchasePrice())).orElse(null));
             m.put("采购日期", Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
                     .map(a -> a.getPurchaseDate()).orElse(null));
-            m.put("auditSignatureList", Optional.ofNullable(approvalsMap.get(woid))
+            m.put("auditSignatureList", Optional.ofNullable(actualApprovalsMap.get(woid))
                     .map(o -> o.stream().map(MultiLevelApproval::getAuditSignature).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
-            m.put("auditOpinionList", Optional.ofNullable(approvalsMap.get(woid))
+            m.put("auditOpinionList", Optional.ofNullable(actualApprovalsMap.get(woid))
                     .map(o -> o.stream().map(MultiLevelApproval::getApprovalOpinion).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
-            m.put("auditDateList", Optional.ofNullable(approvalsMap.get(woid))
+            m.put("auditDateList", Optional.ofNullable(actualApprovalsMap.get(woid))
                     .map(o -> o.stream().map(MultiLevelApproval::getActualApproverDate).filter(ObjectUtil::isNotEmpty).map(date -> DateUtil.format(date, DatePattern.NORM_DATETIME_PATTERN)).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
 
@@ -488,6 +523,39 @@ public class WorkOrderExportService {
                 m.put("partsPicture", partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
                 m.put("parts_picture_table", getPartsPictureTable(byWoId,partPictures));
             }
+
+            HashMap<String, String> approvalMap= new HashMap<>();
+            List<MultiLevelApproval> multiLevelApprovals1 = actualApprovalsMap.get(woid);
+            if(CollectionUtils.isNotEmpty(multiLevelApprovals1)){
+                ArrayList<String> approvalMapKey = new ArrayList<>();
+                for (MultiLevelApproval multiLevelApproval : multiLevelApprovals1) {
+//                    MultiLevelApprovalConfig multiLevelApprovalConfig = configMap.get(multiLevelApproval.getWorkflowConfigApproveUid());
+//                    String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+//                    List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){});
+//                    for (int i = 0; i < approvalNodes.size(); i++) {
+//                        ApprovalNode node = approvalNodes.get(i);
+//                        node.setNodeId(i + 1);
+//                    }
+//                    List<ApprovalNode> collect = approvalNodes.stream().filter(item -> Objects.equals(item.getNodeId(), multiLevelApproval.getApprovalLevel())).collect(Collectors.toList());
+                        int approvalLevel = multiLevelApproval.getApprovalLevel() - 1;
+                        approvalMap.put("audit_signature_title"+approvalLevel,"审核人签名:");
+                        approvalMap.put("audit_opinion_title"+approvalLevel,"备件审核意见:");
+                        approvalMap.put("audit_date_title"+approvalLevel,"备件审核时间:");
+                        if(multiLevelApproval.getApprovalNodeStatus()==2){
+                            approvalMap.put("auditSignatureList"+approvalLevel,multiLevelApproval.getAuditSignature());
+                            approvalMap.put("auditOpinionList"+approvalLevel,multiLevelApproval.getApprovalOpinion());
+                            approvalMap.put("auditDateList"+approvalLevel,DateUtil.format(multiLevelApproval.getActualApproverDate(), DatePattern.NORM_DATETIME_PATTERN));
+                            approvalMapKey.add("auditSignatureList"+approvalLevel);
+                        }
+
+
+
+                }
+                m.put("approvalMap",approvalMap);
+                m.put("approvalMapKey",approvalMapKey);
+            }
+
+
         });
 
         return workOrderdata;
