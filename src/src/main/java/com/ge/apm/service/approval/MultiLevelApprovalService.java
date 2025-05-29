@@ -1210,6 +1210,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             date.setActualApproverName(null);
                             date.setActualApproverDate(null);
                             date.setApprovalOpinion(null);
+                            date.setAuditSignature(null);
                             //生成下条待审批数据
                             MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                             String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
@@ -1367,6 +1368,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             date.setActualApproverName(null);
                             date.setActualApproverDate(null);
                             date.setApprovalOpinion(null);
+                            date.setAuditSignature(null);
                             //生成下条待审批数据
                             MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                             String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
@@ -1987,6 +1989,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         date.setActualApproverName(null);
                         date.setActualApproverDate(null);
                         date.setApprovalOpinion(null);
+                        date.setAuditSignature(null);
                         //生成下条待审批数据
                         MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                         String  linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
@@ -2127,6 +2130,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         date.setActualApproverName(null);
                         date.setActualApproverDate(null);
                         date.setApprovalOpinion(null);
+                        date.setAuditSignature(null);
                         //生成下条待审批数据
                         MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
 
