@@ -166,57 +166,57 @@ public class WorkOrderDocxRenderService {
         mapESign(source, target, "signature", "signature_title", "审核人签名： ");
         mapESign(source, target, "ack_signature", "ack_signature_title", "验收人签名： ");
         int size=0;
-        if (source.containsKey("auditSignatureList")) {
-           List<String> auditSignatures= (List)source.get("auditSignatureList");
-            log.info("auditSignatures:{}",auditSignatures.size());
-           if (auditSignatures!=null && !auditSignatures.isEmpty()){
-                size = auditSignatures.size();
-               for (int i = 0; i < size; i++) {
-                   String storageId = auditSignatures.get(i);
-                   if (storageId !=null){
-                       log.info("storageId:{}",storageId);
-                       mapESignSignature(storageId, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
-                   }
-               }
-           }
-        }
-        if(size<5){
-            for (int i = size; i < 5; i++) {
-                mapESignSignature(null, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
-            }
-        }
-        size=0;
-        if (source.containsKey("auditOpinionList")) {
-            List<String> auditOpinionList= (List) source.get("auditOpinionList");
-            size = auditOpinionList.size();
-            for (int i = 0; i < size; i++) {
-                String opinion = auditOpinionList.get(i);
-                target.put("audit_opinion_title" + i, "备件审核意见： ");
-                target.put("auditOpinionList" + i, opinion);
-            }
-        }
-        if(size<5){
-            for (int i = size; i < 5; i++) {
-                target.put("audit_opinion_title" + i, "");
-                target.put("auditOpinionList" + i, "");
-            }
-        }
-        size=0;
-        if (source.containsKey("auditDateList")) {
-            List<String> auditDateList= (List) source.get("auditDateList");
-            size = auditDateList.size();
-            for (int i = 0; i < size; i++) {
-                String date = auditDateList.get(i);
-                target.put("audit_date_title" + i, "备件审核时间： ");
-                target.put("auditDateList" + i, date);
-            }
-        }
-        if(size<5){
-            for (int i = size; i < 5; i++) {
-                target.put("audit_date_title" + i, "");
-                target.put("auditDateList" + i, "");
-            }
-        }
+//        if (source.containsKey("auditSignatureList")) {
+//           List<String> auditSignatures= (List)source.get("auditSignatureList");
+//            log.info("auditSignatures:{}",auditSignatures.size());
+//           if (auditSignatures!=null && !auditSignatures.isEmpty()){
+//                size = auditSignatures.size();
+//               for (int i = 0; i < size; i++) {
+//                   String storageId = auditSignatures.get(i);
+//                   if (storageId !=null){
+//                       log.info("storageId:{}",storageId);
+//                       mapESignSignature(storageId, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
+//                   }
+//               }
+//           }
+//        }
+//        if(size<5){
+//            for (int i = size; i < 5; i++) {
+//                mapESignSignature(null, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
+//            }
+//        }
+//        size=0;
+//        if (source.containsKey("auditOpinionList")) {
+//            List<String> auditOpinionList= (List) source.get("auditOpinionList");
+//            size = auditOpinionList.size();
+//            for (int i = 0; i < size; i++) {
+//                String opinion = auditOpinionList.get(i);
+//                target.put("audit_opinion_title" + i, "备件审核意见： ");
+//                target.put("auditOpinionList" + i, opinion);
+//            }
+//        }
+//        if(size<5){
+//            for (int i = size; i < 5; i++) {
+//                target.put("audit_opinion_title" + i, "");
+//                target.put("auditOpinionList" + i, "");
+//            }
+//        }
+//        size=0;
+//        if (source.containsKey("auditDateList")) {
+//            List<String> auditDateList= (List) source.get("auditDateList");
+//            size = auditDateList.size();
+//            for (int i = 0; i < size; i++) {
+//                String date = auditDateList.get(i);
+//                target.put("audit_date_title" + i, "备件审核时间： ");
+//                target.put("auditDateList" + i, date);
+//            }
+//        }
+//        if(size<5){
+//            for (int i = size; i < 5; i++) {
+//                target.put("audit_date_title" + i, "");
+//                target.put("auditDateList" + i, "");
+//            }
+//        }
         size=0;
         if (source.containsKey("serviceRequestPicture")) {
             List<String> serviceRequestPicture= (List)source.get("serviceRequestPicture");
@@ -306,30 +306,30 @@ public class WorkOrderDocxRenderService {
         }
 
 
-//        if (source.containsKey("approvalMap")) {
-//            HashMap<String, String> approvalMap= (HashMap<String, String>) source.get("approvalMap");
-//            target.putAll(approvalMap);
-//        }
-//        if (source.containsKey("approvalMapKey")) {
-//            List<String> approvalMapKey = (List<String>) source.get("approvalMapKey");
-//            for (String approvalKey : approvalMapKey) {
-//                if(target.get(approvalKey)!=null){
-//                    String storageId = (String) target.get(approvalKey);
-//
-//                    byte[] blob = getBlobSignature( storageId);
-//                    if (blob != null) {
-//                        target.put(approvalKey, new PictureRenderData(100, 75, PictureType.PNG, blob));
-//                    } else {
-//                        target.put(approvalKey, EMPTY_PICTURE);
-//                    }
-//                }else{
-//                    target.put(approvalKey, EMPTY_PICTURE);
-//                }
-//
-//            }
-//
-//
-//        }
+        if (source.containsKey("approvalMap")) {
+            HashMap<String, String> approvalMap= (HashMap<String, String>) source.get("approvalMap");
+            target.putAll(approvalMap);
+        }
+        if (source.containsKey("approvalMapKey")) {
+            List<String> approvalMapKey = (List<String>) source.get("approvalMapKey");
+            for (String approvalKey : approvalMapKey) {
+                if(target.get(approvalKey)!=null){
+                    String storageId = (String) target.get(approvalKey);
+
+                    byte[] blob = getBlobSignature( storageId);
+                    if (blob != null) {
+                        target.put(approvalKey, new PictureRenderData(100, 75, PictureType.PNG, blob));
+                    } else {
+                        target.put(approvalKey, EMPTY_PICTURE);
+                    }
+                }else{
+                    target.put(approvalKey, EMPTY_PICTURE);
+                }
+
+            }
+
+
+        }
 
         return target;
     }
