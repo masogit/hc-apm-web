@@ -245,8 +245,8 @@
                                             <label class="label">#{msg.patProblems}2</label>
                                             <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
                                         </h:panelGroup>
-                                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').rendered}">
-                                            <label class="label"> #{systemConfigItemController.getFieldColumn(workOrderMgrController.selectedObjectMap['selectedOrg'], 'showWorkOrderType').label}</label>
+                                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').rendered}">
+                                            <label class="label"> #{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').label}</label>
                                             <p:outputLabel value="#{fieldMsg.fieldValue('workOrderType', woItem.workOrderType)}" />
                                         </h:panelGroup>
                                         <h:panelGroup>
