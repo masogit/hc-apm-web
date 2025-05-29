@@ -524,11 +524,11 @@ public class WorkOrderExportService {
                 m.put("parts_picture_table", getPartsPictureTable(byWoId,partPictures));
             }
 
-//            HashMap<String, String> approvalMap= new HashMap<>();
-//            List<MultiLevelApproval> multiLevelApprovals1 = actualApprovalsMap.get(woid);
-//            if(CollectionUtils.isNotEmpty(multiLevelApprovals1)){
-//                ArrayList<String> approvalMapKey = new ArrayList<>();
-//                for (MultiLevelApproval multiLevelApproval : multiLevelApprovals1) {
+            HashMap<String, String> approvalMap= new HashMap<>();
+            List<MultiLevelApproval> multiLevelApprovals1 = actualApprovalsMap.get(woid);
+            if(CollectionUtils.isNotEmpty(multiLevelApprovals1)){
+                ArrayList<String> approvalMapKey = new ArrayList<>();
+                for (MultiLevelApproval multiLevelApproval : multiLevelApprovals1) {
 //                    MultiLevelApprovalConfig multiLevelApprovalConfig = configMap.get(multiLevelApproval.getWorkflowConfigApproveUid());
 //                    String approvalItem = multiLevelApprovalConfig.getApprovalItem();
 //                    List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){});
@@ -537,29 +537,20 @@ public class WorkOrderExportService {
 //                        node.setNodeId(i + 1);
 //                    }
 //                    List<ApprovalNode> collect = approvalNodes.stream().filter(item -> Objects.equals(item.getNodeId(), multiLevelApproval.getApprovalLevel())).collect(Collectors.toList());
-//                    if(CollectionUtils.isNotEmpty(collect)){
-//                        ApprovalNode approvalNode = collect.get(0);
-//                        approvalMap.put(approvalNode.getNodeName()+"auditSignatureTitle","审核人签名:");
-//                        approvalMap.put(approvalNode.getNodeName()+"auditOpinionTitle","备件审核意见:");
-//                        approvalMap.put(approvalNode.getNodeName()+"auditDateTitle","备件审核时间:");
-//                        approvalMap.put(approvalNode.getNodeName()+"auditSignature",multiLevelApproval.getAuditSignature());
-//                        approvalMap.put(approvalNode.getNodeName()+"auditOpinion",multiLevelApproval.getApprovalOpinion());
-//                        approvalMap.put(approvalNode.getNodeName()+"auditDate",DateUtil.format(multiLevelApproval.getActualApproverDate(), DatePattern.NORM_DATETIME_PATTERN));
-//                        approvalMapKey.add(approvalNode.getNodeName()+"auditSignature");
-//                    }else{
-//                        approvalMap.put(multiLevelApproval.getApprovalLevel()+"auditSignatureTitle","审核人签名:");
-//                        approvalMap.put(multiLevelApproval.getApprovalLevel()+"auditOpinionTitle","备件审核意见:");
-//                        approvalMap.put(multiLevelApproval.getApprovalLevel()+"auditDateTitle","备件审核时间:");
-//                        approvalMap.put(multiLevelApproval.getApprovalLevel()+"auditSignature",multiLevelApproval.getAuditSignature());
-//                        approvalMap.put(multiLevelApproval.getApprovalLevel()+"auditOpinion",multiLevelApproval.getApprovalOpinion());
-//                        approvalMap.put(multiLevelApproval.getApprovalLevel()+"auditDate",DateUtil.format(multiLevelApproval.getActualApproverDate(), DatePattern.NORM_DATETIME_PATTERN));
-//                        approvalMapKey.add(multiLevelApproval.getApprovalLevel()+"auditSignature");
-//                    }
-//
-//                }
-//                m.put("approvalMap",approvalMap);
-//                m.put("approvalMapKey",approvalMapKey);
-//            }
+                        int approvalLevel = multiLevelApproval.getApprovalLevel() - 1;
+                        approvalMap.put("audit_signature_title"+approvalLevel,"审核人签名:");
+                        approvalMap.put("audit_opinion_title"+approvalLevel,"备件审核意见:");
+                        approvalMap.put("audit_date_title"+approvalLevel,"备件审核时间:");
+                        approvalMap.put("auditSignatureList"+approvalLevel,multiLevelApproval.getAuditSignature());
+                        approvalMap.put("auditOpinionList"+approvalLevel,multiLevelApproval.getApprovalOpinion());
+                        approvalMap.put("auditDateList"+approvalLevel,DateUtil.format(multiLevelApproval.getActualApproverDate(), DatePattern.NORM_DATETIME_PATTERN));
+                        approvalMapKey.add("auditSignatureList"+approvalLevel);
+
+
+                }
+                m.put("approvalMap",approvalMap);
+                m.put("approvalMapKey",approvalMapKey);
+            }
 
 
         });
