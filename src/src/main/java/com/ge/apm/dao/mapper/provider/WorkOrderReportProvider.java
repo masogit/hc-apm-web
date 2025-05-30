@@ -414,12 +414,7 @@ public class WorkOrderReportProvider {
                         }
                     }else if(tempColumn.equals("srNum")){
                         sb.append(" and sr.sr_num = '").append(value).append("'");
-                    }else if(tempColumn.equals("orgUID")){
-                        sb.append(" and (wo.tenant_uid='" + value + "' or wo.institution_uid='" + value + "' or wo.hospital_uid='" + value + "' or wo.site_uid='" + value + "') ");
-                    }else if(tempColumn.equals("tenantUID")){
-                        sb.append(" and (wo.tenant_uid='").append(value).append("') ");
                     }
-
                 }
             }
         }
