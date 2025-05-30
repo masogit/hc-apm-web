@@ -238,6 +238,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
         nurseSiteMaintainService = WebUtil.getBean( NurseSiteMaintainService.class);
         v2_workOrderService = WebUtil.getBean(V2_WorkOrderService.class);
+        systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         sharedAssetRequests = new ArrayList<>();
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
@@ -2508,12 +2509,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     e.printStackTrace();
                 }
             }
-            if(selected.getSignatureId()!=null){
-                UserAccount userAccount = UserContextService.getCurrentUserAccount();
-                SystemEventAudit systemEventAudit =systemEventAuditAopAspect.buildEventAudit(userAccount, SystemEventAuditEnum.SHARED_RETURN_SIGNATURE, selected.getId(), true, null,"shared_asset_request",null);
-                systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
-            }
             initSignatureContent();
+        if(selected.getSignatureId()!=null){
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            SystemEventAudit systemEventAudit =systemEventAuditAopAspect.buildEventAudit(userAccount, SystemEventAuditEnum.SHARED_RETURN_SIGNATURE, selected.getId(), true, null,"shared_asset_request",null);
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }
     }
 
     public void resetSignature() {
