@@ -647,7 +647,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
             blobObject.setBoUuid(selected.getId());
-            if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
+            if(activeSupplier() && StringUtils.isNotEmpty(selected.getContractNum())){//已激活的供应商：使用合同号作为BoUuid
                 blobObject.setBoUuid(selected.getContractNum());
             }
             blobObject.setBoSubType(type);
