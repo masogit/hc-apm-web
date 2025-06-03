@@ -25,3 +25,6 @@ ALTER TABLE public.v2_blob_object ALTER COLUMN object_storage_id TYPE bpchar(24)
 insert into i18n_type_manage_tenant(id,type_manage_id,type,admin_edit,tenant_id,tenant_uid) select replace(uuid_generate_v4()::text,'-',''),id,type,admin_edit,tiid,uid  from (select  tm.id,tm.type,tm.admin_edit,ti.id as tiId,ti.uid,im.msg_type  from  i18n_type_manage  tm left join i18n_message im on tm.msg_type = im.msg_type left join tenant_info ti on im.site_id = ti.id  where tm.id is not null and im.site_id != -1 and (tm.type = 1 or tm.admin_edit = true) and ti.id is not null) t where not exists(select *  from i18n_type_manage_tenant where type_manage_id = t.id and tenant_uid = t.uid) group by id,type,admin_edit,tiid,uid;
 -- YHAAO-25200
 CREATE INDEX IF NOT EXISTS idx_work_order_asset_uid ON public.v2_work_order USING btree (asset_uid);
+
+-- his增加索引
+CREATE INDEX IF NOT exists idx_his_equipment_is_sum_exec_time ON public.his_equipment_data_source_split (is_sum, exec_time);
