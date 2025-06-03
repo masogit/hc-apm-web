@@ -214,7 +214,7 @@ public class AssetInstallationService {
         List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(temp.getId())).orElse(new ArrayList<>())
                 .stream().filter(item -> item.getBoSubType().contains("asset") || item.getBoSubType().contains("business") || item.getBoSubType().contains("clinical") || item.getBoSubType().contains("technical") || item.getBoSubType().contains("fixasset") || item.getBoSubType().contains("CustomizedAssetAttachmentCategory")).collect(Collectors.toList());
         assetPicList.addAll(getPicList(temp.getArrivalListId()));
-        if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
+        if(activeSupplier() && StringUtils.isNotBlank(temp.getArrivalList().getContractNum())){//已激活的供应商：使用合同号作为BoUuid
             assetPicList.addAll(getPicList(temp.getArrivalList().getContractNum()));
         }
         assetPicList.forEach(item -> {
