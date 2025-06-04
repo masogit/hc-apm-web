@@ -80,28 +80,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
                 if (!blobObject.isImageType()) {
                     String objectName = blobObject.getObjectName();
                     String type = objectName.substring(objectName.lastIndexOf(".") + 1).toLowerCase();
-                    switch (type) {
-                        case "xlsx":
-                        case "xls":
-                            return ImageConstant.EXCEL_DEFAULT_BASE64;
-                        case "docx":
-                        case "doc":
-                            return ImageConstant.WORD_DEFAULT_BASE64;
-                        case "pptx":
-                        case "ppt":
-                            return ImageConstant.PPT_DEFAULT_BASE64;
-                        case "zip":
-                        case "rar":
-                            return ImageConstant.ZIP_DEFAULT_BASE64;
-                        case "pdf":
-                            return ImageConstant.PDF_DEFAULT_BASE64;
-                        case "txt":
-                            return ImageConstant.TXT_DEFAULT_BASE64;
-                        case "mp4":
-                            return ImageConstant.MP4_DEFAULT_BASE64;
-                        default:
-                            break;
-                    }
+                    return getDefaultImage(type);
                 }
             }
             HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
@@ -114,6 +93,43 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             e.printStackTrace();
         }
         return res;
+    }
+
+    List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg");
+
+    public String getImgBase64ByStream(TempFileUtil tempFileUtil) {
+        String fileName = tempFileUtil.getFileName();
+        String type = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        if (imageTypeList.contains(type.toLowerCase())) {
+            return "data:image/jpeg;base64," + Base64Utils.encodeToString(tempFileUtil.getContents());
+        }
+        return getDefaultImage(type);
+    }
+
+    private String getDefaultImage(String type) {
+        switch (type) {
+            case "xlsx":
+            case "xls":
+                return ImageConstant.EXCEL_DEFAULT_BASE64;
+            case "docx":
+            case "doc":
+                return ImageConstant.WORD_DEFAULT_BASE64;
+            case "pptx":
+            case "ppt":
+                return ImageConstant.PPT_DEFAULT_BASE64;
+            case "zip":
+            case "rar":
+                return ImageConstant.ZIP_DEFAULT_BASE64;
+            case "pdf":
+                return ImageConstant.PDF_DEFAULT_BASE64;
+            case "txt":
+                return ImageConstant.TXT_DEFAULT_BASE64;
+            case "mp4":
+                return ImageConstant.MP4_DEFAULT_BASE64;
+            default:
+                break;
+        }
+        return "";
     }
 
     public StreamedContent downloadSingleFile(String fileId) {
