@@ -15,6 +15,7 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.*;
@@ -100,6 +101,10 @@ public class FileDownloadService {
 
     public String getImgBase64(String fileId) {
         return msService.getImgBase64(fileId);
+    }
+
+    public String getImgBase64ByStream(TempFileUtil tempFileUtil) {
+        return msService.getImgBase64ByStream(tempFileUtil);
     }
 
     public void getImgBase64ForReq() {

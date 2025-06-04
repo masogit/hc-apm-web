@@ -421,7 +421,8 @@
                                     <p:dataGrid id="injuryPerformance" var="fileitem" value="#{adverseEventManagementController.injuryPerformance}" columns="5" layout="grid">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
-                                                <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>
+<!--                                                <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>-->
+                                                <img src="#{fileDownloadService.getImgBase64ByStream(fileitem)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
                                                 <p:commandLink  value="#{fileitem.fileName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}" ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeTempHarmPerform(fileitem)}" update="injuryPerformance" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -449,7 +450,8 @@
                                     <p:dataGrid id="mechanicalFailure" var="fileitem" value="#{adverseEventManagementController.mechanicalFailure}" columns="5" layout="grid">
                                         <p:panel  style="text-align:center">
                                             <h:panelGrid columns="1" style="width:100%" >
-                                                <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>
+<!--                                                <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>-->
+                                                <img src="#{fileDownloadService.getImgBase64ByStream(fileitem)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
                                                 <p:commandLink  value="#{fileitem.fileName}" actionListener="#{adverseEventManagementController.exportFile(fileitem)}"    ajax="false"  styleClass="p-mr-2"/>
                                                 <p:commandButton actionListener="#{adverseEventManagementController.removeTempDeviceFaultPerform(fileitem)}" update="mechanicalFailure" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this" readonly="#{adverseEventManagementController.readOnlyCreateForm}">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
