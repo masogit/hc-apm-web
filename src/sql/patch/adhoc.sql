@@ -1,30 +1,3 @@
--- YHAAO-24866 添加合同、供应商附件类型必填项
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, validation, value_type)select replace(uuid_generate_v4()::text,'-',''), 1, '', '合同附件类型必填项', 'contractBlobRequired', '合同附件类型必填项', 'f', 't', '[{"key":"01.中标通知","value":"WinningBidNotice"},{"key":"02.招标文件、投标文件（若有）","value":"TenderingBidding"},{"key":"03.采购合同/协议书","value":"PurchaseContractAgreement"},{"key":"04.供应商营业执照、医疗器械生产/经营许可证、税务证（电子版）","value":"SupplierBusinessLicense"},{"key":"05.供应商产品授权书","value":"SupplierProductAuthorizationLetter"},{"key":"06.产品医疗器械注册证","value":"MedicalDeviceRegistrationCertificate"},{"key":"07.产品配置清单","value":"ProductConfigurationList"},{"key":"08.报关单（进口商品需提供）","value":"CustomsDeclaration"},{"key":"09.商检单（进口商品若有需提供）","value":"InspectionForm"},{"key":"10.发票复印件","value":"CopyOfInvoice"},{"key":"11.产品到货接收表（物流单或到货单或器械科工程师/使用科室人员收货确认签字单）","value":"ProductArrivalReceiptForm"},{"key":"12.产品合格证明资料","value":"ProductQualificationCertificateInformation"},{"key":"13.产品技术指标参数","value":"SpecificationsParameters"},{"key":"14.使用前临床安装验收报告（若有）","value":"InstallationAcceptanceReport"},{"key":"15.使用前产品检验检测报告或证书（若有）","value":"InspectionTestingReport"},{"key":"16.使用前临床培训资料、维修培训资料、培训表纸质、课件图片","value":"UseTrainingMaterials"},{"key":"17.验收单","value":"AcceptanceForm"},{"key":"18.验收清单","value":"AcceptanceFormList"},{"key":"19.使用说明书（操作规程）","value":"UserManual"},{"key":"20.维修作业指导材料（维修手册）","value":"MaintenanceManual"},{"key":"21.售后服务承诺（电子版）","value":"AfterServiceCommitment"},{"key":"22.易损易耗件清单（电子版）","value":"LossesList"},{"key":"23.售后服务网点资料（电子版）","value":"AfterServiceNetwork"},{"key":"24.其它","value":"Other"},{"key":"25.合同文件","value":"ContractDocuments"},{"key":"26.招投标文件","value":"Tenders"},{"key":"27.补充协议书","value":"SupplementaryAgreement"}]', 8 where not exists(select * from config_item where key = 'contractBlobRequired');
-
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text,'-',''), 4, '{"rendered":false,"label":"工单分类","required":"false","requiredMessage":"工单分类为必输项, 不能为空！"}', '维修工单中工单分类字段配置', 'showWorkOrderType', '工单分类', 'f','t',9 where not exists(select * from config_item where key = 'showWorkOrderType');
-insert into i18n_type_manage (id,msg_type, name) select replace(uuid_generate_v4()::text,'-',''), 'workOrderType','工单分类' where not exists(select * from i18n_type_manage where msg_type = 'workOrderType');
-
--- 保养节点步骤状态修改
-update v2_pm_order_step set step_id='Accept' where step_id='accept';
-
-
-
---YHAAO-25135
-update sys_role set home_page = '/portal/homeNurse1.xhtml' where  home_page = '/homeHead.xhtml';
-
---YHAAO-25142
-ALTER TABLE public.v2_work_order_step ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
-ALTER TABLE public.v2_work_order_coworker ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
-ALTER TABLE public.v2_work_order_man_hours ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
-ALTER TABLE public.v2_work_order_detail ALTER COLUMN wo_id TYPE bpchar(32) USING wo_id::bpchar;
-
-ALTER TABLE public.v2_blob_object ALTER COLUMN bo_uuid TYPE bpchar(32) USING bo_uuid::bpchar;
-ALTER TABLE public.v2_blob_object ALTER COLUMN object_storage_id TYPE bpchar(24) USING object_storage_id::bpchar;
-
-
-insert into i18n_type_manage_tenant(id,type_manage_id,type,admin_edit,tenant_id,tenant_uid) select replace(uuid_generate_v4()::text,'-',''),id,type,admin_edit,tiid,uid  from (select  tm.id,tm.type,tm.admin_edit,ti.id as tiId,ti.uid,im.msg_type  from  i18n_type_manage  tm left join i18n_message im on tm.msg_type = im.msg_type left join tenant_info ti on im.site_id = ti.id  where tm.id is not null and im.site_id != -1 and (tm.type = 1 or tm.admin_edit = true) and ti.id is not null) t where not exists(select *  from i18n_type_manage_tenant where type_manage_id = t.id and tenant_uid = t.uid) group by id,type,admin_edit,tiid,uid;
--- YHAAO-25200
-CREATE INDEX IF NOT EXISTS idx_work_order_asset_uid ON public.v2_work_order USING btree (asset_uid);
-
--- his增加索引
-CREATE INDEX IF NOT exists idx_his_equipment_is_sum_exec_time ON public.his_equipment_data_source_split (is_sum, exec_time);
+-- YHAAO-25105
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text,'-',''), 13, 'true', '科室借调流程简化', 'enableSimpleDepartmentSecondment', '开启科室借调流程简化', 'f','t',3 where not exists(select * from config_item where key = 'enableSimpleDepartmentSecondment');
+insert into public.config_item_value(uid, hospital_uid, institution_uid, key, site_uid, tenant_uid, value) select replace(uuid_generate_v4()::text, '-', ''), t.hospital_uid, t.institution_uid, 'enableSimpleDepartmentSecondment', t.site_uid, t.tenant_uid, 'false' FROM workflow_config t WHERE t.enable_site_to_site_allocation = true AND NOT EXISTS ( SELECT 1 FROM config_item_value civ WHERE civ.key = 'enableSimpleDepartmentSecondment' AND civ.site_uid = t.site_uid);

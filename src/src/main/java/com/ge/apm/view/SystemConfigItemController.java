@@ -5,6 +5,8 @@ import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.FieldColumnDto;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -22,6 +24,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.Base64Utils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -50,6 +53,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private ConfigItemValueRepository configItemValueRepository;
     private OrgInfoRepository orgInfoRepository;
     private UaaService uaaService;
+    private SharedAssetService sharedAssetService;
 
     private OrgInfo selectSite;
     private UserAccount user;
@@ -74,6 +78,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        sharedAssetService = WebUtil.getBean(SharedAssetService.class);
         user = UserContextService.getCurrentUserAccount();
 
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
@@ -461,6 +466,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     public FieldColumnDto getFieldColumn(OrgInfo orgInfo, String key) {
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(orgInfo.getSiteUID(), orgInfo.getHospitalUID(), orgInfo.getInstitutionUID(), orgInfo.getTenantUID(), key);
         return JSON.parseObject(value, FieldColumnDto.class);
+    }
+
+    public void siteToSiteAutoAck(ConfigItem item){
+        ConfigItemValue configItemValue = item.getConfigItemValue();
+        String siteUid = configItemValue.getSiteUid();
+        sharedAssetService.asynRemoteCall(GatewayURL.SITE_TO_SITE_AUTO_ACK, HttpMethod.GET,new HashMap<>(),(url)->url+"?siteUID="+siteUid);
     }
 
     public List<String> getMultiSelectedList(String key) {

@@ -4,6 +4,7 @@ import com.ge.apm.dao.SiteToSiteAllocationRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.SiteToSiteAllocation;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -39,6 +40,9 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
     private Date returnAtTime;
     private List<DepartmentSecondmentProcess> process;
     private UserAccountRepository userAccountRepository;
+    private ConfigItemService configItemService;
+    private final String key = "enableSimpleDepartmentSecondment";
+    private Boolean enableSimple = Boolean.FALSE;
     @Override
     protected SiteToSiteAllocationRepository getDAO() {
         return dao;
@@ -49,6 +53,8 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         dao=WebUtil.getBean(SiteToSiteAllocationRepository.class);
         uuaService=WebUtil.getBean(UaaService.class);
         userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
+        configItemService=WebUtil.getBean(ConfigItemService.class);
+        enableSimple = configItemService.getConfigItemByKey(key,UserContextService.getCurrentUserAccount());
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -162,6 +168,9 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         if(!CollectionUtils.isEmpty(strings)){
             List<UserAccount> userAccounts = userAccountRepository.findByUidIn(strings);
             Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
+            UserAccount userAccount = new UserAccount();
+            userAccount.setName("系统确认");
+            collect.put("-1",userAccount);
             addNode("借入待确认",collect.get(target.getBorrowerAck()),target.getBorrowerAckDate());
             addNode("借入待确认(主任)",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
             addNode("借出待确认(主任)",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
@@ -194,11 +203,25 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         process.add(processNode);
     }
 
+    public void autoConfirm(){
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        String siteUID = currentUserAccount.getSiteUID();
+
+    }
+
     public List<DepartmentSecondmentProcess> getProcess() {
         return process;
     }
 
     public void setProcess(List<DepartmentSecondmentProcess> process) {
         this.process = process;
+    }
+
+    public Boolean getEnableSimple() {
+        return enableSimple;
+    }
+
+    public void setEnableSimple(Boolean enableSimple) {
+        this.enableSimple = enableSimple;
     }
 }

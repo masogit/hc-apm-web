@@ -92,87 +92,18 @@
             </h:panelGroup>
 
             <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('enableUnattendedApproval').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableUnattendedApproval').key).concat(')')}</label>
-                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableUnattendedApproval').showValue}" style="width: 15%;">
+                <label class="label">#{systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+                <p:commandButton icon="ui-icon-refresh" actionListener="#{systemConfigItemController.siteToSiteAutoAck(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment'))}" rendered="#{'true'.equalsIgnoreCase(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').showValue)}" value="自动处理历史未完成工单" style="position: relative;left: 20%;bottom: 42%" />
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableUnattendedApproval'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableUnattendedApproval'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('enableUnattendedApproval').configItemValue == null}"/>
-            </h:panelGroup>
-
-            <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('departmentSwitching').name.concat('(').concat(systemConfigItemController.configItemMap.get('departmentSwitching').key).concat(')')}</label>
-                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('departmentSwitching').showValue}" style="width: 15%;">
-                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                </p:selectOneRadio>
-            </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('departmentSwitching'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('departmentSwitching'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('departmentSwitching').configItemValue == null}"/>
-            </h:panelGroup>
-
-            <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('assetScrap').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetScrap').key).concat(')')}</label>
-                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('assetScrap').showValue}" style="width: 15%;">
-                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                </p:selectOneRadio>
-            </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('assetScrap'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('assetScrap'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('assetScrap').configItemValue == null}"/>
-            </h:panelGroup>
-
-            <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('enableSecondmentDepartmentsBetweenHospitals').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableSecondmentDepartmentsBetweenHospitals').key).concat(')')}</label>
-                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableSecondmentDepartmentsBetweenHospitals').showValue}" style="width: 15%;">
-                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                </p:selectOneRadio>
-            </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableSecondmentDepartmentsBetweenHospitals'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableSecondmentDepartmentsBetweenHospitals'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('enableSecondmentDepartmentsBetweenHospitals').configItemValue == null}"/>
-            </h:panelGroup>
-
-            <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('enableMaterialsInterface').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableMaterialsInterface').key).concat(')')}</label>
-                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableMaterialsInterface').showValue}" style="width: 15%;">
-                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                </p:selectOneRadio>
-            </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableMaterialsInterface'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableMaterialsInterface'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('enableMaterialsInterface').configItemValue == null}"/>
-            </h:panelGroup>
-
-            <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('assetReviewMessage').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetReviewMessage').key).concat(')')}</label>
-                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('assetReviewMessage').showValue}" style="width: 15%;">
-                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
-                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                </p:selectOneRadio>
-            </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('assetReviewMessage'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('assetReviewMessage'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('assetReviewMessage').configItemValue == null}"/>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').configItemValue == null}"/>
             </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
