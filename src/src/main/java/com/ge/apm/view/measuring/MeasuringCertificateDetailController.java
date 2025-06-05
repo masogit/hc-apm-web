@@ -11,6 +11,7 @@ import com.ge.apm.service.OCRTemplateService;
 import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.I18nMessageService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
@@ -79,6 +80,15 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         measuringService = WebUtil.getBean(MeasuringService.class);
         ocrTemplateRepository = WebUtil.getBean(OCRTemplateRepository.class);
         systemEventAuditUtil = WebUtil.getBean(SystemEventAuditAopAspect.class);
+        String encodeStr = WebUtil.getRequestParameter("str");
+        String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
+        if("Create".equals(actionName)){
+            try {
+                super.prepareCreate();
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
+        }
     }
 
     public void uploadDataFile(FileUploadEvent event) {
@@ -350,6 +360,13 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         this.contents = null;
         this.contentType = null;
         this.fileName = null;
+    }
+
+    public String createAction() {
+        return UrlEncryptController.encodeUrlParam("measuringCreateDialog?action=Create");
+    }
+    public String getListPageLink() {
+        return "measuringResultMain?faces-redirect=true";
     }
 
 }
