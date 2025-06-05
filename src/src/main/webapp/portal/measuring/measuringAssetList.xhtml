@@ -118,7 +118,7 @@
                     </p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{measuringCertificateDetailController.prepareCreate()}" title="#{msg.Create}" update="measuringTab:measuringCreateDlg" oncomplete="PF('varMeasuringCreateDlg').show()"/>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" action="#{measuringCertificateDetailController.createAction()}" title="#{msg.Create}" />
                         <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUuids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修"/>
                         <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm" disabled="#{empty measureAssetListController.selected}" >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
@@ -200,7 +200,7 @@
                     </p:tree>
                 </p:scrollPanel>
             </p:overlayPanel>
-            <ui:include src="measuringCreateDialog.xhtml" />
+<!--            <ui:include src="measuringCreateDialog.xhtml" />-->
         </div>
     </ui:composition>
 </html>
