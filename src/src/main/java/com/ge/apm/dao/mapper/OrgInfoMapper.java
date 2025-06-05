@@ -36,7 +36,8 @@ public interface OrgInfoMapper {
 
 	@Select({
 			"<script>" +
-					"select oi.* from org_info oi join asset_info ai on oi.uid = ai.clinical_dept_uid where ai.clinical_dept_uid in " +
+					"select oi.* from org_info oi join asset_info ai on oi.uid = ai.clinical_dept_uid " +
+					"where ai.is_checked = TRUE AND ai.is_deleted = FALSE AND ai.is_valid = TRUE AND ai.clinical_dept_uid in " +
 					"<foreach item = 'item' index = 'index' collection = 'orgUidList' open='(' separator=',' close=')'>" +
 					"#{item}" +
 					"</foreach> group by oi.id"+
