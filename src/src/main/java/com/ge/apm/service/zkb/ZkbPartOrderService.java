@@ -1972,7 +1972,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
             emailWrapperMap.put("url", "/zkb?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
-            zkbPartOrder.getAssetInfo().setAssetTags(null);
+            if(zkbPartOrder.getAssetInfo() != null){
+                zkbPartOrder.getAssetInfo().setAssetTags(null);
+            }
             emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = "";
             if(StringUtils.isEmpty(urlType)){
@@ -1999,7 +2001,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
             emailWrapperMap.put("url", "/zkb?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
-            zkbPartOrder.getAssetInfo().setAssetTags(null);
+            if(zkbPartOrder.getAssetInfo() != null){
+                zkbPartOrder.getAssetInfo().setAssetTags(null);
+            }
             emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
 
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
