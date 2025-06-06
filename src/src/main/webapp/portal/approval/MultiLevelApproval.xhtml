@@ -66,7 +66,16 @@
                     <p:column headerText="发起人" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
                         <h:outputText value="#{item.applyUser.name}"/>
                     </p:column>
-                    <p:column headerText="总审批进度" >
+                    <p:column headerText="总审批进度" filterBy="#{item.approvalStatus}" filterMatchMode="EQ" >
+
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('approvalList').filter()"  value="#{multiLevelApprovalListController.status}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="#{msg.Approved3}" itemValue="2"  />
+                                <f:selectItem itemLabel="#{msg.NotApproved}" itemValue="3" />
+                                <f:selectItem itemLabel="#{msg.UnderReview}" itemValue="1" />
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
                     </p:column>
                     <p:column headerText="审批时间" sortBy="#{item.actualApproverDate}" rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
