@@ -47,7 +47,9 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     private OrgInfoRepository orgInfoRepository;
 
     private I18nMessageRepository i18nDao;
-
+    @Getter
+    @Setter
+    private Integer status=null;
     private Integer filterBusinessType  = null;
 
     @Getter
