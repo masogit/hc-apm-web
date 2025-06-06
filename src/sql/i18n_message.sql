@@ -5758,6 +5758,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('mcApplyPurchaseStep','Complete','完成','Complete',NULL,-1);
 
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkOrderTypeNew_xlsx', '工单分类', 'WorkOrderType', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CoworkerEntryType_xlsx', '协作者工时填写方式', 'CoworkerEntryType', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CoworkerEntryDetail_xlsx', '协作者工时详情', 'CoworkerEntryDetail', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderType','020','保养（PM）','PM',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('workOrderType','022','紧急维修（EMG）','EMG',NULL,-1);
