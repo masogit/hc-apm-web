@@ -37,7 +37,8 @@ public class WorkOrderDocxRenderService {
     private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
     private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, PictureType.JPEG, new byte[0]);
 
-
+    @Autowired
+    V2_WorkOrderRepository v2_workOrderRepository;
 
     @Autowired
     private BlobFileService blobService;
@@ -109,6 +110,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("fix_cohour2", "工时2");*/
 
         COPY_KEY_MAPPING.put("fix_man_hour", WebUtil.getMessage("MaintenanceEngineerManhours_xlsx"));
+        COPY_KEY_MAPPING.put("work_order_type", WebUtil.getMessage("WorkOrderTypeNew_xlsx"));
 
         COPY_KEY_MAPPING.put("part_table", "PartInformation");
         COPY_KEY_MAPPING.put("parts_picture_table", "parts_picture_table");
@@ -155,6 +157,7 @@ public class WorkOrderDocxRenderService {
         bindings.put("proceed_table", new ProceedTableRenderPolicy());
         bindings.put("audit_table", new AuditTableRenderPolicy());
         bindings.put("work_hours_table", new WorkHourTableRenderPolicy());
+        bindings.put("coworker_hours_table", new CoworkerHoursTable());
         bindings.put("parts_picture_table",  new PartsPictureTableRenderPolicy(blobService, 2));
         return  WordExportServiceUtil.generate(datas, templateBytes, bindings);
 
@@ -299,6 +302,7 @@ public class WorkOrderDocxRenderService {
         putServiceRequestMessage(target, (String) source.get("woId"));
         putWorkOrderCoworker(target, (String) source.get("woId"));
         putWorkHourList(target, (String) source.get("woId"));
+        putCoworkerHoursList(target, (String) source.get("woId"));
         Map<String, String> COPY_KEY_MAPPING = new HashMap<>();
         copyKeyMapping(COPY_KEY_MAPPING);
         for (Map.Entry<String, String> entry : COPY_KEY_MAPPING.entrySet()) {
@@ -436,6 +440,26 @@ public class WorkOrderDocxRenderService {
         }
 
         workOrderMap.put("work_hours_table", workHourList);
+    }
+
+    private void putCoworkerHoursList(Map<String, Object> workOrderMap, String id){
+        V2_WorkOrder workOrder = v2_workOrderRepository.findById(id);
+        if(workOrder.getCoworkerEntryType() == 0){
+            workOrderMap.put("coworker_hours_table", new ArrayList<>());
+            return;
+        }
+        List<V2_WorkOrderCoworker> v2WorkOrderCoworkers = workOrderCoworkerDao.findByWoIdOrderByCreatedDateDesc(id);
+        List<Map<String, Object>> workHourList = new ArrayList<>();
+        for(V2_WorkOrderCoworker co : v2WorkOrderCoworkers){
+            Map<String, Object> workHour = new HashedMap();
+            workHour.put("协作者", co.getCowokerUserName());
+            workHour.put("开始时间", formatDate(co.getStartTime()));
+            workHour.put("结束时间", formatDate(co.getEndTime()));
+            workHour.put("工时(小时)", formatDouble(co.getManHours()));
+            workHour.put("备注", co.getRemark());
+            workHourList.add(workHour);
+        }
+        workOrderMap.put("coworker_hours_table", workHourList);
     }
 
     private void putWorkOrderCoworker(Map<String, Object> workOrderMap, String id){
