@@ -16,5 +16,6 @@ import java.util.List;
 public interface V2_WorkOrderCoworkerRepository extends GenericRepositoryUUID<V2_WorkOrderCoworker>{
 
     public List<V2_WorkOrderCoworker> findByWoId(String woId);
-    
+    public List<V2_WorkOrderCoworker> findByWoIdOrderByCreatedDateDesc(String woId);
+
 }
