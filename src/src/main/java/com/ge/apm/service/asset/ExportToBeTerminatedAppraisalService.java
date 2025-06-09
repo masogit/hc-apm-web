@@ -233,14 +233,14 @@ public class ExportToBeTerminatedAppraisalService {
             map.put(depart_num, assetInfo.getDepartNum());
             map.put(system_id, assetInfo.getSystemId());
             if(assetInfo.getPurchasePrice()!=null){
-                map.put(unit_price, "1 X "+new BigDecimal(assetInfo.getPurchasePrice()));
+                map.put(unit_price, new BigDecimal(assetInfo.getPurchasePrice()));
                 map.put(purchase_price, new BigDecimal(assetInfo.getPurchasePrice()));
 
             }
             map.put(purchase_date, assetInfo.getPurchaseDate());
-            if(assetInfo.getSalvageValue()!=null){
-                map.put(salvage_value,new BigDecimal(assetInfo.getSalvageValue()));   //最终残值
-            }
+//            if(assetInfo.getSalvageValue()!=null){
+//                map.put(salvage_value,new BigDecimal(assetInfo.getSalvageValue()));   //最终残值
+//            }
              String assetDeptUid = assetInfo.getAssetDeptUID();
              if(StringUtils.isNotBlank(assetDeptUid)){
                  OrgInfo byUid = orgInfoRepository.findByUid(assetDeptUid);
@@ -263,8 +263,18 @@ public class ExportToBeTerminatedAppraisalService {
             if(StringUtils.isNotBlank(assetUsedLifecycle) && lifecycle!=null && lifecycle!=0   && purchasePrice!=null){
                 double assetUsedLifecycleDouble = Double.parseDouble(assetUsedLifecycle);
                 logger.info("assetUsedLifecycleDouble :{},lifecycle:{},purchasePrice:{}",assetUsedLifecycleDouble, lifecycle,purchasePrice);
-                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycleInYear), BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(purchasePrice)).setScale(2, BigDecimal.ROUND_HALF_UP);
-                map.put(accumulated_depreciation, bigDecimal);   //累计折旧
+//                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycleInYear), BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(purchasePrice)).setScale(2, BigDecimal.ROUND_HALF_UP);
+                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycle).multiply(BigDecimal.valueOf(purchasePrice)), RoundingMode.HALF_UP);
+                if(bigDecimal.compareTo(BigDecimal.valueOf(purchasePrice))>=0){
+                    map.put(accumulated_depreciation, BigDecimal.valueOf(purchasePrice));   //累计折旧
+
+                    map.put(salvage_value,0);   //最终残值
+                }else {
+                    map.put(accumulated_depreciation, bigDecimal);   //累计折旧
+                    map.put(salvage_value,BigDecimal.valueOf(purchasePrice).subtract(bigDecimal));   //最终残值
+                }
+            }else if(purchasePrice!=null){
+                map.put(salvage_value,BigDecimal.valueOf(purchasePrice));   //最终残值
             }
             AssetLifecycle lifecycles= assetLifecyleService.selectByAssetUidAndStatusOne(assetInfo.getUid(), AssetConstant.ASSET_STATUS_TO_TERMINATED);
             if(lifecycles!=null){
