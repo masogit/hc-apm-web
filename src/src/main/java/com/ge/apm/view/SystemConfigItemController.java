@@ -53,7 +53,6 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private ConfigItemValueRepository configItemValueRepository;
     private OrgInfoRepository orgInfoRepository;
     private UaaService uaaService;
-    private SharedAssetService sharedAssetService;
 
     private OrgInfo selectSite;
     private UserAccount user;
@@ -78,7 +77,6 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        sharedAssetService = WebUtil.getBean(SharedAssetService.class);
         user = UserContextService.getCurrentUserAccount();
 
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
@@ -468,11 +466,6 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         return JSON.parseObject(value, FieldColumnDto.class);
     }
 
-    public void siteToSiteAutoAck(ConfigItem item){
-        ConfigItemValue configItemValue = item.getConfigItemValue();
-        String siteUid = configItemValue.getSiteUid();
-        sharedAssetService.asynRemoteCall(GatewayURL.SITE_TO_SITE_AUTO_ACK, HttpMethod.GET,new HashMap<>(),(url)->url+"?siteUID="+siteUid);
-    }
 
     public List<String> getMultiSelectedList(String key) {
         return multiSelectedMap.get(key);
