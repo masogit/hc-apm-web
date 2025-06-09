@@ -113,6 +113,7 @@
 <!--                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"-->
 <!--                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}" pageOnly="true"/>-->
 <!--                                </p:commandButton>-->
+                                <p:commandButton icon="ui-icon-refresh" class="btn btn-sm btn-gray" actionListener="#{departmentSecondmentController.siteToSiteAutoAck()}" rendered="#{departmentSecondmentController.enableSimple}" title="处理历史未完成工单"  />
                             </f:facet>
                         </p:dataTable>
                     </h:form>
