@@ -14,10 +14,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.AssetImportDateConvert;
-import com.ge.apm.service.utils.AssetImportStringConvert;
-import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
-import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.utils.*;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
@@ -295,6 +292,16 @@ public class AssetFileImportController {
         List<I18nMessage> tcm = FieldValueMessageController.getFieldValueList("spare01");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+
+
+
+        List<String> assetSheetHeads = template.getAssetSheetHead();
+        if(CollectionUtils.isNotEmpty(assetSheetHeads)){
+            List<String> finalExportFields = exportFields;
+            exportFields= assetSheetHeads.stream().filter(finalExportFields::contains).collect(Collectors.toList());
+        }
+
+
         template.exportSampleAsset(orgList, exportFields);
         template.exportSampleAsset(orgList, exportFields, tcm);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
