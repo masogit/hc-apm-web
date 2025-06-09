@@ -737,6 +737,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void export1(List<String> exportFields) throws IOException {
         logger.info("start to export asset list to excel");
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        List<String> assetSheetHeads = template.getAssetSheetHead();
+        if(CollectionUtils.isNotEmpty(assetSheetHeads)){
+            List<String> finalExportFields = exportFields;
+            exportFields= assetSheetHeads.stream().filter(finalExportFields::contains).collect(Collectors.toList());
+        }
+
         writerAsset(template, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -808,7 +814,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportAssetExcel() throws IOException {
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        insertCrossSiteColumns(exportFields);
+//        insertCrossSiteColumns(exportFields);
         export1(exportFields);
     }
 
