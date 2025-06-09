@@ -10,8 +10,8 @@
     <ui:composition >
 
 
-        <h:form id="departmentDetailForm"  rendered="#{not departmentSecondmentController.enableSimple}" >
-            <h:panelGroup rendered="#{not empty departmentSecondmentController.selected}">
+        <h:form id="departmentDetailForm"   >
+            <h:panelGroup rendered="#{not empty departmentSecondmentController.selected and not departmentSecondmentController.selected.enableSimple}">
                 <div class="card">
                     <p:dataTable var="node" value="#{departmentSecondmentController.process}">
                         <p:column headerText="节点名称">

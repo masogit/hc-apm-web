@@ -280,6 +280,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         }
     }
 
+    public void saveConfigAndUpdateData(){
+        saveConfig(this.selected);
+        siteToSiteAutoAck(this.selected);
+    }
     public void saveConfig() {
         saveConfig(this.selected);
     }
@@ -470,8 +474,16 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public void siteToSiteAutoAck(ConfigItem item){
         ConfigItemValue configItemValue = item.getConfigItemValue();
+        String key = item.getKey();
+        if(!"enableSimpleDepartmentSecondment".equals(key)){
+            return;
+        }
         String siteUid = configItemValue.getSiteUid();
-        sharedAssetService.asynRemoteCall(GatewayURL.SITE_TO_SITE_AUTO_ACK, HttpMethod.GET,new HashMap<>(),(url)->url+"?siteUID="+siteUid);
+        List<OrgInfo> hospitalChildrenByUids = orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(siteUid));
+        List<String> collect = hospitalChildrenByUids.stream().filter(org -> Integer.valueOf(3).equals(org.getOrgType())).map(OrgInfo::getUid).collect(Collectors.toList());
+        for (String siteUID : collect) {
+            sharedAssetService.asynRemoteCall(GatewayURL.SITE_TO_SITE_AUTO_ACK, HttpMethod.GET,new HashMap<>(),(url)->url+"?siteUID="+siteUID);
+        }
     }
 
     public List<String> getMultiSelectedList(String key) {

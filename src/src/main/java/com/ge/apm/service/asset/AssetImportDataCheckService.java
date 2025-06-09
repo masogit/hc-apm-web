@@ -6,6 +6,7 @@ import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetImport;
 import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
@@ -53,6 +54,9 @@ public class AssetImportDataCheckService {
     }
 
     protected AssetCreateService assetCreateService = WebUtil.getBean(AssetCreateService.class);
+
+    protected   ConfigCacheService configCacheService = WebUtil.getBean(ConfigCacheService.class);
+
     protected Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     protected String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
     public Map<String, String> assetFunctionTypes = i18nMap(FieldValueMessageController.getFieldValueList("assetFunctionType", siteId));
@@ -189,6 +193,10 @@ public class AssetImportDataCheckService {
 
             if (!StringUtils.isEmpty(assetImport.getUid())) {
                 AssetInfo existAsset = assetDao.findByUid(assetImport.getUid());
+                if(existAsset !=null && !StringUtils.isEmpty(existAsset.getAssetDeptUID())){
+                    OrgInfo org = configCacheService.findOrgByUid(existAsset.getAssetDeptUID());
+                    existAsset.setAssetDeptName(org.getName());
+                }
                 assetImport.setOldQrCode(existAsset.getQrCode());
                 BeanUtils.copyProperties(assetImport, existAsset, beanNullProperty(assetImport));
                 BeanUtils.copyProperties(existAsset, assetImport);
