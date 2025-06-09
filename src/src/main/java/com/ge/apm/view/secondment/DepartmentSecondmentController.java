@@ -1,10 +1,14 @@
 package com.ge.apm.view.secondment;
 
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SiteToSiteAllocationRepository;
 import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.SiteToSiteAllocation;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigItemService;
+import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -12,8 +16,10 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.event.SelectEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
@@ -43,6 +49,8 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
     private ConfigItemService configItemService;
     private final String key = "enableSimpleDepartmentSecondment";
     private Boolean enableSimple = Boolean.FALSE;
+    private SharedAssetService sharedAssetService;
+    private OrgInfoRepository orgInfoRepository;
     @Override
     protected SiteToSiteAllocationRepository getDAO() {
         return dao;
@@ -54,6 +62,8 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         uuaService=WebUtil.getBean(UaaService.class);
         userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
         configItemService=WebUtil.getBean(ConfigItemService.class);
+        sharedAssetService=WebUtil.getBean(SharedAssetService.class);
+        orgInfoRepository=WebUtil.getBean(OrgInfoRepository.class);
         enableSimple = configItemService.getConfigItemByKey(key,UserContextService.getCurrentUserAccount());
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -165,19 +175,18 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         process=new ArrayList<>();
         SiteToSiteAllocation target = selected;
         List<String> strings = conditionList(target);
-        if(!CollectionUtils.isEmpty(strings)){
-            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(strings);
-            Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
-            UserAccount userAccount = new UserAccount();
-            userAccount.setName("系统确认");
-            collect.put("-1",userAccount);
-            addNode("借入待确认",collect.get(target.getBorrowerAck()),target.getBorrowerAckDate());
-            addNode("借入待确认(主任)",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
-            addNode("借出待确认(主任)",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
-            addNode("送还待确认",collect.get(target.getReturnerAck()),target.getReturnerAckDate());
-            addNode("送还待确认(主任)",collect.get(target.getReceiverSignatureUid()),target.getReceiverSignatureDate());
-            addNode("收回待确认(主任) ",collect.get(target.getReturnerSignatureUid()),target.getReturnerSignatureDate());
-        }
+        List<UserAccount> userAccounts = userAccountRepository.findByUidIn(strings);
+        Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
+        UserAccount userAccount = new UserAccount();
+        userAccount.setName("系统确认");
+        collect.put("-1",userAccount);
+        addNode("借入待确认",collect.get(target.getBorrowerAck()),target.getBorrowerAckDate());
+        addNode("借入待确认(主任)",collect.get(target.getBorrowerSignatureUid()),target.getBorrowerSignatureDate());
+        addNode("借出待确认(主任)",collect.get(target.getLenderSignatureUid()),target.getLenderSignatureDate());
+        addNode("送还待确认",collect.get(target.getReturnerAck()),target.getReturnerAckDate());
+        addNode("送还待确认(主任)",collect.get(target.getReceiverSignatureUid()),target.getReceiverSignatureDate());
+        addNode("收回待确认(主任) ",collect.get(target.getReturnerSignatureUid()),target.getReturnerSignatureDate());
+        target.setEnableSimple(collect.size() == 1);
     }
     private List<String> conditionList(SiteToSiteAllocation target ){
         Set<String> condition = new HashSet<>();
@@ -187,8 +196,8 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         condition.add(target.getReturnerAck());
         condition.add(target.getReceiverSignatureUid());
         condition.add(target.getReturnerSignatureUid());
-        condition.add(target.getReceiverUid());
-        condition.add(target.getReturnerUid());
+//        condition.add(target.getReceiverUid());
+//        condition.add(target.getReturnerUid());
         return condition.stream().filter(item -> StringUtils.hasText(item)).collect(Collectors.toList());
     }
     private void addNode(String nodeName,UserAccount operator, Date operatorTime){
@@ -208,6 +217,26 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         String siteUID = currentUserAccount.getSiteUID();
 
     }
+    public void siteToSiteAutoAck(){
+        try {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            enableSimple = configItemService.getConfigItemByKey(key, currentUserAccount);
+            if(!Boolean.TRUE.equals(enableSimple)){
+                WebUtil.addSuccessMessage("配置变更,更新历史数据失败!");
+                return;
+            }
+            List<OrgInfo> hospitalChildrenByUids = orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(currentUserAccount.getSiteUID()));
+            List<String> collect = hospitalChildrenByUids.stream().filter(item -> Integer.valueOf(3).equals(item.getOrgType()))
+                    .map(OrgInfo::getUid).collect(Collectors.toList());
+            for (String s : collect) {
+                sharedAssetService.asynRemoteCall(GatewayURL.SITE_TO_SITE_AUTO_ACK, HttpMethod.GET,new HashMap<>(),(url)->url+"?siteUID="+s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addSuccessMessage("系统异常,更新历史数据失败!");
+        }
+    }
+
 
     public List<DepartmentSecondmentProcess> getProcess() {
         return process;

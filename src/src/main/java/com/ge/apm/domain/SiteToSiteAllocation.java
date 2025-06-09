@@ -124,6 +124,9 @@ public class SiteToSiteAllocation implements Serializable {
     private Date receiverDate;
     @Column(name = "returner_ack_date")
     private Date returnerAckDate;
+    @Transient
+    @JsonProperty
+    private Boolean enableSimple;
     public String getId() {
         return id;
     }
@@ -514,5 +517,13 @@ public class SiteToSiteAllocation implements Serializable {
 
     public void setReturnerAckDate(Date returnerAckDate) {
         this.returnerAckDate = returnerAckDate;
+    }
+
+    public Boolean getEnableSimple() {
+        return enableSimple;
+    }
+
+    public void setEnableSimple(Boolean enableSimple) {
+        this.enableSimple = enableSimple;
     }
 }

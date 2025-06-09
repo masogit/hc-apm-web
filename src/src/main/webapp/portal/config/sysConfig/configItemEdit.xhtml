@@ -40,6 +40,7 @@
                                           required="true" style="width: 15%;">
                             <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                             <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                            <p:ajax event="change" update="configItemEditForm" />
                         </p:selectOneRadio>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 4}">
@@ -113,6 +114,7 @@
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{systemConfigItemController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
+                <p:commandButton id="save" validateClient="true" value="#{msg.Save}并处理历史未完成工单" rendered="#{systemConfigItemController.selected.key eq 'enableSimpleDepartmentSecondment' and systemConfigItemController.selected.showValue eq 'true' }" actionListener="#{systemConfigItemController.saveConfigAndUpdateData}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('configItemEditDialog').hide()"/>
             </h:form>
         </p:dialog>
