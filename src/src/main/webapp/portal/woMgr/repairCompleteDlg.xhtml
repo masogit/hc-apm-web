@@ -153,7 +153,7 @@
                             <h:panelGroup>
                                 <label class="label">工时填写方式*</label>
                                 <p:selectOneRadio id="entryType" required="true" disabled="false" value="#{workOrderMgrController.selectedWorkOrder.entryType}"  requiredMessage="工时填写方式不能为空">
-                                    <p:ajax event="change" process="@this" update=":growl woTab:repairCompleteDialogForm:entryType woTab:repairCompleteDialogForm:workHourDetail woTab:repairCompleteDialogForm:entryTypeFlag"  listener="#{workOrderMgrController.updateEntryType(workOrderMgrController.selectedWorkOrder.entryType)}" />
+                                    <p:ajax event="change" process="@this" update=":growl woTab:repairCompleteDialogForm:entryType woTab:repairCompleteDialogForm:workHourDetail woTab:repairCompleteDialogForm:coworkerList woTab:repairCompleteDialogForm:entryTypeFlag"  listener="#{workOrderMgrController.updateEntryType(workOrderMgrController.selectedWorkOrder.entryType)}" />
                                     <f:selectItem itemLabel="增加工时段" itemValue="1"/>
                                     <f:selectItem itemLabel="填写总工时" itemValue="0"/>
                                 </p:selectOneRadio>
@@ -293,12 +293,32 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.coworker}工时填写方式</label>
+                                <p:selectOneRadio id="coworkerEntryType" required="true" value="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType}"  requiredMessage="工时填写方式不能为空">
+                                    <p:ajax event="change" process="@this" update=":growl woTab:repairCompleteDialogForm:coworkerEntryType woTab:repairCompleteDialogForm:coworkerList"  listener="#{workOrderMgrController.updateCoworkerEntryType(workOrderMgrController.selectedWorkOrder.coworkerEntryType)}" />
+                                    <f:selectItem itemLabel="增加工时段" itemValue="1"/>
+                                    <f:selectItem itemLabel="填写总工时" itemValue="0"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+
                             <h:panelGroup rendered="#{!userContextService.countyArea}">
                                 <label class="label">#{msg.addworker}</label>
                                 <p:dataTable id="coworkerList" class="coworkerList" value="#{workOrderMgrController.coWorkerList}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
                                              rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.coworker}">
                                         <h:outputText value="#{item.cowokerUserName}"/>
+                                    </p:column>
+                                    <p:column headerText="开始时间" rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                                        <h:outputText value="#{item.startTime}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="结束时间" rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                                        <h:outputText value="#{item.endTime}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                        </h:outputText>
                                     </p:column>
                                     <p:column headerText="#{msg.manHours}">
                                         <h:outputText value="#{item.manHours}" />

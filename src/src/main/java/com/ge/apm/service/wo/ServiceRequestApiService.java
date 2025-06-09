@@ -564,7 +564,7 @@ class WorkOrderActionForm {
     String assetStatus;
     String intExtType;
     Object stepDetail;
-    Object stepCoworker;
+    List<V2_WorkOrderCoworker> stepCoworker;
     Double manHours;
     Double otherExpense;
     Integer currentStepId;
@@ -584,6 +584,16 @@ class WorkOrderActionForm {
     String comment;
 
     String workOrderType;
+
+    Integer coworkerEntryType;
+
+    public Integer getCoworkerEntryType() {
+        return coworkerEntryType;
+    }
+
+    public void setCoworkerEntryType(Integer coworkerEntryType) {
+        this.coworkerEntryType = coworkerEntryType;
+    }
 
     public String getWorkOrderType() {
         return workOrderType;
@@ -777,11 +787,11 @@ class WorkOrderActionForm {
         this.repairType = repairType;
     }
 
-    public Object getStepCoworker() {
+    public List<V2_WorkOrderCoworker> getStepCoworker() {
         return stepCoworker;
     }
 
-    public void setStepCoworker(Object stepCoworker) {
+    public void setStepCoworker(List<V2_WorkOrderCoworker> stepCoworker) {
         this.stepCoworker = stepCoworker;
     }
 

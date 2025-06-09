@@ -304,6 +304,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     boolean enableSignNeedScanQrCode;
     @Getter @Setter
     private OrgInfo currentUserOrgInfo;
+    @Getter @Setter
+    private String newMessage;
+
     @Override
     protected void init() {
         try {
@@ -1327,6 +1330,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public List<ServiceRequestMsg> getServiceRequestMessageList(String woId) {
         return selected == null ? null : woService.getServiceRequestMessageList(woId);
     }
+    public void saveMsg(){
+        woService.saveServiceRequestMessage(newMessage, loginUser, selected.getId());
+        newMessage = "";
+    }
+
     public void prepareActSetting(String woid){
         prepareAct(woid);
         V2_WorkOrder temp=new V2_WorkOrder();
@@ -1505,6 +1513,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (selectedWorkOrder.getEntryType() == null) {
             selectedWorkOrder.setEntryType(0);
         }
+        if(selectedWorkOrder.getCoworkerEntryType() == null){
+            selectedWorkOrder.setCoworkerEntryType(0);
+        }
 
         String result = selectedWorkOrder.getRepairResult();
         if(result!=null) {
@@ -1517,7 +1528,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
             if (result.equalsIgnoreCase("1")) {
                 currentStatus = 1;
-
             }
         }
 
@@ -2554,6 +2564,23 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (coWorkerList.contains(coWorkerDetail)) {
             coWorkerList.remove(coWorkerDetail);
         }
+        if(selectedWorkOrder.getCoworkerEntryType() == 1){
+            String strHours = "0";
+            long milliSeconds = coWorkerDetail.getEndTime().getTime() - coWorkerDetail.getStartTime().getTime();
+            if (milliSeconds > 0) {
+                DecimalFormat df = new DecimalFormat("0.0");
+                strHours = df.format((float) milliSeconds / (1000 * 60 * 60));
+                BigDecimal b = new BigDecimal(strHours);
+                float f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+                f1 = Float.parseFloat(df.format(f1));
+                strHours = df.format(f1);
+            } else {
+                WebUtil.addErrorMessage("结束时间不能小于开始时间");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+            coWorkerDetail.setManHours(Double.valueOf(strHours));
+        }
         UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
         coWorkerDetail.setCowokerUserName(coWorker.getName());
         coWorkerList.add(coWorkerDetail);
@@ -3091,6 +3118,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             selectedWorkOrder.setManHours(null);
             workHoursList = null;
         }
+    }
+
+    public void updateCoworkerEntryType(Integer entryType) {
+        if (selectedWorkOrder == null) {
+            selectedWorkOrder = new V2_WorkOrder();
+        }
+        selectedWorkOrder.setCoworkerEntryType(entryType);
+        coWorkerList = new ArrayList<>();
+        V2_WorkOrderCoworker emptyDetail = new V2_WorkOrderCoworker();
+        emptyDetail.setId("000");
+        coWorkerList.add(emptyDetail);
     }
 
     public void setNothing(){}

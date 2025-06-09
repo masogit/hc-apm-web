@@ -13,6 +13,7 @@ import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.I18nMessageService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -23,9 +24,7 @@ import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.BaseFormulaEvaluator;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Name;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
@@ -81,8 +80,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     SXSSFWorkbook workBook;
+    XSSFWorkbook workBookRead;
+
+    boolean isExistenceHead=false;
+
+
+    List<String> assetSheetHead;
 
     SXSSFSheet assetSheet;
+    XSSFSheet assetSheetXs;
     SXSSFSheet orgSheet;
     SXSSFSheet tcmSheet;
 
@@ -147,7 +153,34 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         byte[] templateBytes = microServiceUtil.downloadSingleFileByte(storageId);
         InputStream inputStream = new ByteArrayInputStream(templateBytes);
 //        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
-        workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+        workBookRead = new XSSFWorkbook(inputStream);
+
+        assetSheetXs = workBookRead.getSheet(SHEET_ASSET);
+
+        if (assetSheetXs != null && assetSheetXs.getRow(0) != null) {
+            isExistenceHead=true;
+        }
+        if(isExistenceHead){
+            if(CollectionUtils.isEmpty(assetSheetHead)){
+                assetSheetHead=new ArrayList<>();
+            }
+            String[] keyRow = ExcelDocument.getKeyRow(assetSheetXs, 1);
+            if(keyRow.length>0){
+                for (String s : keyRow) {
+                    assetSheetHead.add(s);
+                }
+            }
+            workBookRead.removeSheetAt(workBookRead.getSheetIndex(SHEET_ASSET));
+            workBookRead.createSheet(SHEET_ASSET);
+            workBookRead.setSheetOrder(SHEET_ASSET, 0);
+            int newIndex = workBookRead.getSheetIndex(SHEET_ASSET);
+            workBookRead.setActiveSheet(newIndex);
+            workBookRead.setSelectedTab(newIndex);
+        }
+
+
+
+        workBook = new SXSSFWorkbook(workBookRead);
 
         assetSheet = workBook.getSheet(SHEET_ASSET);
         if (assetSheet == null) {
@@ -602,7 +635,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         workBook.setForceFormulaRecalculation(true);
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
 
-        assetSheet.setSelected(true);
+        assetSheet.setSelected(false);
 
     }
 
@@ -980,5 +1013,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             }*/
             return this;
         }
+    }
+
+    public List<String> getAssetSheetHead(){
+
+
+
+        return assetSheetHead;
     }
 }

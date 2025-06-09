@@ -7,21 +7,34 @@
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
 
-    <p:dialog class="coworkerDlg" id="coworkerDlg" widgetVar="coworkerDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.coworker}">
+    <p:dialog class="coworkerDlg" id="coworkerDlg" widgetVar="coworkerDlg" modal="true" width="550"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.coworker}">
         <h:form id="coworkerDlgForm" >
             <h:panelGroup  rendered="#{not empty workOrderMgrController.coWorkerDetail}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                    <h:panelGroup>
+                    <h:panelGroup >
                         <label class="label">#{msg.coworker}*</label>
                         <p:selectOneMenu id="selectEmployee" value="#{workOrderMgrController.coWorkerDetail.cowokerUserId}" required="true" requiredMessage="#{msg.coworker} #{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{workOrderMgrController.getWorkerList()}" var="item1" itemLabel="#{item1.name}" itemValue="#{item1.id}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                        <label class="label">开始时间*</label>
+                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.coWorkerDetail.startTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                        <label class="label">结束时间*</label>
+                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.coWorkerDetail.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="结束时间#{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==0}">
                         <label class="label">#{msg.manhourPrice}*</label>
                         <p:inputNumber decimalPlaces="2" maxValue="999" id="manHours" value="#{workOrderMgrController.coWorkerDetail.manHours}" required="true" requiredMessage="#{msg.manhourPrice} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">备注</label>
+                        <p:inputTextarea value="#{workOrderMgrController.coWorkerDetail.remark}" rows="3"  cols="30"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>

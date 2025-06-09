@@ -178,6 +178,36 @@ public class WorkOrderExportPojo {
     private Integer entryType;
     // 工时明细
     private String workHourDetail;
+    //工单分类
+    private String workOrderType;
+
+    private Integer coworkerEntryType;
+
+    private String coworkerEntryDetail;
+
+    public String getCoworkerEntryDetail() {
+        return coworkerEntryDetail;
+    }
+
+    public void setCoworkerEntryDetail(String coworkerEntryDetail) {
+        this.coworkerEntryDetail = coworkerEntryDetail;
+    }
+
+    public Integer getCoworkerEntryType() {
+        return coworkerEntryType;
+    }
+
+    public void setCoworkerEntryType(Integer coworkerEntryType) {
+        this.coworkerEntryType = coworkerEntryType;
+    }
+
+    public String getWorkOrderType() {
+        return workOrderType;
+    }
+
+    public void setWorkOrderType(String workOrderType) {
+        this.workOrderType = workOrderType;
+    }
 
     public List<String> getAuditSignatureList() {
         return auditSignatureList;

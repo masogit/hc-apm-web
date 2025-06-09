@@ -453,6 +453,7 @@ public class V2_WorkOrderService {
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setEntryType(selectedWorkOrder.getEntryType());
+        formData.setCoworkerEntryType(selectedWorkOrder.getCoworkerEntryType());
         //【最新进展】
         formData.setComment(selectedWorkOrder.getComment());
 
@@ -672,6 +673,16 @@ public class V2_WorkOrderService {
 
     public List<ServiceRequestMsg> getServiceRequestMessageList(String id) {
         return msgDao.findBySrIdOrderBySendTime(id);
+    }
+
+    public void saveServiceRequestMessage(String msg, UserAccount userAccount, String srId){
+        ServiceRequestMsg serviceRequestMsg = new ServiceRequestMsg();
+        serviceRequestMsg.setSrId(srId);
+        serviceRequestMsg.setMessage(msg);
+        serviceRequestMsg.setSendTime(new Date());
+        serviceRequestMsg.setSenderUserId(userAccount.getId());
+        serviceRequestMsg.setSenderUserName(userAccount.getName());
+        msgDao.save(serviceRequestMsg);
     }
 
     /**

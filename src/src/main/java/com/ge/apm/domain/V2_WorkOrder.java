@@ -166,6 +166,12 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrderCoworker> v2_workOrder_coworker_list;
 
+    /**
+     * 填写工时选择方式 0 输入填写 , 1 多个工时段填写
+     */
+    @Column(name="coworker_entry_type")
+    private Integer coworkerEntryType;
+
     @Column(name = "comment")
     private String comment;
 
@@ -351,6 +357,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Transient
     private Integer repairPersonId;
 
+    public Integer getCoworkerEntryType() {
+        return coworkerEntryType;
+    }
+
+    public void setCoworkerEntryType(Integer coworkerEntryType) {
+        this.coworkerEntryType = coworkerEntryType;
+    }
 
     public Integer getRepairPersonId() {
         return repairPersonId;
