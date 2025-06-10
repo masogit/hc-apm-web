@@ -444,7 +444,7 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "in_stock_no")
     private String inStockNo;
 
-    //库存状态 1、待审核 2、已审核 3、已入库 4、已出库
+    //库存状态 1、待审核 2、已审核 3、已入库 4、已出库 5、已退库
     @Column(name = "stock_status")
     private Integer stockStatus;
 
