@@ -5,17 +5,25 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetOutStockDto;
 import com.ge.apm.service.WordExportServiceUtil;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
@@ -23,7 +31,9 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
-public class AssetOutStockService {
+public class AssetOutStockService extends MicroServiceInvoker {
+
+    protected static final Logger logger = LoggerFactory.getLogger(MicroServiceInvoker.class);
 
     @Autowired
     ArrivalListItemRepository arrivalListItemRepository;
@@ -229,6 +239,22 @@ public class AssetOutStockService {
         bindings.put("list", new AssetOutStockTableRenderPolicy(stockType));
         return WordExportServiceUtil.generate(data, templateBytes, bindings);
 
+    }
+
+    public boolean checkAssetInfo(List<String> assetUids) {
+        Map<String, Object> map = MapUtil.newHashMap();
+        map.put("assetUids", assetUids);
+        String token = UserContextService.getAccessToken();
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ASSET_CHECK_ORDER_CONDITION);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+        if (isOkay(response)) {
+            return (boolean) responseMap.get("data");
+        } else {
+            logger.error("AssetOutStockService check asset error assetUids:{},result:{}", assetUids , responseMap.get("data"));
+        }
+        return false;
     }
 
     public String queryInStockNo(String preStr){
