@@ -192,10 +192,10 @@ public class WorkOrderReportExportController implements Serializable {
 
     private void exportWoData(List<Map<String, Object>> workOrderdata) {
         SystemTemplateEnum systemTemplateEnum=SystemTemplateEnum.WORK_ORDER_REPORT_EXCEL;
-        String fileName = "APM_WorkOrder_Template.xlsx";
+//        String fileName = "APM_WorkOrder_Template.xlsx";
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if(!userContextService.isLocale()){
-             fileName = "APM_WorkOrder_Template_en.xlsx";
+//             fileName = "APM_WorkOrder_Template_en.xlsx";
             systemTemplateEnum=SystemTemplateEnum.WORK_ORDER_REPORT_EXCEL_EN;
         }
 
