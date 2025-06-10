@@ -444,7 +444,7 @@ public class WorkOrderDocxRenderService {
 
     private void putCoworkerHoursList(Map<String, Object> workOrderMap, String id){
         V2_WorkOrder workOrder = v2_workOrderRepository.findById(id);
-        if(workOrder.getCoworkerEntryType() == 0){
+        if(workOrder.getCoworkerEntryType() == null || workOrder.getCoworkerEntryType() == 0){
             workOrderMap.put("coworker_hours_table", new ArrayList<>());
             return;
         }
