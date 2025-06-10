@@ -262,7 +262,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())
                             && ZkbConstantUtil.T.equals(selected.getNeedLetterFlag())
                             && (ZkbConstantUtil.F.equals(selected.getUploadLetterFlag()) || StringUtils.isEmpty(selected.getUploadLetterFlag()))){
-                        zkbPartOrderStatusVo.setLetterTips("请尽快邮件提交探头说明函致400唐扬Yang.Tang@ge.com。");
+                        zkbPartOrderStatusVo.setLetterTips("请尽快邮件提交探头说明函和旧探头序列号照片致400唐扬Yang.Tang@gehealthcare.com。");
                     }
                 }
             }else if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Artificial.toString())){
