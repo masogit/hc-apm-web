@@ -280,11 +280,11 @@ public class ExportToBeTerminatedAppraisalService {
 
                     map.put(salvage_value,0);   //最终残值
                 }else {
-                    map.put(accumulated_depreciation, bigDecimal);   //累计折旧
-                    map.put(salvage_value,BigDecimal.valueOf(purchasePrice).subtract(bigDecimal));   //最终残值
+                    map.put(accumulated_depreciation, bigDecimal.setScale(2,RoundingMode.HALF_UP));   //累计折旧
+                    map.put(salvage_value,BigDecimal.valueOf(purchasePrice).subtract(bigDecimal).setScale(2,RoundingMode.HALF_UP));   //最终残值
                 }
             }else if(purchasePrice!=null){
-                map.put(salvage_value,BigDecimal.valueOf(purchasePrice));   //最终残值
+                map.put(salvage_value,BigDecimal.valueOf(purchasePrice).setScale(2,RoundingMode.HALF_UP));   //最终残值
             }
             AssetLifecycle lifecycles= assetLifecyleService.selectByAssetUidAndStatusOne(assetInfo.getUid(), AssetConstant.ASSET_STATUS_TO_TERMINATED);
             if(lifecycles!=null){
