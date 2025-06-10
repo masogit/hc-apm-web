@@ -10,9 +10,12 @@
             </div>
             <div class="ui-g-12">
                 <p:tabView id="assetOutStockTab"  dynamic="true" cache="false" activeIndex="0">
-                    <p:ajax event="tabChange" listener="#{assetStockedController.onTabChange}" update=":growl :assetOutStockTab:auditInStocked :assetOutStockTab:inStockedRecord :assetOutStockTab:outStockedRecord"/>
-                    <p:tab title="审核入库" id="auditInStocked">
+                    <p:ajax event="tabChange" listener="#{assetStockedController.onTabChange}" update=":growl :assetOutStockTab:inStockedRecord :assetOutStockTab:outStockedRecord"/>
+                    <!--<p:tab title="审核入库" id="auditInStocked">
                         <ui:include src="auditInStocked.xhtml"/>
+                    </p:tab>-->
+                    <p:tab title="库存管理" id="stockedManage">
+                        <ui:include src="stockedManage.xhtml"/>
                     </p:tab>
                     <p:tab title="入库记录" id="inStockedRecord">
                         <ui:include src="inStockedRecord.xhtml"/>
