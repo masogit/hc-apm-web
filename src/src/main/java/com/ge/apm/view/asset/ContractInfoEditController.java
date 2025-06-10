@@ -29,6 +29,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -73,6 +75,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private SupplierController supplierController;
     private ArrivalListRepository arrivalListRepository;
     private ConfigItemValueRepository configItemValueRepository;
+    private HttpServletRequest request;
 
     private List<V2_BlobObject> attachements;
     private List<Supplier> supplierList = Collections.emptyList();
@@ -143,6 +146,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
+        if (ObjectUtil.isEmpty(actionName)) {
+            request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            actionName = request.getParameter("action");
+        }
         currentUser = UserContextService.getCurrentUserAccount();
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
@@ -158,7 +165,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             }
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-            this.selected = dao.findById(selectedId);
+            if (ObjectUtil.isEmpty(selectedId)) {
+                String contractNum = request.getParameter("contractNum");
+                this.selected = dao.findEquipmentByContractNum(contractNum, currentUser.getTenantUID());
+            } else {
+                this.selected = dao.findById(selectedId);
+            }
             prepareEdit();
             attachements = blobService.findBlobObjectsByBoUid(selected.getId());
             allItemList = contractService.getContractItems(selected.getId());

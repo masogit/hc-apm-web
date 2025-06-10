@@ -1,0 +1,133 @@
+/*
+ */
+package com.ge.apm.domain;
+
+import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ *
+ * @author 212547631
+ */
+@Data
+@Entity
+@Table(name = "asset_in_sotck_record")
+public class AssetInStockRecord implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @Column(columnDefinition = "CHAR(32)")
+    private String id;
+
+    @Column(name = "site_uid")
+    private String siteUid;
+
+    @Column(name = "hospital_uid")
+    private String hospitalUid;
+
+    @Column(name = "institution_uid")
+    private String institutionUid;
+
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+
+    @Column(name = "asset_uid", columnDefinition = "CHAR(32)")
+    private String assetUid;
+
+    //入库单号
+    @Column(name = "in_stock_no")
+    private String inStockNo;
+
+    //入库业务日期-审核入库时间
+    @Column(name = "business_date")
+    private Date businessDate;
+
+    //供应商
+    @Size(max = 64)
+    @Column(name = "vendor")
+    private String vendor;
+
+    //入库单制单人
+    @Column(name = "in_stock_user")
+    private String inStockUser;
+
+    //资产财产编号
+    @Size(max = 64)
+    @Column(name = "financing_num")
+    private String financingNum;
+
+    //设备名称
+    @Basic(optional = false)
+    @Size(min = 1, max = 64)
+    @Column(name = "asset_name")
+    private String assetName;
+
+    //合同号
+    @Size(max = 64)
+    @Column(name = "contract_num")
+    private String contractNum;
+
+    //启用日期
+    @Column(name = "install_date")
+    @Temporal(TemporalType.DATE)
+    private Date installDate;
+
+    //设备型号
+    @Column(name = "function_type")
+    private String functionType;
+
+    //备注
+    @Column(name = "comments")
+    @Size(max = 256)
+    private String comments;
+
+    //采购价格(元)
+    @Column(name = "purchase_price")
+    private Double purchasePrice;
+
+    //发票号
+    @Size(max = 64)
+    @Column(name = "invoice_num")
+    private String invoiceNum;
+
+    //发票日期
+    @Column(name = "invoice_date")
+    @Temporal(TemporalType.DATE)
+    private Date invoiceDate;
+
+    //到货清单id
+    @Column(name = "arrival_list_id", columnDefinition = "CHAR(32)")
+    private String arrivalListId;
+
+    //到货单条目
+    @Column(name = "arrival_item_id", columnDefinition = "CHAR(32)")
+    private String arrivalItemId;
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof AssetInStockRecord)) {
+            return false;
+        }
+        AssetInStockRecord other = (AssetInStockRecord) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+    
+}

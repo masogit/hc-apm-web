@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <h:form id="searchDataForm">
+        <p:fieldset legend="#{msg.FilterCondition}">
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup>
+                    <label class="label">入库单号</label>
+                    <p:inputText value="#{assetStockedController.searchItem.inStockNo}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">业务时间</label>
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                locale="#{userContextService.getCalendarLocale()}"
+                                pattern="#{userContextService.timeFormat()}" id="startDate"
+                                value="#{assetStockedController.startDate}"
+                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                    -
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                locale="#{userContextService.getCalendarLocale()}"
+                                pattern="#{userContextService.timeFormat()}" id="endDate"
+                                value="#{assetStockedController.endDate}"
+                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.assetName}</label>
+                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.name}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.vendor}</label>
+                    <p:autoComplete dropdown="true" value="#{assetStockedController.supplier}" scrollHeight="300"  forceSelection="true"
+                                    completeMethod="#{assetStockedController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                    </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">资产价值</label>
+                    <p:inputNumber minValue="0" decimalPlaces="2" value="#{assetStockedController.startPrice}"/>
+                    -
+                    <p:inputNumber minValue="0" decimalPlaces="2" value="#{assetStockedController.endPrice}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.functionType}</label>
+                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.functionType}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.arrivalListInvoiceNum}</label>
+                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.invoiceNum}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.arrivalListContractNum}</label>
+                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.contractNum}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">状态</label>
+                    <p:selectOneMenu value="#{assetStockedController.searchItem.stockStatus}">
+                        <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
+                        <f:selectItem itemLabel="待入库" itemValue="2"/>
+                        <f:selectItem itemLabel="已入库" itemValue="3"/>
+                        <f:selectItem itemLabel="已出库" itemValue="4"/>
+                        <f:selectItem itemLabel="已退库" itemValue="5"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:commandButton value="#{msg.Search}" validateClient="true" update=":growl :assetOutStockTab:AssetStockedManageListForm :assetOutStockTab:AssetStockedManageListForm:datalist"/>
+            <p:commandButton value="清空条件" validateClient="true" actionListener="#{assetStockedController.initSearchItem()}" update=":growl :assetOutStockTab:searchDataForm :assetOutStockTab:AssetStockedManageListForm:datalist"/>
+        </p:fieldset>
+    </h:form>
+
+    <h:form id="AssetStockedManageListForm">
+        <p:dataTable id="datalist" value="#{assetStockedController.lazyModel}" var="item" widgetVar="varDataList"
+                     selection="#{assetStockedController.selectedItems}"
+                     lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                     rowKey="#{item.id}" sortMode="single" sortBy="#{item.lastModifiedDate}"   sortOrder="descending"
+                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                     rowsPerPageTemplate="20,50,100,500">
+            <p:ajax event="rowSelect" listener="#{assetStockedController.onRowSelect}" update=":growl :assetOutStockTab:searchDataForm :assetOutStockTab:AssetStockedManageListForm:datalist"/>
+            <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
+            <p:column headerText="入库单号">
+                <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" />
+            </p:column>
+            <p:column headerText="业务时间">
+                <h:outputText value="#{item.installDate}">
+                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                </h:outputText>
+            </p:column>
+            <p:column headerText="#{msg.vendor}">
+                <h:outputText value="#{item.arrivalList.vendor}"/>
+            </p:column>
+            <p:column headerText="制单人">
+                <h:outputText value="#{assetStockedController.getUserNameByUid(item.inStockUser)}"/>
+            </p:column>
+            <p:column headerText="#{msg.financingNum}">
+                <h:outputText value="#{item.financingNum}"/>
+            </p:column>
+            <p:column headerText="#{msg.assetName}">
+                <h:outputText value="#{item.arrivalList.assetName}"/>
+            </p:column>
+            <p:column headerText="#{msg.arrivalListContractNum}">
+                <h:outputText value="#{item.arrivalList.contractNum}"/>
+            </p:column>
+            <p:column headerText="#{msg.installDate}">
+                <h:outputText value="#{item.installDate}">
+                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                </h:outputText>
+            </p:column>
+            <p:column headerText="#{msg.functionType}">
+                <h:outputText value="#{item.arrivalList.functionType}"/>
+            </p:column>
+            <p:column headerText="#{msg.comments}">
+                <h:outputText value="#{item.comments}"/>
+            </p:column>
+            <p:column headerText="资产价值">
+                <h:outputText value="#{item.purchasePrice}"/>
+            </p:column>
+            <p:column headerText="#{msg.arrivalListInvoiceNum}">
+                <h:outputText value="#{item.arrivalList.invoiceNum}"/>
+            </p:column>
+            <p:column headerText="发票日期">
+                <h:outputText value="#{item.arrivalList.invoiceDate}"/>
+            </p:column>
+            <p:column headerText="状态">
+                <h:outputText value="#{fieldMsg.fieldValue('stockStatus', item.stockStatus)}"/>
+            </p:column>
+            <f:facet name="{Toolbar}">
+                <p:commandButton value="生成入库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" action="#{assetStockedController.prepareGeneratedInStockDoc()}" actionListener="#{assetStockedController.generatedStockDoc('inStock')}" validateClient="true" oncomplete="handleGeneratedInStockDoc(xhr, status, args);" update=":growl :assetOutStockTab:GeneratedInStockDocDlg"/>
+                <p:commandButton value="生成出库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" action="#{assetStockedController.prepareGeneratedOutStockDoc()}" actionListener="#{assetStockedController.generatedStockDoc('outStock')}" validateClient="true" oncomplete="handleGeneratedOutStockDoc(xhr, status, args);" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
+            </f:facet>
+        </p:dataTable>
+    </h:form>
+    <p:dialog id="GeneratedInStockDocDlg" widgetVar="GeneratedInStockDocDialog" modal="true" resizable="true" draggable="true" width="1450" header="#{assetStockedController.inStock ? '打印入库单' : '生成入库单'}">
+        <h:form id="GeneratedInStockForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup>
+                    <label class="label">合计数量：#{assetStockedController.selectedItems.size()}；合计金额：#{assetStockedController.totalPurchasePrice()}</label>
+                    <label class="label">合同号：#{assetStockedController.contractNum}；已安装设备：#{assetStockedController.installed}台；未安装：#{assetStockedController.notInstalled}台</label>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{assetStockedController.inStock}">
+                    <label class="label">入库单号</label>
+                    <p:autoComplete dropdown="true" value="#{assetStockedController.inStockNo}" scrollHeight="300"  forceSelection="true"
+                                    completeMethod="#{assetStockedController.autoCompleteInStockNo}">
+                        <p:ajax event="itemSelect" listener="#{assetStockedController.onNoChange('inStock')}" update=":assetOutStockTab:GeneratedInStockForm"/>
+                        <p:ajax listener="#{assetStockedController.onNoChange('inStock')}" update=":assetOutStockTab:GeneratedInStockForm"/>
+                    </p:autoComplete>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:dataTable id="inStockDocList" value="#{assetStockedController.selectedItems}" var="item"
+                         lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
+                         emptyMessage="#{msg.noRecordFound}">
+                <p:column headerText="业务时间">
+                    <h:outputText value="#{item.installDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg.vendor}">
+                    <h:outputText value="#{item.arrivalList.vendor}"/>
+                </p:column>
+                <p:column headerText="#{msg.financingNum}">
+                    <h:outputText value="#{item.financingNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.assetName}">
+                    <h:outputText value="#{item.arrivalList.assetName}"/>
+                </p:column>
+                <p:column headerText="#{msg.arrivalListContractNum}">
+                    <h:outputText value="#{item.arrivalList.contractNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.functionType}">
+                    <h:outputText value="#{item.arrivalList.functionType}"/>
+                </p:column>
+                <p:column headerText="#{msg.comments}">
+                    <h:outputText value="#{item.comments}"/>
+                </p:column>
+                <p:column headerText="资产价值">
+                    <h:outputText value="#{item.purchasePrice}"/>
+                </p:column>
+                <p:column headerText="#{msg.arrivalListInvoiceNum}">
+                    <h:outputText value="#{item.arrivalList.invoiceNum}"/>
+                </p:column>
+                <p:column headerText="发票日期">
+                    <h:outputText value="#{item.arrivalList.invoiceDate}"/>
+                </p:column>
+                <p:column headerText="状态">
+                    <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}"/>
+                </p:column>
+            </p:dataTable>
+            <p:commandButton validateClient="true" action="#{assetStockedController.generatedInStockDoc()}" rendered="#{!assetStockedController.inStock}"
+                             value="#{msg.Confirm}" update=":assetOutStockTab:GeneratedInStockForm :assetOutStockTab:AssetStockedManageListForm:datalist" icon="ui-icon-check"
+                             oncomplete="handleSubmit(args, 'GeneratedInStockDocDialog');"/>
+            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" update=":assetOutStockTab:AssetStockedManageListForm:datalist" onclick="PF('GeneratedInStockDocDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+    <p:dialog id="GeneratedOutStockDocDlg" widgetVar="GeneratedOutStockDocDialog" modal="true" resizable="true" draggable="true" width="1450" header="#{assetStockedController.outStock ? '打印出库单' : '生成出库单'}">
+        <h:form id="GeneratedOutStockForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <label class="label">合计数量：#{assetStockedController.selectedItems.size()}；合计金额：#{assetStockedController.totalPurchasePrice()}</label>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{assetStockedController.outStock}">
+                    <label class="label">出库单号</label>
+                    <p:autoComplete dropdown="true" value="#{assetStockedController.outStockNo}" scrollHeight="300"  forceSelection="true"
+                                    completeMethod="#{assetStockedController.autoCompleteOutStockNo}">
+                        <p:ajax event="itemSelect" listener="#{assetStockedController.onNoChange('outStock')}" update=":assetOutStockTab:GeneratedOutStockForm"/>
+                        <p:ajax listener="#{assetStockedController.onNoChange('outStock')}" update=":assetOutStockTab:GeneratedOutStockForm"/>
+                    </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!assetStockedController.outStock}">
+                    <label class="label">领用科室<span style="color: red">*</span></label>
+                    <p:inputText id="dept" value="#{assetStockedController.recruiteDept.name}" readonly="true" required="true" requiredMessage="领用科室 #{msg.ValidationRequire}"/>
+                    <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                    <p:overlayPanel  id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit"
+                                     style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true">
+                        <p:scrollPanel style="height:300px; border: 0" mode="native">
+                            <p:inputText id="searchDeptName" value="#{assetStockedController.searchDeptName}"/>
+                            <p:commandButton process=":assetOutStockTab:GeneratedOutStockForm:searchDeptName @this" partialSubmit="true" icon="ui-icon-search" update="orgTreeEdit" actionListener="#{assetStockedController.treeSeachCondition()}" value="检索"/>
+                            <p:tree id="orgTreeEdit" value="#{assetStockedController.orgTreeEdit}" var="node"
+                                    selectionMode="single" class="tree" style="width:98%; border:0">
+                                <p:ajax process="@this" event="select"
+                                        update="@parent:dept"
+                                        listener="#{assetStockedController.onSelectTreeNode}"
+                                        oncomplete="PF('varOrgEdit').hide();"/>
+                                <p:ajax process="@this" event="expand"/>
+                                <p:ajax process="@this" event="collapse"/>
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:dataTable id="outStockDocList" value="#{assetStockedController.selectedItems}" var="item"
+                         lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
+                         emptyMessage="#{msg.noRecordFound}">
+                <p:column headerText="业务时间">
+                    <h:outputText value="#{item.installDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg.vendor}">
+                    <h:outputText value="#{item.arrivalList.vendor}"/>
+                </p:column>
+                <p:column headerText="#{msg.financingNum}">
+                    <h:outputText value="#{item.financingNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.assetName}">
+                    <h:outputText value="#{item.arrivalList.assetName}"/>
+                </p:column>
+                <p:column headerText="#{msg.arrivalListContractNum}">
+                    <h:outputText value="#{item.arrivalList.contractNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.functionType}">
+                    <h:outputText value="#{item.arrivalList.functionType}"/>
+                </p:column>
+                <p:column headerText="#{msg.comments}">
+                    <h:outputText value="#{item.comments}"/>
+                </p:column>
+                <p:column headerText="资产价值">
+                    <h:outputText value="#{item.purchasePrice}"/>
+                </p:column>
+                <p:column headerText="#{msg.arrivalListInvoiceNum}">
+                    <h:outputText value="#{item.arrivalList.invoiceNum}"/>
+                </p:column>
+                <p:column headerText="发票日期">
+                    <h:outputText value="#{item.arrivalList.invoiceDate}"/>
+                </p:column>
+                <p:column headerText="状态">
+                    <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}"/>
+                </p:column>
+            </p:dataTable>
+            <p:commandButton validateClient="true" action="#{assetStockedController.generatedOutStockDoc()}" rendered="#{!assetStockedController.outStock}"
+                             value="#{msg.Confirm}" update=":assetOutStockTab:GeneratedOutStockForm :assetOutStockTab:AssetStockedManageListForm:datalist" icon="ui-icon-check"
+                             oncomplete="handleSubmit(args, 'GeneratedOutStockDocDialog');"/>
+            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" update=":assetOutStockTab:AssetOutStockedListForm:datalist" onclick="PF('GeneratedOutStockDocDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+    <script type="text/javascript">
+        function reload() {
+            window.location.reload();
+        }
+        function handleGeneratedInStockDoc(xhr, status, args) {
+            var generatedInStockDoc = args.generatedInStockDoc;
+            if(generatedInStockDoc != false) {
+                PF('GeneratedInStockDocDialog').show();
+            }
+        }
+        function handleGeneratedOutStockDoc(xhr, status, args) {
+            var generatedOutStockDoc = args.generatedOutStockDoc;
+            if(generatedOutStockDoc != false) {
+                PF('GeneratedOutStockDocDialog').show();
+            }
+        }
+    </script>
+</ui:composition>
+</html>
