@@ -13,6 +13,7 @@ import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
@@ -36,6 +37,7 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -257,14 +259,22 @@ public class ExportToBeTerminatedAppraisalService {
             }
             map.put(num, 1);   //数量
             String assetUsedLifecycle = assetInfo.getAssetUsedLifecycle();
+
+            long  usedMonth=0;
+            if (!ObjectUtil.isEmpty(assetInfo.getPurchaseDate()) || !ObjectUtil.isEmpty(assetInfo.getLifecycle())) {
+
+                LocalDate localInstallDate =new Date(assetInfo.getPurchaseDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate now = LocalDate.now();
+                 usedMonth = ChronoUnit.MONTHS.between(localInstallDate, now);
+            }
             Integer lifecycle = assetInfo.getLifecycle();
             Double lifecycleInYear = assetInfo.getLifecycleInYear();
             Double purchasePrice = assetInfo.getPurchasePrice();
-            if(StringUtils.isNotBlank(assetUsedLifecycle) && lifecycle!=null && lifecycle!=0   && purchasePrice!=null){
-                double assetUsedLifecycleDouble = Double.parseDouble(assetUsedLifecycle);
-                logger.info("assetUsedLifecycleDouble :{},lifecycle:{},purchasePrice:{}",assetUsedLifecycleDouble, lifecycle,purchasePrice);
+            if(usedMonth>0 && lifecycle!=null && lifecycle!=0   && purchasePrice!=null){
+
+                logger.info("assetUsedLifecycleDouble :{},lifecycle:{},purchasePrice:{}",usedMonth, lifecycle,purchasePrice);
 //                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycleInYear), BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(purchasePrice)).setScale(2, BigDecimal.ROUND_HALF_UP);
-                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycle).multiply(BigDecimal.valueOf(purchasePrice)), RoundingMode.HALF_UP);
+                BigDecimal bigDecimal = BigDecimal.valueOf(usedMonth).divide(BigDecimal.valueOf(lifecycle),5, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(purchasePrice));
                 if(bigDecimal.compareTo(BigDecimal.valueOf(purchasePrice))>=0){
                     map.put(accumulated_depreciation, BigDecimal.valueOf(purchasePrice));   //累计折旧
 
