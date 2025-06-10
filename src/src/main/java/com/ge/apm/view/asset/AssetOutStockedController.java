@@ -2,12 +2,12 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.AssetOutStockService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -36,10 +36,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -47,7 +44,6 @@ import java.util.stream.Collectors;
 public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOutStockRecord> {
 
     private AssetOutStockRecordRepository dao = null;
-    private ArrivalListRepository arrivalListRepository;
     private ArrivalListItemRepository arrivalListItemRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private UaaService uaaService;
@@ -95,7 +91,6 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetOutStockRecordRepository.class);
-        arrivalListRepository = WebUtil.getBean(ArrivalListRepository.class);
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -223,6 +218,10 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             WebUtil.addErrorMessage("包含已退库的设备，无法生成退库单！");
             return;
         }
+        AssetInfoEditController assetInfoEditController = WebUtil.getBean(AssetInfoEditController.class);
+        if (assetInfoEditController.checkAssetOrderIsComplete(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()))) {
+            return;
+        }
         boolean checked = assetOutStockService.checkAssetInfo(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()));
         if (!checked) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
@@ -247,7 +246,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             arrivalListItem.setClinicalDeptUID(setAssetOutStockDept);
             arrivalListItem.setInStockNo(null);
             arrivalListItem.setInStockBusinessDate(now);
-            arrivalListItem.setStockStatus(5);
+            arrivalListItem.setStockStatus(2);
             arrivalListItem.setComments(searchItem.getComments());
             arrivalListItems.add(arrivalListItem);
             selectedItem.setStockStatus(5);
@@ -317,11 +316,16 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         }
     }
 
-    public String openNewWindowView(String stockNo) {
-        if (stockNo.startsWith("CK")) {
-            return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + stockNo;
-        } else {
-            return "";
+    public String openNewWindowView(AssetOutStockRecord outStockRecord, String type) {
+        switch (type) {
+            case "outStocked" :
+                return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + outStockRecord.getOutStockNo();
+            case "assetInfo" :
+                return "/portal/asset/info/AssetDetail.xhtml?faces-redirect=true&amp;actionName=View&amp;terminate=false&amp;assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
+            case "contractInfo" :
+                return "/portal/asset/contract/ContractView.xhtml?faces-redirect=true&amp;action=Edit&amp;contractNum=" + outStockRecord.getContractNum();
+            default:
+                return "";
         }
     }
 

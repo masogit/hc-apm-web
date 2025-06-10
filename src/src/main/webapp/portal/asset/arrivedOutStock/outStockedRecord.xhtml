@@ -105,7 +105,7 @@
             <p:ajax event="rowSelect" listener="#{assetOutStockedController.onRowSelect}" update=":growl :assetOutStockTab:outStockedDataForm :assetOutStockTab:AssetOutStockedListForm:datalist"/>
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="出库单号">
-                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item.outStockNo)}" value="#{item.outStockNo}" onblur="reload()" />
+                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'outStocked')}" value="#{item.outStockNo}" onblur="reload()" />
             </p:column>
             <p:column headerText="业务时间">
                 <h:outputText value="#{item.businessDate}">
@@ -119,13 +119,15 @@
                 <h:outputText value="#{assetOutStockedController.getUserNameByUid(item.outStockUser)}"/>
             </p:column>
             <p:column headerText="#{msg.financingNum}">
-                <h:outputText value="#{item.financingNum}"/>
+                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'assetInfo')}" value="#{item.contractNum}" />
+<!--                <h:outputText value="#{item.financingNum}"/>-->
             </p:column>
             <p:column headerText="#{msg.assetName}">
                 <h:outputText value="#{item.assetName}"/>
             </p:column>
             <p:column headerText="#{msg.arrivalListContractNum}">
-                <h:outputText value="#{item.contractNum}"/>
+                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'contractInfo')}" value="#{item.contractNum}" />
+<!--                <h:outputText value="#{item.contractNum}"/>-->
             </p:column>
             <p:column headerText="#{msg.installDate}">
                 <h:outputText value="#{item.installDate}">
@@ -154,7 +156,8 @@
                 <h:outputText value="#{fieldMsg.fieldValue('stockStatus', item.stockStatus)}"/>
             </p:column>
             <f:facet name="{Toolbar}">
-                <p:commandButton value="生成退库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" action="#{assetOutStockedController.prepareGeneratedReturnedStockDoc()}" validateClient="true" oncomplete="handleGeneratedReturnedStockDoc(xhr, status, args);" update=":growl :assetOutStockTab:GeneratedReturnedStockDocDlg"/>
+                <p:commandButton value="生成退库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" action="#{assetOutStockedController.prepareGeneratedReturnedStockDoc()}" validateClient="true"
+                                 oncomplete="handleAssetReturnedStockSubmit(xhr, status, args);" update=":growl :assetOutStockTab:GeneratedReturnedStockDocDlg :assetOutStockTab:unfinishedAssetOrderDetailDialog"/>
                 <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray" icon="ui-icon-print" title="预览打印二维码"  actionListener="#{assetOutStockedController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="handleSubmit(args,'qrPreviewedDlg')" />
             </f:facet>
         </p:dataTable>
@@ -216,13 +219,28 @@
             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" update=":assetOutStockTab:AssetOutStockedListForm:datalist" onclick="PF('GeneratedReturnedStockDocDialog').hide()"/>
         </h:form>
     </p:dialog>
+    <p:dialog widgetVar="unfinishedAssetOrderDetailDialog" modal="true" id="unfinishedAssetOrderDetailDialog" draggable="true" appendTo="@(body)" height="300" width="500"   >
+        <p:fieldset legend="当前设备有未完成工单,请进行处理">
+            <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('returnedStock')}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
+            <br/> <br/> <br/>
+            <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
+                未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not empty assetInfoEditController.pmOrderList}">
+                未完成保养工单号: #{assetInfoEditController.pmOrderList}  <br/> <br/> <br/>
+            </h:panelGroup>
+
+        </p:fieldset>
+    </p:dialog>
     <script type="text/javascript">
         function reload() {
             window.location.reload();
         }
-        function handleGeneratedReturnedStockDoc(xhr, status, args) {
-            var generatedReturnedStockDoc = args.generatedReturnedStockDoc;
-            if(generatedReturnedStockDoc != false) {
+        function handleAssetReturnedStockSubmit(xhr, status, args) {
+            var asetOrderIsComplete = args.asetOrderIsComplete;
+            if(asetOrderIsComplete==true) {
+                PF('unfinishedAssetOrderDetailDialog').show();
+            }else{
                 PF('GeneratedReturnedStockDocDialog').show();
             }
         }
