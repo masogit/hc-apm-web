@@ -134,6 +134,29 @@
                         </p:inputTextarea>
                     </h:panelGroup>
                 </p:panelGrid>
+
+                <p:panelGrid columns="1" id="returnFileGrid" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                    <h:panelGroup rendered="#{zkbPartOrderAuditController.showCatUploadFlag()}">
+                        <p:dataList id="newCatNoFileList" value="#{zkbPartOrderAuditController.queryBlobByType('ZkbPartOrderReturnNewCat')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">新探头序列号照片</f:facet>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                            <p:commandButton actionListener="#{zkbPartOrderAuditController.removeUniversalFile(fileitem)}" update="newCatNoFileList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="ZkbPartOrderReturnNewCat" allowTypes="/(\.|\/)(pdf|png|jpg|PDF|JPG|PNG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleUniversalFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="newCatNoFileList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" />
+                        <p:dataList id="oldCatNoFileList" value="#{zkbPartOrderAuditController.queryBlobByType('ZkbPartOrderReturnOldCat')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">旧探头序列号照片</f:facet>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                            <p:commandButton actionListener="#{zkbPartOrderAuditController.removeUniversalFile(fileitem)}" update="oldCatNoFileList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="ZkbPartOrderReturnOldCat" allowTypes="/(\.|\/)(pdf|png|jpg|PDF|JPG|PNG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleUniversalFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="oldCatNoFileList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" />
+                    </h:panelGroup>
+                </p:panelGrid>
             </p:fieldset>
 
 

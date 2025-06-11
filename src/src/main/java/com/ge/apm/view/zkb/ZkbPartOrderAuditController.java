@@ -88,6 +88,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     ZkbPartOrderCloseWorkTime selectZkbPartOrderCloseWorkTime;
     @Getter@Setter
     private List<V2_BlobObject> closeBlobObjectList = new ArrayList<>();
+    @Getter@Setter
+    private List<V2_BlobObject> universalBlobObjectList = new ArrayList<>();
 
     private String modifyType="";
     private String modifyTitle="";
@@ -357,6 +359,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
                 if(getUnrealStatusRender()){
                     zkbPartOrderStatusVo.setUnrealTips(zkbPartOrderService.getProbeUnrealData(selected, zkbPartOrderStatusVo.getShowCatListFlag()));
+                }
+                if(StrUtil.isNotEmpty(selected.getReturnType()) && selected.getReturnType().equals(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name())){
+                    if(selected.getOrderNo().startsWith("FE")){
+                        universalBlobObjectList = zkbPartOrderService.queryBlobBySubType(selectedId);
+                    }
                 }
             }
             if(zkbPartOrderStatusVo.isCanEditFlag() && ZkbConstantUtil.T.equals(selected.getSupplementFlag())){
@@ -733,7 +740,20 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderService.normalNextComplete(zkbPartOrderCloseInfo,selected,zkbPartOrderCloseWorkTimeList, closeBlobObjectList,currentUser);
             //发送邮件给关单审核人
             zkbPartOrderService.sendEmail(selected, "", UserContextService.getAccessToken());
-        } else {
+        } else if(ZkbPartOrderStep.PartOrderStep.ReturnPending.name().equals(selected.getCurrentStep()) && ZkbPartOrder.OrderType.Probe.name().equals(selected.getOrderType())){
+            List<V2_BlobObject> newBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_NEW_CAT);
+            if(CollectionUtils.isEmpty(newBlobList)){
+                WebUtil.addErrorMessage("新探头序列号照片未上传！","");
+                return "";
+            }
+            List<V2_BlobObject> oldBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_OLD_CAT);
+            if(CollectionUtils.isEmpty(oldBlobList)){
+                WebUtil.addErrorMessage("旧探头序列号照片未上传！","");
+                return "";
+            }
+            zkbPartOrderService.normalNext(this.selected,currentUser,zkbPartOrderCloseInfo);
+            zkbPartOrderService.saveBlob(universalBlobObjectList, selected.getId());
+        }else {
             zkbPartOrderService.normalNext(this.selected,currentUser,zkbPartOrderCloseInfo);
         }
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
@@ -1146,8 +1166,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
              }
             zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-
-            boolean arg = zkbPartOrderService.probeModifyReturn(selected,currentUser);
+            List<V2_BlobObject> newBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_NEW_CAT);
+            if(CollectionUtils.isEmpty(newBlobList)){
+                WebUtil.addErrorMessage("新探头序列号照片未上传！","");
+                return;
+            }
+            List<V2_BlobObject> oldBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_OLD_CAT);
+            if(CollectionUtils.isEmpty(oldBlobList)){
+                WebUtil.addErrorMessage("旧探头序列号照片未上传！","");
+                return;
+            }
+            boolean arg = zkbPartOrderService.probeModifyReturn(selected,currentUser, universalBlobObjectList);
             if(arg){
                 WebUtil.addErrorMessage("归还类型已修改，剩余名额不足，需400手动处理！","");
              }
@@ -1438,8 +1467,34 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturn.setPartNo(zkbPartOrderItem.getPartNo());
     }
 
-    //region get、set
+    public List<V2_BlobObject> queryBlobByType(String type){
+        return universalBlobObjectList.stream().filter(t -> t.getBoSubType().equals(type)).collect(Collectors.toList());
+    }
 
+    public void handleUniversalFileUpload(FileUploadEvent event){
+        String type = event.getComponent().getId();
+        V2_BlobObject v2_blobObject = zkbPartOrderService.uploadFile(event, type);
+        universalBlobObjectList.add(v2_blobObject);
+        WebUtil.addSuccessMessage( WebUtil.getMessage("SuccessUploaded"));
+    }
+
+    public void removeUniversalFile(V2_BlobObject v2_blobObject){
+        universalBlobObjectList.remove(v2_blobObject);
+        blobService.deleteBlobFile(v2_blobObject);
+    }
+
+    public boolean showCatUploadFlag(){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(selected.getOrderNo().startsWith("FE")){
+                if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name().equals(selected.getReturnType())){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //region get、set
     public String getModifyType() {
         return modifyType;
     }
