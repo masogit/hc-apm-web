@@ -1068,7 +1068,7 @@
                         <h:panelGroup>
                             <label class="label">归还类型*</label>
                             <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}" >
-                                <p:ajax event="change" update="returnTypeGrid" />
+                                <p:ajax event="change" update="returnTypeGrid returnFileGrid" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -1150,6 +1150,28 @@
                             <label class="label">归还备注</label>
                             <p:inputTextarea id="returnRemark" value="#{zkbPartOrderAuditController.selected.returnRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag)}">
                             </p:inputTextarea>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="1" id="returnFileGrid" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.showCatUploadFlag()}">
+                            <p:dataList id="newCatNoFileList" value="#{zkbPartOrderAuditController.queryBlobByType('ZkbPartOrderReturnNewCat')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">新探头序列号照片</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandButton actionListener="#{zkbPartOrderAuditController.removeUniversalFile(fileitem)}" update="newCatNoFileList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload id="ZkbPartOrderReturnNewCat" allowTypes="/(\.|\/)(pdf|png|jpg|PDF|JPG|PNG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleUniversalFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                          multiple="true"  sizeLimit="100000000"  update="newCatNoFileList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}"/>
+                            <p:dataList id="oldCatNoFileList" value="#{zkbPartOrderAuditController.queryBlobByType('ZkbPartOrderReturnOldCat')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">旧探头序列号照片</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandButton actionListener="#{zkbPartOrderAuditController.removeUniversalFile(fileitem)}" update="oldCatNoFileList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload id="ZkbPartOrderReturnOldCat" allowTypes="/(\.|\/)(pdf|png|jpg|PDF|JPG|PNG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleUniversalFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                          multiple="true"  sizeLimit="100000000"  update="oldCatNoFileList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:dataTable id="zkbReturnDatalist" value="#{zkbPartOrderAuditController.zkbPartOrderReturnList}" var="it" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}"

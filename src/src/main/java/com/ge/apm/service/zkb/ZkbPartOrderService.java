@@ -29,6 +29,7 @@ import webapp.framework.web.WebUtil;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -1392,6 +1393,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    public void saveBlob(List<V2_BlobObject> v2BlobObjectList, String uuid){
+        for(V2_BlobObject v :v2BlobObjectList){
+            v.setBoUuid(uuid);
+        }
+        blobObjectRepository.save(v2BlobObjectList);
+    }
+
     public boolean probeOrderNewCatChangeCheck(ZkbPartOrder selected, ZkbContract zkbContract){
         boolean result = false;
         if(selected.getQty() == 0){
@@ -1539,11 +1547,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             w.setCloseId(zkbPartOrderCloseInfo.getId());
         }
         zkbPartOrderCloseWorkTimeRepository.save(zkbPartOrderCloseWorkTimeList);
-
-        for(V2_BlobObject v :v2BlobObjectList){
-            v.setBoUuid(zkbPartOrderCloseInfo.getId());
-        }
-        blobObjectRepository.save(v2BlobObjectList);
+        saveBlob(v2BlobObjectList, zkbPartOrderCloseInfo.getId());
         //將其他srNo的數據設置為已完成。
         updateCompleteAuditBySrNum(zkbPartOrder);
     }
@@ -2153,6 +2157,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return v2_blobObject;
     }
 
+    public V2_BlobObject uploadFile(FileUploadEvent event, String type){
+        V2_BlobObject v2_blobObject = blobService.uploadFile(event);
+        if(v2_blobObject != null){
+            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
+            v2_blobObject.setBoSubType(type);
+            blobObjectRepository.save(v2_blobObject);
+        }
+        return v2_blobObject;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public boolean submitCloseReturn(List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList,ZkbPartOrder zkbPartOrder,UserAccount currentUser){
         boolean arg = false;
@@ -2222,7 +2236,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean probeModifyReturn(ZkbPartOrder zkbPartOrder,UserAccount account){
+    public boolean probeModifyReturn(ZkbPartOrder zkbPartOrder,UserAccount account, List<V2_BlobObject> v2_blobObjectList){
         boolean arg = false;
         ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
         int oldBackTotal = 0;
@@ -2244,6 +2258,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 arg = true;
             }else{
                 zkbPartOrderQuotaService.subReturnQty(zkbContract,zkbPartOrder,ce,account);
+            }
+        }
+        if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name().equals(zkbPartOrder.getReturnType())){
+            if(zkbPartOrder.getOrderNo().startsWith("FE")){
+                List<V2_BlobObject> newList = v2_blobObjectList.stream().filter(t-> StrUtil.isEmpty(t.getBoUuid())).collect(Collectors.toList());
+                saveBlob(newList, zkbPartOrder.getId());
             }
         }
         return arg;
@@ -2611,6 +2631,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
     }
     //endregion
+
+    public List<V2_BlobObject> queryBlobBySubType(String id){
+        List<V2_BlobObject> list = new ArrayList<>();
+        List<V2_BlobObject> newList = blobObjectRepository.findByBoUuidAndBoSubType(id, V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_NEW_CAT);
+        list.addAll(newList);
+        List<V2_BlobObject> oldList = blobObjectRepository.findByBoUuidAndBoSubType(id, V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_OLD_CAT);
+        list.addAll(oldList);
+        return list;
+    }
 
     public boolean checkDeductMaintain(ZkbContractAsset zkbContractAsset,Date requestTime){
         if(zkbContractAsset.getMaintainStartDate() == null && zkbContractAsset.getMaintainEndDate() == null){
