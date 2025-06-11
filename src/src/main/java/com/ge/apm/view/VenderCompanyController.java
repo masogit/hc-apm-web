@@ -7,6 +7,7 @@ import com.ge.apm.dao.VenderNoticeRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.preview.PreViewerBean;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -48,6 +49,8 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private Boolean relation;
     @Getter @Setter
     private Map<String, List<V2_BlobObject>> attachmentMap = MapUtil.newHashMap();
+    @Getter @Setter
+    private String venderCompanyId;
     private UserAccount currentUser;
 
     private PreViewerBean preViewerBean;
@@ -62,6 +65,11 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         venderNoticeRepository = WebUtil.getBean(VenderNoticeRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         this.filterBySite = false;
+        String encodeStr = WebUtil.getRequestParameter("str");
+        venderCompanyId = (String) UrlEncryptController.getValueFromMap(encodeStr, "venderCompanyId");
+        if (ObjectUtil.isNotEmpty(venderCompanyId)) {
+            this.selected = dao.findById(venderCompanyId);
+        }
     }
 
     @Override
