@@ -33,6 +33,8 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -126,7 +128,14 @@ public class AssetInfoDetailController {
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = Boolean.parseBoolean(terminateStr);
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-        if(selectedId!=null) selected = assetDao.findByUid(selectedId);
+        if (selectedId != null) {
+            selected = assetDao.findByUid(selectedId);
+        } else {
+            HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            terminate = Boolean.parseBoolean(request.getParameter("terminate"));
+            String assetUid = (String) UrlEncryptController.getValueFromMap(request.getParameter("assetUid"), "assetUid");
+            selected = assetDao.findByUid(assetUid);
+        }
         selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());

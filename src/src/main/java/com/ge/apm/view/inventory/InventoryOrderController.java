@@ -135,11 +135,12 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     public void onCreate() throws IllegalAccessException, InstantiationException {
         super.prepareCreate();
         orgsForSelected = apiService.onCreateInventory();
-        if (filterNoneAsset) {
+        // YHAAO-25279 微信端直接过滤
+        /*if (filterNoneAsset) {
             List<OrgInfo> orgInfos = uaaService.filterNoneAsset(orgsForSelected.stream().map(OrgDto::getUid).collect(Collectors.toList()));
             List<Integer> orgInfoIds = orgInfos.stream().map(OrgInfo::getId).collect(Collectors.toList());
             orgsForSelected = orgsForSelected.stream().filter(t -> orgInfoIds.contains(t.getId())).collect(Collectors.toList());
-        }
+        }*/
     }
 
     public void onFinishOrder(String id){
