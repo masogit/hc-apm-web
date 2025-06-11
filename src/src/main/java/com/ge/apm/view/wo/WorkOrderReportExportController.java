@@ -191,17 +191,23 @@ public class WorkOrderReportExportController implements Serializable {
     }
 
     private void exportWoData(List<Map<String, Object>> workOrderdata) {
-        String fileName = "APM_WorkOrder_Template.xlsx";
+        SystemTemplateEnum systemTemplateEnum=SystemTemplateEnum.WORK_ORDER_REPORT_EXCEL;
+//        String fileName = "APM_WorkOrder_Template.xlsx";
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if(!userContextService.isLocale()){
-             fileName = "APM_WorkOrder_Template_en.xlsx";
+//             fileName = "APM_WorkOrder_Template_en.xlsx";
+            systemTemplateEnum=SystemTemplateEnum.WORK_ORDER_REPORT_EXCEL_EN;
         }
 
         workOrderdata = workOrderExportService.supplementWorkOrder(workOrderdata);
 
         try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/" + fileName);
-            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+//            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/" + fileName);
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            byte[] byteArray = systemTemplateService.getTemplateFileByte(systemTemplateEnum, user);
+
+
+            ExcelDocument doc = new ExcelDocument(new ByteArrayInputStream(byteArray), ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = workOrderExportService.exportData(doc, workOrderdata, workOrderExportService.createPartsData(workOrderdata));
             if (exportFlag) {
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "WorkOrderData.xlsx");

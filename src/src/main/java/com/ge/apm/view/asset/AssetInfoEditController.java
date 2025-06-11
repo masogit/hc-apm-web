@@ -1331,6 +1331,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         if (qrCodeLib.getStatus() != 1) {
             WebUtil.addErrorMessage(WebUtil.getMessage("AlreadyUsingQrCode"));
+            logger.error("update qrCode err, qrCode is : " + qrCode + " asset qrCode is : " + selected.getQrCode());
             return false;
         }
 
