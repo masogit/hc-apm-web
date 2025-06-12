@@ -12,7 +12,7 @@ import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
-import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
+import com.ge.healthcare.cn.common.utils.render.AbstractWoTableRenderPolicy;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
