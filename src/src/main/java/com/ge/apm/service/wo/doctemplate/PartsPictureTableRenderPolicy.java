@@ -7,6 +7,7 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.template.ElementTemplate;
 import com.deepoove.poi.template.run.RunTemplate;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.healthcare.cn.common.utils.render.AbstractWoTableRenderPolicy;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
