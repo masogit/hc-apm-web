@@ -348,8 +348,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             return;
         }
         String url = "selectedid=" + selected.getUid();
+        if (ObjectUtil.isNotEmpty(selected.getVenderCompanyId())) {
+            url = "venderCompanyId=" + selected.getVenderCompanyId();
+        }
         url = "View.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
-//        url = "VenderCompanyDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }

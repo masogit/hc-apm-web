@@ -11,7 +11,7 @@
                 <p:outputLabel class="pageTitle" value="供应商详细信息"/>
             </div>
             <div class="ui-g-12 card">
-                <h:form id="SupplierDetilForm">
+                <h:form id="SupplierDetilForm" rendered="#{supplierController.selected != null}">
                     <p:fieldset legend="供应商基本信息">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                             <h:panelGroup>
@@ -229,8 +229,10 @@
                             </p:dataList>
                         </h:panelGroup>
                     </p:fieldset>
+                    <ui:include src="/portal/preview/view.xhtml" />
                 </h:form>
-                <ui:include src="/portal/preview/view.xhtml" />
+
+                <ui:include src="VenderCompanyDetail.xhtml" />
             </div>
         </div>
     </ui:define>
