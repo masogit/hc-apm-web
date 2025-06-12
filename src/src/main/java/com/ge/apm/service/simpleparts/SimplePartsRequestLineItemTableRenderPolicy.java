@@ -1,6 +1,6 @@
 package com.ge.apm.service.simpleparts;
 
-import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
+import com.ge.healthcare.cn.common.utils.render.AbstractWoTableRenderPolicy;
 import org.apache.poi.xwpf.usermodel.*;
 
 import java.util.List;

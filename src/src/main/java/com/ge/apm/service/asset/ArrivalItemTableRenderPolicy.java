@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
+
+import com.ge.healthcare.cn.common.utils.render.AbstractWoTableRenderPolicy;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
