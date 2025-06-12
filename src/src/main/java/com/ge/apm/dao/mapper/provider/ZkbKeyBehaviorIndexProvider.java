@@ -14,16 +14,26 @@ public class ZkbKeyBehaviorIndexProvider {
     public String loadZkbKeyBehaviorIndex(Map<String,Object> param){
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT " +
-                " T .*, t1. NAME AS tenant_name " +
-                "FROM " +
-                " zkb_key_behavior_index T " +
-                "INNER JOIN tenant_info t1 ON T .tenant_uid = t1.uid " +
-                "WHERE " +
-                " 1 = 1");
+        sb.append(" select RANK () OVER (PARTITION BY kbi_date ORDER BY total_score DESC ) rank, * from " +
+                "( SELECT DISTINCT (apm_billing_rate_score + compliance_score + engineer_score + part_return_score + paste_quick_response_rate_score + satisfactory_degree_score ) AS total_score," +
+                " T .*, t1.NAME AS tenant_name, dit.di_rank,ccst.ccs_rank,pcbt.pcb_rank FROM zkb_key_behavior_index T " +
+                " INNER JOIN tenant_info t1 ON T.tenant_uid = t1.uid " +
+                " left join (SELECT RANK ( ) OVER ( PARTITION by dt ORDER BY total_score DESC ) di_rank, * FROM " +
+                "   ( SELECT DISTINCT i.tenant_uid, ( apm_billing_rate_score + compliance_score + engineer_score + part_return_score + paste_quick_response_rate_score + satisfactory_degree_score ) AS total_score , TO_CHAR( kbi_date, 'yyyy-MM' ) dt FROM zkb_key_behavior_index i " +
+                "    inner join zkb_contract c on i.tenant_uid = c.tenant_uid and contract_type = 'DI' and start_date <= ( kbi_date+ INTERVAL '1 month - 1 day') and end_date >= kbi_date" +
+                "   ) T order by dt ) dit on T.tenant_uid = dit.tenant_uid and TO_CHAR(T.kbi_date, 'yyyy-MM' ) = dit.dt " +
+                " left join (SELECT RANK ( ) OVER ( PARTITION by dt ORDER BY total_score DESC ) ccs_rank, * FROM " +
+                "   ( SELECT DISTINCT i.tenant_uid, ( apm_billing_rate_score + compliance_score + engineer_score + part_return_score + paste_quick_response_rate_score + satisfactory_degree_score ) AS total_score , TO_CHAR( kbi_date, 'yyyy-MM' ) dt FROM zkb_key_behavior_index i " +
+                "    inner join zkb_contract c on i.tenant_uid = c.tenant_uid and contract_type in ('CCS','Biomed','CCSB' ) and start_date <= ( kbi_date+ INTERVAL '1 month - 1 day') and end_date >= kbi_date" +
+                "   ) T order by dt ) ccst on T.tenant_uid = ccst.tenant_uid and TO_CHAR(T.kbi_date, 'yyyy-MM' ) = ccst.dt " +
+                " left join (SELECT RANK ( ) OVER ( PARTITION by dt ORDER BY total_score DESC ) pcb_rank, * FROM " +
+                "   ( SELECT DISTINCT i.tenant_uid, ( apm_billing_rate_score + compliance_score + engineer_score + part_return_score + paste_quick_response_rate_score + satisfactory_degree_score ) AS total_score , TO_CHAR( kbi_date, 'yyyy-MM' ) dt FROM zkb_key_behavior_index i " +
+                "    inner join zkb_contract c on i.tenant_uid = c.tenant_uid and contract_type in ('PCB','PCB MVS') and start_date <= ( kbi_date+ INTERVAL '1 month - 1 day') and end_date >= kbi_date" +
+                "   ) T order by dt ) pcbt on T.tenant_uid = pcbt.tenant_uid and TO_CHAR(T.kbi_date, 'yyyy-MM' ) = pcbt.dt " +
+                " WHERE 1 = 1   ");
         String filter = buildFilter_zkbOrderHistoryDetail(searchFilterList);
         sb.append(filter);
-        sb.append(" order by kbi_date desc , tenant_name asc");
+        sb.append(" ) T ORDER BY kbi_date DESC,tenant_name ASC;");
         return sb.toString();
     }
 
@@ -34,19 +44,19 @@ public class ZkbKeyBehaviorIndexProvider {
             Object value = searchFilter.value;
             if("tenantUID".equals(tempColumn))
             {
-                sb.append("and tenant_uid='"+value.toString()+"'");
+                sb.append("and T.tenant_uid='"+value.toString()+"'");
             }
             if("beginningTime".equals(tempColumn))
             {
-                sb.append(" and kbi_date>='"+value+"'");
+                sb.append(" and T.kbi_date>='"+value+"'");
             }
             if("endingTime".equals(tempColumn))
             {
-                sb.append(" and kbi_date<='"+value+"'");
+                sb.append(" and T.kbi_date<='"+value+"'");
             }
             if("effect".equals(tempColumn))
             {
-                sb.append(" and effect = '"+value+"'");
+                sb.append(" and T.effect = '"+value+"'");
             }
         }
         return sb.toString();
@@ -62,7 +72,7 @@ public class ZkbKeyBehaviorIndexProvider {
                         "AVG(part_return_score) as part_return_score,"+
                         "AVG(paste_quick_response_rate_score) as paste_quick_response_rate_score,"+
                         "AVG(satisfactory_degree_score) as satisfactory_degree_score,kbi_date "+
-                        "from zkb_key_behavior_index where 1=1 ");
+                        "from zkb_key_behavior_index T where 1=1 ");
         String filter = buildFilter_zkbOrderHistoryDetail(searchFilterList);
         sb.append(filter);
         sb.append("GROUP BY kbi_date ORDER BY kbi_date ASC");

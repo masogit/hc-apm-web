@@ -161,6 +161,15 @@ public class ZkbKeyBehaviorIndex {
     @Transient
     private Integer rank;
 
+    @Transient
+    private Integer diRank;
+
+    @Transient
+    private Integer ccsRank;
+
+    @Transient
+    private Integer pcbRank;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -447,8 +456,6 @@ public class ZkbKeyBehaviorIndex {
         this.rank = rank;
     }
 
-
-
     public String getEffect() {
         return effect;
     }
@@ -471,5 +478,29 @@ public class ZkbKeyBehaviorIndex {
 
     public void setRemarkCcsb(String remarkCcsb) {
         this.remarkCcsb = remarkCcsb;
+    }
+
+    public Integer getDiRank() {
+        return diRank;
+    }
+
+    public void setDiRank(Integer diRank) {
+        this.diRank = diRank;
+    }
+
+    public Integer getCcsRank() {
+        return ccsRank;
+    }
+
+    public void setCcsRank(Integer ccsRank) {
+        this.ccsRank = ccsRank;
+    }
+
+    public Integer getPcbRank() {
+        return pcbRank;
+    }
+
+    public void setPcbRank(Integer pcbRank) {
+        this.pcbRank = pcbRank;
     }
 }
