@@ -1,7 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.deepoove.poi.data.PictureRenderData;
-import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
+import com.ge.healthcare.cn.common.utils.render.AbstractWoTableRenderPolicy;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
