@@ -361,7 +361,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     zkbPartOrderStatusVo.setUnrealTips(zkbPartOrderService.getProbeUnrealData(selected, zkbPartOrderStatusVo.getShowCatListFlag()));
                 }
                 if(StrUtil.isNotEmpty(selected.getReturnType()) && selected.getReturnType().equals(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name())){
-                    if(selected.getOrderNo().startsWith("FE")){
+                    if(StrUtil.isNotEmpty(selected.getOrderNo()) && selected.getOrderNo().toUpperCase().startsWith("FE")){
                         universalBlobObjectList = zkbPartOrderService.queryBlobBySubType(selectedId);
                     }
                 }
@@ -1485,7 +1485,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public boolean showCatUploadFlag(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-            if(StrUtil.isNotEmpty(selected.getOrderNo()) && selected.getOrderNo().startsWith("FE")){
+            if(StrUtil.isNotEmpty(selected.getOrderNo()) && selected.getOrderNo().toUpperCase().startsWith("FE")){
                 if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name().equals(selected.getReturnType())){
                     return true;
                 }
