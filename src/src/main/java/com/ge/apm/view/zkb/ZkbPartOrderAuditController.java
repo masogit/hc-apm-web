@@ -1485,7 +1485,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public boolean showCatUploadFlag(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-            if(selected.getOrderNo().startsWith("FE")){
+            if(StrUtil.isNotEmpty(selected.getOrderNo()) && selected.getOrderNo().startsWith("FE")){
                 if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name().equals(selected.getReturnType())){
                     return true;
                 }
