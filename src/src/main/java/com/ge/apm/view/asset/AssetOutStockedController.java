@@ -1,7 +1,9 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetOutStockService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.common.ConfigCacheService;
@@ -10,6 +12,7 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -44,6 +47,7 @@ import java.util.stream.Collectors;
 public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOutStockRecord> {
 
     private AssetOutStockRecordRepository dao = null;
+    private AssetStockedRepository assetStockedRepository;
     private ArrivalListItemRepository arrivalListItemRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private UaaService uaaService;
@@ -56,6 +60,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     private UserAccountRepository userAccountRepository;
     private SupplierRepository supplierRepository;
     private ConfigCacheService configCacheService;
+    private MqUtils mqUtils;
 
     private UserAccount currentUser;
     private AssetOutStockRecord searchItem;
@@ -98,6 +103,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetOutStockRecordRepository.class);
+        assetStockedRepository = WebUtil.getBean(AssetStockedRepository.class);
         arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -109,6 +115,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        mqUtils = WebUtil.getBean(MqUtils.class);
         currentUser = UserContextService.getCurrentUserAccount();
         supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
@@ -229,11 +236,6 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     }
 
     public void prepareGeneratedReturnedStockDoc() {
-        if (selectedItems.stream().map(AssetOutStockRecord::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
-            RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
-            WebUtil.addErrorMessage("包含不同到货单，无法生成退库单！");
-            return;
-        }
         if (selectedItems.stream().map(AssetOutStockRecord::getStockStatus).collect(Collectors.toSet()).contains(5)) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
             WebUtil.addErrorMessage("包含已退库的设备，无法生成退库单！");
@@ -259,23 +261,36 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     }
 
     public void generatedReturnedStockDoc() {
-        List<ArrivalListItem> arrivalListItems = ListUtil.newArrayList();
         String setAssetOutStockDept = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "setAssetOutStockDept");
         Date now = DateUtil.now();
+        List<String> assetUidList = selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList());
         for (AssetOutStockRecord selectedItem : selectedItems) {
-            ArrivalListItem arrivalListItem = arrivalListItemRepository.findById(selectedItem.getArrivalItemId());
-            arrivalListItem.setClinicalDeptUID(setAssetOutStockDept);
-            arrivalListItem.setInStockNo(null);
-            arrivalListItem.setInStockBusinessDate(now);
-            arrivalListItem.setStockStatus(2);
-            arrivalListItem.setComments(searchItem.getComments());
-            arrivalListItems.add(arrivalListItem);
             selectedItem.setStockStatus(5);
             selectedItem.setComments(searchItem.getComments());
             selectedItem.setReturnedDate(now);
         }
-        arrivalListItemRepository.save(arrivalListItems);
+        List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUidList);
+        for (AssetInfo assetInfo : assetInfos) {
+            assetInfo.setInstallDate(now);
+            assetInfo.setClinicalDeptUID(setAssetOutStockDept);
+        }
+        assetInfoRepository.save(assetInfos);
+        for (AssetInfo assetInfo : assetInfos) {
+            saveAssetHistory(assetInfo, searchItem.getComments());
+        }
         dao.save(selectedItems);
+    }
+
+    private void saveAssetHistory(AssetInfo newAsset, String comment) {
+        MqContext mqContext = new MqContext();
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetOutStockedController");
+        mqContext.setMethodName("generatedReturnedStockDoc");
+        mqContext.setDescribe("设备退库修改科室");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("comment", comment);
+        mqContext.setJsonObject(jsonObject);
+        mqUtils.sendAssetToMQ(newAsset, currentUser, mqContext);
     }
 
     public void treeSeachCondition(){

@@ -236,10 +236,13 @@
         }
         function handleAssetReturnedStockSubmit(xhr, status, args) {
             var asetOrderIsComplete = args.asetOrderIsComplete;
-            if(asetOrderIsComplete==true) {
-                PF('unfinishedAssetOrderDetailDialog').show();
-            }else{
-                PF('GeneratedReturnedStockDocDialog').show();
+            var generatedReturnedStockDoc = args.generatedReturnedStockDoc;
+            if (generatedReturnedStockDoc != false) {
+                if (asetOrderIsComplete == true) {
+                    PF('unfinishedAssetOrderDetailDialog').show();
+                }else{
+                    PF('GeneratedReturnedStockDocDialog').show();
+                }
             }
         }
     </script>

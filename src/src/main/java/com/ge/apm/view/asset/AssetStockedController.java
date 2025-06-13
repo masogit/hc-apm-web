@@ -272,7 +272,9 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             return;
         }
         AssetStocked selected = (AssetStocked) event.getObject();
-        searchItem.getArrivalList().setContractNum(selected.getArrivalList().getContractNum());
+        if (ObjectUtil.isNotEmpty(selected.getArrivalList())) {
+            searchItem.getArrivalList().setContractNum(selected.getArrivalList().getContractNum());
+        }
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {
