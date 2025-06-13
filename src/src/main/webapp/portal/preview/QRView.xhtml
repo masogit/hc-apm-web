@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html>
 <html
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-      xmlns:p="http://primefaces.org/ui">
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+        xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
 
-   <p:dialog id="qrPreviewedDlg" width="1000" height="800"  widgetVar="qrPreviewedDlg" modal="true" howEffect="fade"  maximizable="true" appendTo="@this">
-       <p:panelGrid   columns="2" layout="grid" styleClass="showcase-text-align-center" rendered="#{qRPreViewerBean.itemList.size() > 0}">
-           <p:outputLabel><h1>设备数量：#{qRPreViewerBean.itemList.size()} 台</h1></p:outputLabel>
-           <p:commandButton value="打印" icon="ui-icon-print" style="position: relative;left: 80%">
-               <p:printer target="qrcodePanel" />
-           </p:commandButton>
-       </p:panelGrid>
-       <p:panelGrid id="qrcodePanel"  columns="2" layout="grid"  rendered="#{qRPreViewerBean.itemList.size() > 0}">
-               <c:forEach var="item" items="#{qRPreViewerBean.itemList}">
-                   <p:outputPanel id="pnlPrint">
+    <p:dialog id="qrPreviewedDlg" width="1000" height="800" widgetVar="qrPreviewedDlg" modal="true" howEffect="fade" maximizable="true" appendTo="@this">
+        <p:panelGrid columns="2" layout="grid" styleClass="showcase-text-align-center" rendered="#{qRPreViewerBean.itemList.size() > 0}">
+            <p:outputLabel><h1>#{msg.DeviceCount}: #{qRPreViewerBean.itemList.size()} #{msg.Unit}</h1></p:outputLabel>
+            <p:commandButton value="#{msg.Print}" icon="ui-icon-print" style="position: relative;left: 80%">
+                <p:printer target="qrcodePanel" />
+            </p:commandButton>
+        </p:panelGrid>
+        <p:panelGrid id="qrcodePanel" columns="2" layout="grid" rendered="#{qRPreViewerBean.itemList.size() > 0}">
+            <c:forEach var="item" items="#{qRPreViewerBean.itemList}">
+                <p:outputPanel id="pnlPrint">
                     <p:graphicImage value="#{qRPreViewerBean.getImg(item)}" stream="false"/>
-                   </p:outputPanel>
-               </c:forEach>
-       </p:panelGrid>
-   </p:dialog>
- </ui:composition>
+                </p:outputPanel>
+            </c:forEach>
+        </p:panelGrid>
+    </p:dialog>
+</ui:composition>
 </html>
