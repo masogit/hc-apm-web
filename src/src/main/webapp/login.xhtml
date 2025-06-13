@@ -178,7 +178,7 @@
                             </center>
                         </div>
                         <p:tabView  activeIndex="0" prependId="false">
-                            <p:tab title="密码登录" id="psw">
+                            <p:tab title="#{msg.PasswordLogin}" id="psw">
                                 <div class="ui-g-12">
                                     <p:inputText id="j_username"  placeholder="#{msg.login_name}" />
                                     <i class="fa fa-user" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
@@ -191,7 +191,7 @@
                                     <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary"  validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl dlgAccountLoginPhone" oncomplete="pwdLoginAfter(xhr, status, args);"/>
                                 </div>
                             </p:tab>
-                            <p:tab title="短信登录" id="sms">
+                            <p:tab title="#{msg.SmsLogin}" id="sms">
                                 <div class="ui-g-12">
                                     <p:inputText id="telephone" requiredMessage="#{msg.login_name}: #{msg.ValidationRequire}" placeholder="登录手机号" style="width: 80%" />
                                     <i class="fa fa-mobile-phone" style="height: 0px;float: left;left: -20px;top: 5px;position: relative;"/>

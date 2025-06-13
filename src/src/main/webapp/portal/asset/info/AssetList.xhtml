@@ -59,9 +59,9 @@
                             <span class="warrantyExpired">#{msg.MorWExpired}</span>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="全部" />
-                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="主设备"/>
-                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="子设备"/>
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="#{msg.All}" />
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="#{msg.ParentDevice}"/>
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="#{msg.ChildDevice}"/>
                         </h:panelGroup>
                     </h:panelGrid>
 
@@ -134,7 +134,7 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="操 作" exportable="false" width="60" id="operatorColumn">
+                        <p:column headerText="#{msg.Actions}" exportable="false" width="60" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
@@ -1148,7 +1148,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="batchToRelRule" oncomplete="PF('relRuleAssetDialog').show()" actionListener="#{assetInfoListController.setSelectedAssetsUids()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_BATCH_PM')}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="#{msg.SetRulesInBatch}" disabled="#{not assetInfoListController.isChecked()}"/>
 <!--                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>-->
-                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" update="batchEditBeforeForm" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" oncomplete="PF('batchEditBeforeDialog').show()"/>
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.BatchModify}" update="batchEditBeforeForm" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" oncomplete="PF('batchEditBeforeDialog').show()"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportAssetExcel}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
@@ -1161,7 +1161,7 @@
                                     <p:confirm header="#{msg.ConfirmationOfBatchToBeTerminated}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsToBeTerminated}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
-                            <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="预览打印二维码" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
+                            <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-print" title="#{msg.PreviewPrintQRcode}" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoListController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="PF('qrPreviewedDlg').show()" />
                             <p:commandButton id="bathDepartmentCovert" class="btn btn-sm btn-gray batch-terminated" icon="fa fa-arrow-circle-right" title="批量申请转科" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" disabled="#{not assetInfoListController.isChecked()}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoListController.getSelectedUidList())}" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
 
                         </f:facet>
