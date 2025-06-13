@@ -4,7 +4,6 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.preview.QRPreViewerBean;
@@ -35,9 +34,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -52,6 +49,8 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
     private OrgInfoRepository orgInfoRepository;
     private AssetInfoRepository assetInfoRepository;
     private QRPreViewerBean qrPreViewerBean;
+    private UserAccountRepository userAccountRepository;
+    private SupplierRepository supplierRepository;
 
     private UserAccount currentUser;
     private AssetInStockRecord searchItem;
@@ -84,6 +83,10 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
     private Boolean inStock = Boolean.FALSE;
     @Getter @Setter
     private Boolean outStock = Boolean.FALSE;
+    @Getter @Setter
+    private Map<String, String> userMap;
+    @Getter @Setter
+    private Map<Integer, String> supplierMap;
 
     @Override
     protected void init() {
@@ -92,11 +95,12 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
         assetInstallationService = WebUtil.getBean(AssetInstallationService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-        SupplierService supplierService = WebUtil.getBean(SupplierService.class);
-        autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
-        qrPreViewerBean=WebUtil.getBean(QRPreViewerBean.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        supplierRepository = WebUtil.getBean(SupplierRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        supplierList = supplierService.getSupplierList();
+        supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
         orgTreeEdit = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4));
         initSearchItem();
@@ -130,42 +134,51 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
             searchFilters.add(new SearchFilter("businessDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(inStockBusinessEndDate).toDate(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getAssetName())) {
-            searchFilters.add(new SearchFilter("assetName", SearchFilter.Operator.LIKE, searchItem.getAssetName(), "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.name", SearchFilter.Operator.LIKE, searchItem.getAssetName(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(supplier.getId())) {
-            searchFilters.add(new SearchFilter("supplierId", SearchFilter.Operator.EQ, supplier.getId(), "1*"));
-        }
-        if (ObjectUtil.isNotEmpty(searchItem.getPurchasePrice())) {
-            searchFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, searchItem.getPurchasePrice(), "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.supplierId", SearchFilter.Operator.EQ, supplier.getId(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(startPrice)) {
-            searchFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, startPrice, "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.purchasePrice", SearchFilter.Operator.GTE, startPrice, "1*"));
         }
         if (ObjectUtil.isNotEmpty(endPrice)) {
-            searchFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.LTE, endPrice, "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.purchasePrice", SearchFilter.Operator.LTE, endPrice, "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getFunctionType())) {
-            searchFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, searchItem.getFunctionType(), "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.functionType", SearchFilter.Operator.LIKE, searchItem.getFunctionType(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getInvoiceNum())) {
-            searchFilters.add(new SearchFilter("invoiceNum", SearchFilter.Operator.LIKE, searchItem.getInvoiceNum(), "1*"));
+            searchFilters.add(new SearchFilter("arrivalList.invoiceNum", SearchFilter.Operator.LIKE, searchItem.getInvoiceNum(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getInStockNo())) {
             searchFilters.add(new SearchFilter("inStockNo", SearchFilter.Operator.LIKE, searchItem.getInStockNo(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getContractNum())) {
-            searchFilters.add(new SearchFilter("contractNum", SearchFilter.Operator.LIKE, searchItem.getContractNum(), "1*"));
+            searchFilters.add(new SearchFilter("arrivalList.contractNum", SearchFilter.Operator.LIKE, searchItem.getContractNum(), "1*"));
         }
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<AssetInStockRecord> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<AssetInStockRecord> content = page.getContent();
+        Set<String> userUidList = content.stream().map(AssetInStockRecord::getInStockUser).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        if (ObjectUtil.isNotEmpty(userUidList)) {
+            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUidList);
+            userMap = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, UserAccount::getName));
+        }
+        Set<Integer> supplierIds = content.stream().map(AssetInStockRecord::getAssetInfo).map(AssetInfo::getSupplierId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        if (ObjectUtil.isNotEmpty(supplierIds)) {
+            List<Supplier> suppliers = supplierRepository.findByIdIn(supplierIds);
+            supplierMap = suppliers.stream().collect(Collectors.toMap(Supplier::getId, Supplier::getName));
+        }
+        return page;
     }
 
     private void pckFilters(List<SearchFilter> searchFilters) {
-        if (!this.hasFilterOnField("siteUid")) {
+        if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
 

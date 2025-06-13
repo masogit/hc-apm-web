@@ -25,7 +25,7 @@
             <div class="ui-g-12 card">
                 <h:form id="approvalForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                    <p:commandButton value="我发起的"   process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.initiatedByMe}" actionListener="#{multiLevelApprovalListController.initiateApprovalByMe}" />
+                    <p:commandButton value="#{msg.MyRequests}"   process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.initiatedByMe}" actionListener="#{multiLevelApprovalListController.initiateApprovalByMe}" />
                     <p:commandButton value="待审批"     process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.pendingApprovalByMe}" actionListener="#{multiLevelApprovalListController.pendingApprovalByMe}"   rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE')}"/>
                     <p:commandButton value="我审批的"   process="@this" update="approvalList ItemDetailViewForm buttonSet"  disabled="#{multiLevelApprovalListController.approvedByMe}" actionListener="#{multiLevelApprovalListController.approvedApprovalByMe}"  rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE')}"/>
                 </h:panelGrid>
@@ -43,13 +43,13 @@
                     <p:ajax event="rowSelect" listener="#{multiLevelApprovalListController.onRowSelect}" update="ItemDetailViewForm"/>
                     <p:ajax event="filter" listener="#{multiLevelApprovalListController.onFilter}"/>
 
-                    <p:column headerText="审批单号"   filterBy="#{item.approvalNumber}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.ApprovalNumber}"   filterBy="#{item.approvalNumber}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.approvalNumber}"/>
                     </p:column>
-                    <p:column headerText="业务单号"  filterBy="#{item.businessNumber}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.BusinessNumber}" filterBy="#{item.businessNumber}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.businessNumber}"/>
                     </p:column>
-                    <p:column headerText="业务类型"  filterBy="#{item.businessType}" filterMatchMode="EQ" >
+                    <p:column headerText="#{msg.BusinessType}"  filterBy="#{item.businessType}" filterMatchMode="EQ" >
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()" value="#{multiLevelApprovalListController.filterBusinessType}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -58,15 +58,15 @@
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
-                    <p:column headerText="申请科室" filterBy="#{item.applyUser.org.name}" filterMatchMode="LIKE"  >
+                    <p:column headerText="#{msg.RequestingDepartment}" filterBy="#{item.applyUser.org.name}" filterMatchMode="LIKE"  >
 <!--                        <c:if test="#{item.applyUser.org.orgType eq 4}">-->
                             <h:outputText value="#{item.applyUser.org.name}" rendered="#{item.applyUser.org.orgType eq 4}"/>
 <!--                        </c:if>-->
                     </p:column>
-                    <p:column headerText="发起人" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
+                    <p:column headerText="#{msg.RequestedBy}" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
                         <h:outputText value="#{item.applyUser.name}"/>
                     </p:column>
-                    <p:column headerText="总审批进度" filterBy="#{item.approvalStatus}" filterMatchMode="EQ" >
+                    <p:column headerText="#{msg.ApprovalStatus}" filterBy="#{item.approvalStatus}" filterMatchMode="EQ" >
 
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()"  value="#{multiLevelApprovalListController.status}" >
@@ -78,19 +78,19 @@
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
                     </p:column>
-                    <p:column headerText="审批时间" sortBy="#{item.actualApproverDate}" rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
+                    <p:column headerText="#{msg.ApprovalTime}" sortBy="#{item.actualApproverDate}" rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
                         <h:outputText value="#{item.actualApproverDate}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" rendered="#{multiLevelApprovalListController.pendingApprovalByMe}">
                         <!--17 为采购-->
-                        <p:commandButton value="审批" rendered="#{item.businessType eq 17}"
+                        <p:commandButton value="#{msg.audit}" rendered="#{item.businessType eq 17}"
                                          action="#{multiLevelApprovalListController.promptApproval(item)}"
                                          update="MultiLevelApprovalClaimPurDialog"
                                          oncomplete="PF('MultiLevelApprovalClaimPurDialog').show()"  />
                         <!--17 为采购-->
-                        <p:commandButton value="审批" rendered="#{item.businessType ne 17}"
+                        <p:commandButton value="#{msg.audit}" rendered="#{item.businessType ne 17}"
                                          action="#{multiLevelApprovalListController.promptApproval(item)}"
                                          update="MultiLevelApprovalClaimDialog"
                                          oncomplete="PF('MultiLevelApprovalClaimDialog').show()"  />

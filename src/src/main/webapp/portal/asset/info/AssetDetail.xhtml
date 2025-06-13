@@ -239,7 +239,7 @@
                                                     required="false" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"
                                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                                     </h:panelGroup>
-                                    <p:commandButton value="查询" validateClient="true" actionListener="#{inspectionServiceController.query(assetInfoDetailController.selected)}" update=":growl EventRecord :assetDetail:approvale :assetDetail:modifyRecordList"/>
+                                    <p:commandButton value="#{msg.zkbKeyBehaviorIndex_quiry}" validateClient="true" actionListener="#{inspectionServiceController.query(assetInfoDetailController.selected)}" update=":growl EventRecord :assetDetail:approvale :assetDetail:modifyRecordList"/>
                                 </p:panelGrid>
                             </p:fieldset>
 
@@ -292,7 +292,7 @@
                                     <p:column headerText="#{msg.currentStep}" >
                                         <h:outputText value="#{item.currentStepName}"/>
                                     </p:column>
-                                    <p:column headerText="当前处理人" >
+                                    <p:column headerText="#{msg.CurrentOwner}" >
                                         <h:outputText value="#{item.currentPersonName}"/>
                                     </p:column>
                                 </p:dataTable>
@@ -319,7 +319,8 @@
                                         <f:facet name="filter" >
                                             <p:selectOneMenu onchange="PF('varPmOrderListgl').filter()" >
                                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                                <f:selectItems value="#{inspectionServiceController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+<!--                                                <f:selectItems value="#{inspectionServiceController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>-->
+                                                <f:selectItems value="#{fieldMsg.getFieldValueList('pmCurrentSteps')}" var="item" itemLabel="#{item.value}" itemValue="#{item.valueZh}"/>
                                             </p:selectOneMenu>
                                         </f:facet>
                                         <h:outputText value="#{item.currentStepName}"/>
@@ -327,10 +328,10 @@
                                     <p:column headerText="#{msg.currentPersonUID}" >
                                         <h:outputText value="#{item.currentPersonName}"/>
                                     </p:column>
-                                    <p:column headerText="类型" >
+                                    <p:column headerText="#{msg.type}" >
                                         <h:outputText value="#{(item.ruleLevel == 2 || item.ruleLevel == 3) ? '保养' : item.ruleLevel == 4 ? '质控' : '巡检'}"/>
                                     </p:column>
-                                    <p:column headerText="完成时间" >
+                                    <p:column headerText="#{msg.CompletionTime}" >
                                         <h:outputText value="#{item.endTime}">
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
@@ -415,7 +416,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="日常检查记录" >
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.DailyInspectionRecord}" >
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/maintainMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                         <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl nurseSiteMaintainForm" onclick="PF('nurseSiteMaintainDialog').show()"/>
@@ -424,20 +425,20 @@
                                                  paginator="true" paginatorPosition="bottom" rows="5"
                                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                        <p:column styleClass="textCenter"  headerText="计划检查日期" >
+                                        <p:column styleClass="textCenter"  headerText="#{msg.ScheduledInspectionDate}" >
                                             <h:outputText value="#{item.scheduleDate}">
                                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                             </h:outputText>
                                         </p:column>
-                                        <p:column headerText="实际检查日期" >
+                                        <p:column headerText="#{msg.ActualInspectionDate}" >
                                             <h:outputText value="#{item.checkDate}">
                                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                             </h:outputText>
                                         </p:column>
-                                        <p:column headerText="检查人" >
+                                        <p:column headerText="#{msg.Inspector}" >
                                             <h:outputText value="#{item.checker}"/>
                                         </p:column>
-                                        <p:column headerText="工单状态" >
+                                        <p:column headerText="#{msg.Status}" >
                                             <h:outputText value="#{item.status}"/>
                                         </p:column>
                                     </p:dataTable>
@@ -478,7 +479,7 @@
                                         </p:panel>
                                     </c:when>
                                     <c:otherwise>
-                                        <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="开关机记录" id="A">
+                                        <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.OperationLog}" id="A">
                                             <f:facet name="actions">
                                                 <!--                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/assetOptRecordList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
                                                 <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
@@ -488,23 +489,23 @@
                                                          paginator="true" paginatorPosition="bottom" rows="5"
                                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                                <p:column headerText="开机时间" >
+                                                <p:column headerText="#{msg.StartupTime}" >
                                                     <h:outputText value="#{item.startDate}">
                                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
                                                     </h:outputText>
                                                 </p:column>
-                                                <p:column headerText="关机时间" >
+                                                <p:column headerText="#{msg.ShutdownTime}" >
                                                     <h:outputText value="#{item.endDate}">
                                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm "/>
                                                     </h:outputText>
                                                 </p:column>
-                                                <p:column headerText="开机人" >
+                                                <p:column headerText="#{msg.StartupPerson}" >
                                                     <h:outputText value="#{item.createByName}" />
                                                 </p:column>
-                                                <p:column headerText="关机人" >
+                                                <p:column headerText="#{msg.ShutdownPerson}" >
                                                     <h:outputText value="#{empty item.endDate?'':item.modifyByName}" />
                                                 </p:column>
-                                                <p:column headerText="使用时长">
+                                                <p:column headerText="#{msg.RuntimeDuration}">
                                                     <h:outputText value="#{item.costTime}">
                                                     </h:outputText>
                                                 </p:column>
@@ -524,13 +525,13 @@
                                         <p:column headerText="#{msg.serialNum}">
                                             <h:outputText value="#{item.serialNum}" />
                                         </p:column>
-                                        <p:column headerText="计量证书编号">
+                                        <p:column headerText="#{msg.CertificateNo}">
                                             <h:outputText value="#{item.meteringNO}" />
                                         </p:column>
-                                        <p:column headerText="检定结论">
+                                        <p:column headerText="#{msg.VerificationConclusion}">
                                             <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}" />
                                         </p:column>
-                                        <p:column headerText="计量日期">
+                                        <p:column headerText="#{msg.VerificationDate}">
                                             <h:outputText value="#{item.checkDate}">
                                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                             </h:outputText>
@@ -538,7 +539,7 @@
                                     </p:dataTable >
                                 </p:panel>
 
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="不良事件记录" >
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.AdverseEventRecords}" >
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" />
                                     </f:facet>
@@ -553,11 +554,11 @@
                                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                                  rows="5" emptyMessage="#{msg.noRecordFound}">
 
-                                        <p:column headerText="工单编号" >
+                                        <p:column headerText="#{msg.WorkOrderNo}" >
                                             <h:outputText value="#{item.workOrderNum}"/>
                                         </p:column>
 
-                                        <p:column headerText="状态" >
+                                        <p:column headerText="#{msg.Status}" >
                                             <h:outputText
                                                     value="#{item.status == 1?'暂存':
                                         item.status == 2?'待审核':
@@ -571,11 +572,11 @@
                                         '未知'  }"/>
                                         </p:column>
 
-                                        <p:column headerText="报告人" >
+                                        <p:column headerText="#{msg.ReportedBy}" >
                                             <h:outputText value="#{item.reporterName}"/>
                                         </p:column>
 
-                                        <p:column styleClass="textCenter"  headerText="报告时间" >
+                                        <p:column styleClass="textCenter"  headerText="#{msg.ReportedTime}" >
                                             <h:outputText value="#{item.reportDate}">
                                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                                             </h:outputText>
@@ -585,7 +586,7 @@
                             </h:panelGroup>
                         </h:form>
                         <p:panel  id="approvale"
-                                  header="设备流程记录"
+                                  header="#{msg.ApprovalWorkflow}"
                                   toggleable="true" toggleSpeed="500"
                                   widgetVar="approvale" style="margin-bottom:20px;">
                             <ui:include src="ApprovalProcess.xhtml"/>
