@@ -12,6 +12,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -97,20 +98,17 @@ public class AssetOutStockService extends MicroServiceInvoker {
         return new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/zip", "out_stock_template.docx");
     }
 
-    public StreamedContent exportWord(List<ArrivalListItem> arrivalListItemList, String sockType) throws IOException {
+    public StreamedContent exportWord(List<AssetStocked> assetStockedList, String sockType) throws IOException {
         //1、doc模板部分
-        Map<String, Object> data = createFileData(arrivalListItemList);
-        String templatePath;
+        Map<String, Object> data = createFileData(assetStockedList);
         String fileName;
         String type;
         if ("inStock".equals(sockType)) {
-            templatePath = PATH_WORD_IN_STOCK_TEMPLATE;
             fileName = "入库单.docx";
-            type= SystemTemplateEnum.IN_STOCKED.getCode();
+            type = SystemTemplateEnum.IN_STOCKED.getCode();
         } else {
-            templatePath = PATH_WORD_OUT_STOCK_TEMPLATE;
             fileName = "出库单.docx";
-            type=SystemTemplateEnum.OUT_STOCKED.getCode();
+            type =SystemTemplateEnum.OUT_STOCKED.getCode();
         }
         UserAccount user = UserContextService.getCurrentUserAccount();
         String storageId= systemTemplateValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID(),type,"doc");
@@ -154,8 +152,8 @@ public class AssetOutStockService extends MicroServiceInvoker {
         return data;
     }
 
-    public Map<String, Object> createFileData(List<ArrivalListItem> arrivalListItemList){
-        ArrivalListItem temp = arrivalListItemList.get(0);
+    public Map<String, Object> createFileData(List<AssetStocked> assetStockedList){
+        AssetStocked temp = assetStockedList.get(0);
         String deptName = Optional.ofNullable(temp.getRecruiteDeptUid()).map(orgInfoRepository::getByUid).map(OrgInfo::getName).orElse("");
         Map<String, Object> data = new HashMap<>();
         data.put("depName", deptName);
@@ -163,22 +161,22 @@ public class AssetOutStockService extends MicroServiceInvoker {
         data.put("inStockNo", temp.getInStockNo());
         data.put("outStockNo", temp.getOutStockNo());
         data.put("userName", UserContextService.getCurrentUserAccount().getName());
-        data.put("sum", arrivalListItemList.size());
-        data.put("sumPrice", arrivalListItemList.stream().mapToDouble(ArrivalListItem::getPurchasePrice).sum());
+        data.put("sum", assetStockedList.size());
+        data.put("sumPrice", assetStockedList.stream().map(AssetStocked::getAssetInfo).filter(t -> ObjectUtil.isNotEmpty(t.getPurchasePrice())).mapToDouble(AssetInfo::getPurchasePrice).sum());
         data.put("invoiceNum", temp.getArrivalList().getInvoiceNum());
         data.put("vendor", temp.getArrivalList().getVendor());
 
         List<Map<String, Object>> dataList = new ArrayList<>();
-        for(ArrivalListItem arrivalListItem : arrivalListItemList){
+        for(AssetStocked assetStocked : assetStockedList){
             Map<String, Object> mm = new HashMap<>();
             mm.put("type", "专用设备");
-            mm.put("assetName", arrivalListItem.getArrivalList().getAssetName());
-            mm.put("functionType", arrivalListItem.getArrivalList().getFunctionType());
+            mm.put("assetName", assetStocked.getArrivalList().getAssetName());
+            mm.put("functionType", assetStocked.getArrivalList().getFunctionType());
             mm.put("unit", "台");
             mm.put("qty", "1");
-            mm.put("purchasePrice", arrivalListItem.getPurchasePrice());
-            mm.put("total", arrivalListItem.getPurchasePrice());
-            mm.put("vendor", arrivalListItem.getArrivalList().getVendor());
+            mm.put("purchasePrice", assetStocked.getAssetInfo().getPurchasePrice());
+            mm.put("total", assetStocked.getAssetInfo().getPurchasePrice());
+            mm.put("vendor", assetStocked.getArrivalList().getVendor());
             dataList.add(mm);
         }
         data.put("list", dataList);

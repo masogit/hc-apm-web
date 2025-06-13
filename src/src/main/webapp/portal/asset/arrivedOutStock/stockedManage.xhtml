@@ -29,7 +29,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.assetName}</label>
-                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.name}"/>
+                    <p:inputText value="#{assetStockedController.searchItem.assetName}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.vendor}</label>
@@ -45,15 +45,15 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.functionType}</label>
-                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.functionType}"/>
+                    <p:inputText value="#{assetStockedController.searchItem.functionType}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.arrivalListInvoiceNum}</label>
-                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.invoiceNum}"/>
+                    <p:inputText value="#{assetStockedController.searchItem.invoiceNum}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.arrivalListContractNum}</label>
-                    <p:inputText value="#{assetStockedController.searchItem.arrivalList.contractNum}"/>
+                    <p:inputText value="#{assetStockedController.searchItem.contractNum}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">状态</label>
@@ -75,7 +75,7 @@
         <p:dataTable id="datalist" value="#{assetStockedController.lazyModel}" var="item" widgetVar="varDataList"
                      selection="#{assetStockedController.selectedItems}"
                      lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                     rowKey="#{item.id}" sortMode="single" sortBy="#{item.lastModifiedDate}"   sortOrder="descending"
+                     rowKey="#{item.id}" sortMode="single" sortBy="#{item.id}" sortOrder="descending"
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                      rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -86,7 +86,7 @@
                 <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" />
             </p:column>
             <p:column headerText="业务时间">
-                <h:outputText value="#{item.installDate}">
+                <h:outputText value="#{item.assetInfo.installDate}">
                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                 </h:outputText>
             </p:column>
@@ -97,7 +97,7 @@
                 <h:outputText value="#{assetStockedController.getUserNameByUid(item.inStockUser)}"/>
             </p:column>
             <p:column headerText="#{msg.financingNum}">
-                <h:outputText value="#{item.financingNum}"/>
+                <h:outputText value="#{item.assetInfo.financingNum}"/>
             </p:column>
             <p:column headerText="#{msg.assetName}">
                 <h:outputText value="#{item.arrivalList.assetName}"/>
@@ -106,7 +106,7 @@
                 <h:outputText value="#{item.arrivalList.contractNum}"/>
             </p:column>
             <p:column headerText="#{msg.installDate}">
-                <h:outputText value="#{item.installDate}">
+                <h:outputText value="#{item.assetInfo.installDate}">
                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                 </h:outputText>
             </p:column>
@@ -117,7 +117,7 @@
                 <h:outputText value="#{item.comments}"/>
             </p:column>
             <p:column headerText="资产价值">
-                <h:outputText value="#{item.purchasePrice}"/>
+                <h:outputText value="#{item.assetInfo.purchasePrice}"/>
             </p:column>
             <p:column headerText="#{msg.arrivalListInvoiceNum}">
                 <h:outputText value="#{item.arrivalList.invoiceNum}"/>
@@ -154,7 +154,7 @@
                          lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
                          emptyMessage="#{msg.noRecordFound}">
                 <p:column headerText="业务时间">
-                    <h:outputText value="#{item.installDate}">
+                    <h:outputText value="#{item.assetInfo.installDate}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
@@ -162,7 +162,7 @@
                     <h:outputText value="#{item.arrivalList.vendor}"/>
                 </p:column>
                 <p:column headerText="#{msg.financingNum}">
-                    <h:outputText value="#{item.financingNum}"/>
+                    <h:outputText value="#{item.assetInfo.financingNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.assetName}">
                     <h:outputText value="#{item.arrivalList.assetName}"/>
@@ -177,7 +177,7 @@
                     <h:outputText value="#{item.comments}"/>
                 </p:column>
                 <p:column headerText="资产价值">
-                    <h:outputText value="#{item.purchasePrice}"/>
+                    <h:outputText value="#{item.assetInfo.purchasePrice}"/>
                 </p:column>
                 <p:column headerText="#{msg.arrivalListInvoiceNum}">
                     <h:outputText value="#{item.arrivalList.invoiceNum}"/>
@@ -238,7 +238,7 @@
                          lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
                          emptyMessage="#{msg.noRecordFound}">
                 <p:column headerText="业务时间">
-                    <h:outputText value="#{item.installDate}">
+                    <h:outputText value="#{item.assetInfo.installDate}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
@@ -246,7 +246,7 @@
                     <h:outputText value="#{item.arrivalList.vendor}"/>
                 </p:column>
                 <p:column headerText="#{msg.financingNum}">
-                    <h:outputText value="#{item.financingNum}"/>
+                    <h:outputText value="#{item.assetInfo.financingNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.assetName}">
                     <h:outputText value="#{item.arrivalList.assetName}"/>
@@ -261,7 +261,7 @@
                     <h:outputText value="#{item.comments}"/>
                 </p:column>
                 <p:column headerText="资产价值">
-                    <h:outputText value="#{item.purchasePrice}"/>
+                    <h:outputText value="#{item.assetInfo.assetInfo.purchasePrice}"/>
                 </p:column>
                 <p:column headerText="#{msg.arrivalListInvoiceNum}">
                     <h:outputText value="#{item.arrivalList.invoiceNum}"/>
