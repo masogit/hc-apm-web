@@ -4,7 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetOutStockService;
 import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -53,6 +53,9 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     private AssetInfoRepository assetInfoRepository;
     private QRPreViewerBean qrPreViewerBean;
     private AssetOutStockService assetOutStockService;
+    private UserAccountRepository userAccountRepository;
+    private SupplierRepository supplierRepository;
+    private ConfigCacheService configCacheService;
 
     private UserAccount currentUser;
     private AssetOutStockRecord searchItem;
@@ -87,6 +90,10 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     private Long notInstalled;
     @Getter @Setter
     private String contractNum;
+    @Getter @Setter
+    private Map<String, String> userMap;
+    @Getter @Setter
+    private Map<Integer, String> supplierMap;
 
     @Override
     protected void init() {
@@ -96,12 +103,14 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-        SupplierService supplierService = WebUtil.getBean(SupplierService.class);
-        autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
-        qrPreViewerBean=WebUtil.getBean(QRPreViewerBean.class);
-        assetOutStockService=WebUtil.getBean(AssetOutStockService.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
+        assetOutStockService = WebUtil.getBean(AssetOutStockService.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        supplierRepository = WebUtil.getBean(SupplierRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        supplierList = supplierService.getSupplierList();
+        supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
         orgTreeEdit = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4));
         initSearchItem();
@@ -167,7 +176,19 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         if (ObjectUtil.isNotEmpty(searchItem.getContractNum())) {
             searchFilters.add(new SearchFilter("contractNum", SearchFilter.Operator.LIKE, searchItem.getContractNum(), "1*"));
         }
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<AssetOutStockRecord> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<AssetOutStockRecord> content = page.getContent();
+        Set<String> userUidList = content.stream().map(AssetOutStockRecord::getOutStockUser).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        if (ObjectUtil.isNotEmpty(userUidList)) {
+            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUidList);
+            userMap = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, UserAccount::getName));
+        }
+        Set<Integer> supplierIds = content.stream().map(AssetOutStockRecord::getAssetInfo).map(AssetInfo::getSupplierId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        if (ObjectUtil.isNotEmpty(supplierIds)) {
+            List<Supplier> suppliers = supplierRepository.findByIdIn(supplierIds);
+            supplierMap = suppliers.stream().collect(Collectors.toMap(Supplier::getId, Supplier::getName));
+        }
+        return page;
     }
 
     private void pckFilters(List<SearchFilter> searchFilters) {
@@ -204,7 +225,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     }
 
     public Double totalPurchasePrice() {
-        return selectedItems.stream().filter(t -> ObjectUtil.isNotEmpty(t.getPurchasePrice())).mapToDouble(AssetOutStockRecord::getPurchasePrice).sum();
+        return selectedItems.stream().map(AssetOutStockRecord::getAssetInfo).filter(assetInfo -> ObjectUtil.isNotEmpty(assetInfo.getPurchasePrice())).mapToDouble(AssetInfo::getPurchasePrice).sum();
     }
 
     public void prepareGeneratedReturnedStockDoc() {
@@ -232,7 +253,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             AssetOutStockRecord assetOutStockRecord = selectedItems.get(0);
             List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetOutStockRecord.getArrivalListId());
             notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
-            contractNum = assetOutStockRecord.getContractNum();
+            contractNum = assetOutStockRecord.getArrivalList().getContractNum();
             installed = arrivalListItems.size() - notInstalled;
         }
     }
@@ -299,12 +320,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     }
 
     public String getOrgNameByUid(String orgUid) {
-        if (!Strings.isNullOrEmpty(orgUid)) {
-            OrgInfo org = orgInfoRepository.getOrgInfoByUid(orgUid);
-            return org == null ? null : org.getName();
-        }else {
-            return null;
-        }
+        return configCacheService.findOrgByUid(orgUid).getName();
     }
 
     public String getUserNameByUid(String userUid) {
@@ -323,7 +339,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             case "assetInfo" :
                 return "/portal/asset/info/AssetDetail.xhtml?faces-redirect=true&amp;actionName=View&amp;terminate=false&amp;assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
             case "contractInfo" :
-                return "/portal/asset/contract/ContractView.xhtml?faces-redirect=true&amp;action=Edit&amp;contractNum=" + outStockRecord.getContractNum();
+                return "/portal/asset/contract/ContractView.xhtml?faces-redirect=true&amp;action=Edit&amp;contractNum=" + outStockRecord.getArrivalList().getContractNum();
             default:
                 return "";
         }

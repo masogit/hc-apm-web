@@ -34,20 +34,17 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class AssetStockedController extends GenericCRUDUUIDController<ArrivalListItem> {
+public class AssetStockedController extends GenericCRUDUUIDController<AssetStocked> {
 
-    private ArrivalListItemRepository dao = null;
+    private AssetStockedRepository dao = null;
     private ArrivalListRepository arrivalListRepository;
+    private ArrivalListItemRepository arrivalListItemRepository;
     private AssetInStockRecordRepository assetInStockRecordRepository;
     private AssetOutStockRecordRepository assetOutStockRecordRepository;
     private UaaService uaaService;
@@ -59,9 +56,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private AssetInfoRepository assetInfoRepository;
     private QRPreViewerBean qrPreViewerBean;
     private ConfigItemValueRepository configItemValueRepository;
+    private UserAccountRepository userAccountRepository;
+    private SupplierRepository supplierRepository;
 
     private UserAccount currentUser;
-    private ArrivalListItem searchItem;
+    private AssetStocked searchItem;
     private Supplier supplier;
     private OrgInfo recruiteDept;
     @Getter @Setter
@@ -74,7 +73,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private Double endPrice;
     private String searchDeptName;
     private List<Supplier> supplierList;
-    private List<ArrivalListItem> selectedItems = ListUtil.newArrayList();
+    private List<AssetStocked> selectedItems = ListUtil.newArrayList();
     @Getter @Setter
     private Date startDate;
     @Getter @Setter
@@ -105,11 +104,16 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     private Long notInstalled;
     @Getter @Setter
     private String contractNum;
+    @Getter @Setter
+    private Map<String, String> userMap;
+    @Getter @Setter
+    private Map<Integer, String> supplierMap;
 
     @Override
     protected void init() {
-        dao = WebUtil.getBean(ArrivalListItemRepository.class);
+        dao = WebUtil.getBean(AssetStockedRepository.class);
         arrivalListRepository = WebUtil.getBean(ArrivalListRepository.class);
+        arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
         assetInStockRecordRepository = WebUtil.getBean(AssetInStockRecordRepository.class);
         assetOutStockRecordRepository = WebUtil.getBean(AssetOutStockRecordRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -117,12 +121,13 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         assetOutStockService = WebUtil.getBean(AssetOutStockService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
-        SupplierService supplierService = WebUtil.getBean(SupplierService.class);
-        autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
-        qrPreViewerBean=WebUtil.getBean(QRPreViewerBean.class);
-        configItemValueRepository=WebUtil.getBean(ConfigItemValueRepository.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        supplierRepository = WebUtil.getBean(SupplierRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        supplierList = supplierService.getSupplierList();
+        supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
         orgTreeEdit = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4));
         initSearchItem();
@@ -139,18 +144,18 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         outStockBusinessEndDate = null;
         startPrice = null;
         endPrice = null;
-        searchItem = new ArrivalListItem();
+        searchItem = new AssetStocked();
         queryRecruiteDept = null;
         searchItem.setArrivalList(new ArrivalList());
     }
 
     @Override
-    protected ArrivalListItemRepository getDAO() {
+    protected AssetStockedRepository getDAO() {
         return dao;
     }
 
     @Override
-    protected Page<ArrivalListItem> loadData(PageRequest pageRequest) {
+    protected Page<AssetStocked> loadData(PageRequest pageRequest) {
         searchFilters = new ArrayList<>();
         selectedItems = ListUtil.newArrayList();
         pckFilters(searchFilters);
@@ -173,13 +178,13 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         if(ObjectUtil.isEmpty(setAssetOutStockDept)){
             return new PageImpl<>(new ArrayList<>(),pageRequest, 0);
         }
-        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, setAssetOutStockDept, "1*"));
-        searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IsNotNull, null, "1*"));
+//        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, setAssetOutStockDept, "1*"));
+        searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3), "1*"));
         if (ObjectUtil.isNotEmpty(startDate)) {
-            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.GTE, startDate, "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.installDate", SearchFilter.Operator.GTE, startDate, "1*"));
         }
         if (ObjectUtil.isNotEmpty(endDate)) {
-            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(endDate).toDate(), "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.installDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(endDate).toDate(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(inStockBusinessStartDate)) {
             searchFilters.add(new SearchFilter("inStockBusinessDate", SearchFilter.Operator.GTE, inStockBusinessStartDate, "1*"));
@@ -193,26 +198,23 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         if (ObjectUtil.isNotEmpty(outStockBusinessEndDate)) {
             searchFilters.add(new SearchFilter("outStockBusinessDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(outStockBusinessEndDate).toDate(), "1*"));
         }
-        if (ObjectUtil.isNotEmpty(searchItem.getArrivalList().getName())) {
-            searchFilters.add(new SearchFilter("arrivalList.assetName", SearchFilter.Operator.LIKE, searchItem.getArrivalList().getName(), "1*"));
+        if (ObjectUtil.isNotEmpty(searchItem.getAssetName())) {
+            searchFilters.add(new SearchFilter("assetInfo.name", SearchFilter.Operator.LIKE, searchItem.getAssetName(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(supplier.getId())) {
-            searchFilters.add(new SearchFilter("arrivalList.supplierId", SearchFilter.Operator.EQ, supplier.getId(), "1*"));
-        }
-        if (ObjectUtil.isNotEmpty(searchItem.getPurchasePrice())) {
-            searchFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, searchItem.getPurchasePrice(), "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.supplierId", SearchFilter.Operator.EQ, supplier.getId(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(startPrice)) {
-            searchFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, startPrice, "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.purchasePrice", SearchFilter.Operator.GTE, startPrice, "1*"));
         }
         if (ObjectUtil.isNotEmpty(endPrice)) {
-            searchFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.LTE, endPrice, "1*"));
+            searchFilters.add(new SearchFilter("assetInfo.purchasePrice", SearchFilter.Operator.LTE, endPrice, "1*"));
         }
-        if (ObjectUtil.isNotEmpty(searchItem.getArrivalList().getFunctionType())) {
-            searchFilters.add(new SearchFilter("arrivalList.functionType", SearchFilter.Operator.LIKE, searchItem.getArrivalList().getFunctionType(), "1*"));
+        if (ObjectUtil.isNotEmpty(searchItem.getFunctionType())) {
+            searchFilters.add(new SearchFilter("assetInfo.functionType", SearchFilter.Operator.LIKE, searchItem.getFunctionType(), "1*"));
         }
-        if (ObjectUtil.isNotEmpty(searchItem.getArrivalList().getInvoiceNum())) {
-            searchFilters.add(new SearchFilter("arrivalList.invoiceNum", SearchFilter.Operator.LIKE, searchItem.getArrivalList().getInvoiceNum(), "1*"));
+        if (ObjectUtil.isNotEmpty(searchItem.getInvoiceNum())) {
+            searchFilters.add(new SearchFilter("arrivalList.invoiceNum", SearchFilter.Operator.LIKE, searchItem.getInvoiceNum(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getInStockNo())) {
             searchFilters.add(new SearchFilter("inStockNo", SearchFilter.Operator.LIKE, searchItem.getInStockNo(), "1*"));
@@ -226,20 +228,31 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         if (ObjectUtil.isNotEmpty(queryRecruiteDept)) {
             searchFilters.add(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.EQ, queryRecruiteDept.getUid(), "1*"));
         }
-        if (ObjectUtil.isNotEmpty(searchItem.getArrivalList().getContractNum())) {
-            searchFilters.add(new SearchFilter("arrivalList.contractNum", SearchFilter.Operator.LIKE, searchItem.getArrivalList().getContractNum(), "1*"));
+        if (ObjectUtil.isNotEmpty(searchItem.getContractNum())) {
+            searchFilters.add(new SearchFilter("arrivalList.contractNum", SearchFilter.Operator.LIKE, searchItem.getContractNum(), "1*"));
         }
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<AssetStocked> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<AssetStocked> content = page.getContent();
+        Set<String> userUidList = content.stream().map(AssetStocked::getInStockUser).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        if (ObjectUtil.isNotEmpty(userUidList)) {
+            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUidList);
+            userMap = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, UserAccount::getName));
+        }
+        Set<Integer> supplierIds = content.stream().map(AssetStocked::getAssetInfo).map(AssetInfo::getSupplierId).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        if (ObjectUtil.isNotEmpty(supplierIds)) {
+            List<Supplier> suppliers = supplierRepository.findByIdIn(supplierIds);
+            supplierMap = suppliers.stream().collect(Collectors.toMap(Supplier::getId, Supplier::getName));
+        }
+        return page;
     }
 
     private void pckFilters(List<SearchFilter> searchFilters) {
-        if (!this.hasFilterOnField("arrivalList.siteUID")) {
+        if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("arrivalList.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
 
@@ -258,7 +271,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         if (null == event.getObject()) {
             return;
         }
-        ArrivalListItem selected = (ArrivalListItem) event.getObject();
+        AssetStocked selected = (AssetStocked) event.getObject();
         searchItem.getArrivalList().setContractNum(selected.getArrivalList().getContractNum());
     }
 
@@ -271,8 +284,8 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         pckFilters(searchFilterList);
         searchFilterList.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
         searchFilterList.add(new SearchFilter("inStockNo", SearchFilter.Operator.LIKE, query, "1*"));
-        List<ArrivalListItem> listItems = dao.findBySearchFilter(searchFilterList);
-        return listItems.stream().map(ArrivalListItem::getInStockNo).distinct().collect(Collectors.toList());
+        List<AssetStocked> listItems = dao.findBySearchFilter(searchFilterList);
+        return listItems.stream().map(AssetStocked::getInStockNo).distinct().collect(Collectors.toList());
     }
 
     public Collection<String> autoCompleteOutStockNo(String query) {
@@ -280,8 +293,8 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         pckFilters(searchFilterList);
         searchFilterList.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, 4, "1*"));
         searchFilterList.add(new SearchFilter("outStockNo", SearchFilter.Operator.LIKE, query, "1*"));
-        List<ArrivalListItem> listItems = dao.findBySearchFilter(searchFilterList);
-        return listItems.stream().map(ArrivalListItem::getOutStockNo).distinct().collect(Collectors.toList());
+        List<AssetStocked> listItems = dao.findBySearchFilter(searchFilterList);
+        return listItems.stream().map(AssetStocked::getOutStockNo).distinct().collect(Collectors.toList());
     }
 
     public void onNoChange(String stockType) {
@@ -292,36 +305,36 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         }
     }
 
-    public void auditInStocked(ArrivalListItem arrivalListItem) {
-        assetInstallationService.auditInStocked(UserContextService.getAccessToken(), arrivalListItem.getId());
+    public void auditInStocked(AssetStocked assetStocked) {
+        assetInstallationService.auditInStocked(UserContextService.getAccessToken(), assetStocked.getId());
     }
 
     public void bathAuditInStocked() {
-        for (ArrivalListItem selectedItem : selectedItems) {
+        for (AssetStocked selectedItem : selectedItems) {
             assetInstallationService.auditInStocked(UserContextService.getAccessToken(), selectedItem.getId());
         }
     }
 
     public Double totalPurchasePrice() {
-        return selectedItems.stream().filter(t -> ObjectUtil.isNotEmpty(t.getPurchasePrice())).mapToDouble(ArrivalListItem::getPurchasePrice).sum();
+        return selectedItems.stream().map(AssetStocked::getAssetInfo).filter(t -> ObjectUtil.isNotEmpty(t.getPurchasePrice())).mapToDouble(AssetInfo::getPurchasePrice).sum();
     }
 
     public void prepareGeneratedInStockDoc() {
-        if (selectedItems.stream().map(ArrivalListItem::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
+        if (selectedItems.stream().map(AssetStocked::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedInStockDoc", false);
             WebUtil.addErrorMessage("包含不同到货单，无法生成入库单！");
             return;
         }
-        if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
+        if (selectedItems.stream().map(AssetStocked::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedInStockDoc", false);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成入库单！");
             return;
         }
         if (ObjectUtil.isNotEmpty(selectedItems)) {
-            ArrivalListItem arrivalListItem = selectedItems.get(0);
-            List<ArrivalListItem> arrivalListItems = dao.findByArrivalListId(arrivalListItem.getArrivalListId());
+            AssetStocked assetStocked = selectedItems.get(0);
+            List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetStocked.getArrivalListId());
             notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
-            contractNum = arrivalListItem.getArrivalList().getContractNum();
+            contractNum = assetStocked.getArrivalList().getContractNum();
             installed = arrivalListItems.size() - notInstalled;
         }
     }
@@ -330,7 +343,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         String inStockNo = assetOutStockService.queryInStockNo("RK");
         Date now = DateUtil.now();
         List<AssetInStockRecord> inStockRecords = ListUtil.newArrayList();
-        for (ArrivalListItem selectedItem : selectedItems) {
+        for (AssetStocked selectedItem : selectedItems) {
             if (ObjectUtil.isEmpty(selectedItem.getInStockNo())) {
                 selectedItem.setOutStockBusinessDate(now);
             }
@@ -342,18 +355,18 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             assetInStockRecord.setHospitalUid(selectedItem.getArrivalList().getHospitalUID());
             assetInStockRecord.setInstitutionUid(selectedItem.getArrivalList().getInstitutionUID());
             assetInStockRecord.setTenantUid(selectedItem.getArrivalList().getTenantUID());
-            assetInStockRecord.setAssetUid(selectedItem.getAssetUID());
+            assetInStockRecord.setAssetUid(selectedItem.getAssetUid());
             assetInStockRecord.setInStockNo(selectedItem.getInStockNo());
             assetInStockRecord.setBusinessDate(now);
             assetInStockRecord.setVendor(selectedItem.getArrivalList().getVendor());
             assetInStockRecord.setInStockUser(selectedItem.getInStockUser());
-            assetInStockRecord.setFinancingNum(selectedItem.getFinancingNum());
-            assetInStockRecord.setAssetName(selectedItem.getArrivalList().getAssetName());
+            assetInStockRecord.setFinancingNum(selectedItem.getAssetInfo().getFinancingNum());
+            assetInStockRecord.setAssetName(selectedItem.getAssetInfo().getName());
             assetInStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
-            assetInStockRecord.setInstallDate(selectedItem.getInstallDate());
-            assetInStockRecord.setFunctionType(selectedItem.getFunctionType());
+            assetInStockRecord.setInstallDate(selectedItem.getAssetInfo().getInstallDate());
+            assetInStockRecord.setFunctionType(selectedItem.getAssetInfo().getFunctionType());
             assetInStockRecord.setComments(selectedItem.getComments());
-            assetInStockRecord.setPurchasePrice(selectedItem.getPurchasePrice());
+            assetInStockRecord.setPurchasePrice(selectedItem.getAssetInfo().getPurchasePrice());
             assetInStockRecord.setInvoiceNum(selectedItem.getArrivalList().getInvoiceNum());
             assetInStockRecord.setInvoiceDate(selectedItem.getArrivalList().getInvoiceDate());
             assetInStockRecord.setArrivalListId(selectedItem.getArrivalListId());
@@ -365,7 +378,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void prepareGeneratedOutStockDoc() {
-        if (selectedItems.stream().map(ArrivalListItem::getInStockNo).anyMatch(ObjectUtil::isEmpty)) {
+        if (selectedItems.stream().map(AssetStocked::getInStockNo).anyMatch(ObjectUtil::isEmpty)) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedOutStockDoc", false);
             WebUtil.addErrorMessage("设备未生成入库单号，不允许出库！");
             return;
@@ -373,7 +386,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
     }
 
     public void generatedOutStockDoc() {
-        if (selectedItems.stream().map(ArrivalListItem::getStockStatus).collect(Collectors.toList()).contains(4)) {
+        if (selectedItems.stream().map(AssetStocked::getStockStatus).collect(Collectors.toList()).contains(4)) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage("包含已出库的设备，无法生成出库单！");
             return;
@@ -387,32 +400,31 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         Date now = DateUtil.now();
         List<String> assetIds = ListUtil.newArrayList();
         List<AssetOutStockRecord> outStockRecords = ListUtil.newArrayList();
-        for (ArrivalListItem selectedItem : selectedItems) {
+        for (AssetStocked selectedItem : selectedItems) {
             selectedItem.setOutStockNo(inStockNo);
             selectedItem.setRecruiteDeptUid(recruiteDept.getUid());
-            selectedItem.setClinicalDeptUID(recruiteDept.getUid());
             selectedItem.setRecruiter(currentUser.getUid());
-            selectedItem.setOutStocDate(now);
+            selectedItem.setOutStockBusinessDate(now);
             selectedItem.setOutStockUser(currentUser.getUid());
             selectedItem.setStockStatus(4);
-            assetIds.add(selectedItem.getAssetUID());
+            assetIds.add(selectedItem.getAssetUid());
             AssetOutStockRecord assetOutStockRecord = new AssetOutStockRecord();
             assetOutStockRecord.setSiteUid(selectedItem.getArrivalList().getSiteUID());
             assetOutStockRecord.setHospitalUid(selectedItem.getArrivalList().getHospitalUID());
             assetOutStockRecord.setInstitutionUid(selectedItem.getArrivalList().getInstitutionUID());
             assetOutStockRecord.setTenantUid(selectedItem.getArrivalList().getTenantUID());
-            assetOutStockRecord.setAssetUid(selectedItem.getAssetUID());
+            assetOutStockRecord.setAssetUid(selectedItem.getAssetUid());
             assetOutStockRecord.setOutStockNo(selectedItem.getOutStockNo());
             assetOutStockRecord.setBusinessDate(now);
             assetOutStockRecord.setVendor(selectedItem.getArrivalList().getVendor());
             assetOutStockRecord.setOutStockUser(selectedItem.getOutStockUser());
-            assetOutStockRecord.setFinancingNum(selectedItem.getFinancingNum());
+            assetOutStockRecord.setFinancingNum(selectedItem.getAssetInfo().getFinancingNum());
             assetOutStockRecord.setAssetName(selectedItem.getArrivalList().getAssetName());
             assetOutStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
-            assetOutStockRecord.setInstallDate(selectedItem.getInstallDate());
-            assetOutStockRecord.setFunctionType(selectedItem.getFunctionType());
+            assetOutStockRecord.setInstallDate(selectedItem.getAssetInfo().getInstallDate());
+            assetOutStockRecord.setFunctionType(selectedItem.getAssetInfo().getFunctionType());
             assetOutStockRecord.setComments(selectedItem.getComments());
-            assetOutStockRecord.setPurchasePrice(selectedItem.getPurchasePrice());
+            assetOutStockRecord.setPurchasePrice(selectedItem.getAssetInfo().getPurchasePrice());
             assetOutStockRecord.setInvoiceNum(selectedItem.getArrivalList().getInvoiceNum());
             assetOutStockRecord.setInvoiceDate(selectedItem.getArrivalList().getInvoiceDate());
             assetOutStockRecord.setArrivalListId(selectedItem.getArrivalListId());
@@ -453,11 +465,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             return;
         }
         List<String> stockNos;
-        List<Integer> stockStatus = selectedItems.stream().map(ArrivalListItem::getStockStatus).distinct().collect(Collectors.toList());
+        List<Integer> stockStatus = selectedItems.stream().map(AssetStocked::getStockStatus).distinct().collect(Collectors.toList());
         if ("inStock".equals(stockType)) {
-            stockNos = selectedItems.stream().map(ArrivalListItem::getInStockNo).distinct().collect(Collectors.toList());
+            stockNos = selectedItems.stream().map(AssetStocked::getInStockNo).distinct().collect(Collectors.toList());
         } else {
-            stockNos = selectedItems.stream().map(ArrivalListItem::getOutStockNo).distinct().collect(Collectors.toList());
+            stockNos = selectedItems.stream().map(AssetStocked::getOutStockNo).distinct().collect(Collectors.toList());
             if (stockStatus.size() > 1 || !stockStatus.contains(4)) {
                 WebUtil.addErrorMessage("只能打印已出库的设备！");
                 return;
@@ -562,7 +574,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
             WebUtil.addErrorMessage("请选择设备");
             return;
         }
-        List<String>  assetUids= this.selectedItems.stream().map(ArrivalListItem::getAssetUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        List<String>  assetUids= this.selectedItems.stream().map(AssetStocked::getAssetUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(assetUids)){
             WebUtil.addErrorMessage("未查询到相关设备二维码");
             return;
@@ -581,11 +593,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         this.filterClinicalDeptOrg = filterClinicalDeptOrg;
     }
 
-    public ArrivalListItem getSearchItem() {
+    public AssetStocked getSearchItem() {
         return searchItem;
     }
 
-    public void setSearchItem(ArrivalListItem searchItem) {
+    public void setSearchItem(AssetStocked searchItem) {
         this.searchItem = searchItem;
     }
 
@@ -661,11 +673,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<ArrivalLis
         this.searchDeptName = searchDeptName;
     }
 
-    public List<ArrivalListItem> getSelectedItems() {
+    public List<AssetStocked> getSelectedItems() {
         return selectedItems;
     }
 
-    public void setSelectedItems(List<ArrivalListItem> selectedItems) {
+    public void setSelectedItems(List<AssetStocked> selectedItems) {
         this.selectedItems = selectedItems;
     }
 }
