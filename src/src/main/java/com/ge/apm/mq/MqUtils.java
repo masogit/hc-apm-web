@@ -13,6 +13,7 @@ import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -101,7 +102,7 @@ public class MqUtils {
         mqContextDTO.setServiceName(mqContext.getServiceName());
         mqContextDTO.setDescribe(mqContext.getDescribe());
         mqContextDTO.setLocale(mqContext.getLocale());
-        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObject = ObjectUtil.isNotEmpty(mqContext.getJsonObject()) ? mqContext.getJsonObject() : new JSONObject();
         jsonObject.put("currentUserAccount", userAccount);
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         Field[] declaredFields = asset.getClass().getDeclaredFields();
