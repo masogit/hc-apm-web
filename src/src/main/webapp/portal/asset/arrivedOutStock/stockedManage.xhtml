@@ -100,7 +100,7 @@
                 <h:outputText value="#{item.assetInfo.financingNum}"/>
             </p:column>
             <p:column headerText="#{msg.assetName}">
-                <h:outputText value="#{item.arrivalList.assetName}"/>
+                <h:outputText value="#{item.assetInfo.name}"/>
             </p:column>
             <p:column headerText="#{msg.arrivalListContractNum}">
                 <h:outputText value="#{item.arrivalList.contractNum}"/>
@@ -111,7 +111,7 @@
                 </h:outputText>
             </p:column>
             <p:column headerText="#{msg.functionType}">
-                <h:outputText value="#{item.arrivalList.functionType}"/>
+                <h:outputText value="#{item.assetInfo.functionType}"/>
             </p:column>
             <p:column headerText="#{msg.comments}">
                 <h:outputText value="#{item.comments}"/>
@@ -261,7 +261,7 @@
                     <h:outputText value="#{item.comments}"/>
                 </p:column>
                 <p:column headerText="资产价值">
-                    <h:outputText value="#{item.assetInfo.assetInfo.purchasePrice}"/>
+                    <h:outputText value="#{item.assetInfo.purchasePrice}"/>
                 </p:column>
                 <p:column headerText="#{msg.arrivalListInvoiceNum}">
                     <h:outputText value="#{item.arrivalList.invoiceNum}"/>

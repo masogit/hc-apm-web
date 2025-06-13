@@ -53,6 +53,10 @@ public class AssetOutStockService extends MicroServiceInvoker {
 
     @Autowired
     private SystemTemplateValueRepository systemTemplateValueRepository;
+
+    @Autowired
+    private AssetStockedRepository assetStockedRepository;
+
     public static final String PATH_WORD_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/out_stock_template.docx";
     public static final String PATH_WORD_IN_STOCK_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/in_stocked_template.docx";
     public static final String PATH_WORD_OUT_STOCK_TEMPLATE = "/portal/asset/arrivedOutStock/docTemplate/out_stocked_template.docx";
@@ -257,13 +261,13 @@ public class AssetOutStockService extends MicroServiceInvoker {
 
     public String queryInStockNo(String preStr){
         preStr = queryPre(preStr);
-        String oldMax = arrivalListItemRepository.queryInStockNo(UserContextService.getCurrentUserAccount().getTenantUID(), preStr+ "%");
+        String oldMax = assetStockedRepository.queryInStockNo(UserContextService.getCurrentUserAccount().getTenantUID(), preStr+ "%");
         return preStr + querySerialNumber(oldMax);
     }
 
     public String queryOutStockNo(String preStr){
         preStr = queryPre(preStr);
-        String oldMax = arrivalListItemRepository.queryOutStockNo(UserContextService.getCurrentUserAccount().getTenantUID(), preStr+ "%");
+        String oldMax = assetStockedRepository.queryOutStockNo(UserContextService.getCurrentUserAccount().getTenantUID(), preStr+ "%");
         return preStr + querySerialNumber(oldMax);
     }
 
