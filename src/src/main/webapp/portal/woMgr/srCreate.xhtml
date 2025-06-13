@@ -6,156 +6,137 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-
-    <ui:composition>
-
-        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="#{msg.newrepair}" >
-
-            <h:form id="ServiceRequestCreateForm">
-                <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" rendered="#{not empty workOrderMgrController.newServiceRequest}">
-                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                        <h:panelGroup >
-                            <label class="label">#{msg.assetName}*</label>
-                            <p:inputText id="assetName" readonly="true" value="#{workOrderMgrController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
-                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(workOrderMgrController, 'woTab:ServiceRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="woTab:selectAssetDlg assetstatus lName" oncomplete="PF('varSelectAssetDlg').show();"/>
+<ui:composition>
+    <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="#{msg.newrepair}" >
+        <h:form id="ServiceRequestCreateForm">
+            <p:fieldset legend="#{msg.CreateWorkOrder}" rendered="#{not empty workOrderMgrController.newServiceRequest}">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class="label">#{msg.assetName}*</label>
+                        <p:inputText id="assetName" readonly="true" value="#{workOrderMgrController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
+                        <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(workOrderMgrController, 'woTab:ServiceRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="woTab:selectAssetDlg assetstatus lName" oncomplete="PF('varSelectAssetDlg').show();"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetLocation}</label>
+                        <p:inputText id="lName" value="#{workOrderMgrController.locationName}" maxlength="256" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestorName}</label>
+                        <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestorName}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.RepairReporterPhone}</label>
+                        <p:inputText id="requestorPhone"  requiredMessage="#{msg.RepairReporterPhone} #{msg.ValidationRequire}" value="#{workOrderMgrController.newServiceRequest.requestorPhone}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.casePriority}*</label>
+                        <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.casePriority}" >
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestTime}</label>
+                        <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestTime}" >
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestReason}*</label>
+                        <p:inputTextarea placeholder="#{msg.EquipmentFault}" value="#{workOrderMgrController.faultReason}" maxlength="256" />
+                        <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestReason}" />
+                    </h:panelGroup>
+                    <h:panelGroup id="assetstatus"><!--当前状态-->
+                        <label class="label">#{msg.status}</label>
+                        <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                            <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <c:if test="#{userContextService.countyArea}">
+                                <f:selectItem  itemLabel="可正常使用" itemValue="1"/>
+                            </c:if>
+                        </p:selectOneRadio>
+                        <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.newServiceRequest.confirmedDownTime}" showOn="button"
+                                    readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{workOrderMgrController.repaFlag}">
+                        <label class="label">#{msg.repairReportSendPlace}*</label>
+                        <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.repairReportSendPlace}" required="true" requiredMessage="#{msg.repairReportSendPlace} #{msg.ValidationRequire}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('repairReportSendPlace')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{userContextService.zkbAccount}">
+                        <label class="label">#{msg.customerName}*</label>
+                        <p:inputText value="#{workOrderMgrController.newServiceRequest.customerName}" maxlength="256" required="true" requiredMessage="#{msg.customerName} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{userContextService.zkbAccount}">
+                        <label class="label">#{msg.customerTel}*</label>
+                        <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}" maxlength="256" required="true" requiredMessage="#{msg.customerTel} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{userContextService.zkbAccount}">
+                        <label class="label">#{msg.customerPosition}*</label>
+                        <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256" required="true" requiredMessage="#{msg.customerPosition} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <c:if test="#{userContextService.countyArea}">
+                        <h:panelGroup id="siebleNumber">
+                            <label class="label">#{msg.siebleNumber}（如填写，长度必须填为13位）</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="13">
+                                <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.siebleNumber,msg.siebleNumber,13)}"></p:ajax>
+                            </p:inputText>
                         </h:panelGroup>
-
                         <h:panelGroup>
-                            <label class="label">#{msg.assetLocation}</label>
-                            <p:inputText id="lName" value="#{workOrderMgrController.locationName}" maxlength="256" />
+                            <label class="label">#{msg.callCenterNumber}（如填写，长度必须填为10位）</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="10">
+                                <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.callCenterNumber,msg.callCenterNumber,10)}"></p:ajax>
+                            </p:inputText>
                         </h:panelGroup>
-
                         <h:panelGroup>
-                            <label class="label">#{msg.requestorName}</label>
-                            <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestorName}" />
-                        </h:panelGroup>
-
-                        <h:panelGroup>
-                            <label class="label">#{msg.requestorName}电话</label>
-                            <p:inputText id="requestorPhone"  requiredMessage="#{msg.requestorName}电话 #{msg.ValidationRequire}" value="#{workOrderMgrController.newServiceRequest.requestorPhone}" />
-                        </h:panelGroup>
-
-                        <h:panelGroup>
-                            <label class="label">#{msg.casePriority}*</label>
-                            <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.casePriority}" >
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item"
+                            <label class="label">#{msg.countyAreaOrderType}</label>
+                            <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.orderType}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('countyAreaOrderType')}" var="item"
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
-
                         <h:panelGroup>
-                            <label class="label">#{msg.requestTime}</label>
-                            <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                            </p:outputLabel>
+                            <label class="label">客户联系人</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerName}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.requestReason}*</label>
-                            <!--<p:inputTextarea placeholder="设备故障" value="#{workOrderMgrController.newServiceRequest.requestReason}" maxlength="256" />-->
-                            <p:inputTextarea placeholder="#{msg.EquipmentFault}" value="#{workOrderMgrController.faultReason}" maxlength="256" />
-                            <p:outputLabel value="#{workOrderMgrController.newServiceRequest.requestReason}" />
+                            <label class="label">客户电话</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}"/>
                         </h:panelGroup>
-                        <h:panelGroup id="assetstatus"><!--当前状态-->
-                            <label class="label">#{msg.status}</label>
-                            <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
-                                <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
-<!--                                <f:selectItems value="#{workOrderMgrController.initStatus('2','3')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                <c:if test="#{userContextService.countyArea}">
-                                    <f:selectItem  itemLabel="可正常使用" itemValue="1"/>
-                                </c:if>
-                            </p:selectOneRadio>
-                            <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.newServiceRequest.confirmedDownTime}" showOn="button" 
-                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
+                        <h:panelGroup>
+                            <label class="label">医院名称</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.hospitalName}" readonly="true"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrController.repaFlag}">
-                            <label class="label">#{msg.repairReportSendPlace}*</label>
-                            <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.repairReportSendPlace}" required="true" requiredMessage="#{msg.repairReportSendPlace} #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="请选择" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('repairReportSendPlace')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.zkbAccount}">
-                            <label class="label">医院客户姓名*</label>
-                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerName}" maxlength="256" required="true" requiredMessage="医院客户姓名 #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.zkbAccount}">
-                            <label class="label">医院客户电话*</label>
-                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}" maxlength="256" required="true" requiredMessage="医院客户电话 #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.zkbAccount}">
-                            <label class="label">医院客户职务*</label>
-                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256" required="true" requiredMessage="医院客户职务 #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
+                    </c:if>
+                </p:panelGrid>
 
-                        <c:if test="#{userContextService.countyArea}">
-                            <h:panelGroup id="siebleNumber">
-                                <label class="label">#{msg.siebleNumber}（如填写，长度必须填为13位）</label>
-                                <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="13">
-                                    <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.siebleNumber,msg.siebleNumber,13)}"></p:ajax>
-                                </p:inputText>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.callCenterNumber}（如填写，长度必须填为10位）</label>
-                                <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="10">
-                                    <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.callCenterNumber,msg.callCenterNumber,10)}"></p:ajax>
-                                </p:inputText>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.countyAreaOrderType}</label>
-                                <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.orderType}" >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('countyAreaOrderType')}" var="item"
-                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">客户联系人</label>
-                                <p:inputText value="#{workOrderMgrController.newServiceRequest.customerName}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">客户电话</label>
-                                <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">医院名称</label>
-                                <p:inputText value="#{workOrderMgrController.newServiceRequest.hospitalName}" readonly="true"/>
-                            </h:panelGroup>
-                        </c:if>
-                    </p:panelGrid>
-                    
-                    <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">
-                        <f:facet name="header">#{msg.RequestImage}<p:outputLabel value="(图片数量最多上传5份！)" style="color: red"></p:outputLabel></f:facet>
-                        <p:panel  style="text-align:center">
-                            <h:panelGrid columns="1" style="width:100%" >
-                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
-<!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
-                                <p:commandButton actionListener="#{workOrderMgrController.removeAttachmentById(fileitem.id)}" update="pictureList woTab:ServiceRequestCreateForm:type1" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                </p:commandButton>   
-                            </h:panelGrid>
+                <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">
+                    <f:facet name="header">#{msg.RequestImage}<p:outputLabel value="#{msg.MaxImageUploadLimit}" style="color: red"></p:outputLabel></f:facet>
+                    <p:panel  style="text-align:center">
+                        <h:panelGrid columns="1" style="width:100%" >
+                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                            <p:commandButton actionListener="#{workOrderMgrController.removeAttachmentById(fileitem.id)}" update="pictureList woTab:ServiceRequestCreateForm:type1" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </p:panel>
+                </p:dataGrid>
+                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                              multiple="true" sizeLimit="10000000"  update="pictureList type1" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{workOrderMgrController.picList.size() ge 5}"/>
+                <h:panelGroup >
+                    <p:commandButton validateClient="true" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" disabled="#{!workOrderMgrController.canCreateSr()}"  update="woTab:woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                    <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update="woTab:ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                </h:panelGroup>
 
-                        </p:panel>
-
-                    </p:dataGrid>
-                    <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                  multiple="true" sizeLimit="10000000"  update="pictureList type1" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{workOrderMgrController.picList.size() ge 5}"/>
-                    <h:panelGroup >
-                        <p:commandButton validateClient="true" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" disabled="#{!workOrderMgrController.canCreateSr()}"  update="woTab:woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
-
-                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update="woTab:ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
-                    </h:panelGroup>
-                    
-                     <h:panelGroup >
-                       <h:outputText style="color:red; font-size:18px" value="#{msg.RepairTelephoneNumberTips}:4008128188" rendered="#{!workOrderMgrController.canCreateSr() or (workOrderMgrController.selectedAsset.ibStatus eq 1 and workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
-                    </h:panelGroup>
-                </p:fieldset>
-            </h:form>
-
-            <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
-        </p:dialog>
-
-    </ui:composition>
+                <h:panelGroup >
+                    <h:outputText style="color:red; font-size:18px" value="#{msg.RepairTelephoneNumberTips}:4008128188" rendered="#{!workOrderMgrController.canCreateSr() or (workOrderMgrController.selectedAsset.ibStatus eq 1 and workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
+                </h:panelGroup>
+            </p:fieldset>
+        </h:form>
+        <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
+    </p:dialog>
+</ui:composition>
 </html>

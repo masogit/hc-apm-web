@@ -5,20 +5,17 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
-
 <ui:composition>
-    <p:dialog id="supplierUserDlg" widgetVar="supplierUserDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="管理供应商相关责任人" height="800" width="1000">
-
+    <p:dialog id="supplierUserDlg" widgetVar="supplierUserDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ManageSupplierResponsiblePersons}" height="800" width="1000">
         <h:form id="pendingApprovalSupplierUserForm">
-            <p:fieldset legend="待审批供应商责任人">
+            <p:fieldset legend="#{msg.PendingApprovalSupplierResponsiblePerson}">
                 <h:form>
-                    <p:inputText id="queryStrPending" placeholder="用户名/手机号" value="#{supplierController.queryStrPending}" maxlength="100" required="false"/>
-                    <p:commandButton id="searchButton_pending" value="查询" title="查询" actionListener="#{supplierController.queryByPending}" update="supplierTab:pendingApprovalSupplierUserForm"/>
+                    <p:inputText id="queryStrPending" placeholder="#{msg.UsernameOrPhone}" value="#{supplierController.queryStrPending}" maxlength="100" required="false"/>
+                    <p:commandButton id="searchButton_pending" value="#{msg.Query}" title="#{msg.Query}" actionListener="#{supplierController.queryByPending}" update="supplierTab:pendingApprovalSupplierUserForm"/>
                 </h:form>
                 <p:dataTable id="datalist_pendingSupplierUser" value="#{supplierController.pendingApprovalUserList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="5" emptyMessage="#{msg.noRecordFound}">
-
                     <p:column width="36" id="checkBoxColumnPending">
                         <p:selectBooleanCheckbox value="#{supplierController.selectedMapPending[item.id]}"  class="selectCheckBoxPending">
                             <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBoxPending();"/>
@@ -29,57 +26,54 @@
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="用户名">
+                    <p:column headerText="#{msg.UserName}">
                         <h:outputText value="#{item.userAccount.name}"/>
                     </p:column>
-                    <p:column headerText="供应商名称">
+                    <p:column headerText="#{msg.SupplierName}">
                         <h:outputText value="#{item.supplier.name}"/>
                     </p:column>
-                    <p:column headerText="手机号">
+                    <p:column headerText="#{msg.PhoneNumber}">
                         <h:outputText value="#{item.userAccount.telephone}"/>
                     </p:column>
-                    <p:column headerText="邮箱">
+                    <p:column headerText="#{msg.Email}">
                         <h:outputText value="#{item.userAccount.email}"/>
                     </p:column>
-                    <p:column headerText="职务">
+                    <p:column headerText="#{msg.Position}">
                         <h:outputText value="#{fieldMsg.fieldValue('userPosition', item.userAccount.position)}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="passButton" value="通过" actionListener="#{supplierController.onApprove}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
-                        <p:commandButton id="rejectButton" validateClient="false" value="拒绝" actionListener="#{supplierController.onRefuse}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
+                        <p:commandButton id="passButton" value="#{msg.Approve}" actionListener="#{supplierController.onApprove}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
+                        <p:commandButton id="rejectButton" validateClient="false" value="#{msg.Reject}" actionListener="#{supplierController.onRefuse}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
                     </f:facet>
-
                 </p:dataTable>
             </p:fieldset>
         </h:form>
-
         <h:form id="approvedSupplierUserForm">
-            <p:fieldset legend="已审批供应商责任人">
+            <p:fieldset legend="#{msg.ApprovedSupplierResponsiblePerson}">
                 <h:form>
-                    <p:inputText id="queryStrApproved" placeholder="用户名/手机号" value="#{supplierController.queryStrApproved}" maxlength="100" required="false"/>
-                    <p:commandButton id="searchButton_approved" value="查询" title="查询" actionListener="#{supplierController.queryByApproved}" update="supplierTab:approvedSupplierUserForm"/>
+                    <p:inputText id="queryStrApproved" placeholder="#{msg.UsernameOrPhone}" value="#{supplierController.queryStrApproved}" maxlength="100" required="false"/>
+                    <p:commandButton id="searchButton_approved" value="#{msg.Query}" title="#{msg.Query}" actionListener="#{supplierController.queryByApproved}" update="supplierTab:approvedSupplierUserForm"/>
                 </h:form>
                 <p:dataTable id="datalist_approvedSupplierUser" value="#{supplierController.approvedUserList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="5" emptyMessage="#{msg.noRecordFound}">
-
-                    <p:column headerText="用户名">
+                    <p:column headerText="#{msg.UserName}">
                         <h:outputText value="#{item.userAccount.name}"/>
                     </p:column>
-                    <p:column headerText="供应商名称">
+                    <p:column headerText="#{msg.SupplierName}">
                         <h:outputText value="#{item.supplier.name}"/>
                     </p:column>
-                    <p:column headerText="手机号">
+                    <p:column headerText="#{msg.PhoneNumber}">
                         <h:outputText value="#{item.userAccount.telephone}"/>
                     </p:column>
-                    <p:column headerText="邮箱">
+                    <p:column headerText="#{msg.Email}">
                         <h:outputText value="#{item.userAccount.email}"/>
                     </p:column>
-                    <p:column headerText="职务">
+                    <p:column headerText="#{msg.Position}">
                         <h:outputText value="#{fieldMsg.fieldValue('userPosition', item.userAccount.position)}"/>
                     </p:column>
-                    <p:column width="140"  headerText="操作" exportable="false">
-                        <p:commandButton validateClient="false" value="停用" actionListener="#{supplierController.onRefuse(item)}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
+                    <p:column width="140"  headerText="#{msg.Operation}" exportable="false">
+                        <p:commandButton validateClient="false" value="#{msg.Deactivate}" actionListener="#{supplierController.onRefuse(item)}" update="supplierTab:approvedSupplierUserForm supplierTab:pendingApprovalSupplierUserForm"></p:commandButton>
                     </p:column>
                     <f:facet name="{Toolbar}">
                     </f:facet>
@@ -87,7 +81,5 @@
             </p:fieldset>
         </h:form>
     </p:dialog>
-
 </ui:composition>
-
 </html>

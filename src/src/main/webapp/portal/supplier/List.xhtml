@@ -8,180 +8,160 @@
 
 <ui:composition>
 
-        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
-        <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
-        <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
+    <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+    <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
 
-        <style>
-            .supplierExpiredSoon {
-                background-color: #fca752!important;
-                color: #000000!important;
+    <style>
+        .supplierExpiredSoon {
+            background-color: #fca752!important;
+            color: #000000!important;
+        }
+        .supplierExpired {
+            background-color: #f04134!important;
+            color: #000000!important;
+        }
+    </style>
+
+    <div class="ui-g-12 card">
+        <h:form rendered="#{(supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION') )  or( supplierController.activeVender() and userContextService.accessContainsFunctionMenu('ASSET_VENDER') )}">
+            <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="#{msg.InvitationQRCode}" title="#{msg.InvitationQRCode}" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
+        </h:form>
+        <h:form rendered="#{supplierController.activeVender()}">
+            <h:panelGrid id="filterType" columns="2" style="float: right">
+                <h:panelGroup style="float: right">
+                    <span>#{msg.Legend}：</span>
+                    <span class="supplierExpiredSoon">#{msg.SupplierCertExpiringSoon}</span>
+                    <span></span>
+                    <span class="supplierExpired">#{msg.SupplierCertExpired}</span>
+                </h:panelGroup>
+            </h:panelGrid>
+        </h:form>
+
+        <h:form id="SupplierListForm">
+            <p:dataTable id="datalist" value="#{supplierController.lazyModel}" var="item" widgetVar="varDataList"
+                         selectionMode="single" selection="#{supplierController.selected}" stickyHeader=""
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowStyleClass="#{item.supplierAlertStatus}"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500">
+                <p:ajax event="rowSelect" update="createButton editButton" />
+                <p:ajax event="rowDblselect" listener="#{supplierController.onSelectAsset}" onstart="prepareViewWindow();" oncomplete="openViewWindow(xhr, status, args)" update="createButton editButton" />
+                <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
+                <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                <p:column width="36" id="checkBox" exportable="false">
+                    <p:selectBooleanCheckbox value="#{supplierController.selectedMap[item.id]}" class="selectCheckBox">
+                        <p:ajax update=" @(.selectCheckBoxHeader) @(.batchDelete)" oncomplete="updateSelectAllCheckBox();"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox class="selectCheckBoxHeader">
+                            <p:ajax listener="#{supplierController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batchDelete)" oncomplete="updateSelectAllCheckBox();"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.city}" sortBy="#{item.city}" filterBy="#{item.city}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.city}"/>
+                </p:column>
+                <p:column headerText="#{msg.address}" sortBy="#{item.address}" filterBy="#{item.address}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.address}"/>
+                </p:column>
+                <p:column headerText="#{msg.zipcode}" sortBy="#{item.zipcode}" filterBy="#{item.zipcode}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.zipcode}"/>
+                </p:column>
+                <p:column headerText="#{msg.contactor}" sortBy="#{item.contactor}" filterBy="#{item.contactor}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.contactor}"/>
+                </p:column>
+                <p:column headerText="#{msg.contactInformation}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.tel}"/>
+                </p:column>
+                <p:column headerText="#{msg.type}" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu value="#{supplierController.supplierType}" onchange="PF('varDataList').filter()" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('supplierType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
+                </p:column>
+                <p:column headerText="#{msg.source}" filterBy="#{item.source}" filterMatchMode="EQ" rendered="#{supplierController.activeVender()}">
+                    <f:facet name="filter">
+                        <p:selectOneMenu value="#{supplierController.source}" onchange="PF('varDataList').filter()" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                            <f:selectItem itemLabel="#{msg.MaintainedByHospital}" itemValue="1" />
+                            <f:selectItem itemLabel="#{msg.MaintainedBySupplier}" itemValue="2" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.venderCompanyId == null ? msg.MaintainedByHospital : msg.MaintainedBySupplier}"/>
+                </p:column>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update="supplierTab:SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
+                    <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update="supplierTab:SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected or supplierController.selected.source eq 'VenderCompany'}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
+                    <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update="supplierTab:supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION')}"/>
+                    <p:commandButton id="deleteButton" class="batchDelete" process="@this" icon="ui-icon-close" title="#{msg.BatchDelete}" actionListener="#{supplierController.batchDeleteSupplier}" update="datalist" disabled="#{not supplierController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_DELETE')}">
+                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{supplierController.exportAssetExcel}" update=":growl"
+                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                        <p:fileDownload value="#{supplierController.exportFile}" />
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+            <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton  datalist:deleteButton" immediate="true"/>
+        </h:form>
+
+        <ui:include src="Edit.xhtml"/>
+        <ui:include src="supplierUser.xhtml"/>
+        <ui:include src="supplierQrCode.xhtml"/>
+    </div>
+
+    <script>
+        //<![CDATA[
+        function updateSelectAllCheckBoxPending() {
+            var checkboxlist = $(".selectCheckBoxPending");
+            var selectAllstatus = true;
+            checkboxlist.each(function () {
+                selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+            });
+            $("#pendingApprovalSupplierUserForm\\:datalist\\:selectCheckBoxHeaderPending_input").attr('checked', selectAllstatus);
+            if (selectAllstatus) {
+                $(".selectCheckBoxHeaderPending")[0].children[1].classList.add("ui-state-active");
+            } else {
+                $(".selectCheckBoxHeaderPending")[0].children[1].classList.remove("ui-state-active");
             }
-            .supplierExpired {
-                background-color: #f04134!important;
-                color: #000000!important;
+        }
+
+        function updateSelectAllCheckBoxApproved() {
+            var checkboxlist = $(".selectCheckBoxApproved");
+            var selectAllstatus = true;
+            checkboxlist.each(function () {
+                selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+            });
+            $("#approvedSupplierUserForm\\:datalist\\:selectCheckBoxHeaderApproved_input").attr('checked', selectAllstatus);
+            if (selectAllstatus) {
+                $(".selectCheckBoxHeaderApproved")[0].children[1].classList.add("ui-state-active");
+            } else {
+                $(".selectCheckBoxHeaderApproved")[0].children[1].classList.remove("ui-state-active");
             }
-        </style>
+        }
 
-            <div class="ui-g-12 card">
-                <h:form rendered="#{(supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION') )  or( supplierController.activeVender() and userContextService.accessContainsFunctionMenu('ASSET_VENDER') )}">
-                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
-                </h:form>
-                <h:form rendered="#{supplierController.activeVender()}">
-                    <h:panelGrid id="filterType" columns="2" style="float: right">
-                        <h:panelGroup style="float: right">
-                            <span >#{msg.Legend}：</span>
-                            <span class="supplierExpiredSoon">供应商证照即将到期</span>
-                            <span></span>
-                            <span class="supplierExpired">供应商证照已经到期</span>
-                        </h:panelGroup>
-                    </h:panelGrid>
-                </h:form>
+        var newWin;
+        function prepareViewWindow() {
+            newWin = window.open('about:blank', '_blank');
+            newWin.document.body.innerHTML = '#{msg.Loading}...';
+        }
 
-                <h:form id="SupplierListForm">
-                    <p:dataTable id="datalist" value="#{supplierController.lazyModel}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{supplierController.selected}" stickyHeader=""
-                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowStyleClass="#{item.supplierAlertStatus}"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="rowSelect" update="createButton editButton" />
-                        <p:ajax event="rowDblselect" listener="#{supplierController.onSelectAsset}" onstart="prepareViewWindow();" oncomplete="openViewWindow(xhr, status, args)" update="createButton editButton" />
-                        <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
-                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                        <p:column width="36" id="checkBox" exportable="false">
-                            <p:selectBooleanCheckbox value="#{supplierController.selectedMap[item.id]}" class="selectCheckBox">
-                                <p:ajax update=" @(.selectCheckBoxHeader) @(.batchDelete)" oncomplete="updateSelectAllCheckBox();"/>
-                            </p:selectBooleanCheckbox>
-                            <f:facet name="header"  >
-                                <p:selectBooleanCheckbox class="selectCheckBoxHeader">
-                                    <p:ajax listener="#{supplierController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batchDelete)" oncomplete="updateSelectAllCheckBox();"/>
-                                </p:selectBooleanCheckbox>
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.city}" sortBy="#{item.city}" filterBy="#{item.city}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.city}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.address}" sortBy="#{item.address}" filterBy="#{item.address}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.address}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.zipcode}" sortBy="#{item.zipcode}" filterBy="#{item.zipcode}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.zipcode}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.contactor}" sortBy="#{item.contactor}" filterBy="#{item.contactor}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.contactor}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.contactInformation}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.tel}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.type}" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu value="#{supplierController.supplierType}" onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('supplierType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
-                        </p:column>
-                        <p:column headerText="来源" filterBy="#{item.source}" filterMatchMode="EQ" rendered="#{supplierController.activeVender()}">
-                            <f:facet name="filter">
-                                <p:selectOneMenu value="#{supplierController.source}" onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
-                                    <f:selectItem itemLabel="院方维护" itemValue="1" />
-                                    <f:selectItem itemLabel="供应商维护" itemValue="2" />
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{item.venderCompanyId == null ? '院方维护' : '供应商维护'}"/>
-                        </p:column>
-                        <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update="supplierTab:SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update="supplierTab:SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected or supplierController.selected.source eq 'VenderCompany'}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
-                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update="supplierTab:supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION')    }"/>
-                            <p:commandButton id="deleteButton" class="batchDelete" process="@this" icon="ui-icon-close" title="批量删除" actionListener="#{supplierController.batchDeleteSupplier}" update="datalist" disabled="#{not supplierController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_DELETE')}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                            </p:commandButton>
-<!--                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">-->
-<!--                                <p:dataExporter type="xlsx" target="supplierTab:SupplierListForm:datalist" fileName="Supplier_export"/>-->
-<!--                            </p:commandButton>-->
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{supplierController.exportAssetExcel}" update=":growl"
-                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
-                                <p:fileDownload value="#{supplierController.exportFile}" />
-                            </p:commandButton>
-                        </f:facet>
-                    </p:dataTable>
-                    <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton  datalist:deleteButton" immediate="true"/>
-                </h:form>
-
-                <ui:include src="Edit.xhtml"/>
-                <ui:include src="supplierUser.xhtml"/>
-                <ui:include src="supplierQrCode.xhtml"/>
-            </div>
-
-        <script>
-            //<![CDATA[
-            function updateSelectAllCheckBoxPending() {
-                var checkboxlist = $(".selectCheckBoxPending");
-                var selectAllstatus = true;
-                checkboxlist.each(function () {
-                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
-                });
-                $("#pendingApprovalSupplierUserForm\\:datalist\\:selectCheckBoxHeaderPending_input").attr('checked', selectAllstatus);
-                if (selectAllstatus) {
-                    $(".selectCheckBoxHeaderPending")[0].children[1].classList.add("ui-state-active");
-                } else {
-                    $(".selectCheckBoxHeaderPending")[0].children[1].classList.remove("ui-state-active");
-                }
-            }
-
-            function updateSelectAllCheckBoxApproved() {
-                var checkboxlist = $(".selectCheckBoxApproved");
-                var selectAllstatus = true;
-                checkboxlist.each(function () {
-                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
-                });
-                $("#approvedSupplierUserForm\\:datalist\\:selectCheckBoxHeaderApproved_input").attr('checked', selectAllstatus);
-                if (selectAllstatus) {
-                    $(".selectCheckBoxHeaderApproved")[0].children[1].classList.add("ui-state-active");
-                } else {
-                    $(".selectCheckBoxHeaderApproved")[0].children[1].classList.remove("ui-state-active");
-                }
-            }
-
-            var newWin;
-            function prepareViewWindow() {
-                newWin = window.open('about:blank', '_blank');
-                newWin.document.body.innerHTML = '加载中...';
-            }
-
-            function openViewWindow(xhr, status, args) {
-                newWin.document.body.innerHTML = '加载中...';
-                newWin.location.href = args.url;
-            }
-
-
-            // function updateSelectAllCheckBox() {
-            //     var checkboxlist = $(".selectCheckBox");
-            //     var selectAllstatus = true;
-            //     checkboxlist.each(function () {
-            //         selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
-            //     });
-            //     $("#SupplierListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
-            //     if (selectAllstatus) {
-            //         $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
-            //     } else {
-            //         $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
-            //     }
-            // }
-            //]]>
-        </script>
-
-<!--    </ui:define>-->
+        function openViewWindow(xhr, status, args) {
+            newWin.document.body.innerHTML = '#{msg.Loading}...';
+            newWin.location.href = args.url;
+        }
+        //]]>
+    </script>
 
 </ui:composition>
 </html>
