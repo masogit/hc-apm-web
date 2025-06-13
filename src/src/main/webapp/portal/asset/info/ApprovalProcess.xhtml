@@ -27,19 +27,19 @@
         <p:ajax event="rowSelect" listener="#{multiLevelApprovalListController.onRowSelect}"
                 update="assetDetail:itemDetailViewForm3"/>
 
-        <p:column headerText="审批单号">
+        <p:column headerText="#{msg.ApprovalNumber}">
             <h:outputText value="#{item.approvalNumber}"/>
         </p:column>
-        <p:column headerText="业务单号">
+        <p:column headerText="#{msg.BusinessNumber}">
             <h:outputText value="#{item.businessNumber}"/>
         </p:column>
-        <p:column headerText="业务类型">
+        <p:column headerText="#{msg.BusinessType}">
             <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
         </p:column>
-        <p:column headerText="总审批进度">
+        <p:column headerText="#{msg.ApprovalStatus}">
             <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
         </p:column>
-        <p:column headerText="审批时间" sortBy="#{item.actualApproverDate}"
+        <p:column headerText="#{msg.ApprovalTime}" sortBy="#{item.actualApproverDate}"
                   rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
             <h:outputText value="#{item.actualApproverDate}">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>

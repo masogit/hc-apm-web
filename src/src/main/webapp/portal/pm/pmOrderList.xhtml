@@ -131,7 +131,7 @@
                     </f:facet>
                     <h:outputText value="#{item.ruleName}"/>
                 </p:column>
-                <p:column headerText="保养周期" filterBy="#{item.period}" filterMatchMode="EQ">
+                <p:column headerText="#{msg.maintenancePeriod}" filterBy="#{item.period}" filterMatchMode="EQ">
                     <h:outputText value="#{item.period.toString().concat(v2PmOrderController.getPeriodUnit(item.periodUnit))}"/>
                 </p:column>
 <!--                <p:column headerText="保养周期单位">-->
@@ -146,14 +146,15 @@
                 </p:column>
 
 
-                <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.MaintenanceNumber}" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.pmNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.CurrentProcessingStep}" filterBy="#{item.currentStepName}" filterMatchMode="EQ" rendered="#{v2PmOrderController.queryIndex != 7}">
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{pmOrderGlobalController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+<!--                            <f:selectItems value="#{pmOrderGlobalController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>-->
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmCurrentSteps')}" var="item" itemLabel="#{item.value}" itemValue="#{item.valueZh}"/>
                         </p:selectOneMenu>
                     </f:facet>
 
