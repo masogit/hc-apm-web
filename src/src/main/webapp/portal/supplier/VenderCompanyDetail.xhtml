@@ -5,315 +5,310 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://java.sun.com/jsf/core">
-
-    <ui:composition>
-        <div class="ui-g-12 card">
-            <h:form id="VenderCompanyDetailForm">
-                <p:fieldset legend="供应商详细信息" rendered="#{not empty venderCompanyController.selected}">
-                    <p:fieldset legend="基本信息">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">法人姓名</label>
-                                <p:inputText id="corporate" value="#{venderCompanyController.selected.corporate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">法人联系方式</label>
-                                <p:inputText id="corporateTel" value="#{venderCompanyController.selected.corporateTel}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">统一社会信用代码</label>
-                                <p:inputText id="creditCode" value="#{venderCompanyController.selected.creditCode}" readonly="true"/>
-                            </h:panelGroup>
-                            <!--<h:panelGroup>
-                                <label class="label">组织机构编码</label>
-                                <p:inputText id="supplierCode" value="#{venderCompanyController.selected.supplierCode}" readonly="true"/>
-                            </h:panelGroup>-->
-                        </p:panelGrid>
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">#{msg.city}</label>
-                                <p:inputText id="city" value="#{venderCompanyController.selected.city}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.address}</label>
-                                <p:inputText id="address" value="#{venderCompanyController.selected.address}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">项目对接人姓名</label>
-                                <p:inputText id="projectDockerName" value="#{venderCompanyController.selected.projectDockerName}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">项目对接人电话</label>
-                                <p:inputText id="projectDockerTel" value="#{venderCompanyController.selected.projectDockerTel}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">项目对接人职位</label>
-                                <p:inputText id="projectDockerPosition" value="#{venderCompanyController.selected.projectDockerPosition}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">#{msg.vendor}#{msg.type}</label>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{venderCompanyController.selected.maintainerT}" disabled="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{venderCompanyController.selected.manufacturerT}" disabled="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{venderCompanyController.selected.supplierT}" disabled="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="营业执照信息">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">营业执照编码</label>
-                                <p:inputText id="licenseCode" value="#{venderCompanyController.selected.licenseCode}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">营业执照开始日期</label>
-                                <p:inputText id="licenseStartDate" value="#{venderCompanyController.selected.licenseStartDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">营业执照截止日期</label>
-                                <p:inputText id="licenseEndDate" value="#{venderCompanyController.selected.licenseEndDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">营业执照业务范围</label>
-                                <p:inputText id="licenseScope" value="#{venderCompanyController.selected.licenseScope}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="licenseAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'license')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">营业执照附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="维修资质信息" rendered="#{venderCompanyController.selected.maintainerT}">
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="maintenanceQualificationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'maintenanceQualification')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">维修资质相关的附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="医疗器械经营许可证信息" rendered="#{venderCompanyController.selected.supplierT}">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">许可证编码</label>
-                                <p:inputText id="permitCode" value="#{venderCompanyController.selected.permitCode}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">许可证开始日期</label>
-                                <p:inputText id="permitStartDate" value="#{venderCompanyController.selected.permitStartDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">许可证截止日期</label>
-                                <p:inputText id="permitEndDate" value="#{venderCompanyController.selected.permitEndDate}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">许可证附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="afterSaleServiceAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'afterSaleService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">售后服务承诺附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="authorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">授权书附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="医疗器械经营备案凭证信息" rendered="#{venderCompanyController.selected.supplierT}">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">备案凭证编码</label>
-                                <p:inputText id="businessFilingCode" value="#{venderCompanyController.selected.businessFilingCode}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">备案凭证开始日期</label>
-                                <p:inputText id="businessFilingStartDate" value="#{venderCompanyController.selected.businessFilingStartDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">备案凭证截止日期</label>
-                                <p:inputText id="businessFilingEndDate" value="#{venderCompanyController.selected.businessFilingEndDate}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="businessFilingAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFiling')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">备案凭证附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="businessFilingAfterSaleServiceAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFilingAfterSaleService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">售后服务承诺附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="businessFilingAuthorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFilingAuthorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">授权书附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="医疗器械生产许可证信息" rendered="#{venderCompanyController.selected.manufacturerT}">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">生产许可证编码</label>
-                                <p:inputText id="manufacturingPermitCode" value="#{venderCompanyController.selected.manufacturingPermitCode}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">生产许可证开始日期</label>
-                                <p:inputText id="manufacturingPermitStartDate" value="#{venderCompanyController.selected.manufacturingPermitStartDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">生产许可证截止日期</label>
-                                <p:inputText id="manufacturingPermitEndDate" value="#{venderCompanyController.selected.manufacturingPermitEndDate}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="manufacturingPermitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'manufacturingPermit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">生产许可证附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="医疗器械生产备案凭证信息" rendered="#{venderCompanyController.selected.manufacturerT}">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">生产备案凭证编码</label>
-                                <p:inputText id="manufacturingFilingCode" value="#{venderCompanyController.selected.manufacturingFilingCode}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">生产备案凭证开始日期</label>
-                                <p:inputText id="manufacturingFilingStartDate" value="#{venderCompanyController.selected.manufacturingFilingStartDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">生产备案凭证截止日期</label>
-                                <p:inputText id="manufacturingFilingEndDate" value="#{venderCompanyController.selected.manufacturingFilingEndDate}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="manufacturingFilingAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'manufacturingFiling')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">生产备案凭证附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="产品注册证信息" rendered="false">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">产品注册证编号</label>
-                                <p:inputText id="productRegistrationCode" value="#{venderCompanyController.selected.productRegistrationCode}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">产品注册证开始日期</label>
-                                <p:inputText id="productRegistrationStartDate" value="#{venderCompanyController.selected.productRegistrationStartDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">产品注册证截止日期</label>
-                                <p:inputText id="productRegistrationEndDate" value="#{venderCompanyController.selected.productRegistrationEndDate}" readonly="true"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="productRegistrationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'productRegistration')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">产品注册证附件</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                </p:dataList>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset columns="4" legend="发送通知" rendered="#{venderCompanyController.venderCompanyId == null}">
-                        <h:panelGroup >
-                            <label class="label">通知内容</label>
-                            <p:inputTextarea id="noticeContent" value="#{venderCompanyController.noticeContent}" style="width: 25%" maxlength="256"/>
-                            <p:commandButton validateClient="true" actionListener="#{venderCompanyController.sendNotice()}" value="发送" update="noticeContent :growl" icon="ui-icon-check"/>
+<ui:composition>
+    <div class="ui-g-12 card">
+        <h:form id="VenderCompanyDetailForm">
+            <p:fieldset legend="#{msg.SupplierDetailInfo}" rendered="#{not empty venderCompanyController.selected}">
+                <p:fieldset legend="#{msg.BasicInfo}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.CorporateName}</label>
+                            <p:inputText id="corporate" value="#{venderCompanyController.selected.corporate}" readonly="true"/>
                         </h:panelGroup>
-                    </p:fieldset>
-                    <p:commandButton validateClient="true" actionListener="#{venderCompanyController.relation}" disabled="#{venderCompanyController.relationDisabled()}" rendered="#{venderCompanyController.venderCompanyId == null}"
-                                     value="添加供应商" update="supplierTab:VenderCompanyDetailForm supplierTab:VenderCompanyForm:datalist1  supplierTab:SupplierListForm:datalist :growl" icon="ui-icon-check"/>
+                        <h:panelGroup>
+                            <label class="label">#{msg.CorporateContact}</label>
+                            <p:inputText id="corporateTel" value="#{venderCompanyController.selected.corporateTel}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.UnifiedCreditCode}</label>
+                            <p:inputText id="creditCode" value="#{venderCompanyController.selected.creditCode}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.city}</label>
+                            <p:inputText id="city" value="#{venderCompanyController.selected.city}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.address}</label>
+                            <p:inputText id="address" value="#{venderCompanyController.selected.address}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.ProjectContactName}</label>
+                            <p:inputText id="projectDockerName" value="#{venderCompanyController.selected.projectDockerName}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ProjectContactTel}</label>
+                            <p:inputText id="projectDockerTel" value="#{venderCompanyController.selected.projectDockerTel}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ProjectContactPosition}</label>
+                            <p:inputText id="projectDockerPosition" value="#{venderCompanyController.selected.projectDockerPosition}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.SupplierType}</label>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox id="wxs" label="#{msg.maintainer}" value="#{venderCompanyController.selected.maintainerT}" disabled="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox label="#{msg.manufacturer}" value="#{venderCompanyController.selected.manufacturerT}" disabled="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{venderCompanyController.selected.supplierT}" disabled="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:fieldset>
-            </h:form>
-            <ui:include src="/portal/preview/view.xhtml" />
-        </div>
-    </ui:composition>
+                <p:fieldset legend="#{msg.BusinessLicenseInfo}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.LicenseCode}</label>
+                            <p:inputText id="licenseCode" value="#{venderCompanyController.selected.licenseCode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.LicenseStartDate}</label>
+                            <p:inputText id="licenseStartDate" value="#{venderCompanyController.selected.licenseStartDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.LicenseEndDate}</label>
+                            <p:inputText id="licenseEndDate" value="#{venderCompanyController.selected.licenseEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.LicenseScope}</label>
+                            <p:inputText id="licenseScope" value="#{venderCompanyController.selected.licenseScope}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="licenseAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'license')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.LicenseAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.MaintenanceQualificationInfo}" rendered="#{venderCompanyController.selected.maintainerT}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="maintenanceQualificationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'maintenanceQualification')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.MaintenanceAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.MedicalDevicePermitInfo}" rendered="#{venderCompanyController.selected.supplierT}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.PermitCode}</label>
+                            <p:inputText id="permitCode" value="#{venderCompanyController.selected.permitCode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.PermitStartDate}</label>
+                            <p:inputText id="permitStartDate" value="#{venderCompanyController.selected.permitStartDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.PermitEndDate}</label>
+                            <p:inputText id="permitEndDate" value="#{venderCompanyController.selected.permitEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="permitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.PermitAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="afterSaleServiceAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'afterSaleService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.AfterSaleServiceAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="authorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.AuthorizationAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.BusinessFilingInfo}" rendered="#{venderCompanyController.selected.supplierT}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.BusinessFilingCode}</label>
+                            <p:inputText id="businessFilingCode" value="#{venderCompanyController.selected.businessFilingCode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.BusinessFilingStartDate}</label>
+                            <p:inputText id="businessFilingStartDate" value="#{venderCompanyController.selected.businessFilingStartDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.BusinessFilingEndDate}</label>
+                            <p:inputText id="businessFilingEndDate" value="#{venderCompanyController.selected.businessFilingEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="businessFilingAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFiling')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.BusinessFilingAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="businessFilingAfterSaleServiceAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFilingAfterSaleService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.AfterSaleServiceAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="businessFilingAuthorizationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'businessFilingAuthorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.AuthorizationAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.ManufacturingPermitInfo}" rendered="#{venderCompanyController.selected.manufacturerT}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.ManufacturingPermitCode}</label>
+                            <p:inputText id="manufacturingPermitCode" value="#{venderCompanyController.selected.manufacturingPermitCode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ManufacturingPermitStartDate}</label>
+                            <p:inputText id="manufacturingPermitStartDate" value="#{venderCompanyController.selected.manufacturingPermitStartDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ManufacturingPermitEndDate}</label>
+                            <p:inputText id="manufacturingPermitEndDate" value="#{venderCompanyController.selected.manufacturingPermitEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="manufacturingPermitAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'manufacturingPermit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.ManufacturingPermitAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.ManufacturingFilingInfo}" rendered="#{venderCompanyController.selected.manufacturerT}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.ManufacturingFilingCode}</label>
+                            <p:inputText id="manufacturingFilingCode" value="#{venderCompanyController.selected.manufacturingFilingCode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ManufacturingFilingStartDate}</label>
+                            <p:inputText id="manufacturingFilingStartDate" value="#{venderCompanyController.selected.manufacturingFilingStartDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ManufacturingFilingEndDate}</label>
+                            <p:inputText id="manufacturingFilingEndDate" value="#{venderCompanyController.selected.manufacturingFilingEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="manufacturingFilingAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'manufacturingFiling')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.ManufacturingFilingAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.ProductRegistrationInfo}" rendered="false">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.ProductRegistrationCode}</label>
+                            <p:inputText id="productRegistrationCode" value="#{venderCompanyController.selected.productRegistrationCode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ProductRegistrationStartDate}</label>
+                            <p:inputText id="productRegistrationStartDate" value="#{venderCompanyController.selected.productRegistrationStartDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ProductRegistrationEndDate}</label>
+                            <p:inputText id="productRegistrationEndDate" value="#{venderCompanyController.selected.productRegistrationEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:dataList id="productRegistrationAttachments" value="#{venderCompanyController.getAttachList(venderCompanyController.selected.id, 'productRegistration')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.ProductRegistrationAttachments}</f:facet>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                </p:commandLink>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset columns="4" legend="#{msg.SendNotice}" rendered="#{venderCompanyController.venderCompanyId == null}">
+                    <h:panelGroup >
+                        <label class="label">#{msg.NoticeContent}</label>
+                        <p:inputTextarea id="noticeContent" value="#{venderCompanyController.noticeContent}" style="width: 25%" maxlength="256"/>
+                        <p:commandButton validateClient="true" actionListener="#{venderCompanyController.sendNotice()}" value="#{msg.Send}" update="noticeContent :growl" icon="ui-icon-check"/>
+                    </h:panelGroup>
+                </p:fieldset>
+                <p:commandButton validateClient="true" actionListener="#{venderCompanyController.relation}" disabled="#{venderCompanyController.relationDisabled()}" rendered="#{venderCompanyController.venderCompanyId == null}"
+                                 value="#{msg.AddSupplier}" update="supplierTab:VenderCompanyDetailForm supplierTab:VenderCompanyForm:datalist1  supplierTab:SupplierListForm:datalist :growl" icon="ui-icon-check"/>
+            </p:fieldset>
+        </h:form>
+        <ui:include src="/portal/preview/view.xhtml" />
+    </div>
+</ui:composition>
 </html>
