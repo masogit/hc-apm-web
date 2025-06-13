@@ -54,6 +54,7 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -567,45 +568,47 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setClosedPrice(itemDetail.getClosedPrice());
     }
     public String getStepImg(V2_WorkOrder v2_workOrder){
+        Locale locale = LocaleContextHolder.getLocale();
+        boolean en = locale.ENGLISH == locale;
         Integer stepId =v2_workOrder.getCurrentStepId();
         int mode =v2_workOrder.getDispatchMode()!=null?v2_workOrder.getDispatchMode().intValue():0;
         switch(stepId){
             case 7: //待评价
-                return "icons/5.png";
+                return en?"icons/en_5.png":"icons/5.png";
             case 6: //
-                return "icons/5.png";
+                return en?"icons/en_5.png":"icons/5.png";
             case 5: //待验收
             {
                 if( v2_workOrder.getV2_workOrder_detail_list().size()>0 && v2_workOrder.getApprovalDate()==null){//有备件 没有提交审核 则显审核图标显示为灰色的
-                    return "icons/6.png";
+                    return en?"icons/en_6.png":"icons/6.png";
                 }
                 if(v2_workOrder.getV2_workOrder_detail_list().size() ==0){
-                    return "icons/6.png";
+                    return en?"icons/en_6.png":"icons/6.png";
                 }
                 else{
-                    return "icons/5.png";
+                    return en?"icons/en_5.png":"icons/5.png";
                 }
             }
             case 8: //待审核
-                return "icons/4.png";
+                return en?"icons/en_4.png":"icons/4.png";
             case 4: //维修中
             case 10: //待送修
             case 11: //待返还
             {
                 if(v2_workOrder.getApprovalDate()!=null){
-                    return  "icons/4.png";
+                    return   en?"icons/en_4.png":"icons/4.png";
                 }
-                return "icons/3.png";
+                return  en?"icons/en_3.png":"icons/3.png";
             }
 
             case 3: //接单中
-                return "icons/2.png";
+                return en?"icons/en_2.png":"icons/2.png";
             case 2:
                 if(mode== 2 || mode ==3 ){//如果是抢单或抢单加手动模式
-                    return "icons/2.png";
+                    return en?"icons/en_2.png":"icons/2.png";
                 }
             default:
-                return "icons/1.png";
+                return en?"icons/en_1.png":"icons/1.png";
         }
     }
     public String getStepName(V2_WorkOrder v2_workOrder){
