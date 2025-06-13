@@ -52,7 +52,7 @@
                             <f:selectItem itemLabel="#{msg.Related}" itemValue="true" />
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{item.relation ? #{msg.Related} : #{msg.NotRelated}}"/>
+                    <h:outputText value="#{item.relation ? msg.Related : msg.NotRelated}"/>
                 </p:column>
                 <!--                <f:facet name="{Toolbar}">-->
                 <!--                    <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.AddVenderCompany}" actionListener="#{venderCompanyController.prepareEdit}" update="supplierTab:SupplierRelationDlg" oncomplete="PF('SupplierRelationDialog').show()" disabled="#{empty venderCompanyController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>-->
