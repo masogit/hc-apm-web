@@ -2261,7 +2261,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
         if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name().equals(zkbPartOrder.getReturnType())){
-            if(zkbPartOrder.getOrderNo().startsWith("FE")){
+            if(zkbPartOrder.getOrderNo().toUpperCase().startsWith("FE")){
                 List<V2_BlobObject> newList = v2_blobObjectList.stream().filter(t-> StrUtil.isEmpty(t.getBoUuid())).collect(Collectors.toList());
                 saveBlob(newList, zkbPartOrder.getId());
             }
