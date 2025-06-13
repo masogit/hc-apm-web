@@ -41,7 +41,7 @@
                             <f:selectItem itemLabel="#{msg.Completed}" itemValue="1" />
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{item.status == 1 ? #{msg.Completed} : #{msg.NotCompleted}}"/>
+                    <h:outputText value="#{item.status == 1 ? msg.Completed : msg.NotCompleted}"/>
                 </p:column>
                 <p:column headerText="#{msg.replyUser}" sortBy="#{item.replyUser}" filterBy="#{item.replyUser}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.replyUser}"/>
