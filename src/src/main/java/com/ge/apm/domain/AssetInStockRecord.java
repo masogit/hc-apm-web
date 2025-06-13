@@ -41,6 +41,10 @@ public class AssetInStockRecord implements Serializable {
     @Column(name = "asset_uid", columnDefinition = "CHAR(32)")
     private String assetUid;
 
+    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
+
     //入库单号
     @Column(name = "in_stock_no")
     private String inStockNo;
@@ -105,6 +109,10 @@ public class AssetInStockRecord implements Serializable {
     //到货清单id
     @Column(name = "arrival_list_id", columnDefinition = "CHAR(32)")
     private String arrivalListId;
+
+    @JoinColumn(name = "arrival_list_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ArrivalList arrivalList;
 
     //到货单条目
     @Column(name = "arrival_item_id", columnDefinition = "CHAR(32)")
