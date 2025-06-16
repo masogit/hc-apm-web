@@ -270,9 +270,12 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             selectedItem.setReturnedDate(now);
         }
         List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUidList);
+        OrgInfo orgInfo = orgInfoRepository.getByUid(setAssetOutStockDept);
         for (AssetInfo assetInfo : assetInfos) {
             assetInfo.setInstallDate(now);
+            assetInfo.setClinicalDeptId(orgInfo.getId());
             assetInfo.setClinicalDeptUID(setAssetOutStockDept);
+            assetInfo.setClinicalDeptName(orgInfo.getName());
         }
         assetInfoRepository.save(assetInfos);
         for (AssetInfo assetInfo : assetInfos) {
