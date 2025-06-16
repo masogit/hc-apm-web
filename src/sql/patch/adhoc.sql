@@ -9,3 +9,7 @@ insert into public.config_item_value(uid, hospital_uid, institution_uid, key, si
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启2级规则自动添加性能检测报告', 'enableSecondRuleReportAutoAdd', '保养单是否自动添加2级规则性能报告', 'f', 't', 3 where not exists (select * from config_item where key = 'enableSecondRuleReportAutoAdd');
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启3级规则自动添加性能检测报告', 'enableThreeRuleReportAutoAdd', '保养单是否自动添加3级规则性能报告', 'f', 't', 3 where not exists (select * from config_item where key = 'enableThreeRuleReportAutoAdd');
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启质量控制自动添加性能检测报告', 'enableQuantityControlReportAutoAdd', '保养单是否自动添加质量控制性能报告', 'f', 't', 3 where not exists (select * from config_item where key = 'enableQuantityControlReportAutoAdd');
+
+
+--
+update v2_wrok_order set coworker_entry_type = '0';
