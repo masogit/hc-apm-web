@@ -13,11 +13,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/assetStocked")
@@ -34,14 +34,15 @@ public class AssetStockedRestController {
 	private AssetOutStockRecordRepository assetOutStockRecordRepository;
 
 	@RequestMapping(value = "/initData", method = RequestMethod.GET)
-	@ResponseBody
 	public String initData() {
 		List<AssetStocked> stockedList = ListUtil.newArrayList();
 		List<AssetInStockRecord> inStockRecords = ListUtil.newArrayList();
 		List<AssetOutStockRecord> outStockRecords = ListUtil.newArrayList();
 		try {
+			List<String> assetUidList = assetStockedRepository.find().stream().map(AssetStocked::getAssetUid).distinct().collect(Collectors.toList());
 			List<SearchFilter> arrivalItemSearchList = ListUtil.newArrayList();
 			arrivalItemSearchList.add(new SearchFilter("stockStatus", SearchFilter.Operator.IsNotNull, null, "1*"));
+			arrivalItemSearchList.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, assetUidList, "1*"));
 			List<ArrivalListItem> itemList = arrivalListItemRepository.findBySearchFilter(arrivalItemSearchList);
 			for (ArrivalListItem arrivalListItem : itemList) {
 				AssetStocked assetStocked = new AssetStocked();
@@ -106,9 +107,28 @@ public class AssetStockedRestController {
 				}
 
 			}
-			System.out.println(stockedList);
-			System.out.println(inStockRecords);
-			System.out.println(outStockRecords);
+			assetStockedRepository.save(stockedList);
+			assetInStockRecordRepository.save(inStockRecords);
+			assetOutStockRecordRepository.save(outStockRecords);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return e.getMessage();
+		}
+		return "success";
+	}
+
+	@RequestMapping(value = "/removeData", method = RequestMethod.GET)
+	public String removeData() {
+		try {
+			List<String> assetUidList = assetStockedRepository.find().stream().map(AssetStocked::getAssetUid).distinct().collect(Collectors.toList());
+			List<SearchFilter> arrivalItemSearchList = ListUtil.newArrayList();
+			arrivalItemSearchList.add(new SearchFilter("stockStatus", SearchFilter.Operator.IsNotNull, null, "1*"));
+			arrivalItemSearchList.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, assetUidList, "1*"));
+			List<ArrivalListItem> itemList = arrivalListItemRepository.findBySearchFilter(arrivalItemSearchList);
+			List<String> arrivalItemIds = itemList.stream().map(ArrivalListItem::getId).collect(Collectors.toList());
+			assetStockedRepository.deleteByArrivalItemIdIn(arrivalItemIds);
+			assetInStockRecordRepository.deleteByArrivalItemIdIn(arrivalItemIds);
+			assetOutStockRecordRepository.deleteByArrivalItemIdIn(arrivalItemIds);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return e.getMessage();

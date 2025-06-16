@@ -8,6 +8,8 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.AssetInStockRecord;
 import webapp.framework.dao.GenericRepositoryUUID;
 
-public interface AssetInStockRecordRepository extends GenericRepositoryUUID<AssetInStockRecord>{
+import java.util.List;
 
+public interface AssetInStockRecordRepository extends GenericRepositoryUUID<AssetInStockRecord>{
+    void deleteByArrivalItemIdIn(List<String> arrivalItemIds);
 }
