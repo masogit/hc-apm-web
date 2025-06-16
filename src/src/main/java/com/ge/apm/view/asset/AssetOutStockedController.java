@@ -350,7 +350,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     public String openNewWindowView(AssetOutStockRecord outStockRecord, String type) {
         switch (type) {
             case "outStocked" :
-                return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + outStockRecord.getOutStockNo();
+                return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + outStockRecord.getOutStockNo() + "&amp;userName=" + currentUser.getName();
             case "assetInfo" :
                 return "/portal/asset/info/AssetDetail.xhtml?faces-redirect=true&amp;actionName=View&amp;terminate=false&amp;assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
             case "contractInfo" :

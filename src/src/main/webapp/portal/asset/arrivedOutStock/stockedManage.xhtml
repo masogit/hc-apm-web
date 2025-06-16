@@ -61,8 +61,6 @@
                         <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
                         <f:selectItem itemLabel="待入库" itemValue="2"/>
                         <f:selectItem itemLabel="已入库" itemValue="3"/>
-                        <f:selectItem itemLabel="已出库" itemValue="4"/>
-                        <f:selectItem itemLabel="已退库" itemValue="5"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
             </p:panelGrid>
@@ -86,7 +84,7 @@
                 <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" />
             </p:column>
             <p:column headerText="业务时间">
-                <h:outputText value="#{item.assetInfo.installDate}">
+                <h:outputText value="#{item.businessDate}">
                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                 </h:outputText>
             </p:column>

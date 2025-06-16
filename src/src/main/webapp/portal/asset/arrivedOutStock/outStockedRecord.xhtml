@@ -155,7 +155,7 @@
             </p:column>
             <f:facet name="{Toolbar}">
                 <p:commandButton value="生成退库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" action="#{assetOutStockedController.prepareGeneratedReturnedStockDoc()}" validateClient="true"
-                                 oncomplete="handleAssetReturnedStockSubmit(xhr, status, args);" update=":growl"/>
+                                 oncomplete="handleAssetReturnedStockSubmit(xhr, status, args);" update=":growl :assetOutStockTab:GeneratedReturnedStockDocDlg :assetOutStockTab:unfinishedAssetOrderDetailDialog"/>
                 <p:commandButton id="previewQRCode" class="btn btn-sm btn-gray" icon="ui-icon-print" title="预览打印二维码"  actionListener="#{assetOutStockedController.prepareViewQrcode()}" update=":qrPreviewedDlg"  oncomplete="handleSubmit(args,'qrPreviewedDlg')" />
             </f:facet>
         </p:dataTable>
