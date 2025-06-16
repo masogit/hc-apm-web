@@ -79,14 +79,6 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
     @Getter @Setter
     private Date endDate;
     @Getter @Setter
-    private Date inStockBusinessStartDate;
-    @Getter @Setter
-    private Date inStockBusinessEndDate;
-    @Getter @Setter
-    private Date outStockBusinessStartDate;
-    @Getter @Setter
-    private Date outStockBusinessEndDate;
-    @Getter @Setter
     private StreamedContent exportInStockFile;
     @Getter @Setter
     private StreamedContent exportOutStockFile;
@@ -138,10 +130,6 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         supplier = new Supplier();
         startDate = null;
         endDate = null;
-        inStockBusinessStartDate = null;
-        inStockBusinessEndDate = null;
-        outStockBusinessStartDate = null;
-        outStockBusinessEndDate = null;
         startPrice = null;
         endPrice = null;
         searchItem = new AssetStocked();
@@ -159,20 +147,6 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         searchFilters = new ArrayList<>();
         selectedItems = ListUtil.newArrayList();
         pckFilters(searchFilters);
-        /*tabId = tabId == null ? "auditInStocked" : tabId;
-        switch (tabId) {
-            case "auditInStocked":
-                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, 1, "1*"));
-                break;
-            case "inStockedRecord":
-                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3, 4), "1*"));
-                break;
-            case "outStockedRecord":
-                searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(3, 4), "1*"));
-                break;
-            default:
-                break;
-        }*/
         // YHAAO-25213 取消审核入库 增加库存管理
         String setAssetOutStockDept = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "setAssetOutStockDept");
         if(ObjectUtil.isEmpty(setAssetOutStockDept)){
@@ -181,22 +155,10 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
 //        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, setAssetOutStockDept, "1*"));
         searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.IN, ListUtil.newArrayList(2, 3), "1*"));
         if (ObjectUtil.isNotEmpty(startDate)) {
-            searchFilters.add(new SearchFilter("assetInfo.installDate", SearchFilter.Operator.GTE, startDate, "1*"));
+            searchFilters.add(new SearchFilter("businessDate", SearchFilter.Operator.GTE, startDate, "1*"));
         }
         if (ObjectUtil.isNotEmpty(endDate)) {
-            searchFilters.add(new SearchFilter("assetInfo.installDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(endDate).toDate(), "1*"));
-        }
-        if (ObjectUtil.isNotEmpty(inStockBusinessStartDate)) {
-            searchFilters.add(new SearchFilter("inStockBusinessDate", SearchFilter.Operator.GTE, inStockBusinessStartDate, "1*"));
-        }
-        if (ObjectUtil.isNotEmpty(inStockBusinessEndDate)) {
-            searchFilters.add(new SearchFilter("inStockBusinessDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(inStockBusinessEndDate).toDate(), "1*"));
-        }
-        if (ObjectUtil.isNotEmpty(outStockBusinessStartDate)) {
-            searchFilters.add(new SearchFilter("outStockBusinessDate", SearchFilter.Operator.GTE, outStockBusinessStartDate, "1*"));
-        }
-        if (ObjectUtil.isNotEmpty(outStockBusinessEndDate)) {
-            searchFilters.add(new SearchFilter("outStockBusinessDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(outStockBusinessEndDate).toDate(), "1*"));
+            searchFilters.add(new SearchFilter("businessDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(endDate).toDate(), "1*"));
         }
         if (ObjectUtil.isNotEmpty(searchItem.getAssetName())) {
             searchFilters.add(new SearchFilter("assetInfo.name", SearchFilter.Operator.LIKE, searchItem.getAssetName(), "1*"));
@@ -273,7 +235,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         }
         AssetStocked selected = (AssetStocked) event.getObject();
         if (ObjectUtil.isNotEmpty(selected.getArrivalList())) {
-            searchItem.getArrivalList().setContractNum(selected.getArrivalList().getContractNum());
+            searchItem.setContractNum(selected.getArrivalList().getContractNum());
         }
     }
 

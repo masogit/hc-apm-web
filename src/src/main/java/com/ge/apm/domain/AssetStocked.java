@@ -28,6 +28,10 @@ public class AssetStocked implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
+    //库存管理业务时间-设备安装时间
+    @Column(name = "business_date")
+    private Date businessDate;
+
     //领用人
     @Column(name = "recruiter")
     private String recruiter;
