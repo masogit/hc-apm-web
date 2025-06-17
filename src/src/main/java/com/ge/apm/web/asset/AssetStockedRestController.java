@@ -121,10 +121,8 @@ public class AssetStockedRestController {
 	@RequestMapping(value = "/removeData", method = RequestMethod.GET)
 	public String removeData() {
 		try {
-			List<String> assetUidList = assetStockedRepository.find().stream().map(AssetStocked::getAssetUid).distinct().collect(Collectors.toList());
 			List<SearchFilter> arrivalItemSearchList = ListUtil.newArrayList();
 			arrivalItemSearchList.add(new SearchFilter("stockStatus", SearchFilter.Operator.IsNotNull, null, "1*"));
-			arrivalItemSearchList.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, assetUidList, "1*"));
 			List<ArrivalListItem> itemList = arrivalListItemRepository.findBySearchFilter(arrivalItemSearchList);
 			List<String> arrivalItemIds = itemList.stream().map(ArrivalListItem::getId).collect(Collectors.toList());
 			assetStockedRepository.deleteByArrivalItemIdIn(arrivalItemIds);
