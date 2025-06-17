@@ -151,7 +151,7 @@
                             </p:autoComplete>
                         </h:panelGroup>
                         <h:panelGroup id="itemCode" rendered="#{userContextService.isCountyArea()}">
-                            <label class="label">备件编号</label>
+                            <label class="label">#{msg.SparePartCode}</label>
                             <p:inputText readonly="true"
                                          value="#{v2PmOrderController.getPartsItemCode(null)}"/>
                         </h:panelGroup>
@@ -163,7 +163,7 @@
                            </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup id="remainingStock" rendered="#{v2PmOrderController.statusFlag==1}">
-                            <label class="label">所剩库存</label>
+                            <label class="label">#{msg.RemainingStock}</label>
                             <p:inputText id="remainingStock2" name="remainingStock" placeholder="剩余库存"
                                          readonly="true"
                                          value="#{v2PmOrderController.itemDetail.currentQuantity}"/>
@@ -245,7 +245,7 @@
                     </p:panelGrid>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.isCountyArea()}">
                         <h:panelGroup>
-                            <label class="label">备件描述</label>
+                            <label class="label">#{msg.partsDescription}</label>
                             <p:inputTextarea rows="1" cols="100" value="#{v2PmOrderController.itemDetail.partsDescription}"/>
                         </h:panelGroup>
                     </p:panelGrid>

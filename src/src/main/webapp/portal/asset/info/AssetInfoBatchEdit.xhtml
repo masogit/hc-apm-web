@@ -51,114 +51,114 @@
         </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="批量修改基本信息"/>
+                <p:outputLabel class="pageTitle" value="#{msg.batchEditBasicInfo}"/>
             </div>
             <div class="ui-g-12 card">
-                <span  style="color:red">如您未选择任何设备，此次批量修改将被应用到所有可见设备，请谨慎操作！</span>
-            <h:form id="AssetInfoEditForm">
-                            <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageBasicFields}" >
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
-                                        <ui:include src="customEditFieldsBatchEdit.xhtml"/>
-                                    </c:forEach>
-                                </p:panelGrid>
-                            </p:fieldset>
+                <span style="color:red">#{msg.batchEditWarning}</span>
+                <h:form id="AssetInfoEditForm">
+                    <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageBasicFields}" >
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
+                                <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
 
-                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageCodesFields}" >
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
-                                        <ui:include src="customEditFieldsBatchEdit.xhtml"/>
-                                    </c:forEach>
-                                </p:panelGrid>
-                            </p:fieldset>
-                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageStatusFields}">
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageStatusFields}" var="fieldItem" >
-                                        <ui:include src="customEditFieldsBatchEdit.xhtml"/>
-                                    </c:forEach>
-                                </p:panelGrid>
-                            </p:fieldset>
-                            <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageCatalogFields}">
-                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                        <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
-                                            <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageCodesFields}" >
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
+                                <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageStatusFields}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageStatusFields}" var="fieldItem" >
+                                <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageCatalogFields}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
+                                <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                            </c:forEach>
+                            <c:if test="#{userContextService.zkbAccount}" >
+                                <h:panelGroup>
+                                    <label class="label">#{msg.mainDirectory}<span style="color:red">*</span></label>
+                                    <p:selectOneMenu id="fileMainDirectory" value="#{assetInfoBulkEditController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
+                                        <p:ajax update="fileSecondDirectory"/>
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <c:forEach items="#{assetInfoBulkEditController.findMainDirectory()}" var="v">
+                                            <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
                                         </c:forEach>
-                                        <c:if test="#{userContextService.zkbAccount}" >
-                                            <h:panelGroup>
-                                                <label class="label">#{msg.mainDirectory}<span style="color:red">*</span></label>
-                                                <p:selectOneMenu id="fileMainDirectory" value="#{assetInfoBulkEditController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
-                                                    <p:ajax update="fileSecondDirectory"/>
-                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <c:forEach items="#{assetInfoBulkEditController.findMainDirectory()}" var="v">
-                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
-                                                    </c:forEach>
-                                                </p:selectOneMenu>
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-                                                <label class="label">#{msg.secondDirectory}<span style="color:red">*</span></label>
-                                                <p:selectOneMenu id="fileSecondDirectory" value="#{assetInfoBulkEditController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
-                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <c:forEach items="#{assetInfoBulkEditController.subZkbFileDirectoryList}" var="v">
-                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
-                                                    </c:forEach>
-                                                </p:selectOneMenu>
-                                            </h:panelGroup>
-                                        </c:if>
-                                    </p:panelGrid>
-                            </p:fieldset>
-                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageDateFields}">
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageDateFields}" var="fieldItem" >
-                                            <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.secondDirectory}<span style="color:red">*</span></label>
+                                    <p:selectOneMenu id="fileSecondDirectory" value="#{assetInfoBulkEditController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <c:forEach items="#{assetInfoBulkEditController.subZkbFileDirectoryList}" var="v">
+                                            <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
                                         </c:forEach>
-                                </p:panelGrid>
-                            </p:fieldset>
-                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageFinicialFields}">
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageFinicialFields}" var="fieldItem" >
-                                            <ui:include src="customEditFieldsBatchEdit.xhtml"/>
-                                        </c:forEach>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                            </c:if>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageDateFields}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageDateFields}" var="fieldItem" >
+                                <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageFinicialFields}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoBulkEditController.customConfig.assetsEditpageFinicialFields}" var="fieldItem" >
+                                <ui:include src="customEditFieldsBatchEdit.xhtml"/>
+                            </c:forEach>
 
-                                </p:panelGrid>
-                            </p:fieldset>
-                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
-                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <h:panelGroup >
-                                        <p:dataList id="pictureList" value="#{assetInfoBulkEditController.getAttachList(assetInfoBulkEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <p:commandButton actionListener="#{assetInfoBulkEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                            </p:commandButton>
-                                        </p:dataList>
-                                    </h:panelGroup>
-                                        <h:panelGroup >
-                                         <p:dataList id="contractList" value="#{assetInfoBulkEditController.getAttachList(assetInfoBulkEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                <p:commandButton actionListener="#{assetInfoBulkEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                </p:commandButton>
-                            </p:dataList>
-                                        </h:panelGroup>
-                                    <h:panelGroup >
-                            <p:dataList id="manualList" value="#{assetInfoBulkEditController.getAttachList(assetInfoBulkEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                <p:commandButton actionListener="#{assetInfoBulkEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                </p:commandButton>
-                            </p:dataList>
-                        </h:panelGroup>
-                                </p:panelGrid>
-                              </p:fieldset>
-                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <h:panelGroup id="buttonGroup">
-                            <p:commandButton value="批量修改" icon="ui-icon-check" action="#{assetInfoBulkEditController.verifyIfRequiredBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" update="AssetInfoEditForm importDataForm" auto="true"  style="float:left"  rendered="#{assetInfoBulkEditController.getFlag()}" />
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup >
+                                <p:dataList id="pictureList" value="#{assetInfoBulkEditController.getAttachList(assetInfoBulkEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton actionListener="#{assetInfoBulkEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <p:dataList id="contractList" value="#{assetInfoBulkEditController.getAttachList(assetInfoBulkEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton actionListener="#{assetInfoBulkEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <p:dataList id="manualList" value="#{assetInfoBulkEditController.getAttachList(assetInfoBulkEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton actionListener="#{assetInfoBulkEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup id="buttonGroup">
+                            <p:commandButton value="#{msg.batchEdit}" icon="ui-icon-check" action="#{assetInfoBulkEditController.verifyIfRequiredBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" update="AssetInfoEditForm importDataForm" auto="true"  style="float:left"  rendered="#{assetInfoBulkEditController.getFlag()}" />
                             <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoBulkEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                             </h:panelGroup>
-                            </p:panelGrid>
-                          </h:form>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
 
                 <ui:include src="createSupplierBatchEdit.xhtml" />
             </div>
@@ -166,7 +166,7 @@
 
                 <h:form id="importDataForm">
                     <p:tabView>
-                        <p:tab title="批量修改异常信息">
+                        <p:tab title="#{msg.batchEditErrorInfo}">
                             <p:dataTable  value="#{assetInfoBulkEditController.assetInfos}" var="item" >
 
                                 <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
@@ -178,8 +178,8 @@
                                 <p:column headerText="#{msg.QRCode}">
                                     <h:outputText value="#{item.qrCode}"/>
                                 </p:column>
-                                <p:column headerText="错误提示" >
-                                     <h:outputText value="#{item.errorMessage}"/>
+                                <p:column headerText="#{msg.errorMessage}" >
+                                    <h:outputText value="#{item.errorMessage}"/>
                                 </p:column>
                             </p:dataTable>
 
@@ -199,9 +199,9 @@
                 <image id="shwoPicDialogImg" src="" style="max-height: 900px; max-width: 900px"></image>
             </div>
             <div>
-                <p:commandButton id="spin" value="旋转"/>
-                <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
-                <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                <p:commandButton id="spin" value="#{msg.rotate}"/>
+                <p:commandButton id="enlarge" value="#{msg.enlarge}" onclick ="ImageSuofang(true)"/>
+                <p:commandButton id="shrink" value="#{msg.shrink}" onclick ="ImageSuofang(false)"/>
             </div>
         </div>
         <script id="shwoPicDialog_s" type="text/javascript">$(function () {
@@ -213,7 +213,7 @@
             function showthis(pic) {
                 var s = $('#shwoPicDialogImg')[0]
                 s.src = pic.src;
-                s.style.transform = 'rotate('+ 0 +'deg)';
+                s.style.transform = 'rotate(' + 0 + 'deg)';
                 s.width = pic.width * 1.6;
                 s.height = pic.height * 1.6;
                 PF('shwoPicDialog').show();
@@ -224,19 +224,18 @@
             $("#spin").click(function () {
                 num++;
                 // $("#shwoPicDialogImg").style.rotate = num * 90;
-                $("#shwoPicDialogImg")[0].style.transform = 'rotate('+num * 90+'deg)';
+                $("#shwoPicDialogImg")[0].style.transform = 'rotate(' + num * 90 + 'deg)';
             })
 
             function ImageSuofang(args) {
-                var imgsrc =  $("#shwoPicDialogImg")[0];
+                var imgsrc = $("#shwoPicDialogImg")[0];
                 if (args) {
-                    if(imgsrc.width * 1.1 > 900 ||imgsrc.height * 1.1>900 ){
+                    if (imgsrc.width * 1.1 > 900 || imgsrc.height * 1.1 > 900) {
                         return;
                     }
                     imgsrc.width = imgsrc.width * 1.1;
                     imgsrc.height = imgsrc.height * 1.1;
-                }
-                else {
+                } else {
                     imgsrc.width = imgsrc.width / 1.1;
                     imgsrc.height = imgsrc.height / 1.1;
                 }
@@ -247,7 +246,7 @@
                 var audioList = $("input[id*='audio']");
                 $.each(audioList, function (index) {
                     var audioClass = (index == 0 ? "track-default" : "");
-                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>语音" + (index + 1) + "</a></li>";
+                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>#{msg.voice}" + (index + 1) + "</a></li>";
                     $audioUlEle.append(templ);
                 });
 
@@ -260,8 +259,8 @@
                 // Some options
                 var opt_play_first = false, // If true, will attempt to auto-play the default track on page loads. No effect on mobile devices, like iOS.
                     opt_auto_play = true, // If true, when a track is selected, it will auto-play.
-                    opt_text_playing = "播放", // Text when playing
-                    opt_text_selected = "选择"; // Text when not playing
+                    opt_text_playing = "#{msg.playing}", // Text when playing
+                    opt_text_selected = "#{msg.selected}"; // Text when not playing
 
                 // A flag to capture the first track
                 var first_track = true;
@@ -269,8 +268,8 @@
                 // Change the time format
                 $.jPlayer.timeFormat.padMin = false;
                 $.jPlayer.timeFormat.padSec = false;
-                $.jPlayer.timeFormat.sepMin = " 分 ";
-                $.jPlayer.timeFormat.sepSec = " 秒";
+                $.jPlayer.timeFormat.sepMin = "#{msg.minute}";
+                $.jPlayer.timeFormat.sepSec = "#{msg.second}";
 
                 // Initialize the play state text
                 my_playState.text(opt_text_selected);
@@ -314,20 +313,25 @@
                 });
 
             });
+
             function handleComplete(xhr, status, args) {
                 var unCheckedNurseSite = args.unCheckedNurseSite;
                 var toDeleteNurseMaintainSite = args.toDeleteNurseMaintainSite
-                if(unCheckedNurseSite==true && toDeleteNurseMaintainSite == false) {
+                if (unCheckedNurseSite == true && toDeleteNurseMaintainSite == false) {
                     PF('toDeleteCheckedNurseSite').show()
                 }
             }
+
             //]]>
         </script>
-        <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
-            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
-                <p:commandButton validateClient="true" action="#{assetInfoBulkEditController.todelete()}" value="是" icon="ui-icon-check"
+        <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog"
+                  draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="#{msg.deleteUnfinishedCheckPrompt}">
+                <p:commandButton validateClient="true" action="#{assetInfoBulkEditController.todelete()}"
+                                 value="#{msg.yes}" icon="ui-icon-check"
                                  oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
-                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
+                <p:commandButton immediate="true" value="#{msg.no}" icon="ui-icon-arrow-back"
+                                 oncomplete="PF('toDeleteCheckedNurseSite').hide()" update=":growl"/>
             </p:fieldset>
         </p:dialog>
     </ui:define>
