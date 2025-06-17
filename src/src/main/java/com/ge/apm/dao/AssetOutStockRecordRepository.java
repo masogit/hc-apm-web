@@ -6,10 +6,14 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.AssetOutStockRecord;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
 
 public interface AssetOutStockRecordRepository extends GenericRepositoryUUID<AssetOutStockRecord>{
+    @Transactional
+    @Modifying
     void deleteByArrivalItemIdIn(List<String> arrivalItemIds);
 }

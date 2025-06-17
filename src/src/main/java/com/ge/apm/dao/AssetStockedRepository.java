@@ -6,7 +6,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.AssetStocked;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -26,5 +28,7 @@ public interface AssetStockedRepository extends GenericRepositoryUUID<AssetStock
     @Query(value = "select RIGHT(max(out_stock_no),3) from asset_stocked ali, asset_info al where al.tenant_uid = ?1 and ali.asset_uid = al.uid and ali.out_stock_no like ?2",nativeQuery = true)
     String queryOutStockNo(String tenantUid, String outStockNo);
 
+    @Transactional
+    @Modifying
     void deleteByArrivalItemIdIn(List<String> arrivalItemIds);
 }
