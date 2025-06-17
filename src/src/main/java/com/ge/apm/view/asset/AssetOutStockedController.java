@@ -270,9 +270,12 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             selectedItem.setReturnedDate(now);
         }
         List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUidList);
+        OrgInfo orgInfo = orgInfoRepository.getByUid(setAssetOutStockDept);
         for (AssetInfo assetInfo : assetInfos) {
-            assetInfo.setInstallDate(now);
+//            assetInfo.setInstallDate(now);
+            assetInfo.setClinicalDeptId(orgInfo.getId());
             assetInfo.setClinicalDeptUID(setAssetOutStockDept);
+            assetInfo.setClinicalDeptName(orgInfo.getName());
         }
         assetInfoRepository.save(assetInfos);
         for (AssetInfo assetInfo : assetInfos) {
@@ -288,6 +291,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         mqContext.setMethodName("generatedReturnedStockDoc");
         mqContext.setDescribe("设备退库修改科室");
         JSONObject jsonObject = new JSONObject();
+        jsonObject.put("stockedType", "assetReturnedStock");
         jsonObject.put("comment", comment);
         mqContext.setJsonObject(jsonObject);
         mqUtils.sendAssetToMQ(newAsset, currentUser, mqContext);

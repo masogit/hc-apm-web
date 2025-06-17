@@ -91,9 +91,9 @@
                                         <span class="jp-current-time"></span>
                                     </p>
                                     <ul>
-                                        <li><a class="jp-play" href="#">Play</a></li>
-                                        <li><a class="jp-pause" href="#">Pause</a></li>
-                                        <li><a class="jp-stop" href="#">Stop</a></li>
+                                        <li><a class="jp-play" href="#">#{msg.Play}</a></li>
+                                        <li><a class="jp-pause" href="#">#{msg.Pause}</a></li>
+                                        <li><a class="jp-stop" href="#">#{msg.Stop}</a></li>
                                     </ul>
                                 </div>
                                 <c:forEach items="#{assetInfoEditController.audioList}" var="item" varStatus="status">
@@ -171,7 +171,7 @@
                                         <ui:include src="customEditFields.xhtml"/>
                                     </c:forEach>
                                     <h:panelGroup rendered="#{userContextService.countyArea}">
-                                        <label class="label">IB合同类别</label>
+                                        <label class="label">#{msg.IBContractCategory}</label>
                                         <p:inputText id="contractType" value="#{assetInfoEditController.selected.contractType}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
@@ -313,10 +313,10 @@
                                     <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.checkIfRequireBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.selected.usageStatus ne 2 and assetInfoEditController.selected.usageStatus ne 3))}"/>
                                     <p:commandButton  id = "submitForApprovalButton"  value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval(2)}" validateClient="true" update="submitForApprovalButton :growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and ((assetInfoEditController.selected.usageStatus ne 2 and assetInfoEditController.selected.usageStatus ne 3))}"/>
                                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                                    <p:commandButton id="specialAssetInfo"  rendered="#{  assetInfoEditController.CRUDActionName eq '修改' and  userContextService.accessContainsApmFeature('SPECIAL_ASSET') and (!assetInfoEditController.selected.specialAsset or  empty assetInfoEditController.selected.specialAsset    )}"  value="转特种设备" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="specialAssetInfo"  rendered="#{  assetInfoEditController.CRUDActionName eq '修改' and  userContextService.accessContainsApmFeature('SPECIAL_ASSET') and (!assetInfoEditController.selected.specialAsset or  empty assetInfoEditController.selected.specialAsset    )}"  value="#{msg.ToSpecialEquipment}" action="#{assetInfoEditController.transforSpecialAsset}" immediate="true"  update=":growl" style="float:right;"/>
 
                                     <p:commandButton id="preInactive" rendered="#{assetInfoEditController.CRUDActionName eq '修改' and  assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')  and !assetInfoEditController.assetScrapEnable }" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
-                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.assetScrapEnable }" value="报废申请"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoEditController.selected.uid))}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
+                                    <p:commandButton id="preInactiveEnable" rendered="#{ assetInfoEditController.CRUDActionName eq '修改' and assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.assetScrapEnable }" value="#{msg.ScrapApplication}"   actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoEditController.selected.uid))}" immediate="true"  update="unfinishedAssetOrderDetailDialog :growl" style="float:right;"  oncomplete="handleCheckAssetOrderIsCompletes(xhr, status, args);" />
 
                                     <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                                 </h:panelGroup>
@@ -342,7 +342,7 @@
 
                         </h:form>
                     </p:tab>
-                    <p:tab title="规则设置" rendered="#{assetInfoEditController.createAction}">
+                    <p:tab title="#{msg.RulesSettings}" rendered="#{assetInfoEditController.createAction}">
                         <h:form id="createRule">
                             <p:panelGrid id ="PmOrderRule" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
@@ -364,7 +364,7 @@
                                     </p:autoComplete>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_VIEW')}">
-                                    <label class="label">日常检查规则(请先选择设备所属科室)</label>
+                                    <label class="label">#{msg.DailyInspectionRule}(#{msg.PleaseSelectEquipmentDepartmentFirst})</label>
                                     <p:selectManyMenu id="addMaintainConfig" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="false"
                                                       filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
                                         <p:ajax process="@this" listener="#{maintainConfigController.onSelectedCheckItemChange}" update=""></p:ajax>
@@ -375,7 +375,7 @@
                                     </p:selectManyMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_USING_RECORD_EDIT')}">
-                                    <label class="label">使用登记规则(请先选择设备所属科室)</label>
+                                    <label class="label">#{msg.UsageRegistrationRule}(#{msg.PleaseSelectEquipmentDepartmentFirst})</label>
                                     <p:autoComplete id="addMaintainConfigJN" value="#{assetInfoEditController.selectedNurseSiteMaintainConfigJN}" dropdown="true" scrollHeight="300"
                                                     forceSelection="true" completeMethod="#{maintainConfigJNController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}"
                                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="nurseSiteMaintainConfigJNConverter" >
@@ -386,7 +386,7 @@
                             </p:panelGrid>
                         </h:form>
                     </p:tab>
-                    <p:tab title="特种设备信息" rendered="#{assetInfoEditController.selected.specialAsset and   not empty assetInfoEditController.specialAssetInfo}">
+                    <p:tab title="#{msg.SpecialAssetInfo}" rendered="#{assetInfoEditController.selected.specialAsset and   not empty assetInfoEditController.specialAssetInfo}">
                         <ui:include src="createSpecialAsset.xhtml" />
                     </p:tab>
                 </p:tabView>
@@ -398,9 +398,9 @@
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
                 <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span>
                 <span>
-                    <p:commandButton id="spin" value="旋转" styleClass="anticon-plus"/>
-                    <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
-                    <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                    <p:commandButton id="spin" value="#{msg.Rotate}" styleClass="anticon-plus"/>
+                    <p:commandButton id="enlarge" value="#{msg.ZoomIn}" onclick ="ImageSuofang(true)"/>
+                    <p:commandButton id="shrink" value="#{msg.ZoomOut}" onclick ="ImageSuofang(false)"/>
                 </span>
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
                     <span class="ui-icon ui-icon-closethick"></span></a>
@@ -496,7 +496,7 @@
                 var audioList = $("input[id*='audio']");
                 $.each(audioList, function (index) {
                     var audioClass = (index == 0 ? "track-default" : "");
-                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>语音" + (index + 1) + "</a></li>";
+                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>#{msg.Voice}" + (index + 1) + "</a></li>";
                     $audioUlEle.append(templ);
                 });
 
@@ -509,8 +509,8 @@
                 // Some options
                 var opt_play_first = false, // If true, will attempt to auto-play the default track on page loads. No effect on mobile devices, like iOS.
                     opt_auto_play = true, // If true, when a track is selected, it will auto-play.
-                    opt_text_playing = "播放", // Text when playing
-                    opt_text_selected = "选择"; // Text when not playing
+                    opt_text_playing = "#{msg.Playing}", // Text when playing
+                    opt_text_selected = "#{msg.Selected}"; // Text when not playing
 
                 // A flag to capture the first track
                 var first_track = true;
@@ -518,8 +518,8 @@
                 // Change the time format
                 $.jPlayer.timeFormat.padMin = false;
                 $.jPlayer.timeFormat.padSec = false;
-                $.jPlayer.timeFormat.sepMin = " 分 ";
-                $.jPlayer.timeFormat.sepSec = " 秒";
+                $.jPlayer.timeFormat.sepMin = " #{msg.Minute} ";
+                $.jPlayer.timeFormat.sepSec = " #{msg.Second}";
 
                 // Initialize the play state text
                 my_playState.text(opt_text_selected);
@@ -565,7 +565,7 @@
             });
             //]]>
         </script>
-        <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
+        <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="#{msg.Signature}" modal="true">
             <h:form id="signatureForm">
                 <h:panelGrid columnClasses="value" columns="1">
                     <h:panelGroup>
@@ -574,8 +574,8 @@
                         <p:graphicImage value="#{assetInfoEditController.signatureContentStream}" stream="false" rendered="#{assetInfoEditController.signatureContentStream!=null}"></p:graphicImage>
                     </h:panelGroup>
                 </h:panelGrid>
-                <p:commandButton value="确认" actionListener="#{assetInfoEditController.applyAssetApplication('scrap')}" update=":tab:AssetInfoEditForm"  oncomplete="handleApproveSuccess(xhr, status, args);" />
-                <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{assetInfoEditController.resetSignature()}" update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
+                <p:commandButton value="#{msg.Confirm}" actionListener="#{assetInfoEditController.applyAssetApplication('scrap')}" update=":tab:AssetInfoEditForm"  oncomplete="handleApproveSuccess(xhr, status, args);" />
+                <p:commandButton immediate="true" process="@this" value="#{msg.Rewrite}" actionListener="#{assetInfoEditController.resetSignature()}" update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
             </h:form>
             <script>
@@ -585,45 +585,45 @@
 
 
         <p:dialog  widgetVar="toDeleteCheckedNurseSite"  modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
-            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
-                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.toDelete()}" value="是" icon="ui-icon-check"
+            <p:fieldset legend="#{msg.EquipmentHasUnfinishedDailyInspectionDelete}">
+                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.toDelete()}" value="#{msg.Yes}" icon="ui-icon-check"
                                  oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
-                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
+                <p:commandButton immediate="true" value="#{msg.No}" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
             </p:fieldset>
         </p:dialog>
 
 
         <p:dialog  widgetVar="unfinishedAssetOrderDetailDialog"  modal="true" id="unfinishedAssetOrderDetailDialog" draggable="true"    appendTo="@(body)"  height="300" width="500"   >
-            <p:fieldset legend="当前设备有未完成工单,请进行处理">
-                <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('scrap')}"  value="自动处理未完成临床助手工单" icon="ui-icon-check"/>
+            <p:fieldset legend="#{msg.CurrentEquipmentHasUnfinishedWorkOrder}">
+                <p:commandButton  rendered="#{assetInfoEditController.nurseSiteMaintainIsComplete}" validateClient="true" actionListener="#{assetInfoEditController.processUnfinishedNurseSiteMaintain('scrap')}"  value="#{msg.AutoProcessUnfinishedClinicalAssistantWorkOrder}" icon="ui-icon-check"/>
                 <br/> <br/> <br/>
                 <h:panelGroup rendered="#{not empty assetInfoEditController.workOrderList}">
-                    未完成维修工单号: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
+                    #{msg.UnfinishedMaintenanceWorkOrderNumber}: #{assetInfoEditController.workOrderList}  <br/> <br/> <br/>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{not empty assetInfoEditController.pmOrderList}">
-                    未完成保养工单号: #{assetInfoEditController.pmOrderList}  <br/> <br/> <br/>
+                    #{msg.UnfinishedMaintenanceWorkOrderNumber}: #{assetInfoEditController.pmOrderList}  <br/> <br/> <br/>
                 </h:panelGroup>
 
             </p:fieldset>
         </p:dialog>
 
 
-        <p:dialog id="scrapapply" widgetVar="scrapapply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="500" width="500" header="报废申请">
+        <p:dialog id="scrapapply" widgetVar="scrapapply"  modal="true" resizable="true" draggable="true" appendTo="@(body)"   height="500" width="500" header="#{msg.ScrapApplication}">
             <h:form id="nodeForm" >
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">申请理由*</label>
-                        <p:inputTextarea placeholder="报废申请"  value="#{assetInfoEditController.applyReason}" maxlength="256"  required="true" />
+                        <label class="label">#{msg.ApplicationReason}*</label>
+                        <p:inputTextarea placeholder="#{msg.ScrapApplication}"  value="#{assetInfoEditController.applyReason}" maxlength="256"  required="true" />
                         <p:outputLabel value="#{assetInfoEditController.applyReason}" />
                     </h:panelGroup>
                     <h:panelGroup rendered="#{assetInfoEditController.getIsAssetStaff()}">
-                        <label class="label">鉴定理由*</label>
-                        <p:inputTextarea placeholder="鉴定理由"  value="#{assetInfoEditController.approvalReason}" maxlength="256"  required="#{assetInfoEditController.getIsAssetStaff()}"/>
+                        <label class="label">#{msg.AppraisalReason}*</label>
+                        <p:inputTextarea placeholder="#{msg.AppraisalReason}"  value="#{assetInfoEditController.approvalReason}" maxlength="256"  required="#{assetInfoEditController.getIsAssetStaff()}"/>
                         <p:outputLabel value="#{assetInfoEditController.approvalReason}" />
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{assetInfoEditController.getIsAssetStaff()}">
-                        <label class="label">处置方式</label>
+                        <label class="label">#{msg.DisposalMethod}</label>
                         <p:selectOneMenu id="equipmentDisposalMethod"  value="#{assetInfoEditController.equipmentDisposalMethod}" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('equipmentDisposalMethod')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -633,14 +633,14 @@
                     </h:panelGroup>
                     <h:panelGroup id="customDisposalMethod" rendered="#{assetInfoEditController.getIsAssetStaff()}">
                         <h:panelGroup  rendered="#{assetInfoEditController.equipmentDisposalMethod eq '0'}" >
-                            <label class="label">自定义处置方式</label>
-                            <p:inputTextarea placeholder="自定义处置方式" value="#{assetInfoEditController.customDisposalMethod}" maxlength="256" />
+                            <label class="label">#{msg.CustomDisposalMethod}</label>
+                            <p:inputTextarea placeholder="#{msg.CustomDisposalMethod}" value="#{assetInfoEditController.customDisposalMethod}" maxlength="256" />
                             <p:outputLabel value="#{assetInfoEditController.customDisposalMethod}" />
                         </h:panelGroup>
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:dataGrid id="pictureListScrap" var="fileitem" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap')}" columns="5" layout="grid">
-                            <f:facet name="header">#{msg.Attachment}<p:outputLabel value="(图片数量最多上传5份！)" style="color: red"></p:outputLabel></f:facet>
+                            <f:facet name="header">#{msg.Attachment}<p:outputLabel value="(#{msg.MaximumFiveImagesCanBeUploaded})" style="color: red"></p:outputLabel></f:facet>
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
                                     <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
@@ -653,24 +653,24 @@
 
                         </p:dataGrid>
                         <p:fileUpload id="typeScrap" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                      multiple="true" sizeLimit="10000000" fileLimit="#{5-assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size()}" fileLimitMessage="图片数量最多上传5份！" update="pictureListScrap @this" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size() ge 5}"/>
+                                      multiple="true" sizeLimit="10000000" fileLimit="#{5-assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size()}" fileLimitMessage="#{msg.MaximumFiveImagesCanBeUploaded}" update="pictureListScrap @this" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size() ge 5}"/>
                     </h:panelGroup>
                 </p:panelGrid>
 
-                <p:commandButton id="scrapButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSignature()}" value="确定"  icon="ui-icon-check" update="signatureDlg" oncomplete="PF('signatureDlg').show();"/>
-<!--                <p:commandButton style="display: none" id="openSignature" actionListener="#{assetInfoEditController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />-->
+                <p:commandButton id="scrapButton"  validateClient="true" immediate="false" actionListener="#{assetInfoEditController.getSignature()}" value="#{msg.Confirm}"  icon="ui-icon-check" update="signatureDlg" oncomplete="PF('signatureDlg').show();"/>
+                <!--                <p:commandButton style="display: none" id="openSignature" actionListener="#{assetInfoEditController.getSignature()}" value="#{msg.ViewSignature}" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />-->
 
-                <p:commandButton  validateClient="false" immediate="true"  value="取消"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
+                <p:commandButton  validateClient="false" immediate="true"  value="#{msg.Cancel}"  icon="ui-icon-check" oncomplete="PF('scrapapply').hide()"/>
             </h:form>
 
         </p:dialog>
 
         <p:dialog id="annualInspectionReportDlg" widgetVar="annualInspectionReportDlg" modal="true" resizable="true" draggable="true"
-                  appendTo="@(body)" header="新增年检报告" width="800" height="400">
+                  appendTo="@(body)" header="#{msg.AnnualInspectionReport}" width="800" height="400">
             <h:form id="reportEditForm"><h:panelGroup id="displayy">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">报告名称<span
+                        <label class="label">#{msg.reportName}<span
                                 style="color:red"></span></label>
                         <p:inputText id="reportName"
                                      value="#{assetInfoEditController.assetAnnualInspectionReport.name}"
@@ -679,7 +679,7 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">报告类型<span
+                        <label class="label">#{msg.reportType}<span
                                 style="color:red"></span></label>
                         <p:inputText id="reportType"
                                      value="#{assetInfoEditController.assetAnnualInspectionReport.reportType}"
@@ -689,7 +689,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">检测单位<span
+                        <label class="label">#{msg.testingUnit}<span
                                 style="color:red"></span></label>
                         <p:inputText id="testingUnit"
                                      value="#{assetInfoEditController.assetAnnualInspectionReport.testingUnit}"
@@ -698,7 +698,7 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">检测结果<span
+                        <label class="label">#{msg.testResults}<span
                                 style="color:red"></span></label>
                         <p:inputText id="testResults"
                                      value="#{assetInfoEditController.assetAnnualInspectionReport.testResults}"
@@ -708,7 +708,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">报告发证单位<span
+                        <label class="label">#{msg.certificateIssuingUnit}<span
                                 style="color:red"></span></label>
                         <p:inputText id="certificateIssuingUnit"
                                      value="#{assetInfoEditController.assetAnnualInspectionReport.certificateIssuingUnit}"
@@ -717,7 +717,7 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">报告生效时间<span
+                        <label class="label">#{msg.effectiveTime}<span
                                 style="color:red"></span></label>
                         <p:calendar timeZone="#{userContextService.getTimeZone()}"
                                     locale="#{userContextService.getCalendarLocale()}"
@@ -728,7 +728,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">报告到期时间<span
+                        <label class="label">#{msg.expiryDate}<span
                                 style="color:red"></span></label>
                         <p:calendar timeZone="#{userContextService.getTimeZone()}"
                                     locale="#{userContextService.getCalendarLocale()}"
@@ -766,11 +766,11 @@
             </h:panelGroup></h:form>
         </p:dialog>
         <p:dialog id="permitInfoDlg" widgetVar="permitInfoDlg" modal="true" resizable="true" draggable="true"
-                  appendTo="@(body)" header="新增证照信息" width="800" height="400">
+                  appendTo="@(body)" header="#{msg.PermitInfo}" width="800" height="400">
             <h:form id="permitInfoEditForm"><h:panelGroup id="displayssy">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">证件名称<span
+                        <label class="label">#{msg.certificateName}<span
                                 style="color:red"></span></label>
                         <p:inputText id="certificateName"
                                      value="#{assetInfoEditController.permitInfo.certificateName}"
@@ -779,7 +779,7 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">证书类型<span
+                        <label class="label">#{msg.certificateType}<span
                                 style="color:red"></span></label>
                         <p:inputText id="certificateType"
                                      value="#{assetInfoEditController.permitInfo.certificateType}"
@@ -789,7 +789,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">持证人<span
+                        <label class="label">#{msg.holder}<span
                                 style="color:red"></span></label>
                         <p:inputText id="holder"
                                      value="#{assetInfoEditController.permitInfo.holder}"
@@ -799,7 +799,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">报告生效时间<span
+                        <label class="label">#{msg.effectiveTime}<span
                                 style="color:red"></span></label>
                         <p:calendar timeZone="#{userContextService.getTimeZone()}"
                                     locale="#{userContextService.getCalendarLocale()}"
@@ -810,7 +810,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">报告到期时间<span
+                        <label class="label">#{msg.expiryDate}<span
                                 style="color:red"></span></label>
                         <p:calendar timeZone="#{userContextService.getTimeZone()}"
                                     locale="#{userContextService.getCalendarLocale()}"

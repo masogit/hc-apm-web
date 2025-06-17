@@ -50,6 +50,7 @@ public class AssetStockedRestController {
 				assetStocked.setId(null);
 				assetStocked.setAssetUid(arrivalListItem.getAssetUID());
 				assetStocked.setArrivalItemId(arrivalListItem.getId());
+				assetStocked.setBusinessDate(arrivalListItem.getInstallDate());
 				if (arrivalListItem.getStockStatus() == 1) {
 					assetStocked.setStockStatus(2);
 				}
@@ -66,7 +67,7 @@ public class AssetStockedRestController {
 					assetInStockRecord.setHospitalUid(arrivalList.getHospitalUID());
 					assetInStockRecord.setSiteUid(arrivalList.getSiteUID());
 					assetInStockRecord.setArrivalItemId(arrivalListItem.getId());
-					assetInStockRecord.setBusinessDate(arrivalListItem.getInStockBusinessDate());
+					assetInStockRecord.setBusinessDate(arrivalListItem.getOutStockBusinessDate());
 					assetInStockRecord.setVendor(arrivalList.getVendor());
 					assetInStockRecord.setInStockUser(arrivalListItem.getInStockUser());
 					assetInStockRecord.setFinancingNum(arrivalListItem.getFinancingNum());
@@ -90,7 +91,7 @@ public class AssetStockedRestController {
 					assetOutStockRecord.setHospitalUid(arrivalList.getHospitalUID());
 					assetOutStockRecord.setSiteUid(arrivalList.getSiteUID());
 					assetOutStockRecord.setArrivalItemId(arrivalListItem.getId());
-					assetOutStockRecord.setBusinessDate(arrivalListItem.getOutStockBusinessDate());
+					assetOutStockRecord.setBusinessDate(arrivalListItem.getOutStocDate());
 					assetOutStockRecord.setVendor(arrivalList.getVendor());
 					assetOutStockRecord.setOutStockUser(arrivalListItem.getOutStockUser());
 					assetOutStockRecord.setFinancingNum(arrivalListItem.getFinancingNum());
@@ -120,10 +121,8 @@ public class AssetStockedRestController {
 	@RequestMapping(value = "/removeData", method = RequestMethod.GET)
 	public String removeData() {
 		try {
-			List<String> assetUidList = assetStockedRepository.find().stream().map(AssetStocked::getAssetUid).distinct().collect(Collectors.toList());
 			List<SearchFilter> arrivalItemSearchList = ListUtil.newArrayList();
 			arrivalItemSearchList.add(new SearchFilter("stockStatus", SearchFilter.Operator.IsNotNull, null, "1*"));
-			arrivalItemSearchList.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, assetUidList, "1*"));
 			List<ArrivalListItem> itemList = arrivalListItemRepository.findBySearchFilter(arrivalItemSearchList);
 			List<String> arrivalItemIds = itemList.stream().map(ArrivalListItem::getId).collect(Collectors.toList());
 			assetStockedRepository.deleteByArrivalItemIdIn(arrivalItemIds);

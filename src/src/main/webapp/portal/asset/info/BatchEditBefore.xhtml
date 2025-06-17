@@ -4,11 +4,11 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog  id="batchEditBeforeDialog" widgetVar="batchEditBeforeDialog"  modal="true" resizable="true" draggable="true" width="30%" height="200px" header="批量修改设备">
+    <p:dialog  id="batchEditBeforeDialog" widgetVar="batchEditBeforeDialog"  modal="true" resizable="true" draggable="true" width="30%" height="200px" header="#{msg.batchEditAssets}">
         <h:form id="batchEditBeforeForm" class="bcls">
             <p:panelGrid id ="PmOrderRule" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
-                    <h1 class="m-0">此次操作将对<span style="color: red">#{assetInfoListController.resultList.size()}</span>台设备生效</h1>
+                    <h1 class="m-0">#{msg.batchEditAffectedDevices} <span style="color: red">#{assetInfoListController.resultList.size()}</span> #{msg.devices}</h1>
                 </h:panelGroup>
                 <h:panelGroup>
                     <p:commandButton validateClient="true"  actionListener="#{assetInfoListController.navigateTo()}" value="#{msg.ok}" icon="ui-icon-check" update=":growl" />
