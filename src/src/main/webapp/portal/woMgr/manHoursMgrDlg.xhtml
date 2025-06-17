@@ -8,28 +8,28 @@
 
 <ui:composition>
 
-    <p:dialog class="moreManHoursDialog" id="moreManHoursDialog" widgetVar="moreManHoursDialog" modal="true" height="600" width="1100"  resizable="true" draggable="true" appendTo="@(body)" header="工时管理">
+    <p:dialog class="moreManHoursDialog" id="moreManHoursDialog" widgetVar="moreManHoursDialog" modal="true" height="600" width="1100"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.manHoursManagement}">
         <h:form id="moreManHoursDialogForm">
             <h:panelGroup>
                 <p:dataTable id="manHoursDataList" class="manHoursDataList" value="#{workOrderMgrController.v2WorkOrderManHoursList}" var="item" widgetVar="varManHoursDataList"
                              lazy="false" paginator="false" editable="true" rowKey="#{item.id}" rows="50" emptyMessage="#{msg.noRecordFound}">
                     <p:ajax event="rowEdit"  listener="#{workOrderMgrController.onRowEdit}" process="@this" update="@this"/>
                     <p:ajax event="rowEditCancel" listener="#{workOrderMgrController.onRowCancel}" process="@this" update="@this"/>
-                    <p:column headerText="工单编号">
+                    <p:column headerText="#{msg.workOrderNumber}">
                         <h:outputText value="#{item.srNum}"/>
                     </p:column>
-                    <p:column headerText="工时所属人">
+                    <p:column headerText="#{msg.manHoursOwner}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{item.manHoursOwner}"/>
                             </f:facet>
                             <f:facet name="input">
-                                <p:inputText value="#{item.manHoursOwner}" required="true" requiredMessage="工时所属人 #{msg.ValidationRequire}"/>
+                                <p:inputText value="#{item.manHoursOwner}" required="true" requiredMessage="#{msg.manHoursOwner} #{msg.ValidationRequire}"/>
                                 <span style="color: red;">*</span>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="工时日期">
+                    <p:column headerText="#{msg.manHoursDate}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{item.manHoursDate}">
@@ -38,14 +38,14 @@
                             </f:facet>
                             <f:facet name="input">
                                 <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{item.manHoursDate}"
-                                            required="true" requiredMessage="工时日期 #{msg.ValidationRequire}" showOn="button"
+                                            required="true" requiredMessage="#{msg.manHoursDate} #{msg.ValidationRequire}" showOn="button"
                                             readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" maxdate="#{appContextService.curentDate}">
                                 </p:calendar>
                                 <span style="color: red;">*</span>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="工作工时">
+                    <p:column headerText="#{msg.workHours}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{item.workHours}"/>
@@ -55,7 +55,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="差旅工时">
+                    <p:column headerText="#{msg.travelHours}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{item.travelHours}"/>
@@ -65,7 +65,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="等待工时">
+                    <p:column headerText="#{msg.waitingHours}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{item.waitingHours}"/>
@@ -75,7 +75,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="工时描述">
+                    <p:column headerText="#{msg.manHoursDescription}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{item.comment}"/>
@@ -85,9 +85,9 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="操作">
+                    <p:column headerText="#{msg.Actions}">
                         <p:commandLink id="createButton" process="@this" actionListener="#{workOrderMgrController.initManHours}" title="#{msg.Add}" update="manHoursDataList" rendered="#{item.id eq '000' and empty item.woId}"><span class="ui-icon ui-icon-plusthick" /></p:commandLink>
-                        <p:rowEditor process="@this" cancelTitle="取消" editTitle="修改" saveTitle="保存" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}" update="manHoursDataList"/>
+                        <p:rowEditor process="@this" cancelTitle="#{msg.Cancel}" editTitle="#{msg.Edit}" saveTitle="#{msg.Save}" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}" update="manHoursDataList"/>
                         <p:commandLink process="@this" actionListener="#{workOrderMgrController.deleteManHours(item)}" title="#{msg.Delete}" update="manHoursDataList" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
                     </p:column>
                 </p:dataTable>

@@ -184,7 +184,7 @@
                             <f:selectItems value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                         </p:selectOneMenu>
                     </f:facet>
-                    <p:graphicImage  width="165" height="38" name="#{workOrderMgrController.getStepImg(item)}"/>
+                    <p:graphicImage  width="165" height="38" url="#{workOrderMgrController.getStepImg(item)}"/>
                 </p:column>
                 <!--当前处理步骤 for 全部-->
                 <p:column rendered="#{workOrderMgrController.queryIndex eq 11 and !userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">

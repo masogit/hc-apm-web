@@ -21,7 +21,6 @@
                                 <p:selectBooleanCheckbox  id="selectCheckBoxHeader" value="#{v2PmOrderController.selectedMap['All']}" class="selectCheckBoxHeader">
                                     <p:ajax process="@this" listener="#{v2PmOrderController.onApprovedDetailsSelected('All')}" update="@this @(.selectCheckBox)"/>
                                 </p:selectBooleanCheckbox>
-                                <!--<h:outputText value="勾选审批" />-->
                             </f:facet>
                         </p:column>
                         <p:column headerText="#{msg.PartName}">
@@ -47,9 +46,8 @@
                             <h:outputText value="#{item.serialNum}" />
                         </p:column>
                         <p:column headerText="#{msg.InvoiceNumber}">
-                        <h:outputText value="#{item.invoiceNum}" />
-                    </p:column>
-
+                            <h:outputText value="#{item.invoiceNum}" />
+                        </p:column>
                         <p:column headerText="#{msg.WarrantyDate}">
                             <h:outputText value="#{item.warrantyDate}">
                                 <f:convertDateTime pattern="yyyy-MM-dd"/>
@@ -60,11 +58,7 @@
                                 <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                             </h:outputText>
                         </p:column>
-                       <!-- <p:column headerText="到货">
-                            <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
-                        </p:column>-->
                     </p:dataTable>
-
                 </p:fieldset>
                 <h:panelGroup>
                     <label class="label">#{msg.feedbackComment}</label>
@@ -72,9 +66,9 @@
                 </h:panelGroup>
                 <br/>
                 <h:panelGroup>
-                   <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.preApprovePMOrder()}" value="#{msg.ApprovalP}" update="pmTab:signatureDlg" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
-                   <p:commandButton style="display: none" id="partRefresh" update="pmTab:pmOrderListForm @(.beizhuClass) @(.selectCheckBoxHeader) @(.selectCheckBox)"/>
-                    <p:commandButton style="display: none" id="openSignature" actionListener="#{v2PmOrderController.getSignature()}" value="查看签名" update="pmTab:signatureDlg" oncomplete="PF('signatureDlg').show();" />
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.preApprovePMOrder()}" value="#{msg.ApprovalP}" update="pmTab:signatureDlg" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                    <p:commandButton style="display: none" id="partRefresh" update="pmTab:pmOrderListForm @(.beizhuClass) @(.selectCheckBoxHeader) @(.selectCheckBox)"/>
+                    <p:commandButton style="display: none" id="openSignature" actionListener="#{v2PmOrderController.getSignature()}" value="#{msg.ViewSignature}" update="pmTab:signatureDlg" oncomplete="PF('signatureDlg').show();" />
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmapproveDialog').hide()"/>
                 </h:panelGroup>
             </h:panelGroup>
@@ -100,20 +94,19 @@
                 }
             }
         </script>
-
     </p:dialog>
-    <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
+    <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="#{msg.Signature}" modal="true">
         <h:form id="signatureForm">
             <h:panelGrid columnClasses="value" columns="1">
                 <h:panelGroup>
                     <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{v2PmOrderController.signatureContent}"
-                        guideline="false" rendered="#{v2PmOrderController.signatureContentStream==null}" />
+                                 guideline="false" rendered="#{v2PmOrderController.signatureContentStream==null}" />
                     <p:graphicImage value="#{v2PmOrderController.signatureContentStream}" stream="false" rendered="#{v2PmOrderController.signatureContentStream!=null}"></p:graphicImage>
                 </h:panelGroup>
             </h:panelGrid>
-            <p:commandButton value="确认" actionListener="#{v2PmOrderController.saveSignatureAndSubmitApprove()}" update="pmTab:signatureForm" oncomplete="handleApproveSuccess(xhr, status, args);"/>
+            <p:commandButton value="#{msg.Confirm}" actionListener="#{v2PmOrderController.saveSignatureAndSubmitApprove()}" update="pmTab:signatureForm" oncomplete="handleApproveSuccess(xhr, status, args);"/>
             <p:commandButton immediate="true" process="@this" style="display: none" id="refreshDataTable" update="pmTab:pmOrderListForm @(.beizhuClass) @(.selectCheckBoxHeader) @(.selectCheckBox)"/>
-            <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{v2PmOrderController.resetSignature()}" update="pmTab:signatureForm" oncomplete="PF('sigPanel').clear()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Rewrite}" actionListener="#{v2PmOrderController.resetSignature()}" update="pmTab:signatureForm" oncomplete="PF('sigPanel').clear()"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
         </h:form>
     </p:dialog>
