@@ -1,12 +1,15 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -58,6 +61,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
     private ConfigItemValueRepository configItemValueRepository;
     private UserAccountRepository userAccountRepository;
     private SupplierRepository supplierRepository;
+    private MqUtils mqUtils;
 
     private UserAccount currentUser;
     private AssetStocked searchItem;
@@ -118,6 +122,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
+        mqUtils = WebUtil.getBean(MqUtils.class);
         currentUser = UserContextService.getCurrentUserAccount();
         supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
@@ -399,9 +404,25 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         }
         if (ObjectUtil.isNotEmpty(assetIds)) {
             assetInfoRepository.outStocked(assetIds, recruiteDept.getId(), recruiteDept.getUid(), recruiteDept.getName());
+            List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetIds);
+            for (AssetInfo assetInfo : assetInfos) {
+                saveAssetHistory(assetInfo);
+            }
         }
         assetOutStockRecordRepository.save(outStockRecords);
         dao.save(selectedItems);
+    }
+
+    private void saveAssetHistory(AssetInfo newAsset) {
+        MqContext mqContext = new MqContext();
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetStockedController");
+        mqContext.setMethodName("generatedOutStockDoc");
+        mqContext.setDescribe("设备出库修改科室");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("stockedType", "assetOutStock");
+        mqContext.setJsonObject(jsonObject);
+        mqUtils.sendAssetToMQ(newAsset, currentUser, mqContext);
     }
 
     public void generatedStockDoc(String stockType) {
