@@ -50,6 +50,7 @@ public class AssetStockedRestController {
 				assetStocked.setId(null);
 				assetStocked.setAssetUid(arrivalListItem.getAssetUID());
 				assetStocked.setArrivalItemId(arrivalListItem.getId());
+				assetStocked.setBusinessDate(arrivalListItem.getInstallDate());
 				if (arrivalListItem.getStockStatus() == 1) {
 					assetStocked.setStockStatus(2);
 				}
@@ -66,7 +67,7 @@ public class AssetStockedRestController {
 					assetInStockRecord.setHospitalUid(arrivalList.getHospitalUID());
 					assetInStockRecord.setSiteUid(arrivalList.getSiteUID());
 					assetInStockRecord.setArrivalItemId(arrivalListItem.getId());
-					assetInStockRecord.setBusinessDate(arrivalListItem.getInStockBusinessDate());
+					assetInStockRecord.setBusinessDate(arrivalListItem.getOutStockBusinessDate());
 					assetInStockRecord.setVendor(arrivalList.getVendor());
 					assetInStockRecord.setInStockUser(arrivalListItem.getInStockUser());
 					assetInStockRecord.setFinancingNum(arrivalListItem.getFinancingNum());
@@ -90,7 +91,7 @@ public class AssetStockedRestController {
 					assetOutStockRecord.setHospitalUid(arrivalList.getHospitalUID());
 					assetOutStockRecord.setSiteUid(arrivalList.getSiteUID());
 					assetOutStockRecord.setArrivalItemId(arrivalListItem.getId());
-					assetOutStockRecord.setBusinessDate(arrivalListItem.getOutStockBusinessDate());
+					assetOutStockRecord.setBusinessDate(arrivalListItem.getOutStocDate());
 					assetOutStockRecord.setVendor(arrivalList.getVendor());
 					assetOutStockRecord.setOutStockUser(arrivalListItem.getOutStockUser());
 					assetOutStockRecord.setFinancingNum(arrivalListItem.getFinancingNum());
