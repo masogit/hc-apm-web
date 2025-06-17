@@ -261,7 +261,7 @@ public class ExportToBeTerminatedAppraisalService {
             String assetUsedLifecycle = assetInfo.getAssetUsedLifecycle();
 
             long  usedMonth=0;
-            if (!ObjectUtil.isEmpty(assetInfo.getPurchaseDate()) || !ObjectUtil.isEmpty(assetInfo.getLifecycle())) {
+            if (!ObjectUtil.isEmpty(assetInfo.getPurchaseDate())) {
 
                 LocalDate localInstallDate =new Date(assetInfo.getPurchaseDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 LocalDate now = LocalDate.now();
@@ -274,7 +274,7 @@ public class ExportToBeTerminatedAppraisalService {
 
                 logger.info("assetUsedLifecycleDouble :{},lifecycle:{},purchasePrice:{}",usedMonth, lifecycle,purchasePrice);
 //                BigDecimal bigDecimal = BigDecimal.valueOf(assetUsedLifecycleDouble).divide(BigDecimal.valueOf(lifecycleInYear), BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(purchasePrice)).setScale(2, BigDecimal.ROUND_HALF_UP);
-                BigDecimal bigDecimal = BigDecimal.valueOf(usedMonth).divide(BigDecimal.valueOf(lifecycle),5, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(purchasePrice));
+                BigDecimal bigDecimal = BigDecimal.valueOf(usedMonth).multiply(BigDecimal.valueOf(purchasePrice)).divide(BigDecimal.valueOf(lifecycle),5, RoundingMode.HALF_UP);
                 if(bigDecimal.compareTo(BigDecimal.valueOf(purchasePrice))>=0){
                     map.put(accumulated_depreciation, BigDecimal.valueOf(purchasePrice));   //累计折旧
 

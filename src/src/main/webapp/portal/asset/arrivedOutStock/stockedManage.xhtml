@@ -152,7 +152,7 @@
                          lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
                          emptyMessage="#{msg.noRecordFound}">
                 <p:column headerText="业务时间">
-                    <h:outputText value="#{item.assetInfo.installDate}">
+                    <h:outputText value="#{item.businessDate}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
@@ -236,7 +236,7 @@
                          lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
                          emptyMessage="#{msg.noRecordFound}">
                 <p:column headerText="业务时间">
-                    <h:outputText value="#{item.assetInfo.installDate}">
+                    <h:outputText value="#{item.businessDate}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
