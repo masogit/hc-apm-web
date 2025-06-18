@@ -99,6 +99,8 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     private Map<String, String> userMap;
     @Getter @Setter
     private Map<Integer, String> supplierMap;
+    @Getter @Setter
+    private String setAssetOutStockDept;
 
     @Override
     protected void init() {
@@ -120,6 +122,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
         orgTreeEdit = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4));
+        setAssetOutStockDept = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "setAssetOutStockDept");
         initSearchItem();
     }
 
@@ -261,13 +264,14 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     }
 
     public void generatedReturnedStockDoc() {
-        String setAssetOutStockDept = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "setAssetOutStockDept");
         Date now = DateUtil.now();
         List<String> assetUidList = selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList());
+        String returnedStockNo = assetOutStockService.queryOutStockNo("TR");
         for (AssetOutStockRecord selectedItem : selectedItems) {
             selectedItem.setStockStatus(5);
             selectedItem.setComments(searchItem.getComments());
             selectedItem.setReturnedDate(now);
+            selectedItem.setReturnedStockNo(returnedStockNo);
         }
         List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUidList);
         OrgInfo orgInfo = orgInfoRepository.getByUid(setAssetOutStockDept);
@@ -355,6 +359,9 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         switch (type) {
             case "outStocked" :
                 return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + outStockRecord.getOutStockNo() + "&amp;userName=" + currentUser.getName();
+            case "returnedStocked" :
+                OrgInfo returnedDept = orgInfoRepository.findByUid(setAssetOutStockDept);
+                return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + outStockRecord.getReturnedStockNo() + "&amp;userName=" + currentUser.getName() + "&amp;returnedStockDept=" + returnedDept.getName();
             case "assetInfo" :
                 return "/portal/asset/info/AssetDetail.xhtml?faces-redirect=true&amp;actionName=View&amp;terminate=false&amp;assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
             case "contractInfo" :
