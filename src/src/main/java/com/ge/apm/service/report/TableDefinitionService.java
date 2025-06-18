@@ -267,6 +267,7 @@ public class TableDefinitionService {
         newTemplate.setExcelStorageId(selectedTableDefinition.getExcelStorageId());
         newTemplate.setInstrumentKeyValues(selectedTableDefinition.getInstrumentKeyValues());
         newTemplate.setSchema(tableString);
+        newTemplate.setTemplateType(selectedTableDefinition.getTemplateType());
         templateDao.save(newTemplate);
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
         selectedTableDefinition.setLastModifiedBy(operator);
