@@ -64,8 +64,8 @@ public class AssetOptUnClosedRecordController extends GenericCRUDUUIDController<
         }
         searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.NE, true));
         Page<AssetOptRecord> page = assetOptRecordRepository.findBySearchFilter(searchFilters, pageRequest);
-        supplementUserName(page.getContent());
-        service.supplementCostTime(page.getContent());
+        //supplementUserName(page.getContent());
+        //service.supplementCostTime(page.getContent());
         return page;
     }
 

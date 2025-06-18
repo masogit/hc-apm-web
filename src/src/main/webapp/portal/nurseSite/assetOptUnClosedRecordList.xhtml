@@ -17,7 +17,7 @@
 
 						<p:ajax event="filter" listener="#{assetOptUnClosedRecordController.onFilter}" />
 
-						<p:column headerText="资产名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+						<p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfo.name}" />
 						</p:column>
 						<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
@@ -26,7 +26,10 @@
 						<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfo.functionType}" />
 						</p:column>
-						<p:column headerText="设备分类" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
+						<p:column headerText="制造商序列号" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfo.serialNum}" />
+						</p:column>
+						<!--<p:column headerText="设备分类" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
 							<f:facet name="filter">
 								<p:selectOneMenu onchange="PF('varDataList').filter()">
 									<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -37,16 +40,16 @@
 						</p:column>
 						<p:column headerText="所属院区" visible="false" exportable="true">
 							<h:outputText value="#{item.assetInfoSiteName}" />
-						</p:column>
+						</p:column>-->
 						<p:column headerText="所属科室" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.clinicalDeptName}" />
 						</p:column>
-						<p:column headerText="开机人" filterBy="#{item.createBy.name}" filterMatchMode="LIKE">
+						<!--<p:column headerText="开机人" filterBy="#{item.createBy.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.createBy.name}" />
 						</p:column>
 						<p:column headerText="关机人" filterBy="#{item.modifyBy.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{empty item.endDate?'':item.modifyBy.name}" />
-						</p:column>
+						</p:column>-->
 						<p:column headerText="开机时间" sortBy="#{item.startDate}" filterBy="#{item.startDate}" filterMatchMode="GTE">
 							<f:facet name="filter">
 								<p:inputText id="filterstartDate" widgetVar="varFilterstartDate" />
@@ -55,7 +58,7 @@
 								<f:convertDateTime timeZone="GMT+8" pattern="MM/dd/yyyy HH:mm:ss" />
 							</h:outputText>
 						</p:column>
-						<p:column headerText="关机时间" sortBy="#{item.endDate}" filterBy="#{item.endDate}" filterMatchMode="GTE">
+						<!--<p:column headerText="关机时间" sortBy="#{item.endDate}" filterBy="#{item.endDate}" filterMatchMode="GTE">
 							<f:facet name="filter">
 								<p:inputText id="filterendDate" widgetVar="varFilterendDate" />
 							</f:facet>
@@ -78,7 +81,7 @@
 						<p:column headerText="诊断结果" filterBy="#{item.diagnosticResult}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.diagnosticResult}">
 							</h:outputText>
-						</p:column>
+						</p:column>-->
 						<p:column headerText="备注">
 							<h:outputText value="#{item.comment}">
 							</h:outputText>
@@ -106,7 +109,7 @@
 					title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
 			<p:commandButton onclick="PF('panelFilterstartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
 		</p:overlayPanel>
-		<p:overlayPanel widgetVar="panelFilterendDate" for="optRecordListForm:datalist:filterendDate" dismissable="false">
+		<!--<p:overlayPanel widgetVar="panelFilterendDate" for="optRecordListForm:datalist:filterendDate" dismissable="false">
 			<h:panelGrid columns="2">
 				<p:outputLabel value="#{msg.From}" />
 				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_endDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true" mask="true"
@@ -119,6 +122,6 @@
 					onclick="setDateFilter('varDataList','varFilterendDate','varStartTimeFrom_endDate','varStartTimeTo_endDate'); PF('panelFilterendDate').hide();"
 					title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
 			<p:commandButton onclick="PF('panelFilterendDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
-		</p:overlayPanel>
+		</p:overlayPanel>-->
 	</ui:define>
 </ui:composition>
