@@ -255,7 +255,25 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         return multiEum;
     }
 
-    public void deleteConfig(ConfigItem configItem) {
+
+
+    public void onAssetScrapChange() {
+         boolean isAssetScrapEnabled = Boolean.parseBoolean(
+                configItemMap.get("assetScrap").getShowValue()
+        );
+         if (!isAssetScrapEnabled) {
+             ConfigItem showAssetScrapNoItem = configItemMap.get("showAssetScrapNo");
+            showAssetScrapNoItem.setShowValue("false"); // 同步值
+         }
+    }
+
+
+    public void deleteConfigScrip(ConfigItem configItemF,ConfigItem configItemS) {
+        deleteConfig(configItemF);
+        deleteConfig(configItemS);
+    }
+
+        public void deleteConfig(ConfigItem configItem) {
         if(this.selectSite != null){
             ConfigItemValue configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), this.selectSite.getSiteUID());
             if (ObjectUtil.isNotEmpty(configItemValue)) {
@@ -287,6 +305,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     public void saveConfig() {
         saveConfig(this.selected);
     }
+
+    public void saveConfigScrip(ConfigItem configItemF,ConfigItem configItemS){
+        saveConfig(configItemF);
+        saveConfig(configItemS);
+    }
+
 
     public void saveConfig(ConfigItem configItem){
         this.selected = configItem;
