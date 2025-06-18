@@ -59,7 +59,7 @@
                         </h:panelGroup>
 
                         <c:choose>
-                            <c:when test="#{assetArrivedItemsController.activeSupplier()}">
+                            <c:when test="#{userContextService.activeSupplier()}">
                                 <h:panelGroup>
                                     <label class="label">使用人</label>
                                     <p:inputText value="#{assetArrivedItemsController.selected.usingPerson}" readonly="true" />
