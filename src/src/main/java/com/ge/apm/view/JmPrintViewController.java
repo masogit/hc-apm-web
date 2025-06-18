@@ -61,11 +61,14 @@ public class JmPrintViewController extends GenericCRUDUUIDController<JmReport> i
                 String stockNo = request.getParameter("stockNo");
                 param.put("inStockNo", stockNo);
                 param.put("outStockNo", stockNo);
+                param.put("returnedStockNo", stockNo);
                 param.put("userName", request.getParameter("userName"));
                 if (stockNo.startsWith("RK")) {
                     partPrintReport = dao.findReportByName("到货入库单");
-                } else {
+                } else if (stockNo.startsWith("CK")) {
                     partPrintReport = dao.findReportByName("到货出库单");
+                } else {
+                    partPrintReport = dao.findReportByName("到货退库单");
                 }
                 break;
             case "workOrderDetail" :
