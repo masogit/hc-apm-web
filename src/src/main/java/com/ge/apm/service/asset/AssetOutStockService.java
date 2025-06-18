@@ -271,6 +271,12 @@ public class AssetOutStockService extends MicroServiceInvoker {
         return preStr + querySerialNumber(oldMax);
     }
 
+    public String queryReturnedStockNo(String preStr){
+        preStr = queryPre(preStr);
+        String oldMax = assetStockedRepository.queryReturnedStockNo(UserContextService.getCurrentUserAccount().getTenantUID(), preStr+ "%");
+        return preStr + querySerialNumber(oldMax);
+    }
+
     public String queryPre(String preStr){
         OrgInfo hospitalOrg = orgInfoRepository.getOrgInfoUIDByUid(UserContextService.getCurrentUserAccount().getHospitalUID());
         String orgCode = hospitalOrg.getOrgCode() == null ? "000" : hospitalOrg.getOrgCode();
