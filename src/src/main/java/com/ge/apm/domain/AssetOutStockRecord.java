@@ -57,6 +57,10 @@ public class AssetOutStockRecord implements Serializable {
     @Column(name = "returned_date")
     private Date returnedDate;
 
+    //退库单号
+    @Column(name = "returned_stock_no")
+    private String returnedStockNo;
+
     //供应商
     @Size(max = 64)
     @Column(name = "vendor")
