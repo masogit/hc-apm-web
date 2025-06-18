@@ -5493,6 +5493,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','3','已入库','In stock',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','4','已出库','Out stock',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','5','已退库','Returned stock',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','6','无效入库','Invalid in stock',NULL,-1);
 --重点设备
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualRepairExpenses', '年维修支出', 'Annual repair expenses', NULL, -1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualMaintenanceExpenses', '年维保支出', 'Annual maintenance expenses', NULL, -1);
