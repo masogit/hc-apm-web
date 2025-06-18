@@ -13,3 +13,17 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 --
 update v2_wrok_order set coworker_entry_type = '0';
+
+--增加是否展示报废单号配置项 https://ge-hc.atlassian.net/browse/YHAAO-25336
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,
+                                user_parent_config, value_type)
+select replace(uuid_generate_v4()::text, '-', ''),
+       13,
+       'false',
+       '是否展示报废单号,需先启用设备报废流程',
+       'showAssetScrapNo',
+       '是否展示报废单号',
+       'f',
+       't',
+       3
+    where not exists (select * from config_item where key = 'showAssetScrapNo');
