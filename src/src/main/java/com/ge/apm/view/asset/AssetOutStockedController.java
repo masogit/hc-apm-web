@@ -60,6 +60,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     private UserAccountRepository userAccountRepository;
     private SupplierRepository supplierRepository;
     private ConfigCacheService configCacheService;
+    private AssetInStockRecordRepository assetInStockRecordRepository;
     private MqUtils mqUtils;
 
     private UserAccount currentUser;
@@ -96,6 +97,8 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     @Getter @Setter
     private String contractNum;
     @Getter @Setter
+    private String arrivalName;
+    @Getter @Setter
     private Map<String, String> userMap;
     @Getter @Setter
     private Map<Integer, String> supplierMap;
@@ -117,6 +120,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        assetInStockRecordRepository = WebUtil.getBean(AssetInStockRecordRepository.class);
         mqUtils = WebUtil.getBean(MqUtils.class);
         currentUser = UserContextService.getCurrentUserAccount();
         supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
@@ -259,6 +263,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetOutStockRecord.getArrivalListId());
             notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
             contractNum = assetOutStockRecord.getArrivalList().getContractNum();
+            arrivalName = assetOutStockRecord.getArrivalList().getName();
             installed = arrivalListItems.size() - notInstalled;
         }
     }
@@ -285,6 +290,8 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         for (AssetInfo assetInfo : assetInfos) {
             saveAssetHistory(assetInfo, searchItem.getComments());
         }
+        // 修改上次已入库为已退库
+        assetInStockRecordRepository.updateStatusByReturnedStock(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()));
         dao.save(selectedItems);
     }
 

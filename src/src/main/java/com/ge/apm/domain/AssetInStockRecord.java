@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "asset_in_sotck_record")
+@Table(name = "asset_in_stock_record")
 public class AssetInStockRecord implements Serializable {
 
     @Id
@@ -117,6 +117,10 @@ public class AssetInStockRecord implements Serializable {
     //到货单条目
     @Column(name = "arrival_item_id", columnDefinition = "CHAR(32)")
     private String arrivalItemId;
+
+    //状态 3、已入库 5、已退库 6、无效入库
+    @Column(name = "stock_status")
+    private Integer stockStatus;
 
     @Override
     public int hashCode() {

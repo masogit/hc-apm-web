@@ -101,6 +101,8 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
     @Getter @Setter
     private String contractNum;
     @Getter @Setter
+    private String arrivalName;
+    @Getter @Setter
     private Map<String, String> userMap;
     @Getter @Setter
     private Map<Integer, String> supplierMap;
@@ -304,6 +306,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetStocked.getArrivalListId());
             notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
             contractNum = assetStocked.getArrivalList().getContractNum();
+            arrivalName = assetStocked.getArrivalList().getName();
             installed = arrivalListItems.size() - notInstalled;
         }
     }
@@ -340,8 +343,11 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             assetInStockRecord.setInvoiceDate(selectedItem.getArrivalList().getInvoiceDate());
             assetInStockRecord.setArrivalListId(selectedItem.getArrivalListId());
             assetInStockRecord.setArrivalItemId(selectedItem.getId());
+            assetInStockRecord.setStockStatus(3);
             inStockRecords.add(assetInStockRecord);
         }
+        // 修改上次已入库为无效入库
+        assetInStockRecordRepository.updateStatusByInStock(selectedItems.stream().map(AssetStocked::getAssetUid).collect(Collectors.toList()));
         assetInStockRecordRepository.save(inStockRecords);
         dao.save(selectedItems);
     }
