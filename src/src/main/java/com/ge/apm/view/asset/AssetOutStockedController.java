@@ -281,7 +281,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     public void generatedReturnedStockDoc() {
         Date now = DateUtil.now();
         List<String> assetUidList = selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList());
-        String returnedStockNo = assetOutStockService.queryOutStockNo("TR");
+        String returnedStockNo = assetOutStockService.queryReturnedStockNo("TR");
         for (AssetOutStockRecord selectedItem : selectedItems) {
             selectedItem.setStockStatus(5);
             selectedItem.setComments(searchItem.getComments());
