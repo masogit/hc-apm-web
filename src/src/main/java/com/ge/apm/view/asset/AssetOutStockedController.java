@@ -243,6 +243,11 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     }
 
     public void prepareGeneratedReturnedStockDoc() {
+        if (selectedItems.stream().map(AssetOutStockRecord::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
+            RequestContext.getCurrentInstance().addCallbackParam("generatedInStockDoc", false);
+            WebUtil.addErrorMessage("包含不同到货单，无法生成入库单！");
+            return;
+        }
         if (selectedItems.stream().map(AssetOutStockRecord::getStockStatus).collect(Collectors.toSet()).contains(5)) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
             WebUtil.addErrorMessage("包含已退库的设备，无法生成退库单！");
