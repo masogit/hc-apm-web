@@ -136,7 +136,7 @@
                                    message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>
-                <p:column headerText="报废单号" >
+                <p:column headerText="报废单号" rendered="#{assetInfoTerminatedListController.checkScrapConfit()}" >
                     <h:commandLink ajax="false" target="_blank" action="#{assetInfoTerminatedListController.openNewWindowView(item.terminateBusinessNumber)}"  value="#{item.terminateBusinessNumber}" />
                 </p:column>
                 <c:forEach items="#{assetInfoTerminatedListController.customedColumns}" var="columnItem">

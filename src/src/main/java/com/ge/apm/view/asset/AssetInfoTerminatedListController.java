@@ -165,6 +165,17 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
     }
 
+
+    public boolean checkScrapConfit(){
+        String assetScrapValue = userContextService.getConfigItemValue("assetScrap");
+        String showAssetScrapNoValue = userContextService.getConfigItemValue("showAssetScrapNo");
+        if(Boolean.TRUE.toString().equals(assetScrapValue) && Boolean.TRUE.toString().equals(showAssetScrapNoValue)){
+            return true;
+
+        }
+        return false;
+    }
+
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //export excel use
