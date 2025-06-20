@@ -60,6 +60,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     private UserAccountRepository userAccountRepository;
     private SupplierRepository supplierRepository;
     private ConfigCacheService configCacheService;
+    private AssetInStockRecordRepository assetInStockRecordRepository;
     private MqUtils mqUtils;
 
     private UserAccount currentUser;
@@ -96,6 +97,8 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     @Getter @Setter
     private String contractNum;
     @Getter @Setter
+    private String arrivalName;
+    @Getter @Setter
     private Map<String, String> userMap;
     @Getter @Setter
     private Map<Integer, String> supplierMap;
@@ -117,6 +120,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        assetInStockRecordRepository = WebUtil.getBean(AssetInStockRecordRepository.class);
         mqUtils = WebUtil.getBean(MqUtils.class);
         currentUser = UserContextService.getCurrentUserAccount();
         supplierList = supplierRepository.getBySiteId(currentUser.getSiteId());
@@ -239,6 +243,16 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     }
 
     public void prepareGeneratedReturnedStockDoc() {
+        if (selectedItems.stream().map(AssetOutStockRecord::getArrivalListId).collect(Collectors.toSet()).size() > 1) {
+            RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
+            WebUtil.addErrorMessage("包含不同到货单，无法生成退库单！");
+            return;
+        }
+        if (selectedItems.stream().map(AssetOutStockRecord::getRecruiteDeptUid).collect(Collectors.toSet()).size() > 1) {
+            RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
+            WebUtil.addErrorMessage("包含不同领用科室，无法生成退库单！");
+            return;
+        }
         if (selectedItems.stream().map(AssetOutStockRecord::getStockStatus).collect(Collectors.toSet()).contains(5)) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
             WebUtil.addErrorMessage("包含已退库的设备，无法生成退库单！");
@@ -259,6 +273,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetOutStockRecord.getArrivalListId());
             notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
             contractNum = assetOutStockRecord.getArrivalList().getContractNum();
+            arrivalName = assetOutStockRecord.getArrivalList().getName();
             installed = arrivalListItems.size() - notInstalled;
         }
     }
@@ -266,7 +281,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     public void generatedReturnedStockDoc() {
         Date now = DateUtil.now();
         List<String> assetUidList = selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList());
-        String returnedStockNo = assetOutStockService.queryOutStockNo("TR");
+        String returnedStockNo = assetOutStockService.queryReturnedStockNo("TR");
         for (AssetOutStockRecord selectedItem : selectedItems) {
             selectedItem.setStockStatus(5);
             selectedItem.setComments(searchItem.getComments());
@@ -285,6 +300,8 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         for (AssetInfo assetInfo : assetInfos) {
             saveAssetHistory(assetInfo, searchItem.getComments());
         }
+        // 修改上次已入库为已退库
+        assetInStockRecordRepository.updateStatusByReturnedStock(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()));
         dao.save(selectedItems);
     }
 
