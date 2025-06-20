@@ -23,4 +23,7 @@ public interface CustomRoleRepository extends GenericRepository<CustomRole> {
 
     @Query(value = "select  ua.uid from user_account ua left join user_role ur on ua.id=ur.user_id  where ua.tenant_uid = ?1 group by ua.uid HAVING sum(ur.role_type) is null or sum(ur.role_type) = count(ur.id) ",nativeQuery = true)
     List<String> findCustomRolesUser(String tenantUid);
+
+
+    List<CustomRole> findByTenantUIDAndNameIn(String tenantUID, List<String> newRoleNames);
 }
