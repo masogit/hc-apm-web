@@ -3,8 +3,11 @@ package com.ge.apm.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -43,6 +46,7 @@ public class  ApprovalNode implements Serializable {
     private Boolean usedOperatingRoom;
 
 
+    private List<String> selectedRoles=new ArrayList<>();
     public boolean getSelectByOrg() {
         return selectByOrg;
     }
@@ -101,5 +105,14 @@ public class  ApprovalNode implements Serializable {
 
     public void setUsedOperatingRoom(Boolean usedOperatingRoom) {
         this.usedOperatingRoom = usedOperatingRoom;
+    }
+
+
+    public List<String> getSelectedRoles() {
+        return selectedRoles;
+    }
+
+    public void setSelectedRoles(List<String> selectedRoles) {
+        this.selectedRoles = selectedRoles;
     }
 }
