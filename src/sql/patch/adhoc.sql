@@ -27,3 +27,6 @@ select replace(uuid_generate_v4()::text, '-', ''),
        't',
        3
     where not exists (select * from config_item where key = 'showAssetScrapNo');
+
+
+ALTER TABLE multi_level_approval ALTER COLUMN approval_uid TYPE VARCHAR(1024);
