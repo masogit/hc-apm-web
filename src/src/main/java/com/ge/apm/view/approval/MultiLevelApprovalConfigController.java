@@ -104,6 +104,13 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     @Getter
     @Setter
+    private List<SysRoleVO> roleListVO;
+
+    private SysRoleRepository sysRoleRepository;
+    private CustomRoleRepository customRoleRepository;
+
+    @Getter
+    @Setter
     private boolean selectAssetGroupParts;
     @Override
     protected void init() {
@@ -123,6 +130,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
+        customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         buildApproveUserList();
         partsTypes = i18nMessageService.getByMsgType("partsType");
     }
@@ -281,10 +290,16 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     //保存审批节点
     public void saveNode() {
 //        approvalNode.setMultiLevelApprovalUsers(approvalNode.getApproveUsers());
-        if(StringUtils.isEmpty(approvalNode.getApprovalStrategy()) && CollectionUtils.isEmpty(approvalNode.getApproveUsers()) &&( StringUtils.isBlank(approvalNode.getRoleApproveCondition().getApproveRole())  ||  approvalNode.getRoleApproveCondition().getCondition()==null )){
+        if(StringUtils.isEmpty(approvalNode.getApprovalStrategy()) && CollectionUtils.isEmpty(approvalNode.getApproveUsers()) &&( CollectionUtils.isEmpty(approvalNode.getSelectedRoles())  ||  approvalNode.getRoleApproveCondition().getCondition()==null )){
             WebUtil.addErrorMessage("请选择审核人");
             return;
         }
+        RoleApproveCondition roleApproveCondition = approvalNode.getRoleApproveCondition();
+        if(CollectionUtils.isNotEmpty(approvalNode.getSelectedRoles())){
+            roleApproveCondition.setApproveRole(StringUtils.join(approvalNode.getSelectedRoles(), ","));
+        }
+
+        approvalNode.setRoleApproveCondition(roleApproveCondition);
 
         if (null != approvalNode.getNodeId()) {
 //            if(approvalNode.isClinicalDepartmentDirector()){
@@ -381,6 +396,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 }
                 if(CollectionUtils.isNotEmpty(item.getApproveUsers())){
                     item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+                }else{
+                    item.setUserUids(null);
                 }
 //                item.setMultiLevelApprovalUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
 //
@@ -634,8 +651,27 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         RoleApproveCondition roleApproveCondition = node.getRoleApproveCondition();
         if (roleApproveCondition != null && roleApproveCondition.getApproveRole() != null && roleApproveCondition.getCondition() != null) {
             try {
-                ApmSystemRole role = ApmSystemRole.valueOf(roleApproveCondition.getApproveRole());
-                approvalUsers.add(role.getRoleName());
+//                ApmSystemRole role = ApmSystemRole.valueOf(roleApproveCondition.getApproveRole());
+//                approvalUsers.add(role.getRoleName());
+                List<String> selectedRoles = new ArrayList<>(Arrays.asList(roleApproveCondition.getApproveRole().split(",")));
+                List<String> collect = Arrays.stream(ApmSystemRole.values()).map(ApmSystemRole::name).collect(Collectors.toList());
+                List<String> sysRoles = collect.stream().filter(selectedRoles::contains).collect(Collectors.toList());
+                List<String> customRoles = selectedRoles.stream().filter(item -> !sysRoles.contains(item)).collect(Collectors.toList());
+
+                if(CollectionUtils.isNotEmpty(sysRoles)){
+                    List<SysRole> sysRoleList = sysRoleRepository.getByNameIn(sysRoles);
+                    if(CollectionUtils.isNotEmpty(sysRoleList)){
+                        approvalUsers.addAll(sysRoleList.stream().map(SysRole::getRoleDesc).collect(Collectors.toList()));
+                    }
+                }
+
+                if(CollectionUtils.isNotEmpty(customRoles)){
+                    UserAccount userAccount = UserContextService.getCurrentUserAccount();
+                    List<CustomRole> customRoleList = customRoleRepository.findByTenantUIDAndNameIn(userAccount.getTenantUID(),customRoles);
+                    if(CollectionUtils.isNotEmpty(customRoleList)){
+                        approvalUsers.addAll(customRoleList.stream().map(CustomRole::getName).collect(Collectors.toList()));
+                    }
+                }
             } catch (Exception e) {
                 logger.error("审核角色不存在 ApproveRole:{}",roleApproveCondition.getApproveRole());
             }
@@ -648,6 +684,9 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 //        roleApproveCondition = new RoleApproveCondition();
         selectedUserOrg = null;
         approvalRoleAssetHead = Boolean.FALSE;
+
+        getSystemRoleList();
+        approvalNode.setSelectedRoles(new ArrayList<>());
     }
 
     public void onEditNode(int nodeId) {
@@ -657,11 +696,20 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 setApprovalRoleAssetHead(StringUtils.isNotEmpty(approvalNode.getApprovalStrategy()));
                 if(node.getRoleApproveCondition()==null){
                     approvalNode.setRoleApproveCondition(new RoleApproveCondition());
+                    approvalNode.setSelectedRoles(new ArrayList<>());
+                }else{
+                    RoleApproveCondition roleApproveCondition1 = node.getRoleApproveCondition();
+                    String approveRole = roleApproveCondition1.getApproveRole();
+                    if(StringUtils.isNotBlank(approveRole)){
+                        List<String> selectedRoles = new ArrayList<>(Arrays.asList(approveRole.split(",")));
+                        approvalNode.setSelectedRoles(selectedRoles);
+                    }
                 }
             }
         }
         approvalUserFirst=null;
         approvalUserReplace=null;
+        getSystemRoleList();
     }
 
     public void delNode(int nodeId) {
@@ -1121,5 +1169,18 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         WebUtil.addSuccessMessage("多级审批更换审批人员成功");
         approvalUserReplace=null;
         approvalUserFirst=null;
+    }
+
+
+    private void  getSystemRoleList(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        roleListVO = uaaService.getSysRoleVO(userAccount.getTenantUID());
+
+        if (uaaService.isOpenNewMenuRoles(userAccount.getTenantUID())) {
+            Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(userAccount.getTenantUID());
+            Set<String> tenantCustomRoles = uaaService.getTenantCustomRoles(userAccount.getTenantUID()).stream().map(CustomRole::getName).collect(Collectors.toSet());
+            roleListVO = roleListVO.stream().filter(role -> tenantSysRoles.contains(role.getName()) || tenantCustomRoles.contains(role.getName())).collect(Collectors.toList());
+        }
     }
 }

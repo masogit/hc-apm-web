@@ -295,4 +295,19 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query(value="select distinct u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=?2 and o.orgUid in ?1")
     public List<UserAccount> findByUserOrgAndRoleId(List<String> uid,int roleId);
+
+
+
+
+//    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.* FROM org_hierarchy oh JOIN user_org uo ON uo.org_uid = oh.uid JOIN user_account ua ON uo.user_uid = ua.uid WHERE ua.id IN ( SELECT ur.user_id FROM user_role ur JOIN sys_role sr ON ur.role_id = sr.id WHERE sr.NAME IN ?2 GROUP BY ur.user_id HAVING COUNT(DISTINCT sr.NAME) = ?3 );", nativeQuery = true)
+//    List<UserAccount> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleName ,int size);
+
+
+    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.* FROM org_hierarchy oh JOIN user_org uo ON uo.org_uid = oh.uid JOIN user_account ua ON uo.user_uid = ua.uid JOIN user_role ur ON ua.id = ur.user_id JOIN sys_role sr ON ur.role_id = sr.id GROUP BY ua.id HAVING SUM(CASE WHEN sr.name IN ?2 THEN 1 ELSE 0 END) > 0 AND SUM(CASE WHEN sr.name = 'MultiLevelAuditor' THEN 1 ELSE 0 END) > 0", nativeQuery = true)
+    List<UserAccount> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleNames );
+
+
+    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.uid FROM custom_role cr JOIN user_role ur ON cr.id = ur.role_id AND cr.name =?2 JOIN user_account ua ON ur.user_id = ua.id JOIN user_org uo ON ua.uid = uo.user_uid JOIN org_hierarchy oh ON uo.org_uid = oh.uid JOIN user_role sysur ON ua.id = sysur.user_id AND sysur.role_id = ?3", nativeQuery = true)
+    List<String> findByClinicalDeptUidAndCustomRoles(String clinicalDeptUID,List<String> roleNames,int id );
+
 }
