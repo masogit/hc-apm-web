@@ -913,6 +913,11 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     @TableField(exist = false)
     private Date terminateOperationDate;
+    //待报废操作人
+    @Transient
+    @TableField(exist = false)
+    private String terminateBusinessNumber;
+
 
     @Column(name = "supplier_py_code")
     private String supplierPyCode;
@@ -1096,6 +1101,14 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setMeasuringAlertStatus(String measuringAlertStatus) {
         this.measuringAlertStatus = measuringAlertStatus;
+    }
+
+    public String getTerminateBusinessNumber() {
+        return terminateBusinessNumber;
+    }
+
+    public void setTerminateBusinessNumber(String terminateBusinessNumber) {
+        this.terminateBusinessNumber = terminateBusinessNumber;
     }
 
     public boolean isSpecialAsset() {
