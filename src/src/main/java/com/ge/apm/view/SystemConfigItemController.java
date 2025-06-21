@@ -174,8 +174,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
             }
         }
-
-        return page;
+        configItemList = page.getContent();
+        for (ConfigItem configItem : configItemList) {
+            if ("assetScrap".equals(configItem.getKey()) || "showAssetScrapNo".equals(configItem.getKey()) ) {
+                configItemMap.put(configItem.getKey(),configItem);
+            }
+        }
+         return page;
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
@@ -306,10 +311,30 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         saveConfig(this.selected);
     }
 
-    public void saveConfigScrip(ConfigItem configItemF,ConfigItem configItemS){
-        saveConfig(configItemF);
-        saveConfig(configItemS);
+    public void saveConfigScrap(ConfigItem configItemF,ConfigItem configItemS){
+        saveScrap(configItemF);
+        saveScrap(configItemS);
+        WebUtil.addErrorMessage("保存成功！");
     }
+
+    public void saveScrap(ConfigItem configItemF){
+        if(this.selectSite != null){
+            ConfigItemValue configItemValue;
+            configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid(configItemF.getKey(), this.selectSite.getSiteUID());
+            if(configItemValue == null){
+                configItemValue = new ConfigItemValue();
+                configItemValue.setTenantUid(selectSite.getTenantUID());
+                configItemValue.setInstitutionUid(selectSite.getInstitutionUID());
+                configItemValue.setHospitalUid(selectSite.getHospitalUID());
+                configItemValue.setSiteUid(selectSite.getSiteUID());
+                configItemValue.setKey(configItemF.getKey());
+            }
+            configItemValue.setValue(configItemF.getShowValue());
+            configItemValueRepository.save(configItemValue);
+            configItemF.setConfigItemValue(configItemValue);
+        }
+    }
+
 
 
     public void saveConfig(ConfigItem configItem){
