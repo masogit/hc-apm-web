@@ -1,9 +1,6 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
@@ -62,6 +59,9 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
+    private AssetScrapRepository assetScrapRepository;
+
+
 
     //选定的院区
     private OrgInfo selectSite;
@@ -134,7 +134,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     @Override
     protected void init() {
         user = UserContextService.getCurrentUserAccount();
-
+        assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
         dao = WebUtil.getBean(AssetInfoRepository.class);
         aiMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
@@ -163,6 +163,17 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
+    }
+
+
+    public boolean checkScrapConfit(){
+        String assetScrapValue = userContextService.getConfigItemValue("assetScrap");
+        String showAssetScrapNoValue = userContextService.getConfigItemValue("showAssetScrapNo");
+        if(Boolean.TRUE.toString().equals(assetScrapValue) && Boolean.TRUE.toString().equals(showAssetScrapNoValue)){
+            return true;
+
+        }
+        return false;
     }
 
     @Override
@@ -205,7 +216,21 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
                 }
             });
         }
-
+        if(!CollectionUtils.isEmpty(uids)){
+            List<AssetScrap>  assetScrapList= assetScrapRepository.selectByAssetUids(uids);
+            Map<String, AssetScrap> collect = assetScrapList.stream()
+                    .collect(Collectors.toMap(
+                            AssetScrap::getAssetUid,  // Key提取器
+                            scrap -> scrap,           // Value提取器（对象本身）
+                            (existing, replacement) -> existing  // 冲突解决策略：保留先出现的值
+                    ));
+            currentPageAssets.forEach(item -> {
+                AssetScrap assetScrap = collect.get(item.getUid());
+                if(assetScrap != null){
+                    item.setTerminateBusinessNumber(assetScrap.getBusinessNumber());
+                 }
+            });
+        }
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
 
         Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
@@ -228,6 +253,11 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             }
         });
 
+    }
+
+    public String openNewWindowView(String terminateBusinessNumber) {
+//             "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
+        return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=terminate&amp;terminateBusinessNumber=" + terminateBusinessNumber;
     }
 
     private void setUserSearchFilters() {

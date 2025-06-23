@@ -195,7 +195,7 @@
                             <f:selectItems value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,9,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6,9')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                         </p:selectOneMenu>
                     </f:facet>
-                    <p:graphicImage  width="165" height="38" name="#{workOrderMgrController.getStepImg(item)}"/>
+                    <p:graphicImage  width="165" height="38" url="#{workOrderMgrController.getStepImg(item)}"/>
                 </p:column>
                 <!--当前处理步骤 for 全部 云阜-->
                 <p:column rendered="#{workOrderMgrController.queryIndex eq 11 and userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ" >
@@ -291,10 +291,10 @@
                 </p:column>
                 <f:facet name="{Toolbar}">
 
-                    <p:commandButton id="batchReviewButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量审批" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton()}" rendered="#{workOrderMgrController.queryIndex == 10 }" oncomplete="PF('batchWoActionDialog').show()"/>
-                    <p:commandButton id="batchAckButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="批量验收" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton() }" rendered="#{workOrderMgrController.queryIndex == 5}" oncomplete="PF('ackDialogBatch').show()"/>
+                    <p:commandButton id="batchReviewButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="#{msg.batchApproval}" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton()}" rendered="#{workOrderMgrController.queryIndex == 10 }" oncomplete="PF('batchWoActionDialog').show()"/>
+                    <p:commandButton id="batchAckButton" icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="#{msg.batchAcceptance}" update="woTab:woMgrListForm" disabled="#{workOrderMgrController.batchReviewPassButton() }" rendered="#{workOrderMgrController.queryIndex == 5}" oncomplete="PF('ackDialogBatch').show()"/>
 
-                    <p:commandButton id="manHoursManageButton" value="工时管理" actionListener="#{workOrderMgrController.prepareMoreManHoursView}" update="woTab:moreManHoursDialogForm" disabled="#{empty workOrderMgrController.selected or !(workOrderMgrController.queryIndex gt 3 and workOrderMgrController.queryIndex lt 8)}" oncomplete="PF('moreManHoursDialog').show()" rendered="#{userContextService.countyArea}"/>
+                    <p:commandButton id="manHoursManageButton" value="#{msg.workHourManagement}" actionListener="#{workOrderMgrController.prepareMoreManHoursView}" update="woTab:moreManHoursDialogForm" disabled="#{empty workOrderMgrController.selected or !(workOrderMgrController.queryIndex gt 3 and workOrderMgrController.queryIndex lt 8)}" oncomplete="PF('moreManHoursDialog').show()" rendered="#{userContextService.countyArea}"/>
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                         <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
                     </p:commandButton>
