@@ -175,24 +175,24 @@
             </if>
             <if test="oneSearchStr != null">
                 AND (
-                  ai.name like concat('%',#{name},'%')
+                  ai.name like concat('%',#{oneSearchStr},'%')
                   or
-                  ai.name_py_code like concat('%',#{namePyCode},'%')
+                  ai.name_py_code like concat('%',#{oneSearchStr},'%')
                   or
-                  ai.depart_num like concat('%',#{departNum},'%')
+                  ai.depart_num like concat('%',#{oneSearchStr},'%')
                 or
-                ai.financing_num like concat('%',#{financingNum},'%')
+                ai.financing_num like concat('%',#{oneSearchStr},'%')
                 or
-                ai.qr_code like concat('%',#{qrCode},'%')
+                ai.qr_code like concat('%',#{oneSearchStr},'%')
 
                 or
-                ai.serial_num like concat('%',#{serialNum},'%')
+                ai.serial_num like concat('%',#{oneSearchStr},'%')
 
                 or
-                ai.manufacture like concat('%',#{manufacture},'%')
+                ai.manufacture like concat('%',#{oneSearchStr},'%')
 
                 or
-                ai.clinical_dept_name like concat('%',#{clinicalDeptName},'%')
+                ai.clinical_dept_name like concat('%',#{oneSearchStr},'%')
                 )
             </if>
 
