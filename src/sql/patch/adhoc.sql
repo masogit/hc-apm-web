@@ -35,3 +35,5 @@ WHERE "key" = 'assetScrap';
 
 
 ALTER TABLE multi_level_approval ALTER COLUMN approval_uid TYPE VARCHAR(1024);
+
+CREATE index if not exists asset_opt_record_clinical_dept_uid_idx ON public.asset_opt_record (clinical_dept_uid);
