@@ -1164,7 +1164,13 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         if(approvalUserFirst!=null){
             multiLevelApprovalRepository.updateApprovalUser(approvalNode.getNodeId(),approvalUserFirst.getUid(),approvalUserReplace.getUid(),selected.getId());
         }else{
-            multiLevelApprovalRepository.addApprovalUser(approvalNode.getNodeId(),approvalUserReplace.getUid()+",",selected.getId());
+            String approvalUids=null;
+            if(CollectionUtils.isEmpty(approvalNode.getApproveUsers())){
+                approvalUids=","+approvalUserReplace.getUid()+",";
+            }else{
+                approvalUids=approvalUserReplace.getUid()+",";
+            }
+            multiLevelApprovalRepository.addApprovalUser(approvalNode.getNodeId(),approvalUids,selected.getId());
         }
         WebUtil.addSuccessMessage("多级审批更换审批人员成功");
         approvalUserReplace=null;
