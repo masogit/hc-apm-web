@@ -517,6 +517,7 @@ public class V2_WorkOrderService {
         formData.setAttachments(attachments);
         formData.setAssigneeId(assignId);
         formData.setEntryType(selectedWorkOrder.getEntryType());
+        formData.setCoworkerEntryType(selectedWorkOrder.getCoworkerEntryType());
         formData.setWorkOrderType(selectedWorkOrder.getWorkOrderType());
         if(selectedWorkOrder.getEntryType() == 1){
             formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
