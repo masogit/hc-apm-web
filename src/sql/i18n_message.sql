@@ -6143,7 +6143,9 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ViewSignature','查看签名','View Signature',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'RemainingStock', '所剩库存', 'Remaining Stock', '剩餘庫存', -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'SparePartCode', '备件编号', 'Spare Part Code', '備件編號', -1);
-
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'batchAcceptance', '批量验收', 'Batch Acceptance', '批量驗收', -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'batchApproval', '批量审批', 'Batch Approval', '批量審批', -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES ('label', 'workHourManagement', '工时管理', 'Work Hour Management', '工時管理', -1);
 
 
 
