@@ -28,7 +28,7 @@ public interface AssetStockedRepository extends GenericRepositoryUUID<AssetStock
     @Query(value = "select RIGHT(max(out_stock_no),3) from asset_stocked ali, asset_info al where al.tenant_uid = ?1 and ali.asset_uid = al.uid and ali.out_stock_no like ?2",nativeQuery = true)
     String queryOutStockNo(String tenantUid, String outStockNo);
 
-    @Query(value = "select RIGHT(max(returned_stock_no),3) from asset_stocked ali, asset_info al where al.tenant_uid = ?1 and ali.asset_uid = al.uid and ali.returned_stock_no like ?2",nativeQuery = true)
+    @Query(value = "select RIGHT(max(returned_stock_no),3) from asset_out_stock_record ali, asset_info al where al.tenant_uid = ?1 and ali.asset_uid = al.uid and ali.returned_stock_no like ?2",nativeQuery = true)
     String queryReturnedStockNo(String tenantUid, String outStockNo);
 
     @Transactional

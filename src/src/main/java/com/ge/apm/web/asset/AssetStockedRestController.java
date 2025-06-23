@@ -42,7 +42,9 @@ public class AssetStockedRestController {
 			List<String> assetUidList = assetStockedRepository.find().stream().map(AssetStocked::getAssetUid).distinct().collect(Collectors.toList());
 			List<SearchFilter> arrivalItemSearchList = ListUtil.newArrayList();
 			arrivalItemSearchList.add(new SearchFilter("stockStatus", SearchFilter.Operator.IsNotNull, null, "1*"));
-			arrivalItemSearchList.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, assetUidList, "1*"));
+			if (ObjectUtil.isNotEmpty(assetUidList)) {
+				arrivalItemSearchList.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, assetUidList, "1*"));
+			}
 			List<ArrivalListItem> itemList = arrivalListItemRepository.findBySearchFilter(arrivalItemSearchList);
 			for (ArrivalListItem arrivalListItem : itemList) {
 				AssetStocked assetStocked = new AssetStocked();
@@ -78,6 +80,7 @@ public class AssetStockedRestController {
 					assetInStockRecord.setPurchasePrice(arrivalListItem.getPurchasePrice());
 					assetInStockRecord.setInvoiceNum(arrivalList.getInvoiceNum());
 					assetInStockRecord.setInvoiceDate(arrivalList.getInvoiceDate());
+					assetInStockRecord.setStockStatus(3);
 					inStockRecords.add(assetInStockRecord);
 				}
 				if (ObjectUtil.isNotEmpty(arrivalListItem.getOutStockNo())) {

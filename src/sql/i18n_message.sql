@@ -5493,6 +5493,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','3','已入库','In stock',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','4','已出库','Out stock',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','5','已退库','Returned stock',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','6','无效入库','Invalid in stock',NULL,-1);
 --重点设备
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualRepairExpenses', '年维修支出', 'Annual repair expenses', NULL, -1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES('label', 'annualMaintenanceExpenses', '年维保支出', 'Annual maintenance expenses', NULL, -1);
@@ -6142,7 +6143,9 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ViewSignature','查看签名','View Signature',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'RemainingStock', '所剩库存', 'Remaining Stock', '剩餘庫存', -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'SparePartCode', '备件编号', 'Spare Part Code', '備件編號', -1);
-
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'batchAcceptance', '批量验收', 'Batch Acceptance', '批量驗收', -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'batchApproval', '批量审批', 'Batch Approval', '批量審批', -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES ('label', 'workHourManagement', '工时管理', 'Work Hour Management', '工時管理', -1);
 
 
 

@@ -157,6 +157,9 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
         if (ObjectUtil.isNotEmpty(searchItem.getContractNum())) {
             searchFilters.add(new SearchFilter("arrivalList.contractNum", SearchFilter.Operator.LIKE, searchItem.getContractNum(), "1*"));
         }
+        if (ObjectUtil.isNotEmpty(searchItem.getStockStatus())) {
+            searchFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, searchItem.getStockStatus(), "1*"));
+        }
         Page<AssetInStockRecord> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         List<AssetInStockRecord> content = page.getContent();
         Set<String> userUidList = content.stream().map(AssetInStockRecord::getInStockUser).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
