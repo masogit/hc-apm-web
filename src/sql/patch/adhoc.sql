@@ -11,8 +11,8 @@ insert into public.config_item (uid, category, default_value, description, key, 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否开启质量控制自动添加性能检测报告', 'enableQuantityControlReportAutoAdd', '保养单是否自动添加质量控制性能报告', 'f', 't', 3 where not exists (select * from config_item where key = 'enableQuantityControlReportAutoAdd');
 
 
---
-update v2_wrok_order set coworker_entry_type = '0';
+--批量添加协作者工时类型
+update v2_work_order set coworker_entry_type = '0' where coworker_entry_type is null;
 
 --增加是否展示报废单号配置项 https://ge-hc.atlassian.net/browse/YHAAO-25336
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,
