@@ -283,6 +283,10 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
         return "Create".equals(crudActionName);
     }
 
+    public boolean isEditAction() {
+        return "Edit".equals(crudActionName);
+    }
+
     public String getCRUDActionName() {
         return WebUtil.getMessage(crudActionName);
     }
@@ -596,5 +600,13 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
+    }
+
+    public String getCrudActionName() {
+        return crudActionName;
+    }
+
+    public void setCrudActionName(String crudActionName) {
+        this.crudActionName = crudActionName;
     }
 }
