@@ -741,18 +741,22 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             //发送邮件给关单审核人
             zkbPartOrderService.sendEmail(selected, "", UserContextService.getAccessToken());
         } else if(ZkbPartOrderStep.PartOrderStep.ReturnPending.name().equals(selected.getCurrentStep()) && ZkbPartOrder.OrderType.Probe.name().equals(selected.getOrderType())){
-            List<V2_BlobObject> newBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_NEW_CAT);
-            if(CollectionUtils.isEmpty(newBlobList)){
-                WebUtil.addErrorMessage("新探头序列号照片未上传！","");
-                return "";
-            }
-            List<V2_BlobObject> oldBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_OLD_CAT);
-            if(CollectionUtils.isEmpty(oldBlobList)){
-                WebUtil.addErrorMessage("旧探头序列号照片未上传！","");
-                return "";
+            if(selected.getOrderNo().toUpperCase().startsWith("FE") && ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name().equals(selected.getReturnType())){
+                List<V2_BlobObject> newBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_NEW_CAT);
+                if(CollectionUtils.isEmpty(newBlobList)){
+                    WebUtil.addErrorMessage("新探头序列号照片未上传！","");
+                    return "";
+                }
+                List<V2_BlobObject> oldBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_OLD_CAT);
+                if(CollectionUtils.isEmpty(oldBlobList)){
+                    WebUtil.addErrorMessage("旧探头序列号照片未上传！","");
+                    return "";
+                }
             }
             zkbPartOrderService.normalNext(this.selected,currentUser,zkbPartOrderCloseInfo);
-            zkbPartOrderService.saveBlob(universalBlobObjectList, selected.getId());
+            if(CollectionUtils.isNotEmpty(universalBlobObjectList)){
+                zkbPartOrderService.saveBlob(universalBlobObjectList, selected.getId());
+            }
         }else {
             zkbPartOrderService.normalNext(this.selected,currentUser,zkbPartOrderCloseInfo);
         }
@@ -1166,16 +1170,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
              }
             zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-            List<V2_BlobObject> newBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_NEW_CAT);
-            if(CollectionUtils.isEmpty(newBlobList)){
-                WebUtil.addErrorMessage("新探头序列号照片未上传！","");
-                return;
+            if(selected.getOrderNo().toUpperCase().startsWith("FE") && ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.name().equals(selected.getReturnType())){
+                List<V2_BlobObject> newBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_NEW_CAT);
+                if(CollectionUtils.isEmpty(newBlobList)){
+                    WebUtil.addErrorMessage("新探头序列号照片未上传！","");
+                    return;
+                }
+                List<V2_BlobObject> oldBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_OLD_CAT);
+                if(CollectionUtils.isEmpty(oldBlobList)){
+                    WebUtil.addErrorMessage("旧探头序列号照片未上传！","");
+                    return;
+                }
             }
-            List<V2_BlobObject> oldBlobList = queryBlobByType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN_OLD_CAT);
-            if(CollectionUtils.isEmpty(oldBlobList)){
-                WebUtil.addErrorMessage("旧探头序列号照片未上传！","");
-                return;
-            }
+
             boolean arg = zkbPartOrderService.probeModifyReturn(selected,currentUser, universalBlobObjectList);
             if(arg){
                 WebUtil.addErrorMessage("归还类型已修改，剩余名额不足，需400手动处理！","");
