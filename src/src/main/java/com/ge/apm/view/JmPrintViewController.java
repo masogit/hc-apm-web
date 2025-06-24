@@ -3,10 +3,13 @@ package com.ge.apm.view;
 import com.ge.apm.dao.JmReportRepository;
 import com.ge.apm.domain.JmReport;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -30,11 +33,13 @@ public class JmPrintViewController extends GenericCRUDUUIDController<JmReport> i
 
     private UserAccount loginUser;
     private HttpServletRequest request;
-
+     private MicroServiceUtil microServiceUtil;
     @Override
     protected void init() {
         this.dao = WebUtil.getBean(JmReportRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
+        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
+
         request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         type = request.getParameter("type");
     }
@@ -55,10 +60,11 @@ public class JmPrintViewController extends GenericCRUDUUIDController<JmReport> i
         switch (type) {
             case "departmentConvert":
                 param.put("convertNo", request.getParameter("convertNo"));
+                param.put("fileSearchUrl", microServiceUtil.getWebContextUrl() + "/gateway" + GatewayURL.SEARCH_FILE);
                 partPrintReport = dao.findReportByName("转科单");
                 break;
-
             case "terminate":
+                param.put("fileSearchUrl", microServiceUtil.getWebContextUrl() + "/gateway" + GatewayURL.SEARCH_FILE);
                 param.put("terminateBusinessNumber", request.getParameter("terminateBusinessNumber"));
                 partPrintReport = dao.findReportByName("报废单");
                 break;

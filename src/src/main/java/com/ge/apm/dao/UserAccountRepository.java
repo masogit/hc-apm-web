@@ -303,11 +303,11 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 //    List<UserAccount> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleName ,int size);
 
 
-    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.* FROM org_hierarchy oh JOIN user_org uo ON uo.org_uid = oh.uid JOIN user_account ua ON uo.user_uid = ua.uid JOIN user_role ur ON ua.id = ur.user_id JOIN sys_role sr ON ur.role_id = sr.id GROUP BY ua.id HAVING SUM(CASE WHEN sr.name IN ?2 THEN 1 ELSE 0 END) > 0 AND SUM(CASE WHEN sr.name = 'MultiLevelAuditor' THEN 1 ELSE 0 END) > 0", nativeQuery = true)
+    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.* FROM org_hierarchy oh JOIN user_org uo ON uo.org_uid = oh.uid JOIN user_account ua ON uo.user_uid = ua.uid JOIN user_role ur ON ua.id = ur.user_id and  ur.role_type=0      JOIN sys_role sr ON ur.role_id = sr.id GROUP BY ua.id HAVING SUM(CASE WHEN sr.name IN ?2 THEN 1 ELSE 0 END) > 0 AND SUM(CASE WHEN sr.name = 'MultiLevelAuditor' THEN 1 ELSE 0 END) > 0", nativeQuery = true)
     List<UserAccount> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleNames );
 
 
-    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.uid FROM custom_role cr JOIN user_role ur ON cr.id = ur.role_id AND cr.name =?2 JOIN user_account ua ON ur.user_id = ua.id JOIN user_org uo ON ua.uid = uo.user_uid JOIN org_hierarchy oh ON uo.org_uid = oh.uid JOIN user_role sysur ON ua.id = sysur.user_id AND sysur.role_id = ?3", nativeQuery = true)
+    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.uid FROM custom_role cr JOIN user_role ur ON cr.id = ur.role_id AND cr.name =?2 and ur.role_type=1    JOIN user_account ua ON ur.user_id = ua.id JOIN user_org uo ON ua.uid = uo.user_uid JOIN org_hierarchy oh ON uo.org_uid = oh.uid JOIN user_role sysur ON ua.id = sysur.user_id  and sysur.role_type=0  AND sysur.role_id = ?3", nativeQuery = true)
     List<String> findByClinicalDeptUidAndCustomRoles(String clinicalDeptUID,List<String> roleNames,int id );
 
 }
