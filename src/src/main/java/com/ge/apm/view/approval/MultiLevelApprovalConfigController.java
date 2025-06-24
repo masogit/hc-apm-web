@@ -42,6 +42,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static com.ge.apm.service.constant.ApprovalConstant.APPROVAL_SEPARATOR;
+
 @ManagedBean
 @ViewScoped
 public class MultiLevelApprovalConfigController extends GenericCRUDUUIDController<MultiLevelApprovalConfig> {
@@ -361,14 +363,14 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         Integer maxAmountNew = selected.getMaxAmount() != null ?selected.getMaxAmount() : 0;
         String configrationOld = selected.getConfigration();
         boolean enable=true;
-        if(selected.getId() != null){
-            MultiLevelApprovalConfig multiLevelApprovalConfig = configDao.findById(selected.getId());
-            enable = multiLevelApprovalConfig.getEnable();
-            if(checkExistMultiLevelApproval()){
-                WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
-                return;
-            }
-        }
+//        if(selected.getId() != null){
+//            MultiLevelApprovalConfig multiLevelApprovalConfig = configDao.findById(selected.getId());
+//            enable = multiLevelApprovalConfig.getEnable();
+//            if(checkExistMultiLevelApproval()){
+//                WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
+//                return;
+//            }
+//        }
 //        userAssetTypeUpdate();
         if (null != configrationOld) {
             Map map = JSON.parseObject(configrationOld, Map.class);
@@ -1123,6 +1125,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
 
     public void approvalUserUpdate(){
+        logger.info("approvalUserUpdate select:{},approvalNode:{},approvalUserReplace:{}",JSON.toJSONString(selected),JSON.toJSONString(approvalNode),approvalUserReplace.getUid());
         if( approvalUserReplace==null){
             WebUtil.addWarnMessage("请选择替换的审批人员");
             return;
@@ -1161,17 +1164,20 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         selected.setApprovalItem(nodes);
         configDao.save(selected);
         //更新审批节点
-        if(approvalUserFirst!=null){
-            multiLevelApprovalRepository.updateApprovalUser(approvalNode.getNodeId(),approvalUserFirst.getUid(),approvalUserReplace.getUid(),selected.getId());
-        }else{
-            String approvalUids=null;
-            if(CollectionUtils.isEmpty(approvalNode.getApproveUsers())){
-                approvalUids=","+approvalUserReplace.getUid()+",";
-            }else{
-                approvalUids=approvalUserReplace.getUid()+",";
-            }
-            multiLevelApprovalRepository.addApprovalUser(approvalNode.getNodeId(),approvalUids,selected.getId());
+
+        List<String> approvalUids=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(approvalNode.getApproveUsers())){
+            approvalUids= approvalNode.getApproveUsers().stream().filter(item -> org.apache.commons.lang.StringUtils.isNotBlank(item.getUid())).map(UserAccount::getUid).collect(Collectors.toList());
         }
+        Object[] objects = approvalUids.toArray();
+        String str = org.apache.commons.lang.StringUtils.join(objects, ",");
+
+        if (StringUtils.isNotBlank(str)) {
+            str = APPROVAL_SEPARATOR + str + APPROVAL_SEPARATOR;
+        }
+
+        multiLevelApprovalRepository.updateApprovalUser(approvalNode.getNodeId(),str,selected.getId());
+
         WebUtil.addSuccessMessage("多级审批更换审批人员成功");
         approvalUserReplace=null;
         approvalUserFirst=null;

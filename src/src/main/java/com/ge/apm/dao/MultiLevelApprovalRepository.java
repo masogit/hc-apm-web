@@ -64,6 +64,11 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     @Modifying
     void updateApprovalUser(Integer nodeId,String approvalUserFirstUid ,String approvalUserReplaceUid, String id);
 
+    @Query(value = "update  multi_level_approval  set approval_uid = ?2   where  approval_level=?1 and workflow_config_approve_uid=?3  and ( approval_status = 0 or approval_status = 1   ) ",nativeQuery = true)
+    @Transactional
+    @Modifying
+    void updateApprovalUser(Integer nodeId  ,String approvalUid, String id);
+
 
     @Query(value = "update  multi_level_approval  set approval_uid =concat(approval_uid,?2)   where  approval_level_now=?1 and workflow_config_approve_uid=?3  and ( approval_status = 0 or approval_status = 1   ) ",nativeQuery = true)
     @Transactional
