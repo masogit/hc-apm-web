@@ -372,6 +372,22 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         }
     }
 
+    public String getJmPrintReportViewUrl(AssetOutStockRecord outStockRecord, String type) {
+        switch (type) {
+            case "outStocked" :
+                return "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=" + outStockRecord.getOutStockNo() + "&userName=" + currentUser.getName();
+            case "returnedStocked" :
+                OrgInfo returnedDept = orgInfoRepository.findByUid(setAssetOutStockDept);
+                return "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=" + outStockRecord.getReturnedStockNo() + "&userName=" + currentUser.getName() + "&returnedStockDept=" + returnedDept.getName();
+            case "assetInfo" :
+                return "/portal/asset/info/AssetDetail.xhtml?actionName=View&terminate=false&assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
+            case "contractInfo" :
+                return "/portal/asset/contract/ContractView.xhtml?action=Edit&contractNum=" + outStockRecord.getArrivalList().getContractNum();
+            default:
+                return "";
+        }
+    }
+
     public String openNewWindowView(AssetOutStockRecord outStockRecord, String type) {
         switch (type) {
             case "outStocked" :
