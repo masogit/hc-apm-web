@@ -449,6 +449,16 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public List<Map<String, Object>> parseArrivalItemsListToMap(List<ArrivalListItem> itemList) {
         List<Map<String, Object>> listMapResult = new ArrayList<>();
         Set<String> userUidList = itemList.stream().map(ArrivalListItem::getCurrentPersonUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        Set<String> assetOwnerUIDs = itemList.stream().map(ArrivalListItem::getAssetOwnerUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        Set<String> assetOwnerUID2s = itemList.stream().map(ArrivalListItem::getAssetOwnerUID2).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        Set<String> assetOwnerUID3s = itemList.stream().map(ArrivalListItem::getAssetOwnerUID3).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        Set<String> clinicalOwnerUids = itemList.stream().map(ArrivalListItem::getClinicalOwnerUid).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+
+        userUidList.addAll(assetOwnerUIDs);
+        userUidList.addAll(assetOwnerUID2s);
+        userUidList.addAll(assetOwnerUID3s);
+        userUidList.addAll(clinicalOwnerUids);
+
         List<UserAccount> users = userAccountRepository.getSimpleByUids(userUidList.isEmpty() ? Collections.singletonList("-1") : userUidList);
         Map<String, String> userMap = users.stream().collect(Collectors.toMap(UserAccount::getUid, UserAccount::getName));
         Set<String> orgUidList = itemList.stream().map(ArrivalListItem::getClinicalDeptUID).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
