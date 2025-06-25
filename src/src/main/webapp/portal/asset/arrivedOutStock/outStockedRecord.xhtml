@@ -105,7 +105,10 @@
             <p:ajax event="rowSelect" listener="#{assetOutStockedController.onRowSelect}" update=":growl :assetOutStockTab:outStockedDataForm :assetOutStockTab:AssetOutStockedListForm:datalist"/>
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="出库单号">
-                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'outStocked')}" value="#{item.outStockNo}" onblur="reload()" />
+<!--                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'outStocked')}" value="#{item.outStockNo}" onblur="reload()" />-->
+                <a href="/geapm#{assetOutStockedController.getJmPrintReportViewUrl(item, 'outStocked')}" target="_Blank">
+                    <h:outputText value="#{item.outStockNo}"/>
+                </a>
             </p:column>
             <p:column headerText="业务时间">
                 <h:outputText value="#{item.businessDate}">
@@ -119,13 +122,19 @@
                 <h:outputText value="#{assetOutStockedController.userMap.get(item.outStockUser)}"/>
             </p:column>
             <p:column headerText="#{msg.financingNum}">
-                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'assetInfo')}" value="#{item.assetInfo.financingNum}" onblur="reload()" />
+<!--                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'assetInfo')}" value="#{item.assetInfo.financingNum}" onblur="reload()" />-->
+                <a href="/geapm#{assetOutStockedController.getJmPrintReportViewUrl(item, 'assetInfo')}" target="_Blank">
+                    <h:outputText value="#{item.assetInfo.financingNum}"/>
+                </a>
             </p:column>
             <p:column headerText="#{msg.assetName}">
                 <h:outputText value="#{item.assetInfo.name}"/>
             </p:column>
             <p:column headerText="#{msg.arrivalListContractNum}">
-                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'contractInfo')}" value="#{item.arrivalList.contractNum}" onblur="reload()" />
+<!--                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'contractInfo')}" value="#{item.arrivalList.contractNum}" onblur="reload()" />-->
+                <a href="/geapm#{assetOutStockedController.getJmPrintReportViewUrl(item, 'contractInfo')}" target="_Blank">
+                    <h:outputText value="#{item.arrivalList.contractNum}"/>
+                </a>
             </p:column>
             <p:column headerText="#{msg.installDate}">
                 <h:outputText value="#{item.assetInfo.installDate}">
@@ -154,7 +163,10 @@
                 <h:outputText value="#{fieldMsg.fieldValue('stockStatus', item.stockStatus)}"/>
             </p:column>
             <p:column headerText="退库单号">
-                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'returnedStocked')}" value="#{item.returnedStockNo}" onblur="reload()" />
+<!--                <h:commandLink target="_blank" action="#{assetOutStockedController.openNewWindowView(item, 'returnedStocked')}" value="#{item.returnedStockNo}" onblur="reload()" />-->
+                <a href="/geapm#{assetOutStockedController.getJmPrintReportViewUrl(item, 'returnedStocked')}" target="_Blank">
+                    <h:outputText value="#{item.returnedStockNo}"/>
+                </a>
             </p:column>
             <f:facet name="{Toolbar}">
                 <p:commandButton value="生成退库单" disabled="#{!userContextService.hasAnyRoleByApmRoles('StockedManager')}" action="#{assetOutStockedController.prepareGeneratedReturnedStockDoc()}" validateClient="true"

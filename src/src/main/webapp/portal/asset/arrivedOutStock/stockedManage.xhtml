@@ -81,7 +81,10 @@
             <p:ajax event="rowSelect" listener="#{assetStockedController.onRowSelect}" update=":growl :assetOutStockTab:searchDataForm :assetOutStockTab:AssetStockedManageListForm:datalist"/>
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="入库单号">
-                <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" />
+<!--                <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" onblur="reload()" />-->
+                <a href="/geapm#{assetStockedController.getJmPrintReportViewUrl(item.inStockNo)}" target="_Blank">
+                    <h:outputText value="#{item.inStockNo}"/>
+                </a>
             </p:column>
             <p:column headerText="业务时间">
                 <h:outputText value="#{item.businessDate}">

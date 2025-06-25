@@ -82,7 +82,10 @@
             <p:ajax event="rowSelect" listener="#{assetInStockedController.onRowSelect}" update=":growl :assetOutStockTab:inStockedDataForm :assetOutStockTab:AssetInStockedListForm:datalist"/>
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="入库单号">
-                <h:commandLink target="_blank" action="#{assetInStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" onblur="reload()" />
+<!--                <h:commandLink target="_blank" action="#{assetInStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" onblur="reload()" />-->
+                <a href="/geapm#{assetInStockedController.getJmPrintReportViewUrl(item.inStockNo)}" target="_Blank">
+                    <h:outputText value="#{item.inStockNo}"/>
+                </a>
             </p:column>
             <p:column headerText="业务时间">
                 <h:outputText value="#{item.businessDate}">
@@ -102,7 +105,10 @@
                 <h:outputText value="#{item.assetInfo.name}"/>
             </p:column>
             <p:column headerText="#{msg.arrivalListContractNum}">
-                <h:commandLink target="_blank" action="#{assetInStockedController.openNewWindowView(item.arrivalList.contractNum)}" value="#{item.arrivalList.contractNum}" onblur="reload()" />
+<!--                <h:commandLink target="_blank" action="#{assetInStockedController.openNewWindowView(item.arrivalList.contractNum)}" value="#{item.arrivalList.contractNum}" onblur="reload()" />-->
+                <a href="/geapm#{assetInStockedController.getJmPrintReportViewUrl(item.arrivalList.contractNum)}" target="_Blank">
+                    <h:outputText value="#{item.arrivalList.contractNum}"/>
+                </a>
             </p:column>
             <p:column headerText="#{msg.installDate}">
                 <h:outputText value="#{item.assetInfo.installDate}">
