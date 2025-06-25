@@ -270,6 +270,11 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=departmentConvert&amp;convertNo=" + convertNo;
     }
 
+    public String getJmNewWindowView(String convertNo) {
+//             "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
+        return "/portal/JmPrintReportView.xhtml?type=departmentConvert&convertNo=" + convertNo;
+    }
+
     public Integer getStatus() {
         return status;
     }
