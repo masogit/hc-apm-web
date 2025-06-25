@@ -645,7 +645,7 @@ public class PmReportService {
         List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(pmOrder.getId());
         List<V2_WorkOrderCoworker> coWorkerList = getCoWorkerList(pmOrderService.getWorkOrderCoworker(pmOrder.getId()));
         List<V2_WorkOrder_Detail> accessoryList = getAccessoryList(pmOrderService.getWorkOrderDetails(pmOrder.getId()));
-        List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep(pmOrder.getId());
+        List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep0(pmOrder.getId());
 
          List<PmOrderRuleCheckList> pmCheckItemList = null;
         Map<String, UnstructuredData> hmCheck = null;
