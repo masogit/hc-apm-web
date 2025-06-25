@@ -5806,7 +5806,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ScheduledInspectionDate','计划检查日期','Scheduled Inspection Date',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ActualInspectionDate','实际检查日期','Actual Inspection Date',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Inspector','检查人','Inspector',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Status','工单状态','Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','OperationLog','开关机记录','Operation Log',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','StartupTime','开机时间','Startup Time',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ShutdownTime','关机时间','Shutdown Time',NULL,-1);
@@ -5873,8 +5872,8 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ContactInfo', '联系方式', 'Contact Information', '聯繫方式', -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ImportErrorInfo', '导入失败信息', 'Import Error Information', '導入失敗信息', -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'VenderCompanyLogin', '供应商登录', 'Vender Company Login', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'corporate', '企业', 'Corporate', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'projectDockerName', '项目Docker名称', 'Project Docker Name', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'corporate', '法人', 'Corporate', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'projectDockerName', '负责人姓名', 'Person in Charge''s Name', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'city', '城市', 'City', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'relation', '关联', 'Relation', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'NotRelated', '未关联', 'Not Related', NULL, -1);
@@ -5922,8 +5921,7 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'UsernameOrPhone', '用户名/手机号', 'Username/Phone Number', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'Query', '查询', 'Query', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'UserName', '用户名', 'User Name', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
-VALUES ('label', 'PhoneNumber', '手机号', 'Phone Number', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PhoneNumber', '手机号', 'Phone Number', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'Email', '邮箱', 'Email', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'Position', '职务', 'Position', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'Approve', '通过', 'Approve', NULL, -1);
@@ -5958,9 +5956,7 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessFilingAttachments', '备案凭证附件', 'Business Filing Attachments', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitCode', '生产许可证编码', 'Manufacturing Permit Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitStartDate', '生产许可证开始日期', 'Manufacturing Permit Start Date', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
-VALUES ('label', 'ManufacturingPermitEndDate', '生产许可证截止日期', 'Manufacturing Permit End Date', NULL, -1);
--- 医疗器械生产备案凭证信息
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitEndDate', '生产许可证截止日期', 'Manufacturing Permit End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingInfo', '医疗器械生产备案凭证信息', 'Manufacturing Filing Certificate Information', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingCode', '生产备案凭证编码', 'Manufacturing Filing Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingStartDate', '生产备案凭证开始日期', 'Manufacturing Filing Start Date', NULL, -1);
@@ -5989,8 +5985,7 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PersonnelImport', '人员导入', 'Personnel Import', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'orgInfoId', '机构信息', 'Organization Information', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BindRulesNotice', '请分别绑定保养规则、临床助手规则和日常使用登记规则！', 'Please bind maintenance rules, clinical assistant rules and daily use registration rules respectively!', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)
-VALUES ('label', 'UncompletedInspectionNotice', '设备存在未完成的日常检查，需要删除吗？', 'There are uncompleted daily inspections for the equipment, do you want to delete them?', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'UncompletedInspectionNotice', '设备存在未完成的日常检查，需要删除吗？', 'There are uncompleted daily inspections for the equipment, do you want to delete them?', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'GenerateQrcodeIfEmpty', '如果为空则生成二维码', 'Generate QR code if empty', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'GeneratePmOrder', '同时生成保养工单', 'Generate maintenance work order at the same time', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'selectOneMessage', '请选择', 'Please select', NULL, -1);
@@ -5998,7 +5993,6 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'CreateWorkOrder', '创建工单', 'Create Work Order', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'noAssetSelected', '没有选择资产', 'No Asset Selected', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'requestorPhone', '申请人电话', 'Requestor Phone', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'casePriority', '工单优先级', 'Work Order Priority', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'customerName', '医院客户姓名', 'Hospital Customer Name', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'customerTel', '医院客户电话', 'Hospital Customer Phone', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'customerPosition', '医院客户职务', 'Hospital Customer Position', NULL, -1);
@@ -6145,6 +6139,8 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'batchAcceptance', '批量验收', 'Batch Acceptance', '批量驗收', -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'batchApproval', '批量审批', 'Batch Approval', '批量審批', -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES ('label', 'workHourManagement', '工时管理', 'Work Hour Management', '工時管理', -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES ('label', 'InvalidCredentials', '用户名或密码错误。请重新输入用户名和密码！', 'Incorrect username or password. Please re-enter your username and password!', '用戶名或密碼錯誤。請重新輸入用戶名和密碼！', -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id)VALUES ('label', 'AccountDisabled', '该账号已被停用，请联系系统管理员!', 'This account has been disabled. Please contact the system administrator!', '該帳號已被停用，請聯繫系統管理員！', -1);
 
 
 
