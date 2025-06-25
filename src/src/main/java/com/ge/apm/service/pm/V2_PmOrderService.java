@@ -597,7 +597,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
     public List<PmOrderSteps> getPmOrderStep0(String pmOrderId){
        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-        List<V2_PmOrderStep> pmOrderSteps = pmOrderStepRepository.findByPmId(pmOrderId);
+        List<V2_PmOrderStep> pmOrderSteps = pmOrderStepRepository.findByPmIdOrderByStartTimeAsc(pmOrderId);
         List<PmOrderSteps> collect = pmOrderSteps.stream().map(item -> {
             PmOrderSteps step = new PmOrderSteps();
             String ownerName = item.getOwnerName();
