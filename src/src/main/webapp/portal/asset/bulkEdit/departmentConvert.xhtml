@@ -45,7 +45,12 @@
             <!--sharedId-->
             <p:column headerText="转科单号" sortBy="#{item.convertNo}" filterBy="#{item.convertNo}" filterMatchMode="LIKE">
 <!--            <h:commandLink target="_blank" action="#{assetStockedController.openNewWindowView(item.inStockNo)}" value="#{item.inStockNo}" onblur="reload()" />-->
-                <h:commandLink ajax="false" target="_blank" action="#{departmentConvertController.openNewWindowView(item.convertNo)}" actionListener="#{departmentConvertController.getStatus()}" value="#{item.convertNo}" />
+            <!--    <h:commandLink ajax="false" target="_blank" action="#{departmentConvertController.openNewWindowView(item.convertNo)}" actionListener="#{departmentConvertController.getStatus()}" value="#{item.convertNo}" />
+
+-->
+                <a href="/geapm#{departmentConvertController.getJmNewWindowView(item.convertNo)}" target="_Blank">
+                    <h:outputText value="#{item.convertNo}"/>
+                </a>
             </p:column>
             <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                 <h:outputText value="#{item.assetName}"/>
