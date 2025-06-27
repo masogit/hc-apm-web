@@ -147,6 +147,19 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('displayMainSubPmOrder'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('displayMainSubPmOrder').configItemValue == null}"/>
             </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('PMOrderExportType').name.concat('(').concat(systemConfigItemController.configItemMap.get('PMOrderExportType').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('PMOrderExportType').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="WORD" itemValue="WORD"/>
+                    <f:selectItem itemLabel="PDF" itemValue="PDF"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('PMOrderExportType'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('PMOrderExportType'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('PMOrderExportType').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 
