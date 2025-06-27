@@ -588,7 +588,7 @@ public class PmReportService {
         }
     }
     private byte[] getPDF(byte[] docByte) throws Exception {
-      return   PDFConversionUtil.getPDF(new ByteArrayInputStream(docByte),PDFConversion.Type.DOC);
+      return   PDFConversionUtil.getPDF(new ByteArrayInputStream(docByte),PDFConversion.Type.doc);
     }
     public String generateMessageTip(Map<String, Boolean> woOrders) {
         StringBuilder messageTipBuilder = new StringBuilder();

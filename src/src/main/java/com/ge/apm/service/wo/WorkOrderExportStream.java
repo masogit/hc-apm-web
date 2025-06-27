@@ -163,7 +163,7 @@ public class WorkOrderExportStream extends InputStream {
 
     }
     private byte[] getPDF(byte[] bytes) throws Exception {
-       return PDFConversionUtil.getPDF(new ByteArrayInputStream(bytes), PDFConversion.Type.DOCX);
+       return PDFConversionUtil.getPDF(new ByteArrayInputStream(bytes), PDFConversion.Type.doc);
     }
 
     public String getContentType() {
