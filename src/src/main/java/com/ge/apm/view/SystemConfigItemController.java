@@ -340,7 +340,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     public void saveConfig(ConfigItem configItem){
         this.selected = configItem;
         if(this.selectSite != null){
-            if(this.selected.getValueType()!=8 &&  !regularCheck()){
+            if((this.selected.getValueType()!=8 && this.selected.getValueType()!=7) &&  !regularCheck()){
                 logger.info("配置项保存，正则校验不通过：");
                 WebUtil.addErrorMessage("配置项保存失败，正则校验不通过！");
                 return;
