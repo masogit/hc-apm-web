@@ -59,6 +59,8 @@ public class MaintainController implements ServerEventInterface{
 	private Date initEndDate;
 	private Date startBatchDate;
 	private Date endBatchDate;
+	private Date currentDate;
+
 	private Date userClickDate;
 	// validate
 	private boolean isDeleteDisable;
@@ -953,5 +955,9 @@ public class MaintainController implements ServerEventInterface{
 
 	public void setSelectAll(boolean selectAll) {
 		isSelectAll = selectAll;
+	}
+
+	public Date getCurrentDate() {
+		return new Date();
 	}
 }
