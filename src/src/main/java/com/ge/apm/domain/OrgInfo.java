@@ -140,6 +140,28 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "contact_phone")
     private String contactPhone;
 
+    @Transient
+    private String assetType;
+
+    @Transient
+    private String orgName;
+
+    public String getAssetType() {
+        return assetType == null ? "" : assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
     public String getAddress() {
         return address;
     }
