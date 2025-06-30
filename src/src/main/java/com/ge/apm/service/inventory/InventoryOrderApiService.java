@@ -33,16 +33,16 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	//初始化创建工单科室列表
-	public List<OrgDto> onCreateInventory(){
+	public List<OrgInfo> onCreateInventory(){
 
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
 		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
 		ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.GET,requestEntity,LinkedHashMap.class);
-		return JSONObject.parseObject(JSONObject.toJSONString(response.getBody().get("data")), new TypeReference<List<OrgDto>>() {});
+		return JSONObject.parseObject(JSONObject.toJSONString(response.getBody().get("data")), new TypeReference<List<OrgInfo>>() {});
 	}
 
 	// 创建盘点工单
-	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<OrgDto> selectedOrgs){
+	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<OrgInfo> selectedOrgs){
 		Map map =new HashMap<String,Object>();
 		map.put("planStartTime",format.format(selected.getPlanStartTime()));
 		map.put("planEndTime",format.format(selected.getPlanEndTime()));
