@@ -1,10 +1,14 @@
 package com.ge.apm.service.asset;
 
 import com.deepoove.poi.policy.RenderPolicy;
+import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.ArrivalList;
+import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.SystemTemplate;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -21,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -74,6 +81,9 @@ public class AssetInstallationReportService {
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
+
+    @Autowired
+    private ArrivalListItemRepository itemDao;
 
     public Map<String, Object> createReportData(ArrivalListItem arrivalListItem){
 
@@ -483,5 +493,41 @@ public class AssetInstallationReportService {
             return fileName;
         }
     }
+    public StreamedContent exportReport(SystemTemplate systemTemplate,ArrivalListItem arrivalListItem) throws IOException{
+            byte[] templateBytes =  microServiceUtil.downloadSingleFileByte(systemTemplate.getValueStorageId()!=null?systemTemplate.getValueStorageId():systemTemplate.getStorageId());
+            if (templateBytes != null) {
+                if("固定资产验收单(面单)".equals(systemTemplate.getTemplateTypeNameValue()) || "固定资产验收单(底单)".equals(systemTemplate.getTemplateTypeNameValue())   ){
+                    String contractNum = arrivalListItem.getArrivalList().getContractNum();
+                    String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
+                    if(StringUtils.isBlank(contractNum)){
+                        WebUtil.addErrorMessage("合同号不能为空");
+                        return null;
+                    }
+                    if(StringUtils.isBlank(clinicalDeptUID)){
+                        WebUtil.addErrorMessage("所属科室不能为空");
+                        return null;
+                    }
+                    List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+                    if(itemList == null || itemList.isEmpty()){
+                        WebUtil.addErrorMessage("没有需要导出的验收报告");
+                        return null;
+                    }
 
+                    Map<String, Object> data = this.createReportDataBatch(itemList);
+
+                    return this.exportDocxBatch(data, templateBytes, systemTemplate.getTemplateTypeNameValue()!=null?systemTemplate.getTemplateTypeNameValue():systemTemplate.getTemplateTypeName());
+
+                }else{
+                    Map<String, Object> data = this.createReportData(arrivalListItem);
+                    return this.exportDocx(data, templateBytes, systemTemplate.getTemplateTypeNameValue()!=null?systemTemplate.getTemplateTypeNameValue():systemTemplate.getTemplateTypeName());
+
+                }
+            }
+            return null;
+
+    }
+    public byte[] getReportTemplate(SystemTemplate systemTemplate) throws IOException {
+        byte[] templateBytes =  microServiceUtil.downloadSingleFileByte(systemTemplate.getValueStorageId()!=null?systemTemplate.getValueStorageId():systemTemplate.getStorageId());
+        return templateBytes;
+    }
 }

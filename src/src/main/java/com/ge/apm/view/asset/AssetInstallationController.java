@@ -1156,40 +1156,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     public void exportReport(SystemTemplate systemTemplate) {
         try {
-//            Map<String, Object> data = assetInstallationReportService.createReportData(arrivalListItem);
-//            byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
-
-            byte[] templateBytes =    msService.downloadSingleFileByte(systemTemplate.getValueStorageId()!=null?systemTemplate.getValueStorageId():systemTemplate.getStorageId());
-            if (templateBytes != null) {
-                if("固定资产验收单(面单)".equals(systemTemplate.getTemplateTypeNameValue()) || "固定资产验收单(底单)".equals(systemTemplate.getTemplateTypeNameValue())   ){
-                    String contractNum = arrivalListItem.getArrivalList().getContractNum();
-                    String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
-                    if(StringUtils.isBlank(contractNum)){
-                        WebUtil.addErrorMessage("合同号不能为空");
-                        return;
-                    }
-                    if(StringUtils.isBlank(clinicalDeptUID)){
-                        WebUtil.addErrorMessage("所属科室不能为空");
-                        return;
-                    }
-                    List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
-                    if(itemList == null || itemList.isEmpty()){
-                        WebUtil.addErrorMessage("没有需要导出的验收报告");
-                        return;
-                    }
-
-                    Map<String, Object> data = assetInstallationReportService.createReportDataBatch(itemList);
-
-                    exportFile = assetInstallationReportService.exportDocxBatch(data, templateBytes, systemTemplate.getTemplateTypeNameValue()!=null?systemTemplate.getTemplateTypeNameValue():systemTemplate.getTemplateTypeName());
-
-
-
-                }else{
-                    Map<String, Object> data = assetInstallationReportService.createReportData(arrivalListItem);
-                    exportFile = assetInstallationReportService.exportDocx(data, templateBytes, systemTemplate.getTemplateTypeNameValue()!=null?systemTemplate.getTemplateTypeNameValue():systemTemplate.getTemplateTypeName());
-
-                }
-            }
+             exportFile = assetInstallationReportService.exportReport(systemTemplate, arrivalListItem);
         } catch (IOException e) {
             Logger.getLogger(AssetInstallationController.class.getName()).log(Level.SEVERE, null, e);
             WebUtil.addErrorMessage("导出失败");
