@@ -207,6 +207,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             param.put("orderBy", orderBySql);
 
         }
+        param.put("tenantUid", user.getTenantUID());
         List<AssetInfo> list= assetInfoMapper.toBeTerminatedList(param);
         Long count= assetInfoMapper.toBeTerminatedListCount(param);
         PageImpl<AssetInfo> res = new PageImpl<>(list, pageRequest, count);
