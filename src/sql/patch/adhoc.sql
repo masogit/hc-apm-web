@@ -4,3 +4,8 @@ insert into public.config_item (uid, category, default_value, description, key, 
 -- YHAAO-25508
 CREATE INDEX IF NOT EXISTS asset_lifecycle_asset_uid_idx ON PUBLIC.asset_lifecycle USING btree (asset_uid);
 CREATE INDEX IF NOT EXISTS asset_lifecycle_tenant_uid_idx ON PUBLIC.asset_lifecycle USING btree (tenant_uid);
+
+
+-- 多级审批给申请人uid赋值
+UPDATE multi_level_approval mla SET application_uid = ( SELECT mla2.initiate_approver_uid FROM multi_level_approval mla2 WHERE mla.business_uid = mla2.business_uid AND mla2.initiate_approver_uid IS NOT NULL LIMIT 1 ) WHERE application_uid is null  and   EXISTS ( SELECT 1 FROM multi_level_approval mla2 WHERE mla.business_uid = mla2.business_uid AND mla2.initiate_approver_uid IS NOT NULL );
+

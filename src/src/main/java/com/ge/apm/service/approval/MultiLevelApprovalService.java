@@ -15,6 +15,7 @@ import com.ge.apm.service.asset.AssetInfoToBeTerminatedService;
 import com.ge.apm.service.asset.AssetLifecyleService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -130,6 +131,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private V2_WorkOrderService woService;
     @Autowired
     private AssetInfoBulkEditService assetInfoBulkEditService;
+    @Autowired
+    private ConfigCacheService configCacheService;
 
     @Autowired
     private SysRoleRepository sysRoleRepository;
@@ -389,6 +392,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         multiLevelApproval.setTenantUID(userAccount.getTenantUID());
                         multiLevelApproval.setHierOrgUid(userAccount.getSiteUID());
                         multiLevelApproval.setDigest(approvableTarget.getBusinessDigest());
+                        setApplicationDepartment(approvableTarget,userAccount,multiLevelApproval);
                         MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(multiLevelApproval);
                         if (multiLevel != null) {
                             // 发送短信
@@ -405,6 +409,24 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             }
         }
         return null;
+    }
+
+    private void setApplicationDepartment(ApprovableTarget approvableTarget, UserAccount userAccount, MultiLevelApproval multiLevelApproval) {
+        OrgInfo org =null;
+        switch (approvableTarget.getBusinessType()){
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
+                AssetInfo approvalAssetInfo = approvableTarget.getApprovalAssetInfo();
+                org = configCacheService.findOrgByUid(approvalAssetInfo.getClinicalDeptUID());
+                break;
+            default:
+                org = configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
+                break;
+        }
+
+        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+
     }
 
     private List<String> generationAdjustment(List<ApprovalNode> approvalNodes,ApprovalNode approvalNode,String businessUid,int businessType) {
