@@ -84,15 +84,16 @@
                     <p:column headerText="#{msg.period}" sortBy="#{item.period}" filterBy="#{item.period}" filterMatchMode="EQ">
                         <h:outputText value="#{item.period}"/>
                     </p:column>
-                    <p:column headerText="循环周期单位" sortBy="#{item.periodUnit}" filterBy="#{item.periodUnit}" filterMatchMode="EQ">
-                        <h:outputText value="#{pmOrderRuleController.getPeriodUnit(item.periodUnit)}"/>
+                    <p:column headerText="#{msg.cyclePeriodUnit}" sortBy="#{item.periodUnit}" filterBy="#{item.periodUnit}" filterMatchMode="EQ">
+                        <h:outputText value="#{fieldMsg.fieldValue('cyclePeriodUnit',item.periodUnit)}"/>
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItem itemLabel="年" itemValue="y"/>
-                                <f:selectItem itemLabel="月" itemValue="m"/>
-                                <f:selectItem itemLabel="周" itemValue="w"/>
-                                <f:selectItem itemLabel="日" itemValue="d"/>
+<!--                                <f:selectItem itemLabel="年" itemValue="y"/>-->
+<!--                                <f:selectItem itemLabel="月" itemValue="m"/>-->
+<!--                                <f:selectItem itemLabel="周" itemValue="w"/>-->
+<!--                                <f:selectItem itemLabel="日" itemValue="d"/>-->
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('cyclePeriodUnit')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
