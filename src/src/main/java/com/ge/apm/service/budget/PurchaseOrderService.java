@@ -6,6 +6,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
@@ -65,6 +66,9 @@ public class PurchaseOrderService {
     private PurchaseVenderRepository purchaseVenderRepository;
     @Autowired
     private MultiLevelApprovalService approvalService;
+
+    @Autowired
+    private ConfigCacheService configCacheService;
 
     public String getBaseURL(){
         return baseURL;
@@ -329,14 +333,24 @@ public class PurchaseOrderService {
                 approval.get().setApprovalLevelNow(1);
                 approval.get().setWorkflowConfigApproveUid(approvalConfig.getId());
                 approval.get().setInitiateApproverUid(account.getUid());
+                approval.get().setApplicationUid(account.getUid());
                 approval.get().setCreatedDate(new Date());
                 approval.get().setCreatedBy(account.getLoginName());
-
+                setApplicationDepartment(account,approval.get());
                 approval.get().setTenantUID(account.getTenantUID());
                 approval.get().setHierOrgUid(account.getSiteUID());
             });
         });
         return approval.get();
+    }
+
+
+    private void setApplicationDepartment( UserAccount userAccount, MultiLevelApproval multiLevelApproval) {
+        OrgInfo  org= configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
+
+        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+
     }
     private void sendMsg(PurchaseOrderInfo purchaseOrderInfo, MultiLevelApprovalConfig config,  MultiLevelApproval approval) {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
