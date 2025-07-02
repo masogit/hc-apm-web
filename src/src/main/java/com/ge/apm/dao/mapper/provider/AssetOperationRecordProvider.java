@@ -14,7 +14,9 @@ import java.util.Set;
 public class AssetOperationRecordProvider {
 	private static final String ROW_NUM_STR = " row_number() over ( PARTITION BY a.asset_info_uid ORDER BY a.create_date DESC ) AS rownum,";
 	private static final String SELECT_STR = " a.id as id,a.asset_info_uid as assetInfoUid,a.asset_info_name as assetInfoName,a.asset_info_function_type as assetInfoFunctionType,a.asset_info_depart_num as assetInfoDepartNum,a.serial_num as serialNum,a.asset_info_clinical_dept_name as assetInfoClinicalDeptName,a.hospital_number as hospitalNumber,a.operation_name as operationName,a.operation_by_name as operationByName,a.create_date as createDate,a.description";
-	private static final String TABLE_STR = " from ((asset_operation_record a join asset_info b on a.asset_info_uid= b.uid and b.is_deleted='f') ) where 1=1";
+	private static final String TABLE_STR = " from ((asset_operation_record a join asset_info b on a.asset_info_uid= b.uid and b.is_deleted='f'";
+
+	private static final String TABLE_END = " ) ) where 1=1";
 	public String getAll(Map<String, Object> param) {
 		StringBuilder sb = new StringBuilder();
 		@SuppressWarnings("unchecked")
@@ -33,6 +35,12 @@ public class AssetOperationRecordProvider {
 		}
 		sb.append(SELECT_STR);
 		sb.append(TABLE_STR);
+		if (ObjectUtil.isNotEmpty(columns)) {
+			for (SearchFilter searchFilter : columns) {
+				addTenantFilter(sb, searchFilter);
+			}
+		}
+		sb.append(TABLE_END);
 		if (ObjectUtil.isNotEmpty(columns)) {
 			sb.append(" and (");
 			for (SearchFilter searchFilter : columns) {
@@ -75,6 +83,13 @@ public class AssetOperationRecordProvider {
 			sb.append("select count(*)");
 		}
 		sb.append(TABLE_STR);
+
+		if (ObjectUtil.isNotEmpty(columns)) {
+			for (SearchFilter searchFilter : columns) {
+				addTenantFilter(sb, searchFilter);
+			}
+		}
+		sb.append(TABLE_END);
 		if (ObjectUtil.isNotEmpty(columns)) {
 			sb.append(" and (");
 			for (SearchFilter searchFilter : columns) {
@@ -131,19 +146,45 @@ public class AssetOperationRecordProvider {
 				sb.append("or b.clinical_dept_uid in ").append(strValue);
 				sb.append("or b.asset_dept_uid in ").append(strValue).append(")").append(" and ");
 			}
-		} else {
+		}
+//		else {
+//			switch (tempColumn) {
+//				case "assetInfo.siteUID":
+//					sb.append("b.site_uid='").append(value).append("' and ");
+//					break;
+//				case "assetInfo.hospitalUID":
+//					sb.append("b.hospital_uid='").append(value).append("' and ");
+//					break;
+//				case "assetInfo.institutionUID":
+//					sb.append("b.institution_uid='").append(value).append("' and ");
+//					break;
+//				case "assetInfo.tenantUID":
+//					sb.append("b.tenant_uid='").append(value).append("' and ");
+//					break;
+//				default:
+//					break;
+//			}
+//		}
+	}
+
+
+	private void addTenantFilter(StringBuilder sb, SearchFilter searchFilter) {
+		String tempColumn = searchFilter.fieldName;
+		Object value = searchFilter.value;
+		SearchFilter.Operator op = searchFilter.operator;
+		if (op.equals(SearchFilter.Operator.EQ))  {
 			switch (tempColumn) {
 				case "assetInfo.siteUID":
-					sb.append("b.site_uid='").append(value).append("' and ");
+					sb.append(" and b.site_uid='").append(value).append("'");
 					break;
 				case "assetInfo.hospitalUID":
-					sb.append("b.hospital_uid='").append(value).append("' and ");
+					sb.append(" and b.hospital_uid='").append(value).append("'");
 					break;
 				case "assetInfo.institutionUID":
-					sb.append("b.institution_uid='").append(value).append("' and ");
+					sb.append("and b.institution_uid='").append(value).append("'");
 					break;
 				case "assetInfo.tenantUID":
-					sb.append("b.tenant_uid='").append(value).append("' and ");
+					sb.append("and b.tenant_uid='").append(value).append("'");
 					break;
 				default:
 					break;

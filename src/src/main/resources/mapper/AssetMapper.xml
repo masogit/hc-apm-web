@@ -67,14 +67,23 @@
         <where>${ew.sqlSegment}</where>
     </select>
     <select id="toBeTerminatedList" resultType="com.ge.apm.domain.AssetInfo">
-
-        select  ai.*,al.modify_time as terminateOperationDate ,al.modify_by terminateOperation from asset_info ai left join (select a1.* from  asset_lifecycle  a1 inner join  ( select max(create_time) create_time,asset_uid from asset_lifecycle  where   current_status = 4  group by    asset_uid  )  a2 on     a1.asset_uid=a2.asset_uid and a1.create_time=a2.create_time) al on ai.uid=al.asset_uid
-
+        SELECT
+            ai.*,
+            al.modify_time AS terminateOperationDate,
+            al.modify_by terminateOperation
+        FROM
+            asset_info ai
+        LEFT JOIN (
+            SELECT
+                *, row_number()over(partition by asset_uid order by create_time desc)
+            FROM
+                asset_lifecycle
+            WHERE current_status = 4 AND tenant_uid = #{tenantUid}
+        ) al ON ai.uid = al.asset_uid AND al.row_number = 1
         <include refid="queryCondition"/>
-
-       <if test="orderBy!=null">
+        <if test="orderBy!=null">
            ${orderBy}
-       </if>
+        </if>
         LIMIT #{page} OFFSET #{offset}
     </select>
 
@@ -136,6 +145,9 @@
 
     <sql id="queryCondition">
         <where>
+            <if test="tenantUid != null">
+                AND ai.tenant_uid = #{tenantUid}
+            </if>
             <if test="isDeleted != null">
                 AND ai.is_deleted = #{isDeleted}
             </if>

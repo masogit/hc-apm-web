@@ -11,6 +11,7 @@ import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.budget.BudgetConstant;
@@ -106,6 +107,10 @@ public class BudgetPersistService {
     private PurchaseBudgetConfigRepository purchaseBudgetConfigRepository;
     @Autowired
     private I18nMessageRepository i18nMessageRepository;
+
+    @Autowired
+    private ConfigCacheService configCacheService;
+
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -337,12 +342,19 @@ public class BudgetPersistService {
                 approval.get().setApplicationUid(account.getUid());
                 approval.get().setCreatedDate(new Date());
                 approval.get().setCreatedBy(account.getLoginName());
-
+                setApplicationDepartment(account,approval.get());
                 approval.get().setTenantUID(account.getTenantUID());
                 approval.get().setHierOrgUid(account.getSiteUID());
             });
         });
         return approval.get();
+    }
+    private void setApplicationDepartment( UserAccount userAccount, MultiLevelApproval multiLevelApproval) {
+        OrgInfo  org= configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
+
+        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+
     }
     private void sendMsg(BudgetApplication application, MultiLevelApprovalConfig config,  MultiLevelApproval approval) {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->

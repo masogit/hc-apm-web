@@ -109,7 +109,7 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         }
         for (TreeNode orgNode : selectedAccessOrgNodes) {
             OrgInfo orgInfo = (OrgInfo) orgNode.getData();
-            selectedOrgUid.add(orgInfo.getUid());
+            selectedOrgUid.add(orgInfo.getUid() + "#assetType=" + orgInfo.getAssetType());
         }
         if (ObjectUtil.isEmpty(selectedOrgUid)) {
             WebUtil.addErrorMessage("盘点科室不能为空");

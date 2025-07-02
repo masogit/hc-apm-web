@@ -58,9 +58,9 @@
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.RequestingDepartment}" filterBy="#{item.applyUser.org.name}" filterMatchMode="LIKE"  >
+                    <p:column headerText="#{msg.RequestingDepartment}" filterBy="#{item.applicationDepartment}" filterMatchMode="LIKE"  >
 <!--                        <c:if test="#{item.applyUser.org.orgType eq 4}">-->
-                            <h:outputText value="#{item.applyUser.org.name}" rendered="#{item.applyUser.org.orgType eq 4}"/>
+                            <h:outputText value="#{item.applicationDepartment}"/>
 <!--                        </c:if>-->
                     </p:column>
                     <p:column headerText="#{msg.RequestedBy}" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
