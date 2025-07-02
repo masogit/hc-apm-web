@@ -26,6 +26,7 @@ public class ReminderRule implements Serializable {
     public static final String UNATTENDED_OVERDUE_MSG = "{'first':'无人值守借用超期提醒','keyword1':'检测到{clinicalDeptName}已借用设备{assetName}({assetNumber})已超过{chargingDays}天，请尽快归还！'}";
     public static final String SUPPLIER_REVIEW_MSG = "{'first':'供应商关联审核提醒','keyword1':'{name}({type})'}";
     public static final String UNATTENDED_APPROVAL_MSG = "{'first':'无人值守审批提醒','keyword1':'{swapIndex}','keyword2':'{clinicalDeptName}申请借用{assetName}审批,请及时处理！','keyword3':'{applyTime}','linkUrl':'/wx/myReservation'}";
+    public static final String ADJUSTMENT_CENTER_RETURN_MSG = "{'first':'设备借用超期','keyword1':'检测到{clinicalDeptName}已借用设备{assetName}({assetNumber})已超过{chargingDays}天，请尽快归还！'}";
 
     @Id
     @GeneratedValue(generator = "uuid")

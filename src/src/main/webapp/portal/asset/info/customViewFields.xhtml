@@ -127,7 +127,7 @@
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'modalityType')}">
         <h:panelGroup >
-            <label class="label">设备modality</label>
+            <label class="label">#{msg.modalityType}</label>
             <p:inputText value="#{assetInfoDetailController.selected.modalityType}" readonly="true"/>
         </h:panelGroup>
     </c:if>

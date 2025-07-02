@@ -21,6 +21,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.reminderRule}<span style="color:red">*</span></label>
                         <p:selectOneMenu value="#{reminderRuleController.selected.type}" required="true" disabled="#{reminderRuleController.selected.id != null}">
+                            <p:ajax event="change" update="noticeTypeRoleGroup"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('reminderRule')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
@@ -32,12 +33,22 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('reminderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.noticeType}<span style="color:red">*</span></label >
-                        <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.noticeType}" required="true">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('noticeType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
+                    <h:panelGroup id="noticeTypeRoleGroup">
+                        <h:panelGroup rendered="#{reminderRuleController.selected.type eq 'AdjustmentCenterReturn'}">
+                            <label class="label">#{msg.noticeType}<span style="color:red">*</span></label >
+                            <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.noticeType}" required="true">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('noticeType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{reminderRuleController.selected.type ne 'AdjustmentCenterReturn'}">
+                            <label class="label">#{msg.noticeType}<span style="color:red">*</span></label >
+                            <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.noticeType}" required="true">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
+                                <f:selectItem itemLabel="#{fieldMsg.doGetFieldValue('noticeType','noticeTypeRole')}" itemValue="noticeTypeRole" />
+                                <f:selectItem itemLabel="#{fieldMsg.doGetFieldValue('noticeType','noticeTypeUser')}" itemValue="noticeTypeUser" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.multiplePush}<span style="color:red">*</span></label>
