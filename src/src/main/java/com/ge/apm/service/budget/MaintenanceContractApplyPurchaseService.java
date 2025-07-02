@@ -9,6 +9,7 @@ import com.ge.apm.domain.budget.*;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
@@ -82,7 +83,8 @@ public class MaintenanceContractApplyPurchaseService {
     private MicroServiceUtil msService;
 
     private FileDownloadService fileDownloadService;
-
+    @Autowired
+    private ConfigCacheService configCacheService;
     @PostConstruct
     protected void init() {
         msService = WebUtil.getBean(MicroServiceUtil.class);
@@ -342,14 +344,20 @@ public class MaintenanceContractApplyPurchaseService {
                 approval.get().setApplicationUid(account.getUid());
                 approval.get().setCreatedDate(new Date());
                 approval.get().setCreatedBy(account.getLoginName());
-
+                setApplicationDepartment(account,approval.get());
                 approval.get().setTenantUID(account.getTenantUID());
                 approval.get().setHierOrgUid(account.getSiteUID());
             });
         });
         return approval.get();
     }
+    private void setApplicationDepartment( UserAccount userAccount, MultiLevelApproval multiLevelApproval) {
+        OrgInfo  org= configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
 
+        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+
+    }
     private void sendMsg(MaintenanceContractApplyPurchase application, MultiLevelApprovalConfig config, MultiLevelApproval approval) {
         Optional.ofNullable(config.getApprovalItem()).flatMap(item ->
                 Optional.ofNullable(JSON.parseObject(item, new TypeReference<List<ApprovalNode>>() {
