@@ -109,6 +109,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         if (selectedId != null) {
             selected = dao.findById(selectedId);
+            picList = blobService.findBlobObjectsByBoUid(selectedId);
         }
     }
 
@@ -333,8 +334,8 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
         selectedDept = orgInfo;
-        this.selected.setDeptName(selectedDept.getName());
-        this.selected.setDeptUid(selectedDept.getUid());
+        this.newServiceRequest.setDeptName(selectedDept.getName());
+        this.newServiceRequest.setDeptUid(selectedDept.getUid());
     }
 
     public void saveServiceRequest(){
