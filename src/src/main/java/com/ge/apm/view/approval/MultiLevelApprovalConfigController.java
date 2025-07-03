@@ -113,6 +113,10 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     @Getter
     @Setter
+    private String filterBusinessType  = null;
+
+    @Getter
+    @Setter
     private boolean selectAssetGroupParts;
     @Override
     protected void init() {
