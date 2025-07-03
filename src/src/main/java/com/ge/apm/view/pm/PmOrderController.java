@@ -3,7 +3,6 @@ package com.ge.apm.view.pm;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -17,21 +16,17 @@ import org.primefaces.model.DualListModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import com.ge.apm.dao.FileUploadedRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.FileUploaded;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmOrder;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInfoOperateService;
-import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -48,9 +43,9 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     
     private UserAccount currentUser;
     
-    private List<FileUploaded> attachements ;
+
     
-    private AttachmentFileService fileService;
+//    private AttachmentFileService fileService;
     
     private UserAccount owner;
     private List<UserAccount> ownerList;
@@ -59,7 +54,7 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     
     private UaaService uuaService;
     
-    private FileUploadedRepository fileUploadedRepository;
+
     
     private AssetInfoOperateService assetInfoOperateService = null;
 
@@ -84,11 +79,10 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
 		this.filterBySite = true;
 		dao = WebUtil.getBean(PmOrderRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
-		fileService = WebUtil.getBean(AttachmentFileService.class);
+//		fileService = WebUtil.getBean(AttachmentFileService.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
-		fileUploadedRepository = WebUtil.getBean(FileUploadedRepository.class);
 		uuaService = (UaaService) WebUtil.getBean(UaaService.class);
-		attachements = new ArrayList<FileUploaded>();
+
         //ownerList =uuaService.getUsersWithAssetHeadOrStaffRole(currentUser.getHospitalId());
         ownerList = userDao.getUsersWithAssetStaffRoleBySiteId(currentUser.getSiteId());
         assetInfoOperateService = WebUtil.getBean(AssetInfoOperateService.class);
@@ -149,9 +143,9 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     
     public void onBeforeUpdateObject(PmOrder object)
     {
-    	if(this.attachements.isEmpty()){
-    		object.setFileId(null);
-		}
+//    	if(this.attachements.isEmpty()){
+//    		object.setFileId(null);
+//		}
     }
     
    @Override
@@ -164,16 +158,16 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
    
     @Override
     public void prepareEdit(){
-    	attachements.clear();
+//    	attachements.clear();
     	if(selected.getOwnerId() != null){
     		owner = userDao.findById(selected.getOwnerId());
     	}
-    	if(selected.getFileId() != null){
-    		FileUploaded fu =  fileUploadedRepository.findById(this.selected.getFileId());
-    		if(fu != null){
-    			attachements.add(fu);
-    		}
-    	}
+//    	if(selected.getFileId() != null){
+//    		FileUploaded fu =  fileUploadedRepository.findById(this.selected.getFileId());
+//    		if(fu != null){
+//    			attachements.add(fu);
+//    		}
+//    	}
     	super.prepareEdit();
     }
     
@@ -187,7 +181,7 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     
     @Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
-    	attachements.clear();
+//    	attachements.clear();
     	super.prepareCreate();
 	}
     
@@ -218,29 +212,17 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     		return;
     	}
     	boolean isFindFile = false;
-        for (FileUploaded item : attachements) {
-            if (fileId.equals(item.getId())) {
-            	isFindFile = true;
-                fileService.deleteAttachment(item.getId());
-            }
-        }
-        if(isFindFile){
-        attachements.clear();
-        }
+
     }
     
     @Transactional
     public void handleFileUpload(FileUploadEvent event) {
-    	FileUploaded attach = new FileUploaded();
-        String fileName = fileService.getFileName(event.getFile());
-        attach.setFileName(fileName);
-        Integer uploadFileId = fileService.uploadFile(event.getFile());
-        if(uploadFileId>0){
-        	attach.setId(uploadFileId);
-            WebUtil.addSuccessMessage(String.format(WebUtil.getMessage("is uploaded."), fileName));
-            attachements.add(attach);
-            this.selected.setFileId(uploadFileId);
-        }
+//        String fileName = fileService.getFileName(event.getFile());
+//        Integer uploadFileId = fileService.uploadFile(event.getFile());
+//        if(uploadFileId>0){
+//            WebUtil.addSuccessMessage(String.format(WebUtil.getMessage("is uploaded."), fileName));
+//            this.selected.setFileId(uploadFileId);
+//        }
     }
     
     public void onOwnerChange() {
@@ -333,13 +315,6 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
 		this.ownerList = ownerList;
 	}
 
-	public List<FileUploaded> getAttachements() {
-		return attachements;
-	}
-
-	public void setAttachements(List<FileUploaded> attachements) {
-		this.attachements = attachements;
-	}
 
     private String filterPlanTime = null;
     private String filterIsFinished = null;

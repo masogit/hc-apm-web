@@ -9,13 +9,17 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.dto.OrgDto;
 import com.ge.apm.service.inventory.InventoryOrderApiService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -26,6 +30,7 @@ import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -45,14 +50,22 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     private UaaService uaaService;
     private InventoryOrderService service;
     private InventoryOrderApiService apiService;
+    private OrgInfoRepository orgInfoRepository;
     @Getter @Setter
-    List<OrgDto> orgsForSelected = new ArrayList<>(); //待选科室
+    private boolean propagateSelectionUp = true;
+    @Getter @Setter
+    List<OrgInfo> orgsForSelected = new ArrayList<>(); //待选科室
     @Setter @Getter
-    List<String> selectedOrgUid; //勾选盘点科室
+    List<String> selectedOrgUid = new ArrayList<>(); //勾选盘点科室
     @Setter @Getter
     private InventoryOrder inventoryOrder;
     @Getter @Setter
     private Boolean filterNoneAsset = true;
+    @Getter @Setter
+    private String searchOrgName;
+    @Getter @Setter
+    private TreeNode orgTree;
+    private TreeNode[] selectedAccessOrgNodes;
 	@Override
     protected void init() {
         dao = WebUtil.getBean(InventoryOrderRepository.class);
@@ -61,6 +74,7 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
         apiService = WebUtil.getBean(InventoryOrderApiService.class);
         service=WebUtil.getBean(InventoryOrderService.class);
+        orgInfoRepository=WebUtil.getBean(OrgInfoRepository.class);
         service.init();
     }
 
@@ -93,16 +107,20 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
             WebUtil.addErrorMessage("计划结束时间不得早于开始时间");
             return "";
         }
+        for (TreeNode orgNode : selectedAccessOrgNodes) {
+            OrgInfo orgInfo = (OrgInfo) orgNode.getData();
+            selectedOrgUid.add(orgInfo.getUid() + "#assetType=" + orgInfo.getAssetType());
+        }
         if (ObjectUtil.isEmpty(selectedOrgUid)) {
             WebUtil.addErrorMessage("盘点科室不能为空");
             return "";
         }
 	    try{
-            List<OrgDto> selectedOrgs = ListUtil.newArrayList();
-            for (OrgDto orgDto : orgsForSelected) {
+            List<OrgInfo> selectedOrgs = ListUtil.newArrayList();
+            for (OrgInfo OrgInfo : orgsForSelected) {
                 for (String string : selectedOrgUid) {
-                    if (string.contains(orgDto.getUid()) && string.contains("#assetType=" + orgDto.getAssetType())) {
-                        selectedOrgs.add(orgDto);
+                    if (string.contains(OrgInfo.getUid()) && string.contains("#assetType=" + OrgInfo.getAssetType())) {
+                        selectedOrgs.add(OrgInfo);
                     }
                 }
             }
@@ -135,12 +153,60 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     public void onCreate() throws IllegalAccessException, InstantiationException {
         super.prepareCreate();
         orgsForSelected = apiService.onCreateInventory();
+        selectedOrgUid.clear();
+        initOrgTree();
         // YHAAO-25279 微信端直接过滤
         /*if (filterNoneAsset) {
-            List<OrgInfo> orgInfos = uaaService.filterNoneAsset(orgsForSelected.stream().map(OrgDto::getUid).collect(Collectors.toList()));
+            List<OrgInfo> orgInfos = uaaService.filterNoneAsset(orgsForSelected.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
             List<Integer> orgInfoIds = orgInfos.stream().map(OrgInfo::getId).collect(Collectors.toList());
             orgsForSelected = orgsForSelected.stream().filter(t -> orgInfoIds.contains(t.getId())).collect(Collectors.toList());
         }*/
+    }
+
+    public void initOrgTree() {
+        List<OrgInfo> orgInfos = orgInfoRepository.getOrgInfosByParentId(currentUser.getSiteUID());
+        orgsForSelected.forEach(org -> org.setName(org.getOrgName()));
+        orgInfos.addAll(orgsForSelected);
+        orgTree = uaaService.getOrgTreeNodes(currentUser.getSiteUID(), orgInfos);
+    }
+
+    public void getFilteredNodes() {
+        if (StringUtils.isEmpty(searchOrgName)) {
+            propagateSelectionUp = true;
+        } else {
+            if (!orgTree.getChildren().get(0).isSelected()) {
+                propagateSelectionUp = false;
+            }
+        }
+        uaaService.filterTreeNode(orgTree, searchOrgName, -1, -1);
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        if (!selectedOrgUid.contains(orgInfo.getUid())) {
+            selectedOrgUid.add(orgInfo.getUid());
+        }
+    }
+
+    public void onSelectAccessTreeNode(NodeSelectEvent event) {
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+    public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
     }
 
     public void onFinishOrder(String id){
@@ -164,6 +230,14 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     @Override
     protected GenericRepositoryUUID<InventoryOrder> getDAO() {
         return dao;
+    }
+
+    public TreeNode[] getSelectedAccessOrgNodes() {
+        return selectedAccessOrgNodes;
+    }
+
+    public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
+        this.selectedAccessOrgNodes = selectedAccessOrgNodes;
     }
 	
 }

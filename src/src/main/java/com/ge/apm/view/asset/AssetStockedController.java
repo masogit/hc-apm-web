@@ -544,6 +544,15 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         }
     }
 
+    public String getJmPrintReportViewUrl(String stockNo) {
+        String viewUrl = "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=";
+        if (stockNo.startsWith("RK")) {
+            return viewUrl + stockNo;
+        } else {
+            return viewUrl + stockNo + "&userName=" + currentUser.getName();
+        }
+    }
+
     public String openNewWindowView(String stockNo) {
         String viewUrl = "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
         if (stockNo.startsWith("RK")) {

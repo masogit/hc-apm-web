@@ -22,6 +22,8 @@ import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigItemService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
@@ -29,6 +31,8 @@ import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import com.ge.healthcare.cn.common.pdf.PDFConversion;
+import com.ge.healthcare.cn.common.pdf.PDFConversionUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.render.PmPartsPictureTableRenderPolicy;
 import com.google.common.base.Strings;
@@ -91,6 +95,9 @@ public class PmReportService {
 
     @Autowired
     private SystemTemplateService systemTemplateService;
+
+    @Autowired
+    private ConfigItemService configItemService;
 
     /**
      * Render Dynamic Table content.
@@ -529,7 +536,7 @@ public class PmReportService {
         }
         long count = pmOrders.values().stream().filter(i -> i).count();
 //        byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
-
+        String pmOrderExportType = configItemService.getConfigItemByKeyToString("PMOrderExportType", user);
         byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.PM_ORDER_REPORT, user);
 
         String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
@@ -540,13 +547,18 @@ public class PmReportService {
                 if (selected) {
                     try {
                         V2_PmOrder pmOrder = pmOrderService.findById(id);
+                        String name = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
                         byte[] bytes = generate(pmOrder, activeTemplateBytes);
+                        if("pdf".equalsIgnoreCase(pmOrderExportType)){
+                            bytes = getPDF(bytes);
+                            name = name.substring(0, name.lastIndexOf(".")).concat(".pdf");
+                        }
                         if (bytes != null) {
                             List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(id);
                             if(CollectionUtils.isNotEmpty(byBoUuid)){
                                 byBoUuid = byBoUuid.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
                             }
-                            String name = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
+
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
                             for (V2_BlobObject v2BlobObject : byBoUuid) {
@@ -575,7 +587,9 @@ public class PmReportService {
             return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", reportName);
         }
     }
-
+    private byte[] getPDF(byte[] docByte) throws Exception {
+      return   PDFConversionUtil.getPDF(new ByteArrayInputStream(docByte),PDFConversion.Type.doc);
+    }
     public String generateMessageTip(Map<String, Boolean> woOrders) {
         StringBuilder messageTipBuilder = new StringBuilder();
         for (Map.Entry<String, Boolean> entry : woOrders.entrySet()) {
@@ -645,7 +659,7 @@ public class PmReportService {
         List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(pmOrder.getId());
         List<V2_WorkOrderCoworker> coWorkerList = getCoWorkerList(pmOrderService.getWorkOrderCoworker(pmOrder.getId()));
         List<V2_WorkOrder_Detail> accessoryList = getAccessoryList(pmOrderService.getWorkOrderDetails(pmOrder.getId()));
-        List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep(pmOrder.getId());
+        List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep0(pmOrder.getId());
 
          List<PmOrderRuleCheckList> pmCheckItemList = null;
         Map<String, UnstructuredData> hmCheck = null;

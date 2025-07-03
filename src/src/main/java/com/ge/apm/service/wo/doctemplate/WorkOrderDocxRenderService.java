@@ -10,9 +10,11 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.ArrivalItemBatchTableRenderPolicy;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.MultilApproveStatusMapping;
 import com.ge.apm.service.wo.WorkOrderExportService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.render.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
@@ -58,6 +60,9 @@ public class WorkOrderDocxRenderService {
 
     @Autowired
     private V2_WorkOrderManHoursDetailRepository manHoursDetailRepository;
+
+    @Autowired
+    private ConfigItemService configItemService;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private DecimalFormat df = new DecimalFormat("#0.00");
@@ -480,5 +485,9 @@ public class WorkOrderDocxRenderService {
 
     private String formatDouble(Double num) {
         return num != null ? df.format(num) : "";
+    }
+
+    public String getConfigItemValue(String key) {
+      return   configItemService.getConfigItemByKeyToString(key, UserContextService.getCurrentUserAccount());
     }
 }

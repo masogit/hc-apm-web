@@ -10,7 +10,6 @@ import com.ge.apm.dao.WorkOrderStepRepository;
 import com.ge.apm.domain.WorkOrder;
 import com.ge.apm.domain.WorkOrderStep;
 import com.ge.apm.domain.WorkOrderStepDetail;
-import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.wo.WorkOrderService;
 import java.util.ArrayList;
 import javax.faces.bean.ManagedProperty;
@@ -24,8 +23,8 @@ public class WorkOrderStepController extends JpaCRUDController<WorkOrderStep> {
 
     WorkOrderStepRepository dao = null;
     
-    @ManagedProperty("#{attachmentFileService}")
-    private AttachmentFileService fileService;
+//    @ManagedProperty("#{attachmentFileService}")
+//    private AttachmentFileService fileService;
 
     @Override
     protected void init() {
@@ -162,9 +161,9 @@ public class WorkOrderStepController extends JpaCRUDController<WorkOrderStep> {
         }
    }
     
-    public void setFileService(AttachmentFileService fileService) {
-        this.fileService = fileService;
-    }
+//    public void setFileService(AttachmentFileService fileService) {
+//        this.fileService = fileService;
+//    }
     
     public List<WorkOrderStep> getAttachList(Integer orderStepId) {
         if (orderStepId == null) return null;
@@ -179,7 +178,7 @@ public class WorkOrderStepController extends JpaCRUDController<WorkOrderStep> {
     
     public void removeAttachment(Integer attachid) {
         if (attachid == null) return;
-        fileService.deleteAttachment(attachid);
+//        fileService.deleteAttachment(attachid);
         WorkOrderStep step = dao.findById(this.selected.getId());
         step.setFileId(null);
         this.selected.setFileId(null);
@@ -190,23 +189,23 @@ public class WorkOrderStepController extends JpaCRUDController<WorkOrderStep> {
     }
     
     public void handleFileUpload(FileUploadEvent event) {
-        Integer uploadFileId = fileService.uploadFile(event.getFile());
-        String fileName = fileService.getFileName(event.getFile());
-        WorkOrderStep step = dao.findById(this.selected.getId());
-        if (step == null) return;
-        //如果有文件则删除以前的文件
-        if (step.getFileId() != null) {
-            fileService.deleteAttachment(step.getFileId());
-        }
-        step.setAttachmentUrl(fileName);
-        this.selected.setAttachmentUrl(fileName);
-        if (uploadFileId > 0) {
-            step.setFileId(uploadFileId);
-            this.selected.setFileId(uploadFileId);
-            WebUtil.addSuccessMessage("文件上传成功。", fileName + " is uploaded.");
-        }
-        dao.save(step);
-        loadWorkOrderSteps(this.selected.getWorkOrderId());
+//        Integer uploadFileId = fileService.uploadFile(event.getFile());
+//        String fileName = fileService.getFileName(event.getFile());
+//        WorkOrderStep step = dao.findById(this.selected.getId());
+//        if (step == null) return;
+//        //如果有文件则删除以前的文件
+//        if (step.getFileId() != null) {
+//            fileService.deleteAttachment(step.getFileId());
+//        }
+//        step.setAttachmentUrl(fileName);
+//        this.selected.setAttachmentUrl(fileName);
+//        if (uploadFileId > 0) {
+//            step.setFileId(uploadFileId);
+//            this.selected.setFileId(uploadFileId);
+//            WebUtil.addSuccessMessage("文件上传成功。", fileName + " is uploaded.");
+//        }
+//        dao.save(step);
+//        loadWorkOrderSteps(this.selected.getWorkOrderId());
     }
     
 }

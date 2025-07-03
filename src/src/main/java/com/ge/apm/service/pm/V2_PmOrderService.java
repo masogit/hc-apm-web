@@ -7,12 +7,15 @@ package com.ge.apm.service.pm;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.WorkOrderStatus;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     private UnstructuredDataRepository unstructuredDataDao;
     @Autowired
     private PmOrderRuleCheckListRepository pmckLstDao;
+    @Autowired
+    private V2_PmOrderStepRepository pmOrderStepRepository;
 
     @PostConstruct
     public void initialize(){
@@ -588,6 +593,40 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
         List<PmOrderSteps> pmOrderSteps = ucService.getPmOrderStepsList(pmOrderId);
         return pmOrderSteps == null ? new ArrayList<>() : pmOrderSteps;
+    }
+
+    public List<PmOrderSteps> getPmOrderStep0(String pmOrderId){
+       DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        List<V2_PmOrderStep> pmOrderSteps = pmOrderStepRepository.findByPmIdOrderByStartTimeAsc(pmOrderId);
+        List<PmOrderSteps> collect = pmOrderSteps.stream().map(item -> {
+            PmOrderSteps step = new PmOrderSteps();
+            String ownerName = item.getOwnerName();
+            String ownerUid = item.getOwnerUid();
+            Date startTime = item.getStartTime();
+            Date endTime = item.getEndTime();
+            String stepName = item.getStepName();
+            if (StringUtils.isEmpty(ownerName)) {
+                if (StringUtils.isNotEmpty(ownerUid)) {
+                    UserAccount owner = userAccountRepository.findByUid(ownerUid);
+                    if (owner != null) {
+                        ownerName = owner.getName();
+                    }
+                }
+            }
+            if(StringUtils.isEmpty(stepName)){
+                stepName = "Create".equals(item.getStepId()) ? "新建" : WorkOrderStatus.getStepName(item.getStepId());
+            }
+            step.setOwnerName(ownerName);
+            step.setStepName(stepName);
+            step.setStartTime(startTime == null?"":dtf.print(startTime.getTime()));
+            step.setEndTime(endTime == null?"":dtf.print(endTime.getTime()));
+            step.setStepId(item.getStepId());
+            step.setOwnerId(item.getOwnerUid());
+            step.setComments(item.getComment());
+            return step;
+        }).collect(Collectors.toList());
+
+        return collect;
     }
 
     public void approvePMorder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessList,String comments){

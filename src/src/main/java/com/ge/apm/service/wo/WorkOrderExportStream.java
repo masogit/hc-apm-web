@@ -2,6 +2,8 @@ package com.ge.apm.service.wo;
 
 import com.ge.apm.domain.Progress;
 import com.ge.apm.service.wo.doctemplate.WorkOrderDocxRenderService;
+import com.ge.healthcare.cn.common.pdf.PDFConversion;
+import com.ge.healthcare.cn.common.pdf.PDFConversionUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -38,12 +40,15 @@ public class WorkOrderExportStream extends InputStream {
 
     private Progress progress;
 
+    private String exportType = "WORD";
+
     public WorkOrderExportStream(List<Map<String, Object>> workOrderData, byte[] templateBytes, WorkOrderDocxRenderService renderService, Progress progress) {
         this.workOrderData = workOrderData;
         this.templateBytes = templateBytes;
         bout = new ByteArrayOutputStream();
         zout = new ZipOutputStream(bout);
         this.renderService = renderService;
+        this.exportType = renderService.getConfigItemValue("WorkOrderExportType");
         this.progress = progress;
         if (CollectionUtils.isNotEmpty(workOrderData) && workOrderData.size() > 1) {
             this.setContentType("application/zip");
@@ -102,9 +107,13 @@ public class WorkOrderExportStream extends InputStream {
         String fileName = getFileName(map, index + 1);
         try {
             bout.reset();
+            byte[] wordData = renderService.renderDocx(map, templateBytes);
+            if("pdf".equalsIgnoreCase(exportType)){
+                wordData = getPDF(wordData);
+                fileName = fileName.substring(0,fileName.indexOf(".")).concat(".pdf");
+            }
             zout.putNextEntry(new ZipEntry(fileName));
             log.info("Adding zip entry for: " + fileName);
-            byte[] wordData = renderService.renderDocx(map, templateBytes);
             OutputStream outputStream = new FileOutputStream("/tmp/" + fileName);
             outputStream.write(wordData);
             outputStream.close();
@@ -122,7 +131,8 @@ public class WorkOrderExportStream extends InputStream {
                 progress.setValue(currentProgress);
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             log.error("export report to zip error:{}", e.getMessage());
         }
     }
@@ -135,13 +145,25 @@ public class WorkOrderExportStream extends InputStream {
      */
     public void exportDocReport() {
         try {
-            biStream = new ByteArrayInputStream(renderService.renderDocx(workOrderData.get(0), templateBytes));
+            byte[] wordData = renderService.renderDocx(workOrderData.get(0), templateBytes);
+            if("pdf".equalsIgnoreCase(exportType)){
+                wordData = getPDF(wordData);
+                this.setContentType("application/pdf");
+                String fileName = getFileName(workOrderData.get(0), 1);
+                fileName = fileName.substring(0,fileName.indexOf(".")).concat(".pdf");
+                this.setFileName(fileName);
+            }
+            biStream = new ByteArrayInputStream(wordData);
             read = 1;
             progress.setValue(99);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             log.error("export doc report error:{}", e.getMessage());
         }
 
+    }
+    private byte[] getPDF(byte[] bytes) throws Exception {
+       return PDFConversionUtil.getPDF(new ByteArrayInputStream(bytes), PDFConversion.Type.doc);
     }
 
     public String getContentType() {

@@ -3,7 +3,6 @@ package com.ge.apm.view.insp;
 import com.ge.apm.dao.InspectionOrderRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.insp.InspectionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -55,7 +54,7 @@ public class QualityCtrlOrderController extends JpaCRUDController<InspectionOrde
 
     List<InspectionOrderDetail> orderDetailItemList;
 
-    AttachmentFileService fileService;
+//    AttachmentFileService fileService;
 
     private String operation;
 
@@ -65,7 +64,7 @@ public class QualityCtrlOrderController extends JpaCRUDController<InspectionOrde
     @Override
     protected void init() {
         dao = WebUtil.getBean(InspectionOrderRepository.class);
-        fileService = WebUtil.getBean(AttachmentFileService.class);
+//        fileService = WebUtil.getBean(AttachmentFileService.class);
         inspectionService = WebUtil.getBean(InspectionService.class);
         uuaService = WebUtil.getBean(UaaService.class);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -247,12 +246,12 @@ public class QualityCtrlOrderController extends JpaCRUDController<InspectionOrde
     }
 
     public void handleFileUpload(FileUploadEvent event) {
-        Integer id = fileService.uploadFile(event.getFile());
-        selected.setPaperUrl(id.toString());
+//        Integer id = fileService.uploadFile(event.getFile());
+//        selected.setPaperUrl(id.toString());
     }
 
     public void removeAttach() {
-        fileService.deleteAttachment(Integer.valueOf(selected.getPaperUrl()));
+//        fileService.deleteAttachment(Integer.valueOf(selected.getPaperUrl()));
         selected.setPaperUrl(null);
 
     }

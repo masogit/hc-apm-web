@@ -300,6 +300,14 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
         }
     }
 
+    public String getJmPrintReportViewUrl(String str) {
+        if (str.startsWith("RK")) {
+            return "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=" + str;
+        } else {
+            return "/portal/asset/contract/ContractView.xhtml?action=Edit&contractNum=" + str;
+        }
+    }
+
     public String openNewWindowView(String str) {
         if (str.startsWith("RK")) {
             return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + str;

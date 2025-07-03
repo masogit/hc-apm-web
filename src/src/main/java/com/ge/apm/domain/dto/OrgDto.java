@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class OrgDto implements Serializable {
     private Integer id;
     private String uid;
+    private Integer parentId;
     private String orgName;
     private Boolean selected;
     private String assetType;

@@ -16,19 +16,19 @@
                             <h:panelGroup>
                                 <label class="label">计划开始时间<span style="color: red">*</span></label>
                                 <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planStartTime}" class="manufactDateChange"
-                                            showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                                            showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.ActualStartTime} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">计划结束时间<span style="color: red">*</span></label>
                                 <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planEndTime}"  class="manufactDateChange"
-                                             showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                                             showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.ActuaEndTime} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
                     <p:fieldset legend="盘点科室选择">
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup id="approveuser">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <!--<h:panelGroup id="approveuser">
                                 <label class="label"> 选择科室 </label>
                                 <p:selectCheckboxMenu
                                         value="#{inventoryOrderController.selectedOrgUid}"
@@ -39,12 +39,27 @@
                                                    itemLabel="#{item.orgName}" itemValue="#{item.uid}#assetType=#{item.assetType}"/>
                                     <p:ajax process="@this"/>
                                 </p:selectCheckboxMenu>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">过滤无设备科室</label>
                                 <p:selectBooleanCheckbox value="#{inventoryOrderController.filterNoneAsset}" >
-                                    <p:ajax listener="#{inventoryOrderController.onCreate()}" update="approveuser"/>
+                                    <p:ajax listener="#{inventoryOrderController.onCreate()}" update="orgDept"/>
                                 </p:selectBooleanCheckbox>
+                            </h:panelGroup>
+                            <h:panelGroup id="orgDept">
+                                <label class="label"> 选择科室</label>
+                                <p:scrollPanel style="border: 0;" mode="native">
+                                    <p:inputText id = "accessOrgSearch" value="#{inventoryOrderController.searchOrgName}"/>
+                                    <p:commandButton partialSubmit="true" icon="ui-icon-search" update="orgTree3" actionListener="#{inventoryOrderController.getFilteredNodes}" value="检索"/>
+                                    <p:tree id="orgTree3" class="tree" style="border:0" value="#{inventoryOrderController.orgTree}" selection="#{inventoryOrderController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" propagateSelectionUp="#{inventoryOrderController.propagateSelectionUp}">
+                                        <p:ajax event="select" listener="#{inventoryOrderController.onSelectAccessTreeNode}" />
+                                        <p:ajax event="unselect" listener="#{inventoryOrderController.onUnselectAccessTreeNode}" />
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -65,12 +80,12 @@
                         <h:panelGroup>
                             <label class="label">实际开始时间<span style="color: red">*</span></label>
                             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDatee" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.inventoryOrder.startTime}" maxdate ="#{appContextService.curentDate}"  class="manufactDateChange"
-                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.ActualStartTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">实际结束时间<span style="color: red">*</span></label>
                             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDatee" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.inventoryOrder.endTime}" maxdate="#{appContextService.curentDate}"  class="manufactDateChange"
-                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.ActuaEndTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                     </h:panelGrid>
 

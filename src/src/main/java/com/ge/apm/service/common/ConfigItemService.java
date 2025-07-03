@@ -27,8 +27,12 @@ public class ConfigItemService {
      * */
     public Boolean getConfigItemByKey(String key, UserAccount loginUser) {
         Boolean flag = null;
-        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+        String value = getConfigItemByKeyToString(key,loginUser);
         flag = Boolean.valueOf(value);
         return flag;
+    }
+
+    public String getConfigItemByKeyToString(String key, UserAccount loginUser) {
+        return configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
     }
 }

@@ -59,7 +59,7 @@ public class ExportService {
             "simple_parts_category", "simple_parts_config", "simple_parts_inventory", "simple_parts_item", "simple_parts_request", "simple_parts_request_line_item", "simple_parts_transaction", "simple_parts_warehouse",
             "small_asset_performance", "small_asset_performance_config", "small_asset_performance_report", "supplier", "supplier_qr_code",
             "table_definition", "tenant_option_config", "user_account", "user_account_history", "user_behavior", "user_login_info", "user_schedule", "user_schedule_stage_config", "user_tags", "user_token_history", "v2_pm_order", "v2_service_request", "v2_wechat_message_log",
-            "v2_work_order", "v2_work_order_coworker", "v2_work_order_detail", "v2_work_order_step", "v2_work_order_workflow_config", "v2_workflow_config", "v2_workflow_config_bak", "wechat_message_log",
+            "v2_work_order", "v2_work_order_coworker", "v2_work_order_detail", "v2_work_order_step", "wechat_message_log",
             "work_order_export_template", "workflow_config", "workorder_workflow_config");
 
     public void queryData(List<ExportRecord> itemBatch, String token, String uid) {
