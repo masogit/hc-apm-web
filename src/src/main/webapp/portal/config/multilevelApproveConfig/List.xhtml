@@ -36,7 +36,15 @@
                             <h:outputText value="#{item.approvalName}"/>
                         </p:column>
 
-                        <p:column headerText="业务类型" sortBy="#{item.businessType}">
+                        <p:column headerText="业务类型" sortBy="#{item.businessType}"    filterBy="#{item.businessType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{multiLevelApprovalConfigController.filterBusinessType}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{multiLevelApprovalConfigController.businessTypeList}" var="item"
+                                                   itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+
                             <h:outputText value="#{multiLevelApprovalConfigController.switchName(item.businessType)}"/>
                         </p:column>
 
