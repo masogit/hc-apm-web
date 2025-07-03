@@ -259,7 +259,10 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 //             "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
         return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=terminate&amp;terminateBusinessNumber=" + terminateBusinessNumber;
     }
-
+    public String getJmNewWindowView(String terminateBusinessNumber) {
+//             "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=";
+        return "/portal/JmPrintReportView.xhtml?type=terminate&terminateBusinessNumber=" + terminateBusinessNumber;
+    }
     private void setUserSearchFilters() {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));

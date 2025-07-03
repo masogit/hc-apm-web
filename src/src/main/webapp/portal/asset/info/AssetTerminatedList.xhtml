@@ -137,7 +137,12 @@
                     </p:commandButton>
                 </p:column>
                 <p:column headerText="报废单号" rendered="#{assetInfoTerminatedListController.checkScrapConfit()}" >
+<!--
                     <h:commandLink ajax="false" target="_blank" action="#{assetInfoTerminatedListController.openNewWindowView(item.terminateBusinessNumber)}"  value="#{item.terminateBusinessNumber}" />
+-->
+                    <a href="/geapm#{assetInfoTerminatedListController.getJmNewWindowView(item.terminateBusinessNumber)}" target="_Blank">
+                        <h:outputText value="#{item.terminateBusinessNumber}"/>
+                    </a>
                 </p:column>
                 <c:forEach items="#{assetInfoTerminatedListController.customedColumns}" var="columnItem">
                     <c:if test="#{columnItem eq 'name'}">

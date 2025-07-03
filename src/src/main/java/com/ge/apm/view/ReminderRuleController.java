@@ -300,6 +300,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             case "UnattendedApproval":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.UNATTENDED_APPROVAL_MSG, WechatParam.class));
                 break;
+            case "AdjustmentCenterReturn":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.ADJUSTMENT_CENTER_RETURN_MSG, WechatParam.class));
+                break;
             default:
                 break;
         }

@@ -25,7 +25,7 @@ public enum CustomConfigFields {
     clinicalDeptName(fieldName, "clinicalDeptName" ,Text),  //所属科室
     assetDeptName(fieldName, "assetDeptName" ,Text),    //使用科室
     accountingDeptName(fieldName, "accountingDeptName" ,Text),  //账户科室
-    modalityType(fieldName, "设备modality" ,Text),   //设备类型
+    modalityType(fieldName, "modalityType" ,Text),   //设备类型
     monitorRate(fieldName, "monitorRate" ,Text),  //主机功率
     otherPower(fieldName, "otherPower" ,Text),  //其他功率
     unitPriceElectricity(fieldName, "unitPriceElectricity" ,Text),  //电费单价

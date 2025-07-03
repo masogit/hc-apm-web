@@ -113,6 +113,19 @@ public class MultiLevelApproval implements Serializable {
      */
     @Column(name = "application_uid")
     private String applicationUid;
+    /**
+     * 多级审批申请科室
+     */
+    @Column(name = "application_department_uid")
+    private String  applicationDepartmentUid;
+
+    /**
+     * 多级审批申请科室
+     */
+    @Column(name = "application_department")
+    private String  applicationDepartment;
+
+
 
     /**
      * 实际审批人UID
@@ -175,8 +188,8 @@ public class MultiLevelApproval implements Serializable {
 
     @Transient
     private List<V2_BlobObject> attachments;
-    @Transient
-    private String  applicationDepartment ;
+//    @Transient
+//    private String  applicationDepartment ;
 
     /**
      * 处理人

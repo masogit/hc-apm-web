@@ -96,7 +96,7 @@ public class CustomConfigController {
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
         if (userContextService.isOpenNewMenuRoles()) {
             List<CustomRole> customRoles = WebUtil.getBean(UaaService.class).getTenantCustomRoles(selectSite.getTenantUID());
-            customRoles = customRoles.stream().filter(r -> StringUtils.isNotEmpty(r.getFunctionList()) && r.getFunctionList().contains(ApmFunction.ASSET_INFO_READ.name())).collect(Collectors.toList());
+            customRoles = customRoles.stream().filter(r -> StringUtils.isNotEmpty(r.getFunctionList()) && (r.getFunctionList().contains(ApmFunction.ASSET_INFO_READ.name()) || r.getFunctionList().contains("ASSET_MOBILE_SEARCH"))).collect(Collectors.toList());
             configRoles.putAll(customRoles.stream().collect(Collectors.toMap(CustomRole::getName, CustomRole::getName)));
         }
         selectedAddFields = new HashMap();

@@ -26,6 +26,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.wo.WorkOrderMgrController;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
@@ -224,6 +225,15 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             List<SearchFilter> checkDateFilters = searchFilters.stream().filter(sf -> "checkDate".equals(sf.fieldName)).collect(Collectors.toList());
             searchFilters.removeIf(e -> "checkDate".equals(e.fieldName));
             WrapperSearchFilterUtils.convert(checkDateFilters, wrapper, "mcd");
+        }
+        if(this.hasFilterOnField("nextMeteringDate")){
+            List<SearchFilter> nextMeteringDateFilters = searchFilters.stream().filter(sf -> "nextMeteringDate".equals(sf.fieldName)).collect(Collectors.toList());
+            List<SearchFilter> validDateToFilters = ListUtil.newArrayList();
+            for (SearchFilter nextMeteringDateFilter : nextMeteringDateFilters) {
+                validDateToFilters.add(new SearchFilter("validDateTo", nextMeteringDateFilter.operator, nextMeteringDateFilter.value));
+            }
+            searchFilters.removeIf(e -> "nextMeteringDate".equals(e.fieldName));
+            WrapperSearchFilterUtils.convert(validDateToFilters, wrapper, "mcd");
         }
         if(this.hasFilterOnField("meteringNO")){
             String meteringNO = searchFilters.stream().filter(sf -> "meteringNO".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("meteringNO", SearchFilter.Operator.EQ, 0)).value.toString();

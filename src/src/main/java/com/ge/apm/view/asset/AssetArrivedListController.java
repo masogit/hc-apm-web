@@ -5,6 +5,7 @@ import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.ArrivalSupplierReportService;
+import com.ge.apm.service.asset.AssetInstallationReportService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
@@ -20,6 +21,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -32,6 +34,7 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -51,6 +54,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @ManagedBean
 @ViewScoped
@@ -59,12 +64,13 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private ArrivalListRepository dao = null;
     private TenantInfoRepository tenantInfoDao = null;
     private ArrivalListItemRepository itemDao;
-
+    private AssetInstallationReportService installationReportService;
     private ArrivalSupplierReportService arrivalSupplierReportService;
     private AssetInstallationService aiService;
     private UaaService uaaService;
     private StreamedContent exportPdf;
     private StreamedContent exportDoc;
+    private StreamedContent exportZip;
     private Date varArrivalDateTo = null;
     private String arrivalFormatTime = null;
     private String supplierUserBind;
@@ -86,6 +92,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         uaaService = WebUtil.getBean(UaaService.class);
         arrivalSupplierReportService = WebUtil.getBean(ArrivalSupplierReportService.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        installationReportService = WebUtil.getBean(AssetInstallationReportService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
         supplierService = WebUtil.getBean(SupplierService.class);
@@ -496,6 +503,46 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         }
         return null;
     }
+    public void  exportArrivalSupplierReportToZip() throws IOException{
+       ByteArrayOutputStream bout = new ByteArrayOutputStream();
+       try(ZipOutputStream zout = new ZipOutputStream(bout)) {
+           String id = selected.getId();
+           List<ArrivalListItem> arrivalListItems = itemDao.findByArrivalListId(id);
+           if (CollectionUtils.isEmpty(arrivalListItems)) return;
+           List<SystemTemplate> systemTemplates = systemTemplateService.findByKeyAndSiteForUseParent(SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode(), UserContextService.getCurrentUserAccount());
+           List<String> names = new ArrayList<>();
+           for (ArrivalListItem item : arrivalListItems) {
+               String path = null;
+               if (StringUtils.isEmpty(path = item.getAliasName()) && StringUtils.isEmpty(path = item.getQrCode()) && StringUtils.isEmpty(path = item.getSerialNum()) && StringUtils.isEmpty(path = item.getAssetUID())) {
+                   path = UUID.randomUUID().toString();
+               }
+               for (SystemTemplate systemTemplate : systemTemplates) {
+                   StreamedContent streamedContent = installationReportService.exportReport(systemTemplate, item);
+                   if (streamedContent != null) {
+                       String fileName = streamedContent.getName();
+                       String name = path + File.separator + fileName;
+                       // 防止重复文件名
+                       if (names.contains(name)) {
+                           String prefix = fileName.lastIndexOf(".") > 0
+                                   ? fileName.substring(0, fileName.lastIndexOf("."))
+                                   : fileName;
+                           String suffix = fileName.lastIndexOf(".") > 0
+                                   ? fileName.substring(fileName.lastIndexOf("."))
+                                   : "";
+                           fileName = prefix + UUID.randomUUID() + suffix;
+                           name = path + File.separator + fileName;
+                       }
+                       names.add(name);
+                       zout.putNextEntry(new ZipEntry(name));
+                       byte[] bytes = IOUtils.toByteArray(streamedContent.getStream());
+                       IOUtils.write(bytes, zout);
+                       zout.closeEntry();
+                   }
+               }
+           }
+       }
+       exportZip = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "AssetInstallReports.zip");
+    }
 
     public Map<String, Boolean> getSelectedMap() {
         return selectedMap;
@@ -543,5 +590,13 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public void setStatusFlag(Integer statusFlag) {
         this.statusFlag = statusFlag;
+    }
+
+    public StreamedContent getExportZip() {
+        return exportZip;
+    }
+
+    public void setExportZip(StreamedContent exportZip) {
+        this.exportZip = exportZip;
     }
 }

@@ -739,9 +739,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
         List<String> assetSheetHeads = template.getAssetSheetHead();
         if(CollectionUtils.isNotEmpty(assetSheetHeads)){
-            assetSheetHeads.add("UUID");
             List<String> finalExportFields = exportFields;
             exportFields= assetSheetHeads.stream().filter(finalExportFields::contains).collect(Collectors.toList());
+            if(!exportFields.contains("UUID")){
+                exportFields.add("UUID");
+            }
         }
 
         writerAsset(template, exportFields);
