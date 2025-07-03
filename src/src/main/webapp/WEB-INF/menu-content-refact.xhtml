@@ -164,6 +164,8 @@
                            <p:menuitem id="um101" value="#{msg.commonFaults}" outcome="/portal/assetRepairQuickTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_VIEW')}"/>
 <!--                           <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />-->
                            <p:menuitem id="um226" value="MVS院级工单" outcome="/portal/mvsWorkOrder/workOrderList.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('AssetHead') and userContextService.isYiMaiYangGuangTenant()}"   />
+                           <p:menuitem value="无台账报修" outcome="/portal/woMgr/noAsset/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}"/>
+
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'MAINTAIN'}">
