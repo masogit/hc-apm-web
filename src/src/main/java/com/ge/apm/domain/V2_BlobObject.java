@@ -63,6 +63,7 @@ public class V2_BlobObject implements Serializable {
     }
 
     public static final String BO_TYPE_ServiceRequest = "ServiceRequest";
+    public static final String BO_TYPE_SR_NO_ASSET = "ServiceRequestNoAsset";
     public static final String BO_TYPE_PCCReport = "PccReport";
     public static final String BO_TYPE_PmRequest = "PmRequest";
     public static final String BO_TYPE_MultiLevelApproval = "MultiLevelApproval"; // 多级审批

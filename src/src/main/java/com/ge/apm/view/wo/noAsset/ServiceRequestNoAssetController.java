@@ -1,0 +1,352 @@
+package com.ge.apm.view.wo.noAsset;
+
+import com.alibaba.fastjson.JSONPath;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.ServiceRequestNoAssetRepository;
+import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.wo.ServiceRequestNoAssetService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.util.CollectionUtils;
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@ManagedBean
+@ViewScoped
+public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V2_ServiceRequestNoAsset> {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ServiceRequestNoAssetController.class);
+
+    private BlobFileService blobService;
+    private ServiceRequestNoAssetRepository dao;
+    private OrgInfoRepository orgDao;
+    private ConfigCacheService cacheService;
+    private CustomConfigService ccService;
+    private UaaService uaaService;
+    private UserContextService userContextService;
+    private OrgInfoTreeService orgInfoTreeService;
+    private ServiceRequestNoAssetService serviceRequestNoAssetService;
+    private UserAccount loginUser;
+    @Getter @Setter
+    private Set<String> clinicalDeptOrgUidSet;
+    @Getter @Setter
+    private String fileterOrgName;
+    @Getter@Setter
+    private String applyTimeFormatTime = null;
+    private List<OrgInfo> clinicalDeptList;
+    private OrgInfo selectSite;
+
+    @Getter @Setter
+    private String siteUidFilter;
+    @Getter @Setter
+    private List<OrgInfo> orgList;
+    @Getter@Setter
+    List<V2_ServiceRequestNoAsset> bySearchFilterInternal = null;
+    @Getter@Setter
+    private List<V2_BlobObject> picList;
+    @Getter@Setter
+    private V2_ServiceRequestNoAsset newServiceRequest;
+    @Getter @Setter
+    private String searchDeptName;
+    @Getter @Setter
+    private OrgInfo selectedDept;
+    @Getter  @Setter
+    private TreeNode orgTree;
+    @Getter  @Setter
+    private OrgInfo org;
+
+    @Override
+    protected void init() {
+        super.init();
+        dao = WebUtil.getBean(ServiceRequestNoAssetRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+        cacheService = WebUtil.getBean(ConfigCacheService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        serviceRequestNoAssetService = WebUtil.getBean(ServiceRequestNoAssetService.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        loginUser = UserContextService.getCurrentUserAccount();
+        selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
+        ccService = WebUtil.getBean(CustomConfigService.class);
+        org = orgDao.findById(loginUser.getOrgInfoId());
+
+        loadClinicalDeptList();
+        String encodeStr = WebUtil.getRequestParameter("str");
+        String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+        if (selectedId != null) {
+            selected = dao.findById(selectedId);
+        }
+    }
+
+    @Override
+    protected Page<V2_ServiceRequestNoAsset> loadData(PageRequest pageRequest) {
+        this.setSearchFilter();
+        Page<V2_ServiceRequestNoAsset> pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        bySearchFilterInternal = pageResult.getContent();
+        return pageResult;
+    }
+
+    @Override
+    public void setSearchFilter() {
+        if (this.searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
+
+        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("deptUid", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "deptUid".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
+
+        if (!this.hasFilterOnField("siteUID")) {
+            if (userContextService.hasRole("AssetHead")) {
+                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            } else {
+                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            }
+        }
+    }
+
+    private void loadClinicalDeptList() {
+        try {
+            clinicalDeptList = Collections.emptyList();
+            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+            if (!CollectionUtils.isEmpty(deptList)) {
+                clinicalDeptList = deptList.stream()
+                        .filter(item ->
+                        {
+                            if (item == null) {
+                                LOGGER.info("null");
+                            }
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
+                        .collect(Collectors.toList());
+            }
+
+            if (null != selectSite && !clinicalDeptList.isEmpty()) {
+                clinicalDeptList = clinicalDeptList.stream()
+                        .filter(item -> StringUtils.equals(item.getSiteUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getHospitalUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getInstitutionUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getTenantUID(), selectSite.getSiteUID()))
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            LOGGER.error("loadClinicalDeptList occur exception", e);
+            throw e;
+        }
+    }
+
+    public void onSelectRow() throws IOException {
+        if (null == selected) {
+            return;
+        }
+
+        String url = "actionName=View&selectedid="
+                + selected.getId();
+        url = "view.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+
+
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            fileterOrgName = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(fileterOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterOrgName.equals(item.getName()))) {
+            fileterOrgName = null;
+        }
+
+        if (fileterOrgName != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(fileterOrgName)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public List<OrgInfo> LoadSiteNameList() {
+        if (CollectionUtils.isEmpty(orgList)) {
+            if (!CollectionUtils.isEmpty(bySearchFilterInternal)) {
+                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream()
+                        .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
+            }
+            if (!CollectionUtils.isEmpty(orgList)) {
+                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
+        }
+        return orgList;
+    }
+
+    public String getRequestReasonInShort(String reason) {
+        if (reason == null) {
+            return null;
+        }
+        if (reason.length() <= 20) {
+            return reason;
+        } else {
+            return reason.substring(0, 19) + "...";
+        }
+    }
+
+    public void createServiceRequest() {
+        CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
+        //从配置信息获取当前状态
+        String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
+
+        newServiceRequest = new V2_ServiceRequestNoAsset();
+        picList = new ArrayList();
+        newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
+
+        newServiceRequest.setRequestorId(loginUser.getId());
+        newServiceRequest.setDeptUid(loginUser.getOrgInfoUID());
+        newServiceRequest.setRequestorName(loginUser.getName());
+        newServiceRequest.setRequestorPhone(loginUser.getTelephone());
+        newServiceRequest.setRequestTime(new Date());
+        OrgInfo orgInfo = orgDao.findByUid(loginUser.getOrgInfoUID());
+        if (orgInfo.getOrgType() == 4) {
+            newServiceRequest.setDeptName(orgInfo.getName());
+            newServiceRequest.setDeptUid(orgInfo.getUid());
+        }
+        OrgInfo orgArea = getCourtyardAreaOrg(orgInfo);
+        newServiceRequest.setSiteUID(orgArea.getUid());
+        newServiceRequest.setSiteName(orgArea.getName());
+
+        newServiceRequest.setSiteUID(loginUser.getSiteUID());
+
+        TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(loginUser.getOrgInfoUID(), loginUser.getUid(), 4);
+        orgTree = initOrgTree(treeNodeEdit);
+        selected = null;
+    }
+
+    public TreeNode initOrgTree(TreeNode treeNode) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        } else {
+            // 用户在科室级别时, 可选择所在科室
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(org.getOrgType() == 4);
+            node.setRowKey("org_" + org.getId());
+            rootNode.getChildren().add(node);
+        }
+        rootNode.setExpanded(true);
+        return orgTree;
+    }
+
+
+    public OrgInfo getCourtyardAreaOrg(OrgInfo orgInfo) {
+        if (orgInfo != null && orgInfo.getOrgLevel() == orgInfo.getOrgType()) {
+            return orgInfo;
+        }
+        return getCourtyardAreaOrg(orgInfo.getParentOrg());
+    }
+
+    public List<V2_BlobObject> getPicListByBoType(String boType) {
+        if (picList != null) {
+            List<V2_BlobObject> collect = picList.stream().filter(item -> boType.equals(item.getBoType())).collect
+                    (Collectors.toList());
+            return collect;
+        } else {
+            return null;
+        }
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        synchronized (picList){
+            if(picList != null && picList.size() >= 5){
+                WebUtil.addWarnMessage("上传图片数量不能超过5个！");
+                return;
+            }
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                picList.add(blobObject);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_SR_NO_ASSET);
+                blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
+        }
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        selectedDept = orgInfo;
+        this.selected.setDeptName(selectedDept.getName());
+        this.selected.setDeptUid(selectedDept.getUid());
+    }
+
+    public void saveServiceRequest(){
+        serviceRequestNoAssetService.saveServiceRequest(newServiceRequest, picList);
+    }
+
+    public void cancel(){
+        newServiceRequest = null;
+    }
+
+    @Override
+    protected GenericRepositoryUUID<V2_ServiceRequestNoAsset> getDAO() {
+        return dao;
+    }
+}

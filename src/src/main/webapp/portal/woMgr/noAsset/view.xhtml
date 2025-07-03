@@ -1,0 +1,88 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+   <ui:define name="head">
+   </ui:define>
+   <ui:define name="content">
+      <div class="ui-g clearfix" id="header">
+         <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="无报修台账查看"/>
+         </div>
+
+         <div class="ui-g-12 card">
+         <h:form id="viewForm">
+            <p:fieldset legend="报修信息">
+               <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                  <h:panelGroup>
+                     <label class="label">#{msg.hospitalId}*</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.siteName}"/>
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.clinicalDeptName}*</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.deptName}"/>
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.assetName}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.assetName}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.RepairReporterPhone}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.requestorPhone}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.casePriority}*</label>
+                     <h:outputText value="#{fieldMsg.fieldValue('casePriority',serviceRequestNoAssetController.selected.casePriority)}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.requestTime}</label>
+                     <p:outputLabel value="#{serviceRequestNoAssetController.selected.requestTime}" >
+                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                     </p:outputLabel>
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.requestReason}*</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.requestReason}" />
+                  </h:panelGroup>
+                  <h:panelGroup >
+                     <label class="label">#{msg.comment}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.comment}"/>
+                  </h:panelGroup>
+               </p:panelGrid>
+               <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
+                  <p:dataGrid id="requestImage" var="fileitem" value="#{serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}" columns="5" layout="grid" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
+                     <p:panel  style="text-align:center">
+                        <h:panelGrid columns="1" style="width:100%" >
+                           <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(serviceRequestNoAssetController,fileitem.objectStorageId)}"/>
+                           <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                           </p:graphicImage>
+                        </h:panelGrid>
+                        <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                     </p:panel>
+                  </p:dataGrid>
+               </p:fieldset>
+            </p:fieldset>
+         </h:form>
+         </div>
+      </div>
+</ui:define>
+   <style type="text/css">
+      .header1  thead{
+         display: none!important;
+      }
+   </style>
+   <script type="text/javascript">
+      function handlePreview(args, dialog) {
+         debugger;
+         var jqDialog = jQuery('#' + dialog);
+         if (args.validationFailed) {
+            PF(dialog).hide();
+         } else {
+            PF(dialog).show();
+         }
+      }
+   </script>
+</ui:composition>
