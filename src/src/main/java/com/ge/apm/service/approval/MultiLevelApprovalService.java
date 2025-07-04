@@ -489,9 +489,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         List<String> sysRoles = collect.stream().filter(selectedRoles::contains).collect(Collectors.toList());
                         List<String> customRoles = selectedRoles.stream().filter(item -> !sysRoles.contains(item)).collect(Collectors.toList());
                         if(CollectionUtils.isNotEmpty(sysRoles)){
-                            List<UserAccount> userByClinicalDeptUID = userAccountRepository.findByClinicalDeptUidAndRoleNames(clinicalDeptUID, sysRoles);
+                            List<String> userByClinicalDeptUID = userAccountRepository.findByClinicalDeptUidAndRoleNames(clinicalDeptUID, sysRoles);
                             if(CollectionUtils.isNotEmpty(userByClinicalDeptUID)){
-                                uids.addAll(userByClinicalDeptUID.stream().map(UserAccount::getUid).collect(Collectors.toList()));
+                                uids.addAll(userByClinicalDeptUID);
                             }
                         }
                         if(CollectionUtils.isNotEmpty(customRoles)){
