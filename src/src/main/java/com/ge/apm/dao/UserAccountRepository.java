@@ -303,18 +303,10 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 //    List<UserAccount> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleName ,int size);
 
 
-//    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.* FROM org_hierarchy oh JOIN user_org uo ON uo.org_uid = oh.uid JOIN user_account ua ON uo.user_uid = ua.uid JOIN user_role ur ON ua.id = ur.user_id and  ur.role_type=0      JOIN sys_role sr ON ur.role_id = sr.id GROUP BY ua.id HAVING SUM(CASE WHEN sr.name IN ?2 THEN 1 ELSE 0 END) > 0 AND SUM(CASE WHEN sr.name = 'MultiLevelAuditor' THEN 1 ELSE 0 END) > 0", nativeQuery = true)
-//    List<UserAccount> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleNames );
-//
-//
-//    @Query(value = "WITH RECURSIVE org_hierarchy AS ( SELECT * FROM org_info WHERE uid = ?1 UNION ALL SELECT o.* FROM org_info o JOIN org_hierarchy h ON o.uid = h.parent_uid ) SELECT DISTINCT ua.uid FROM custom_role cr JOIN user_role ur ON cr.id = ur.role_id AND cr.name =?2 and ur.role_type=1    JOIN user_account ua ON ur.user_id = ua.id JOIN user_org uo ON ua.uid = uo.user_uid JOIN org_hierarchy oh ON uo.org_uid = oh.uid JOIN user_role sysur ON ua.id = sysur.user_id  and sysur.role_type=0  AND sysur.role_id = ?3", nativeQuery = true)
-//    List<String> findByClinicalDeptUidAndCustomRoles(String clinicalDeptUID,List<String> roleNames,int id );
 
 
-    @Query(value = "SELECT ua.uid FROM user_account ua WHERE ua.org_uid = ?1 AND EXISTS ( SELECT 1 FROM user_role ur1 JOIN sys_role sr1 ON ur1.role_id = sr1.id and ur1.role_type=0  WHERE ur1.user_id = ua.id AND sr1.name in ?2 ) AND EXISTS ( SELECT 1 FROM user_role ur2 JOIN sys_role sr2 ON ur2.role_id = sr2.id WHERE ur2.user_id = ua.id AND sr2.name = 'MultiLevelAuditor' )", nativeQuery = true)
+    @Query(value = "SELECT ua.uid FROM user_account ua WHERE ua.org_uid = ?1 AND EXISTS ( SELECT 1 FROM user_role ur1 JOIN sys_role sr1 ON ur1.role_id = sr1.id and ur1.role_type=0  WHERE ur1.user_id = ua.id AND sr1.name in (?2) ) AND EXISTS ( SELECT 1 FROM user_role ur2 JOIN sys_role sr2 ON ur2.role_id = sr2.id WHERE ur2.user_id = ua.id AND sr2.name = 'MultiLevelAuditor' )", nativeQuery = true)
     List<String> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleNames );
-    @Query(value = "SELECT ua.uid FROM user_account ua WHERE ua.org_uid = ?1 AND EXISTS ( SELECT 1 FROM user_role ur1 JOIN custom_role sr1 ON   ur1.role_id = sr1.id  and ur1.role_type=1  WHERE ur1.user_id = ua.id AND sr1.name in ?2 ) AND EXISTS ( SELECT 1 FROM user_role ur2 JOIN sys_role sr2 ON ur2.role_id = sr2.id WHERE ur2.user_id = ua.id AND sr2.name = 'MultiLevelAuditor' )", nativeQuery = true)
+    @Query(value = "SELECT ua.uid FROM user_account ua WHERE ua.org_uid = ?1 AND EXISTS ( SELECT 1 FROM user_role ur1 JOIN custom_role sr1 ON   ur1.role_id = sr1.id  and ur1.role_type=1  WHERE ur1.user_id = ua.id AND sr1.name in (?2) ) AND EXISTS ( SELECT 1 FROM user_role ur2 JOIN sys_role sr2 ON ur2.role_id = sr2.id WHERE ur2.user_id = ua.id AND sr2.name = 'MultiLevelAuditor' )", nativeQuery = true)
     List<String> findByClinicalDeptUidAndCustomRoles(String clinicalDeptUID,List<String> roleNames );
-
-
 }
