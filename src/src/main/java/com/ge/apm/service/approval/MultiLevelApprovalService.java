@@ -483,8 +483,27 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         clinicalDeptUID=v2WorkOrder.getAssetInfo().getClinicalDeptUID();
                     }
                     if(org.apache.commons.lang3.StringUtils.isNotBlank(clinicalDeptUID)) {
-                        int roleId = roleDao.getIdByName(roleApproveCondition.getApproveRole());
-                        uids = userRoleDao.findOrgUidByRoleId(clinicalDeptUID, roleId);
+//                        int roleId = roleDao.getIdByName(roleApproveCondition.getApproveRole());
+                        List<String> selectedRoles = new ArrayList<>(Arrays.asList(roleApproveCondition.getApproveRole().split(",")));
+                        List<String> collect = Arrays.stream(ApmSystemRole.values()).map(ApmSystemRole::name).collect(Collectors.toList());
+                        List<String> sysRoles = collect.stream().filter(selectedRoles::contains).collect(Collectors.toList());
+                        List<String> customRoles = selectedRoles.stream().filter(item -> !sysRoles.contains(item)).collect(Collectors.toList());
+                        if(CollectionUtils.isNotEmpty(sysRoles)){
+                            List<UserAccount> userByClinicalDeptUID = userAccountRepository.findByClinicalDeptUidAndRoleNames(clinicalDeptUID, sysRoles);
+                            if(CollectionUtils.isNotEmpty(userByClinicalDeptUID)){
+                                uids.addAll(userByClinicalDeptUID.stream().map(UserAccount::getUid).collect(Collectors.toList()));
+                            }
+                        }
+                        if(CollectionUtils.isNotEmpty(customRoles)){
+                            SysRole sysRole = sysRoleRepository.getByName(ApmSystemRole.MultiLevelAuditor.name());
+                            List<String> userByClinicalDeptUIDs= userAccountRepository.findByClinicalDeptUidAndCustomRoles(clinicalDeptUID, customRoles);
+                            if(CollectionUtils.isNotEmpty(userByClinicalDeptUIDs)){
+                                if(CollectionUtils.isNotEmpty(userByClinicalDeptUIDs)){
+                                    uids.addAll(userByClinicalDeptUIDs);
+                                }
+                            }
+                        }
+//                        uids = userRoleDao.findOrgUidByRoleId(clinicalDeptUID, roleId);
                     }
                     break;
                 default:
