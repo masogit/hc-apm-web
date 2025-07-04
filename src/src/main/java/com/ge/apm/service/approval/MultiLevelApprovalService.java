@@ -1161,6 +1161,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                     mqContext.setServiceName("hc-apm-web");
                                     mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
                                     mqContext.setDescribe("资产转科审核同意");
+                                    mqContext.setSource("departmentConvert");
                                     UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
                                     mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
                                 }

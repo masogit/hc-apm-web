@@ -303,11 +303,13 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         }
         if (ObjectUtil.isNotEmpty(selectedItems)) {
             AssetStocked assetStocked = selectedItems.get(0);
-            List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetStocked.getArrivalListId());
-            notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
-            contractNum = assetStocked.getArrivalList().getContractNum();
-            arrivalName = assetStocked.getArrivalList().getName();
-            installed = arrivalListItems.size() - notInstalled;
+            if (ObjectUtil.isNotEmpty(assetStocked.getArrivalListId())) {
+                List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetStocked.getArrivalListId());
+                notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
+                contractNum = assetStocked.getArrivalList().getContractNum();
+                arrivalName = assetStocked.getArrivalList().getName();
+                installed = arrivalListItems.size() - notInstalled;
+            }
         }
     }
 
@@ -344,6 +346,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             assetInStockRecord.setArrivalListId(selectedItem.getArrivalListId());
             assetInStockRecord.setArrivalItemId(selectedItem.getId());
             assetInStockRecord.setStockStatus(3);
+            assetInStockRecord.setStockSource(selectedItem.getStockSource());
             inStockRecords.add(assetInStockRecord);
         }
         // 修改上次已入库为无效入库
@@ -406,6 +409,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             assetOutStockRecord.setArrivalItemId(selectedItem.getId());
             assetOutStockRecord.setRecruiteDeptUid(selectedItem.getRecruiteDeptUid());
             assetOutStockRecord.setStockStatus(4);
+            assetOutStockRecord.setStockSource(selectedItem.getStockSource());
             outStockRecords.add(assetOutStockRecord);
         }
         if (ObjectUtil.isNotEmpty(assetIds)) {

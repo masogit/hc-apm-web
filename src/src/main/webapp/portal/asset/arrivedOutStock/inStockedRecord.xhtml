@@ -56,12 +56,12 @@
                     <p:inputText value="#{assetInStockedController.searchItem.contractNum}"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">状态</label>
+                    <label class="label">#{msg.stockStatus}</label>
                     <p:selectOneMenu value="#{assetInStockedController.searchItem.stockStatus}">
-                        <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
-                        <f:selectItem itemLabel="已入库" itemValue="3"/>
-                        <f:selectItem itemLabel="已退库" itemValue="5"/>
-                        <f:selectItem itemLabel="无效入库" itemValue="6"/>
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
+                        <f:selectItem itemLabel="#{fieldMsg.fieldValue('stockStatus', 3)}" itemValue="3"/>
+                        <f:selectItem itemLabel="#{fieldMsg.fieldValue('stockStatus', 5)}" itemValue="5"/>
+                        <f:selectItem itemLabel="#{fieldMsg.fieldValue('stockStatus', 6)}" itemValue="6"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
             </p:panelGrid>
@@ -130,8 +130,11 @@
             <p:column headerText="发票日期">
                 <h:outputText value="#{item.arrivalList.invoiceDate}"/>
             </p:column>
-            <p:column headerText="状态">
+            <p:column headerText="#{msg.stockStatus}">
                 <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}"/>
+            </p:column>
+            <p:column headerText="#{msg.stockSource}">
+                <h:outputText value="#{fieldMsg.fieldValue('stockSource', item.stockSource)}"/>
             </p:column>
         </p:dataTable>
     </h:form>

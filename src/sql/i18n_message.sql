@@ -5489,7 +5489,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'nextMeteringDate', '下次计量日期', 'Next Metering Date', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','stockStatus','资产库存状态','Equipment stock Status',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','stockStatus','库存状态','Equipment stock Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','1','待审核','To be approved',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','2','待入库','Approval',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('stockStatus','3','已入库','In stock',NULL,-1);
@@ -6147,8 +6147,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','usageYearDateComments','系统信息提示：基于APM效期知识库数据，系统将依据设备医疗器械注册证号、设备型号、设备厂商三个核心维度为您提取关联信息。需要说明的是，本功能提供的内容为知识库匹配结果，仅供参考使用，具体请结合实际业务场景进一步核实。','System information tip: Based on the APM validity knowledge base data, the system will extract relevant information for you according to the three core dimensions of equipment medical device registration certificate number, equipment model and equipment manufacturer. It should be noted that the content provided by this function is a knowledge base matching result, which is for reference only. Please further verify it in combination with the actual business scenarios.',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','batchModifyRule','批量操作只支持相同注册号设备，请重新勾选！','Batch operations only support devices with the same registration number, please check it again!',NULL,-1);
 
-
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','stockSource','库存来源','Stocked Source',NULL,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('stockSource','1','台账入库','ledger',NULL, -1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('stockSource','2','转科入库','convert',NULL ,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('stockSource','3','到货入库','arrival',NULL, -1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('stockSource','4','退货入库','returned',NULL, -1);
 
 
 
