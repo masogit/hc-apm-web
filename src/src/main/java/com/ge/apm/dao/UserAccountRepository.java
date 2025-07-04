@@ -312,7 +312,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
 
     @Query(value = "SELECT ua.uid FROM user_account ua WHERE ua.org_uid = ?1 AND EXISTS ( SELECT 1 FROM user_role ur1 JOIN sys_role sr1 ON ur1.role_id = sr1.id and ur1.role_type=0  WHERE ur1.user_id = ua.id AND sr1.name in ?2 ) AND EXISTS ( SELECT 1 FROM user_role ur2 JOIN sys_role sr2 ON ur2.role_id = sr2.id WHERE ur2.user_id = ua.id AND sr2.name = 'MultiLevelAuditor' )", nativeQuery = true)
-    List<UserAccount> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleNames );
+    List<String> findByClinicalDeptUidAndRoleNames(String clinicalDeptUID,List<String> roleNames );
     @Query(value = "SELECT ua.uid FROM user_account ua WHERE ua.org_uid = ?1 AND EXISTS ( SELECT 1 FROM user_role ur1 JOIN custom_role sr1 ON   ur1.role_id = sr1.id  and ur1.role_type=1  WHERE ur1.user_id = ua.id AND sr1.name in ?2 ) AND EXISTS ( SELECT 1 FROM user_role ur2 JOIN sys_role sr2 ON ur2.role_id = sr2.id WHERE ur2.user_id = ua.id AND sr2.name = 'MultiLevelAuditor' )", nativeQuery = true)
     List<String> findByClinicalDeptUidAndCustomRoles(String clinicalDeptUID,List<String> roleNames );
 
