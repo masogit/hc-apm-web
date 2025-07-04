@@ -6138,6 +6138,19 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('cyclePeriodUnit','d','日','Day',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AffiliatedOrganization','所属机构','Affiliated Organization',NULL,-1);
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deviceExpiryManagement','设备效期管理','Device expiry management',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','editUsageYear','修改设备使用年限','Edit usage year',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','batchEditUsageYear','批量修改设备使用年限','Batch edit usage year',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','saveUsageYearError','使用年限值错误或小于等于0无法修改！','Usage year error or less than or equal zero!',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','usageYearDate','使用年限植入','Usage tear date',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','usageYearDateReferTo','使用年限参考','Usage tear date refer to',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','usageYearDateComments','系统信息提示：基于APM效期知识库数据，系统将依据设备医疗器械注册证号、设备型号、设备厂商三个核心维度为您提取关联信息。需要说明的是，本功能提供的内容为知识库匹配结果，仅供参考使用，具体请结合实际业务场景进一步核实。','System information tip: Based on the APM validity knowledge base data, the system will extract relevant information for you according to the three core dimensions of equipment medical device registration certificate number, equipment model and equipment manufacturer. It should be noted that the content provided by this function is a knowledge base matching result, which is for reference only. Please further verify it in combination with the actual business scenarios.',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','batchModifyRule','批量操作只支持相同注册号设备，请重新勾选！','Batch operations only support devices with the same registration number, please check it again!',NULL,-1);
+
+
+
+
+
 
 
 
