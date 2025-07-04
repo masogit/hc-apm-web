@@ -366,6 +366,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value= "UPDATE asset_info  set created_by=?2 where id=?1",nativeQuery = true)
     void updateCreatedBy(int id, String userName);
 
+    @Transactional
+    @Modifying
+    @Query(value= "UPDATE asset_info  set lifecycle =?1 where id in (?2)",nativeQuery = true)
+    void updateLifecycleByIds(Integer id, Set<Integer> ids);
+
     List<AssetInfo> findByLocationCode(String namePyCode);
 
     List<AssetInfo> findByLocationCodeIn(List<String> collect);
