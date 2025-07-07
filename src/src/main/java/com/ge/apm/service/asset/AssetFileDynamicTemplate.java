@@ -663,7 +663,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         int startRow = EXCEL_ORG_DATA_ROW;
         for (I18nMessage i18nMessage : messages) {
 
-            writer.writeRowData(startRow, new String[]{i18nMessage.getMsgKey() + " " + i18nMessage.getValueZh()});
+            writer.writeRowData(startRow, new String[]{i18nMessage.getMsgKey() + " " + i18nMessage.getValue()});
 
             ++startRow;
         }
