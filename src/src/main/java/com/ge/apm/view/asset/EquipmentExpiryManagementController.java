@@ -100,7 +100,6 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         }
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
         this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
-        this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         if (null != selectSite) {
             this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
@@ -275,7 +274,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
             if (StringUtils.isNotEmpty(selected.getManufacture()) && StringUtils.isNotEmpty(selected.getFunctionType())) {
                 // 继续通过制造商和设备型号获取
-                equipmentExpiryManagements = equipmentExpiryManagementRepository.findByManufactureAndAndFunctionType(selected.getManufacture(), selected.getFunctionType());;
+                equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(selected.getManufacture().replace(" ", "").toLowerCase(), selected.getFunctionType().replace(" ", "").toLowerCase());;
             }
             if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
                 equipmentExpiryManagements = new ArrayList<>();

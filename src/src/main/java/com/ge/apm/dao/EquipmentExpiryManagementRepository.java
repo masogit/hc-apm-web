@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.EquipmentExpiryManagement;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
 
 import java.util.List;
@@ -9,6 +10,7 @@ public interface EquipmentExpiryManagementRepository extends GenericRepository<E
 
     List<EquipmentExpiryManagement> findByRegisterNo(String registerNo);
 
-    List<EquipmentExpiryManagement> findByManufactureAndAndFunctionType(String manufacture, String functionType);
+    @Query(value = "SELECT * FROM equipment_expiry_information WHERE TRIM(keyword) ~* ?1 AND REGEXP_REPLACE(LOWER(TRIM(function_type)), '\\s+', '', 'g') = ?2", nativeQuery = true)
+    List<EquipmentExpiryManagement> matchByManufactureAndFunctionType(String manufacture, String functionType);
 
 }
