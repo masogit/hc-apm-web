@@ -270,11 +270,13 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         }
         if (ObjectUtil.isNotEmpty(selectedItems)) {
             AssetOutStockRecord assetOutStockRecord = selectedItems.get(0);
-            List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetOutStockRecord.getArrivalListId());
-            notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
-            contractNum = assetOutStockRecord.getArrivalList().getContractNum();
-            arrivalName = assetOutStockRecord.getArrivalList().getName();
-            installed = arrivalListItems.size() - notInstalled;
+            if (ObjectUtil.isNotEmpty(assetOutStockRecord.getArrivalListId())) {
+                List<ArrivalListItem> arrivalListItems = arrivalListItemRepository.findByArrivalListId(assetOutStockRecord.getArrivalListId());
+                notInstalled = arrivalListItems.stream().filter(item -> "new".equals(item.getInstallStatus())).count();
+                contractNum = assetOutStockRecord.getArrivalList().getContractNum();
+                arrivalName = assetOutStockRecord.getArrivalList().getName();
+                installed = arrivalListItems.size() - notInstalled;
+            }
         }
     }
 
@@ -289,11 +291,14 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             selectedItem.setReturnedStockNo(returnedStockNo);
         }
         List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUidList);
-        OrgInfo orgInfo = orgInfoRepository.getByUid(setAssetOutStockDept);
         for (AssetInfo assetInfo : assetInfos) {
-//            assetInfo.setInstallDate(now);
+            OrgInfo orgInfo = orgInfoRepository.getByUid(getStockDept(assetInfo));
+            assetInfo.setTenantUID(orgInfo.getTenantUID());
+            assetInfo.setInstitutionUID(orgInfo.getInstitutionUID());
+            assetInfo.setHospitalUID(orgInfo.getHospitalUID());
+            assetInfo.setSiteUID(orgInfo.getSiteUID());
             assetInfo.setClinicalDeptId(orgInfo.getId());
-            assetInfo.setClinicalDeptUID(setAssetOutStockDept);
+            assetInfo.setClinicalDeptUID(orgInfo.getUid());
             assetInfo.setClinicalDeptName(orgInfo.getName());
         }
         assetInfoRepository.save(assetInfos);
@@ -311,6 +316,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         mqContext.setClassName("AssetOutStockedController");
         mqContext.setMethodName("generatedReturnedStockDoc");
         mqContext.setDescribe("设备退库修改科室");
+        mqContext.setSource("departmentReturned");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("stockedType", "assetReturnedStock");
         jsonObject.put("comment", comment);
@@ -377,7 +383,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             case "outStocked" :
                 return "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=" + outStockRecord.getOutStockNo() + "&userName=" + currentUser.getName();
             case "returnedStocked" :
-                OrgInfo returnedDept = orgInfoRepository.findByUid(setAssetOutStockDept);
+                OrgInfo returnedDept = orgInfoRepository.findByUid(getStockDept(outStockRecord.getAssetInfo()));
                 return "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=" + outStockRecord.getReturnedStockNo() + "&userName=" + currentUser.getName() + "&returnedStockDept=" + returnedDept.getName();
             case "assetInfo" :
                 return "/portal/asset/info/AssetDetail.xhtml?actionName=View&terminate=false&assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
@@ -393,7 +399,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             case "outStocked" :
                 return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + outStockRecord.getOutStockNo() + "&amp;userName=" + currentUser.getName();
             case "returnedStocked" :
-                OrgInfo returnedDept = orgInfoRepository.findByUid(setAssetOutStockDept);
+                OrgInfo returnedDept = orgInfoRepository.findByUid(getStockDept(outStockRecord.getAssetInfo()));
                 return "/portal/JmPrintReportView.xhtml?faces-redirect=true&amp;type=assetStock&amp;stockNo=" + outStockRecord.getReturnedStockNo() + "&amp;userName=" + currentUser.getName() + "&amp;returnedStockDept=" + returnedDept.getName();
             case "assetInfo" :
                 return "/portal/asset/info/AssetDetail.xhtml?faces-redirect=true&amp;actionName=View&amp;terminate=false&amp;assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
@@ -422,6 +428,10 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         List<String> collect = assetInfos.stream().filter(item -> StringUtils.hasText(item.getQrCode())).map(item -> item.getQrCode() + ":" + item.getSiteUID()).collect(Collectors.toList());
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         qrPreViewerBean.onServerEvent("",collect);
+    }
+
+    private String getStockDept(AssetInfo assetInfo) {
+        return configItemValueRepository.findByKeyAndSiteForUseParent(assetInfo.getSiteUID(), assetInfo.getHospitalUID(), assetInfo.getInstitutionUID(), assetInfo.getTenantUID(), "setAssetOutStockDept");
     }
 
     public String getFilterClinicalDeptOrg() {

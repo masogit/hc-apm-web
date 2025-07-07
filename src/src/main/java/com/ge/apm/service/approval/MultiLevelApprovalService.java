@@ -489,14 +489,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         List<String> sysRoles = collect.stream().filter(selectedRoles::contains).collect(Collectors.toList());
                         List<String> customRoles = selectedRoles.stream().filter(item -> !sysRoles.contains(item)).collect(Collectors.toList());
                         if(CollectionUtils.isNotEmpty(sysRoles)){
-                            List<UserAccount> userByClinicalDeptUID = userAccountRepository.findByClinicalDeptUidAndRoleNames(clinicalDeptUID, sysRoles);
+                            List<String> userByClinicalDeptUID = userAccountRepository.findByClinicalDeptUidAndRoleNames(clinicalDeptUID, sysRoles);
                             if(CollectionUtils.isNotEmpty(userByClinicalDeptUID)){
-                                uids.addAll(userByClinicalDeptUID.stream().map(UserAccount::getUid).collect(Collectors.toList()));
+                                uids.addAll(userByClinicalDeptUID);
                             }
                         }
                         if(CollectionUtils.isNotEmpty(customRoles)){
                             SysRole sysRole = sysRoleRepository.getByName(ApmSystemRole.MultiLevelAuditor.name());
-                            List<String> userByClinicalDeptUIDs= userAccountRepository.findByClinicalDeptUidAndCustomRoles(clinicalDeptUID, customRoles,sysRole.getId());
+                            List<String> userByClinicalDeptUIDs= userAccountRepository.findByClinicalDeptUidAndCustomRoles(clinicalDeptUID, customRoles);
                             if(CollectionUtils.isNotEmpty(userByClinicalDeptUIDs)){
                                 if(CollectionUtils.isNotEmpty(userByClinicalDeptUIDs)){
                                     uids.addAll(userByClinicalDeptUIDs);
@@ -1161,6 +1161,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                     mqContext.setServiceName("hc-apm-web");
                                     mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
                                     mqContext.setDescribe("资产转科审核同意");
+                                    mqContext.setSource("departmentConvert");
                                     UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
                                     mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
                                 }

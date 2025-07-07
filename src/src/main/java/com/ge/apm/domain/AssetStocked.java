@@ -93,6 +93,10 @@ public class AssetStocked implements Serializable {
     @Column(name = "arrival_item_id", columnDefinition = "CHAR(32)")
     private String arrivalItemId;
 
+    //库存来源 1、台账入库 2、转科入库 3、到货入库 4、退库入库
+    @Column(name = "stock_source")
+    private Integer stockSource;
+
     @Transient
     private String assetName;
     @Transient

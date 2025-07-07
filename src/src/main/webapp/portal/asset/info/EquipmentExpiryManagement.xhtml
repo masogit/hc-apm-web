@@ -1,0 +1,301 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript">
+        </script>
+
+        <style>
+            th {
+                font-size: 12px !important;
+            }
+            td {
+                font-size: 12px !important;
+                padding: 0px !important;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.deviceExpiryManagement}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg"
+                                             value="#{empty equipmentExpiryManagementController.selectSite? msg.AllHospitals:equipmentExpiryManagementController.selectSite.name}"
+                                             type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
+                                            modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search"
+                                                 process=":searchForm:treeNodeNameFilter @this"
+                                                 update="searchForm:orgTree"
+                                                 actionListener="#{orgTreeController.filterTreeNodeByName()}"
+                                                 value="#{msg.Search}"/>
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;"
+                                            value="#{orgTreeController.siteOrgTree}"
+                                            selection="#{orgTreeController.selectedOrgNode}" var="node"
+                                            selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select"
+                                                listener="#{equipmentExpiryManagementController.onSelectSiteTreeNode}"
+                                                update=":equipmentExpiryManagementForm"
+                                                oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <p:inputText id="searchText" value="#{equipmentExpiryManagementController.oneSearchStr}"
+                                     placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}"
+                                     maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup"
+                                    update=":equipmentExpiryManagementForm"/>
+                        </p:inputText>
+                    </h:panelGrid>
+                </h:form>
+                <h:form id="equipmentExpiryManagementForm">
+                    <p:dataTable id="datalist" value="#{equipmentExpiryManagementController.lazyModel}" var="item"
+                                 widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false"
+                                 selection="#{equipmentExpiryManagementController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+
+                                 rowKey="#{item.id}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{equipmentExpiryManagementController.onFilter}"
+                                oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:column width="36" id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{equipmentExpiryManagementController.selectedMap[item.id]}"
+                                                     class="selectCheckBox">
+                                <p:ajax process="@this" update="@this :equipmentExpiryManagementForm:datalist"
+                                        listener="#{equipmentExpiryManagementController.onSelectOfPage}"
+                                        oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{equipmentExpiryManagementController.onSelectAllOfPage}"
+                                            update="@(.selectCheckBox) :equipmentExpiryManagementForm:datalist"
+                                            oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="操 作" exportable="false">
+                            <p:commandButton class="ui-button" title="#{msg.editUsageYear}" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}" onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm"/>
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
+                                  sortBy="#{item.namePyCode}" filterBy="#{item.name}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{equipmentExpiryManagementController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{equipmentExpiryManagementController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{equipmentExpiryManagementController.onClinicalDeptNameFilterChange}" process="@this"  update=":equipmentExpiryManagementForm:datalist" oncomplete="afterLoadRender()" />
+                                    <p:ajax process="@this" listener="#{equipmentExpiryManagementController.onClinicalDeptNameFilterChange}" update=":equipmentExpiryManagementForm:datalist"  oncomplete="afterLoadRender()"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
+                        </p:column>
+                        <c:if test="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}">
+                            <p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.assetTypeGroup}"/><br/>
+                                    <p:autoComplete dropdown="true" value="#{equipmentExpiryManagementController.filterAssetTypeGroup}" appendTo="@(Body)"
+                                                    scrollHeight="300"  forceSelection="true" completeMethod="#{equipmentExpiryManagementController.autoCompleteAssetTypeGroupName}" size="5">
+                                        <p:ajax event="itemSelect" listener="#{equipmentExpiryManagementController.onAssetTypeGroupNameFilterChange}" process="@this"  update=":equipmentExpiryManagementForm:datalist"/>
+<!--                                        <p:ajax process="@this" listener="#{equipmentExpiryManagementController.onAssetTypeGroupNameFilterChange}" update=":equipmentExpiryManagementForm:datalist" />-->
+                                    </p:autoComplete>
+                                </f:facet>
+                                <h:outputText value="#{equipmentExpiryManagementController.convertAssetTypeGroupEncodedToName(item.assetType)}"/>
+                            </p:column>
+                        </c:if>
+                        <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}"
+                                  filterBy="#{item.manufacture}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.makerShortName}" sortBy="#{item.makerShortName}"
+                                  filterBy="#{item.makerShortName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.makerShortName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}"
+                                  filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.RegistrationNumber}" sortBy="#{item.registrationNo}"
+                                  filterBy="#{item.registrationNo}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.registrationNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.lifecycle}" sortBy="#{item.lifecycle}"
+                                  filterBy="#{item.lifecycle}" filterMatchMode="EQ">
+                            <h:outputText
+                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ManufactureDate}" sortBy="#{item.manufactDate}" filterBy="#{item.manufactDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterManufactureDate" widgetVar="varFilterManufactureDate" />
+                            </f:facet>
+                            <h:outputText value="#{item.manufactDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}"
+                                  filterBy="#{item.serialNum}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" exportable="true" width="150"
+                                  sortBy="#{item.qrCode}" filterBy="#{item.qrCode}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="batchSetUseYearButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.batchEditUsageYear}" update="batchEditBeforeForm" actionListener="#{equipmentExpiryManagementController.batchEditUsageDateBefore()}" disabled="#{!equipmentExpiryManagementController.isChecked()}" oncomplete="PF('batchEditBeforeDialog').show()"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="AquipmentExpiry_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:remoteCommand name="rc"
+                                     update=":equipmentExpiryManagementForm:datalist datalist:batchSetUseYearButton"
+                                     immediate="true"/>
+                </h:form>
+                <p:overlayPanel widgetVar="panelFilterManufactureDate"
+                                for=":equipmentExpiryManagementForm:datalist:filterManufactureDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}" />
+                        <p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_manufactureDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+                                    navigator="true" mask="true" size="12" locale="zh" />
+                        <p:outputLabel value="#{msg.To}" />
+                        <p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_manufactureDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false"
+                                    navigator="true" mask="true" size="12" locale="zh" />
+                    </h:panelGrid>
+                    <p:commandButton
+                            onclick="setDateFilter('varDataList','varFilterManufactureDate','varStartTimeFrom_manufactureDate','varStartTimeTo_manufactureDate'); PF('panelFilterManufactureDate').hide();"
+                            title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+                    <p:commandButton onclick="PF('panelFilterManufactureDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button"
+                                     style="zoom: 0.8;" />
+                </p:overlayPanel>
+            </div>
+        </div>
+        <p:dialog  id="batchEditBeforeDialog" widgetVar="batchEditBeforeDialog"  modal="true" resizable="true" draggable="true" width="30%" height="200px" header="#{msg.batchEditAssets}">
+            <h:form id="batchEditBeforeForm" class="bcls">
+                <p:panelGrid id ="batchEditUsage" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <h1 class="m-0">#{msg.batchEditAffectedDevices} <span style="color: red">#{equipmentExpiryManagementController.batchModifyCount}</span> #{msg.devices}</h1>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(null)}" value="#{msg.ok}" onclick="PF('editUsageDateDialog').show()" icon="ui-icon-check" update=":editUsageDateForm" />
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('batchEditBeforeDialog').hide()"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="editUsageDateDlg" widgetVar="editUsageDateDialog" width="1000" height="650" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.editUsageYear}" closable="false">
+            <h:form id="editUsageDateForm">
+                <p:fieldset legend="#{msg.usageYearDate}">
+                    <p:inputNumber id="lifecycle" value="#{equipmentExpiryManagementController.lifecycle}" decimalPlaces="0" minValue="1" maxValue="100" style="width: 500px" />#{msg.Year}
+                </p:fieldset>
+                <p:fieldset legend="#{msg.usageYearDateReferTo}">
+                    <h3 style="width: 800px" class="block-title">#{msg.usageYearDateComments}</h3>
+                    <p:dataTable id="lifecyclelist" value="#{equipmentExpiryManagementController.equipmentExpiryManagements}" var="item"
+                                 widgetVar="varLifecyclelist" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.manufacture}">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.RegistrationNumber}">
+                            <h:outputText value="#{item.registerNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.lifecycle}">
+                            <h:outputText
+                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ManufactureDate}">
+                            <h:outputText value="#{item.manufactDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+                <p:commandButton validateClient="true" actionListener="#{equipmentExpiryManagementController.applyChange()}" value="#{msg.Save}"
+                                 update=":equipmentExpiryManagementForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'editUsageDateDialog');"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('editUsageDateDialog').hide()" />
+            </h:form>
+        </p:dialog>
+        <script>
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+
+            $(function () {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX = "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX = "hidden";
+            });
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#equipmentExpiryManagementForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

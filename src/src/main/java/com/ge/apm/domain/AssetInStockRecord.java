@@ -122,6 +122,10 @@ public class AssetInStockRecord implements Serializable {
     @Column(name = "stock_status")
     private Integer stockStatus;
 
+    //库存来源 1、台账入库 2、转科入库 3、到货入库 4、退库入库
+    @Column(name = "stock_source")
+    private Integer stockSource;
+
     @Override
     public int hashCode() {
         int hash = 0;
