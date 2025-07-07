@@ -222,7 +222,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         if (ids.size() > 1) {
             List<AssetInfo> assetInfos = dao.findByIdIn(ids);
             Set<String> registerNo = assetInfos.stream().map(AssetInfo::getRegistrationNo).filter(Objects::nonNull).collect(Collectors.toSet());
-            if (CollectionUtils.isEmpty(registerNo) || registerNo.size() != assetInfos.size() || registerNo.size() != 1) {
+            if (CollectionUtils.isEmpty(registerNo) || registerNo.size() != 1) {
                 selectedMap.clear();
                 WebUtil.addErrorMessage(WebUtil.getMessage("batchModifyRule"));
             }
@@ -259,6 +259,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     public void prepareEditUsageDate(AssetInfo assetInfo) {
         if (assetInfo != null) {
             selected = assetInfo;
+            this.lifecycle = assetInfo.getLifecycle()!=null?assetInfo.getLifecycle() / 12:null;
         } else {
             selectedMap.entrySet().stream().forEach(k -> {
                 if (k.getValue()) {
