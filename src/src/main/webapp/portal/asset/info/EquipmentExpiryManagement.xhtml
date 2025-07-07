@@ -80,7 +80,7 @@
                         <p:ajax event="filter" listener="#{equipmentExpiryManagementController.onFilter}"
                                 oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
-                        <p:column width="36" id="checkBoxColumn">
+                        <p:column width="36" id="checkBoxColumn" exportable="false">
                             <p:selectBooleanCheckbox value="#{equipmentExpiryManagementController.selectedMap[item.id]}"
                                                      class="selectCheckBox">
                                 <p:ajax process="@this" update="@this :equipmentExpiryManagementForm:datalist"
@@ -205,7 +205,7 @@
                         <h1 class="m-0">#{msg.batchEditAffectedDevices} <span style="color: red">#{equipmentExpiryManagementController.batchModifyCount}</span> #{msg.devices}</h1>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(null)}" value="#{msg.ok}" onclick="PF('editUsageDateDialog').show()" icon="ui-icon-check" update=":editUsageDateForm" />
+                        <p:commandButton validateClient="true" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(null)}" value="#{msg.ok}" onclick="PF('editUsageDateDialog').show();PF('batchEditBeforeDialog').hide()" icon="ui-icon-check" update=":editUsageDateForm" />
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('batchEditBeforeDialog').hide()"/>
                     </h:panelGroup>
                 </p:panelGrid>
@@ -245,7 +245,7 @@
                     </p:dataTable>
                 </p:fieldset>
                 <p:commandButton validateClient="true" actionListener="#{equipmentExpiryManagementController.applyChange()}" value="#{msg.Save}"
-                                 update=":equipmentExpiryManagementForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'editUsageDateDialog');"/>
+                                 update=":equipmentExpiryManagementForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'editUsageDateDialog');"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('editUsageDateDialog').hide()" />
             </h:form>
         </p:dialog>
