@@ -546,4 +546,12 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		selectedFunctions = customSelectedFunctions;
 	}
 
+	public String getAuthorityByType(String authority, String authorityType) {
+		if (authorityType.equals("web")) {
+			return Arrays.asList(authority.split(",")).stream().filter(v -> !v.contains("移动端.")).collect(Collectors.joining(","));
+		} else {
+			return Arrays.asList(authority.split(",")).stream().filter(v -> v.contains("移动端.")).collect(Collectors.joining(","));
+		}
+	}
+
 }

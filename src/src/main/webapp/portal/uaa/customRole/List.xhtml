@@ -33,17 +33,17 @@
 <!--                    <p:column headerText="主页" sortBy="#{item.homePage}" filterBy="#{item.homePage}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.homePage}"/>
                     </p:column>-->
-                    <p:column headerText="#{msg.WebMenu}" sortBy="#{item.menusCH}" filterBy="#{item.menusCH}" filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.menusCH}"/>
-                    </p:column>
+<!--                    <p:column headerText="#{msg.WebMenu}" sortBy="#{item.menusCH}" filterBy="#{item.menusCH}" filterMatchMode="LIKE" >-->
+<!--                        <h:outputText value="#{item.menusCH}"/>-->
+<!--                    </p:column>-->
                     <p:column headerText="#{msg.WebAuthority}" sortBy="#{item.webAuthoritiesCH}" filterBy="#{item.webAuthoritiesCH}" filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.webAuthoritiesCH}"/>
+                        <h:outputText value="#{customRoleController.getAuthorityByType(item.webAuthoritiesCH, 'web')}"/>
                     </p:column>
-                    <p:column headerText="#{msg.WeChatCard}" sortBy="#{item.cardsCH}" filterBy="#{item.cardsCH}" filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.cardsCH}"/>
-                    </p:column>
+<!--                    <p:column headerText="#{msg.WeChatCard}" sortBy="#{item.cardsCH}" filterBy="#{item.cardsCH}" filterMatchMode="LIKE" >-->
+<!--                        <h:outputText value="#{item.cardsCH}"/>-->
+<!--                    </p:column>-->
                     <p:column headerText="#{msg.WeChatAuthority}" sortBy="#{item.authoritiesCH}" filterBy="#{item.authoritiesCH}" filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.authoritiesCH}"/>
+                        <h:outputText value="#{customRoleController.getAuthorityByType(item.webAuthoritiesCH, 'weChat')}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
                        <!-- <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
