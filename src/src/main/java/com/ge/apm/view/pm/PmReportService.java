@@ -268,12 +268,13 @@ public class PmReportService {
             for (V2_WorkOrderCoworker coworker : coWorkerList) {
                 // ignore fake empty coworker
                 if ("000".equalsIgnoreCase(coworker.getId())) continue;
+                String manHours = String.valueOf(coworker.getManHours());
                 if (count == 0) {
                     content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
-                    content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), coworker.getManHours().toString());
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), "null".equalsIgnoreCase(manHours)?"":manHours);
                 } else if (count == 1) {
                     content.put(MaintenanceTemplate.Maintenance.COWORKER2.toString(), coworker.getCowokerUserName());
-                    content.put(MaintenanceTemplate.Maintenance.COWORKER2_TIME.toString(), coworker.getManHours().toString());
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER2_TIME.toString(), "null".equalsIgnoreCase(manHours)?"":manHours);
                 }
                 count++;
             }
