@@ -227,9 +227,6 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
-                            <h:outputText value="#{item.assetName}"/>
-                        </p:column>
                         <p:column headerText="#{msg.manufacture}">
                             <h:outputText value="#{item.manufacture}"/>
                         </p:column>
