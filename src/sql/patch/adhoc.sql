@@ -12,3 +12,9 @@ UPDATE multi_level_approval mla SET application_uid = ( SELECT mla2.initiate_app
 update asset_stocked set stock_source = 3 where stock_source is null;
 update asset_in_stock_record set stock_source = 3 where stock_source is null;
 update asset_out_stock_record set stock_source = 3 where stock_source is null;
+-- 效期库索引
+CREATE INDEX idx_equipment_function_type_expr
+    ON equipment_expiry_information (REGEXP_REPLACE(LOWER(TRIM(function_type)), '\s+', '', 'g'));
+CREATE INDEX idx_equipment_keyword_pattern ON equipment_expiry_information
+    (LOWER(keyword));
+ALTER TABLE equipment_expiry_information ALTER COLUMN manufact_date TYPE varchar(10);

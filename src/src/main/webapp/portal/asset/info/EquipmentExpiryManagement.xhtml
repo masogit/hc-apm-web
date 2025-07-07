@@ -220,7 +220,8 @@
                     <h3 style="width: 800px" class="block-title">#{msg.usageYearDateComments}</h3>
                     <p:dataTable id="lifecyclelist" value="#{equipmentExpiryManagementController.equipmentExpiryManagements}" var="item"
                                  widgetVar="varLifecyclelist" resizableColumns="true" liveResize="true" resizeMode="fit"
-                                 selectionMode="single" scrollable="false"
+                                 disabledSelection="true"
+                                 scrollable="false"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -239,13 +240,10 @@
                             <h:outputText value="#{item.registerNo}"/>
                         </p:column>
                         <p:column headerText="#{msg.lifecycle}">
-                            <h:outputText
-                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                            <h:outputText value="#{item.lifecycle}"/>
                         </p:column>
                         <p:column headerText="#{msg.ManufactureDate}">
-                            <h:outputText value="#{item.manufactDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                            </h:outputText>
+                            <h:outputText value="#{item.manufactDate}" />
                         </p:column>
                     </p:dataTable>
                 </p:fieldset>
