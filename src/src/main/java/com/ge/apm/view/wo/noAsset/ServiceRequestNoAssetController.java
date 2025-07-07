@@ -1,6 +1,7 @@
 package com.ge.apm.view.wo.noAsset;
 
 import com.alibaba.fastjson.JSONPath;
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.ServiceRequestNoAssetRepository;
 import com.ge.apm.domain.*;
@@ -8,11 +9,14 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.ServiceRequestNoAssetService;
+import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -30,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -37,9 +42,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,10 +58,13 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     private OrgInfoRepository orgDao;
     private ConfigCacheService cacheService;
     private CustomConfigService ccService;
+    private ConfigService configService;
     private UaaService uaaService;
     private UserContextService userContextService;
+    private V2_WorkOrderService woService;
     private OrgInfoTreeService orgInfoTreeService;
     private ServiceRequestNoAssetService serviceRequestNoAssetService;
+    private BlobObjectRepository blobObjectRepository;
     private UserAccount loginUser;
     @Getter @Setter
     private Set<String> clinicalDeptOrgUidSet;
@@ -88,6 +94,21 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Getter  @Setter
     private OrgInfo org;
 
+    @Getter @Setter
+    private V2_ServiceRequest newAssetServiceRequest = new V2_ServiceRequest();
+    @Getter @Setter
+    private Boolean needConfirmTime = false;
+    @Getter @Setter
+    private Integer currentStatus = 1;
+    @Getter @Setter
+    private AssetInfo selectedAsset;
+    @Getter @Setter
+    private String locationName;
+
+    @Getter@Setter
+    private List<V2_BlobObject> picSrList = new ArrayList<>();
+    private CustomConfig customConfig;
+    private CustomConfigObject currentCustomConfig;
     @Override
     protected void init() {
         super.init();
@@ -96,6 +117,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         cacheService = WebUtil.getBean(ConfigCacheService.class);
+        configService = WebUtil.getBean(ConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         serviceRequestNoAssetService = WebUtil.getBean(ServiceRequestNoAssetService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -103,7 +125,11 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
         ccService = WebUtil.getBean(CustomConfigService.class);
         org = orgDao.findById(loginUser.getOrgInfoId());
+        woService = WebUtil.getBean(V2_WorkOrderService.class);
+        blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
 
+        customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
+        currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         loadClinicalDeptList();
         String encodeStr = WebUtil.getRequestParameter("str");
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -330,6 +356,24 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         }
     }
 
+    public void handleFileUploadAssetSr(FileUploadEvent event) {
+        synchronized (picSrList){
+            if(picSrList != null && picSrList.size() >= 5){
+                WebUtil.addWarnMessage("上传图片数量不能超过5个！");
+                return;
+            }
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                picSrList.add(blobObject);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
+        }
+    }
+
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
@@ -338,6 +382,196 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         this.newServiceRequest.setDeptUid(selectedDept.getUid());
     }
 
+    public void onStatusChange() {
+        if (selectedAsset == null && selected == null) {
+            return;
+        }
+        if(currentStatus==2){ //选择停机状态
+            needConfirmTime=true;
+        }
+        if(currentStatus==3){//选择 限制功能使用
+            needConfirmTime=false;
+        }
+    }
+
+    public void createServiceRequestByNoAsset(V2_ServiceRequestNoAsset serviceRequestNoAsset) {
+
+        CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
+        Object repairReportSendPlace=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='orderFields'].repairReportSendPlace.defaultValue[0]");
+        String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+        newAssetServiceRequest = new V2_ServiceRequest();
+        picSrList = new ArrayList();
+        currentStatus= Integer.valueOf(strAssetStatus);
+        newAssetServiceRequest.setStatus(currentStatus);
+        newAssetServiceRequest.setRequestorId(loginUser.getId());
+        OrgInfo depOrg = orgDao.findByUid(serviceRequestNoAsset.getDeptUid());
+        newAssetServiceRequest.setFromDeptId(depOrg.getId());
+        newAssetServiceRequest.setRequestorName(serviceRequestNoAsset.getRequestorName());
+        newAssetServiceRequest.setRequestorPhone(serviceRequestNoAsset.getRequestorPhone());
+        newAssetServiceRequest.setRequestTime(serviceRequestNoAsset.getRequestTime());
+        newAssetServiceRequest.setRequestReason(serviceRequestNoAsset.getRequestReason());
+
+        picSrList.addAll(picList);
+
+        if(repairReportSendPlace != null){
+            newAssetServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());
+        }
+        if(selectedAsset != null && userContextService.isCountyArea()){
+            OrgInfo orgInfo = cacheService.findOrgByUid(selectedAsset.getSiteUID());
+            newAssetServiceRequest.setCustomerName(orgInfo.getContactPerson());
+            newAssetServiceRequest.setCustomerTel(orgInfo.getContactPhone());
+            newAssetServiceRequest.setHospitalName(orgInfo.getName());//这里只需要开单页面显示，asset微服务会保存医院Uid和名称。
+        }
+    }
+
+
+    private void onSelectedAsset(AssetInfo asset) {
+        String lName ="";
+        if(StringUtils.isNotEmpty(asset.getAssetDeptUID())){
+            OrgInfo org = cacheService.findOrgByUid(asset.getAssetDeptUID());
+            lName= org.getName();
+        }else{
+            lName= asset.getClinicalDeptName();
+        }
+        asset.setLocationName(lName);
+        locationName = lName;
+
+        if(newAssetServiceRequest != null && userContextService.isCountyArea()){
+            OrgInfo orgInfo = cacheService.findOrgByUid(asset.getSiteUID());
+            newAssetServiceRequest.setCustomerName(orgInfo.getContactPerson());
+            newAssetServiceRequest.setCustomerTel(orgInfo.getContactPhone());
+            newAssetServiceRequest.setHospitalName(orgInfo.getName());
+        }
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        AssetInfo asset = (AssetInfo) eventObject;
+        if (asset == null) {
+            return;
+        }
+        onSelectedAsset(asset);
+        this.selectedAsset = asset;
+        currentStatus = asset.getStatus();
+
+        if(customConfig ==null){
+            if (currentStatus == AssetConstant.ASSET_STATUS_NORMAL
+                    || currentStatus == AssetConstant.ASSET_STATUS_TO_TERMINATED
+                    || currentStatus == AssetConstant.ASSET_STATUS_STOP) {
+                currentStatus = AssetConstant.ASSET_STATUS_ILL;
+            }
+            needConfirmTime = false;
+        }else{ //如果有自定义配置
+            String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+            currentStatus= Integer.valueOf(strAssetStatus);
+            if(currentStatus == AssetConstant.ASSET_STATUS_ILL) //限制功能使用
+                needConfirmTime=false;
+            if(currentStatus == AssetConstant.ASSET_STATUS_DOWN)//停机
+                needConfirmTime=true;
+        }
+
+
+        if (this.newServiceRequest == null) {
+            return;
+        }
+
+    }
+
+    public void saveServiceRequestAsset() {
+        if(userContextService.isCountyArea()){
+            String msg = null;
+            if(newAssetServiceRequest.getSiebleNumber() != null && newAssetServiceRequest.getSiebleNumber().length() != 13){
+                msg = WebUtil.getMessage("siebleNumber")+"长度必须填为13位";
+            }
+            if(newAssetServiceRequest.getCallCenterNumber() != null && newAssetServiceRequest.getCallCenterNumber().length() != 10){
+                msg = WebUtil.getMessage("callCenterNumber")+"长度必须填为10位";
+            }
+            if(StringUtils.isNotBlank(msg)){
+                WebUtil.addErrorMessage(msg);
+                //前端弹窗不退出并提示错误信息
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+        }
+        if (null == selectedAsset) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        WorkflowConfig woc = configService.findConfigBySite(selectedAsset.getSiteUID());
+        if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
+            this.saveServiceRequestSupplier();
+        }
+        if(StringUtils.isEmpty(newAssetServiceRequest.getRequestReason())){
+            newAssetServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
+        }
+
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoAssetDepartmentNoRepaired"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else {
+            selectedAsset.setStatus(currentStatus);
+            newAssetServiceRequest.setAssetLocation(locationName);
+            newAssetServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
+            woService.createServiceRequest(newAssetServiceRequest, selectedAsset, picSrList,null);
+            cancel();
+        }
+    }
+
+    public void saveServiceRequestSupplier() {
+        if(StringUtils.isEmpty(newAssetServiceRequest.getRequestReason())){
+            newAssetServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
+        }
+        if(selectedAsset.getSupplierNewUID() == null){
+            WebUtil.addErrorMessage("设备未关联供应商,无法使用供应商派工");
+            return;
+        }
+        Map<String, Object> map = woService.findSupplierFEByAssetUid(selectedAsset);
+        List<UserAccount>  data = (List<UserAccount>)map.get("data");
+        if(ObjectUtils.isEmpty(data)){
+            WebUtil.addErrorMessage("设备未绑定供应商维修工程师");
+            return;
+        }
+        int size = data.size();
+        if(size>1){
+            WebUtil.addErrorMessage("设备绑定工程师过多");
+            return;
+        }
+        if (null == selectedAsset) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoAssetDepartmentNoRepaired"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else {
+            selectedAsset.setStatus(currentStatus);
+            newAssetServiceRequest.setAssetLocation(locationName);
+            newAssetServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
+
+            woService.createServiceRequest(newAssetServiceRequest, selectedAsset, picSrList,2);
+            cancel();
+        }
+    }
+
+    public void cancelAsset(){
+        newAssetServiceRequest = null;
+    }
+
+
     public void saveServiceRequest(){
         serviceRequestNoAssetService.saveServiceRequest(newServiceRequest, picList);
     }
@@ -345,6 +579,8 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     public void cancel(){
         newServiceRequest = null;
     }
+
+
 
     @Override
     protected GenericRepositoryUUID<V2_ServiceRequestNoAsset> getDAO() {
