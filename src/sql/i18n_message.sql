@@ -6153,7 +6153,7 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('stockSource','3','到货入库','arrival',NULL, -1);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('stockSource','4','退货入库','returned',NULL, -1);
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','qualityControlCalendar','质控日历','Quality Control Calendar',NULL,-1);
 
 
 

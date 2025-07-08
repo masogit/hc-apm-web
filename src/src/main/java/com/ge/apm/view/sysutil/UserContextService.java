@@ -279,6 +279,9 @@ public class UserContextService implements Serializable {
     }
 
     public boolean accessContainsFunctionMenu(String functionName) {
+        if ("QUALITY_CONTROL_CALENDAR_VIEW".equals(functionName) || "DEVICEDATAPREVIEW_VIEW".equals(functionName)) {
+            System.out.println("132");
+        }
         Set<String> functions = getFunctionListByFeatureAndRoles();
         functions = functions.stream().filter(function -> function.startsWith(functionName)).collect(Collectors.toSet());
         return CollectionUtils.isNotEmpty(functions);
