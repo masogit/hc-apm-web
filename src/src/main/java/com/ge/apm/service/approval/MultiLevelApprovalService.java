@@ -1153,17 +1153,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                     assetInfoBulkEditService.commitBulkEditSite(assetInfos, assetInfo, null);
                                 } else {
                                     assetInfoDao.save(assetInfos);
-                                }
-
-                                for (AssetInfo assetInfo : assetInfos) {
-                                    MqContext mqContext = new MqContext();
-                                    mqContext.setClassName("MultiLevelApprovalService");
-                                    mqContext.setServiceName("hc-apm-web");
-                                    mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
-                                    mqContext.setDescribe("资产转科审核同意");
-                                    mqContext.setSource("departmentConvert");
-                                    UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-                                    mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
+                                    for (AssetInfo assetInfo : assetInfos) {
+                                        MqContext mqContext = new MqContext();
+                                        mqContext.setClassName("MultiLevelApprovalService");
+                                        mqContext.setServiceName("hc-apm-web");
+                                        mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
+                                        mqContext.setDescribe("资产转科审核同意");
+                                        mqContext.setSource("departmentConvert");
+                                        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+                                        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
+                                    }
                                 }
 
                                 Set<String> approverUids = multiLevelApprovalList.stream().map(MultiLevelApproval::getActualApproverUid).collect(Collectors.toSet());
