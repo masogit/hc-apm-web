@@ -6,6 +6,7 @@ import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
@@ -2138,12 +2139,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public boolean getIsAssetStaff(){
+    public boolean getAssetScrapFunction(){
+        Set<String> functionListByFeatureAndRoles = userContextService.getFunctionListByFeatureAndRoles();
+       return   functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_ASSET_BUTTON.name()) ||  functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_CLINICAL_BUTTON.name());
 
-        List<SysRole> userRoles = sysRoleRepository.getUserRolesByUserId(loginUser.getId());
-        List<String> strings = Arrays.asList(ApmSystemRole.ClinicalStaff.name(), ApmSystemRole.DeptHead.name(), ApmSystemRole.NursingStaff.name());
-        List<SysRole> roleList = userRoles.stream().filter(item->!strings.contains(item.getName()) ).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(roleList)) {
+    }
+
+    public boolean getIsAssetStaff(){
+//        List<SysRole> userRoles = sysRoleRepository.getUserRolesByUserId(loginUser.getId());
+//        List<String> strings = Arrays.asList(ApmSystemRole.ClinicalStaff.name(), ApmSystemRole.DeptHead.name(), ApmSystemRole.NursingStaff.name());
+//        List<SysRole> roleList = userRoles.stream().filter(item->!strings.contains(item.getName()) ).collect(Collectors.toList());
+        Set<String> functionListByFeatureAndRoles = userContextService.getFunctionListByFeatureAndRoles();
+        if (!functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_ASSET_BUTTON.name())) {
             return false;
         }else{
             return true;
