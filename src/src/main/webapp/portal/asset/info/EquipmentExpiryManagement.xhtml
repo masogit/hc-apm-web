@@ -58,8 +58,11 @@
                                      placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}"
                                      maxlength="100" style="width: 500px">
                             <p:ajax event="keyup"
-                                    update=":equipmentExpiryManagementForm"/>
+                                    update=":equipmentExpiryManagementForm searchButtons"/>
                         </p:inputText>
+                        <h:panelGroup id="searchButtons">
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":equipmentExpiryManagementForm searchText" actionListener="#{equipmentExpiryManagementController.setOneSearchStr('')}" rendered="#{not empty equipmentExpiryManagementController.oneSearchStr}"/>
+                        </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
                 <h:form id="equipmentExpiryManagementForm">
@@ -74,7 +77,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="filter" listener="#{equipmentExpiryManagementController.onFilter}"
-                                oncomplete="updateSelectAllCheckBox();"/>
+                                oncomplete="updateSelectAllCheckBox();" update="searchForm"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
                         <p:column id="checkBoxColumn" width="49" exportable="false">
                             <p:selectBooleanCheckbox value="#{equipmentExpiryManagementController.selectedMap[item.id]}"

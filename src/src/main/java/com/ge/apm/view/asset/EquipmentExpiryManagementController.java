@@ -129,7 +129,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         }
         if (user.isEnableAssetTypeGroup()) {
             if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
-                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.EQ, assetTypeGroupEncodedSet, "1*"));
+                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
             } else {
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
                 this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
