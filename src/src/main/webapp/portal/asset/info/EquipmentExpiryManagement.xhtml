@@ -63,7 +63,7 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="equipmentExpiryManagementForm">
-                    <p:dataTable id="datalist" value="#{equipmentExpiryManagementController.lazyModel}" var="item" style="padding: 0!important;font-size: 12!important;"
+                    <p:dataTable id="datalist" value="#{equipmentExpiryManagementController.lazyModel}" var="item"
                                  widgetVar="varDataList"
                                  selectionMode="single" scrollable="false"
                                  selection="#{equipmentExpiryManagementController.selected}"
@@ -77,6 +77,12 @@
                                 oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
                         <p:column id="checkBoxColumn" width="49" exportable="false">
+                            <p:selectBooleanCheckbox value="#{equipmentExpiryManagementController.selectedMap[item.id]}"
+                                                     class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated) :equipmentExpiryManagementForm:datalist :panelFilterManufactureDate"
+                                        listener="#{equipmentExpiryManagementController.onSelectOfPage}"
+                                        oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
                             <f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
                                     <p:ajax listener="#{equipmentExpiryManagementController.onSelectAllOfPage}"
@@ -84,12 +90,6 @@
                                             oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
-                            <p:selectBooleanCheckbox value="#{equipmentExpiryManagementController.selectedMap[item.id]}"
-                                                     class="selectCheckBox">
-                                <p:ajax process="@this" update="@this @(.batch-terminated) :equipmentExpiryManagementForm:datalist :panelFilterManufactureDate"
-                                        listener="#{equipmentExpiryManagementController.onSelectOfPage}"
-                                        oncomplete="updateSelectAllCheckBox();"/>
-                            </p:selectBooleanCheckbox>
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="49">
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.editUsageYear}" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}" onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm"/>
@@ -117,7 +117,7 @@
                                     <p:autoComplete dropdown="true" value="#{equipmentExpiryManagementController.filterAssetTypeGroup}" appendTo="@(Body)"
                                                     scrollHeight="300"  forceSelection="true" completeMethod="#{equipmentExpiryManagementController.autoCompleteAssetTypeGroupName}" size="5">
                                         <p:ajax event="itemSelect" listener="#{equipmentExpiryManagementController.onAssetTypeGroupNameFilterChange}" process="@this"  update=":equipmentExpiryManagementForm:datalist :panelFilterManufactureDate"/>
-<!--                                        <p:ajax process="@this" listener="#{equipmentExpiryManagementController.onAssetTypeGroupNameFilterChange}" update=":equipmentExpiryManagementForm:datalist" />-->
+                                        <p:ajax process="@this" listener="#{equipmentExpiryManagementController.onAssetTypeGroupNameFilterChange}" update=":equipmentExpiryManagementForm:datalist :panelFilterManufactureDate" />
                                     </p:autoComplete>
                                 </f:facet>
                                 <h:outputText value="#{equipmentExpiryManagementController.convertAssetTypeGroupEncodedToName(item.assetType)}"/>
@@ -253,12 +253,7 @@
                 $("html")[0].style.overflowX= "hidden";
             }
 
-            $(function () {
-                $(".ui-datatable-tablewrapper").css('width', '100%');
-                $("div table")[1].style.overflowX = "scroll";
-                $("div table")[1].style.width = "auto";
-                $("html")[0].style.overflowX = "hidden";
-            });
+
 
             //<![CDATA[
             afterPageLoad = function () {
