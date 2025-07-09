@@ -325,24 +325,33 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             selectedItem.setInStockUser(currentUser.getUid());
             selectedItem.setStockStatus(3);
             AssetInStockRecord assetInStockRecord = new AssetInStockRecord();
-            assetInStockRecord.setSiteUid(selectedItem.getArrivalList().getSiteUID());
-            assetInStockRecord.setHospitalUid(selectedItem.getArrivalList().getHospitalUID());
-            assetInStockRecord.setInstitutionUid(selectedItem.getArrivalList().getInstitutionUID());
-            assetInStockRecord.setTenantUid(selectedItem.getArrivalList().getTenantUID());
+            if (ObjectUtil.isNotEmpty(selectedItem.getArrivalList())) {
+                assetInStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
+                assetInStockRecord.setInvoiceNum(selectedItem.getArrivalList().getInvoiceNum());
+                assetInStockRecord.setInvoiceDate(selectedItem.getArrivalList().getInvoiceDate());
+                assetInStockRecord.setVendor(selectedItem.getArrivalList().getVendor());
+                assetInStockRecord.setSiteUid(selectedItem.getArrivalList().getSiteUID());
+                assetInStockRecord.setHospitalUid(selectedItem.getArrivalList().getHospitalUID());
+                assetInStockRecord.setInstitutionUid(selectedItem.getArrivalList().getInstitutionUID());
+                assetInStockRecord.setTenantUid(selectedItem.getArrivalList().getTenantUID());
+            } else {
+                assetInStockRecord.setVendor(selectedItem.getAssetInfo().getVendor());
+                assetInStockRecord.setSiteUid(selectedItem.getAssetInfo().getSiteUID());
+                assetInStockRecord.setHospitalUid(selectedItem.getAssetInfo().getHospitalUID());
+                assetInStockRecord.setInstitutionUid(selectedItem.getAssetInfo().getInstitutionUID());
+                assetInStockRecord.setTenantUid(selectedItem.getAssetInfo().getTenantUID());
+
+            }
             assetInStockRecord.setAssetUid(selectedItem.getAssetUid());
             assetInStockRecord.setInStockNo(selectedItem.getInStockNo());
             assetInStockRecord.setBusinessDate(now);
-            assetInStockRecord.setVendor(selectedItem.getArrivalList().getVendor());
             assetInStockRecord.setInStockUser(selectedItem.getInStockUser());
             assetInStockRecord.setFinancingNum(selectedItem.getAssetInfo().getFinancingNum());
             assetInStockRecord.setAssetName(selectedItem.getAssetInfo().getName());
-            assetInStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
             assetInStockRecord.setInstallDate(selectedItem.getAssetInfo().getInstallDate());
             assetInStockRecord.setFunctionType(selectedItem.getAssetInfo().getFunctionType());
             assetInStockRecord.setComments(selectedItem.getComments());
             assetInStockRecord.setPurchasePrice(selectedItem.getAssetInfo().getPurchasePrice());
-            assetInStockRecord.setInvoiceNum(selectedItem.getArrivalList().getInvoiceNum());
-            assetInStockRecord.setInvoiceDate(selectedItem.getArrivalList().getInvoiceDate());
             assetInStockRecord.setArrivalListId(selectedItem.getArrivalListId());
             assetInStockRecord.setArrivalItemId(selectedItem.getId());
             assetInStockRecord.setStockStatus(3);
@@ -387,24 +396,32 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             selectedItem.setStockStatus(4);
             assetIds.add(selectedItem.getAssetUid());
             AssetOutStockRecord assetOutStockRecord = new AssetOutStockRecord();
-            assetOutStockRecord.setSiteUid(selectedItem.getArrivalList().getSiteUID());
-            assetOutStockRecord.setHospitalUid(selectedItem.getArrivalList().getHospitalUID());
-            assetOutStockRecord.setInstitutionUid(selectedItem.getArrivalList().getInstitutionUID());
-            assetOutStockRecord.setTenantUid(selectedItem.getArrivalList().getTenantUID());
+            if (ObjectUtil.isNotEmpty(selectedItem.getArrivalList())) {
+                assetOutStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
+                assetOutStockRecord.setInvoiceNum(selectedItem.getArrivalList().getInvoiceNum());
+                assetOutStockRecord.setInvoiceDate(selectedItem.getArrivalList().getInvoiceDate());
+                assetOutStockRecord.setVendor(selectedItem.getArrivalList().getVendor());
+                assetOutStockRecord.setSiteUid(selectedItem.getArrivalList().getSiteUID());
+                assetOutStockRecord.setHospitalUid(selectedItem.getArrivalList().getHospitalUID());
+                assetOutStockRecord.setInstitutionUid(selectedItem.getArrivalList().getInstitutionUID());
+                assetOutStockRecord.setTenantUid(selectedItem.getArrivalList().getTenantUID());
+            } else {
+                assetOutStockRecord.setVendor(selectedItem.getAssetInfo().getVendor());
+                assetOutStockRecord.setSiteUid(selectedItem.getAssetInfo().getSiteUID());
+                assetOutStockRecord.setHospitalUid(selectedItem.getAssetInfo().getHospitalUID());
+                assetOutStockRecord.setInstitutionUid(selectedItem.getAssetInfo().getInstitutionUID());
+                assetOutStockRecord.setTenantUid(selectedItem.getAssetInfo().getTenantUID());
+            }
             assetOutStockRecord.setAssetUid(selectedItem.getAssetUid());
             assetOutStockRecord.setOutStockNo(selectedItem.getOutStockNo());
             assetOutStockRecord.setBusinessDate(now);
-            assetOutStockRecord.setVendor(selectedItem.getArrivalList().getVendor());
             assetOutStockRecord.setOutStockUser(selectedItem.getOutStockUser());
             assetOutStockRecord.setFinancingNum(selectedItem.getAssetInfo().getFinancingNum());
-            assetOutStockRecord.setAssetName(selectedItem.getArrivalList().getAssetName());
-            assetOutStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
+            assetOutStockRecord.setAssetName(selectedItem.getAssetInfo().getName());
             assetOutStockRecord.setInstallDate(selectedItem.getAssetInfo().getInstallDate());
             assetOutStockRecord.setFunctionType(selectedItem.getAssetInfo().getFunctionType());
             assetOutStockRecord.setComments(selectedItem.getComments());
             assetOutStockRecord.setPurchasePrice(selectedItem.getAssetInfo().getPurchasePrice());
-            assetOutStockRecord.setInvoiceNum(selectedItem.getArrivalList().getInvoiceNum());
-            assetOutStockRecord.setInvoiceDate(selectedItem.getArrivalList().getInvoiceDate());
             assetOutStockRecord.setArrivalListId(selectedItem.getArrivalListId());
             assetOutStockRecord.setArrivalItemId(selectedItem.getId());
             assetOutStockRecord.setRecruiteDeptUid(selectedItem.getRecruiteDeptUid());
