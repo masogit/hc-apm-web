@@ -1498,6 +1498,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             param.put("auditSignature", signatureId);
             param.put("applyReason", applyReason);
             param.put("requestSource", 1);
+
             assetDepartmentConvertService.apply(param);
         }
     }
