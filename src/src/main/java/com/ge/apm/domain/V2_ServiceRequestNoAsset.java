@@ -41,11 +41,6 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name = "dept_name")
     private String deptName;
 
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "requestor_id")
-    private Integer requestorId;
-
     //报修人
     @Basic(optional = false)
     @NotNull
@@ -78,6 +73,25 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     //工单状态
     @Column(name = "status")
     private Integer status;
+
+    //1: 2：待派工 3：待接单  4：待关单 5：已关单  9：已取消
+    @Column(name = "current_step_id")
+    private Integer currentStepId;
+
+    @Column(name = "current_step_name")
+    private String currentStepName;
+
+    @Column(name = "current_person_id")
+    private Integer currentPersonId;
+
+    @Column(name = "current_person_name")
+    private String currentPersonName;
+
+    /**
+     * 1: auto dispatch 2: grab and manual 3: grab 4: manual
+     */
+    @Column(name = "dispatch_mode")
+    private Integer dispatchMode;
     
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -99,6 +113,39 @@ public class V2_ServiceRequestNoAsset implements Serializable {
 
     @Column(name = "comment")
     private String comment;
+
+    @Column(name = "created_user_uid")
+    private String createdUserUid;
+
+    @Column(name = "created_user_name")
+    private String createdUserName;
+
+    @Column(name = "repair_type")
+    private Integer repairType;
+
+    //派工信息
+    @Column(name="send_step_owner_Id")
+    private Integer sendStepOwnerId;
+    @Column(name="send_step_owner_name")
+    private String sendStepOwnerName;
+    @Column(name="send_step_start_time")
+    private Date sendStepStartTime;
+
+    //接单信息
+    @Column(name="accept_step_owner_Id")
+    private Integer acceptStepOwnerId;
+    @Column(name="accept_step_owner_name")
+    private String acceptStepOwnerName;
+    @Column(name="accept_step_start_time")
+    private Date acceptStepStartTime;
+
+    @Column(name = "confirmed_down_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Date confirmedDownTime;
+
+    @Column(name = "asset_status")
+    private Integer assetStatus;
 
     @Override
     public int hashCode() {
