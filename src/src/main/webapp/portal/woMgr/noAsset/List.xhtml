@@ -8,7 +8,14 @@
 			<div class="ui-g-12 card ">
 				<h:form id="listForm">
 					<h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+						<p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet" disabled="#{serviceRequestNoAssetController.queryIndex==0}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" action="List.xhtml?faces-redirect=true&amp;query=0" />
 						<p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet createSrNoAssetDialog" actionListener="#{serviceRequestNoAssetController.createServiceRequest()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CREATE')}" oncomplete="PF('createSrNoAssetDialog').show()"/>
+						<!--<p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=1" disabled="#{serviceRequestNoAssetController.queryIndex==1}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" onclick="onButtonChange()"  />-->
+						<p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=2"  disabled="#{serviceRequestNoAssetController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}"/>
+						<p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet" action="List.xhtml?faces-redirect=true&amp;query=3"  disabled="#{serviceRequestNoAssetController.queryIndex==3}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+						<p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=7"  disabled="#{serviceRequestNoAssetController.queryIndex==7}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
+						<p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=9"  disabled="#{serviceRequestNoAssetController.queryIndex==9}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
+						<p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " disabled="#{serviceRequestNoAssetController.queryIndex==11}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" action="List.xhtml?faces-redirect=true&amp;query=11" />
 
 					</h:panelGrid>
 					<p:dataTable id="datalist" value="#{serviceRequestNoAssetController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
@@ -34,6 +41,9 @@
 									<h:outputText value="#{fieldMsg.fieldValue('casePriority',item.casePriority)}" class="priorityItem priorityItem#{item.casePriority}"></h:outputText>
 								</c:otherwise>
 							</c:choose>
+						</p:column>
+						<p:column headerText="#{msg.srNum}" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.srNum}"/>
 						</p:column>
 						<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetName}"/>
@@ -72,12 +82,26 @@
 						<p:column headerText="#{msg.requestReason}" sortBy="#{item.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
 							<h:outputText value="#{serviceRequestNoAssetController.getRequestReasonInShort(item.requestReason)}" title="#{item.requestReason}"/>
 						</p:column>
-
-
-						<p:column headerText="备注">
-							<h:outputText value="#{item.comment}" />
+						<p:column  headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+							<h:outputText  value="#{serviceRequestNoAssetController.getStepName(item)}"/>
 						</p:column>
 
+						<!-- 待派工 -->
+						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{serviceRequestNoAssetController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
+							<p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
+							<p:commandButton  value="#{msg.Cancel}"  actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}" oncomplete="PF('cancelDialog').show()"/>
+						</p:column>
+						<!--  待接单 -->
+						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{serviceRequestNoAssetController.queryIndex==3 and (userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
+							<p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:msg.CompeteOrder}" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}" update=":takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+							<p:commandButton value="#{msg.transfer}" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+							<p:commandButton  value="#{msg.Cancel}"  actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
+						</p:column>
+						<!-- 待关单 -->
+						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE') and serviceRequestNoAssetController.queryIndex==7}">
+							<p:commandButton value="#{msg.closeWo}" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.status eq 2}"/>
+							<p:commandButton value="转台账报修" actionListener="#{serviceRequestNoAssetController.prepareTurnWorkOrder(item.id)}" update=":assetSearchForm" oncomplete="PF('AssetSelectDlg').show()" disabled="#{item.status eq 2}"/>
+						</p:column>
 					</p:dataTable>
 				</h:form>
 
@@ -85,7 +109,7 @@
 				<p:overlayPanel  widgetVar="panelFilterApplyTime" for="listForm:datalist:filterApplyTime" dismissable="false">
 					<h:panelGrid columns="2">
 						<p:outputLabel for="cal1" />
-						<p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{workOrderMgrController.applyTimeFrom}"
+						<p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{serviceRequestNoAssetController.applyTimeFrom}"
 									pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
 						<p:outputLabel for="cal2"/>
 						<p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold"
@@ -96,7 +120,130 @@
 				</p:overlayPanel>
 			</div>
 		</div>
+
+		<p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
+			<h:form id="dispatchDialogForm" >
+				<h:panelGroup id="display4" rendered="#{not empty serviceRequestNoAssetController.selectedSr}">
+					<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">#{msg.WorkOrderAssignee}*</label>
+							<p:selectOneMenu  value="#{serviceRequestNoAssetController.selectedSr.currentPersonId}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+								<f:selectItems value="#{serviceRequestNoAssetController.getAssigneeUsers()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+							</p:selectOneMenu>
+						</h:panelGroup>
+					</p:panelGrid>
+					<br/>
+					<h:panelGroup>
+						<p:commandButton validateClient="true" actionListener="#{serviceRequestNoAssetController.dispatchSrNoAsset()}" value="#{msg.dispatchWorkOrder}" update="listForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'dispatchDialog');"/>
+						<p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('dispatchDialog').hide()"/>
+					</h:panelGroup>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+		<!-- 接单-->
+		<p:dialog id="takeOrderDialog" widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.takeorder}">
+			<h:form id="takeOrderDialogForm" >
+				<h:panelGroup id="display1" rendered="#{not empty serviceRequestNoAssetController.selectedSr}">
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">#{msg.estimatetime}*</label>
+							<p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd HH:mm:ss"  value="#{serviceRequestNoAssetController.esTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="预估时间 #{msg.ValidationRequire}"></p:calendar>
+						</h:panelGroup>
+						<br/>
+						<h:panelGroup>
+							<label class="label">#{msg.repairType}</label>
+							<p:selectOneMenu  value="#{serviceRequestNoAssetController.selectedSr.repairType}" required="true" requiredMessage="#{msg.repairType} #{msg.ValidationRequire}" rendered="#{!userContextService.isCountyArea()}">
+								<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+								<f:selectItems value="#{fieldMsg.getFieldValueList('repairType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+							</p:selectOneMenu>
+							<p:selectOneMenu  value="#{serviceRequestNoAssetController.repairType}" required="true" requiredMessage="#{msg.repairType} #{msg.ValidationRequire}" rendered="#{userContextService.isCountyArea()}">
+								<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+								<f:selectItems value="#{fieldMsg.getFieldValueList('repairTypeCountyArea')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<br/>
+						<h:panelGroup>
+							<label class="label">#{msg.comments}</label>
+							<p:inputTextarea value="#{serviceRequestNoAssetController.comments}" rows="3"  cols="40"  maxlength="128"/>
+						</h:panelGroup>
+
+					</p:panelGrid>
+					<br/>
+					<h:panelGroup>
+						<p:commandButton validateClient="true" actionListener="#{serviceRequestNoAssetController.acceptSrNoAsset()}" value="#{msg.takeorder}" update=":takeOrderDialogForm :growl :listForm:datalist " icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog');"/>
+						<p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{serviceRequestNoAssetController.cancel()}" icon="ui-icon-cancel" onclick="PF('takeOrderDialog').hide()"/>
+					</h:panelGroup>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+		<!-- 取消dlg -->
+		<p:dialog id="cancelDialog" widgetVar="cancelDialog" modal="true" width="500"  resizable="true" draggable="true" header="#{msg.cancelWorkOrder}">
+			<h:form id="cancelDialogForm" >
+				<h:panelGroup id="display1">
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+						<h:panelGroup>
+							<label class="label">#{msg.deviceStatus}*</label>
+							<p:selectOneMenu value="#{serviceRequestNoAssetController.assetStatus}" >
+								<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup >
+							<label class="label">#{msg.cancelWorkOrderReason}</label>
+							<p:inputTextarea value="#{serviceRequestNoAssetController.cancelReason}" maxlength="256"  required="true" requiredMessage="#{msg.cancelWorkOrderReason}#{msg.ValidationRequire}"/>
+						</h:panelGroup>
+					</p:panelGrid>
+					<h:panelGroup >
+						<p:commandButton value="#{msg.selectSearchInterval_2}" icon="ui-icon-arrow-back" actionListener="#{serviceRequestNoAssetController.cancelSrNoAsset()}" validateClient="true"  update="listForm :growl" style="float:left" oncomplete="handleSubmit(args, 'cancelDialog');" >
+							<p:confirm header="#{msg.confirmcancel}" message="#{msg.CancelWorkOrderConformationMsg}" icon="ui-icon-warning"/>
+						</p:commandButton>
+						<p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('cancelDialog').hide()"/>
+					</h:panelGroup>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+		<!-- 抢单 -->
+		<p:dialog id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.TransferOrder}">
+			<h:form id="transferOrderDialogForm" >
+				<h:panelGroup id="display2" rendered="#{not empty serviceRequestNoAssetController.selectedSr}">
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">#{msg.WorkOrderAssignee}</label>
+							<p:selectOneMenu  value="#{serviceRequestNoAssetController.selectedSr.currentPersonId}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
+								<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+								<f:selectItems value="#{serviceRequestNoAssetController.getAssigneeUsers()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+							</p:selectOneMenu>
+							<h:panelGroup>
+								<label class="label">#{msg.Remark}</label>
+								<p:inputTextarea id="comment" placeholder="#{msg.WorkRequirements}" value="#{serviceRequestNoAssetController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+							</h:panelGroup>
+						</h:panelGroup>
+					</p:panelGrid>
+					<br/>
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:commandButton validateClient="true" actionListener="#{serviceRequestNoAssetController.reassignSrNoAsset()}" value="#{msg.TransferOrder}" update=":transferOrderDialogForm :growl :listForm:datalist " icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
+					<p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{serviceRequestNoAssetController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+		<p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="300" appendTo="@(body)" header="#{msg.closeWo}" height="180">
+			<h:form id="toCloseDialogForm" >
+				<h:panelGroup id="display3" rendered="#{not empty serviceRequestNoAssetController.selectedSr}">
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">#{msg.Remark}</label>
+							<p:inputTextarea  value="#{serviceRequestNoAssetController.comments}" rows="4"  cols="30"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:panelGroup>
+				<h:panelGroup>
+					<p:commandButton validateClient="true" actionListener="#{serviceRequestNoAssetController.closeSrNoAsset()}" value="#{msg.closeWo}" update=":toCloseDialogForm :growl :listForm:datalist " icon="ui-icon-check" oncomplete="handleSubmit(args, 'toCloseDialog');"/>
+					<p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{serviceRequestNoAssetController.cancel()}" icon="ui-icon-cancel" onclick="PF('toCloseDialog').hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
 		<ui:include src="srCreate.xhtml" />
+		<ui:include src="AssetSelect.xhtml" />
 		<script >
 			function updateSelectAllCheckBox() {
 				var checkboxlist = $(".selectCheckBox");

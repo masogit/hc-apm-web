@@ -12,22 +12,33 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="measureCoWorkerDlgForm">
-                    <p:fieldset legend="计量报告"  >
+                    <p:fieldset legend="计量报告上传"  >
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
-                                <h:outputText id="fileName" value="#{measuringCertificateDetailController.file.fileName}"/>
-                                <p:commandButton actionListener="#{measuringCertificateDetailController.removeAttachment()}" update="measureCoWorkerDlgForm" rendered="#{not empty measuringCertificateDetailController.file}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                </p:commandButton>
+                                <p:fieldset  toggleable="false" rendered="#{not empty measuringCertificateDetailController.streamedContents}">
+                                    <p:dataGrid  var="fileitem"  value="#{measuringCertificateDetailController.getStreamedContents()}" columns="5" layout="grid" >
+                                        <p:panel  style="text-align:center">
+                                            <h:panelGrid columns="2" style="width:100%" >
+                                                 <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem)}"/>
+                                                <p:graphicImage value="#{measuringCertificateDetailController.getStreamedContentImg(fileitem)}" height="80" width="100" stream="false" >
+                                                </p:graphicImage>
+                                            </h:panelGrid>
+                                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.name}" action="#{measuringCertificateDetailController.downloadFile(fileitem)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                                            <p:commandButton validateClient="false" actionListener="#{measuringCertificateDetailController.removeAttachment(fileitem)}" update="measureCoWorkerDlgForm"  icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:panel>
+                                    </p:dataGrid>
+                                </p:fieldset>
                                 <p:fileUpload id="fileUpload" fileUploadListener="#{measuringCertificateDetailController.uploadDataFile}"
-                                              disabled="#{not empty measuringCertificateDetailController.file}"
-                                              value="#{measuringCertificateDetailController.file}" mode="advanced"
+                                              disabled="#{not empty measuringCertificateDetailController.getOCRTemplates() and not empty measuringCertificateDetailController.streamedContents}"
+                                               mode="advanced"
                                               dragDropSupport="false" style="width:100%" process="@this"
-                                              multiple="false" sizeLimit="10000000"
+                                              multiple="false"
                                               update="measureCoWorkerDlgForm" auto="true" fileLimit="1"
-                                              invalidSizeMessage="#{msg.invalidSizeMessage}10M"
-                                              accept="image/*,application/pdf"
-                                              allowTypes="/(\.|\/)(png|jpeg|pdf)$/" label="#{empty measuringCertificateDetailController.getOCRTemplates()?msg.Add:'添加并OCR识别'}"
+                                              invalidFileMessage="请上传pdf类型计量报告!"
+                                              accept="#{empty measuringCertificateDetailController.getOCRTemplates()?'':'image/*,application/pdf'}"
+                                              allowTypes="#{measuringCertificateDetailController.getAllowTypes()}" label="#{empty measuringCertificateDetailController.getOCRTemplates()?msg.Add:'添加并OCR识别'}"
                                 />
                             </h:panelGroup>
                         </p:panelGrid>
@@ -82,11 +93,11 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">检定日期</label>
+                                <label class="label">检定日期<span style="color:red;">*</span></label>
                                 <p:calendar timeZone="GMT+8"  id="checkDate" pattern="yyyy/MM/dd" value="#{measuringCertificateDetailController.selected.checkDate}" required="true" requiredMessage="检定日期 #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">有效期至</label>
+                                <label class="label">有效期至<span style="color:red;">*</span></label>
                                 <p:calendar timeZone="GMT+8"  id="validDateTo" pattern="yyyy/MM/dd" value="#{measuringCertificateDetailController.selected.validDateTo}" required="true" requiredMessage="有效期至 #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -128,6 +139,7 @@
                     </h:panelGroup>
 
                 </h:form>
+                <ui:include src="/portal/preview/view.xhtml" />
             </div>
         </div>
  </ui:define>

@@ -26,6 +26,10 @@
                      <h:outputText value="#{serviceRequestNoAssetController.selected.deptName}"/>
                   </h:panelGroup>
                   <h:panelGroup>
+                     <label class="label">#{msg.srNum}</label>
+                     <p:outputLabel value="#{serviceRequestNoAssetController.selected.srNum}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
                      <label class="label">#{msg.assetName}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.assetName}" />
                   </h:panelGroup>
@@ -47,6 +51,19 @@
                      <label class="label">#{msg.requestReason}*</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.requestReason}" />
                   </h:panelGroup>
+                  <h:panelGroup id="assetstatus" class="updateDownTime">
+                     <label class="label">#{msg.status}</label>
+                     <p:selectOneRadio id="status" value="#{serviceRequestNoAssetController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.validationRequire}" disabled="#{serviceRequestNoAssetController.currentStatus ne 3}">
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(0, 1)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{serviceRequestNoAssetController.selected.currentStepId ne 4}"/>
+                     </p:selectOneRadio>
+                  </h:panelGroup>
+                  <h:panelGroup id="showDownTime" rendered="#{serviceRequestNoAssetController.currentStatus == 2}">
+                     <label class="label">#{msg.confirmedDownTime}</label>
+                     <p:outputLabel value="#{serviceRequestNoAssetController.selected.confirmedDownTime}" >
+                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                     </p:outputLabel>
+                  </h:panelGroup>
                   <h:panelGroup >
                      <label class="label">#{msg.comment}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.comment}"/>
@@ -64,18 +81,40 @@
                      </p:panel>
                   </p:dataGrid>
                </p:fieldset>
+
+               <p:dataTable value="#{serviceRequestNoAssetController.getSrStep(selected.id)}" var="stepItem">
+                  <p:column headerText="#{msg.stepName}">
+                     <h:outputText value="#{stepItem.stepName}" />
+                  </p:column>
+                  <p:column headerText="#{msg.ownerName}">
+                     <h:outputText value="#{stepItem.ownerName}" />
+                  </p:column>
+                  <p:column headerText="#{msg.startTime}">
+                     <h:outputText value="#{stepItem.startTime}" >
+                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                     </h:outputText>
+                  </p:column>
+                  <p:column headerText="#{msg.endTime}">
+                     <h:outputText value="#{stepItem.endTime}" >
+                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                     </h:outputText>
+                  </p:column>
+                  <p:column headerText="#{msg.description}">
+                     <h:outputText value="#{stepItem.comments}"  style="word-wrap: break-word;"/>
+                  </p:column>
+               </p:dataTable>
             </p:fieldset>
-            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+          <!--  <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                <h:panelGroup>
 
                    <p:commandButton value="转台账报修"  actionListener="#{serviceRequestNoAssetController.createServiceRequestByNoAsset(serviceRequestNoAssetController.selected)}" process="@this" icon="ui-icon-arrow-drop-down" update="createSRDialog "  oncomplete="PF('createSRDialog').show()" style="float:right;" />
                </h:panelGroup>
-            </p:panelGrid>
+            </p:panelGrid>-->
          </h:form>
          </div>
       </div>
       <ui:include src="/portal/preview/view.xhtml"/>
-      <ui:include src="srWoCreate.xhtml"/>
+      <!--<ui:include src="srWoCreate.xhtml"/>-->
 
    </ui:define>
    <style type="text/css">
