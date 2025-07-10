@@ -14,6 +14,7 @@ public enum RepairSourceEnum {
     Inventory,
     /*   计量 */
     Measurement,
+    ServiceRequestNoAsset
     ;
 
 

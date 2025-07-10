@@ -5,12 +5,17 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_ServiceRequestNoAsset;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.service.utils.TimeUtils;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,10 @@ public class ServiceRequestNoAssetApiService  extends MicroServiceInvoker {
         formData.setAssetName(newServiceRequest.getAssetName());
         formData.setComment(newServiceRequest.getComment());
         formData.setRequestorPhone(newServiceRequest.getRequestorPhone());
+        formData.setAssetStatus(newServiceRequest.getAssetStatus());
+        if (null != newServiceRequest.getConfirmedDownTime()) {
+            formData.setConfirmedDownTime(TimeUtils.getStrDate(newServiceRequest.getConfirmedDownTime(), "yyyy-MM-dd HH:mm:ss"));
+        }
 
         HttpEntity<ServiceRequestNoAssetForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_NO_ASSET_REQUEST_CREATE);
@@ -44,7 +53,42 @@ public class ServiceRequestNoAssetApiService  extends MicroServiceInvoker {
         }
     }
 
+
+    public Map<String, Object> getAssigneeUsersBySite(String token,String orgUid) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+
+        String gatewayURL = getGatewayURL(GatewayURL.SERVICE_NO_ASSET_ASSIGNEE_USERS);
+        if(StringUtils.isNotEmpty(orgUid)){
+            gatewayURL = gatewayURL + "?orgUid=" +orgUid;
+        }
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
+    public String invokeAction(String token, ServiceRequestNoAssetActionForm formData, String actionName, String woId){
+        HttpEntity<ServiceRequestNoAssetActionForm> requestEntity = new HttpEntity<ServiceRequestNoAssetActionForm>(formData, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.SERVICE_NO_ASSET_ACTION);
+        String url = gatewayURL.replace("{id}", woId).concat("?type=").concat(actionName);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            logger.info("Invoke ServiceRequestAction " + actionName + " has finished " + responseMap.get("data"));
+            return (String) responseMap.get("data");
+        } else {
+            return this.getResponseFailMessage(response);
+        }
+    }
+
+
 }
+
+
 
 
 @Data
@@ -59,4 +103,22 @@ class ServiceRequestNoAssetForm {
     List<V2_BlobObject> attachments;
     String comment;
     String requestorPhone;
+
+    String confirmedDownTime;
+
+    Integer assetStatus;
+}
+
+@Data
+class ServiceRequestNoAssetActionForm{
+    String assigneeId;
+    Integer currentStepId;
+    String estimatedCloseTime;
+
+    String desc;
+
+    String assetStatus;
+    String cancelReason;
+    Integer repairType;
+    String assetUid;
 }
