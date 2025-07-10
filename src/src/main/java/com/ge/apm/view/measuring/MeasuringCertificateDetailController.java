@@ -11,16 +11,22 @@ import com.ge.apm.service.OCRTemplateService;
 import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.I18nMessageService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import org.apache.commons.io.IOUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.ByteArrayContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -29,6 +35,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -42,11 +50,6 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     private MeasuringCertificateDetailRepository dao;
 
-    private UploadedFile file;
-
-    private String fileName;
-    private byte[] contents;
-    private String contentType;
 
     private UserAccount currentUser;
 
@@ -70,6 +73,8 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     private List<OCRTemplate> ocrTemplates;
 
+    private List<StreamedContent> streamedContents = new ArrayList<>();
+
     @Override
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
@@ -92,15 +97,14 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
     }
 
     public void uploadDataFile(FileUploadEvent event) {
+        UploadedFile file = event.getFile();
+        String fileName = file.getFileName();
         try {
             logger.info("uploadDataFile");
-            file = event.getFile();
-            fileName = file.getFileName();
-            contentType = file.getContentType();
-            contents = file.getContents();
             List<OCRTemplate> ocrTemplates = getOCRTemplates();
             if(CollectionUtils.isEmpty(ocrTemplates)){
-                WebUtil.addSuccessMessage("计量报告上传成功");
+                storageFile(file);
+                WebUtil.addSuccessMessage("上传成功");
                 return;
             }
 
@@ -120,19 +124,21 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             }else{
                 JSONObject jsonObject = templateService.upload(file,GatewayURL.OCR_IMAGE,params);
                 JSONObject data = jsonObject.getJSONObject("data");
-                Object remove = data.remove("source");
+                if(data != null){
+                    Object remove = data.remove("source");
+                    setObject(data);
+                }
+
 //                String source=JSON.toJSONString(remove,SerializerFeature.PrettyFormat);
 //                System.out.println("source:" + source);
 //                String  previewResult=JSON.toJSONString(data,SerializerFeature.PrettyFormat);
 //                System.out.println("previewResult:" + previewResult);
-                if(data != null && data.size() > 0){
-                    setObject(data);
-                }
+
             }
+            storageFile(file);
             WebUtil.addSuccessMessage("计量报告上传识别成功");
         } catch (Exception e) {
             e.printStackTrace();
-            file = null;
             WebUtil.addErrorMessage("计量报告上传失败");
         }
     }
@@ -189,13 +195,6 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         handleValueChangeAssetSN();
     }
 
-    public UploadedFile getFile() {
-        return file;
-    }
-
-    public void setFile(UploadedFile file) {
-        this.file = file;
-    }
 
     @Override
     public void save() {
@@ -228,7 +227,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
             }
             measuringService.updateMeasuringDate(assetInfo);
-            templateService.saveTemplateFile(contents,fileName,contentType, V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,detail.getId());
+            for (StreamedContent item : streamedContents) {
+                templateService.saveTemplateFile(IOUtils.toByteArray(item.getStream()),item.getName(),item.getContentType(), V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,detail.getId());
+            }
             WebUtil.addSuccessMessage("保存成功");
             SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,eventAuditEnum, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));
             systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
@@ -259,10 +260,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         object.setHospitalUID(currentUser.getHospitalUID());
         object.setSiteUID(currentUser.getSiteUID());
         this.assetInfo = null;
-        this.file = null;
-        this.contents = null;
-        this.contentType = null;
-        this.fileName = null;
+        this.streamedContents = new ArrayList<>();
     }
 
     public void handleValueChangeAssetSN() {
@@ -354,12 +352,18 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         }
         return ocrTemplates;
     }
+    public String getAllowTypes(){
+        List<OCRTemplate> ocrTemplates = getOCRTemplates();
+        if(CollectionUtils.isEmpty(ocrTemplates)){
+            return "/(\\.|\\/)([a-zA-Z0-9.]+)$/";
+        }else{
+            return "/(\\.|\\/)(png|PNG|jpeg|JPEG|pdf|PDF)$/";
+        }
 
-    public void removeAttachment(){
-        this.file = null;
-        this.contents = null;
-        this.contentType = null;
-        this.fileName = null;
+    }
+
+    public void removeAttachment(StreamedContent streamedContent){
+        streamedContents.remove(streamedContent);
     }
 
     public String createAction() {
@@ -367,6 +371,48 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
     }
     public String getListPageLink() {
         return "measuringResultMain?faces-redirect=true";
+    }
+
+
+    public List<StreamedContent> getStreamedContents() {
+        return streamedContents;
+    }
+
+    public void setStreamedContents(List<StreamedContent> streamedContents) {
+        this.streamedContents = streamedContents;
+    }
+
+    private void storageFile(UploadedFile file){
+        byte[] contents = file.getContents();
+        ByteArrayContent fileStream = new ByteArrayContent(contents,file.getContentType(),file.getFileName(),contents.length);
+        streamedContents.add(fileStream);
+    }
+
+    public void downloadFile(StreamedContent streamedContent) {
+        try {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            response.setHeader("Content-Disposition", "attachment;filename=" + streamedContent.getName());
+            StreamUtils.copy(streamedContent.getStream(), response.getOutputStream());
+            facesContext.responseComplete();
+            facesContext.renderResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public StreamedContent getStreamedContentImg(StreamedContent streamedContent) {
+        if(streamedContent.getContentType().contains("image")){
+            return streamedContent;
+        }
+        String name = streamedContent.getName();
+        String type = name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+        String defaultImage = MicroServiceUtil.getDefaultImage(type);
+        String replace = defaultImage.replace("data:image/png;base64,", "");
+        byte[] bytes = Base64Utils.decodeFromString(replace);
+        ByteArrayContent byteArrayContent = new ByteArrayContent(bytes,"image/jpeg");
+        return byteArrayContent;
     }
 
 }

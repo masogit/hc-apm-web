@@ -106,7 +106,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return getDefaultImage(type);
     }
 
-    private String getDefaultImage(String type) {
+    public static String getDefaultImage(String type) {
         switch (type) {
             case "xlsx":
             case "xls":
