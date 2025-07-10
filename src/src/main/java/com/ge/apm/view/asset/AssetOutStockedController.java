@@ -268,6 +268,10 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             WebUtil.addErrorMessage("设备有未处理的工单，无法生成退库单！");
             return;
         }
+        notInstalled = 0L;
+        contractNum = "";
+        arrivalName = "";
+        installed = 0L;
         if (ObjectUtil.isNotEmpty(selectedItems)) {
             AssetOutStockRecord assetOutStockRecord = selectedItems.get(0);
             if (ObjectUtil.isNotEmpty(assetOutStockRecord.getArrivalListId())) {

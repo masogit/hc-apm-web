@@ -17,8 +17,10 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.ServiceRequestNoAssetService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -109,6 +111,33 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     private List<V2_BlobObject> picSrList = new ArrayList<>();
     private CustomConfig customConfig;
     private CustomConfigObject currentCustomConfig;
+    @Getter@Setter
+    private Integer queryIndex;
+    @Getter@Setter
+    private String applyTimeFrom;
+
+    @Getter @Setter
+    private V2_ServiceRequestNoAsset selectedSr;
+    @Getter @Setter
+    private Date esTime;
+    @Getter @Setter
+    private String assetStatus;
+    @Getter @Setter
+    private String cancelReason;
+    @Getter @Setter
+    private String comments;
+    @Getter @Setter
+    private AssetInfo selectAsset;
+
+    @Getter  @Setter
+    private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
+    @Getter  @Setter
+    private List<AssetInfo> assetInfoList ;
+    @Getter  @Setter
+    private Map<String, Boolean> selectedMap = new HashMap<>();
+    @Getter  @Setter
+    private TreeNode orgTreeSearch;
+
     @Override
     protected void init() {
         super.init();
@@ -131,17 +160,34 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
         currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         loadClinicalDeptList();
+        String query = WebUtil.getRequestParameter("query");
         String encodeStr = WebUtil.getRequestParameter("str");
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         if (selectedId != null) {
             selected = dao.findById(selectedId);
             picList = blobService.findBlobObjectsByBoUid(selectedId);
+            currentStatus = selected.getAssetStatus();
+
         }
+        if (Strings.isNullOrEmpty(query)) {
+            //云南阜外由默认全部改为默认待办
+            queryIndex = 0;
+        } else {
+            queryIndex = Integer.valueOf(query);
+            searchList(queryIndex);
+        }
+    }
+
+    public void searchList(Integer buttonIndex) {
+        queryIndex = buttonIndex;
+        this.searchFilters = null;
+        cancel();
     }
 
     @Override
     protected Page<V2_ServiceRequestNoAsset> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
+        this.searchFiltersByQuery();
         Page<V2_ServiceRequestNoAsset> pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
         bySearchFilterInternal = pageResult.getContent();
         return pageResult;
@@ -168,6 +214,52 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
                 List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
+        }
+    }
+
+    public void searchFiltersByQuery() {
+        if(queryIndex == 0){
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+        }else if (queryIndex == 1) { //已报修
+
+        }else if (queryIndex == 2) { //待派工
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
+        }else if (queryIndex == 3) { //待接单
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, loginUser.getId(), "1*3+4*A+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+4*A+B*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+4*A+B*"));
+            //去除派工模式4且待派工的单子
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+5*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+5*"));
+            //当前责任人是自己且已经派工的单子
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+6*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+6*"));
+        } if (queryIndex == 7) {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+        } if (queryIndex == 9) {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 9));
+            /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));*/
+        }
+    }
+
+    public String getStepName(V2_ServiceRequestNoAsset serviceRequestNoAsset){
+        Integer stepId =serviceRequestNoAsset.getCurrentStepId();
+        switch(stepId){
+            case 2:
+                return "待派工";
+            case 3:
+                return "待接单";
+            case 7:
+                return "待关单";
+            case 9:
+                return "已关单";
+            default:
+                return "";
         }
     }
 
@@ -279,7 +371,6 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         picList = new ArrayList();
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
 
-        newServiceRequest.setRequestorId(loginUser.getId());
         newServiceRequest.setDeptUid(loginUser.getOrgInfoUID());
         newServiceRequest.setRequestorName(loginUser.getName());
         newServiceRequest.setRequestorPhone(loginUser.getTelephone());
@@ -383,7 +474,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     }
 
     public void onStatusChange() {
-        if (selectedAsset == null && selected == null) {
+        if (newServiceRequest == null) {
             return;
         }
         if(currentStatus==2){ //选择停机状态
@@ -392,6 +483,10 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         if(currentStatus==3){//选择 限制功能使用
             needConfirmTime=false;
         }
+    }
+
+    public List<V2_ServiceRequestNoAssetStep> getSrStep(String id){
+        return serviceRequestNoAssetService.queryStepBySrId(selected.getId());
     }
 
     public void createServiceRequestByNoAsset(V2_ServiceRequestNoAsset serviceRequestNoAsset) {
@@ -573,14 +668,112 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
 
     public void saveServiceRequest(){
+        newServiceRequest.setAssetStatus(currentStatus);
         serviceRequestNoAssetService.saveServiceRequest(newServiceRequest, picList);
     }
 
     public void cancel(){
         newServiceRequest = null;
+        selectAsset = null;
+        comments = "";
     }
 
+    public void prepareAct(String id) {
+        selectedSr = dao.findById(id);
+        needConfirmTime = false;
+        Long time = System.currentTimeMillis();
+        time += 120*1000*60;
+        esTime = new Date(time);
+    }
 
+    public void prepareTurnWorkOrder(String id){
+        prepareAct(id);
+        TreeNode treeNodeSearch = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(loginUser.getSiteUID(), null);
+        orgTreeSearch = initOrgTree(treeNodeSearch);
+        OrgInfo org = orgDao.findByUid(selectedSr.getDeptUid());
+        assetSearchForm.setApplicationDeptId(selectedSr.getDeptUid());
+        assetSearchForm.setDept(org);
+        assetSearchForm.setDeptName(selectedSr.getDeptName());
+    }
+    public void onSearchTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        assetSearchForm.setDept(orgInfo);
+        assetSearchForm.setApplicationDeptId(orgInfo.getUid());
+        assetSearchForm.setDeptName(orgInfo.getName());
+    }
+
+    public void treeSearchCondition(){
+        TreeNode treeNodeEdit = null;
+        if(StrUtil.isEmpty(searchDeptName)){
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(loginUser.getOrgInfoUID(), loginUser.getUid(), 4);
+        }else{
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(loginUser.getOrgInfoUID(), loginUser.getUid(), 4, searchDeptName);
+        }
+        orgTree = initOrgTree(treeNodeEdit);
+    }
+
+    public void cancelSrNoAsset(){
+        serviceRequestNoAssetService.cancelSrNoAsset(selectedSr.getId(), cancelReason, assetStatus);
+        cancelReason = null;
+        cancel();
+    }
+
+    public List<UserAccount> getAssigneeUsers(){
+        if(selectedSr != null){
+            return serviceRequestNoAssetService.getAssigneeUsersBySite(selectedSr.getSiteUID());
+        }
+        return new ArrayList<>();
+    }
+
+    public void dispatchSrNoAsset() {
+        serviceRequestNoAssetService.dispatchSrNoAsset(selectedSr);
+        cancel();
+    }
+
+    public void acceptSrNoAsset(){
+        Integer repairType = selectedSr.getRepairType();
+        serviceRequestNoAssetService.acceptSrNoAsset(selectedSr, esTime, repairType, comments);
+        cancel();
+    }
+
+    public void reassignSrNoAsset() {
+        if(StringUtils.isEmpty(comments)){
+            comments=WebUtil.getMessage("WorkRequirements");
+        }
+        serviceRequestNoAssetService.reassignSrNoAsset(selectedSr, selectedSr.getCurrentPersonId(), comments);
+        cancel();
+    }
+
+    public void closeSrNoAsset() {
+        serviceRequestNoAssetService.closeSrNoAsset(selectedSr, comments);
+        cancel();
+    }
+
+    public void searchAsset(){
+        if(StrUtil.isEmpty(assetSearchForm.getApplicationDeptId())){
+            WebUtil.addErrorMessage("清输入申请科室！");
+            return;
+        }
+        assetInfoList = serviceRequestNoAssetService.queryAssetByCondition(loginUser, assetSearchForm);
+    }
+
+    public void resetAssetSearch(){
+        assetSearchForm = new BudgetAssetSearchForm();
+    }
+
+    public void saveSelectedAsset(){
+        if(selectAsset == null){
+            WebUtil.addErrorMessage("请选择设备！");
+            return;
+        }
+        turnWorkOrder();
+    }
+
+    public void turnWorkOrder() {
+        serviceRequestNoAssetService.turnWorkOrder(selectedSr, selectAsset.getUid());
+        cancel();
+    }
 
     @Override
     protected GenericRepositoryUUID<V2_ServiceRequestNoAsset> getDAO() {

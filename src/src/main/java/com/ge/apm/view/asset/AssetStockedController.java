@@ -385,7 +385,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         }
         String inStockNo = assetOutStockService.queryOutStockNo("CK");
         Date now = DateUtil.now();
-        List<String> assetIds = ListUtil.newArrayList();
+        List<AssetInfo> assetInfos = ListUtil.newArrayList();
         List<AssetOutStockRecord> outStockRecords = ListUtil.newArrayList();
         for (AssetStocked selectedItem : selectedItems) {
             selectedItem.setOutStockNo(inStockNo);
@@ -394,7 +394,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             selectedItem.setOutStockBusinessDate(now);
             selectedItem.setOutStockUser(currentUser.getUid());
             selectedItem.setStockStatus(4);
-            assetIds.add(selectedItem.getAssetUid());
+            assetInfos.add(selectedItem.getAssetInfo());
             AssetOutStockRecord assetOutStockRecord = new AssetOutStockRecord();
             if (ObjectUtil.isNotEmpty(selectedItem.getArrivalList())) {
                 assetOutStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
@@ -429,9 +429,17 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             assetOutStockRecord.setStockSource(selectedItem.getStockSource());
             outStockRecords.add(assetOutStockRecord);
         }
-        if (ObjectUtil.isNotEmpty(assetIds)) {
-            assetInfoRepository.outStocked(assetIds, recruiteDept.getId(), recruiteDept.getUid(), recruiteDept.getName());
-            List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetIds);
+        if (ObjectUtil.isNotEmpty(assetInfos)) {
+            for (AssetInfo assetInfo : assetInfos) {
+                assetInfo.setTenantUID(recruiteDept.getTenantUID());
+                assetInfo.setInstitutionUID(recruiteDept.getInstitutionUID());
+                assetInfo.setHospitalUID(recruiteDept.getHospitalUID());
+                assetInfo.setSiteUID(recruiteDept.getSiteUID());
+                assetInfo.setClinicalDeptId(recruiteDept.getId());
+                assetInfo.setClinicalDeptUID(recruiteDept.getUid());
+                assetInfo.setClinicalDeptName(recruiteDept.getName());
+            }
+            assetInfoRepository.save(assetInfos);
             for (AssetInfo assetInfo : assetInfos) {
                 saveAssetHistory(assetInfo);
             }

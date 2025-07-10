@@ -31,6 +31,8 @@ public enum GatewayURL {
     // Service Request Service
     SERVICE_REQUEST_CREATE("/hcapmassetservice/api/apm/asset/serviceRequests"),
     SERVICE_NO_ASSET_REQUEST_CREATE("/hcapmassetservice/api/apm/asset/serviceRequestsNoAsset"),
+    SERVICE_NO_ASSET_ASSIGNEE_USERS("/hcapmassetservice/api/apm/asset/serviceRequestsNoAsset/assigneeUsers"),
+    SERVICE_NO_ASSET_ACTION("/hcapmassetservice/api/apm/asset/serviceRequestsNoAsset/{id}/action"),
     WORK_ORDER_ACTION("/hcapmassetservice/api/apm/asset/workOrders/{workOrderId}/action"),
     CREATE_WORK_ORDER("/hcapmassetservice/api/apm/asset/workOrders"),
     UPDATE_WODETAIL_PRICE("/hcapmassetservice/api/apm/asset/workOrderDetails"),
