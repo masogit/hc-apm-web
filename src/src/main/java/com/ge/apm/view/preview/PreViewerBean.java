@@ -9,10 +9,13 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -20,9 +23,15 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +49,8 @@ public class PreViewerBean implements ServerEventInterface {
     private BlobObjectRepository blobObjectRepository;
     private MicroServiceUtil microServiceUtil;
     private FileDownloadService fileDownloadService;
+    @Getter@Setter
+    private StreamedContent streamedContent;
     @Getter@Setter
     private String pdfUrl;
 
@@ -75,6 +86,13 @@ public class PreViewerBean implements ServerEventInterface {
                 //type = objectType.contains("image") ? 0 : (objectType.contains("pdf") ? 1 : -1);
                 getTypeByObject();
             }
+        }else if(eventObject instanceof StreamedContent){
+            try {
+                streamedContent = (StreamedContent) eventObject;
+                getTypeByObjectStreamed();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         if(type == -1){
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -104,7 +122,34 @@ public class PreViewerBean implements ServerEventInterface {
             }
         }
     }
-
+    public void getTypeByObjectStreamed() throws IOException {
+        if(streamedContent == null){
+            type = -1;
+        }else {
+            if(streamedContent.getContentType().contains("image") ||
+                    streamedContent.getName().toLowerCase().contains(".jpg") ||
+                    streamedContent.getName().toLowerCase().contains(".png") ||
+                    streamedContent.getName().toLowerCase().contains(".jpeg")
+            ){
+                type = 2;
+            }else if(streamedContent.getContentType().contains("pdf") ||
+                    streamedContent.getName().toLowerCase().contains(".pdf")
+            ){
+                type = 1;
+                String key = UUID.randomUUID().toString();
+                FileInfoResult fileInfoResult= new FileInfoResult();
+                fileInfoResult.setObjectType(streamedContent.getContentType());
+                fileInfoResult.setObjectName(streamedContent.getName());
+                fileInfoResult.setObjectSize((long)streamedContent.getContentLength());
+                fileInfoResult.setBytes(IOUtils.toByteArray(streamedContent.getStream()));
+                DocumentInMemoryUtil.put(key,fileInfoResult);
+                HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+                pdfUrl = request.getContextPath() +"/web/preview/"+key;
+            }else{
+                type = -1;
+            }
+        }
+    }
     public String getHttpURL(String objectId){
         String pdfPreViewUrl = microServiceUtil.getPdfPreViewUrl();
         StringBuilder sbPath = new StringBuilder();
@@ -138,4 +183,47 @@ public class PreViewerBean implements ServerEventInterface {
         Matcher matcher = pattern.matcher(objectName);
         return matcher.matches() || objectType.toLowerCase().contains("image");
     }
+    public boolean  isPreview(StreamedContent fileitem){
+        String objectName = fileitem.getName();
+        String objectType = fileitem.getContentType();
+        Matcher matcher = pattern.matcher(objectName);
+        return matcher.matches() || objectType.toLowerCase().contains("image");
+    }
+    public String preViewerImg() {
+        try {
+            String res = "data:image/jpeg;base64,";
+            byte[] result = IOUtils.toByteArray(streamedContent.getStream());
+            res += Base64Utils.encodeToString(result);
+            return res;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+    public void preViewerPDF() {
+        try {
+            String pdfStr ="<html>\n" +
+                    "    <body style='height: 100%; width: 100%; overflow: hidden; margin:0px; background-color: rgb(40, 40, 40);'>\n" +
+                    "        <embed name='B5B792F77CA913D04E30242F43E5EF78' style='position:absolute; left: 0; top: 0;' width='100%' height='100%' src='about:blank' type='application/pdf' internalid='B5B792F77CA913D04E30242F43E5EF78'>\n" +
+                    "    </body>\n" +
+                    "</html>";
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            PrintWriter writer = response.getWriter();
+//            response.setHeader("Content-Disposition", "inline;filename=" + streamedContent.getName());
+//            response.setHeader("Accept-Ranges", "bytes");
+            response.setContentType(streamedContent.getContentType().concat(";charset=utf-8"));
+//            byte[] byteArray = IOUtils.toByteArray(streamedContent.getStream());
+//            response.setContentLength(byteArray.length);
+            writer.write(pdfStr);
+            facesContext.responseComplete();
+            facesContext.renderResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 }

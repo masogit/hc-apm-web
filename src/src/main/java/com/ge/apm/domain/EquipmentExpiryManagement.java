@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "equipment_expiry_information" ,indexes = {@Index(columnList = "registerNo")})
+@Table(name = "equipment_expiry_information" ,indexes = {@Index(columnList = "registerNo"), })
 public class EquipmentExpiryManagement {
 
     @Id
@@ -19,6 +19,9 @@ public class EquipmentExpiryManagement {
     @Column(name = "manufacture")
     private String manufacture;
 
+    @Column(name = "manufacture_name")
+    private String manufactureName;
+
     @Column(name = "function_type")
     private String functionType;
 
@@ -29,8 +32,7 @@ public class EquipmentExpiryManagement {
     private Integer lifecycle;
 
     @Column(name = "manufact_date")
-    @Temporal(TemporalType.DATE)
-    private Date manufactDate;
+    private String manufactDate;
 
     @Column(name = "asset_name")
     private String assetName;
@@ -45,6 +47,15 @@ public class EquipmentExpiryManagement {
 
     @Column(name = "version_status")
     private Integer versionStatus;
+
+    @Column(name = "keyword")
+    private String keyword;
+
+    @Column(name = "keyword1")
+    private String keyword1;
+
+    @Column(name = "keyword2")
+    private String keyword2;
 
     public String getUid() {
         return uid;
@@ -86,11 +97,11 @@ public class EquipmentExpiryManagement {
         this.lifecycle = lifecycle;
     }
 
-    public Date getManufactDate() {
+    public String getManufactDate() {
         return manufactDate;
     }
 
-    public void setManufactDate(Date manufactDate) {
+    public void setManufactDate(String manufactDate) {
         this.manufactDate = manufactDate;
     }
 
@@ -124,5 +135,37 @@ public class EquipmentExpiryManagement {
 
     public void setVersionStatus(Integer versionStatus) {
         this.versionStatus = versionStatus;
+    }
+
+    public String getManufactureName() {
+        return manufactureName;
+    }
+
+    public void setManufactureName(String manufactureName) {
+        this.manufactureName = manufactureName;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
+    public String getKeyword1() {
+        return keyword1;
+    }
+
+    public void setKeyword1(String keyword1) {
+        this.keyword1 = keyword1;
+    }
+
+    public String getKeyword2() {
+        return keyword2;
+    }
+
+    public void setKeyword2(String keyword2) {
+        this.keyword2 = keyword2;
     }
 }

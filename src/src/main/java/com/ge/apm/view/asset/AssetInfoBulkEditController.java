@@ -1707,6 +1707,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (errFlag) {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("errFlag", errFlag);
+            return;
         }
 
         try {

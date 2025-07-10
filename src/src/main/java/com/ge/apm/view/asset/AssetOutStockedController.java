@@ -268,6 +268,10 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             WebUtil.addErrorMessage("设备有未处理的工单，无法生成退库单！");
             return;
         }
+        notInstalled = 0L;
+        contractNum = "";
+        arrivalName = "";
+        installed = 0L;
         if (ObjectUtil.isNotEmpty(selectedItems)) {
             AssetOutStockRecord assetOutStockRecord = selectedItems.get(0);
             if (ObjectUtil.isNotEmpty(assetOutStockRecord.getArrivalListId())) {
@@ -388,7 +392,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             case "assetInfo" :
                 return "/portal/asset/info/AssetDetail.xhtml?actionName=View&terminate=false&assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
             case "contractInfo" :
-                return "/portal/asset/contract/ContractView.xhtml?action=Edit&contractNum=" + outStockRecord.getArrivalList().getContractNum();
+                return "/portal/asset/contract/ContractView.xhtml?action=Edit&contractNum=" + Optional.ofNullable(outStockRecord.getArrivalList()).map(ArrivalList::getContractNum).orElse("");
             default:
                 return "";
         }

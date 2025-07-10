@@ -317,7 +317,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if (netIncomeStr.endsWith(".0")) {
             assetOperationDetail.put("annualNetIncome", String.valueOf(netIncome.longValue()));
         } else {
-            assetOperationDetail.put("annualNetIncome", String.valueOf(netIncome.doubleValue()));
+            assetOperationDetail.put("annualNetIncome", netIncome.toPlainString());
         }
 
     }
@@ -877,8 +877,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     }
 
     public String netIncomeComputing(Map<String, String> data) {
-        String annualNetIncome=data.get("annualNetIncome");
-        if(Objects.nonNull(annualNetIncome))
+        String annualNetIncome = data.get("annualNetIncome");
+        if (Objects.nonNull(annualNetIncome))
             return null;
         //年收入
         BigDecimal annualIncome = Objects.nonNull(data.get("annualIncome")) ? BigDecimal.valueOf(Double.parseDouble(data.get("annualIncome"))) : BigDecimal.valueOf(0.0);
@@ -896,7 +896,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if (netIncomeStr.endsWith(".0")) {
             return String.valueOf(netIncome.longValue());
         } else {
-            return String.valueOf(netIncome.doubleValue());
+            return netIncome.toPlainString();
         }
     }
 

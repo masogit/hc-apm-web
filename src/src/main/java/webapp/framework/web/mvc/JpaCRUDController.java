@@ -17,6 +17,7 @@ import org.primefaces.model.Visibility;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.HttpRequestUtil;
@@ -194,7 +195,13 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
             if (filterValue == null) {
                 continue;
             }
-
+            if ("lifecycle".equals(fieldName)) {
+                try {
+                    filterValue = Integer.parseInt(filterValue.toString()) * 12;
+                } catch (Exception e) {
+                    continue;
+                }
+            }
             if (isDateTimeField(fieldName)) {
                 // support lte & gte for datetime field
                 String[] values = filterValue.toString().split("~");

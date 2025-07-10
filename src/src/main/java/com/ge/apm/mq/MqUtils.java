@@ -102,6 +102,7 @@ public class MqUtils {
         mqContextDTO.setServiceName(mqContext.getServiceName());
         mqContextDTO.setDescribe(mqContext.getDescribe());
         mqContextDTO.setLocale(mqContext.getLocale());
+        mqContextDTO.setSource(mqContext.getSource());
         JSONObject jsonObject = ObjectUtil.isNotEmpty(mqContext.getJsonObject()) ? mqContext.getJsonObject() : new JSONObject();
         jsonObject.put("currentUserAccount", userAccount);
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();

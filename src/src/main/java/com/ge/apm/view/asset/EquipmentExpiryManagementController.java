@@ -32,6 +32,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 
@@ -100,7 +101,6 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         }
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
         this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true, "1*"));
-        this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         if (null != selectSite) {
             this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
@@ -127,13 +127,13 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
 //            this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
         }
-        if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-        }
         if (user.isEnableAssetTypeGroup()) {
-            this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+            if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
+                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
+            } else {
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+            }
         }
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptOrgUidSet, "1*"));
@@ -223,7 +223,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         if (ids.size() > 1) {
             List<AssetInfo> assetInfos = dao.findByIdIn(ids);
             Set<String> registerNo = assetInfos.stream().map(AssetInfo::getRegistrationNo).filter(Objects::nonNull).collect(Collectors.toSet());
-            if (CollectionUtils.isEmpty(registerNo) || registerNo.size() != assetInfos.size() || registerNo.size() != 1) {
+            if (assetInfos.stream().anyMatch(v -> StringUtils.isEmpty(v.getRegistrationNo())) || CollectionUtils.isEmpty(registerNo) || registerNo.size() != 1) {
                 selectedMap.clear();
                 WebUtil.addErrorMessage(WebUtil.getMessage("batchModifyRule"));
             }
@@ -258,24 +258,34 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     }
 
     public void prepareEditUsageDate(AssetInfo assetInfo) {
+        AtomicBoolean batch = new AtomicBoolean(false);
         if (assetInfo != null) {
             selected = assetInfo;
+            this.lifecycle = selected.getLifecycle()!=null?selected.getLifecycle() / 12:null;
         } else {
             selectedMap.entrySet().stream().forEach(k -> {
                 if (k.getValue()) {
                     selected = dao.getById(k.getKey());
+                    batch.set(true);
                     return;
                 }
             });
+
+            this.lifecycle = null;
         }
         // 匹配效期信息
         if (StringUtils.isNotEmpty(selected.getRegistrationNo())) {
             equipmentExpiryManagements = equipmentExpiryManagementRepository.findByRegisterNo(selected.getRegistrationNo());
         }
+        if (batch.get()) {
+            selected = null;
+            equipmentExpiryManagements = new ArrayList<>();
+            return;
+        }
         if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
-            if (StringUtils.isNotEmpty(selected.getManufacture()) && StringUtils.isNotEmpty(selected.getFunctionType())) {
+            if ((StringUtils.isNotEmpty(selected.getManufacture()) || StringUtils.isNotEmpty(selected.getMakerShortName())) && StringUtils.isNotEmpty(selected.getFunctionType())) {
                 // 继续通过制造商和设备型号获取
-                equipmentExpiryManagements = equipmentExpiryManagementRepository.findByManufactureAndAndFunctionType(selected.getManufacture(), selected.getFunctionType());;
+                equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(StringUtils.isEmpty(selected.getMakerShortName())?selected.getManufacture():selected.getMakerShortName().replace(" ", "").toLowerCase(), selected.getFunctionType().replace(" ", "").toLowerCase());;
             }
             if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
                 equipmentExpiryManagements = new ArrayList<>();
