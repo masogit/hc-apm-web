@@ -127,13 +127,13 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
 //            this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
         }
-        if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-        }
         if (user.isEnableAssetTypeGroup()) {
-            this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+            if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
+                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
+            } else {
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+            }
         }
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptOrgUidSet, "1*"));
@@ -283,9 +283,9 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
             return;
         }
         if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
-            if (StringUtils.isNotEmpty(selected.getManufacture()) && StringUtils.isNotEmpty(selected.getFunctionType())) {
+            if ((StringUtils.isNotEmpty(selected.getManufacture()) || StringUtils.isNotEmpty(selected.getMakerShortName())) && StringUtils.isNotEmpty(selected.getFunctionType())) {
                 // 继续通过制造商和设备型号获取
-                equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(selected.getManufacture().replace(" ", "").toLowerCase(), selected.getFunctionType().replace(" ", "").toLowerCase());;
+                equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(StringUtils.isEmpty(selected.getMakerShortName())?selected.getManufacture():selected.getMakerShortName().replace(" ", "").toLowerCase(), selected.getFunctionType().replace(" ", "").toLowerCase());;
             }
             if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
                 equipmentExpiryManagements = new ArrayList<>();

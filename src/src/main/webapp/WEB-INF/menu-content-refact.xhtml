@@ -306,7 +306,7 @@
                    </c:when>
                    <c:when test="#{item eq 'QUALITY_CONTROL_CALENDAR'}">
                        <!-- 质控日历 -->
-                       <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" icon="fa fa-calendar" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
+                       <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" icon="fa fa-calendar fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
                    </c:when>
                    <c:when test="#{item eq 'SUPPLIER_TENANT'}">
                        <!-- 供应商管理 -->

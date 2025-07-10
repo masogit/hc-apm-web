@@ -357,7 +357,7 @@ public class AssetInfoBulkEditService {
             //设备调剂设置清除
             item.setSharedAssetTypeUid(null);
             
-            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item);
+            assetHistoryService.bathDepartmentConvert(item);
             if (!isAllTransfer) {
                 item.setParentAssetId(null);
                 List<AssetInfo> childAssetInfos = assetInfoDao.findChildAssets(item.getId());

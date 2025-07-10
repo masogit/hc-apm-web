@@ -1142,29 +1142,28 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                     assetInfo.setLastModifiedDate(new Date());
                                     assetInfo.setLastModifiedBy(userAccount.getName());
                                 }
-                                String inDeptUid = temp.getInDeptUid();
+                                /*String inDeptUid = temp.getInDeptUid();
                                 OrgInfo outOrgInfo = orgInfoRepository.getByUid(siteUids.get(0));
                                 OrgInfo inOrgInfo = orgInfoRepository.getByUid(inDeptUid);
-                                if (siteUids.size() > 1 || !Objects.equals(outOrgInfo.getUid(), inOrgInfo.getSiteUID())) {
+                                if (siteUids.size() > 1 && !Objects.equals(outOrgInfo.getUid(), inOrgInfo.getSiteUID())) {
                                     OrgInfo inSiteOrg = orgInfoRepository.getByUid(inOrgInfo.getSiteUID());
                                     AssetInfo assetInfo = new AssetInfo();
                                     assetInfo.setClinicalDeptOrg(inOrgInfo);
                                     assetInfo.setSiteOrg(inSiteOrg);
                                     assetInfoBulkEditService.commitBulkEditSite(assetInfos, assetInfo, null);
-                                } else {
+                                } else {*/
                                     assetInfoDao.save(assetInfos);
-                                }
-
-                                for (AssetInfo assetInfo : assetInfos) {
-                                    MqContext mqContext = new MqContext();
-                                    mqContext.setClassName("MultiLevelApprovalService");
-                                    mqContext.setServiceName("hc-apm-web");
-                                    mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
-                                    mqContext.setDescribe("资产转科审核同意");
-                                    mqContext.setSource("departmentConvert");
-                                    UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-                                    mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
-                                }
+                                    for (AssetInfo assetInfo : assetInfos) {
+                                        MqContext mqContext = new MqContext();
+                                        mqContext.setClassName("MultiLevelApprovalService");
+                                        mqContext.setServiceName("hc-apm-web");
+                                        mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
+                                        mqContext.setDescribe("资产转科审核同意");
+                                        mqContext.setSource("departmentConvert");
+                                        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+                                        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
+                                    }
+                                //}
 
                                 Set<String> approverUids = multiLevelApprovalList.stream().map(MultiLevelApproval::getActualApproverUid).collect(Collectors.toSet());
                                 approverUids.add(temp.getTransferOutUid());
