@@ -228,7 +228,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             }
             measuringService.updateMeasuringDate(assetInfo);
             for (StreamedContent item : streamedContents) {
-                templateService.saveTemplateFile(IOUtils.toByteArray(item.getStream()),item.getName(),item.getContentType(), V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,detail.getId());
+                templateService.savFile(IOUtils.toByteArray(item.getStream()),item.getName(),item.getContentType(), V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,detail.getId());
             }
             WebUtil.addSuccessMessage("保存成功");
             SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(currentUser,eventAuditEnum, selected.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(selected));

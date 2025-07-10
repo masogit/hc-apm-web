@@ -238,15 +238,21 @@ public class OCRTemplateService extends MicroServiceInvoker {
     public V2_BlobObject saveTemplateFile(byte[] contents,String fileName,String contentType,String boType,String uid){
         if(contents == null) return null;
         List<V2_BlobObject> blobObjectsByBoUid = findBlobObjectsByBoUid(uid);
+        V2_BlobObject v2BlobObject = savFile(contents, fileName, contentType, boType, uid);
+        if(!CollectionUtils.isEmpty(blobObjectsByBoUid)){
+            deleteTemplateFile(blobObjectsByBoUid);
+        }
+        return v2BlobObject;
+    }
+
+    public V2_BlobObject savFile(byte[] contents,String fileName,String contentType,String boType,String uid){
+        if(contents == null) return null;
         ByteArrayInputStream bais = new ByteArrayInputStream(contents);
         V2_BlobObject v2BlobObject = blobService.uploadFile(bais,fileName);
         v2BlobObject.setBoUuid(uid);
         v2BlobObject.setObjectType(contentType);
         v2BlobObject.setBoType(boType);
         blobObjectRepository.save(v2BlobObject);
-        if(!CollectionUtils.isEmpty(blobObjectsByBoUid)){
-            deleteTemplateFile(blobObjectsByBoUid);
-        }
         return v2BlobObject;
     }
 
