@@ -10,8 +10,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.OCRTemplateService;
 import com.ge.apm.service.asset.QrCodeDrawService;
 import com.ge.apm.service.common.GatewayURL;
-import com.ge.apm.view.budget.BudgetApplicationBapController;
-import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.ocr.support.MatcherType;
@@ -186,7 +184,6 @@ public class OCRTemplateController extends GenericCRUDUUIDController<OCRTemplate
         }).map(item -> {
             JSONObject jsonObject = (JSONObject) item;
             Double positionX = jsonObject.getDouble("PositionX");
-            Double Format = jsonObject.getDouble("Format");
             positionX = Objects.isNull(positionX) ? 0 : positionX;
             Double positionY = jsonObject.getDouble("PositionY");
             positionY = Objects.isNull(positionY) ? 0 : positionY;

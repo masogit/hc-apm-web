@@ -418,6 +418,19 @@ public class AssetHistoryService {
        return orgDao.findParentNameByUid(uid);
     }
 
+    public void bathDepartmentConvert(AssetInfo newAsset) {
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("AssetHistoryService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("bathDepartmentConvert");
+        mqContext.setDescribe("资产批量转科");
+        mqContext.setSource("departmentConvert");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
+    }
+
     public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset) {
         MqContext mqContext = new MqContext();
         mqContext.setClassName("AssetHistoryService");

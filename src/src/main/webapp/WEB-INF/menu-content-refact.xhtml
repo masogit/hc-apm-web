@@ -304,6 +304,10 @@
                        <!-- 设备数据概览 -->
                        <p:menuitem value="设备数据概览" icon="fa fa-bar-chart fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW')}" outcome="/portal/nine.xhtml"/>
                    </c:when>
+                   <c:when test="#{item eq 'QUALITY_CONTROL_CALENDAR'}">
+                       <!-- 质控日历 -->
+                       <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" icon="fa fa-calendar fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
+                   </c:when>
                    <c:when test="#{item eq 'SUPPLIER_TENANT'}">
                        <!-- 供应商管理 -->
                        <p:submenu label="供应商管理" icon="fa fa-user-secret fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_MANAGEMENT_')}"  >
