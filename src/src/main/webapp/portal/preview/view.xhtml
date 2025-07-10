@@ -22,6 +22,16 @@
             <c:when test="#{preViewerBean.type eq 1}">
                 <embed src="#{preViewerBean.pdfUrl}" type="application/pdf" width="100%" height="780px"/>
             </c:when>
+            <c:when test="#{preViewerBean.type eq 2}">
+                <div class="row" id="imgDivStream" style="width: auto">
+                    <img data-original="#{preViewerBean.preViewerImg()}"
+                         src="#{preViewerBean.preViewerImg()}"
+                         style="opacity:0; width:1px; height:1px"/>
+                </div>
+                <script>
+                    new Viewer(document.getElementById('imgDivStream'), {inline: true});
+                </script>
+            </c:when>
             <c:otherwise>
                 <h:outputText value="预览失败！"/>
             </c:otherwise>
