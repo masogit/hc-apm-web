@@ -368,7 +368,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Transactional
     @Modifying
-    @Query(value= "UPDATE asset_info  set lifecycle =?1 where id in (?2)",nativeQuery = true)
+    @Query(value= "UPDATE asset_info  set lifecycle =?1, last_modified_date = now() where id in (?2)",nativeQuery = true)
     void updateLifecycleByIds(Integer id, Set<Integer> ids);
 
     List<AssetInfo> findByLocationCode(String namePyCode);
