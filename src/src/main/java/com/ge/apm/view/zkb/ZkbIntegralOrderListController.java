@@ -2,7 +2,9 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbIntegralOrderRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.service.zkb.ZkbIntegralOrderExcelService;
 import com.ge.apm.service.zkb.ZkbIntegralOrderListService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -13,9 +15,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -24,9 +28,13 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.persistence.criteria.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 @ManagedBean
@@ -59,12 +67,14 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
     @Getter @Setter
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList ;
 
+    ZkbIntegralOrderExcelService zkbIntegralOrderExcelService;
 
     @Override
     protected void init() {
         super.init();
         zkbIntegralOrderRepository = WebUtil.getBean(ZkbIntegralOrderRepository.class);
         zkbIntegralOrderListService = WebUtil.getBean(ZkbIntegralOrderListService.class);
+        zkbIntegralOrderExcelService = WebUtil.getBean(ZkbIntegralOrderExcelService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         selectionTenantInfo =WebUtil.getRequestParameter("tenantUID") == null ? "" : WebUtil.getRequestParameter("tenantUID");
         currentUser = UserContextService.getCurrentUserAccount();
@@ -92,11 +102,16 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
         return  (Root<ZkbIntegralOrder> root, CriteriaQuery<?> query, CriteriaBuilder builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if(currentUser.getLoginName().contains(ZkbPartOrder.DATA_TYPE_TEST)){
-                if(StringUtils.isEmpty(type)){
-                    predicates.add(builder.equal(root.get("dataType"), ZkbPartOrder.DATA_TYPE_TEST));
-                }
+                predicates.add(builder.equal(root.get("dataType"), ZkbPartOrder.DATA_TYPE_TEST));
             }else {
                 predicates.add(builder.isNull(root.get("dataType")));
+            }
+            if(StringUtils.isNotEmpty(type)){
+                if("ToolBox".equals(type)){
+                    predicates.add(builder.equal(root.get("orderType"), ZkbIntegralOrder.OrderTypeEnum.ToolBox.name()));
+                }else{
+                    predicates.add(builder.notEqual(root.get("orderType"), ZkbIntegralOrder.OrderTypeEnum.ToolBox.name()));
+                }
             }
 
             if(CollectionUtils.isNotEmpty(csearchFilters)){
@@ -236,6 +251,28 @@ public class ZkbIntegralOrderListController extends GenericCRUDUUIDController<Zk
             return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedId=".concat(selected.getId())+"&queryStatus="+queryStatus);
         }else{
             return UrlEncryptController.encodeUrlParam("Audit?action=Edit&selectedId=".concat(selected.getId())+"&queryStatus="+queryStatus);
+        }
+    }
+    public void exportAll(){
+
+        Specification<ZkbIntegralOrder> specification = buildSpecification(this.searchFilters,"ToolBox");
+        Sort sort=new Sort(Sort.Direction.DESC,"createdDate");
+        List<ZkbIntegralOrder> toolBoxList = zkbIntegralOrderRepository.findBySpecification(specification, sort);
+
+        specification = buildSpecification(this.searchFilters,"NoToolBox");
+        List<ZkbIntegralOrder> unToolBoxList = zkbIntegralOrderRepository.findBySpecification(specification, sort);
+
+        HashMap<String, Object> dataMap = zkbIntegralOrderExcelService.createData(toolBoxList, unToolBoxList);
+
+        String impFileName=  "APM_ZKB_IntegralOrder_Exp_Template.xlsx";
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/integralOrder/excel/" + impFileName);
+        try {
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+
+            zkbIntegralOrderExcelService.exportData(doc, dataMap);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
