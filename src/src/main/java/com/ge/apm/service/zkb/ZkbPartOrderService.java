@@ -1998,10 +1998,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public void sendMessage(ZkbPartOrder zkbPartOrder,String token) {
+        sendMessageAgain(zkbPartOrder, token, zkbPartOrder.getCurrentStep());
+    }
+
+    public void sendMessageAgain(ZkbPartOrder zkbPartOrder,String token, String step){
         HashMap<String, Object> emailWrapperMap = null;
         try {
             emailWrapperMap = new HashMap<>();
-            emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
+            emailWrapperMap.put("configType", step);
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
             emailWrapperMap.put("url", "/zkb?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
@@ -2019,7 +2023,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     /**
