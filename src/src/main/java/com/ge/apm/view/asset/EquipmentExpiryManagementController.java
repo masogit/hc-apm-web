@@ -275,7 +275,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         }
         // 匹配效期信息
         if (StringUtils.isNotEmpty(selected.getRegistrationNo())) {
-            equipmentExpiryManagements = equipmentExpiryManagementRepository.findByRegisterNo(selected.getRegistrationNo());
+            equipmentExpiryManagements = equipmentExpiryManagementRepository.findByRegisterNoOrderByManufactDateDesc(selected.getRegistrationNo());
         }
         if (batch.get()) {
             selected = null;
