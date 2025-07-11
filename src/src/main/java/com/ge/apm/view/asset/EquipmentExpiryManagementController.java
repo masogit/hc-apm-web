@@ -258,6 +258,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     }
 
     public void prepareEditUsageDate(AssetInfo assetInfo) {
+        equipmentExpiryManagements = new ArrayList<>();
         AtomicBoolean batch = new AtomicBoolean(false);
         if (assetInfo != null) {
             selected = assetInfo;
@@ -270,8 +271,13 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
                     return;
                 }
             });
-
-            this.lifecycle = null;
+            // 检查如果多选框只有一台批量操作切换为单台处理
+            if (selectedMap.values().stream().filter(Boolean::booleanValue).collect(Collectors.toList()).size() == 1) {
+                this.lifecycle = selected.getLifecycle()!=null?selected.getLifecycle() / 12:null;
+                batch.set(false);
+            } else {
+                this.lifecycle = null;
+            }
         }
         // 匹配效期信息
         if (StringUtils.isNotEmpty(selected.getRegistrationNo())) {
@@ -286,17 +292,14 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
                 // 继续通过制造商和设备型号获取
                 equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(StringUtils.isEmpty(selected.getMakerShortName())?selected.getManufacture():selected.getMakerShortName().replace(" ", "").toLowerCase(), selected.getFunctionType().replace(" ", "").toLowerCase());;
             }
-            if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
-                equipmentExpiryManagements = new ArrayList<>();
-            }
         }
     }
 
     public void applyChange() {
         try {
+            Assert.isTrue((lifecycle != null && lifecycle > 0), WebUtil.getMessage("saveUsageYearError"));
             // 年份转月份
             Integer usageMonth = lifecycle * 12;
-            Assert.isTrue((lifecycle != null && lifecycle > 0), WebUtil.getMessage("saveUsageYearError"));
             if (selected != null) {
                 selected.setLifecycle(usageMonth);
                 dao.save(selected);

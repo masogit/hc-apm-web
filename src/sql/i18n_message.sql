@@ -6148,6 +6148,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','usageYearDateCommentsTwo','需要说明的是，本功能提供的内容为知识库匹配结果，仅供参考使用，具体请结合实际业务场景进一步核实。','It should be noted that the content provided by this function is a knowledge base matching result, which is for reference only. Please further verify it in combination with the actual business scenarios.',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','batchModifyRule','批量操作只支持相同注册号设备，请重新勾选！','Batch operations only support devices with the same registration number, please check it again!',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','usageYear','年','Usage year',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','manufactureDateYear','出厂年份','Usage year',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','stockSource','来源','Source',NULL,-1);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('stockSource','1','台账入库','ledger',NULL, -1);
