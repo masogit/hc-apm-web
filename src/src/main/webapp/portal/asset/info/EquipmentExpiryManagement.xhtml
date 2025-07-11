@@ -61,7 +61,7 @@
                                     update=":equipmentExpiryManagementForm searchButtons"/>
                         </p:inputText>
                         <h:panelGroup id="searchButtons">
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":equipmentExpiryManagementForm searchText" actionListener="#{equipmentExpiryManagementController.setOneSearchStr('')}" rendered="#{not empty equipmentExpiryManagementController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":equipmentExpiryManagementForm searchText searchButtons" actionListener="#{equipmentExpiryManagementController.setOneSearchStr('')}" rendered="#{not empty equipmentExpiryManagementController.oneSearchStr}"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
