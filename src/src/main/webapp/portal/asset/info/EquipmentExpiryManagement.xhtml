@@ -95,7 +95,9 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="49">
-                            <p:commandButton id="editButton" style="width: 28px!important;height: 26px!important;" icon="ui-icon-pencil" title="#{msg.editUsageYear}" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}" onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm"/>
+                            <p:commandLink onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm" process="@this" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}">
+                                <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                            </p:commandLink>
                         </p:column>
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
                                   sortBy="#{item.namePyCode}" filterBy="#{item.name}"
