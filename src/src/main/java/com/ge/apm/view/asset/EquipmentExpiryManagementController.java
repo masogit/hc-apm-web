@@ -279,7 +279,6 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         }
         if (batch.get()) {
             selected = null;
-            equipmentExpiryManagements = new ArrayList<>();
             return;
         }
         if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
