@@ -1501,6 +1501,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return false;
     }
 
+    public void sendMessageAgain(String step){
+        zkbPartOrderService.sendMessageAgain(selected,UserContextService.getAccessToken(), step);
+    }
+
     //region get、set
     public String getModifyType() {
         return modifyType;
