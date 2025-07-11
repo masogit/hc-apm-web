@@ -95,7 +95,7 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="49">
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.editUsageYear}" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}" onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm"/>
+                            <p:commandButton id="editButton" style="width: 28px!important;height: 26px!important;" icon="ui-icon-pencil" title="#{msg.editUsageYear}" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}" onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm"/>
                         </p:column>
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
                                   sortBy="#{item.namePyCode}" filterBy="#{item.name}"
@@ -213,10 +213,12 @@
         <p:dialog id="editUsageDateDlg" widgetVar="editUsageDateDialog" width="1000" height="500" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.editUsageYear}" closable="true">
             <h:form id="editUsageDateForm">
                 <p:fieldset legend="#{msg.usageYearDate}">
-                    <p:inputNumber id="lifecycle" value="#{equipmentExpiryManagementController.lifecycle}" decimalPlaces="0" minValue="1" maxValue="100" style="width: 500px" />#{msg.usageYear}
+                    <p:inputNumber id="lifecycle" value="#{equipmentExpiryManagementController.lifecycle}" decimalPlaces="0" emptyValue="0" minValue="0" maxValue="100" style="width: 500px" />#{msg.usageYear}
                 </p:fieldset>
                 <p:fieldset legend="#{msg.usageYearDateReferTo}" style="height: 350px">
-                    <span style="width: 800px;font-size: 12px;color: #3e464c">#{msg.usageYearDateComments}</span>
+                    <span style="width: 700px;font-size: 11px;color: #3e464c94">#{msg.usageYearDateComments}</span>
+                <br/>
+                    <span style="width: 700px;font-size: 11px;color: #3e464c94">#{msg.usageYearDateCommentsTwo}</span>
                     <p:dataTable id="lifecyclelist" value="#{equipmentExpiryManagementController.equipmentExpiryManagements}" var="item"
                                  widgetVar="varLifecyclelist" resizableColumns="true" liveResize="true" resizeMode="fit"
                                  disabledSelection="true"
@@ -226,19 +228,19 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="5" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="5">
-                        <p:column headerText="#{msg.manufacture}">
-                            <h:outputText value="#{item.manufacture}"/>
+                        <p:column headerText="#{msg.RegistrationNumber}">
+                            <h:outputText value="#{item.registerNo}"/>
                         </p:column>
                         <p:column headerText="#{msg.functionType}">
                             <h:outputText value="#{item.functionType}"/>
                         </p:column>
-                        <p:column headerText="#{msg.RegistrationNumber}">
-                            <h:outputText value="#{item.registerNo}"/>
+                        <p:column headerText="#{msg.makerShortName}">
+                            <h:outputText value="#{empty item.manufacture?item.manufactureName:item.manufacture}"/>
                         </p:column>
                         <p:column headerText="#{msg.lifecycle}">
                             <h:outputText value="#{item.lifecycle}"/>
                         </p:column>
-                        <p:column headerText="#{msg.ManufactureDate}">
+                        <p:column headerText="#{msg.manufactureDateYear}">
                             <h:outputText value="#{item.manufactDate}" />
                         </p:column>
                     </p:dataTable>
