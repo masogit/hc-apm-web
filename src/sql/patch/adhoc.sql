@@ -19,6 +19,3 @@ CREATE INDEX idx_equipment_keyword_pattern ON equipment_expiry_information
     (LOWER(keyword));
 ALTER TABLE equipment_expiry_information ALTER COLUMN manufact_date TYPE varchar(10);
 
-
---YHAAO-25614 释放二维码 之后需要删除
-update qr_code_lib set status =1 where   qr_code='DM23000800' and status=5;
