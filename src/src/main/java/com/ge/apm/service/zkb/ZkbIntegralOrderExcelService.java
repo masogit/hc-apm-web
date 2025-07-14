@@ -57,7 +57,7 @@ public class ZkbIntegralOrderExcelService {
         map.put("当前状态",  WebUtil.getFieldValueMessage("zkbIntegralOrderStatus", i.getStatus()));
         map.put("当前步骤",  WebUtil.getFieldValueMessage("zkbIntegralOrderSteps", i.getCurrentStep()));        map.put("申请人", i.getRequestUser());
         map.put("申请人电话", i.getRequestPhone());
-        map.put("申请时间", DateUtil.format(i.getRequestDate(), "yyyy-MM-dd"));
+        map.put("申请时间", DateUtil.format(i.getRequestDate(), "yyyy-MM-dd HH:mm:ss"));
         ZkbPartOrderCat zkbPartOrderCat = zkbPartOrderCatRepository.findById(i.getCatId());
         if(zkbPartOrderCat != null){
             map.put("工具箱号", zkbPartOrderCat.getCatNo());
@@ -73,11 +73,11 @@ public class ZkbIntegralOrderExcelService {
         map.put("备注", i.getRemark());
         map.put("工程师是否有资质", WebUtil.getFieldValueMessage("zkbCommonYOrN", i.getEngineerQualificationsFlag()));
         map.put("工程师资质审批人", i.getEngineerAuditer());
-        map.put("工程师资质审批时间", DateUtil.format(i.getEngineerAuditDate(), "yyyy-MM-dd"));
+        map.put("工程师资质审批时间", DateUtil.format(i.getEngineerAuditDate(), "yyyy-MM-dd HH:mm:ss"));
         map.put("工程师资质审批备注", i.getEngineerRemark());
         map.put("Order#", i.getOrderNo());
         map.put("下单审批人", i.getOrderedAuditer());
-        map.put("下单审批时间", DateUtil.format(i.getOrderedDate(), "yyyy-MM-dd"));
+        map.put("下单审批时间", DateUtil.format(i.getOrderedDate(), "yyyy-MM-dd HH:mm:ss"));
         map.put("下单审批备注", i.getOrderedRemark());
 
         return map;
@@ -100,7 +100,7 @@ public class ZkbIntegralOrderExcelService {
         map.put("订单类型", WebUtil.getFieldValueMessage("zkbIntegralOrderType", i.getOrderType()));
         map.put("申请人", i.getRequestUser());
         map.put("申请人电话", i.getRequestPhone());
-        map.put("申请时间", DateUtil.format(i.getRequestDate(), "yyyy-MM-dd"));
+        map.put("申请时间", DateUtil.format(i.getRequestDate(), "yyyy-MM-dd HH:mm:ss"));
         map.put("医院名称", i.getHospitalName());
         map.put("医院报修人姓名", i.getHospitalRepairer());
         map.put("医院报修人电话", i.getHospitalRepairerPhone());
