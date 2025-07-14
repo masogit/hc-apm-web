@@ -590,9 +590,6 @@
                             </p:commandLink>
                             <!--<p:outputLabel style="color: red;font-weight:bold;margin-left: 20px;font-size: x-large" value="#{zkbPartOrderAuditController.decisionTechAudit()}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending'}"/>-->
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.isChoseAdmin()}">
-                            <p:commandButton immediate="false" process="@this" value="发送短信" action="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}"  />
-                        </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showTse}">
                         <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
@@ -617,9 +614,6 @@
                             <label class="label">备注</label>
                             <p:inputTextarea value="#{zkbPartOrderAuditController.selected.tseRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
                             </p:inputTextarea>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.isChoseAdmin()}">
-                            <p:commandButton immediate="false" process="@this" value="发送短信" action="#{zkbPartOrderAuditController.sendMessageAgain('TsePending')}"  />
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
@@ -669,9 +663,6 @@
                             </c:choose>
                             <p:inputTextarea id="manageRemark" value="#{zkbPartOrderAuditController.selected.manageRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
                             </p:inputTextarea>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.isChoseAdmin()}">
-                            <p:commandButton immediate="false" process="@this" value="发送短信" action="#{zkbPartOrderAuditController.sendMessageAgain('ManagePending')}"  />
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
@@ -1600,6 +1591,19 @@
                 <p:commandButton id="reject" validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.showBtn eq '0' and zkbPartOrderAuditController.zkbPartOrderStatusVo.canEditFlag}" disabled="#{zkbPartOrderAuditController.selected.repairFlag eq 't'}"/>
                 <p:commandButton immediate="false"  process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderAuditController.backList}" />
 
+
+                <p:menuButton value="发送短信" style="float : right; margin-right: 20px;" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
+                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}" value="技术支持" icon="ui-icon-arrowstop-1-s"/>
+                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}" value="区域经理" icon="ui-icon-arrowstop-1-s"/>
+                </p:menuButton>
+               <!-- <p:commandButton id="sendTechMessage" ajax="false" value="技术支持" style="display: none"
+                                 actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}"
+                                 icon="ui-icon-arrowthick-1-s" update=":growl">
+                </p:commandButton>
+                <p:commandButton id="sendManageMessage" ajax="false" value="详情导出" style="display: none"
+                                 actionListener="#区域经理}"
+                                 icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                </p:commandButton>-->
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
             <ui:include src="historyData.xhtml"/>
@@ -1687,6 +1691,13 @@
             }
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
+            }
+
+            function sendTechMessage() {
+                document.getElementById('zkbPartOrderEditForm:sendTechMessage').click();
+            }
+            function sendManageMessage() {
+                document.getElementById('zkbPartOrderEditForm:sendManageMessage').click();
             }
         </script>
     </ui:define>
