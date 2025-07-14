@@ -21,4 +21,5 @@ ALTER TABLE equipment_expiry_information ALTER COLUMN manufact_date TYPE varchar
 --  qr_code_lib 添加索引
 CREATE INDEX if not exists qr_code_lib_qr_code_idx ON public.qr_code_lib (qr_code);
 CREATE INDEX if not exists qr_code_lib_tenant_uid_idx ON public.qr_code_lib (tenant_uid);
-
+-- 配置项全部使用上级配置
+update config_item set user_parent_config = true where user_parent_config = false;

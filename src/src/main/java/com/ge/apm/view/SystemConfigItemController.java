@@ -123,37 +123,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         List<ConfigItem> list = page.getContent();
 
         if(CollectionUtils.isNotEmpty(list)){
+            List<ConfigItemValue> configItemValues = configItemValueRepository.selectConfigItemAll(selectSite.getSiteUID(), selectSite.getHospitalUID(), selectSite.getInstitutionUID(), selectSite.getTenantUID());
+            Map<String, ConfigItemValue> valueMap = configItemValues.stream().filter(value -> ObjectUtil.isNotEmpty(value) && ObjectUtil.isNotEmpty(value.getKey())).collect(Collectors.toMap(ConfigItemValue::getKey, value -> value));
             for (ConfigItem configItem : list) {
-                // 使用上级配置
-                ConfigItemValue value;
-                if(null != configItem.getUserParentConfig() && configItem.getUserParentConfig()){
-                    value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID());
-                    if(value == null){
-                        value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getHospitalUID());
-                        if(value == null){
-                            value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getInstitutionUID());
-                            if(value == null){
-                                value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getTenantUID());
-                            }
-                        }
-                    }
-                }else{
-                    if (configItem.getCategory() == 13) {
-                        switch (selectSite.getOrgType()) {
-                            case 4:
-                            case 3:
-                                value = Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID()))
-                                        .orElse(configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getTenantUID()));
-                                break;
-                            default:
-                                value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getTenantUID());
-                                break;
-                        }
-
-                    } else {
-                        value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID());
-                    }
-                }
+                ConfigItemValue value = valueMap.get(configItem.getKey());
                 if(value != null){
                     configItem.setConfigItemValue(value);
                     configItem.setShowValue(value.getValue());
