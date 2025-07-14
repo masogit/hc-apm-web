@@ -61,7 +61,7 @@
                                     update=":equipmentExpiryManagementForm searchButtons"/>
                         </p:inputText>
                         <h:panelGroup id="searchButtons">
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":equipmentExpiryManagementForm searchText" actionListener="#{equipmentExpiryManagementController.setOneSearchStr('')}" rendered="#{not empty equipmentExpiryManagementController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":equipmentExpiryManagementForm searchText searchButtons" actionListener="#{equipmentExpiryManagementController.setOneSearchStr('')}" rendered="#{not empty equipmentExpiryManagementController.oneSearchStr}"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
@@ -95,7 +95,9 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="49">
-                            <p:commandButton id="editButton" style="width: 28px!important;height: 26px!important;" icon="ui-icon-pencil" title="#{msg.editUsageYear}" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}" onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm"/>
+                            <p:commandLink title="#{msg.editUsageYear}" onclick="PF('editUsageDateDialog').show()" update=":editUsageDateForm" process="@this" actionListener="#{equipmentExpiryManagementController.prepareEditUsageDate(item)}">
+                                <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;margin-top: 8px"/>
+                            </p:commandLink>
                         </p:column>
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
                                   sortBy="#{item.namePyCode}" filterBy="#{item.name}"
@@ -217,7 +219,7 @@
                 </p:fieldset>
                 <p:fieldset legend="#{msg.usageYearDateReferTo}" style="height: 350px">
                     <span style="width: 700px;font-size: 11px;color: #3e464c94">#{msg.usageYearDateComments}</span>
-                <br/>
+                <br/>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
                     <span style="width: 700px;font-size: 11px;color: #3e464c94">#{msg.usageYearDateCommentsTwo}</span>
                     <p:dataTable id="lifecyclelist" value="#{equipmentExpiryManagementController.equipmentExpiryManagements}" var="item"
                                  widgetVar="varLifecyclelist" resizableColumns="true" liveResize="true" resizeMode="fit"

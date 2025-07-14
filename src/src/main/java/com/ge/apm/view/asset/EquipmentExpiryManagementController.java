@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepository;
@@ -139,6 +140,9 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptOrgUidSet, "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (pageRequest.getSort() == null) {
+            pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), new Sort(Sort.Direction.DESC, "lastModifiedDate"));
         }
         Page<AssetInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = page.getContent();
@@ -302,6 +306,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
             Integer usageMonth = lifecycle * 12;
             if (selected != null) {
                 selected.setLifecycle(usageMonth);
+                selected.setLastModifiedDate(new Date());
                 dao.save(selected);
             } else {
                 Set<Integer> assetIds = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toSet());
