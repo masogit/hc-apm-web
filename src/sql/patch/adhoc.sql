@@ -18,4 +18,7 @@ CREATE INDEX idx_equipment_function_type_expr
 CREATE INDEX idx_equipment_keyword_pattern ON equipment_expiry_information
     (LOWER(keyword));
 ALTER TABLE equipment_expiry_information ALTER COLUMN manufact_date TYPE varchar(10);
+--  qr_code_lib 添加索引
+CREATE INDEX if not exists qr_code_lib_qr_code_idx ON public.qr_code_lib (qr_code);
+CREATE INDEX if not exists qr_code_lib_tenant_uid_idx ON public.qr_code_lib (tenant_uid);
 
