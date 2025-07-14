@@ -9,13 +9,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by 503266962
@@ -104,23 +105,10 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
         List<ConfigItem> list = page.getContent();
 
         if(CollectionUtils.isNotEmpty(list)){
+            List<ConfigItemValue> configItemValues = configItemValueRepository.selectConfigItemAll(selectSite.getSiteUID(), selectSite.getHospitalUID(), selectSite.getInstitutionUID(), selectSite.getTenantUID());
+            Map<String, ConfigItemValue> valueMap = configItemValues.stream().filter(value -> ObjectUtil.isNotEmpty(value) && ObjectUtil.isNotEmpty(value.getKey())).collect(Collectors.toMap(ConfigItemValue::getKey, value -> value));
             for (ConfigItem configItem : list) {
-                // 使用上级配置
-                ConfigItemValue value;
-                if(null != configItem.getUserParentConfig() && configItem.getUserParentConfig()){
-                    value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID());
-                    if(value == null){
-                        value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getHospitalUID());
-                        if(value == null){
-                            value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getInstitutionUID());
-                            if(value == null){
-                                value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getTenantUID());
-                            }
-                        }
-                    }
-                }else{
-                    value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID());
-                }
+                ConfigItemValue value = valueMap.get(configItem.getKey());
                 if(value != null){
                     configItem.setConfigItemValue(value);
                     configItem.setShowValue(value.getValue());
