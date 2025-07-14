@@ -154,13 +154,12 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         super.prepareCreate();
         orgsForSelected = apiService.onCreateInventory();
         selectedOrgUid.clear();
-        initOrgTree();
-        // YHAAO-25279 微信端直接过滤
-        /*if (filterNoneAsset) {
+        if (filterNoneAsset) {
             List<OrgInfo> orgInfos = uaaService.filterNoneAsset(orgsForSelected.stream().map(OrgInfo::getUid).collect(Collectors.toList()));
             List<Integer> orgInfoIds = orgInfos.stream().map(OrgInfo::getId).collect(Collectors.toList());
             orgsForSelected = orgsForSelected.stream().filter(t -> orgInfoIds.contains(t.getId())).collect(Collectors.toList());
-        }*/
+        }
+        initOrgTree();
     }
 
     public void initOrgTree() {
