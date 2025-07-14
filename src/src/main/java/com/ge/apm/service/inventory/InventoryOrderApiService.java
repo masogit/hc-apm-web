@@ -36,7 +36,7 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 	public List<OrgInfo> onCreateInventory(){
 
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
-		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
+		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER) + "?filterNoneAsset=false";
 		ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.GET,requestEntity,LinkedHashMap.class);
 		return JSONObject.parseObject(JSONObject.toJSONString(response.getBody().get("data")), new TypeReference<List<OrgInfo>>() {});
 	}
