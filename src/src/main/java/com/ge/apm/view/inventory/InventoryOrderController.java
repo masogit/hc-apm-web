@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.inventory.InventoryOrderApiService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
@@ -167,6 +168,7 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         orgsForSelected.forEach(org -> org.setName(org.getOrgName()));
         orgInfos.addAll(orgsForSelected);
         orgTree = uaaService.getOrgTreeNodes(currentUser.getSiteUID(), orgInfos);
+        TreeNodeUtil.expandTreeNode(orgTree);
     }
 
     public void getFilteredNodes() {
