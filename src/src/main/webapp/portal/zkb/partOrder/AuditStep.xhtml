@@ -1592,18 +1592,8 @@
                 <p:commandButton immediate="false"  process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderAuditController.backList}" />
 
 
-                <p:menuButton value="发送短信" style="float : right; margin-right: 20px;" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
-                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}" value="技术支持" icon="ui-icon-arrowstop-1-s" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Probe'}"/>
-                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('ManagePending')}" value="区域经理" icon="ui-icon-arrowstop-1-s"/>
-                </p:menuButton>
-               <!-- <p:commandButton id="sendTechMessage" ajax="false" value="技术支持" style="display: none"
-                                 actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}"
-                                 icon="ui-icon-arrowthick-1-s" update=":growl">
-                </p:commandButton>
-                <p:commandButton id="sendManageMessage" ajax="false" value="详情导出" style="display: none"
-                                 actionListener="#区域经理}"
-                                 icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                </p:commandButton>-->
+
+                <p:commandButton immediate="false" style="float : right; margin-right: 20px;"  process="@this" value="发送短信" icon="ui-icon-arrowstop-1-s" action="#{zkbPartOrderAuditController.sendMessageAgain()}" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin and (zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}"/>
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
             <ui:include src="historyData.xhtml"/>
