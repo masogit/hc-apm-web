@@ -367,14 +367,14 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         Integer maxAmountNew = selected.getMaxAmount() != null ?selected.getMaxAmount() : 0;
         String configrationOld = selected.getConfigration();
         boolean enable=true;
-//        if(selected.getId() != null){
-//            MultiLevelApprovalConfig multiLevelApprovalConfig = configDao.findById(selected.getId());
-//            enable = multiLevelApprovalConfig.getEnable();
-//            if(checkExistMultiLevelApproval()){
-//                WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
-//                return;
-//            }
-//        }
+        if(selected.getId() != null){
+            MultiLevelApprovalConfig multiLevelApprovalConfig = configDao.findById(selected.getId());
+            enable = multiLevelApprovalConfig.getEnable();
+            if(checkExistMultiLevelApproval()){
+                WebUtil.addWarnMessage("当前配置下有进行中的多级审批单，不允许编辑&删除！");
+                return;
+            }
+        }
 //        userAssetTypeUpdate();
         if (null != configrationOld) {
             Map map = JSON.parseObject(configrationOld, Map.class);
