@@ -1554,6 +1554,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 return;
             }
         }
+        HashMap<String, String> hm = pmOrderService.fillInform(selectedPmOrder);
+        //如果返回false的话就不用跳出提醒填写报告提示
+        if(isFillRequired(hm)){
+            return;
+        }
         //去保修前把单子关了,把备件信息和协作人都传给后台
         if (accessoryList != null) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
