@@ -1502,7 +1502,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void sendMessageAgain(){
-        zkbPartOrderService.sendMessageAgain(selected,UserContextService.getAccessToken());
+        try{
+            zkbPartOrderService.sendMessageAgain(selected, UserContextService.getAccessToken());
+            WebUtil.addSuccessMessage("发送成功！");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            WebUtil.addSuccessMessage("发送失败！");
+        }
     }
 
     //region get、set
