@@ -1593,8 +1593,8 @@
 
 
                 <p:menuButton value="发送短信" style="float : right; margin-right: 20px;" rendered="#{zkbPartOrderAuditController.zkbPartOrderStatusVo.choseAdmin}">
-                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}" value="技术支持" icon="ui-icon-arrowstop-1-s"/>
-                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}" value="区域经理" icon="ui-icon-arrowstop-1-s"/>
+                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}" value="技术支持" icon="ui-icon-arrowstop-1-s" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Probe'}"/>
+                    <p:menuitem style="padding: 0px;" immediate="true" actionListener="#{zkbPartOrderAuditController.sendMessageAgain('ManagePending')}" value="区域经理" icon="ui-icon-arrowstop-1-s"/>
                 </p:menuButton>
                <!-- <p:commandButton id="sendTechMessage" ajax="false" value="技术支持" style="display: none"
                                  actionListener="#{zkbPartOrderAuditController.sendMessageAgain('TechnicalPending')}"
