@@ -122,8 +122,10 @@
                     <p:column headerText="#{msg.vendor}" visible="false" exportable="true">
                         <h:outputText value="#{item.arrivalList.vendor}"/>
                     </p:column>
-                    <p:column headerText="#{msg.purchasePrice}" visible="false" exportable="true">
-                        <h:outputText value="#{item.purchasePrice}"/>
+                    <p:column headerText="#{msg.purchasePrice}"  visible="false" exportable="true">
+                        <h:outputText value="#{item.purchasePrice}">
+                            <f:convertNumber pattern="#,##0.00" />
+                        </h:outputText>
                     </p:column>
                     <p:column headerText="#{msg.purchaseDate}" visible="false" exportable="true">
                         <h:outputText value="#{item.purchaseDate}">
