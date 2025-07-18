@@ -308,6 +308,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private String newMessage;
 
+    private V2_WorkOrderDetailRepository v2WorkOrderDetailRepository;
+
     @Override
     protected void init() {
         try {
@@ -354,6 +356,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
             configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
             configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+            v2WorkOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -1573,12 +1576,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if(selectedWorkOrder == null){
             return;
         }
+        List<V2_WorkOrder_Detail> v2WorkOrderDetails = new ArrayList<>();
+
         BigDecimal totalPriceToBigDecimal = BigDecimal.ZERO;
         if(accessoryList!=null && !accessoryList.isEmpty()){
             for (V2_WorkOrder_Detail detail:accessoryList) {
                 if(detail.getApproved()==null || !detail.getApproved()){
                     BigDecimal bigDecimal = new BigDecimal(detail.getClosedPrice()==null?0:detail.getClosedPrice()).setScale(2,BigDecimal.ROUND_HALF_UP);
                     totalPriceToBigDecimal = totalPriceToBigDecimal.add(bigDecimal);
+                    detail.setApproved(null);
+                    v2WorkOrderDetails.add(detail);
                 }
             }
         }
@@ -1607,6 +1614,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
+        v2WorkOrderDetailRepository.save(v2WorkOrderDetails);
 
         WebUtil.addErrorMessage("审批发起成功!");
         return ;
@@ -4107,6 +4115,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     public String openNewWindowView(String srId) {
         return "/portal/woMgr/woPartsJmPrintReportView.xhtml?faces-redirect=true&amp;sr_id=" +  srId ;
+    }
+
+    public boolean approvedCompleted(){
+        return approveList.stream().anyMatch(item -> item.getApprovalStatus() == 0 || item.getApprovalStatus() == 1);
     }
 }
 
