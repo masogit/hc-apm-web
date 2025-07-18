@@ -70,11 +70,31 @@
             <p:column headerText="二维码" filterBy="#{item.assetQrCode}" filterMatchMode="LIKE">
                 <h:outputText value="#{item.assetQrCode}" />
             </p:column>
+            <p:column headerText="转出院区" filterBy="#{item.outSiteUid}" filterMatchMode="EQ">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{departmentConvertController.outSite}" autoWidth="false" style="max-width: 150px;" >
+                        <p:ajax  update="datalist" />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{departmentConvertController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{item.outSiteName}" />
+            </p:column>
             <p:column headerText="转出科室"  filterBy="#{item.outDeptName}" filterMatchMode="LIKE">
                 <h:outputText value="#{item.outDeptName}" />
             </p:column>
             <p:column headerText="转出人"   filterBy="#{item.transferOutName}" filterMatchMode="LIKE">
                 <h:outputText value="#{item.transferOutName}"/>
+            </p:column>
+            <p:column headerText="转入院区" filterBy="#{item.inSiteUid}" filterMatchMode="EQ">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{departmentConvertController.inSite}" autoWidth="false" style="max-width: 150px;" >
+                        <p:ajax  update="datalist" />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{departmentConvertController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{item.inSiteName}" />
             </p:column>
             <p:column headerText="转入科室"   filterBy="#{item.inDeptName}" filterMatchMode="LIKE">
                 <h:outputText value="#{item.inDeptName}"/>
