@@ -55,7 +55,7 @@
                     <h:form id="sparePartsBuyIngForm">
                         <p:dataTable id="datalist1"
                                      value="#{simplePartsRequestListController.lazyModel}"
-                                     var="item" lazy="true" paginator="true" paginatorPosition="bottom"
+                                     var="item" lazy="true" paginator="true" paginatorPosition="both"
                                      paginatorAlwaysVisible="true"
                                      selectionMode="single" selection="#{simplePartsRequestListController.selected}"
                                      rowKey="#{item.id}" sortMode="single" sortOrder="descending"
