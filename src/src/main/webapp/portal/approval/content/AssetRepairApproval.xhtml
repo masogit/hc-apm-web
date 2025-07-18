@@ -24,7 +24,9 @@
                 </p:column>
 
                 <p:column headerText="#{msg.assetName}" >
-                    <h:outputText value="#{item.assetInfo.name}"/>
+                    <p:link ajax="false"  outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/info/AssetDetail.xhtml?faces-redirect=true&amp;actionName=View&amp;terminate=true&amp;selectedid='.concat(item.assetInfo.uid))}" styleClass="p-mr-2"   target="_blank"   >
+                         <h:outputText value="#{item.assetInfo.name}"/>
+                    </p:link>
                 </p:column>
                 <p:column headerText="#{msg.ManufacturerSerialNumber}" >
                     <h:outputText value="#{item.assetInfo.serialNum}"/>
