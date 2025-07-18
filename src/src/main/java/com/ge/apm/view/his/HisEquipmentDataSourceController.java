@@ -5,6 +5,7 @@ import com.ge.apm.dao.ExcelImportRecordRepository;
 import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
 import com.ge.apm.dao.HisEquipmentDataSourceRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.mapper.HisEquipmentDataSourceMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.HisRequestParamsDto;
@@ -27,7 +28,9 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
@@ -82,6 +85,8 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
     private ExcelImportRecordRepository excelImportRecordRepository;
     private HisOrgComponentController orgComponentController;
 
+    private HisEquipmentDataSourceMapper hisEquipmentDataSourceMapper;
+
     private List<ExcelImportRecord> excelImportRecords;
 
     @Override
@@ -98,6 +103,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         excelImportRecordRepository = WebUtil.getBean(ExcelImportRecordRepository.class);
 
         orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
+        hisEquipmentDataSourceMapper = WebUtil.getBean(HisEquipmentDataSourceMapper.class);
         orgComponentController.registerController(this);
         initExcelImportRecords();
     }
@@ -131,14 +137,122 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
             searchFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, selectedOrg.getSiteUID()));
         }
+//        if (hisRequestParamsDto.getStartDate() != null) {
+//            searchFilters.add(new SearchFilter("execTime", SearchFilter.Operator.GTE, hisRequestParamsDto.getStartDate()));
+//        }
+//        if (hisRequestParamsDto.getEndDate() != null) {
+//            searchFilters.add(new SearchFilter("execTime", SearchFilter.Operator.LT, DateUtil.getDateAddOneDay(hisRequestParamsDto.getEndDate())));
+//        }
+//        return sourceDao.findBySearchFilter(searchFilters,pageRequest);
+        Map<String, Object> param = new HashMap<String, Object>();
+        covQueryCondition(searchFilters, param);
+        param.put("page", pageRequest.getPageSize());
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
         if (hisRequestParamsDto.getStartDate() != null) {
-            searchFilters.add(new SearchFilter("execTime", SearchFilter.Operator.GTE, hisRequestParamsDto.getStartDate()));
+            param.put("startDate", hisRequestParamsDto.getStartDate());
         }
         if (hisRequestParamsDto.getEndDate() != null) {
-            searchFilters.add(new SearchFilter("execTime", SearchFilter.Operator.LT, DateUtil.getDateAddOneDay(hisRequestParamsDto.getEndDate())));
+            param.put("endDate",DateUtil.getDateAddOneDay(hisRequestParamsDto.getEndDate()));
         }
-        return sourceDao.findBySearchFilter(searchFilters,pageRequest);
+
+        Sort sort = pageRequest.getSort();
+        StringBuilder orderBy = new StringBuilder();
+        for (Sort.Order order : sort) {
+            String property = order.getProperty();
+            boolean ascending = order.isAscending();
+            switch (property){
+                case "id":
+                    orderBy.append("source."+("id")).append(ascending ? " ASC" : " DESC").append(",");
+                    break;
+                case "totalAmount":
+                    orderBy.append("source."+("total_amount")).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                case "execTime":
+                    orderBy.append("source."+("exec_time")).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                case "receiptNum":
+                    orderBy.append("source."+("receipt_num")).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                case "deviceCode":
+                    orderBy.append("source."+("device_code")).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                case "deviceDeptCode":
+                    orderBy.append("source."+("device_dept_code")).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+                case "execDeptCode":
+                    orderBy.append("source."+("exec_dept_code")).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
+                    break;
+            }
+        }
+        param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
+
+
+
+        List<HisEquipmentDataSource> hisEquipmentDataSourceList = hisEquipmentDataSourceMapper.queryList(param);
+        Long count = hisEquipmentDataSourceMapper.selectListCount(param);
+
+        return  new PageImpl<>(hisEquipmentDataSourceList, pageRequest, count);
+
     }
+
+    public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        for (SearchFilter searchFilter :searchFilters) {
+            String fieldName = searchFilter.fieldName;
+            switch (fieldName) {
+                case "orgCode":
+                    param.put("orgCode", searchFilter.value);
+                    break;
+                case "siteUid":
+                    param.put("siteUid", searchFilter.value);
+                    break;
+                case "tenantUid":
+                    param.put("tenantUid", searchFilter.value);
+                    break;
+                case "deviceCode":
+                    param.put("deviceCode", searchFilter.value);
+                    break;
+                case "deviceDeptCode":
+                    param.put("deviceDeptCode", searchFilter.value);
+                    break;
+                case "execDeptCode":
+                    param.put("execDeptCode", searchFilter.value);
+                    break;
+                case "sourceCode":
+                    param.put("sourceCode", searchFilter.value);
+                    break;
+                case "isMatched":
+                    param.put("isMatched", searchFilter.value);
+                    break;
+                case "sfxmName":
+                    param.put("sfxmName", searchFilter.value);
+                    break;
+                case "patientRegistrationNum":
+                    param.put("patientRegistrationNum", searchFilter.value);
+                    break;
+
+                case "prescriptionNum":
+                    param.put("prescriptionNum", searchFilter.value);
+                    break;
+                case "execTime":
+                    param.put("execTime", searchFilter.value);
+                    break;
+                case "receiptNum":
+                    double receiptNum = Double.parseDouble(searchFilter.value.toString());
+                    param.put("receiptNum", receiptNum);
+                    break;
+                case "totalAmount":
+                    double totalAmount = Double.parseDouble(searchFilter.value.toString());
+                    param.put("totalAmount", totalAmount);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+
+
 
     @Override
     public List<HisEquipmentDataSource> getItemList() {

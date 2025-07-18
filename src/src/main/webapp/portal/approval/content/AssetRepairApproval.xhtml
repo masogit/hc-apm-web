@@ -96,7 +96,7 @@
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{msg.ApprovalStatus}">
-                    <h:outputText value="#{empty detailItem.approved? msg.Unapproved: detailItem.approved? msg.pass:msg.fail}" />
+                    <h:outputText value="#{empty detailItem.approved?(multiLevelApprovalController.approvedCompleted()?msg.ApprovalInProgress: msg.Unapproved): detailItem.approved? msg.pass:msg.fail}" />
                 </p:column>
                 <p:column headerText="#{msg.PartType}">
                     <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
