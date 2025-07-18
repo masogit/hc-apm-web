@@ -1032,4 +1032,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         attachList = attachList.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
+    public boolean approvedCompleted(){
+       return multiLevelApprovals.stream().anyMatch(item -> item.getApprovalStatus() == 0 || item.getApprovalStatus() == 1);
+    }
+
 }
