@@ -68,7 +68,7 @@
                         <p:dataTable id="datalist1" value="#{simplePartsInventoryController.lazyModel}" var="item"
                                      widgetVar="varDataList"
                                      rowStyleClass="#{item.warningStatus}"
-                                     lazy="true" paginator="true" paginatorPosition="bottom"
+                                     lazy="true" paginator="true" paginatorPosition="both"
                                      paginatorAlwaysVisible="true"
                                      rowKey="#{item.id}" sortMode="single" sortOrder="descending"
                                      sortBy="#{item.id}"

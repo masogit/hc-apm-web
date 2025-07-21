@@ -36,6 +36,8 @@ public class SupplierService {
     private SupplierQrCodeRepository supplierQrCodeDao;
     @Autowired
     private AssetInfoRepository assetInfoDao;
+    @Autowired
+    private SupplierContactPersonRepository supplierContactPersonRepository;
 
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();

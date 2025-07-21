@@ -3,16 +3,15 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.AssetDepartmentConvertRepository;
 import com.ge.apm.dao.SiteToSiteAllocationRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.AssetDepartmentConvert;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.SiteToSiteAllocation;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.DepartmentConvertService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.google.common.base.Strings;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -45,7 +44,9 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     private Date returnAtTime;
 
     private Integer status;
-
+    private List<OrgInfo> clinicalDeptList;
+    private String inSite;
+    private String outSite;
     private List<AssetDepartmentConvert> currentPageAssets;
 
     //复选的设备
@@ -83,6 +84,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
+        loadClinicalDeptList();
     }
 
     @Override
@@ -281,5 +283,47 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uuaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+    }
+
+    public List<OrgInfo> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public String getInSite() {
+        return inSite;
+    }
+
+    public void setInSite(String inSite) {
+        this.inSite = inSite;
+    }
+
+    public String getOutSite() {
+        return outSite;
+    }
+
+    public void setOutSite(String outSite) {
+        this.outSite = outSite;
+    }
+
+    public List<OrgInfo> getClinicalDeptList() {
+        return clinicalDeptList;
+    }
+
+    public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+        this.clinicalDeptList = clinicalDeptList;
     }
 }

@@ -1,9 +1,6 @@
 package com.ge.apm.view;
 
-import com.ge.apm.dao.ConfigItemValueRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.VenderCompanyRepository;
-import com.ge.apm.dao.VenderNoticeRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.preview.PreViewerBean;
@@ -40,6 +37,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private SupplierRepository supplierRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private VenderNoticeRepository venderNoticeRepository;
+    private SupplierContactPersonRepository supplierContactPersonRepository;
     private SupplierController supplierController;
     @Getter @Setter
     private String noticeContent;
@@ -60,6 +58,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         blobService = WebUtil.getBean(BlobFileService.class);
         supplierRepository = WebUtil.getBean(SupplierRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        supplierContactPersonRepository = WebUtil.getBean(SupplierContactPersonRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         preViewerBean = WebUtil.getBean(PreViewerBean.class);
         venderNoticeRepository = WebUtil.getBean(VenderNoticeRepository.class);
@@ -166,6 +165,10 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
             name= name.substring(0,name.length()-1);
         }
         return name;
+    }
+
+    public List<SupplierContactPerson> getPersonList() {
+        return supplierContactPersonRepository.findByVenderCompanyId(this.selected.getId());
     }
 
     public List<V2_BlobObject> getAttachList(String id, String type) {

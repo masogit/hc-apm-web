@@ -34,9 +34,9 @@ public interface WorkOrderMapper {
 
 //	@Select("SELECT sr.case_priority casePriority, sr.request_time requestTime, sr.request_reason requestReason, sr.requestor_name requestorName, wo.dispatch_mode dispatchMode, wo.approval_date approvalDate, wo.current_step_id currentStepId, wo.current_step_name currentStepName, wo.current_person_name currentPersonName FROM v2_service_request sr, v2_work_order wo WHERE sr.id = wo.sr_id ${ew.sqlSegment}")
 	@Select("SELECT wo.*, sr.case_priority casePriority, sr.request_time requestTime, sr.request_reason requestReason, sr.requestor_name requestorName FROM v2_service_request sr " +
-			"LEFT JOIN ( SELECT wo.id, wo.asset_id, wo.sr_id, wo.dispatch_mode dispatchMode, wo.approval_date approvalDate, wo.current_step_id currentStepId, wo.current_step_name currentStepName, wo.current_person_name currentPersonName, count(wod.id) detailCount " +
-			"FROM v2_work_order wo LEFT JOIN v2_work_order_detail wod ON wo.id = wod.wo_id WHERE wo.asset_id in (${assetIds}) group by wo.id ) wo ON sr.id = wo.sr_id " +
+			"LEFT JOIN ( SELECT wo.id, wo.asset_id, wo.asset_uid, wo.sr_id, wo.dispatch_mode dispatchMode, wo.approval_date approvalDate, wo.current_step_id currentStepId, wo.current_step_name currentStepName, wo.current_person_name currentPersonName, count(wod.id) detailCount " +
+			"FROM v2_work_order wo LEFT JOIN v2_work_order_detail wod ON wo.id = wod.wo_id WHERE wo.asset_uid in (${assetUIds}) group by wo.id ) wo ON sr.id = wo.sr_id " +
 			"WHERE 1=1 ${ew.sqlSegment}")
-	List<WorkOrderEventRecordDto> getEventRecord(Pagination pagination, @Param("ew") Wrapper wrapper, @Param("assetIds") String assetIds);
+	List<WorkOrderEventRecordDto> getEventRecord(Pagination pagination, @Param("ew") Wrapper wrapper, @Param("assetUIds") String assetUIds);
 
 }

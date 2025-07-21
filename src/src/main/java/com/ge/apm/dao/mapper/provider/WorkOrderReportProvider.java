@@ -139,7 +139,7 @@ public class WorkOrderReportProvider {
 
         sb.append("select wo.id as id,wo.sr_id as srId,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.uid as assetUid," +
                 "ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
-                "wo.status as status, ai.id as assetId , " +
+                "wo.status as status, ai.id as assetId ,ai.risk_grade as riskGrade, " +
                 "wo.sub_status as subStatus, " +
                 "ai.registration_no as registrationNo, "+
                 "ai.warranty_date as warrantyDate, "+

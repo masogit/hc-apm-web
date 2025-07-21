@@ -170,7 +170,7 @@
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
                         </f:facet>
 
-                        <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.id, 3)}" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.uid, 3)}" emptyMessage="#{msg.noRecordFound}">
                             <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" >
                                 <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
                             </p:column>
@@ -219,7 +219,7 @@
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
-                        <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoDetailController.selected.id,3)}" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoDetailController.selected.uid,3)}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.creatorUID}" >
                                 <h:outputText value="#{item.creatorName}"/>
                             </p:column>

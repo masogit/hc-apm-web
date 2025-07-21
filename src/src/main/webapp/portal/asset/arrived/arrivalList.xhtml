@@ -108,7 +108,7 @@
                             <p:commandButton id="exportDocButton" title="导出选中记录到DOC" icon="ui-icon-document" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportArrivalSupplierReportToDoc()}" update="datalist" disabled="#{empty assetArrivedListController.selected}" rendered="#{assetArrivedListController.activeSupplier()}">
                                 <p:fileDownload value="#{assetArrivedListController.exportDoc}" />
                             </p:commandButton>
-                            <p:commandButton id="exportReportButton" title="导出选中记录安装报告" icon="ui-icon-arrowstop-1-s" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportArrivalSupplierReportToZip()}" update="datalist" disabled="#{empty assetArrivedListController.selected}">
+                            <p:commandButton id="exportReportButton" title="导出选中记录安装报告"  ajax="false"  icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportArrivalSupplierReportToZip()}" update="datalist" disabled="#{empty assetArrivedListController.selected}">
                                 <p:fileDownload value="#{assetArrivedListController.exportZip}" />
                             </p:commandButton>
                             

@@ -1,25 +1,8 @@
--- YHAAO-25109
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 4, 'WORD', '维修工单报告导出形式', 'WorkOrderExportType', '维修工单报告导出形式', 'f', 't', 7,'[{"key":"WORD","value":"WORD"},{"key":"PDF","value":"PDF"}]' where not exists (select * from config_item where key = 'WorkOrderExportType');
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 5, 'WORD', '保养工单报告导出形式', 'PMOrderExportType', '保养工单报告导出形式', 'f', 't', 7,'[{"key":"WORD","value":"WORD"},{"key":"PDF","value":"PDF"}]' where not exists (select * from config_item where key = 'PMOrderExportType');
--- YHAAO-25508
-CREATE INDEX IF NOT EXISTS asset_lifecycle_asset_uid_idx ON PUBLIC.asset_lifecycle USING btree (asset_uid);
-CREATE INDEX IF NOT EXISTS asset_lifecycle_tenant_uid_idx ON PUBLIC.asset_lifecycle USING btree (tenant_uid);
+
+-- YHAAO-25583 更新历史数据院区
+update asset_department_convert adc set out_site_uid=o2.uid ,out_site_name =o2.name,in_site_uid = o4.uid, in_site_name= o4.name from asset_department_convert a1 left join org_info o1 on a1.out_dept_uid = o1.uid left join org_info o2 on o1.site_uid = o2.uid left join  org_info o3 on o3.uid = a1.in_dept_uid left join org_info o4 on o3.site_uid = o4.uid where a1.id = adc.id and  ((adc.out_site_uid is null or adc.out_site_uid = '') or (adc.out_site_name is null or adc.out_site_name ='' ) or (adc.in_site_uid is null or adc.in_site_uid = '') or (adc.in_site_name is null or adc.in_site_name = ''));
+-- YHAAO-25580 多级审批-设备维修：备件审批状态取最新工单的审批状态
+update v2_work_order_detail vod  set approved=null where approved=false and exists(select 1 from multi_level_approval mla where mla.business_uid=vod.wo_id and mla.approval_status=0 or mla.approval_status=1 )
 
 
--- 多级审批给申请人uid赋值
-UPDATE multi_level_approval mla SET application_uid = ( SELECT mla2.initiate_approver_uid FROM multi_level_approval mla2 WHERE mla.business_uid = mla2.business_uid AND mla2.initiate_approver_uid IS NOT NULL LIMIT 1 ) WHERE application_uid is null  and   EXISTS ( SELECT 1 FROM multi_level_approval mla2 WHERE mla.business_uid = mla2.business_uid AND mla2.initiate_approver_uid IS NOT NULL );
--- 库存管理新增库存来源
-update asset_stocked set stock_source = 3 where stock_source is null;
-update asset_in_stock_record set stock_source = 3 where stock_source is null;
-update asset_out_stock_record set stock_source = 3 where stock_source is null;
--- 效期库索引
-CREATE INDEX idx_equipment_function_type_expr
-    ON equipment_expiry_information (REGEXP_REPLACE(LOWER(TRIM(function_type)), '\s+', '', 'g'));
-CREATE INDEX idx_equipment_keyword_pattern ON equipment_expiry_information
-    (LOWER(keyword));
-ALTER TABLE equipment_expiry_information ALTER COLUMN manufact_date TYPE varchar(10);
---  qr_code_lib 添加索引
-CREATE INDEX if not exists qr_code_lib_qr_code_idx ON public.qr_code_lib (qr_code);
-CREATE INDEX if not exists qr_code_lib_tenant_uid_idx ON public.qr_code_lib (tenant_uid);
--- 配置项全部使用上级配置
-update config_item set user_parent_config = true where user_parent_config = false;
+

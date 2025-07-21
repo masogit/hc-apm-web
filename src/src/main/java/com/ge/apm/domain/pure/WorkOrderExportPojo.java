@@ -185,6 +185,8 @@ public class WorkOrderExportPojo {
 
     private String coworkerEntryDetail;
 
+    private Integer riskGrade;
+
     public String getCoworkerEntryDetail() {
         return coworkerEntryDetail;
     }
@@ -881,5 +883,13 @@ public class WorkOrderExportPojo {
 
     public void setFactoryWarrantyDate(Date factoryWarrantyDate) {
         this.factoryWarrantyDate = factoryWarrantyDate;
+    }
+
+    public Integer getRiskGrade() {
+        return riskGrade;
+    }
+
+    public void setRiskGrade(Integer riskGrade) {
+        this.riskGrade = riskGrade;
     }
 }
