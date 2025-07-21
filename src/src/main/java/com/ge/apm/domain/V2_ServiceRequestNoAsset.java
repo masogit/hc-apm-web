@@ -147,6 +147,13 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name = "asset_status")
     private Integer assetStatus;
 
+    @Column(name = "sr_id")
+    private String srId;
+
+    //取消原因
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+
     @Override
     public int hashCode() {
         Integer hash = 0;
