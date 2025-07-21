@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.HisEquipmentDataSourceMapper">
+
+    <select id="queryList" resultType="com.ge.apm.domain.his.HisEquipmentDataSource">
+
+
+           select source.*,sfxm.sfxm_name as sfxmName from  his_equipment_data_source source left join  his_equipment_sfxm sfxm  on  source.device_dept_code=sfxm.sfxm_id and source.org_code=sfxm.hos_id and   source.tenant_uid=sfxm.tenant_uid
+        <include refid="queryCondition"/>
+        <if test="orderBy != null">
+            ORDER BY ${orderBy}
+        </if>
+        LIMIT #{page} OFFSET #{offset}
+
+    </select>
+
+
+    <select id="selectListCount" resultType="long">
+
+
+        select count(*) from  his_equipment_data_source source left join  his_equipment_sfxm sfxm  on  source.device_dept_code=sfxm.sfxm_id and source.org_code=sfxm.hos_id and   source.tenant_uid=sfxm.tenant_uid
+        <include refid="queryCondition"/>
+
+
+    </select>
+    <sql id="queryCondition">
+        <where>
+            <if test="orgCode!=null">
+                and   source.org_code=#{orgCode}
+            </if>
+            <if test="tenantUid!=null">
+                and  source.tenant_uid=#{tenantUid}
+            </if>
+            <if test="siteUid!=null">
+                and source.site_uid=#{siteUid}
+            </if>
+            <if test="deviceCode!=null">
+                and source.device_code like concat('%',#{deviceCode},'%')
+            </if>
+            <if test="deviceDeptCode!=null">
+                and source.device_dept_code like concat('%',#{deviceDeptCode},'%')
+            </if>
+            <if test="execDeptCode!=null">
+                and  source.exec_dept_code like concat('%',#{deviceDeptCode},'%')
+            </if>
+
+            <if test="sfxmName!=null">
+                and sfxm.sfxm_name like concat('%',#{sfxmName},'%')
+            </if>
+            <if test="execTime!=null">
+                and  source.exec_time <![CDATA[<=]]>  #{execTime}
+            </if>
+            <if test="sourceCode!=null">
+                and source.source_code=#{sourceCode}
+            </if>
+            <if test="isMatched!=null">
+                and source.is_matched=#{isMatched}
+            </if>
+
+
+            <if test="patientRegistrationNum!=null">
+                and source.patient_registration_num=#{patientRegistrationNum}
+            </if>
+            <if test="prescriptionNum!=null">
+                and source.prescription_num=#{prescriptionNum}
+            </if>
+            <if test="receiptNum!=null">
+                and source.receipt_num   <![CDATA[>=]]>   #{receiptNum}
+            </if>
+            <if test="totalAmount!=null">
+                and source.total_amount   <![CDATA[>=]]>   #{totalAmount}
+            </if>
+            <if test="startDate!=null">
+                and  source.exec_time <![CDATA[>=]]>  #{startDate}
+            </if>
+
+            <if test="endDate!=null">
+                and  source.exec_time <![CDATA[<=]]>  #{endDate}
+            </if>
+
+            <if test="execTime!=null">
+                and  source.exec_time <![CDATA[>=]]>  #{execTime}
+            </if>
+        </where>
+
+
+    </sql>
+    
+</mapper>

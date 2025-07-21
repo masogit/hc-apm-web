@@ -99,9 +99,9 @@
                                             <h:outputText value="#{item.deviceDeptCode}"/>
                                         </p:column>
 
-                                        <p:column headerText="收费项目名称" sortBy="#{item.hisEquipmentSfxm.sfxmName}"
-                                                  filterBy="#{item.hisEquipmentSfxm.sfxmName}" filterMatchMode="LIKE">
-                                            <h:outputText value="#{item.hisEquipmentSfxm.sfxmName}"/>
+                                        <p:column headerText="收费项目名称" sortBy="#{item.sfxmName}"
+                                                  filterBy="#{item.sfxmName}" filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.sfxmName}"/>
                                         </p:column>
 
 
@@ -146,7 +146,9 @@
                                         <p:column headerText="执行时间" sortBy="#{item.execTime}"
                                                   filterBy="#{item.execTime}"
                                                   filterMatchMode="LIKE">
-                                            <h:outputText value="#{item.execTime}"/>
+                                            <h:outputText value="#{item.execTime}">
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd HH:mm:ss"  />
+                                            </h:outputText>
                                         </p:column>
                                         <p:column headerText="系统来源" sortBy="#{item.sourceCode}"
                                                   filterBy="#{item.sourceCode}"
