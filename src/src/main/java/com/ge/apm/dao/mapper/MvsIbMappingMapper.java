@@ -13,6 +13,9 @@ public interface MvsIbMappingMapper extends BaseMapper<MvsIbMapping> {
     @Select("select distinct mvs.mvs_ib_id from mvs_ib_mapping mvs where mvs.ib_id = #{assetId} and mvs.mvs_ib_id is not null")
     List<Integer> findMvsAssetIds(@Param("assetId") Integer assetId);
 
+    @Select("select  DISTINCT COALESCE(mvs.mvs_ib_uid, mvs.e_home_ib_uid) AS mvs_ib_uid from mvs_ib_mapping mvs where mvs.ib_uid = #{assetUId} ")
+    List<String> findMvsAssetUIds(@Param("assetUId") String assetUId);
+
     @Insert("INSERT INTO mvs_ib_mapping(" +
             "  create_time,  " +
             "  created_by,  " +

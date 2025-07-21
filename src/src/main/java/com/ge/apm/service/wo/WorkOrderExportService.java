@@ -388,6 +388,9 @@ public class WorkOrderExportService {
             if (workOrderExportPojo.getSrId() != null) {
                 workOrderMap.put("srId", workOrderExportPojo.getSrId());
             }
+            if(workOrderExportPojo.getRiskGrade() != null){
+                workOrderMap.put(WebUtil.getMessage("riskGrade"), FieldValueMessageController.fieldValue("riskGrade", workOrderExportPojo.getRiskGrade().toString()));
+            }
             resultList.add(workOrderMap);
         }
         return resultList;

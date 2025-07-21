@@ -15,7 +15,7 @@
                 <p:fieldset legend="备件仓库">
                     <h:form id="basicListForm">
                         <p:dataTable id="datalist" value="#{simplePartsWarehouseListController.lazyModel}"
-                                     var="item" lazy="true" paginator="true" paginatorPosition="bottom"
+                                     var="item" lazy="true" paginator="true" paginatorPosition="both"
                                      paginatorAlwaysVisible="true"
                                      selectionMode="single" selection="#{simplePartsWarehouseListController.selected}"
                                      rowKey="#{item.id}" sortMode="single" sortOrder="descending"

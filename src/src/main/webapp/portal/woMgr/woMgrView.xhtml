@@ -373,7 +373,7 @@
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.approvalStatus}">
-                                    <h:outputText value="#{empty detailItem.approved? msg.unapproved: detailItem.approved? msg.pass:msg.fail}" />
+                                    <h:outputText value="#{empty detailItem.approved?(workOrderMgrController.approvedCompleted()?msg.ApprovalInProgress: msg.Unapproved): detailItem.approved? msg.pass:msg.fail}" />
                                 </p:column>
                                 <p:column headerText="#{msg.partType}">
                                     <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />
@@ -416,7 +416,7 @@
                                 </p:column>
                             </p:dataTable>
                             <!--添加审核流程表格-->
-                            <p:dataTable class="cl3" value="#{workOrderMgrController.getApproveList()}" var="approveItem" rendered="#{not empty workOrderMgrController.approveList and userContextService.hasAnyRoleByApmRoles('AssetStaff') and (workOrderMgrController.queryIndex == 4 or workOrderMgrController.queryIndex == 5 or workOrderMgrController.queryIndex == 6 or workOrderMgrController.queryIndex == 7 or workOrderMgrController.queryIndex == 8)}">
+                            <p:dataTable class="cl3" value="#{workOrderMgrController.getApproveList()}" var="approveItem" rendered="#{not empty workOrderMgrController.approveList and userContextService.hasAnyRoleByApmRoles('AssetStaff') and (workOrderMgrController.queryIndex == 4 or workOrderMgrController.queryIndex == 5 or workOrderMgrController.queryIndex == 6 or workOrderMgrController.queryIndex == 7 or workOrderMgrController.queryIndex == 8or workOrderMgrController.queryIndex == 12)}">
                                 <p:column headerText="#{msg.approvalNumber}">
                                     <h:outputText value="#{approveItem.approvalNumber}"/>
                                 </p:column>
