@@ -238,10 +238,10 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
             //当前责任人是自己且已经派工的单子
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+6*"));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+6*"));
-        } if (queryIndex == 7) {
+        } if (queryIndex == 4) {
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
-        } if (queryIndex == 9) {
+        } if (queryIndex == 5) {
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 9));
             /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));*/
         }
@@ -254,9 +254,9 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
                 return "待派工";
             case 3:
                 return "待接单";
-            case 7:
+            case 4:
                 return "待关单";
-            case 9:
+            case 5:
                 return "已关单";
             default:
                 return "";
