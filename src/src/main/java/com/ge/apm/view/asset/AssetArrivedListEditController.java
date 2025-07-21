@@ -179,7 +179,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 //移除标记为已完成的设备合同
                 List<ContractInfo> completeEquipmentContracts = contractList.stream()
                         .filter(item -> (ContractInfo.ContractType.Equipment.toString().equals(item.getContractType()) &&
-                                ContractInfo.ContractStatus.COMPLETE.toString().equals(item.getContractStatus()))&&
+                                ContractInfo.ContractStatus.COMPLETE.toString().equals(item.getContractStatus())) ||
+                                //移除网页版供应商新建或退回的合同
                                 ListUtil.newArrayList(1, 3).contains(item.getStatus()))
                         .collect(Collectors.toList());
                 contractList.removeAll(completeEquipmentContracts);
