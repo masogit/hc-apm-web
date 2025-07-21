@@ -263,7 +263,7 @@
                                              paginator="true" paginatorPosition="bottom" rows="5" widgetVar="varworkOrderListgl"
                                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
-                                    <p:ajax event="filter" listener="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.id)}" />
+                                    <p:ajax event="filter" listener="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.uid)}" />
                                     <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" >
                                         <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
                                     </p:column>
