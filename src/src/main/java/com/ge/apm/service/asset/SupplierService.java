@@ -36,6 +36,8 @@ public class SupplierService {
     private SupplierQrCodeRepository supplierQrCodeDao;
     @Autowired
     private AssetInfoRepository assetInfoDao;
+    @Autowired
+    private SupplierContactPersonRepository supplierContactPersonRepository;
 
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -174,6 +176,8 @@ public class SupplierService {
         }
         supplierDao.save(supplier);
 
+        // 修改供应商发送MQ
+        supplierContactPersonRepository.findByVenderCompanyId(supplier.getVenderCompanyId());
         assetInfoDao.updateSupplierName(supplier.getName(), supplier.getId(), supplier.getTenantUID());
         assetInfoDao.updateMaintainerName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
         assetInfoDao.updateManufactureName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
