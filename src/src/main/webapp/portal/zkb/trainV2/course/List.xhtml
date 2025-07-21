@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+    <div class="ui-g">
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="培训课程字典列表"/>
+        </div>
+        <div class="ui-g-12 card">
+            <h:form id="listForm">
+                <p:dataTable id="datalist" value="#{zkbTrainCourseController.lazyModel}" var="item" widgetVar="varDataList"
+                             selectionMode="single" selection="#{zkbTrainCourseController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             rows="20" emptyMessage="数据为空"
+                             currentPageReportTemplate="总行数: {totalRecords}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="rowSelect"  update="deleteButton editButton :zkbCourseEditForm"/>
+                    <p:ajax event="filter" listener="#{zkbTrainCourseController.onFilter}" />
+
+                    <p:column headerText="课程编号"  filterBy="#{item.code}"  filterMatchMode="LIKE"  >
+                        <h:outputText value="#{item.code}"/>
+                    </p:column>
+                    <p:column headerText="课程名称" filterBy="#{item.name}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+
+                    <p:column headerText="课程简称"  filterBy="#{item.shortName}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.shortName}"/>
+                    </p:column>
+
+                    <p:column headerText="备注"  filterBy="#{item.description}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.description}"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增" actionListener="#{zkbTrainCourseController.prepareCreate}" update=":zkbCourseEditDlg" oncomplete="PF('zkbCourseEditDialog').show()" />
+                        <p:commandButton id="editButton"  icon="ui-icon-pencil" title="编辑" actionListener="#{zkbTrainCourseController.prepareEdit}" update="zkbCourseEditDlg" oncomplete="PF('zkbCourseEditDialog').show()" disabled="#{empty zkbTrainCourseController.selected.id}" />
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbTrainCourseController.delete}" update=":listForm:datalist" >
+                            <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
+                        </p:commandButton>
+
+
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="Edit.xhtml"/>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
+
