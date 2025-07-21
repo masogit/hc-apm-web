@@ -385,7 +385,7 @@
                             <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" actionListener="#{assetInfoController.assembleMaintainData(assetInfoController.selected.uid)}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                         </f:facet>
 
-                        <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoController.selected.id, 3)}" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoController.selected.uid, 3)}" emptyMessage="#{msg.noRecordFound}">
                             <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" >
                                 <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
                             </p:column>
@@ -434,7 +434,7 @@
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
-                        <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoController.selected.id,3)}" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoController.selected.uid,3)}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="创建人" >
                                 <h:outputText value="#{item.creatorName}"/>
                             </p:column>

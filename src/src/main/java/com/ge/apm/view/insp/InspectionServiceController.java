@@ -104,15 +104,15 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         return assetInfoMapper.selectMeasureResult(pagination, wrapper);
     }
 
-    public List<WorkOrderEventRecordDto> getWorkOrderList(Integer assetId){
-        return getWorkOrderList(assetId, 1000);
+    public List<WorkOrderEventRecordDto> getWorkOrderList(String assetUid){
+        return getWorkOrderList(assetUid, 1000);
     }
 
-    public List<WorkOrderEventRecordDto> getWorkOrderList(Integer assetId, Integer limit){
-        List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
-        assetIds.add(assetId);
+    public List<WorkOrderEventRecordDto> getWorkOrderList(String assetUid, Integer limit){
+        List<String> assetUIds = mvsIbMappingMapper.findMvsAssetUIds(assetUid);
+        assetUIds.add(assetUid);
         Pagination pagination = new Pagination(0, limit);
-        Wrapper wrapper = getWrapper("wo.asset_id", null, null, assetIds, "sr.request_time");
+        Wrapper wrapper = getWrapper("wo.asset_uid", null, assetUIds, null, "sr.request_time");
         if (ObjectUtil.isNotEmpty(stepFilter)) {
             Integer filterStepId = woStatus.get(stepFilter);
             List<Integer> steps;
@@ -133,18 +133,20 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
             }
             wrapper.in("wo.currentStepId", steps);
         }
-        return workOrderMapper.getEventRecord(pagination, wrapper, assetIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+        return workOrderMapper.getEventRecord(pagination, wrapper, assetUIds.stream()
+                .map(id -> "'" + id.replace("'", "''") + "'")
+                .collect(Collectors.joining(",")));
     }
 
-    public List<V2_PmOrder> getPmOrderList(Integer assetId){
-        return getPmOrderList(assetId, 1000);
+    public List<V2_PmOrder> getPmOrderList(String assetUid){
+        return getPmOrderList(assetUid, 1000);
     }
 
-    public List<V2_PmOrder> getPmOrderList(Integer assetId,Integer limit){
-        List<Integer> assetIds = mvsIbMappingMapper.findMvsAssetIds(assetId);
-        assetIds.add(assetId);
+    public List<V2_PmOrder> getPmOrderList(String assetUid,Integer limit){
+        List<String> assetUIds = mvsIbMappingMapper.findMvsAssetUIds(assetUid);
+        assetUIds.add(assetUid);
         Pagination pagination = new Pagination(0, limit);
-        Wrapper wrapper = getWrapper("asset_id", null, null, assetIds, "end_time");
+        Wrapper wrapper = getWrapper("asset_uid", null, assetUIds, null, "end_time");
         return pmOrderMapper.getEventRecord(pagination, wrapper);
     }
 
@@ -272,8 +274,8 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         }
         this.assetInfo = assetInfo;
         detailMeasureAssetList = getMeasureAssetList(assetInfo.getId());
-        detailWorkOrderList = getWorkOrderList(assetInfo.getId());
-        detailPmOrderList = getPmOrderList(assetInfo.getId());
+        detailWorkOrderList = getWorkOrderList(assetInfo.getUid());
+        detailPmOrderList = getPmOrderList(assetInfo.getUid());
         detailMaintainDataList = getMaintainDataList();
         detailAssetOperationRecordList = getAssetOperationRecordList();
         detailAssetOptRecordList = getAssetOptRecordList();
