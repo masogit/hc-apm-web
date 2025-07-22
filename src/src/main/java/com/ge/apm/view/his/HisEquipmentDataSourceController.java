@@ -361,11 +361,11 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 //                return;
 //            }
 
-            int maxRowNum = HisEquipmentDataSourceImportService.EXCEL_CONTRACT_HEADER_ROW + 30000;
-            if(doc.exceedMaxRowNum(HisEquipmentDataSourceImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
-                return;
-            }
+//            int maxRowNum = HisEquipmentDataSourceImportService.EXCEL_CONTRACT_HEADER_ROW + 30000;
+//            if(doc.exceedMaxRowNum(HisEquipmentDataSourceImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
+//                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+//                return;
+//            }
             importMapList = hisEquipmentDataSourceImportService.getMapFromTemplate(doc);
             hisEquipmentDataSourceImportService.importData(importMapList);
             errorList = hisEquipmentDataSourceImportService.filterErrorRecords(importMapList);

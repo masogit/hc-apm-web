@@ -74,6 +74,8 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     private Integer batchModifyCount;
     @Getter @Setter
     private List<EquipmentExpiryManagement> equipmentExpiryManagements;
+    @Getter @Setter
+    private Boolean matchByFunctionType;
 
     @Override
     protected void init() {
@@ -262,6 +264,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     }
 
     public void prepareEditUsageDate(AssetInfo assetInfo) {
+        matchByFunctionType = false;
         equipmentExpiryManagements = new ArrayList<>();
         AtomicBoolean batch = new AtomicBoolean(false);
         if (assetInfo != null) {
@@ -295,6 +298,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
             if ((StringUtils.isNotEmpty(selected.getManufacture()) || StringUtils.isNotEmpty(selected.getMakerShortName())) && StringUtils.isNotEmpty(selected.getFunctionType())) {
                 // 继续通过制造商和设备型号获取
                 equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(StringUtils.isEmpty(selected.getMakerShortName())?selected.getManufacture():selected.getMakerShortName().replace(" ", "").toLowerCase(), selected.getFunctionType().replace(" ", "").toLowerCase());;
+                matchByFunctionType = true;
             }
         }
     }
