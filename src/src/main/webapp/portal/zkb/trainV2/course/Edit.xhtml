@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="zkbCourseEditDlg" widgetVar="zkbCourseEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainCourseController.CRUDActionName} 课程" width="250" height="370">
+        <h:form id="zkbCourseEditForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainCourseController.selected != null}">
+
+                <h:panelGroup>
+                    <label class="label">课程ID*</label>
+                    <p:inputText id="cid" value="#{zkbTrainCourseController.selected.code}" required="true" requiredMessage="#{'课程ID'} #{msg.ValidationRequire}" disabled="#{not empty zkbTrainCourseController.selected.code}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">课程名称*</label>
+                    <p:inputText id="cname" value="#{zkbTrainCourseController.selected.name}" required="true" requiredMessage="#{'课程名称'} #{msg.ValidationRequire}"  disabled="#{not empty zkbTrainCourseController.selected.name}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程简称</label>
+                    <p:inputText id="modality" value="#{zkbTrainCourseController.selected.shortName}"  />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程描述</label>
+                    <p:inputTextarea rows="4" cols="25" value="#{zkbTrainCourseController.selected.description}">
+                    </p:inputTextarea>
+                </h:panelGroup>
+
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainCourseController.saveCourse}" update=":growl :listForm:datalist " icon="ui-icon-check" oncomplete="PF('zkbCourseEditDialog').hide()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCourseEditDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>
