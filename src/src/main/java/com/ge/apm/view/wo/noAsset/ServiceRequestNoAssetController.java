@@ -1,9 +1,7 @@
 package com.ge.apm.view.wo.noAsset;
 
 import com.alibaba.fastjson.JSONPath;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.ServiceRequestNoAssetRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.BlobFileService;
@@ -67,6 +65,8 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     private OrgInfoTreeService orgInfoTreeService;
     private ServiceRequestNoAssetService serviceRequestNoAssetService;
     private BlobObjectRepository blobObjectRepository;
+
+    private V2_WorkOrderRepository woDao;
     private UserAccount loginUser;
     @Getter @Setter
     private Set<String> clinicalDeptOrgUidSet;
@@ -138,6 +138,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Getter  @Setter
     private TreeNode orgTreeSearch;
 
+
     @Override
     protected void init() {
         super.init();
@@ -156,6 +157,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         org = orgDao.findById(loginUser.getOrgInfoId());
         woService = WebUtil.getBean(V2_WorkOrderService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
+        woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
 
         customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
         currentCustomConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
@@ -221,7 +223,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         if(queryIndex == 0){
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
         }else if (queryIndex == 1) { //已报修
-
+            searchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, loginUser.getId()));
         }else if (queryIndex == 2) { //待派工
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
@@ -239,10 +241,10 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+6*"));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+6*"));
         } if (queryIndex == 4) {
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
         } if (queryIndex == 5) {
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 9));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));*/
         }
     }
@@ -258,8 +260,18 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
                 return "待关单";
             case 5:
                 return "已关单";
+            case 9:
+                return "已取消";
             default:
                 return "";
+        }
+    }
+
+    public String getTurnWoFlag(V2_ServiceRequestNoAsset serviceRequestNoAsset){
+        if(StrUtil.isEmpty(serviceRequestNoAsset.getSrId())){
+            return "否";
+        }else{
+            return "是";
         }
     }
 
@@ -370,7 +382,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         newServiceRequest = new V2_ServiceRequestNoAsset();
         picList = new ArrayList();
         newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
-
+        currentStatus = 1;
         newServiceRequest.setDeptUid(loginUser.getOrgInfoUID());
         newServiceRequest.setRequestorName(loginUser.getName());
         newServiceRequest.setRequestorPhone(loginUser.getTelephone());
@@ -668,8 +680,13 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
 
     public void saveServiceRequest(){
-        newServiceRequest.setAssetStatus(currentStatus);
-        serviceRequestNoAssetService.saveServiceRequest(newServiceRequest, picList);
+        try{
+            newServiceRequest.setAssetStatus(currentStatus);
+            serviceRequestNoAssetService.saveServiceRequest(newServiceRequest, picList);
+            WebUtil.addSuccessMessage("工单创建成功！");
+        }catch (Exception ex){
+            WebUtil.addErrorMessage("工单创建失败！");
+        }
     }
 
     public void cancel(){
@@ -774,6 +791,14 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         serviceRequestNoAssetService.turnWorkOrder(selectedSr, selectAsset.getUid());
         cancel();
     }
+
+    public void workOrderView(String id){
+        String url = "actionName=View&selectedid=" + id + "&queryIndex=0";
+        url = "../../woMgr/workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
 
     @Override
     protected GenericRepositoryUUID<V2_ServiceRequestNoAsset> getDAO() {

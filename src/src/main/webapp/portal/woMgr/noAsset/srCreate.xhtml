@@ -81,10 +81,10 @@
                         <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{serviceRequestNoAssetController.needConfirmTime}" id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{serviceRequestNoAssetController.newServiceRequest.confirmedDownTime}" showOn="button"
                                     readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <h:panelGroup >
+                    <!--<h:panelGroup >
                         <label class="label">#{msg.comment}</label>
                         <p:inputTextarea value="#{serviceRequestNoAssetController.newServiceRequest.comment}" maxlength="256" />
-                    </h:panelGroup>
+                    </h:panelGroup>-->
 
                 </p:panelGrid>
 

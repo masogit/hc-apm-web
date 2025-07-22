@@ -10,7 +10,7 @@
 					<h:panelGrid id="buttonSet" columns="12" cellpadding="5">
 						<p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet" disabled="#{serviceRequestNoAssetController.queryIndex==0}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" action="List.xhtml?faces-redirect=true&amp;query=0" />
 						<p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet createSrNoAssetDialog" actionListener="#{serviceRequestNoAssetController.createServiceRequest()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CREATE')}" oncomplete="PF('createSrNoAssetDialog').show()"/>
-						<!--<p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=1" disabled="#{serviceRequestNoAssetController.queryIndex==1}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" onclick="onButtonChange()"  />-->
+						<p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=1" disabled="#{serviceRequestNoAssetController.queryIndex==1}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" onclick="onButtonChange()"  />
 						<p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=2"  disabled="#{serviceRequestNoAssetController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}"/>
 						<p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet" action="List.xhtml?faces-redirect=true&amp;query=3"  disabled="#{serviceRequestNoAssetController.queryIndex==3}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
 						<p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=4"  disabled="#{serviceRequestNoAssetController.queryIndex==4}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
@@ -42,8 +42,12 @@
 								</c:otherwise>
 							</c:choose>
 						</p:column>
-						<p:column headerText="#{msg.srNum}" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+						<p:column headerText="#{msg.srNum}" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE" rendered="#{empty item.srId}">
 							<h:outputText value="#{item.srNum}"/>
+						</p:column>
+						<p:column headerText="#{msg.srNum}" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE" rendered="#{not empty item.srId}">
+							<p:commandLink  title="查看维修工单" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" value="#{item.srNum}" action="#{serviceRequestNoAssetController.workOrderView(item.woId)}"  >
+							</p:commandLink>
 						</p:column>
 						<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetName}"/>
@@ -70,7 +74,9 @@
 							</f:facet>
 							<h:outputText value="#{item.deptName}" />
 						</p:column>
-
+						<p:column headerText="#{msg.requestorName}" sortBy="#{item.requestorName}" filterBy="#{item.requestorName}" filterMatchMode="LIKE" >
+							<h:outputText value="#{item.requestorName}"/>
+						</p:column>
 						<p:column headerText="#{msg.requestTime}" sortBy="#{item.requestTime}" filterBy="#{item.requestTime}" filterMatchMode="LIKE">
 							<f:facet name="filter">
 								<p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{serviceRequestNoAssetController.applyTimeFormatTime}"/>
@@ -79,17 +85,27 @@
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 							</h:outputText>
 						</p:column>
+						<p:column headerText="#{msg.requireName}"  filterBy="#{item.repairName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.repairName}"/>
+						</p:column>
 						<p:column headerText="#{msg.requestReason}" sortBy="#{item.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
 							<h:outputText value="#{serviceRequestNoAssetController.getRequestReasonInShort(item.requestReason)}" title="#{item.requestReason}"/>
 						</p:column>
 						<p:column  headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 							<h:outputText  value="#{serviceRequestNoAssetController.getStepName(item)}"/>
 						</p:column>
+						<p:column  headerText="是否已转成有台账报修" >
+							<h:outputText value="#{serviceRequestNoAssetController.getTurnWoFlag(item)}"/>
+						</p:column>
+						<!-- 已报修 -->
+						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{serviceRequestNoAssetController.queryIndex==1 }">
+							<p:commandButton  value="#{msg.Cancel}"  actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" oncomplete="PF('cancelDialog').show()" rendered="#{item.currentStepId != 5 and item.currentStepId != 9}"/>
+						</p:column>
 
 						<!-- 待派工 -->
 						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{serviceRequestNoAssetController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
 							<p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
-							<p:commandButton  value="#{msg.Cancel}"  actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}" oncomplete="PF('cancelDialog').show()"/>
+							<p:commandButton  value="#{msg.Cancel}"  actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
 						</p:column>
 						<!--  待接单 -->
 						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{serviceRequestNoAssetController.queryIndex==3 and (userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
@@ -99,8 +115,8 @@
 						</p:column>
 						<!-- 待关单 -->
 						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE') and serviceRequestNoAssetController.queryIndex==4}">
-							<p:commandButton value="#{msg.closeWo}" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" />
-							<p:commandButton value="转台账报修" actionListener="#{serviceRequestNoAssetController.prepareTurnWorkOrder(item.id)}" update=":assetSearchForm" oncomplete="PF('AssetSelectDlg').show()"/>
+							<p:commandButton value="关单" style="width: 70px;" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" />
+							<p:commandButton value="转台账" actionListener="#{serviceRequestNoAssetController.prepareTurnWorkOrder(item.id)}" update=":assetSearchForm" oncomplete="PF('AssetSelectDlg').show()"/>
 						</p:column>
 					</p:dataTable>
 				</h:form>
@@ -184,7 +200,7 @@
 						<h:panelGroup>
 							<label class="label">#{msg.deviceStatus}*</label>
 							<p:selectOneMenu value="#{serviceRequestNoAssetController.assetStatus}" >
-								<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
+								<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 							</p:selectOneMenu>
 						</h:panelGroup>
 						<h:panelGroup >
@@ -263,6 +279,14 @@
 				newWin.document.body.innerHTML = '加载中...';
 			}
 			function openAssetWindow(xhr, status, args) {
+				newWin.location.href = args.url;
+			}
+
+			function prepareAssetViewWindow() {
+				newWin = window.open('about:blank', '_blank');
+				newWin.document.body.innerHTML = '加载中...';
+			}
+			function openAssetViewWindow(xhr, status, args) {
 				newWin.location.href = args.url;
 			}
 		</script>
