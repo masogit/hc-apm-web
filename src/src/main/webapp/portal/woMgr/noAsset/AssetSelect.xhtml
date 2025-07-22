@@ -16,8 +16,8 @@
                 <p:panelGrid id="assetSearchPanel" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.ApplicationDept}</label>
-                        <p:inputText id="dept" readonly="true" value="#{serviceRequestNoAssetController.assetSearchForm.dept}" disabled="true"/>
-                        <p:commandButton id="org" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="true"/>
+                        <p:inputText id="dept" readonly="true" value="#{serviceRequestNoAssetController.assetSearchForm.dept}"/>
+                        <p:commandButton id="org" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
                         <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade" style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true">
                             <p:scrollPanel style="height:300px; border: 0" mode="native">
                                 <p:inputText id="searchDeptName" value="#{serviceRequestNoAssetController.assetSearchForm.deptName}"  />
