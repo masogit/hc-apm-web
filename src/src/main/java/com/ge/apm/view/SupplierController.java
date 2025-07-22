@@ -104,7 +104,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             this.selected = dao.findByUid(selectedId);
             if(selected!=null){
                 attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
-
+                contactPersonList = supplierContactPersonRepository.findBySupplierUid(this.selected.getUid());
             }
         }
     }
@@ -215,10 +215,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public List<SupplierContactPerson> getPersonList() {
-        if (ObjectUtil.isNotEmpty(this.selected)) {
-            contactPersonList = supplierContactPersonRepository.findBySupplierUid(this.selected.getUid());
+        if ("Edit".equals(super.crudActionName)) {
+            return supplierContactPersonRepository.findBySupplierUid(this.selected.getUid());
         }
-        return contactPersonList;
+        return ListUtil.empty();
     }
 
     public void prepareEditContactPerson(SupplierContactPerson contactPerson) {

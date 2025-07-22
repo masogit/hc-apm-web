@@ -65,26 +65,20 @@
                         <label class="label">#{msg.type}*</label>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:selectBooleanCheckbox id="wxs" label="#{msg.maintainer}" value="#{supplierController.selected.maintainerT}">
-                            <p:ajax process="@this" update="SupplierEditForm"/>
-                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="wxs" label="#{msg.maintainer}" value="#{supplierController.selected.maintainerT}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:selectBooleanCheckbox label="#{msg.manufacturer}" value="#{supplierController.selected.manufacturerT}">
-                            <p:ajax process="@this" update="SupplierEditForm"/>
-                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox label="#{msg.manufacturer}" value="#{supplierController.selected.manufacturerT}"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:selectBooleanCheckbox label="#{msg.supplier}" value="#{supplierController.selected.supplierT}">
-                            <p:ajax process="@this" update="SupplierEditForm"/>
-                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox label="#{msg.supplier}" value="#{supplierController.selected.supplierT}"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup >
-                    <p:dataTable id="contactorList"  value="#{supplierController.getPersonList()}" var="item"
-                                 rowKey="#{item.id}" paginatorPosition="top" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    <p:dataTable id="contactorList" var="item" value="#{supplierController.getPersonList()}" emptyMessage="#{msg.noRecordFound}"
+                                 paginator="true" paginatorPosition="top" rows="5" widgetVar="varPmOrderListgl"
                                  paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="20,50,100,500"  rows="5" emptyMessage="#{msg.noRecordFound}">
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                         <p:ajax event="rowSelect" />
                         <p:column headerText="#{msg.type}">
                             <h:outputText value="#{item.type}"/>
