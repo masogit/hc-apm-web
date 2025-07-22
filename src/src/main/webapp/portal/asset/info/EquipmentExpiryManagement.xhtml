@@ -245,6 +245,11 @@
                         <p:column headerText="#{msg.manufactureDateYear}">
                             <h:outputText value="#{item.manufactDate}" />
                         </p:column>
+                        <p:column headerText="#{msg.matchFactor}" rendered="#{equipmentExpiryManagementController.matchByFunctionType}">
+                            <h:outputText value="#{item.matchFactor}" >
+                                <f:convertNumber type="percent" minFractionDigits="2" />
+                            </h:outputText>
+                        </p:column>
                     </p:dataTable>
                 </p:fieldset>
                 <p:commandButton validateClient="true" actionListener="#{equipmentExpiryManagementController.applyChange()}" value="#{msg.Save}"

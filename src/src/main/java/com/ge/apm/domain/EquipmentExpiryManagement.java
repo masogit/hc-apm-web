@@ -57,6 +57,17 @@ public class EquipmentExpiryManagement {
     @Column(name = "keyword2")
     private String keyword2;
 
+    @Column(name = "match_factor")
+    private Double matchFactor;
+
+    public Double getMatchFactor() {
+        return matchFactor;
+    }
+
+    public void setMatchFactor(Double matchFactor) {
+        this.matchFactor = matchFactor;
+    }
+
     public String getUid() {
         return uid;
     }
