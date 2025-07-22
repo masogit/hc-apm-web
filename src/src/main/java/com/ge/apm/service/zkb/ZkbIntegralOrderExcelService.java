@@ -7,6 +7,7 @@ import com.ge.apm.domain.ZkbIntegralOrder;
 import com.ge.apm.domain.ZkbPartOrderCat;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
@@ -54,8 +55,13 @@ public class ZkbIntegralOrderExcelService {
             map.put("代理商", tenantInfo.getName());
         }
         map.put("申请编号", i.getIntegralOrderNo());
-        map.put("当前状态",  WebUtil.getFieldValueMessage("zkbIntegralOrderStatus", i.getStatus()));
-        map.put("当前步骤",  WebUtil.getFieldValueMessage("zkbIntegralOrderSteps", i.getCurrentStep()));        map.put("申请人", i.getRequestUser());
+        if(StrUtil.isNotEmpty(i.getStatus())){
+            map.put("当前状态",  WebUtil.getFieldValueMessage("zkbIntegralOrderStatus", i.getStatus()));
+        }
+        if (StrUtil.isNotEmpty(i.getCurrentStep())){
+            map.put("当前步骤",  WebUtil.getFieldValueMessage("zkbIntegralOrderSteps", i.getCurrentStep()));
+        }
+        map.put("申请人", i.getRequestUser());
         map.put("申请人电话", i.getRequestPhone());
         map.put("申请时间", DateUtil.format(i.getRequestDate(), "yyyy-MM-dd HH:mm:ss"));
         ZkbPartOrderCat zkbPartOrderCat = zkbPartOrderCatRepository.findById(i.getCatId());
@@ -71,7 +77,9 @@ public class ZkbIntegralOrderExcelService {
         map.put("收货人电话", i.getReceiverPhone());
         map.put("收货地址", i.getReceiverAddress());
         map.put("备注", i.getRemark());
-        map.put("工程师是否有资质", WebUtil.getFieldValueMessage("zkbCommonYOrN", i.getEngineerQualificationsFlag()));
+        if(StrUtil.isNotEmpty(i.getEngineerQualificationsFlag())){
+            map.put("工程师是否有资质", WebUtil.getFieldValueMessage("zkbCommonYOrN", i.getEngineerQualificationsFlag()));
+        }
         map.put("工程师资质审批人", i.getEngineerAuditer());
         map.put("工程师资质审批时间", DateUtil.format(i.getEngineerAuditDate(), "yyyy-MM-dd HH:mm:ss"));
         map.put("工程师资质审批备注", i.getEngineerRemark());
@@ -91,8 +99,12 @@ public class ZkbIntegralOrderExcelService {
         }
         map.put("工单号", i.getSrNum());
         map.put("申请编号", i.getIntegralOrderNo());
-        map.put("当前状态",  WebUtil.getFieldValueMessage("zkbIntegralOrderStatus", i.getStatus()));
-        map.put("当前步骤",  WebUtil.getFieldValueMessage("zkbIntegralOrderSteps", i.getCurrentStep()));
+        if(StrUtil.isNotEmpty(i.getStatus())){
+            map.put("当前状态",  WebUtil.getFieldValueMessage("zkbIntegralOrderStatus", i.getStatus()));
+        }
+        if (StrUtil.isNotEmpty(i.getCurrentStep())){
+            map.put("当前步骤",  WebUtil.getFieldValueMessage("zkbIntegralOrderSteps", i.getCurrentStep()));
+        }
         if(i.getAssetInfo() != null){
             map.put("Sys ID", i.getAssetInfo().getSystemId());
             map.put("设备名称", i.getAssetInfo().getName());

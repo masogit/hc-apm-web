@@ -9,9 +9,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
@@ -35,7 +33,6 @@ import org.primefaces.model.UploadedFile;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.mvc.JpaCRUDController;
-import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,6 +52,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private ArrivalListRepository arrivalListDao;
     private ArrivalListItemRepository arrivalListItemDao;
     private SupplierService supplierService;
+    private SupplierContactPersonRepository supplierContactPersonRepository;
 
     private String supplierType;
     private String source;
@@ -62,12 +60,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private List<SupplierUser> pendingApprovalUserList;
     private String queryStrPending;
     private String queryStrApproved;
+    private SupplierContactPerson supplierContactPerson;
 
     private Map<String, Boolean> selectedMapPending;
     private Map<String, Boolean> selectedMapApproved;
-
     private boolean isShowQrCode = Boolean.FALSE;
-
     private Boolean isShowSupplierCertificate = null;
 
     @Getter @Setter
@@ -76,6 +73,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private Map<Integer, Boolean> selectedMap; //复选的供应商
     @Getter @Setter
     private Boolean isSelectedCurrentPage = false;
+    @Getter @Setter
+    private List<SupplierContactPerson> contactPersonList = ListUtil.newArrayList();
     private boolean activeSupplier;
     private boolean activeVender;
     private FileDownloadService fileDownloadService;
@@ -89,6 +88,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         supplierService = WebUtil.getBean(SupplierService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        supplierContactPersonRepository = WebUtil.getBean(SupplierContactPersonRepository.class);
         preViewerBean = WebUtil.getBean(PreViewerBean.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
@@ -208,6 +208,44 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         onAfterNewObject(selected, true);
     }
 
+    public void prepareAddContactPersonInfo() {
+        this.supplierContactPerson = new SupplierContactPerson();
+        supplierContactPerson.setSupplierId(this.selected.getId());
+        supplierContactPerson.setSupplierUid(this.selected.getUid());
+    }
+
+    public List<SupplierContactPerson> getPersonList() {
+        if (ObjectUtil.isNotEmpty(this.selected)) {
+            contactPersonList = supplierContactPersonRepository.findBySupplierUid(this.selected.getUid());
+        }
+        return contactPersonList;
+    }
+
+    public void prepareEditContactPerson(SupplierContactPerson contactPerson) {
+        supplierContactPerson = contactPerson;
+    }
+
+    public void removeContactPerson(SupplierContactPerson contactPerson) {
+        contactPersonList.remove(contactPerson);
+        supplierContactPersonRepository.delete(contactPerson);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("vendor") + WebUtil.getMessage("contactPerson") + WebUtil.getMessage("DeleteSuccess"));
+    }
+
+    public void saveContactPerson() {
+        Boolean mark = this.supplierContactPerson.getManufacturerT() || this.supplierContactPerson.getSupplierT() || this.supplierContactPerson.getMaintainerT();
+        if (!mark) {//表示供应商类型一个都没有选
+            WebUtil.addErrorMessage(WebUtil.getMessage("TypeErrTip"));
+            RequestContext.getCurrentInstance().addCallbackParam("spType", true);
+            return;
+        }
+        supplierContactPerson.setType(getGongyingshangLeixing(supplierContactPerson));
+        supplierContactPersonRepository.save(supplierContactPerson);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("vendor") + WebUtil.getMessage("contactPerson") + WebUtil.getMessage("SaveSuccess"));
+        if (!contactPersonList.contains(supplierContactPerson)) {
+            contactPersonList.add(supplierContactPerson);
+        }
+    }
+
     @Override
     public void onAfterNewObject(Supplier object, boolean isOK) {
         super.onAfterNewObject(object, isOK);
@@ -293,19 +331,30 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public List<Supplier> getSupplierList() {
         return dao.getBySiteId(UserContextService.getSiteId());
     }
-    
-    public String getGongyingshangLeixing(Supplier supplier){
+
+    public String getGongyingshangLeixing(Supplier supplier) {
         if(supplier==null){
             return "";
         }
+        return getGongyingshangLeixing(supplier.getSupplierT(), supplier.getMaintainerT(), supplier.getManufacturerT());
+    }
+
+    public String getGongyingshangLeixing(SupplierContactPerson supplier) {
+        if(supplier==null){
+            return "";
+        }
+        return getGongyingshangLeixing(supplier.getSupplierT(), supplier.getMaintainerT(), supplier.getManufacturerT());
+    }
+
+    public String getGongyingshangLeixing(Boolean supplierT, Boolean maintainerT, Boolean manufacturerT){
         String name =new String();
-        if(supplier.getMaintainerT() != null && supplier.getMaintainerT()){
+        if(maintainerT != null && maintainerT){
            name= name.concat(WebUtil.getMessage("maitanance")+" ");
         }
-        if(supplier.getManufacturerT() != null && supplier.getManufacturerT()){
+        if(manufacturerT != null && manufacturerT){
             name= name.concat(WebUtil.getMessage("manufacture")+" ");
         }
-        if(supplier.getSupplierT() != null && supplier.getSupplierT()){
+        if(supplierT != null && supplierT){
             name= name.concat(WebUtil.getMessage("vendor")+" ");
         }
 
@@ -711,5 +760,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     public void setNoFoundList(List<Supplier> noFoundList) {
         this.noFoundList = noFoundList;
+    }
+
+    public SupplierContactPerson getSupplierContactPerson() {
+        return supplierContactPerson;
+    }
+
+    public void setSupplierContactPerson(SupplierContactPerson supplierContactPerson) {
+        this.supplierContactPerson = supplierContactPerson;
     }
 }
