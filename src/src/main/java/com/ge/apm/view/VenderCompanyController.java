@@ -13,6 +13,7 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +50,8 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
     private Map<String, List<V2_BlobObject>> attachmentMap = MapUtil.newHashMap();
     @Getter @Setter
     private String venderCompanyId;
+    @Getter @Setter
+    private List<SupplierContactPerson> contactPersonList = ListUtil.newArrayList();
     private UserAccount currentUser;
 
     private PreViewerBean preViewerBean;
@@ -68,6 +71,7 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         venderCompanyId = (String) UrlEncryptController.getValueFromMap(encodeStr, "venderCompanyId");
         if (ObjectUtil.isNotEmpty(venderCompanyId)) {
             this.selected = dao.findById(venderCompanyId);
+            contactPersonList = supplierContactPersonRepository.findByVenderCompanyId(this.selected.getId());
         }
     }
 
@@ -139,7 +143,8 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
         supplier.setLastModifiedBy(currentUser.getLoginName());
         supplier.setLastModifiedDate(new Date());
         supplier.setSource("VenderCompany");
-        supplierRepository.save(supplier);
+        supplier.setContactor(selected.getProjectDockerName());
+        supplier.setTel(selected.getProjectDockerTel());
         supplierController.setSelected(supplier);
         supplierController.saveSubmit();
         WebUtil.addErrorMessage("添加成功！");
@@ -165,6 +170,13 @@ public class VenderCompanyController extends GenericCRUDUUIDController<VenderCom
             name= name.substring(0,name.length()-1);
         }
         return name;
+    }
+
+    public void onRowSelect(SelectEvent event) {
+        if (null == event.getObject()) {
+            return;
+        }
+        contactPersonList = supplierContactPersonRepository.findByVenderCompanyId(this.selected.getId());
     }
 
     public List<SupplierContactPerson> getPersonList() {

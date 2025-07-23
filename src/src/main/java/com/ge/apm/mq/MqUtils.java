@@ -14,6 +14,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -116,6 +117,9 @@ public class MqUtils {
         filter.getExcludes().addAll(collect);
         String str = JSON.toJSONString(assetInfo, filter, SerializerFeature.WriteDateUseDateFormat,SerializerFeature.IgnoreNonFieldGetter);
         jsonObject.put("assetInfo", str);
+        if(StringUtils.isNotBlank(assetInfo.getCreateType())){
+            jsonObject.put("type",assetInfo.getCreateType());
+        }
         mqContextDTO.setJsonObject(jsonObject);
         sendToMq(mqContextDTO);
     }
