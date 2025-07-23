@@ -188,8 +188,12 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
     @Override
     protected Page<V2_ServiceRequestNoAsset> loadData(PageRequest pageRequest) {
-        this.setSearchFilter();
+        if (this.searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
         this.searchFiltersByQuery();
+        this.setSearchFilter();
+
         Page<V2_ServiceRequestNoAsset> pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
         bySearchFilterInternal = pageResult.getContent();
         return pageResult;
@@ -197,9 +201,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
     @Override
     public void setSearchFilter() {
-        if (this.searchFilters == null) {
-            searchFilters = new ArrayList();
-        }
+
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("deptUid", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
@@ -209,19 +211,26 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
 
         if (!this.hasFilterOnField("siteUID")) {
-            if (userContextService.hasRole("AssetHead")) {
+            /*if (userContextService.hasRole("AssetHead")) {
                 List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             } else {
                 List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            }
+            }*/
+            List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+            updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
 
     public void searchFiltersByQuery() {
         if(queryIndex == 0){
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 5));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 9));
         }else if (queryIndex == 1) { //已报修
             searchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, loginUser.getId()));
         }else if (queryIndex == 2) { //待派工
