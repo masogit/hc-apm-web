@@ -66,25 +66,25 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:selectBooleanCheckbox id="wxs" label="#{msg.maintainer}" value="#{supplierController.selected.maintainerT}">
-                            <p:ajax process="@this" update="SupplierEditForm"/>
+                            <p:ajax process="@this" update="supplierTab:addContactPersonForm"/>
                         </p:selectBooleanCheckbox>
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:selectBooleanCheckbox label="#{msg.manufacturer}" value="#{supplierController.selected.manufacturerT}">
-                            <p:ajax process="@this" update="SupplierEditForm"/>
+                            <p:ajax process="@this" update="supplierTab:addContactPersonForm"/>
                         </p:selectBooleanCheckbox>
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:selectBooleanCheckbox label="#{msg.supplier}" value="#{supplierController.selected.supplierT}">
-                            <p:ajax process="@this" update="SupplierEditForm"/>
+                            <p:ajax process="@this" update="supplierTab:addContactPersonForm"/>
                         </p:selectBooleanCheckbox>
                     </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup >
-                    <p:dataTable id="contactorList"  value="#{supplierController.getPersonList()}" var="item"
-                                 rowKey="#{item.id}" paginatorPosition="top" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    <p:dataTable id="contactorList" var="item" value="#{supplierController.contactPersonList}" emptyMessage="#{msg.noRecordFound}"
+                                 paginator="true" paginatorPosition="top" rows="5" widgetVar="varPmOrderListgl"
                                  paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="20,50,100,500"  rows="5" emptyMessage="#{msg.noRecordFound}">
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                         <p:ajax event="rowSelect" />
                         <p:column headerText="#{msg.type}">
                             <h:outputText value="#{item.type}"/>
@@ -301,18 +301,18 @@
         </h:form>
         <p:dialog id="addContactPersonDlg" widgetVar="addContactPersonDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Add}#{msg.vendor}#{msg.contactPerson}">
             <h:form id="addContactPersonForm" >
-                <h:panelGroup id="display" >
+                <h:panelGroup id="display">
                     <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.type}*</label>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{supplierController.selected.maintainerT}">
                             <p:selectBooleanCheckbox label="#{msg.maintainer}" value="#{supplierController.supplierContactPerson.maintainerT}"/>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{supplierController.selected.manufacturerT}">
                             <p:selectBooleanCheckbox label="#{msg.manufacturer}" value="#{supplierController.supplierContactPerson.manufacturerT}"/>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{supplierController.selected.supplierT}">
                             <p:selectBooleanCheckbox label="#{msg.supplier}" value="#{supplierController.supplierContactPerson.supplierT}"/>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -331,7 +331,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup>
-                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{supplierController.saveContactPerson()}" value="#{msg.Confirm}"
+                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{supplierController.saveContactPerson()}" value="#{msg.Save}"
                                          update="supplierTab:SupplierEditForm:contactorList :growl" icon="ui-icon-check" oncomplete="handleContactPersonToSubmit(xhr, status, args)"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('addContactPersonDlg').hide()"/>
                     </h:panelGroup>
