@@ -1087,6 +1087,11 @@ public class AssetInfo implements ChineseName, Serializable {
     @TableField(exist = false)
     private String measuringAlertStatus;
 
+
+    @Transient
+    private String createType;
+
+
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
             DateTime dt = TimeUtil.toJodaDate(nextMeteringDate);
@@ -3362,5 +3367,13 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setAccountingDeptOrg(OrgInfo accountingDeptOrg) {
         this.accountingDeptOrg = accountingDeptOrg;
+    }
+
+    public String getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(String createType) {
+        this.createType = createType;
     }
 }

@@ -683,7 +683,10 @@ public class AssetFileImportBaseService {
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(newAsset, assetInfo);
         if (isCreate) {
-            assetInfo.setId(null);
+//            newAsset.setId(null);
+            newAsset.setCreateType("Add");
+        }else{
+            newAsset.setCreateType("Edit");
         }
 //        this.saveAssetHistory(assetInfo);
 
@@ -1060,7 +1063,10 @@ public class AssetFileImportBaseService {
 
         }
         if (isCreate) {
-            newAsset.setId(null);
+//            newAsset.setId(null);
+            newAsset.setCreateType("Add");
+        }else{
+            newAsset.setCreateType("Edit");
         }
         return newAsset;
     }
