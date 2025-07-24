@@ -38,7 +38,7 @@
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
             </h:outputText>
         </p:column>
-        <p:column headerText="#{msg.inventoryMethod}" filterBy="#{item.inventoryMethod}" filterMatchMode="EQ">
+        <p:column headerText="#{msg.inventoryMethod}" filterBy="#{item.inventoryMethod}" filterMatchMode="EQ" rendered="#{inventoryOrderDetailAssetInfoController3.enableInventoryMethod}">
             <h:outputText value="#{fieldMsg.fieldValue('inventoryMethod', item.inventoryMethod)}"/>
             <f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataList3').filter()" >

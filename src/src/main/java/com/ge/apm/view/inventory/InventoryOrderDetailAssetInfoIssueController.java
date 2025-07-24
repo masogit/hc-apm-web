@@ -1,10 +1,7 @@
 package com.ge.apm.view.inventory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -66,6 +63,8 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	private Set<String> clinicalDeptOrgUidSet;
 	@Getter @Setter
 	private List<OrgInfo> clinicalDeptList;
+	@Getter @Setter
+	private Boolean enableInventoryMethod = Boolean.FALSE;
 
 	@Override
 	protected void init() {
@@ -78,6 +77,9 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		currentUser = UserContextService.getCurrentUserAccount();
 		inventoryOrderDetailDao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        ConfigItemValueRepository configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+		String configValue = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "enableInventoryMethod");
+		enableInventoryMethod = Optional.ofNullable(configValue).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
 		isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
