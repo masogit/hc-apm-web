@@ -386,7 +386,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             if(ZkbPartOrder.OrderType.Tool.name().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Artificial.name().equals(zkbPartOrder.getOrderType())){
                 continue;
             }
-
             if(ZkbPartOrder.OrderType.Parts.name().equals(zkbPartOrder.getOrderType())){
                 AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                 if(assetInfo.getAssetGroup() == null && assetInfo.getAssetGroup() != 2){
