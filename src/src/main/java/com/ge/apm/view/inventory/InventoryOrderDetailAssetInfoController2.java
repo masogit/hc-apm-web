@@ -61,6 +61,8 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
     private Set<String> clinicalDeptOrgUidSet;
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
+    @Getter @Setter
+    private Boolean enableInventoryMethod = Boolean.FALSE;
 
 	@Override
 	protected void init() {
@@ -72,8 +74,11 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
-
         currentUser = UserContextService.getCurrentUserAccount();
+        ConfigItemValueRepository configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        String configValue = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "enableInventoryMethod");
+        enableInventoryMethod = Optional.ofNullable(configValue).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
+
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
         isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));

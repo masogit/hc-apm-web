@@ -1,10 +1,7 @@
 package com.ge.apm.view.inventory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -13,6 +10,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -66,6 +64,8 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 	private Set<String> clinicalDeptOrgUidSet;
 	@Getter @Setter
 	private List<OrgInfo> clinicalDeptList;
+	@Getter @Setter
+	private Boolean enableInventoryMethod = Boolean.FALSE;
 
 	@Override
 	protected void init() {
@@ -77,6 +77,9 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
         uaaService = WebUtil.getBean(UaaService.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
 		orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+		ConfigItemValueRepository configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+		String configValue = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "enableInventoryMethod");
+		enableInventoryMethod = Optional.ofNullable(configValue).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
         if (null == orderId){

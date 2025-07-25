@@ -102,7 +102,7 @@
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
             </h:outputText>
         </p:column>
-        <p:column headerText="盘点状态" filterBy="#{item.status}" filterMatchMode="EQ">
+        <p:column headerText="#{msg.inventoryStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
             <f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />

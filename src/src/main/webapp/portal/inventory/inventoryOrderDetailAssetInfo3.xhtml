@@ -38,6 +38,15 @@
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
             </h:outputText>
         </p:column>
+        <p:column headerText="#{msg.inventoryMethod}" filterBy="#{item.inventoryMethod}" filterMatchMode="EQ" rendered="#{inventoryOrderDetailAssetInfoController3.enableInventoryMethod}">
+            <h:outputText value="#{fieldMsg.fieldValue('inventoryMethod', item.inventoryMethod)}"/>
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList3').filter()" >
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('inventoryMethod')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                </p:selectOneMenu>
+            </f:facet>
+        </p:column>
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist3" fileName="InventoryOrderDetailAssetInfo3_export" />

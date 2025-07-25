@@ -187,6 +187,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 			d.setStatus(1);
 			d.setLastModifiedDate(date);
 			d.setLastModifiedBy(currentUser.getLoginName());
+			d.setInventoryMethod("scanCode");
 		});
 		dao.save(nonInventoryOrderDetails);
 		// 更新资产盘点日期
