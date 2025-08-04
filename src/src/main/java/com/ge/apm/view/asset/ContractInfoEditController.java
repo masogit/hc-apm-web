@@ -14,6 +14,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 
@@ -349,6 +350,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             }
         }
         boolean isEdit = selected.getId() == null ? false : true;
+        if (!isEdit) {
+            this.selected.setCreatedBy(currentUser.getUid());
+            this.selected.setCreatedDate(DateUtil.now());
+        }
         selected = dao.save(this.selected);
         attachements= attachements.stream().filter(item->item.getBoUuid()==null).collect(Collectors.toList());
         attachements.stream().forEach(item -> {
@@ -386,6 +391,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             }
         }
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
+    }
+
+    public String getCreatedBy(String createdBy) {
+        return Optional.ofNullable(createdBy).map(userDao::findByUid).map(UserAccount::getName).orElse(createdBy);
     }
 
     private void udpateAssetInfoWarranty(AssetInfo asset) {
