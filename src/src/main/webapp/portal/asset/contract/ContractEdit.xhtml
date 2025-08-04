@@ -191,6 +191,12 @@
                                     <p:ajax process="@this" />
                                 </p:inputText>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.createdBy}</label>
+                                <p:inputText readonly="true" value="#{contractInfoEditController.getCreatedBy(contractInfoEditController.selected.createdBy)}" >
+                                    <p:ajax process="@this" />
+                                </p:inputText>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup>
                             <p:commandButton value="批量删除文件" class="bathDeleteAttach" update=":AssetContractEditForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{contractInfoEditController.bathDeleteAttach}" disabled="#{!contractInfoEditController.isChecked()}">
