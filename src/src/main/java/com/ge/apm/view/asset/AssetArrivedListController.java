@@ -503,36 +503,41 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         }
         return null;
     }
+
+    /**
+     *  _正常安装,_简易安装
+     * @throws IOException
+     */
     public void  exportArrivalSupplierReportToZip() throws IOException{
        ByteArrayOutputStream bout = new ByteArrayOutputStream();
        try(ZipOutputStream zout = new ZipOutputStream(bout)) {
            String id = selected.getId();
+           String processType = selected.getProcessType();
            List<ArrivalListItem> arrivalListItems = itemDao.findByArrivalListId(id);
            if (CollectionUtils.isEmpty(arrivalListItems)) return;
            List<SystemTemplate> systemTemplates = systemTemplateService.findByKeyAndSiteForUseParent(SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode(), UserContextService.getCurrentUserAccount());
-           List<String> names = new ArrayList<>();
-           for (ArrivalListItem item : arrivalListItems) {
-               String path = null;
-               if (StringUtils.isEmpty(path = item.getAliasName()) && StringUtils.isEmpty(path = item.getQrCode()) && StringUtils.isEmpty(path = item.getSerialNum()) && StringUtils.isEmpty(path = item.getAssetUID())) {
-                   path = UUID.randomUUID().toString();
+           if(StringUtils.isNotEmpty(processType)){
+               String   templateTypeNameSuffix= processType.equalsIgnoreCase("normal")?"_正常安装":"_简易安装";
+               List<SystemTemplate> collect = systemTemplates.stream().filter(item -> item.getTemplateTypeNameValue().contains(templateTypeNameSuffix)).collect(Collectors.toList());
+               if(!CollectionUtils.isEmpty(collect)){
+                   systemTemplates = collect;
                }
+           }
+           Set<String> names = new HashSet<>();
+           for (ArrivalListItem item : arrivalListItems) {
                for (SystemTemplate systemTemplate : systemTemplates) {
                    StreamedContent streamedContent = installationReportService.exportReport(systemTemplate, item);
                    if (streamedContent != null) {
                        String fileName = streamedContent.getName();
-                       String name = path + File.separator + fileName;
+                       String name =  fileName;
                        // 防止重复文件名
-                       if (names.contains(name)) {
-                           String prefix = fileName.lastIndexOf(".") > 0
-                                   ? fileName.substring(0, fileName.lastIndexOf("."))
-                                   : fileName;
-                           String suffix = fileName.lastIndexOf(".") > 0
-                                   ? fileName.substring(fileName.lastIndexOf("."))
-                                   : "";
-                           fileName = prefix + UUID.randomUUID() + suffix;
-                           name = path + File.separator + fileName;
+                       int index = 1;
+                       String suffix = name.substring(name.lastIndexOf("."));
+                       String prefix = name.substring(0,name.lastIndexOf("."));
+                       while (!names.add(name)) {
+                           name = prefix +"（"+index+"）"+suffix;
+                           index ++;
                        }
-                       names.add(name);
                        zout.putNextEntry(new ZipEntry(name));
                        byte[] bytes = IOUtils.toByteArray(streamedContent.getStream());
                        IOUtils.write(bytes, zout);
