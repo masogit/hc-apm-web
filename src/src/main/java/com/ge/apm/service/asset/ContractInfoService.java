@@ -52,6 +52,8 @@ public class ContractInfoService {
     @Autowired
     private ArrivalListRepository arrivalDao;
     @Autowired
+    private ArrivalListItemRepository arrivalListItemDao;
+    @Autowired
     private BlobFileService blobService;
     @Autowired
     private V2_WorkOrderDetailRepository partsDao;
@@ -113,6 +115,8 @@ public class ContractInfoService {
             return contractItem;
         }).collect(Collectors.toList());
         contractItemDao.save(itemList);
+        arrivalItemList.forEach(t -> t.setWarrantyDate(currentContractItem.getContractInfo().getWarrantyEndDate()));
+        arrivalListItemDao.save(arrivalItemList);
     }
 
     public ContractInfoItem getContractItem(String contractItemId) {
