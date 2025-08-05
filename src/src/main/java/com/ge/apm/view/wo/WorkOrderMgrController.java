@@ -310,6 +310,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private V2_WorkOrderDetailRepository v2WorkOrderDetailRepository;
 
+    private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
     @Override
     protected void init() {
         try {
@@ -357,6 +358,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
             configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
             v2WorkOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
+            multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -1300,7 +1302,52 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return woService.getWorkOrderDetails(woId);
+        List<V2_WorkOrder_Detail> workOrderDetails = woService.getWorkOrderDetails(woId);
+
+        List<String> workflowConfigApproveUids = approveList.stream().map(MultiLevelApproval::getWorkflowConfigApproveUid).collect(Collectors.toList());
+        Map<String, List<MultiLevelApproval>> listMap = approveList.stream()
+                .filter(item -> item.getApprovalLevelNow() != -1 && item.getApprovalLevelNow() != 0)
+                .collect(Collectors.groupingBy(MultiLevelApproval::getWorkflowConfigApproveUid));
+        HashMap<String, List<MultiLevelApproval>> stringListHashMap = new HashMap<>();
+
+        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.getByIds(workflowConfigApproveUids);
+        for (MultiLevelApprovalConfig multiLevelApprovalConfig : multiLevelApprovalConfigs) {
+            Map currentConfig = JSON.parseObject(multiLevelApprovalConfig.getConfigration(), Map.class);
+            List<String> currentConfigPartsType = (List<String>) currentConfig.get("selectAssetPartsTypes");
+            List<MultiLevelApproval> multiLevelApprovals = listMap.get(multiLevelApprovalConfig.getId());
+            for (String s : currentConfigPartsType) {
+                stringListHashMap.put(s,multiLevelApprovals);
+            }
+        }
+
+
+
+        workOrderDetails.forEach(item->{
+            if(item.getApproved()!=null){
+                item.setApprovalStatusName((item.getApproved()?"审批通过":"审批不通过"));
+            }else{
+                if(selected!=null && selected.getApprovalStatus()!=null){
+                    if("1".equals(selected.getApprovalStatus())){
+                        item.setApprovalStatusName("未审批");
+                    }else if("5".equals(selected.getApprovalStatus())){
+
+                        List<MultiLevelApproval> multiLevelApprovals = stringListHashMap.get(item.getPartsType());
+
+
+                        if(!CollectionUtils.isEmpty(multiLevelApprovals) && multiLevelApprovals.size()==1){
+                            item.setApprovalStatusName("未审批");
+                        }else{
+                            item.setApprovalStatusName("审批中");
+                        }
+                    }else{
+                        item.setApprovalStatusName("未提交");
+                    }
+                }
+
+            }
+
+        });
+        return workOrderDetails;
     }
 
     public boolean isOwner() {
@@ -1614,7 +1661,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
+        v2WorkOrderDetails.forEach(item->item.setV2WorkOrder(null));
         v2WorkOrderDetailRepository.save(v2WorkOrderDetails);
+
 
         WebUtil.addErrorMessage("审批发起成功!");
         return ;
