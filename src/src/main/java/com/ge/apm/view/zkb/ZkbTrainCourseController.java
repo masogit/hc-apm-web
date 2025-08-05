@@ -21,6 +21,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @ManagedBean
@@ -95,6 +96,9 @@ public class ZkbTrainCourseController  extends GenericCRUDUUIDController<ZkbTrai
 
     }
 
+    public List<HashMap<String,String>> queryNormalCourse(){
+        return zkbTrainCourseService.queryNormalCourse();
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbTrainCourse> getDAO() {

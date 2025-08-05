@@ -6170,3 +6170,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','inventoryMethod','盘点方式','Inventory Method',NULL,-1);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('inventoryMethod','rfid','RFID','RFID',NULL, -1);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('inventoryMethod','scanCode','扫码盘点','Scan Code',NULL ,-1);
+
+
+--ZKB 培训V2 i18
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','normal','普通课程','normal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','advance','进阶课程','advance',NULL,-1);
