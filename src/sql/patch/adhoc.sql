@@ -4,7 +4,7 @@ update asset_department_convert adc set out_site_uid=o2.uid ,out_site_name =o2.n
 -- YHAAO-25580 多级审批-设备维修：备件审批状态取最新工单的审批状态
 update v2_work_order_detail vod  set approved=null where approved=false and exists(select 1 from v2_work_order wo  where wo.id=vod.wo_id and (wo.approval_status='1' or wo.approval_status='5') );
 -- YHAAO-25659 是否显示盘点方式
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '是否显示盘点方式', 'enableInventoryMethod', '是否显示盘点方式', 'f','t',3 where not exists(select * from config_item where key = 'enableInventoryMethod');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 12, 'false', '是否显示盘点方式', 'enableInventoryMethod', '是否显示盘点方式', 'f','t',3 where not exists(select * from config_item where key = 'enableInventoryMethod');
 
 --宝石花医院his  添加systemclien信息
 INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time,
