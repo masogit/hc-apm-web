@@ -6,3 +6,10 @@ update v2_work_order_detail vod  set approved=null where approved=false and exis
 -- YHAAO-25659 是否显示盘点方式
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '是否显示盘点方式', 'enableInventoryMethod', '是否显示盘点方式', 'f','t',3 where not exists(select * from config_item where key = 'enableInventoryMethod');
 
+--宝石花医院his  添加systemclien信息
+INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time,
+                                last_access_date)
+VALUES (REPLACE(uuid_generate_v4()::text, '-', ''), '7778d7b1e4bd4137bfc638e19794a2f8',
+        '1dee1cec8d7f440dbf26a2d1f21a8580', '四川宝石花',
+        '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, clock_timestamp());
+
