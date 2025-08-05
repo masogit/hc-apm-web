@@ -1304,49 +1304,44 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         List<V2_WorkOrder_Detail> workOrderDetails = woService.getWorkOrderDetails(woId);
 
-        List<String> workflowConfigApproveUids = approveList.stream().map(MultiLevelApproval::getWorkflowConfigApproveUid).collect(Collectors.toList());
-        Map<String, List<MultiLevelApproval>> listMap = approveList.stream()
-                .filter(item -> item.getApprovalLevelNow() != -1 && item.getApprovalLevelNow() != 0)
-                .collect(Collectors.groupingBy(MultiLevelApproval::getWorkflowConfigApproveUid));
-        HashMap<String, List<MultiLevelApproval>> stringListHashMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(approveList)) {
+            List<String> workflowConfigApproveUids = approveList.stream().map(MultiLevelApproval::getWorkflowConfigApproveUid).collect(Collectors.toList());
+            Map<String, List<MultiLevelApproval>> listMap = approveList.stream()
+                    .filter(item -> item.getApprovalLevelNow() != -1 && item.getApprovalLevelNow() != 0)
+                    .collect(Collectors.groupingBy(MultiLevelApproval::getWorkflowConfigApproveUid));
+            HashMap<String, List<MultiLevelApproval>> stringListHashMap = new HashMap<>();
 
-        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.getByIds(workflowConfigApproveUids);
-        for (MultiLevelApprovalConfig multiLevelApprovalConfig : multiLevelApprovalConfigs) {
-            Map currentConfig = JSON.parseObject(multiLevelApprovalConfig.getConfigration(), Map.class);
-            List<String> currentConfigPartsType = (List<String>) currentConfig.get("selectAssetPartsTypes");
-            List<MultiLevelApproval> multiLevelApprovals = listMap.get(multiLevelApprovalConfig.getId());
-            for (String s : currentConfigPartsType) {
-                stringListHashMap.put(s,multiLevelApprovals);
+            List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.getByIds(workflowConfigApproveUids);
+            for (MultiLevelApprovalConfig multiLevelApprovalConfig : multiLevelApprovalConfigs) {
+                Map currentConfig = JSON.parseObject(multiLevelApprovalConfig.getConfigration(), Map.class);
+                List<String> currentConfigPartsType = (List<String>) currentConfig.get("selectAssetPartsTypes");
+                List<MultiLevelApproval> multiLevelApprovals = listMap.get(multiLevelApprovalConfig.getId());
+                for (String s : currentConfigPartsType) {
+                    stringListHashMap.put(s,multiLevelApprovals);
+                }
             }
-        }
-
-
-
-        workOrderDetails.forEach(item->{
-            if(item.getApproved()!=null){
-                item.setApprovalStatusName((item.getApproved()?"审批通过":"审批不通过"));
-            }else{
-                if(selected!=null && selected.getApprovalStatus()!=null){
-                    if("1".equals(selected.getApprovalStatus())){
-                        item.setApprovalStatusName("未审批");
-                    }else if("5".equals(selected.getApprovalStatus())){
-
-                        List<MultiLevelApproval> multiLevelApprovals = stringListHashMap.get(item.getPartsType());
-
-
-                        if(!CollectionUtils.isEmpty(multiLevelApprovals) && multiLevelApprovals.size()==1){
+            workOrderDetails.forEach(item->{
+                if(item.getApproved()!=null){
+                    item.setApprovalStatusName((item.getApproved()?"审批通过":"审批不通过"));
+                }else{
+                    if(selected!=null && selected.getApprovalStatus()!=null){
+                        if("1".equals(selected.getApprovalStatus())){
                             item.setApprovalStatusName("未审批");
+                        }else if("5".equals(selected.getApprovalStatus())){
+                            List<MultiLevelApproval> multiLevelApprovals = stringListHashMap.get(item.getPartsType());
+                            if(!CollectionUtils.isEmpty(multiLevelApprovals) && multiLevelApprovals.size()==1){
+                                item.setApprovalStatusName("未审批");
+                            }else{
+                                item.setApprovalStatusName("审批中");
+                            }
                         }else{
-                            item.setApprovalStatusName("审批中");
+                            item.setApprovalStatusName("未提交");
                         }
-                    }else{
-                        item.setApprovalStatusName("未提交");
                     }
                 }
+            });
+        }
 
-            }
-
-        });
         return workOrderDetails;
     }
 
