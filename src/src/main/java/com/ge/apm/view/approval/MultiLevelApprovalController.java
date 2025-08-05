@@ -168,7 +168,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private boolean isReturnApproval=false;
 
     private boolean isDirectDelivery=false;
-
+    private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
         return multiLevelApprovalRepository;
@@ -198,6 +198,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         maintenanceContractApplyPurchaseRepository = WebUtil.getBean(MaintenanceContractApplyPurchaseRepository.class);
         maintenanceContractApplyPurchaseAssetRepository = WebUtil.getBean(MaintenanceContractApplyPurchaseAssetRepository.class);
+        multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
+
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(account.getHospitalUID(), null);
         org = orgDao.findById(account.getOrgInfoId());
         orgTree = initOrgTree(treeNode);
@@ -248,6 +250,45 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                             return objectObjectHashMap;
                         })
                         .collect(Collectors.toList());
+
+                List<MultiLevelApproval> multiLevelApprovalsALl   = multiLevelApprovalRepository.getByBusinessUidList(multiLevelApproval.getBusinessUid());
+                List<String> workflowConfigApproveUids = multiLevelApprovalsALl.stream().map(MultiLevelApproval::getWorkflowConfigApproveUid).collect(Collectors.toList());
+                Map<String, List<MultiLevelApproval>> listMap = multiLevelApprovalsALl.stream()
+                        .filter(item -> item.getApprovalLevelNow() != -1 && item.getApprovalLevelNow() != 0)
+                        .collect(Collectors.groupingBy(MultiLevelApproval::getWorkflowConfigApproveUid));
+                HashMap<String, List<MultiLevelApproval>> stringListHashMap = new HashMap<>();
+
+                List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.getByIds(workflowConfigApproveUids);
+                for (MultiLevelApprovalConfig multiLevelApprovalConfig : multiLevelApprovalConfigs) {
+                    Map currentConfig = JSON.parseObject(multiLevelApprovalConfig.getConfigration(), Map.class);
+                    List<String> currentConfigPartsType = (List<String>) currentConfig.get("selectAssetPartsTypes");
+                    List<MultiLevelApproval> multiLevelApprovals = listMap.get(multiLevelApprovalConfig.getId());
+                    for (String s : currentConfigPartsType) {
+                        stringListHashMap.put(s,multiLevelApprovals);
+                    }
+                }
+
+                workOrderDetails.forEach(item->{
+                    if(item.getApproved()!=null){
+                        item.setApprovalStatusName((item.getApproved()?"审批通过":"审批不通过"));
+                    }else{
+                       if("1".equals(work.getApprovalStatus())){
+                           item.setApprovalStatusName("未审批");
+                       }else if("5".equals(work.getApprovalStatus())){
+                           List<MultiLevelApproval> multiLevelApprovalsType = stringListHashMap.get(item.getPartsType());
+
+
+                           if(!CollectionUtils.isEmpty(multiLevelApprovalsType) && multiLevelApprovalsType.size()==1){
+                               item.setApprovalStatusName("未审批");
+                           }else{
+                               item.setApprovalStatusName("审批中");
+                           }
+                       }else{
+                           item.setApprovalStatusName("未提交");
+                       }
+                    }
+
+                });
                 secondaryApprovalData = workOrderDetails;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
