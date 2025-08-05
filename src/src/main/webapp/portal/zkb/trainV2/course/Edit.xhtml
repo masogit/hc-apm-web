@@ -3,18 +3,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
 
 <ui:composition>
-    <p:dialog id="zkbCourseEditDlg" widgetVar="zkbCourseEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainCourseController.CRUDActionName} 课程" width="250" height="370">
+    <p:dialog id="zkbCourseEditDlg" widgetVar="zkbCourseEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainCourseController.CRUDActionName} 课程" width="600" height="370">
         <h:form id="zkbCourseEditForm">
-            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainCourseController.selected != null}">
-
-                <h:panelGroup>
-                    <label class="label">课程ID*</label>
-                    <p:inputText id="cid" value="#{zkbTrainCourseController.selected.code}" required="true" requiredMessage="#{'课程ID'} #{msg.ValidationRequire}" disabled="#{not empty zkbTrainCourseController.selected.code}"/>
-                </h:panelGroup>
-
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainCourseController.selected != null}">
                 <h:panelGroup>
                     <label class="label">课程名称*</label>
                     <p:inputText id="cname" value="#{zkbTrainCourseController.selected.name}" required="true" requiredMessage="#{'课程名称'} #{msg.ValidationRequire}"  disabled="#{not empty zkbTrainCourseController.selected.name}"/>
@@ -28,7 +22,25 @@
                     <p:inputTextarea rows="4" cols="25" value="#{zkbTrainCourseController.selected.description}">
                     </p:inputTextarea>
                 </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程类型*</label>
+                    <p:selectOneMenu  autoWidth="false" style="width: 80%" value="#{zkbTrainCourseController.selected.courseType}" required="true" requiredMessage="课程类型 #{msg.ValidationRequire}" >
+                        <p:ajax  update="normalCourseIdGroup"/>
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbTrainCourseType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
 
+                <h:panelGroup id="normalCourseIdGroup">
+                    <h:panelGroup rendered="#{zkbTrainCourseController.selected.courseType eq 'advance'}">
+                        <label class="label">基础课程*</label>
+                        <p:selectOneMenu  autoWidth="false" style="width: 80%" value="#{zkbTrainCourseController.selected.normalCourseId}" required="true" requiredMessage="基础课程 #{msg.ValidationRequire}" >
+                            <p:ajax  />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{zkbTrainCourseController.queryNormalCourse()}" var="item" itemLabel="#{item.text}" itemValue="#{item.id}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </h:panelGroup>
             </p:panelGrid>
             <br/>
             <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainCourseController.saveCourse}" update=":growl :listForm:datalist " icon="ui-icon-check" oncomplete="PF('zkbCourseEditDialog').hide()"/>
