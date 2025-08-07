@@ -89,7 +89,11 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
             this.updateSearchFilter(new SearchFilter("initiateApproverUid", SearchFilter.Operator.EQ, user.getUid()));
 
         } else if (TAB_PENDING_APPROVAL_BY_ME.equals(currentTabId)) {
-            this.updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING));
+
+            this.removeFilterOnField("approvalStatus");
+            searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING,"1*2+"));
+            searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING,"1*2+"));
+
             this.updateSearchFilter(new SearchFilter("approvalNodeStatus", SearchFilter.Operator.EQ, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING));
             this.updateSearchFilter(new SearchFilter("approvalUid", SearchFilter.Operator.LIKE, APPROVAL_SEPARATOR + user.getUid() + APPROVAL_SEPARATOR));
 
