@@ -15,7 +15,7 @@ public interface ApprovalConstant {
      * 审批状态--待审批
      */
     public static final int MULTI_LEVEL_STATUS_APPROVAL_WAITING = 0;
-    public static final String MULTI_LEVEL_STATUS_APPROVAL_WAITING_NAME = "待审批";
+    public static final String MULTI_LEVEL_STATUS_APPROVAL_WAITING_NAME = "未审批";
 
     /**
      * @date 2020/7/14 13:59
