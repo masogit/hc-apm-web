@@ -87,7 +87,7 @@ public class ZkbTrainCourseController  extends GenericCRUDUUIDController<ZkbTrai
 
         this.file = event.getFile();
         importFailedDataList = zkbTrainCourseService.handleExcel(file, currentUser);
-        if(importFailedDataList.size()==0){
+        if(importFailedDataList != null && importFailedDataList.size()==0){
             WebUtil.addSuccessMessage("导入完成！");
         }
         else{

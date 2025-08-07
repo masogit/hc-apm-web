@@ -41,6 +41,10 @@
                     </p:autoComplete>
                 </h:panelGroup>
                 <h:panelGroup>
+                    <label class="label">总额*</label>
+                    <p:spinner  value="#{zkbTrainCourseQuotaController.selected.totalQuota}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                </h:panelGroup>
+                <h:panelGroup>
                     <label class="label">名额*</label>
                     <p:spinner  value="#{zkbTrainCourseQuotaController.selected.quota}" min="0" max="10000000" ><p:ajax /></p:spinner>
                 </h:panelGroup>

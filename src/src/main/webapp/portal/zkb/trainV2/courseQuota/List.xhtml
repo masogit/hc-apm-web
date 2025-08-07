@@ -58,7 +58,9 @@
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('ZkbTrainCourseType',item.zkbTrainCourse.courseType)}"/>
                     </p:column>
-
+                    <p:column headerText="总额"  >
+                        <h:outputText value="#{item.totalQuota}"/>
+                    </p:column>
                     <p:column headerText="名额"  >
                         <h:outputText value="#{item.quota}"/>
                     </p:column>

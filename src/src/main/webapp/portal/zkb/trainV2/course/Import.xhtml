@@ -26,7 +26,7 @@
 							<p>
 								1. <a href="APM_ZKB_Train_Course_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
 							</p>
-							<p>2. 文件中填入要导入的数据，其中 [课程编号] 和 [课程名称]必填</p>
+							<p>2. 文件中填入要导入的数据，其中 [课程名称] 和 [课程类型]必填</p>
 							<p>3. 上传文件进行导入</p>
 						</h:panelGroup>
 					</p:fieldset>
@@ -46,9 +46,6 @@
 							currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 							<p:column headerText="EXCEL行数">
 								<h:outputText value="#{item.excelIdex}" />
-							</p:column>
-							<p:column headerText="课程编号">
-								<h:outputText value="#{item.code}" />
 							</p:column>
 							<p:column headerText="课程名称">
 								<h:outputText value="#{item.name}" />
