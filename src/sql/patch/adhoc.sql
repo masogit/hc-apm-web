@@ -15,3 +15,7 @@ VALUES (REPLACE(uuid_generate_v4()::text, '-', ''), '7778d7b1e4bd4137bfc638e1979
         '1dee1cec8d7f440dbf26a2d1f21a8580', '四川宝石花',
         '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, clock_timestamp());
 
+-- 删除到货清单外键约束
+ALTER TABLE asset_opt_record DROP CONSTRAINT "fklkb6140aruelepc2hfb1w39km";
+ALTER TABLE asset_opt_record DROP CONSTRAINT "fk_hxgxok12yhhye3h9rkkmlsnak";
+
