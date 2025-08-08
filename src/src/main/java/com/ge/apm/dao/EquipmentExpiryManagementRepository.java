@@ -7,12 +7,13 @@ import webapp.framework.dao.GenericRepository;
 import java.util.List;
 
 public interface EquipmentExpiryManagementRepository extends GenericRepository<EquipmentExpiryManagement> {
-
-    List<EquipmentExpiryManagement> findByRegisterNoOrderByManufactDateDesc(String registerNo);
+    @Query(value = "SELECT distinct on (e.register_no,e.manufact_date) e.* FROM equipment_expiry_information e  where e.register_no = ?1 order by e.manufact_date", nativeQuery = true)
+    List<EquipmentExpiryManagement> fetchByRegister(String registerNo);
 
     @Query(value = "SELECT * " +
             "FROM ( " +
             "    SELECT  " +
+            "        distinct on(e.function_type,e.manufacture,e.manufact_date)" +
             "        e.uid,e.manufacture,e.manufacture_name,e.function_type,e.register_no,e.lifecycle,e.manufact_date,e.asset_name,e.version_number,e.version_time,e.version_status,e.keyword,e.keyword1,e.keyword2, " +
             "        ( " +
             "            CASE  " +
