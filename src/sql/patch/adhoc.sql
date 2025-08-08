@@ -19,3 +19,9 @@ VALUES (REPLACE(uuid_generate_v4()::text, '-', ''), '7778d7b1e4bd4137bfc638e1979
 ALTER TABLE arrival_list DROP CONSTRAINT "fklkb6140aruelepc2hfb1w39km";
 ALTER TABLE arrival_list DROP CONSTRAINT "fk_hxgxok12yhhye3h9rkkmlsnak";
 
+
+
+
+---工程师扫码默认打开页面设置
+insert into public.config_item (uid, category,default_value,  description, key, name, super_admin_edit, user_parent_config, value_type,validation)
+select replace(uuid_generate_v4()::text,'-',''), 1, 'asset', '工程师扫码默认打开页面设置', 'setEngineerScansToPage', '工程师扫码默认打开页面', 'f', 't', 7,'[{"key":"事件记录","value":"record"},{"key":"设备台账","value":"asset"},{"key":"报修页面","value":"repair"}]' where not exists (select * from config_item where key = 'setEngineerScansToPage');
