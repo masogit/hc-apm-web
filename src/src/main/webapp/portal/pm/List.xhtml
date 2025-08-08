@@ -21,7 +21,7 @@
 
             <div class="ui-g-12 card">
                 <h:form>
-                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建" title="批量创建" actionListener="#{pmOrderController.prepareBatchCreate}" update=":BatchCreateDlg" oncomplete="PF('BatchCreateDialog').show()"/>
+                    <p:commandButton id="batchCreateButton"  value="批量创建" title="批量创建" actionListener="#{pmOrderController.prepareBatchCreate}" update=":BatchCreateDlg" oncomplete="PF('BatchCreateDialog').show()"/>
                 </h:form>
                 <h:form id="PmOrderListForm">
                     <p:dataTable id="datalist" value="#{pmOrderController.lazyModel}" var="item" widgetVar="varDataList"

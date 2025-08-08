@@ -14,8 +14,8 @@
 
             <div class="ui-g-12 card">
                 <h:form >
-                    <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="#{msg.GenerateQRCodes}" title="#{msg.GenerateQRCodes}" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
-                    <!--<p:commandButton id="importQrcode" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>-->
+                    <p:commandButton id="qrCodeLibCreateButton"  value="#{msg.GenerateQRCodes}" title="#{msg.GenerateQRCodes}" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
+                    <!--<p:commandButton id="importQrcode"  value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>-->
                 </h:form>
 
                 <h:form id="qrCodeLibListForm">
