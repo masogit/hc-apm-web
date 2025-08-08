@@ -35,6 +35,17 @@ public interface AuditHandler {
                     }
                 }
                 break;
+            case "supplier_contact_person":
+                if ("delete".equals(operation)) {
+                    systemEventAuditEnum = SystemEventAuditEnum.SUPPLIER_DELETE_CONTACT_PERSON;
+                } else {
+                    if (uid != null) {
+                        systemEventAuditEnum = SystemEventAuditEnum.SUPPLIER_UPDATE_CONTACT_PERSON;
+                    } else {
+                        systemEventAuditEnum = SystemEventAuditEnum.SUPPLIER_CREATE_CONTACT_PERSON;
+                    }
+                }
+                break;
             case "org_info":
                 if ("delete".equals(operation)) {
                     systemEventAuditEnum = SystemEventAuditEnum.ORG_DELETE;
