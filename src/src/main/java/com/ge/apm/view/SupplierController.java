@@ -8,6 +8,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.persistence.Column;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -74,7 +75,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     @Getter @Setter
     private Boolean isSelectedCurrentPage = false;
     @Getter @Setter
-    private List<SupplierContactPerson> contactPersonList = ListUtil.newArrayList();
+    private List<SupplierContactPerson> contactPersonList;
     private boolean activeSupplier;
     private boolean activeVender;
     private FileDownloadService fileDownloadService;
@@ -104,7 +105,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
             this.selected = dao.findByUid(selectedId);
             if(selected!=null){
                 attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
-
+                contactPersonList = supplierContactPersonRepository.findBySupplierUid(this.selected.getUid());
             }
         }
     }
@@ -181,12 +182,14 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
         attachements = new ArrayList<>();
+        contactPersonList = new ArrayList<>();
     }
 
     @Override
     public void prepareEdit(){
         super.prepareEdit();
         attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+        contactPersonList = supplierContactPersonRepository.findBySupplierUid(selected.getUid());
     }
 
     @Override
@@ -215,10 +218,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public List<SupplierContactPerson> getPersonList() {
-        if (ObjectUtil.isNotEmpty(this.selected)) {
-            contactPersonList = supplierContactPersonRepository.findBySupplierUid(this.selected.getUid());
+        if ("Edit".equals(super.crudActionName)) {
+            return supplierContactPersonRepository.findBySupplierUid(this.selected.getUid());
         }
-        return contactPersonList;
+        return ListUtil.empty();
     }
 
     public void prepareEditContactPerson(SupplierContactPerson contactPerson) {
@@ -258,6 +261,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                     }
                 }
             }
+            for (SupplierContactPerson contactPerson : contactPersonList) {
+                contactPerson.setSupplierId(object.getId());
+                contactPerson.setSupplierUid(object.getUid());
+            }
+            supplierContactPersonRepository.save(contactPersonList);
         }
     }
 

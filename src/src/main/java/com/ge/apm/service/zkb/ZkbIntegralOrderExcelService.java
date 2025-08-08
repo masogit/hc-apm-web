@@ -64,9 +64,11 @@ public class ZkbIntegralOrderExcelService {
         map.put("申请人", i.getRequestUser());
         map.put("申请人电话", i.getRequestPhone());
         map.put("申请时间", DateUtil.format(i.getRequestDate(), "yyyy-MM-dd HH:mm:ss"));
-        ZkbPartOrderCat zkbPartOrderCat = zkbPartOrderCatRepository.findById(i.getCatId());
-        if(zkbPartOrderCat != null){
-            map.put("工具箱号", zkbPartOrderCat.getCatNo());
+        if(StrUtil.isNotEmpty(i.getCatId())){
+            ZkbPartOrderCat zkbPartOrderCat = zkbPartOrderCatRepository.findById(i.getCatId());
+            if(zkbPartOrderCat != null){
+                map.put("工具箱号", zkbPartOrderCat.getCatNo());
+            }
         }
         map.put("合同号", i.getContractNo());
         map.put("数量", i.getQty());

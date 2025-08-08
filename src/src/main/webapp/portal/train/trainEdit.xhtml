@@ -132,7 +132,7 @@
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
 
-                        <p:commandButton id="qrCodeButton" immediate="false" process="@this"  icon="ui-icon-remove-red-eye" title="#{msg.Edit}" actionListener="#{trainInSiteController.generateQrCode()}" update="trainTab:qrCodeDlg" oncomplete="PF('qrCodeDlg').show()"  disabled="#{empty trainInSiteController.selectedTrainDetail or trainInSiteController.selectedTrainDetail.status ne 'Planned'}" rendered="#{trainInSiteController.canEdit}"/>
+                        <p:commandButton id="qrCodeButton" immediate="false" process="@this"  icon="ui-icon-remove-red-eye" title="签到二维码" actionListener="#{trainInSiteController.generateQrCode()}" update="trainTab:qrCodeDlg" oncomplete="PF('qrCodeDlg').show()"  disabled="#{empty trainInSiteController.selectedTrainDetail or trainInSiteController.selectedTrainDetail.status ne 'Planned'}" rendered="#{trainInSiteController.canEdit}"/>
 
                     </f:facet>
                 </p:dataTable>

@@ -63,6 +63,9 @@ public class InventoryIssue implements Serializable {
 
     @Column(name = "comment")
     private String comment;
+
+    @Column(name = "inventory_method")
+    private String inventoryMethod;
     
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     @Size(max = 32)
@@ -131,6 +134,14 @@ public class InventoryIssue implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getInventoryMethod() {
+        return inventoryMethod;
+    }
+
+    public void setInventoryMethod(String inventoryMethod) {
+        this.inventoryMethod = inventoryMethod;
     }
 
     public Set<InventoryCheckList> getInventoryCheckLists() {

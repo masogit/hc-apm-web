@@ -12,6 +12,10 @@ import java.util.Date;
 @Table(name = "zkb_train_course")
 public class ZkbTrainCourse {
 
+    public enum CourseTypeEnum{
+        normal, advance
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -21,12 +25,15 @@ public class ZkbTrainCourse {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "code")
-    private String code;
-
     @Column(name = "short_name")
     private String shortName;
 
+    //课程类型普通 normal  进阶 advance
+    @Column(name = "course_type")
+    private String courseType;
+
+    @Column(name = "normal_course_id")
+    private String normalCourseId;
 
     @Column(name = "description")
     @Size(max = 2000)

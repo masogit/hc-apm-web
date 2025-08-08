@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value=""/>
+            </div>
+            <div class="ui-g-12 card">
+                <iframe id="chartFrame" src="" width="100%" height="900"></iframe>
+            </div>
+        </div>
+        <script>
+            window.onload = function () {
+                var token = "#{userContextService.getAccessToken()}";
+                localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
+                localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
+            }
+            window.setTimeout(function setIframeHeight(){
+                try{
+                    var iframe = document.getElementById("chartFrame");
+                    iframe.src="/reports/RadQCBoard";
+                    if(iframe.attachEvent){
+                        iframe.attachEvent("onload", function(){
+                            iframe.height =  iframe.contentWindow.document.documentElement.scrollHeight+200;
+                        });
+                        return;
+                    }else{
+                        iframe.onload = function(){
+                            iframe.height = iframe.contentDocument.body.scrollHeight+200;
+                        };
+                        return;
+                    }
+                }catch(e){
+                    throw new Error('setIframeHeight Error');
+                }
+            },1000);
+        </script>
+    </ui:define>
+
+
+</ui:composition>

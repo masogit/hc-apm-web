@@ -284,6 +284,12 @@ public class UserContextService implements Serializable {
         return CollectionUtils.isNotEmpty(functions);
     }
 
+    public boolean accessContainsFunctionMenu2(String functionName) {
+        Set<String> functions = getFunctionListByFeatureAndRoles();
+        functions = functions.stream().filter(function -> function.contains(functionName)).collect(Collectors.toSet());
+        return CollectionUtils.isNotEmpty(functions);
+    }
+
     public String queryDavinciUrl() {
         ConfigItemValueRepository configItemValueRepository=WebUtil.getBean(ConfigItemValueRepository.class);
         UserAccount currentUser = getCurrentUserAccount();

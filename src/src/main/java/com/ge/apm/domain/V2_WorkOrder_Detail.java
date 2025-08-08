@@ -230,6 +230,10 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     @Column(name = "parts_description")
     private String partsDescription;
 
+
+    @Transient
+    private String  approvalStatusName;
+
     public String getPartsSignature() {
         return partsSignature;
     }
@@ -577,6 +581,14 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     public List<V2_BlobObject> getAttachments() { return attachments; }
 
     public void setAttachments(List<V2_BlobObject> attachments) { this.attachments = attachments; }
+
+    public String getApprovalStatusName() {
+        return approvalStatusName;
+    }
+
+    public void setApprovalStatusName(String approvalStatusName) {
+        this.approvalStatusName = approvalStatusName;
+    }
 
     @Override
     public boolean equals(Object object) {

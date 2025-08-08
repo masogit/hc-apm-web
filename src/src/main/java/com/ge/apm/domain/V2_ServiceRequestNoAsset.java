@@ -41,6 +41,10 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name = "dept_name")
     private String deptName;
 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "requestor_id")
+    private Integer requestorId;
     //报修人
     @Basic(optional = false)
     @NotNull
@@ -146,6 +150,20 @@ public class V2_ServiceRequestNoAsset implements Serializable {
 
     @Column(name = "asset_status")
     private Integer assetStatus;
+
+    @Column(name = "sr_id")
+    private String srId;
+
+    //取消原因
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+
+    //维修人
+    @Column(name = "repair_name")
+    private String repairName;
+
+    @Column(name = "wo_id")
+    private String woId;
 
     @Override
     public int hashCode() {

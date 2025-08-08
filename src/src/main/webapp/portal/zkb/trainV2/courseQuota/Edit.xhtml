@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition>
+    <p:dialog id="zkbCourseQuotaEditDlg" widgetVar="zkbCourseQuotaEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainCourseQuotaController.CRUDActionName} 课程名额" width="600" height="370">
+        <h:form id="editForm">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainCourseQuotaController.selected != null}">
+                <h:panelGroup>
+                    <label class="label">#{msg.TenantInfo}*</label>
+                    <p:selectOneMenu style="width: 100%" id="selectionTenantInfo" value="#{zkbTrainCourseQuotaController.selected.tenantUid}" >
+                        <p:ajax  />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                       <!-- <c:forEach items="#{zkbTrainCourseQuotaController.getSourceTenantInfoList()}" var="v">
+                            <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
+                        </c:forEach>-->
+                        <f:selectItems value="#{zkbTrainCourseQuotaController.getSourceTenantInfoList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">合同号*</label>
+                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.contractNo}"  />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">开始日期*</label>
+                    <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbTrainCourseQuotaController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">结束日期*</label>
+                    <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbTrainCourseQuotaController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程*</label>
+                    <p:autoComplete dropdown="true" value="#{zkbTrainCourseQuotaController.selectedCourse}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="课程 #{msg.ValidationRequire}"
+                                    completeMethod="#{zkbTrainCourseQuotaController.autoCompleteCourse}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbTrainCourseConverter">
+                    </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">总额*</label>
+                    <p:spinner  value="#{zkbTrainCourseQuotaController.selected.totalQuota}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">名额*</label>
+                    <p:spinner  value="#{zkbTrainCourseQuotaController.selected.quota}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainCourseQuotaController.saveData}" update=":growl :listForm:datalist " icon="ui-icon-check" oncomplete="PF('zkbCourseQuotaEditDialog').hide()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCourseQuotaEditDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>

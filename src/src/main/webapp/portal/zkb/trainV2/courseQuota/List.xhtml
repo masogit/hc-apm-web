@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+    <div class="ui-g">
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="培训课程名额管理"/>
+        </div>
+        <div class="ui-g-12 card">
+            <h:form id="listForm">
+                <p:dataTable id="datalist" value="#{zkbTrainCourseQuotaController.lazyModel}" var="item" widgetVar="varDataList"
+                             selectionMode="single" selection="#{zkbTrainCourseQuotaController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             rows="20" emptyMessage="数据为空"
+                             currentPageReportTemplate="总行数: {totalRecords}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="rowSelect"  update="deleteButton editButton :editForm"/>
+                    <p:ajax event="filter" listener="#{zkbTrainCourseQuotaController.onFilter}" />
+                    <p:column headerText="#{msg.zkbContact_tenant}">
+                        <h:outputText value="#{zkbTrainCourseQuotaController.getTenantInfo(item.tenantUid).name}"/>
+                    </p:column>
+
+                    <p:column headerText="合同号" filterBy="#{item.contractNo}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.contractNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_startDate}" filterBy="#{item.startDate}" sortBy="#{item.startDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterStartDate" widgetVar="varFilteStartDate" />
+                        </f:facet>
+                        <h:outputText value="#{item.startDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_endDate}"  filterBy="#{item.endDate}" sortBy="#{item.endDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterEndDate" widgetVar="varFilteEndDate" />
+                        </f:facet>
+                        <h:outputText value="#{item.endDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="课程名称"  filterBy="#{item.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.zkbTrainCourse.name}"/>
+                    </p:column>
+                    <p:column headerText="课程类型"   filterBy="#{item.zkbTrainCourse.courseType}" filterMatchMode="EQ" >
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbTrainCourseType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('ZkbTrainCourseType',item.zkbTrainCourse.courseType)}"/>
+                    </p:column>
+                    <p:column headerText="总额"  >
+                        <h:outputText value="#{item.totalQuota}"/>
+                    </p:column>
+                    <p:column headerText="名额"  >
+                        <h:outputText value="#{item.quota}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增" actionListener="#{zkbTrainCourseQuotaController.prepareCreate}" update=":zkbCourseQuotaEditDlg" oncomplete="PF('zkbCourseQuotaEditDialog').show()" />
+                        <p:commandButton id="editButton"  icon="ui-icon-pencil" title="编辑" actionListener="#{zkbTrainCourseQuotaController.prepareEdit}" update="zkbCourseQuotaEditDlg" oncomplete="PF('zkbCourseQuotaEditDialog').show()" disabled="#{empty zkbTrainCourseQuotaController.selected.id}" />
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbTrainCourseQuotaController.delete}" update=":listForm:datalist" >
+                            <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                        <p:commandButton id="importButton" ajax="false" title="课程导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
+
+                        </p:commandButton>
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="Zkb_Train_Course_Quota"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <p:overlayPanel widgetVar="panelFilterStartDate" for=":listForm:datalist:filterStartDate" dismissable="false">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{msg.From}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    <p:outputLabel value="#{msg.To}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                </h:panelGrid>
+                <p:commandButton onclick="setDateFilter('varDataList','varFilteStartDate','varStartDateFrom','varStartDateTo'); PF('panelFilterStartDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterStartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            </p:overlayPanel>
+
+            <p:overlayPanel widgetVar="panelFilterEndDate" for=":listForm:datalist:filterEndDate" dismissable="false">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{msg.From}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varEndDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    <p:outputLabel value="#{msg.To}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varEndDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                </h:panelGrid>
+                <p:commandButton onclick="setDateFilter('varDataList','varFilteEndDate','varEndDateFrom','varEndDateTo'); PF('panelFilterEndDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterEndDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            </p:overlayPanel>
+        </div>
+            <ui:include src="Edit.xhtml"/>
+
+    </div>
+</ui:define>
+</ui:composition>
+
