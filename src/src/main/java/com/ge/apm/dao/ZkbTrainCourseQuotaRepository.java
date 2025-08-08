@@ -8,4 +8,7 @@ import java.util.List;
 public interface ZkbTrainCourseQuotaRepository extends GenericRepositoryUUID<ZkbTrainCourseQuota> {
 
     ZkbTrainCourseQuota findFirstByTenantUidAndContractNoAndCourseId(String tenantUid, String contractNo, String courseId);
+
+
+    List<ZkbTrainCourseQuota> findByCourseId(String courseId);
 }

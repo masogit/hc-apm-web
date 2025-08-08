@@ -53,7 +53,9 @@
                         <p:commandButton id="importButton" ajax="false" title="课程导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
 
                         </p:commandButton>
-
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="Zkb_Train_Course"/>
+                        </p:commandButton>
                     </f:facet>
                 </p:dataTable>
             </h:form>
