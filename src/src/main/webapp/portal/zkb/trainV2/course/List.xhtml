@@ -23,15 +23,21 @@
                     <p:ajax event="rowSelect"  update="deleteButton editButton :zkbCourseEditForm"/>
                     <p:ajax event="filter" listener="#{zkbTrainCourseController.onFilter}" />
 
-                    <p:column headerText="课程编号"  filterBy="#{item.code}"  filterMatchMode="LIKE"  >
-                        <h:outputText value="#{item.code}"/>
-                    </p:column>
                     <p:column headerText="课程名称" filterBy="#{item.name}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.name}"/>
                     </p:column>
 
                     <p:column headerText="课程简称"  filterBy="#{item.shortName}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.shortName}"/>
+                    </p:column>
+                    <p:column headerText="课程类型"   filterBy="#{item.courseType}" filterMatchMode="EQ" >
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbTrainCourseType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('ZkbTrainCourseType',item.courseType)}"/>
                     </p:column>
 
                     <p:column headerText="备注"  filterBy="#{item.description}"  filterMatchMode="LIKE" >
@@ -44,8 +50,12 @@
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbTrainCourseController.delete}" update=":listForm:datalist" >
                             <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
                         </p:commandButton>
+                        <p:commandButton id="importButton" ajax="false" title="课程导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
 
-
+                        </p:commandButton>
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="Zkb_Train_Course"/>
+                        </p:commandButton>
                     </f:facet>
                 </p:dataTable>
             </h:form>

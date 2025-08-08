@@ -131,6 +131,9 @@ public class InventoryOrderDetail implements Serializable {
     @Column(name = "is_last")
     private Boolean isLast;
 
+    @Column(name = "inventory_method")
+    private String inventoryMethod;
+
     @ExcelProperty(value = "未通过项",index = 11)
     @Transient
     private String inventoryCheckListItems;
@@ -482,6 +485,14 @@ public class InventoryOrderDetail implements Serializable {
 
     public void setIsLast(Boolean isLast) {
         this.isLast = isLast;
+    }
+
+    public String getInventoryMethod() {
+        return inventoryMethod;
+    }
+
+    public void setInventoryMethod(String inventoryMethod) {
+        this.inventoryMethod = inventoryMethod;
     }
 
     public String getEncodeAssetDetailStr() {

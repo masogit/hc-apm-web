@@ -21,6 +21,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @ManagedBean
@@ -86,7 +87,7 @@ public class ZkbTrainCourseController  extends GenericCRUDUUIDController<ZkbTrai
 
         this.file = event.getFile();
         importFailedDataList = zkbTrainCourseService.handleExcel(file, currentUser);
-        if(importFailedDataList.size()==0){
+        if(importFailedDataList != null && importFailedDataList.size()==0){
             WebUtil.addSuccessMessage("导入完成！");
         }
         else{
@@ -95,6 +96,17 @@ public class ZkbTrainCourseController  extends GenericCRUDUUIDController<ZkbTrai
 
     }
 
+    public void delete(){
+        if(!zkbTrainCourseService.checkDelete(selected)){
+            WebUtil.addErrorMessage("删除失败，该课程已被使用");
+            return;
+        }
+        super.delete();
+    }
+
+    public List<HashMap<String,String>> queryNormalCourse(){
+        return zkbTrainCourseService.queryNormalCourse();
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbTrainCourse> getDAO() {

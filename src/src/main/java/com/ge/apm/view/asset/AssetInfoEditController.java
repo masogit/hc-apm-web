@@ -1116,8 +1116,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(selected,assetInfo);
-        if(isCreate){
-            assetInfo.setId(null);
+        if (isCreate) {
+//            newAsset.setId(null);
+            assetInfo.setCreateType("Add");
+        }else{
+            assetInfo.setCreateType("Edit");
         }
         this.saveAssetHistory(assetInfo);
         creteRule();

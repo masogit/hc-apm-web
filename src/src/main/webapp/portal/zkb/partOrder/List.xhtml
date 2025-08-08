@@ -133,9 +133,9 @@
                         <p:column headerText="申请人" filterBy="#{item.requestUser}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.requestUser}"/>
                         </p:column>
-                       <!-- <p:column headerText="审批人" filterBy="#{item.techAuditer}"  filterMatchMode="LIKE">
+                        <p:column headerText="审批人" filterBy="#{item.techAuditer}"  filterMatchMode="LIKE">
                             <h:outputText value="#{zkbPartOrderController.techAuditField(item)}"/>
-                        </p:column>-->
+                        </p:column>
                         <!--rendered="#{!zkbPartOrderController.showStatusBtn}"-->
                         <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoSteps',item.currentStep)}"/>

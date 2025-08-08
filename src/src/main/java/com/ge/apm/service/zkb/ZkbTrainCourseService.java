@@ -1,10 +1,11 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.ZkbTrainCourseQuotaRepository;
 import com.ge.apm.dao.ZkbTrainCourseRepository;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbCourse;
 import com.ge.apm.domain.ZkbTrainCourse;
+import com.ge.apm.domain.ZkbTrainCourseQuota;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ZkbTrainCourseService {
@@ -32,6 +31,9 @@ public class ZkbTrainCourseService {
 
     @Autowired
     ZkbTrainCourseRepository zkbTrainCourseRepository;
+
+    @Autowired
+    ZkbTrainCourseQuotaRepository zkbTrainCourseQuotaRepository;
 
     public boolean checkCourse(ZkbTrainCourse zkbTrainCourse){
         if(StrUtil.isEmpty(zkbTrainCourse.getId())){
@@ -64,20 +66,22 @@ public class ZkbTrainCourseService {
             return null;
         }
         List<String> headers = new ArrayList<>();
-        headers.add("课程编号");
         headers.add("课程名称");
         headers.add("课程简称");
         headers.add("课程描述");
+        headers.add("课程类型");
+        headers.add("基础课程");
+
         Map<String, Integer> header = ExcelParser.findHeader(sheet, headers);
         if (header.isEmpty()) {
             return null;
         }
-        String code;
         String name;
         String shortName;
         String description;
+        String courseType;
+        String normalCourse;
 
-        int cidIdx = header.get("课程编号");
         int cnameIdx = header.get("课程名称");
         int smdx = header.get("课程简称");
         int descriptionIdx = header.get("课程描述");
@@ -92,53 +96,62 @@ public class ZkbTrainCourseService {
             ZkbTrainCourse detail = new ZkbTrainCourse();
             try {
                 detail.setExcelIdex(j + 1);
-                code = StringUtils.trim(ExcelParser.getCellStringValue(row, cidIdx));
                 name = StringUtils.trim(ExcelParser.getCellStringValue(row, cnameIdx));
                 shortName = StringUtils.trim(ExcelParser.getCellStringValue(row, smdx));
                 description = StringUtils.trim(ExcelParser.getCellStringValue(row, descriptionIdx));
-                if(StringUtils.isEmpty(code)){
-                    detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程ID不能为空；");
-                    pass = false;
-                }else {
-                    try {
-                        ZkbTrainCourse course = new ZkbTrainCourse();
-                        course.setCode(code);
-                       /* if(zkbCourseService.isCourseExist(course)){
-                            detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程ID已存在；");
-                            pass = false;
-                        }*/
+                courseType = StringUtils.trim(ExcelParser.getCellStringValue(row, header.get("课程类型")));
+                normalCourse = StringUtils.trim(ExcelParser.getCellStringValue(row, header.get("基础课程")));
 
-                    }catch (Exception e){
-                        LOGGER.info(e.getMessage());
-                        pass = false;
-                    }
-                }
 
                 if (StringUtils.isEmpty(name)) {
                     detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程名称不能为空；");
                     pass = false;
                 }
 
+                if(StringUtils.isEmpty(courseType)){
+                    detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程类型不能为空；");
+                    pass = false;
+                }else{
+                    if("基础课程".equals(courseType)){
+                        detail.setCourseType(ZkbTrainCourse.CourseTypeEnum.normal.name());
+                    }else if("进阶课程".equals(courseType)){
+                        detail.setCourseType(ZkbTrainCourse.CourseTypeEnum.advance.name());
+                    }else {
+                        detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程类型填写有误；");
+                        pass = false;
+                    }
+                }
+                if(StringUtils.isNotEmpty(detail.getCourseType()) && detail.getCourseType().equals(ZkbTrainCourse.CourseTypeEnum.advance.name())){
+                    if(StringUtils.isEmpty(normalCourse)){
+                        detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "基础课程不能为空；");
+                        pass = false;
+                    }else{
+                        List<ZkbTrainCourse> zkbTrainCourses = zkbTrainCourseRepository.findByName(normalCourse);
+                        if(CollectionUtils.isEmpty(zkbTrainCourses)){
+                            detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "基础课程填写有误；");
+                            pass = false;
+                        }else{
+                            detail.setNormalCourseId(zkbTrainCourses.get(0).getId());
+                        }
+                    }
+                }
 
-
-                detail.setCode(code);
                 detail.setName(name);
                 detail.setShortName(shortName);
                 detail.setDescription(description);
 
                 if (!pass) {
                     importFailedDataList.add(detail);
-                    continue;
                 }else {
                     detail.setCreatedBy(user.getLoginName());
-                    listRe.add(detail);
+                    detail.setCreatedDate(new Date());
+                    zkbTrainCourseRepository.save(detail);
+                    //listRe.add(detail);
                 }
-
             } catch (Exception e) {
                 LOGGER.info(e.getMessage());
                 importFailedDataList.add(detail);
             }
-
 
         }
 
@@ -147,4 +160,30 @@ public class ZkbTrainCourseService {
         }
         return importFailedDataList;
     }
+
+
+    public List<HashMap<String, String>> queryNormalCourse(){
+        List<HashMap<String, String>> rs = new ArrayList<>();
+        List<ZkbTrainCourse> courseList = zkbTrainCourseRepository.findByCourseTypeOrderByCreatedDateDesc(ZkbTrainCourse.CourseTypeEnum.normal.name());
+        if(CollectionUtils.isNotEmpty(courseList)){
+            for(ZkbTrainCourse zkbTrainCourse : courseList){
+                HashMap<String, String> mm = new HashMap<>();
+                mm.put("text", zkbTrainCourse.getName());
+                mm.put("id", zkbTrainCourse.getId());
+                rs.add(mm);
+            }
+        }
+        return rs;
+    }
+
+    public boolean checkDelete(ZkbTrainCourse zkbTrainCourse){
+        boolean rs = true;
+        List<ZkbTrainCourseQuota> zkbTrainCourseQuotas = zkbTrainCourseQuotaRepository.findByCourseId(zkbTrainCourse.getId());
+        if(CollectionUtils.isNotEmpty(zkbTrainCourseQuotas)){
+            rs = false;
+        }
+        return rs;
+    }
+
+
 }

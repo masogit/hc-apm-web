@@ -63,10 +63,10 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup >
-                        <p:dataTable id="contactorList"  value="#{venderCompanyController.getPersonList()}" var="item"
-                                     rowKey="#{item.id}" paginatorPosition="top" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                     paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="20,50,100,500"  rows="5" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="contactorList" var="item" value="#{venderCompanyController.contactPersonList}" emptyMessage="#{msg.noRecordFound}"
+                                     paginator="true" paginatorPosition="top" rows="5" widgetVar="varPmOrderListgl"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                             <p:ajax event="rowSelect" />
                             <p:column headerText="#{msg.type}">
                                 <h:outputText value="#{item.type}"/>

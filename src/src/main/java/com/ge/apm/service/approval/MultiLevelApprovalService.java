@@ -378,7 +378,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         multiLevelApproval.setBusinessNumber(approvableTarget.getBusinessNumber());
                         multiLevelApproval.setBusinessType(approvableTarget.getBusinessType());
                         multiLevelApproval.setBusinessUid(approvableTarget.getBusinessUid());
-                        multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+                        multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
                         multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
                         multiLevelApproval.setApprovalLevel(level);
                         multiLevelApproval.setApprovalNumber(autoGenerateFinacingNum());

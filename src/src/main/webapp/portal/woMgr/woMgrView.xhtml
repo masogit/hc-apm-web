@@ -373,7 +373,7 @@
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.approvalStatus}">
-                                    <h:outputText value="#{empty detailItem.approved?(workOrderMgrController.approvedCompleted()?msg.ApprovalInProgress: msg.Unapproved): detailItem.approved? msg.pass:msg.fail}" />
+                                    <h:outputText value="#{detailItem.approvalStatusName}" />
                                 </p:column>
                                 <p:column headerText="#{msg.partType}">
                                     <h:outputText value="#{fieldMsg.fieldValue('partsType', detailItem.partsType)}" />

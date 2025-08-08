@@ -43,16 +43,8 @@
                            <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_TEMPLATE_VIEW')}"/>
                            <p:menuitem id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_HISTORY_VIEW')}"/>
                            <p:menuitem id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_VIEW')}"/>
-                           <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ACHIEVEMENTS_VIEW')}"/>
                            <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EVALUATION_VIEW')}"/>
-                           <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_KEYASSETDATAINPUT_EDIT')}"/>
                            <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_MVS_DATA_IMPORT')}"/>
-
-                           <p:menuitem id="um100" value="#{msg.deviceExpiryManagement}" outcome="/portal/asset/info/EquipmentExpiryManagement.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT')}"/>
-
-                           <p:menuitem id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW') and userContextService.canRender('ASSET_DEVICE_OVERDUE')}"><a/></p:menuitem>
-                           <p:menuitem id="um098" value="不良事件上报" outcome="/portal/adverseEventManagement/adverseEventList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ADVERSE_EVENT_EDIT') and userContextService.canRender('ASSET_ADVERSE_EVENT')}"/>
-                           <p:menuitem id="um099" value="不良事件审核" outcome="/portal/adverseEventManagement/adverseEventApproveList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ADVERSE_EVENT_APPROVE_EDIT') and userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE') and userContextService.canRender('ASSET_ADVERSE_EVENT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'SPECIAL_ASSET'}">
@@ -75,7 +67,7 @@
                    </c:when>
                    <c:when test="#{item eq 'PARTS_APPLY'}">
                        <!-- 备件管理 -->
-                       <p:submenu id="um010" label="备件管理" icon="fa fa-briefcase fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_') and userContextService.canRender('PARTS_APPLY')}">
+                       <p:submenu id="um010" label="备件备品" icon="fa fa-briefcase fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_') and userContextService.canRender('PARTS_APPLY')}">
                            <p:menuitem value="备件申购" outcome="/portal/parts/PartsPurchase.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_APPLY_PURCHASE_EDIT')}"/>
                            <p:menuitem value="备件申领" outcome="/portal/parts/PartsRequest.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_APPLY_TAKE_EDIT')}"/>
                            <p:menuitem value="备件出库" outcome="/portal/parts/PartsOutStock.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_OUTBOUND_EDIT')}"/>
@@ -89,6 +81,13 @@
                            <p:menuitem value="备件仓库" outcome="/portal/parts/PartsWarehouse.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_WAREHOUSE_EDIT')}"/>
                            <p:menuitem value="备件库存配置" outcome="/portal/parts/PartsConfig.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_WAREHOUSE_SETTING_EDIT')}"/>
                            <p:menuitem value="备件报表" outcome="/portal/parts/PartsReport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_REPORT_EDIT')}"/>
+                       </p:submenu>
+                   </c:when>
+                   <c:when test="#{item eq 'ADVERSE_MANAGE'}">
+                       <p:submenu id="um019" label="不良事件管理" icon="fa fa-briefcase fa-fw" rendered="#{userContextService.accessContainsFunctionMenu2('ADVERSE')}" >
+                           <p:menuitem id="um098" value="不良事件上报" outcome="/portal/adverseEventManagement/adverseEventList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ADVERSE_EVENT_EDIT') and userContextService.canRender('ASSET_ADVERSE_EVENT')}"/>
+                           <p:menuitem id="um099" value="不良事件审核" outcome="/portal/adverseEventManagement/adverseEventApproveList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ADVERSE_EVENT_APPROVE_EDIT') and userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE') and userContextService.canRender('ASSET_ADVERSE_EVENT')}"/>
+                           <p:menuitem id="um203" value="国家不良事件监测系统"  outcome="/portal/iframe/mears.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ADVERSE_VIEW')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'PARTS'}">
@@ -132,7 +131,7 @@
                    <c:when test="#{item eq 'REPORT_CENTER'}">
                        <!-- 报表管理 -->
                        <p:submenu label="报表管理" icon="fa fa-tachometer fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('REPORT_CENTER_')}">
-                           <p:menuitem  value="报表中心" outcome="/portal/jmReport/jmReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPORT_CENTER_VIEW')}"/>
+                           <p:menuitem  value="定制报表管理" outcome="/portal/jmReport/jmReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPORT_CENTER_VIEW')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'INSTALL'}">
@@ -169,7 +168,6 @@
                            <p:menuitem id="um200" value="#{msg.RepairWorkorderReport}" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}"/>
                            <p:menuitem id="um201" value="#{msg.WorkScheduleManagement}" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ARRANGE_CREATE')}"/>
                            <p:menuitem id="um202" value="#{msg.VacationManagement}" outcome="/portal/schedule/userVacationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_VACATION_VIEW')}"/>
-                           <p:menuitem id="um203" value="不良事件"  outcome="/portal/iframe/mears.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ADVERSE_VIEW')}"/>
                            <p:menuitem id="um220" value="#{msg.ReportTemplateManagement}" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_VIEW')}"/>
                            <p:menuitem id="um101" value="#{msg.commonFaults}" outcome="/portal/assetRepairQuickTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_VIEW')}"/>
 <!--                           <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />-->
@@ -245,6 +243,8 @@
                            <p:menuitem id="um51" value="#{msg.EquipmentPerformanceImport}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_IMPORT')}"/>
                            <p:menuitem id="um52" value="#{msg.EquipmentPerformanceReportForm}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_REPORT')}"/>
                            <p:menuitem id="um42" value="#{msg.BIPerformanceAnalysisPlatform}" rendered="#{true and !userContextService.isOnlyAssetStaff() and userContextService.accessContainsFunctionMenu('PERFORMANCE_BI_BOARD')}" url="/geapm/web/bi" target="_new"/>
+                           <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ACHIEVEMENTS_VIEW')}"/>
+                           <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_KEYASSETDATAINPUT_EDIT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'AUDIT'}">
@@ -283,6 +283,33 @@
 
                        </p:submenu>
                    </c:when>
+                   <!-- 效期管理 -->
+                   <c:when test="#{item eq 'VALIDITY_MANAGE'}">
+                       <p:submenu id="validityManage" label="效期管理" icon="fa fa-square-o fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') or userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}">
+                           <p:menuitem id="um100" value="#{msg.deviceExpiryManagement}" outcome="/portal/asset/info/EquipmentExpiryManagement.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') }"/>
+                           <p:menuitem id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW') and userContextService.canRender('ASSET_DEVICE_OVERDUE')}"><a/></p:menuitem>
+                       </p:submenu>
+                   </c:when>
+                   <!-- BI报表分析 -->
+                   <c:when test="#{item eq 'BI_REPORT_MANAGE'}">
+                       <!-- 此处二级菜单新增的时候以BI_开头以适应规则 -->
+                       <p:submenu id="biReportManage" label="BI报表分析" icon="fa fa-tags fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW') or userContextService.accessContainsFunctionMenu('BI_')}">
+                           <!-- 设备数据概览 -->
+                           <p:menuitem value="设备数据概览" icon="fa fa-bar-chart fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW') }" outcome="/portal/nine.xhtml"/>
+                           <p:menuitem id="biReport" value="BI报表" target="_blank" rendered="#{userContextService.accessContainsFunctionMenu('BI_REPORT_VIEW') }" onclick="davinciToken()"  />
+                       </p:submenu>
+
+                   </c:when>
+                   <!-- 质控数据概览 -->
+                   <c:when test="#{item eq 'QUALITY_DATA_VIEW'}">
+                       <p:submenu id="qualityDataView" label="质控数据概览" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_')}">
+                           <!-- 质控日历 -->
+                           <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
+                           <p:menuitem id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_RAD_BOARD')}" url="/reports/RadQCBoard" target="_blank"/>
+                       </p:submenu>
+
+                   </c:when>
+
                    <c:when test="#{item eq 'AUDIT_CONFIG'}">
                        <!-- 质控评审配置 -->
                        <p:submenu id="um_audit" label="#{msg.auditConfig}" icon="fa fa-gavel fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('AUDIT_CONFIG_')}">
@@ -309,14 +336,14 @@
                            <p:menuitem id="item004" value="#{msg.userModifyRecord}-ES" outcome="/portal/historyInfo/userEsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_ES')}"/>
                        </p:submenu>
                    </c:when>
-                   <c:when test="#{item eq 'DEVICEDATAPREVIEW'}">
-                       <!-- 设备数据概览 -->
+                   <!--<c:when test="#{item eq 'DEVICEDATAPREVIEW'}">
+                       &lt;!&ndash; 设备数据概览 &ndash;&gt;
                        <p:menuitem value="设备数据概览" icon="fa fa-bar-chart fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW')}" outcome="/portal/nine.xhtml"/>
-                   </c:when>
-                   <c:when test="#{item eq 'QUALITY_CONTROL_CALENDAR'}">
-                       <!-- 质控日历 -->
+                   </c:when>-->
+                   <!--<c:when test="#{item eq 'QUALITY_CONTROL_CALENDAR'}">
+                       &lt;!&ndash; 质控日历 &ndash;&gt;
                        <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" icon="fa fa-calendar fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
-                   </c:when>
+                   </c:when>-->
                    <c:when test="#{item eq 'SUPPLIER_TENANT'}">
                        <!-- 供应商管理 -->
                        <p:submenu label="供应商管理" icon="fa fa-user-secret fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_MANAGEMENT_')}"  >
@@ -338,7 +365,7 @@
                    </c:when>
                     <!--      科室间借调             -->
                    <c:when test="#{item eq 'SECONDMENT_BETWEEN_DEPARTMENTS'}">
-                       <p:submenu id="um5000" icon="fa fa-refresh fa-fw" label="科室调剂" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_') and userContextService.canRender('SECONDMENT_BETWEEN_DEPARTMENTS')}">
+                       <p:submenu id="um5000" icon="fa fa-refresh fa-fw" label="科室间调剂" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_') and userContextService.canRender('SECONDMENT_BETWEEN_DEPARTMENTS')}">
                            <p:menuitem id="um5100" value="调剂计费配置" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_ADJUST_CONFIGURATION')}" outcome="/portal/deptSecondment/config/secondmentConfig.xhtml"/>
                            <p:menuitem id="um5200" value="调剂设备管理" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_DISPATCH_EQUIPMENT_MANAGEMENT')}" outcome="/portal/deptSecondment/config/secondmentAssetSetting.xhtml"/>
                            <p:menuitem id="um5300" value="调剂设备信息" rendered="#{userContextService.accessContainsFunctionMenu('SECONDMENT_BORROWING_APPLICATION')}" outcome="/portal/deptSecondment/order/secondmentOrderApply.xhtml"/>
@@ -368,7 +395,6 @@
             </p:submenu>
             <!-- IoT设备使用概览 -->
             <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('IOT_DEVICE_OVERVIEW')}" outcome="/portal/iframe/dispensingCenter.xhtml"/>
-            <p:menuitem id="biReport" value="BI报表" icon="fa fa-tachometer fa-fw"   target="_blank"  rendered="#{userContextService.accessContainsFunctionMenu('BI_REPORT_VIEW')}" onclick="davinciToken()"  />
             <!-- 我的账号 -->
             <p:menuitem id="um53" value="#{msg.profile}" icon="fa fa-user-circle fa-fw" outcome="/portal/profile.xhtml"/>
             <!-- 注销 -->

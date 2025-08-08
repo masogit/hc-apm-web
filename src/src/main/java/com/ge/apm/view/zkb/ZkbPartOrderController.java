@@ -9,6 +9,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.*;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -32,6 +33,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -43,6 +45,7 @@ import java.util.logging.Logger;
 public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOrder> {
 
     private ZkbPartOrderRepository dao;
+    private AssetInfoRepository assetInfoRepository;
     private ZkbPartOrderMapper zkbPartOrderMapper;
     private UserContextService userContextService;
     private UserAccount currentUser;
@@ -87,6 +90,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         dao = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderMapper = WebUtil.getBean(ZkbPartOrderMapper.class);
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         zkbPartOrderExcelService = WebUtil.getBean(ZkbPartOrderExcelService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -371,6 +375,34 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
         Specification<ZkbPartOrder> specification = buildSpecification(this.searchFilters,"");
         zkbContractPage = dao.findBySpecification(specification, pageRequest);
+
+        for(ZkbPartOrder zkbPartOrder : zkbContractPage.getContent()){
+            if(StringUtils.isNotEmpty(zkbPartOrder.getTechAuditer())){
+                continue;
+            }
+            if(StringUtils.isEmpty(zkbPartOrder.getZone())){
+                continue;
+            }
+
+            if(ZkbPartOrder.OrderType.Tool.name().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Artificial.name().equals(zkbPartOrder.getOrderType())){
+                continue;
+            }
+            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+            if(assetInfo.getAssetGroup() == null || assetInfo.getAssetGroup() != 2){
+                continue;
+            }
+            List<ZkbPartOrderUserConfig> configList;
+            if(ZkbPartOrder.DATA_TYPE_TEST.equals(zkbPartOrder.getDataType())){
+                configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+            }else{
+                configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+            }
+            if(CollectionUtils.isNotEmpty(configList)){
+                List<String> names = configList.stream().map(ZkbPartOrderUserConfig::getName).collect(Collectors.toList());
+                String str = String.join(", ", names);
+                zkbPartOrder.setTechAuditer(str);
+            }
+        }
         //searchFilters.clear();
         return zkbContractPage;
     }
