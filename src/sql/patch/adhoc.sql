@@ -18,4 +18,5 @@ VALUES (REPLACE(uuid_generate_v4()::text, '-', ''), '7778d7b1e4bd4137bfc638e1979
 -- 删除到货清单外键约束
 ALTER TABLE arrival_list DROP CONSTRAINT "fklkb6140aruelepc2hfb1w39km";
 ALTER TABLE arrival_list DROP CONSTRAINT "fk_hxgxok12yhhye3h9rkkmlsnak";
+ALTER TABLE arrival_list ALTER COLUMN creator_uid TYPE VARCHAR(32);
 

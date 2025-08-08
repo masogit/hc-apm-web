@@ -176,7 +176,7 @@ public class SupplierService {
         }
         supplierDao.save(supplier);
 
-        if (ObjectUtil.isNotEmpty(supplier.getVenderCompanyId())) {
+        /*if (ObjectUtil.isNotEmpty(supplier.getVenderCompanyId())) {
             List<SupplierContactPerson> contactPersonList = supplierContactPersonRepository.findByVenderCompanyId(supplier.getVenderCompanyId());
             for (SupplierContactPerson contactPerson : contactPersonList) {
                 contactPerson.setSupplierId(supplier.getId());
@@ -186,7 +186,7 @@ public class SupplierService {
         }
         assetInfoDao.updateSupplierName(supplier.getName(), supplier.getId(), supplier.getTenantUID());
         assetInfoDao.updateMaintainerName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
-        assetInfoDao.updateManufactureName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
+        assetInfoDao.updateManufactureName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());*/
 
     }
 
