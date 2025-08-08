@@ -25,4 +25,4 @@ ALTER TABLE arrival_list ALTER COLUMN creator_uid TYPE VARCHAR(32);
 
 ---工程师扫码默认打开页面设置
 insert into public.config_item (uid, category,default_value,  description, key, name, super_admin_edit, user_parent_config, value_type,validation)
-select replace(uuid_generate_v4()::text,'-',''), 1, 'asset', '工程师扫码默认打开页面设置', 'setEngineerScansToPage', '工程师扫码默认打开页面', 'f', 't', 7,'[{"key":"事件记录","value":"record"},{"key":"设备台账","value":"asset"},{"key":"报修页面","value":"repair"}]' where not exists (select * from config_item where key = 'setEngineerScansToPage');
+select replace(uuid_generate_v4()::text,'-',''), 1, 'record', '工程师扫码默认打开页面设置', 'setEngineerScansToPage', '工程师扫码默认打开页面', 'f', 't', 7,'[{"key":"事件记录","value":"record"},{"key":"设备台账","value":"asset"},{"key":"报修页面","value":"repair"}]' where not exists (select * from config_item where key = 'setEngineerScansToPage');
