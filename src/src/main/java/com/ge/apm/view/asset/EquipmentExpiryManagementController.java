@@ -297,7 +297,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         if (CollectionUtils.isEmpty(equipmentExpiryManagements)) {
             if ((StringUtils.isNotEmpty(selected.getManufacture()) || StringUtils.isNotEmpty(selected.getMakerShortName())) && StringUtils.isNotEmpty(selected.getFunctionType())) {
                 // 继续通过制造商和设备型号获取
-                equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(StringUtils.isEmpty(selected.getMakerShortName())?selected.getManufacture():selected.getMakerShortName().replace(" ", "").toLowerCase(), selected.getFunctionType().replace(" ", "").toLowerCase());;
+                equipmentExpiryManagements = equipmentExpiryManagementRepository.matchByManufactureAndFunctionType(StringUtils.isEmpty(selected.getMakerShortName())?selected.getManufacture():selected.getMakerShortName().replace(" ", "").toLowerCase(), selected.getFunctionType());
                 matchByFunctionType = true;
             }
         }
