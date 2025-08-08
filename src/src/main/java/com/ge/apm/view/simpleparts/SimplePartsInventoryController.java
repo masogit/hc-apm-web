@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -169,6 +170,7 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
 //            Page<SimplePartsInventory> resultPage = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
 
             map.put("queryType",queryType);
+            map.put("tenantUID",currentUserAccount.getTenantUID());
 
             map.put("pageSize",pageRequest.getPageSize());
             map.put("offset",pageRequest.getPageNumber()*pageRequest.getPageSize());
@@ -178,7 +180,12 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
             List<String> partsItemIds = partsInventoryList.stream().map(SimplePartsInventory::getPartsItemId).collect(Collectors.toList());
             List<SimplePartsItem> simplePartsItems = simplePartsItemRepository.findByIdIn(partsItemIds);
             Map<String, List<SimplePartsItem>> temMap = simplePartsItems.stream().collect(Collectors.groupingBy(SimplePartsItem::getId));
-            partsInventoryList.forEach(item->item.setSimplePartsItem(temMap.get(item.getPartsItemId()).get(0)));
+            partsInventoryList.forEach(item->{
+                List<SimplePartsItem> partsItems = temMap.get(item.getPartsItemId());
+                if(!CollectionUtils.isEmpty(partsItems)){
+                    item.setSimplePartsItem(temMap.get(item.getPartsItemId()).get(0));
+                }
+            });
             setWarningStatus(partsInventoryList);
             Page<SimplePartsInventory> page = new PageImpl<>(partsInventoryList, pageRequest,count);
             return page;
