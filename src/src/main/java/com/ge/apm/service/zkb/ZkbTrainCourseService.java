@@ -1,9 +1,11 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.ZkbTrainCourseQuotaRepository;
 import com.ge.apm.dao.ZkbTrainCourseRepository;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbTrainCourse;
+import com.ge.apm.domain.ZkbTrainCourseQuota;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,6 +31,9 @@ public class ZkbTrainCourseService {
 
     @Autowired
     ZkbTrainCourseRepository zkbTrainCourseRepository;
+
+    @Autowired
+    ZkbTrainCourseQuotaRepository zkbTrainCourseQuotaRepository;
 
     public boolean checkCourse(ZkbTrainCourse zkbTrainCourse){
         if(StrUtil.isEmpty(zkbTrainCourse.getId())){
@@ -167,6 +172,15 @@ public class ZkbTrainCourseService {
                 mm.put("id", zkbTrainCourse.getId());
                 rs.add(mm);
             }
+        }
+        return rs;
+    }
+
+    public boolean checkDelete(ZkbTrainCourse zkbTrainCourse){
+        boolean rs = true;
+        List<ZkbTrainCourseQuota> zkbTrainCourseQuotas = zkbTrainCourseQuotaRepository.findByCourseId(zkbTrainCourse.getId());
+        if(CollectionUtils.isNotEmpty(zkbTrainCourseQuotas)){
+            rs = false;
         }
         return rs;
     }

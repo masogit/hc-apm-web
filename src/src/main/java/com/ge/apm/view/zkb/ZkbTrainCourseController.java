@@ -96,6 +96,14 @@ public class ZkbTrainCourseController  extends GenericCRUDUUIDController<ZkbTrai
 
     }
 
+    public void delete(){
+        if(!zkbTrainCourseService.checkDelete(selected)){
+            WebUtil.addErrorMessage("删除失败，该课程已被使用");
+            return;
+        }
+        super.delete();
+    }
+
     public List<HashMap<String,String>> queryNormalCourse(){
         return zkbTrainCourseService.queryNormalCourse();
     }
