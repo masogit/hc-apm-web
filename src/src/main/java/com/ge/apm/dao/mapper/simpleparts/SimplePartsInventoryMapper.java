@@ -89,6 +89,9 @@ public interface SimplePartsInventoryMapper {
 			+ "  <if test='name != null'>"
 			+ "   AND spi.name LIKE CONCAT('%', #{name}, '%')"
 			+ "  </if>"
+			+ "  <if test='tenantUID != null'>"
+			+ "   AND spi.tenant_uid = #{tenantUID}"
+			+ "  </if>"
 			+ "</where>"
 			+ "</script>")
 	int findPartsInventoryCount(Map<String, Object> map);
