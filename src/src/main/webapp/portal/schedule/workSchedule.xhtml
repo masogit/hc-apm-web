@@ -26,9 +26,9 @@
                             </p:tree>
                         </p:scrollPanel>
                     </p:overlayPanel>
-                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="#{msg.CreateWorkScheduleInBatch}" title="#{msg.CreateWorkScheduleInBatch}" update=":workScheduleBatchDlg" oncomplete="PF('workScheduleBatchDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ARRANGE_CREATE')}"/>
-                    <p:commandButton id="batchDeleteButton" icon="ui-icon-extlink" value="批量删除" title="批量删除" update=":workScheduleBatchDeleteDlg" oncomplete="PF('workScheduleBatchDeleteDlg').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ARRANGE_CREATE')}"/>
-                    <p:commandButton id="scheduleDateStageButton" icon="ui-icon-extlink" value="#{msg.SequenceTimeSettings}" title="#{msg.SequenceTimeSettings}" update=":scheduleDateStageDlg" oncomplete="PF('scheduleDateStageDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ARRANGE_CREATE')}"/>
+                    <p:commandButton id="batchCreateButton"  value="#{msg.CreateWorkScheduleInBatch}" title="#{msg.CreateWorkScheduleInBatch}" update=":workScheduleBatchDlg" oncomplete="PF('workScheduleBatchDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ARRANGE_CREATE')}"/>
+                    <p:commandButton id="batchDeleteButton"  value="批量删除" title="批量删除" update=":workScheduleBatchDeleteDlg" oncomplete="PF('workScheduleBatchDeleteDlg').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ARRANGE_CREATE')}"/>
+                    <p:commandButton id="scheduleDateStageButton"  value="#{msg.SequenceTimeSettings}" title="#{msg.SequenceTimeSettings}" update=":scheduleDateStageDlg" oncomplete="PF('scheduleDateStageDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ARRANGE_CREATE')}"/>
                 </h:form>
                 <h:form id="workScheduleForm">
                     <p:growl widgetVar="messages" id="messages" showDetail="true" />
