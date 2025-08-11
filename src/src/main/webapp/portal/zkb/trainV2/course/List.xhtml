@@ -22,7 +22,9 @@
 
                     <p:ajax event="rowSelect"  update="deleteButton editButton :zkbCourseEditForm"/>
                     <p:ajax event="filter" listener="#{zkbTrainCourseController.onFilter}" />
-
+                    <p:column headerText="CatNo" filterBy="#{item.catNo}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.catNo}"/>
+                    </p:column>
                     <p:column headerText="课程名称" filterBy="#{item.name}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.name}"/>
                     </p:column>
@@ -40,7 +42,7 @@
                         <h:outputText value="#{fieldMsg.fieldValue('ZkbTrainCourseType',item.courseType)}"/>
                     </p:column>
 
-                    <p:column headerText="备注"  filterBy="#{item.description}"  filterMatchMode="LIKE" >
+                    <p:column headerText="课程描述"  filterBy="#{item.description}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.description}"/>
                     </p:column>
 

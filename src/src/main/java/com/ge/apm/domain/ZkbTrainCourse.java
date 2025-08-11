@@ -22,6 +22,9 @@ public class ZkbTrainCourse {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    @Column(name = "cat_no")
+    private String catNo;
+
     @Column(name = "name")
     private String name;
 
