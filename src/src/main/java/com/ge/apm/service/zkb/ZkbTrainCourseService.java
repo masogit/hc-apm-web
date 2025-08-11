@@ -66,6 +66,7 @@ public class ZkbTrainCourseService {
             return null;
         }
         List<String> headers = new ArrayList<>();
+        headers.add("CatNo");
         headers.add("课程名称");
         headers.add("课程简称");
         headers.add("课程描述");
@@ -76,12 +77,14 @@ public class ZkbTrainCourseService {
         if (header.isEmpty()) {
             return null;
         }
+        String catNo;
         String name;
         String shortName;
         String description;
         String courseType;
         String normalCourse;
 
+        int catNoIdx = header.get("CatNo");
         int cnameIdx = header.get("课程名称");
         int smdx = header.get("课程简称");
         int descriptionIdx = header.get("课程描述");
@@ -96,12 +99,16 @@ public class ZkbTrainCourseService {
             ZkbTrainCourse detail = new ZkbTrainCourse();
             try {
                 detail.setExcelIdex(j + 1);
+                catNo = StringUtils.trim(ExcelParser.getCellStringValue(row, catNoIdx));
                 name = StringUtils.trim(ExcelParser.getCellStringValue(row, cnameIdx));
                 shortName = StringUtils.trim(ExcelParser.getCellStringValue(row, smdx));
                 description = StringUtils.trim(ExcelParser.getCellStringValue(row, descriptionIdx));
                 courseType = StringUtils.trim(ExcelParser.getCellStringValue(row, header.get("课程类型")));
                 normalCourse = StringUtils.trim(ExcelParser.getCellStringValue(row, header.get("基础课程")));
-
+                if(StrUtil.isEmpty(catNo)){
+                    detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "CatNo不能为空；");
+                    pass = false;
+                }
 
                 if (StringUtils.isEmpty(name)) {
                     detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程名称不能为空；");
@@ -126,7 +133,7 @@ public class ZkbTrainCourseService {
                         detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "基础课程不能为空；");
                         pass = false;
                     }else{
-                        List<ZkbTrainCourse> zkbTrainCourses = zkbTrainCourseRepository.findByName(normalCourse);
+                        List<ZkbTrainCourse> zkbTrainCourses = zkbTrainCourseRepository.findByCatNo(normalCourse);
                         if(CollectionUtils.isEmpty(zkbTrainCourses)){
                             detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "基础课程填写有误；");
                             pass = false;
@@ -135,7 +142,7 @@ public class ZkbTrainCourseService {
                         }
                     }
                 }
-
+                detail.setCatNo(catNo);
                 detail.setName(name);
                 detail.setShortName(shortName);
                 detail.setDescription(description);

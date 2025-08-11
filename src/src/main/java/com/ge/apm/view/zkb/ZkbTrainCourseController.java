@@ -2,7 +2,6 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbTrainCourseRepository;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbCourse;
 import com.ge.apm.domain.ZkbTrainCourse;
 import com.ge.apm.service.zkb.ZkbTrainCourseService;
 import com.ge.apm.view.sysutil.UserContextService;

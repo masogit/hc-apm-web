@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ZkbTrainCourseRepository  extends GenericRepositoryUUID<ZkbTrainCourse> {
     List<ZkbTrainCourse> findByName(String name);
+    List<ZkbTrainCourse> findByCatNo(String catNo);
     List<ZkbTrainCourse> findByNameAndIdNot(String name, String id);
 
     List<ZkbTrainCourse> findByCourseTypeOrderByCreatedDateDesc(String courseType);
