@@ -295,7 +295,7 @@
                        <!-- 此处二级菜单新增的时候以BI_开头以适应规则 -->
                        <p:submenu id="biReportManage" label="BI报表分析" icon="fa fa-tags fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW') or userContextService.accessContainsFunctionMenu('BI_')}">
                            <!-- 设备数据概览 -->
-                           <p:menuitem value="设备数据概览" icon="fa fa-bar-chart fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW') }" outcome="/portal/nine.xhtml"/>
+                           <p:menuitem value="设备数据概览"  rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW') }" outcome="/portal/nine.xhtml"/>
                            <p:menuitem id="biReport" value="BI报表" target="_blank" rendered="#{userContextService.accessContainsFunctionMenu('BI_REPORT_VIEW') }" onclick="davinciToken()"  />
                        </p:submenu>
 
