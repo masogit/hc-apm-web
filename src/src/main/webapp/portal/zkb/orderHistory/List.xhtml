@@ -13,7 +13,7 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form rendered="#{userContextService.zkbAdmin}">
-                    <p:commandButton id="importButton" icon="ui-icon-extlink" value="#{msg.zkbHistory_orderHistoryImport}" title="#{msg.zkbHistory_orderHistoryImport}" action="#{zkbOrderHistoryController.importAction}"/>
+                    <p:commandButton id="importButton"  value="#{msg.zkbHistory_orderHistoryImport}" title="#{msg.zkbHistory_orderHistoryImport}" action="#{zkbOrderHistoryController.importAction}"/>
                 </h:form>
                 <h:form id="searchForm">
                     <p:fieldset legend="#{msg.FilterCondition}">

@@ -12,8 +12,8 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form>
-                    <p:commandButton id="importButton" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" icon="ui-icon-extlink" value="#{msg.ContractImport}" title="#{msg.ContractImport}" action="#{contractInfoController.importAction}"/>
-                    <p:commandButton id="importItemButton" icon="ui-icon-extlink" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" value="#{msg.ContractRelatedEquipmentImport}" title="#{msg.ContractRelatedEquipmentImport}" action="#{contractInfoController.importItemAction}"/>
+                    <p:commandButton id="importButton" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}"  value="#{msg.ContractImport}" title="#{msg.ContractImport}" action="#{contractInfoController.importAction}"/>
+                    <p:commandButton id="importItemButton"  rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CONTRACT_EDIT')}" value="#{msg.ContractRelatedEquipmentImport}" title="#{msg.ContractRelatedEquipmentImport}" action="#{contractInfoController.importItemAction}"/>
                     <h:panelGrid id="filterType" columns="2" style="float: right">
                         <h:panelGroup style="float: right"  rendered="#{contractInfoController.contractExpirationReminderDays > 0}">
                             <span >#{msg.Legend}：</span>

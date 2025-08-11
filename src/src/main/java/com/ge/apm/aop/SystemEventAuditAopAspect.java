@@ -61,9 +61,15 @@ public class SystemEventAuditAopAspect {
     public Object orgInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
         return repositorySystemEventAopPointcutAround(pjp, "admin_feature_active");
     }
+
     @Around("execution(* com.ge.apm.dao.OrgInfoRepository.delete(..)) || execution(* com.ge.apm.dao.OrgInfoRepository.save(..))")
     public Object adminFeatureActiveSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
         return repositorySystemEventAopPointcutAround(pjp, "org_info");
+    }
+
+    @Around("execution(* com.ge.apm.dao.SupplierContactPersonRepository.delete(..)) || execution(* com.ge.apm.dao.SupplierContactPersonRepository.save(..))")
+    public Object supplierContactPersonSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, "supplier_contact_person");
     }
 
 
