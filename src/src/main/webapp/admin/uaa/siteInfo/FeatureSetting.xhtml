@@ -667,25 +667,35 @@
                             </p:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset id="qualityDataView" legend="质控数据概览">
+                        <p:fieldset id="qualityDataView" legend="质控管理">
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"
-                                        itemLabel="质控日历">
-                                    <p:ajax update="qualityDataView"
-                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>质控日历</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
+<!--                                <p:selectBooleanCheckbox-->
+<!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"-->
+<!--                                        itemLabel="质控日历">-->
+<!--                                    <p:ajax update="qualityDataView"-->
+<!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>-->
+<!--                                </p:selectBooleanCheckbox>-->
+<!--                                <p:outputLabel>质控日历</p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
+
+<!--                                <p:selectBooleanCheckbox-->
+<!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_RAD_BOARD']}"-->
+<!--                                        itemLabel="放射科质控大屏">-->
+<!--                                    <p:ajax update="qualityDataView"-->
+<!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_RAD_BOARD')}"/>-->
+<!--                                </p:selectBooleanCheckbox>-->
+<!--                                <p:outputLabel>放射科质控大屏</p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
 
                                 <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_RAD_BOARD']}"
-                                        itemLabel="放射科质控大屏">
+                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_MANAGE']}"
+                                        itemLabel="质控管理">
                                     <p:ajax update="qualityDataView"
-                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_RAD_BOARD')}"/>
+                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_MANAGE')}"/>
                                 </p:selectBooleanCheckbox>
-                                <p:outputLabel>放射科质控大屏</p:outputLabel>
+                                <p:outputLabel>质控管理</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>

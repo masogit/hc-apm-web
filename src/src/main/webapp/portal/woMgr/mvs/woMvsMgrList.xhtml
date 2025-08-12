@@ -82,7 +82,6 @@
                 <p:column headerText="#{msg.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.serviceRequest.srNum}"/>
                 </p:column>
-
                 <p:column headerText="#{msg.requestorName}"  rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.serviceRequest.requestorName}"/>
                 </p:column>
