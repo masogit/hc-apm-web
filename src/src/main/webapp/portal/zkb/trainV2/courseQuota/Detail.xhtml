@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+
+<ui:composition>
+    <p:dialog id="zkbQuotaDetailDlg" widgetVar="zkbQuotaDetailDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainCourseController.CRUDActionName} 课程" width="600" height="370">
+        <h:form id="zkbDetailForm">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainCourseQuotaController.selectedCourseQuotaDetail != null}">
+                <h:panelGroup>
+                    <label class="label">UniqueID*</label>
+                    <p:inputText value="#{zkbTrainCourseQuotaController.selectedCourseQuotaDetail.uniqueID}" required="true" requiredMessage="#{'CatNo'} #{msg.ValidationRequire}"  disabled="#{not empty zkbTrainCourseController.selected.name}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">总额*</label>
+                    <p:spinner  value="#{zkbTrainCourseQuotaController.selectedCourseQuotaDetail.totalQuota}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">剩余名额*</label>
+                    <p:spinner  value="#{zkbTrainCourseQuotaController.selectedCourseQuotaDetail.quota}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainCourseQuotaController.saveDetail}" update=":growl :editForm:detailDatalist :editForm:quota :editForm:totalQuota" icon="ui-icon-check" oncomplete="PF('zkbQuotaDetailDialog').hide()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbQuotaDetailDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>
