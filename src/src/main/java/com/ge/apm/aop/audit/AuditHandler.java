@@ -137,16 +137,6 @@ public interface AuditHandler {
 
     default String extractBoUid(Object[] args) {
         Object entity = args[0];
-        try {
-            java.lang.reflect.Method method = entity.getClass().getMethod("getId");
-            Object idValue = method.invoke(entity);
-            if (idValue != null) {
-                return idValue.toString();
-            }
-            return null;
-        } catch (Exception e) {
-
-        }
 
         try {
             java.lang.reflect.Method method = entity.getClass().getMethod("getUid");
@@ -156,6 +146,17 @@ public interface AuditHandler {
             }
             return null;
         } catch (Exception e) {
+        }
+
+        try {
+            java.lang.reflect.Method method = entity.getClass().getMethod("getId");
+            Object idValue = method.invoke(entity);
+            if (idValue != null) {
+                return idValue.toString();
+            }
+            return null;
+        } catch (Exception e) {
+
         }
 
         return null;
