@@ -115,7 +115,7 @@
 						</p:column>
 						<!-- 待关单 -->
 						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE') and serviceRequestNoAssetController.queryIndex==4}">
-							<p:commandButton value="关单" style="width: 70px;" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" />
+							<p:commandButton value="关  单" style="width: 70px;" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" />
 							<p:commandButton value="转台账" actionListener="#{serviceRequestNoAssetController.prepareTurnWorkOrder(item.id)}" update=":assetSearchForm" oncomplete="PF('AssetSelectDlg').show()"/>
 						</p:column>
 					</p:dataTable>
