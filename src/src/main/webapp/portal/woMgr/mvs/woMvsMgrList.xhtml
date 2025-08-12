@@ -82,9 +82,9 @@
                 <p:column headerText="#{msg.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.serviceRequest.srNum}"/>
                 </p:column>
-                <h:panelGroup rendered="#{workOrderMgrController.selected.serviceRequest.srRepairSource != null}">
+                <h:panelGroup rendered="#{workOrderMgrMvsController.selected.serviceRequest.srRepairSource != null}">
                     <label class="label">#{msg.repairSource}</label>
-                    <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',workOrderMgrController.selected.serviceRequest.srRepairSource)}"   />
+                    <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',workOrderMgrMvsController.selected.serviceRequest.srRepairSource)}"   />
                 </h:panelGroup>
                 <p:column headerText="#{msg.requestorName}"  rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.serviceRequest.requestorName}"/>
