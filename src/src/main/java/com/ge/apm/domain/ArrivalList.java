@@ -248,6 +248,18 @@ public class ArrivalList implements Serializable {
     @Column(name = "file_no")
     private String fileNo;
 
+    // 采购日期
+    @Column(name = "purchase_date")
+    private Date purchaseDate;
+
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(Date purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
     public String getFileNo() {
         return fileNo;
     }
