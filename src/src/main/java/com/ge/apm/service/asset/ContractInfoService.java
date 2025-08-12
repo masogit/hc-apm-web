@@ -16,6 +16,7 @@ import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +104,9 @@ public class ContractInfoService {
         String contractItemId = "";
         if(arrivalItemList.stream().findAny().isPresent()){
             contractItemId = arrivalItemList.stream().findAny().get().getArrivalList().getContractItemId();
+        }
+        if (ObjectUtil.isEmpty(contractItemId)) {
+            return;
         }
         ContractInfoItem currentContractItem = contractItemDao.findById(contractItemId);
         List<ContractInfoItem> itemList = arrivalItemList.stream().map(item -> {
