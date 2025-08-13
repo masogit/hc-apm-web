@@ -301,8 +301,8 @@
 
                    </c:when>
                    <!-- 质控数据概览 -->
-                   <c:when test="#{item eq 'QUALITY_CONTROL_MANAGE' and userContextService.canRender('QUALITY_CONTROL_MANAGE')}">
-                       <p:submenu id="qualityDataView" label="#{msg.DeviceQualityControl}" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_')}">
+                   <c:when test="#{item eq 'QUALITY_CONTROL_MANAGE'}">
+                       <p:submenu id="qualityDataView" label="#{msg.DeviceQualityControl}" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_') and userContextService.canRender('QUALITY_CONTROL_MANAGE')}">
                            <!-- 质控日历 -->
                            <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
                            <p:menuitem id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
