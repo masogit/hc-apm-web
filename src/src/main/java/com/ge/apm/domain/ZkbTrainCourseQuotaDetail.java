@@ -41,11 +41,6 @@ public class ZkbTrainCourseQuotaDetail {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
-    //0：未使用  1：已使用
-    @Column(name = "status")
-    private Integer status;
-
-
     @Override
     public int hashCode() {
         int hash = 0;

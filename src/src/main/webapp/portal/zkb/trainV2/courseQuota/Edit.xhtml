@@ -12,7 +12,7 @@
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainCourseQuotaController.selected != null}">
                 <h:panelGroup>
                     <label class="label">#{msg.TenantInfo}*</label>
-                    <p:selectOneMenu style="width: 80%" id="selectionTenantInfo" value="#{zkbTrainCourseQuotaController.selected.tenantUid}" >
+                    <p:selectOneMenu style="width: 80%" id="selectionTenantInfo" value="#{zkbTrainCourseQuotaController.selected.tenantUid}" required="true" requiredMessage="#{msg.TenantInfo} 不能为空！">
                         <p:ajax  />
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{zkbTrainCourseQuotaController.getSourceTenantInfoList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
@@ -21,11 +21,11 @@
 
                 <h:panelGroup>
                     <label class="label">合同号*</label>
-                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.contractNo}"  />
+                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.contractNo}"  required="true" requiredMessage="合同号 不能为空！"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">开始日期*</label>
-                    <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbTrainCourseQuotaController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbTrainCourseQuotaController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">结束日期*</label>
@@ -33,7 +33,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">Modality*</label>
-                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.modality}"  />
+                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.modality}"  required="true" requiredMessage="Modality 不能为空！" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程*</label>
@@ -43,11 +43,11 @@
                 </h:panelGroup>
                 <h:panelGroup >
                     <label class="label">总额*</label>
-                    <p:spinner id="totalQuota" value="#{zkbTrainCourseQuotaController.selected.totalQuota}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                    <p:spinner id="totalQuota" value="#{zkbTrainCourseQuotaController.selected.totalQuota}" min="0" max="10000000"  required="true" requiredMessage="总额 不能为空！"><p:ajax /></p:spinner>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">剩余名额*</label>
-                    <p:spinner id="quota" value="#{zkbTrainCourseQuotaController.selected.quota}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                    <p:spinner id="quota" value="#{zkbTrainCourseQuotaController.selected.quota}" min="0" max="10000000"  required="true" requiredMessage="剩余名额 不能为空！"><p:ajax /></p:spinner>
                 </h:panelGroup>
             </p:panelGrid>
             <p:fieldset id="detailFieldset" legend="名额详情" rendered="#{!userContextService.zkbUser}">
@@ -65,9 +65,7 @@
                     <p:column headerText="剩余名额">
                         <h:outputText value="#{item.quota}"/>
                     </p:column>
-                    <p:column headerText="状态">
-                        <h:outputText value="#{zkbTrainCourseQuotaController.getStatusName(item.status)}"/>
-                    </p:column>
+
                     <f:facet name="{Toolbar}">
                         <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbTrainCourseQuotaController.prepareDetailCreate}" update=":growl :zkbQuotaDetailDlg" oncomplete="PF('zkbQuotaDetailDialog').show()" disabled="#{userContextService.zkbUser}" />
                         <p:commandButton immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbTrainCourseQuotaController.prepareDetailEdit}" update=":growl :zkbQuotaDetailDlg"  oncomplete="PF('zkbQuotaDetailDialog').show()" disabled="#{empty zkbTrainCourseQuotaController.selectedCourseQuotaDetail}" />
