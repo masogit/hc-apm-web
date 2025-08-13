@@ -5545,7 +5545,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','ManageAccept','经理审批通过','Manage Support Accept',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','ManageReject','经理审批拒绝','Manage Support Reject',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','Ordered','已下单','Ordered',NULL,-1);
-/*INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','OrderedReject','400下单拒绝','OrderedReject',NULL,-1);*/
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','OrderedReject','400下单拒绝','OrderedReject',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','EngineerQualificationAccept','工程师资质审批通过','Engineer Qualification Accept',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbIntegralOrderStatus','EngineerQualificationReject','工程师资质审批拒绝','Engineer Qualification Reject',NULL,-1);
 
@@ -6176,5 +6176,5 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 
 
 --ZKB 培训V2 i18
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','normal','普通课程','normal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','normal','基本课程','normal',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','advance','进阶课程','advance',NULL,-1);
