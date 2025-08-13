@@ -53,6 +53,7 @@
             <result property="customerTel" column="sr_customer_tel"/>
             <result property="customerPosition" column="sr_customer_position"/>
             <result property="status" column="sr_status"/>
+            <result property="srRepairSource" column="sr_repair_source"/>
         </association>
         <collection property="v2_workOrder_detail_list" ofType="com.ge.apm.domain.V2_WorkOrder_Detail">
             <id property="id" column="step_id"/>
@@ -105,6 +106,7 @@
         vs.customer_tel as sr_customer_tel,
         vs.customer_position as sr_customer_position,
         vs.status as sr_status,
+        vs.sr_repair_source as srRepairSource,
         a.uid AS asset_uid
         FROM v2_work_order t
         left join v2_service_request vs on t.sr_id = VS.ID
