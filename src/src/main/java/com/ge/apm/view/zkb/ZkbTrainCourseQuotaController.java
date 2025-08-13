@@ -3,7 +3,6 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.ZkbTrainCourseQuotaRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.zkb.ZkbContractImportService;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.service.zkb.ZkbTrainCourseQuotaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -27,9 +26,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -47,6 +44,7 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
     private ZkbTrainCourseQuotaService zkbTrainCourseQuotaService;
 
     private String actionName;
+    private String actionDetailName;
 
     @Getter@Setter
     private ZkbTrainCourse selectedCourse;
@@ -58,6 +56,10 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
     @Getter@Setter
     private List<Map<String, Object>> errorImportList = new ArrayList<>();
     private UploadedFile file;
+    @Getter@Setter
+    private ZkbTrainCourseQuotaDetail selectedCourseQuotaDetail;
+    @Getter@Setter
+    private List<ZkbTrainCourseQuotaDetail> zkbTrainCourseQuotaDetails = new ArrayList<>();
 
 
     @Override
@@ -105,6 +107,8 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
         this.actionName = "Edit";
         zkbTrainCourseList = zkbTrainCourseQuotaService.queryTrainCourse();
         selectedCourse = selected.getZkbTrainCourse();
+        zkbTrainCourseQuotaDetails = zkbTrainCourseQuotaService.queryDetailByQuota(selected.getId());
+
     }
 
     public List<ZkbTrainCourse> autoCompleteCourse(String query){
@@ -114,7 +118,7 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
     }
 
     public void saveData(){
-        zkbTrainCourseQuotaService.saveData(selected, selectedCourse, currentUser);
+        zkbTrainCourseQuotaService.saveData(selected, selectedCourse, currentUser, zkbTrainCourseQuotaDetails);
         WebUtil.addSuccessMessage("保存成功！");
     }
 
@@ -184,6 +188,59 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
     public String getTemplateName(){
         UserContextService ucs = WebUtil.getBean(UserContextService.class);
         return "APM_ZKB_Train_Course_Quota_Template.xlsx";
+    }
+
+    public void prepareDetailCreate(){
+        selectedCourseQuotaDetail = new ZkbTrainCourseQuotaDetail();
+        selectedCourseQuotaDetail.setStatus(0);
+        selectedCourseQuotaDetail.setTotalQuota(1);
+        selectedCourseQuotaDetail.setQuota(1);
+        //临时赋予id
+        selectedCourseQuotaDetail.setId(UUID.randomUUID().toString());
+        actionDetailName = "Create";
+    }
+
+    public void prepareDetailEdit(){
+        actionDetailName = "Edit";
+    }
+
+    public void saveDetail(){
+        if("Create".equals(actionDetailName)){
+            selectedCourseQuotaDetail.setCreatedBy(currentUser.getCreatedBy());
+            selectedCourseQuotaDetail.setCreatedDate(new Date());
+            zkbTrainCourseQuotaDetails.add(selectedCourseQuotaDetail);
+        }else if("Edit".equals(actionDetailName)){
+            selectedCourseQuotaDetail.setLastModifiedBy(currentUser.getCreatedBy());
+            selectedCourseQuotaDetail.setLastModifiedDate(new Date());
+        }
+        //WebUtil.addSuccessMessage("保存成功！");
+        calcQuota();
+    }
+
+    public void calcQuota(){
+        int quota = 0;
+        int totalQuota = 0;
+        for(ZkbTrainCourseQuotaDetail detail :zkbTrainCourseQuotaDetails){
+            quota += detail.getQuota();
+            totalQuota += detail.getTotalQuota();
+        }
+        selected.setQuota(quota);
+        selected.setTotalQuota(totalQuota);
+    }
+
+    public String getStatusName(int status){
+        if(status == 0){
+            return "未使用";
+        }else if(status == 1){
+            return "已使用";
+        }else{
+            return "";
+        }
+    }
+
+    public void deleteDetail(){
+        zkbTrainCourseQuotaDetails.remove(selectedCourseQuotaDetail);
+        WebUtil.addSuccessMessage("删除成功！");
     }
 
     @Override

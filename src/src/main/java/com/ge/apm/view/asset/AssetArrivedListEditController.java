@@ -331,9 +331,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         selected = dao.findById(selected.getId());
-        if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
+        // 安装时添加
+        /*if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             contractService.contractItemArrival(arrivalItemList);
-        }
+        }*/
         if(userContextService.activeSupplier() && selected.getContractNum() != null){
             Set<String> ids = new HashSet<>();
             ids.add(selected.getId());

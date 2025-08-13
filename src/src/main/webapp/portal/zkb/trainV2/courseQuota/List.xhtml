@@ -45,7 +45,9 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-
+                    <p:column headerText="Modality" filterBy="#{item.Modality}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.modality}"/>
+                    </p:column>
                     <p:column headerText="课程名称"  filterBy="#{item.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.zkbTrainCourse.name}"/>
                     </p:column>

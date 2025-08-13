@@ -172,7 +172,7 @@
                            <p:menuitem id="um101" value="#{msg.commonFaults}" outcome="/portal/assetRepairQuickTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_VIEW')}"/>
 <!--                           <p:menuitem id="um14" value="历史工单" outcome="/portal/woMgr/workOrderHistory.xhtml" />-->
                            <p:menuitem id="um226" value="MVS院级工单" outcome="/portal/mvsWorkOrder/workOrderList.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('AssetHead') and userContextService.isYiMaiYangGuangTenant()}"   />
-                           <p:menuitem value="无台账报修" outcome="/portal/woMgr/noAsset/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}"/>
+                           <p:menuitem value="无台账报修" outcome="/portal/woMgr/noAsset/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_NO_ASSET')}"/>
 
                        </p:submenu>
                    </c:when>
@@ -301,11 +301,11 @@
 
                    </c:when>
                    <!-- 质控数据概览 -->
-                   <c:when test="#{item eq 'QUALITY_DATA_VIEW'}">
-                       <p:submenu id="qualityDataView" label="质控数据概览" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_')}">
+                   <c:when test="#{item eq 'QUALITY_CONTROL_MANAGE' and userContextService.canRender('QUALITY_CONTROL_MANAGE')}">
+                       <p:submenu id="qualityDataView" label="#{msg.DeviceQualityControl}" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_')}">
                            <!-- 质控日历 -->
-                           <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
-                           <p:menuitem id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_RAD_BOARD')}" url="/reports/RadQCBoard" target="_blank"/>
+                           <p:menuitem id="qualityControlCalendar" value="#{msg.qualityControlCalendar}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
+                           <p:menuitem id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
                        </p:submenu>
 
                    </c:when>
