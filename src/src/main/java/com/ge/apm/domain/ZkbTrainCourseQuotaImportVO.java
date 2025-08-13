@@ -8,13 +8,126 @@ import javax.persistence.*;
 import java.util.Date;
 
 
-public class ZkbTrainCourseQuotaImportVO extends ZkbTrainCourseQuota {
+public class ZkbTrainCourseQuotaImportVO {
+    private String  id;
 
     private int lineNum;
 
     private String tenantName;
 
     private String courseName;
+
+    private String modality;
+
+    private String contractNo;
+
+    private Date startDate;
+
+    private Date endDate;
+
+    private String uniqueID;
+
+    private Integer quota = 0;
+
+    private Integer totalQuota = 0;
+
+    private String tenantUid;
+
+    private String courseId;
+
+    private String catNo;
+
+    public String getCatNo() {
+        return catNo;
+    }
+
+    public void setCatNo(String catNo) {
+        this.catNo = catNo;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getModality() {
+        return modality;
+    }
+    
+    public void setModality(String modality) {
+        this.modality = modality;
+    }
+    
+    public String getContractNo() {
+        return contractNo;
+    }
+    
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+    
+    public Date getStartDate() {
+        return startDate;
+    }
+    
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+    
+    public Date getEndDate() {
+        return endDate;
+    }
+    
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getUniqueID() {
+        return uniqueID;
+    }
+
+    public void setUniqueID(String uniqueID) {
+        this.uniqueID = uniqueID;
+    }
+
+
+    public Integer getQuota() {
+        return quota;
+    }
+
+
+    public void setQuota(Integer quota) {
+        this.quota = quota;
+    }
+
+
+    public Integer getTotalQuota() {
+        return totalQuota;
+    }
+
+
+    public void setTotalQuota(Integer totalQuota) {
+        this.totalQuota = totalQuota;
+    }
 
     public String getCourseName() {
         return courseName;
@@ -46,7 +159,7 @@ public class ZkbTrainCourseQuotaImportVO extends ZkbTrainCourseQuota {
         if(this.getContractNo() == null){
             flag = true;
         }
-        if(this.getCourseName() == null){
+        if(this.getCatNo() == null){
             flag = true;
         }
         if(StrUtil.isEmpty(this.getTenantName())){
@@ -56,7 +169,7 @@ public class ZkbTrainCourseQuotaImportVO extends ZkbTrainCourseQuota {
         return flag;
     }
 
-    @Override
+
     public int hashCode() {
         String str = "";
 

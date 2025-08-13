@@ -129,7 +129,7 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
         try {
             doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
             int maxRowNum = ZkbTrainCourseQuotaService.EXCEL_CONTRACT_HEADER_ROW + 5000;
-            if(doc.exceedMaxRowNum(ZkbTrainCourseQuotaService.SHEET_NAME, maxRowNum)){
+            if(doc.exceedMaxRowNum(0, maxRowNum)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
@@ -192,7 +192,6 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
 
     public void prepareDetailCreate(){
         selectedCourseQuotaDetail = new ZkbTrainCourseQuotaDetail();
-        selectedCourseQuotaDetail.setStatus(0);
         selectedCourseQuotaDetail.setTotalQuota(1);
         selectedCourseQuotaDetail.setQuota(1);
         //临时赋予id

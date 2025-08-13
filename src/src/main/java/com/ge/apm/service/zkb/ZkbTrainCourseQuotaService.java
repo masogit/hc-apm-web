@@ -84,7 +84,7 @@ public class ZkbTrainCourseQuotaService {
     public List<Map<String, Object>> getMapFromTemplate(ExcelDocument doc) throws Exception {
         List<Map<String, Object>> result = new ArrayList<>();
         for (int i = EXCEL_CONTRACT_DATA_ROW ; i <= doc.getWorkBook().getSheetAt(0).getLastRowNum() + 1 ; i++) {
-            Map< String, Object> rowMap = doc.getDataRowMap(SHEET_NAME, EXCEL_CONTRACT_HEADER_ROW, i);
+            Map< String, Object> rowMap = doc.getDataRowMap(EXCEL_CONTRACT_HEADER_ROW, i);
 
             Map<String, Object> map = new LinkedHashMap();
             ZkbTrainCourseQuotaImportVO zkbTrainCourseQuotaImportVO = new ZkbTrainCourseQuotaImportVO();
@@ -94,9 +94,11 @@ public class ZkbTrainCourseQuotaService {
             zkbTrainCourseQuotaRow.setFieldStringValue("Dealer Name","setTenantName");
             zkbTrainCourseQuotaRow.setFieldNumValue("总数","setTotalQuota");
             zkbTrainCourseQuotaRow.setFieldNumValue("剩余名额", "setQuota");
-            zkbTrainCourseQuotaRow.setFieldStringValue("课程名称", "setCourseName");
+            zkbTrainCourseQuotaRow.setFieldStringValue("CatNO", "setCatNo");
             zkbTrainCourseQuotaRow.setFieldDateValue("SVCStartDate", "setStartDate");
             zkbTrainCourseQuotaRow.setFieldDateValue("SVCEndDate", "setEndDate");
+            zkbTrainCourseQuotaRow.setFieldStringValue("UniqueID", "setUniqueID");
+            zkbTrainCourseQuotaRow.setFieldStringValue("Modality", "setModality");
             if(zkbTrainCourseQuotaImportVO.isNull()){
                 break;
             }
@@ -124,19 +126,54 @@ public class ZkbTrainCourseQuotaService {
             quota.setEndDate(zkbTrainCourseQuotaImportVO.getEndDate());
             quota.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
             quota.setQuota(zkbTrainCourseQuotaImportVO.getQuota());
+            quota.setModality(zkbTrainCourseQuotaImportVO.getModality());
             quota.setCreatedDate(new Date());
             quota.setCreatedBy(currentUser.getCreatedBy());
             zkbTrainCourseQuotaRepository.save(quota);
+
+            ZkbTrainCourseQuotaDetail zkbTrainCourseQuotaDetail = new ZkbTrainCourseQuotaDetail();
+            zkbTrainCourseQuotaDetail.setUniqueID(zkbTrainCourseQuotaImportVO.getUniqueID());
+            zkbTrainCourseQuotaDetail.setQuotaId(quota.getId());
+            zkbTrainCourseQuotaDetail.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
+            zkbTrainCourseQuotaDetail.setQuota(zkbTrainCourseQuotaImportVO.getQuota());
+            zkbTrainCourseQuotaDetailRepository.save(zkbTrainCourseQuotaDetail);
         }else{
-            quota.setContractNo(zkbTrainCourseQuotaImportVO.getContractNo());
-            quota.setTenantUid(zkbTrainCourseQuotaImportVO.getTenantUid());
-            quota.setCourseId(zkbTrainCourseQuotaImportVO.getCourseId());
+            quota.setModality(zkbTrainCourseQuotaImportVO.getModality());
             quota.setStartDate(zkbTrainCourseQuotaImportVO.getStartDate());
             quota.setEndDate(zkbTrainCourseQuotaImportVO.getEndDate());
-            quota.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
-            quota.setQuota(zkbTrainCourseQuotaImportVO.getQuota());
+           /* quota.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
+            quota.setQuota(zkbTrainCourseQuotaImportVO.getQuota());*/
             quota.setLastModifiedDate(new Date());
             quota.setLastModifiedBy(currentUser.getCreatedBy());
+
+
+            List<ZkbTrainCourseQuotaDetail> details = zkbTrainCourseQuotaDetailRepository.findByUniqueID(zkbTrainCourseQuotaImportVO.getUniqueID());
+            if(CollectionUtils.isNotEmpty(details)){
+                ZkbTrainCourseQuotaDetail detail = details.get(0);
+                int oldTotalQuota = detail.getTotalQuota();
+                int oldQuota = detail.getQuota();
+                if(oldQuota != zkbTrainCourseQuotaImportVO.getQuota() || oldTotalQuota != zkbTrainCourseQuotaImportVO.getTotalQuota()){
+                    detail.setQuota(zkbTrainCourseQuotaImportVO.getQuota());
+                    detail.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
+                    zkbTrainCourseQuotaDetailRepository.save(detail);
+
+                    int cq = zkbTrainCourseQuotaImportVO.getQuota() - oldQuota;
+                    int ctq = zkbTrainCourseQuotaImportVO.getTotalQuota() - oldTotalQuota;
+                    quota.setTotalQuota(quota.getTotalQuota() + cq);
+                    quota.setQuota(quota.getQuota() + ctq);
+                }
+            }else{
+                ZkbTrainCourseQuotaDetail zkbTrainCourseQuotaDetail = new ZkbTrainCourseQuotaDetail();
+                zkbTrainCourseQuotaDetail.setUniqueID(zkbTrainCourseQuotaImportVO.getUniqueID());
+                zkbTrainCourseQuotaDetail.setQuotaId(quota.getId());
+                zkbTrainCourseQuotaDetail.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
+                zkbTrainCourseQuotaDetail.setQuota(zkbTrainCourseQuotaImportVO.getQuota());
+
+                zkbTrainCourseQuotaDetailRepository.save(zkbTrainCourseQuotaDetail);
+
+                quota.setTotalQuota(quota.getTotalQuota() + zkbTrainCourseQuotaDetail.getTotalQuota());
+                quota.setQuota(quota.getQuota() + zkbTrainCourseQuotaDetail.getQuota());
+            }
             zkbTrainCourseQuotaRepository.save(quota);
         }
     }
@@ -184,15 +221,15 @@ public class ZkbTrainCourseQuotaService {
                 vo.setTenantUid(tenantInfo.getUid());
             }
         }
-        if(StrUtil.isEmpty(vo.getCourseName())){
+        if(StrUtil.isEmpty(vo.getCatNo())){
             item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
-            ZkbContractRow.addErrMessage(item, "课程不能为空！");
+            ZkbContractRow.addErrMessage(item, "CatNO不能为空！");
             isValidateData = false;
         }else{
-            List<ZkbTrainCourse> courseList = zkbTrainCourseRepository.findByName(vo.getCourseName());
+            List<ZkbTrainCourse> courseList = zkbTrainCourseRepository.findByCatNo(vo.getCatNo());
             if(courseList == null || courseList.size() == 0){
                 item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
-                ZkbContractRow.addErrMessage(item, "课程不存在！");
+                ZkbContractRow.addErrMessage(item, "CatNO不存在！");
                 isValidateData = false;
             }else if(courseList.size() > 1) {
                 item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
@@ -201,6 +238,11 @@ public class ZkbTrainCourseQuotaService {
             }else{
                 vo.setCourseId(courseList.get(0).getId());
             }
+        }
+        if(StrUtil.isEmpty(vo.getModality())){
+            item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item, "Modality不能为空！");
+            isValidateData = false;
         }
 
 
