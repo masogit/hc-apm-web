@@ -120,6 +120,9 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
     public void saveData(){
         zkbTrainCourseQuotaService.saveData(selected, selectedCourse, currentUser, zkbTrainCourseQuotaDetails);
         WebUtil.addSuccessMessage("保存成功！");
+        selected = null;
+        selectedCourse = null;
+        zkbTrainCourseQuotaDetails = new ArrayList<>();
     }
 
     public void uploadDataFile(FileUploadEvent event) {
@@ -154,6 +157,10 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
         }
     }
 
+    public void delete(){
+        zkbTrainCourseQuotaService.delete(selected);
+        WebUtil.addSuccessMessage("删除成功！");
+    }
 
     public void impQuotaOp(ExcelDocument doc){
         try {

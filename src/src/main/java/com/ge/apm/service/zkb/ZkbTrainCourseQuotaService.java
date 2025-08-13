@@ -39,6 +39,15 @@ public class ZkbTrainCourseQuotaService {
         return tenantInfoDao.findByuid(tenantUID);
     }
 
+    public void delete(ZkbTrainCourseQuota zkbTrainCourseQuota){
+        //先删掉detail表
+        List<ZkbTrainCourseQuotaDetail> details = zkbTrainCourseQuotaDetailRepository.findByQuotaId(zkbTrainCourseQuota.getId());
+        if(CollectionUtils.isNotEmpty(details)){
+            zkbTrainCourseQuotaDetailRepository.delete(details);
+        }
+        zkbTrainCourseQuotaRepository.delete(zkbTrainCourseQuota);
+    }
+
     public List<TenantInfo> getSourceTenantInfoList(){
 
         List<SearchFilter> searchFilters = new ArrayList<>();

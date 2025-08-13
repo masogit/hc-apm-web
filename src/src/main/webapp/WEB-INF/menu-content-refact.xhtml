@@ -285,7 +285,7 @@
                    </c:when>
                    <!-- 效期管理 -->
                    <c:when test="#{item eq 'VALIDITY_MANAGE'}">
-                       <p:submenu id="validityManage" label="效期管理" icon="fa fa-square-o fa-fw" rendered="#{userContextService.canRender('ASSET_DEVICE_OVERDUE') and (userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') or userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW'))}">
+                       <p:submenu id="validityManage" label="效期管理" icon="fa fa-square-o fa-fw" rendered="#{userContextService.canRender('VALIDITY_MANAGE') and (userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') or userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW'))}">
                            <p:menuitem id="um100" value="#{msg.deviceExpiryManagement}" outcome="/portal/asset/info/EquipmentExpiryManagement.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') }"/>
                            <p:menuitem id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
                        </p:submenu>

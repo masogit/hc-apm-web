@@ -36,10 +36,18 @@
                     <p:inputText  value="#{zkbTrainCourseQuotaController.selected.modality}"  required="true" requiredMessage="Modality 不能为空！" />
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">课程*</label>
+                    <label class="label">课程CatNo*</label>
                     <p:autoComplete dropdown="true" value="#{zkbTrainCourseQuotaController.selectedCourse}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="课程 #{msg.ValidationRequire}"
                                     completeMethod="#{zkbTrainCourseQuotaController.autoCompleteCourse}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbTrainCourseConverter">
                     </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程名称*</label>
+                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.zkbTrainCourse.name}" disabled="true"  />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程类型*</label>
+                    <p:inputText  value="#{fieldMsg.fieldValue('ZkbTrainCourseType',zkbTrainCourseQuotaController.selected.zkbTrainCourse.courseType)}" disabled="true"  />
                 </h:panelGroup>
                 <h:panelGroup >
                     <label class="label">总额*</label>

@@ -191,6 +191,13 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         List<String> featureList = JSONArray.parseArray(features).toJavaList(String.class);
         tenantFeatureMap = Arrays.asList(ApmFeature.values()).stream()
                 .collect(Collectors.toMap(ApmFeature::name, i-> featureList.contains(i.name())));
+        if(!tenantFeatureMap.get("ADVERSE_MANAGE")){
+            if(tenantFeatureMap.get("ASSET_ADVERSE_EVENT") || tenantFeatureMap.get("REPAIR_ADVERSE")){
+                tenantFeatureMap.put("ADVERSE_MANAGE", true);
+            }else{
+                tenantFeatureMap.put("ADVERSE_MANAGE", false);
+            }
+        }
         if (StringUtils.hasText(selectedFeature) && !selectedFeature.equals("ALL")) {
             changeActiveListener();
         }
@@ -244,6 +251,14 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             case "PARTS_APPLY":
                 if (tenantFeatureMap.get("PARTS_APPLY")) {
                     tenantFeatureMap.put("PARTS", false);
+                }
+                break;
+            case "ASSET_ADVERSE_EVENT":
+            case "REPAIR_ADVERSE":
+                if(tenantFeatureMap.get("ASSET_ADVERSE_EVENT") || tenantFeatureMap.get("REPAIR_ADVERSE")){
+                    tenantFeatureMap.put("ADVERSE_MANAGE", true);
+                }else{
+                    tenantFeatureMap.put("ADVERSE_MANAGE", false);
                 }
                 break;
         }
