@@ -218,7 +218,7 @@
                     <p:inputNumber id="lifecycle" value="#{equipmentExpiryManagementController.lifecycle}" decimalPlaces="0" emptyValue="0" minValue="0" maxValue="100" style="width: 500px" />#{msg.usageYear}
                     &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
                     <h:panelGroup rendered="#{!empty equipmentExpiryManagementController.selected}">
-                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}"
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat8()}"
                                     id="manufactureDate"  value="#{equipmentExpiryManagementController.selected.manufactDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" title="#{msg.ManufactureDate}"/> <span style="margin-left: -33px">#{msg.manufactureDateInput}</span>
                     </h:panelGroup>
 
