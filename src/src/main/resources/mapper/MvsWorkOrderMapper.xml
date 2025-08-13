@@ -106,7 +106,7 @@
         vs.customer_tel as sr_customer_tel,
         vs.customer_position as sr_customer_position,
         vs.status as sr_status,
-        vs.sr_repair_source as srRepairSource,
+        vs.sr_repair_source as sr_repair_source,
         a.uid AS asset_uid
         FROM v2_work_order t
         left join v2_service_request vs on t.sr_id = VS.ID
