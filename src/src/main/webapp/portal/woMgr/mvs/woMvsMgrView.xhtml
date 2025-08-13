@@ -40,7 +40,8 @@
                                     <label class="label">#{msg.srNum}</label>
                                     <p:outputLabel value="#{workOrderMgrMvsController.selected.serviceRequest.srNum}" />
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{workOrderMgrMvsController.selected.serviceRequest.srRepairSource != null}">
+                                <h:panelGroup>
+<!--                                <h:panelGroup rendered="#{workOrderMgrMvsController.selected.serviceRequest.srRepairSource != null}">-->
                                     <label class="label">#{msg.repairSource}</label>
                                     <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',workOrderMgrMvsController.selected.serviceRequest.srRepairSource)}"   />
                                 </h:panelGroup>
