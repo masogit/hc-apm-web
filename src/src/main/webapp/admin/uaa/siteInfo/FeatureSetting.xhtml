@@ -632,12 +632,12 @@
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                                 <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_DEVICE_OVERDUE']}"
-                                        itemLabel="设备超期">
+                                        value="#{featureSettingController.tenantFeatureMap['VALIDITY_MANAGE']}"
+                                        itemLabel="效期管理">
                                     <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_DEVICE_OVERDUE')}"/>
+                                            listener="#{featureSettingController.featureChange('VALIDITY_MANAGE')}"/>
                                 </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备超期菜单</p:outputLabel>
+                                <p:outputLabel>效期管理菜单</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
