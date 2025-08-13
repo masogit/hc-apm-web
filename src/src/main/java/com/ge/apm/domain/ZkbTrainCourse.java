@@ -25,6 +25,9 @@ public class ZkbTrainCourse {
     @Column(name = "cat_no")
     private String catNo;
 
+    @Column(name = "modality")
+    private String modality;
+
     @Column(name = "name")
     private String name;
 

@@ -11,11 +11,15 @@
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainCourseController.selected != null}">
                 <h:panelGroup>
                     <label class="label">CatNo*</label>
-                    <p:inputText value="#{zkbTrainCourseController.selected.catNo}" required="true" requiredMessage="#{'CatNo'} #{msg.ValidationRequire}"  disabled="#{not empty zkbTrainCourseController.selected.name}"/>
+                    <p:inputText value="#{zkbTrainCourseController.selected.catNo}" required="true" requiredMessage="#{'CatNo'} #{msg.ValidationRequire}"  disabled="#{not empty zkbTrainCourseController.selected.catNo}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程名称*</label>
                     <p:inputText value="#{zkbTrainCourseController.selected.name}" required="true" requiredMessage="#{'课程名称'} #{msg.ValidationRequire}"  disabled="#{not empty zkbTrainCourseController.selected.name}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">Modality*</label>
+                    <p:inputText value="#{zkbTrainCourseController.selected.modality}" required="true" requiredMessage="#{'Modality'} #{msg.ValidationRequire}"  />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程简称</label>

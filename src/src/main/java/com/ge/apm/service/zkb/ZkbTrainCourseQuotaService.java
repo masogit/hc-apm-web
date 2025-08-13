@@ -1,11 +1,13 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.ZkbTrainCourseQuotaDetailRepository;
 import com.ge.apm.dao.ZkbTrainCourseQuotaRepository;
 import com.ge.apm.dao.ZkbTrainCourseRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,10 @@ public class ZkbTrainCourseQuotaService {
     @Autowired
     private ZkbTrainCourseRepository zkbTrainCourseRepository;
 
+    @Autowired
+    private ZkbTrainCourseQuotaDetailRepository zkbTrainCourseQuotaDetailRepository;
+
+
     public static final String SHEET_NAME = "名额";
 
     public TenantInfo getTenantInfo(String tenantUID){
@@ -44,13 +50,13 @@ public class ZkbTrainCourseQuotaService {
         return zkbTrainCourseRepository.find();
     }
 
-    public void saveData(ZkbTrainCourseQuota zkbTrainCourseQuota, ZkbTrainCourse zkbTrainCourse, UserAccount userAccount){
+    public void saveData(ZkbTrainCourseQuota zkbTrainCourseQuota, ZkbTrainCourse zkbTrainCourse, UserAccount userAccount, List<ZkbTrainCourseQuotaDetail> zkbTrainCourseQuotaDetails){
         if(StrUtil.isEmpty(zkbTrainCourseQuota.getId())){
             zkbTrainCourseQuota.setCreatedBy(userAccount.getUid());
             zkbTrainCourseQuota.setCreatedDate(new Date());
             zkbTrainCourseQuota.setCourseId(zkbTrainCourse.getId());
             zkbTrainCourseQuota.setZkbTrainCourse(zkbTrainCourse);
-            zkbTrainCourseQuotaRepository.save(zkbTrainCourseQuota);
+            zkbTrainCourseQuota = zkbTrainCourseQuotaRepository.save(zkbTrainCourseQuota);
         }else{
             zkbTrainCourseQuota.setLastModifiedBy(userAccount.getUid());
             zkbTrainCourseQuota.setLastModifiedDate(new Date());
@@ -59,6 +65,15 @@ public class ZkbTrainCourseQuotaService {
                 zkbTrainCourseQuota.setZkbTrainCourse(zkbTrainCourse);
             }
             zkbTrainCourseQuotaRepository.save(zkbTrainCourseQuota);
+        }
+
+        if(CollectionUtils.isNotEmpty(zkbTrainCourseQuotaDetails)){
+            for(ZkbTrainCourseQuotaDetail detail : zkbTrainCourseQuotaDetails){
+                if(StrUtil.isEmpty(detail.getQuotaId())){
+                    detail.setQuotaId(zkbTrainCourseQuota.getId());
+                }
+            }
+            zkbTrainCourseQuotaDetailRepository.save(zkbTrainCourseQuotaDetails);
         }
     }
 
@@ -238,7 +253,9 @@ public class ZkbTrainCourseQuotaService {
         return hasFailData;
     }
 
-
+    public List<ZkbTrainCourseQuotaDetail> queryDetailByQuota(String id){
+        return zkbTrainCourseQuotaDetailRepository.findByQuotaId(id);
+    }
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }

@@ -19,6 +19,9 @@ public class ZkbTrainCourseQuota {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    @Column(name = "modality")
+    private String modality;
+
     @Column(name = "tenant_uid")
     private String tenantUid;
 
@@ -36,7 +39,6 @@ public class ZkbTrainCourseQuota {
 
     @Column(name = "quota")
     private Integer quota = 0;
-
 
     @Column(name = "total_quota")
     private Integer totalQuota = 0;

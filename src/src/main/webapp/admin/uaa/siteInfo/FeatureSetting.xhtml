@@ -114,15 +114,7 @@
                                 <p:outputLabel>盘点工单菜单</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_PERFORMANCE']}"
-                                        itemLabel="设备绩效记录">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_PERFORMANCE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备绩效记录菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
+
                                 <p:selectBooleanCheckbox
                                         value="#{featureSettingController.tenantFeatureMap['ASSET_CONTRACT']}"
                                         itemLabel="合同管理">
@@ -150,15 +142,7 @@
                                 <p:outputLabel>供应商管理</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_KEYASSETDATAINPUT']}"
-                                        itemLabel="重点医疗设备报表">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_KEYASSETDATAINPUT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>重点医疗设备报表菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
+
                                 <p:selectBooleanCheckbox
                                         value="#{featureSettingController.tenantFeatureMap['ASSET_MVS_DATA']}"
                                         itemLabel="MVS设备信息导入">
@@ -278,6 +262,15 @@
                                             listener="#{featureSettingController.featureChange('REPAIR')}"/>
                                 </p:selectBooleanCheckbox>
                                 <p:outputLabel>维修工作台菜单</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['REPAIR_NO_ASSET']}"
+                                        itemLabel="无台账维修">
+                                    <p:ajax update="repair"
+                                            listener="#{featureSettingController.featureChange('REPAIR_NO_ASSET')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>无台账维修</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:selectBooleanCheckbox
@@ -501,6 +494,26 @@
                                 <p:outputLabel>绩效配置</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['ASSET_PERFORMANCE']}"
+                                        itemLabel="设备绩效记录">
+                                    <p:ajax update="assetGroup"
+                                            listener="#{featureSettingController.featureChange('ASSET_PERFORMANCE')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>设备绩效记录菜单</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['ASSET_KEYASSETDATAINPUT']}"
+                                        itemLabel="重点医疗设备报表">
+                                    <p:ajax update="assetGroup"
+                                            listener="#{featureSettingController.featureChange('ASSET_KEYASSETDATAINPUT')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>重点医疗设备报表菜单</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
                         </p:fieldset>
 
@@ -654,25 +667,35 @@
                             </p:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset id="qualityDataView" legend="质控数据概览">
+                        <p:fieldset id="qualityDataView" legend="质控管理">
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"
-                                        itemLabel="质控日历">
-                                    <p:ajax update="qualityDataView"
-                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>质控日历</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
+<!--                                <p:selectBooleanCheckbox-->
+<!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"-->
+<!--                                        itemLabel="质控日历">-->
+<!--                                    <p:ajax update="qualityDataView"-->
+<!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>-->
+<!--                                </p:selectBooleanCheckbox>-->
+<!--                                <p:outputLabel>质控日历</p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
+
+<!--                                <p:selectBooleanCheckbox-->
+<!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_RAD_BOARD']}"-->
+<!--                                        itemLabel="放射科质控大屏">-->
+<!--                                    <p:ajax update="qualityDataView"-->
+<!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_RAD_BOARD')}"/>-->
+<!--                                </p:selectBooleanCheckbox>-->
+<!--                                <p:outputLabel>放射科质控大屏</p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
+<!--                                <p:outputLabel></p:outputLabel>-->
 
                                 <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_RAD_BOARD']}"
-                                        itemLabel="质控大屏">
+                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_MANAGE']}"
+                                        itemLabel="质控管理">
                                     <p:ajax update="qualityDataView"
-                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_RAD_BOARD')}"/>
+                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_MANAGE')}"/>
                                 </p:selectBooleanCheckbox>
-                                <p:outputLabel>质控大屏</p:outputLabel>
+                                <p:outputLabel>质控管理</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
