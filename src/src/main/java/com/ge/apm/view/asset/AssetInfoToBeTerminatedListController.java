@@ -6,6 +6,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -139,6 +140,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private AssetInfoMapper assetInfoMapper;
 
     private FileDownloadService fileDownloadService;
+
+    private SystemTemplateService systemTemplateService;
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -147,6 +150,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     @Override
     protected void init() {
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
 
         user = UserContextService.getCurrentUserAccount();
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
@@ -304,21 +308,20 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
         return sql;
     }
-    public void exportToBeTerminatedAppraisalFile() {
+    public void exportToBeTerminatedAppraisalFile(boolean singleFileImport) {
         try {
             toBeTerminatedAppraisalFile = null;
             List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
-            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),"ToBeTerminated");
-            AssetTerminationReportTemplate assetTerminationReportTemplate = exportToBeTerminatedAppraisalService.getAssetTerminationReportTemplate(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),"ToBeTerminated");
-            boolean singleFileImport = (assetTerminationReportTemplate != null && assetTerminationReportTemplate.getSingleFileImport()) || assetTerminationReportTemplate == null;
+//            byte[] activeTemplateBytes = exportToBeTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(),"ToBeTerminated");
+            SystemTemplateEnum systemTemplateEnum=singleFileImport?SystemTemplateEnum.ASSET_TOBE_TERMINATED_SINGLE:SystemTemplateEnum.ASSET_TOBE_TERMINATED_MULTI;
+            byte[] activeTemplateBytes = systemTemplateService.getTemplateFileByte(systemTemplateEnum, user);
+
             if(singleFileImport){
                 toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
             }else{
                 toBeTerminatedAppraisalFile = exportToBeTerminatedAppraisalService.exportZip(selectedIds, activeTemplateBytes);
 
             }
-
-
         } catch (IllegalStateException e) {
             WebUtil.addErrorMessage(e.getMessage());
         } catch (IOException e) {
