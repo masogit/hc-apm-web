@@ -2,6 +2,8 @@ package com.ge.apm.service.asset;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
+import com.deepoove.poi.data.PictureRenderData;
+import com.deepoove.poi.data.PictureType;
 import com.deepoove.poi.policy.RenderPolicy;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetScrapRepository;
@@ -54,7 +56,7 @@ public class ExportToBeTerminatedAppraisalService {
         financing_num, asset_name, function_type, install_date, manufacture, vendor,
         maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date,
         asset_dept_name,asset_dept_owner_name,salvage_value,termination_cause,comments,num,accumulated_depreciation,
-        application_date,clinical_dept_name,site,unit_price,qr_code
+        application_date,clinical_dept_name,site,unit_price,qr_code,apply_audit_signature
     }
 
     @Autowired
@@ -74,6 +76,9 @@ public class ExportToBeTerminatedAppraisalService {
 
     @Autowired
     private AssetScrapRepository assetScrapRepository;
+
+    @Autowired
+    private BlobFileService blobFileService;
 
     public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid, Set<String> siteIds) throws Exception {
         ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
@@ -256,6 +261,8 @@ public class ExportToBeTerminatedAppraisalService {
                 AssetScrap assetScrap = assetScrapRepository.findById(assetInfo.getAssetScrapId());
                 map.put(termination_cause, assetScrap.getApplyReason());   //报废原因
                 map.put(comments, assetScrap.getApprovalReason());   //维修部门意见
+                byte[] applySignatureBytes = getSignatureBytes(assetScrap.getApplyAuditSignature());
+                map.put(apply_audit_signature, new PictureRenderData(100, 70, PictureType.PNG, applySignatureBytes));
             }
             map.put(num, 1);   //数量
             String assetUsedLifecycle = assetInfo.getAssetUsedLifecycle();
@@ -360,19 +367,18 @@ public class ExportToBeTerminatedAppraisalService {
                 templateBytes=null;
             }
         }
-
-        if (templateBytes == null) {
-            Map<String, String> templateMapping = new HashMap<>();
-            templateMapping.put("ToBeTerminated", "tobeterminated_template");
-            templateMapping.put("Terminated", "terminated_template");
-            templateMapping.put("zh", "_zh.docx");
-            templateMapping.put("en", "_en.docx");
-             String localeSuffix = LocaleHolder.getLocale().toString().substring(0, 2).toLowerCase();
-             String fileNameBase = templateMapping.get(templateType);
-             String fileExtension = templateMapping.get(localeSuffix);
-             String fileName = fileNameBase + fileExtension;
-             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/"+fileName));
-        }
+//        if (templateBytes == null) {
+//            Map<String, String> templateMapping = new HashMap<>();
+//            templateMapping.put("ToBeTerminated", "tobeterminated_template");
+//            templateMapping.put("Terminated", "terminated_template");
+//            templateMapping.put("zh", "_zh.docx");
+//            templateMapping.put("en", "_en.docx");
+//             String localeSuffix = LocaleHolder.getLocale().toString().substring(0, 2).toLowerCase();
+//             String fileNameBase = templateMapping.get(templateType);
+//             String fileExtension = templateMapping.get(localeSuffix);
+//             String fileName = fileNameBase + fileExtension;
+//             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/"+fileName));
+//        }
 
 
         return templateBytes;
@@ -416,5 +422,15 @@ public class ExportToBeTerminatedAppraisalService {
     public List<AssetTerminationReportTemplate> siteTemplate(String siteUid) {
        return  templateRepository.findBySiteUID(siteUid);
     }
+    public byte[] getSignatureBytes(String storageId) {
+        byte[] signatureBytes = null;
 
+        try {
+            signatureBytes = IOUtils.toByteArray(blobFileService.getBlobObjectByStorageId(storageId).getStream());
+        } catch (IOException e) {
+            logger.info("Error happens while get signature bytes", e);
+        }
+
+        return signatureBytes;
+    }
 }
