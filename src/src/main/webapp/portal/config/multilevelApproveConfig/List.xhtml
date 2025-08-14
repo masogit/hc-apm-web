@@ -27,7 +27,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton updatePersonnelButton"/>
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton updatePersonnelButton copyButton"/>
                         <p:ajax event="filter" listener="#{multiLevelApprovalConfigController.onFilter}"
                                 update="createButton"/>
 
@@ -86,6 +86,12 @@
                                              update="ApproveForm"
                                              actionListener="#{multiLevelApprovalConfigController.preEdit}"
                                              oncomplete="PF('ApproveDialog').show()"/>
+                            <p:commandButton id="copyButton" icon="ui-icon-content-copy" class="btn btn-sm btn-gray"
+                                             title="复制模板" update="datalist, :growl"
+                                             disabled="#{empty multiLevelApprovalConfigController.selected or multiLevelApprovalConfigController.selected.enable}"
+                                             actionListener="#{multiLevelApprovalConfigController.copyTemplate}">
+                            <p:confirm header="复制配置" message="是否确认复制?" icon="ui-icon-warning"/>
+                            </p:commandButton>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
                                              title="#{msg.Delete}" update="datalist, :growl"
                                              disabled="#{empty multiLevelApprovalConfigController.selected}"
