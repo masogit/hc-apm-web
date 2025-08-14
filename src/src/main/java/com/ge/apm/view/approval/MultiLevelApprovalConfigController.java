@@ -8,7 +8,6 @@ import com.ge.apm.dao.mapper.UserOrgInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetTypeGroupDto;
 import com.ge.apm.domain.dto.SelectItemDto;
-import com.ge.apm.domain.dto.UserOrgInfoDto;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -19,7 +18,6 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
-import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,6 +27,7 @@ import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -38,6 +37,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -843,6 +843,26 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
        super.delete();
     }
 
+    public void copyTemplate(){
+        boolean enable = selected.getEnable();
+        if(enable){
+            WebUtil.addWarnMessage("当前配置已启用，不允许复制！");
+            return;
+        }
+        String approvalName = selected.getApprovalName();
+        MultiLevelApprovalConfig repeatConfig = new MultiLevelApprovalConfig();
+        BeanUtils.copyProperties(selected,repeatConfig,"id");
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateStr = format.format(now);
+        approvalName = approvalName.replaceAll("_副本\\d+","");
+        approvalName += "_副本"+dateStr;
+        repeatConfig.setApprovalName(approvalName);
+        repeatConfig.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+        repeatConfig.setCreatedDate(now);
+        configDao.save(repeatConfig);
+        WebUtil.addSuccessMessage("复制配置成功："+ approvalName);
+    }
 
     public boolean checkExistMultiLevelApproval(){
         int count= multiLevelApprovalRepository.getIncompleteApprovalConfig(selected.getId());
