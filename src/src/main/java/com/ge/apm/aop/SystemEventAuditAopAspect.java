@@ -73,6 +73,15 @@ public class SystemEventAuditAopAspect {
         return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.SUPPLIER_CONTACT_PERSON.getBoType());
     }
 
+    @Around("execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.delete(..)) || execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.save(..))")
+    public Object nurseSiteMaintainConfigSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG.getBoType());
+    }
+
+    @Around("execution(* com.ge.apm.dao.NurseSiteMaintainConfigItemRepository.delete*(..)) || execution(* com.ge.apm.dao.NurseSiteMaintainConfigItemRepository.save(..))")
+    public Object nurseSiteMaintainConfigItemSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType());
+    }
 
 //    @Around("execution(* com.ge.apm.dao.SharedAssetRequestRepository.save(..))")
     public Object sharedAssetRequestSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {

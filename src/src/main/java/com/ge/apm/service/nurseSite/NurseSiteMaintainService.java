@@ -19,6 +19,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.mapper.NurseSiteMaintainItemMapper;
 import com.ge.apm.dao.mapper.NurseSiteMaintainMapper;
 import com.ge.apm.domain.*;
@@ -28,6 +29,8 @@ import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExportUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -133,6 +136,8 @@ public class NurseSiteMaintainService {
 	BlobObjectRepository blobObjectRepository;
 	@Autowired
 	private MicroServiceUtil microServiceUtil;
+	@Autowired
+	private SystemEventAuditAopAspect systemEventAuditUtil;
 	private static final String STR_ASSET_NAME = "设备名";
 	private static final String CLINICAL_DEPT_NAME = "所属科室";
 	private static final String STR_ASSET_DEPTNUM = "设备编号";
@@ -607,13 +612,25 @@ public class NurseSiteMaintainService {
 
 	public void deleteAssetUid(String assetUid){
 		if(StringUtils.isNotEmpty(assetUid)){
-			Boolean result=nurseSiteMaintainConfigItemRepository.findExistsAssetUid(assetUid);
-			if(result!=null && result){
-				addBatchJob("deleteAssetInfo", null, null, null, null,assetUid);
+			List<NurseSiteMaintainConfigItem> result=nurseSiteMaintainConfigItemRepository.findExistsAssetUid(assetUid);
+			if(CollectionUtils.isNotEmpty(result)){
+				addBatchJob("deleteAssetInfo", null, null, null, UserContextService.getCurrentUserAccount().getUid(),assetUid);
+				operationRecord(result);
 			}
 		}
 	}
-
+	private void operationRecord(List<NurseSiteMaintainConfigItem> result) {
+		NurseSiteMaintainConfigItem nurseSiteMaintainConfigItem = result.get(0);
+		UserAccount userAccount = new UserAccount();
+		userAccount.setTenantUID(nurseSiteMaintainConfigItem.getTenantUID());
+		userAccount.setInstitutionUID(nurseSiteMaintainConfigItem.getInstitutionUID());
+		userAccount.setHospitalUID(nurseSiteMaintainConfigItem.getHospitalUID());
+		userAccount.setSiteUID(nurseSiteMaintainConfigItem.getSiteUID());
+		for (NurseSiteMaintainConfigItem item : result) {
+			SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(userAccount, SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, item.getId(), true, null, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(item));
+			systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
+		}
+	}
 	public boolean addBatchJob(String action,NurseSiteMaintainConfig config, Date startDate, Date endDate, String userUid,String other) {
 		StringBuilder sb = new StringBuilder();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
