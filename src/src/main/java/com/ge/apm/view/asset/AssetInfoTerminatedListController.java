@@ -6,11 +6,13 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -125,7 +127,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
     private ExportTerminatedAppraisalService exportTerminatedAppraisalService;
     private StreamedContent terminatedAppraisalFile;
-
+    private SystemTemplateService systemTemplateService;
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -147,6 +149,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportTerminatedAppraisalService = WebUtil.getBean(ExportTerminatedAppraisalService.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -840,7 +843,8 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         try {
             terminatedAppraisalFile = null;
             List<String> selectedIds = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
-            byte[] activeTemplateBytes = exportTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
+//            byte[] activeTemplateBytes = exportTerminatedAppraisalService.getActiveTemplateBytes(isInsulate, user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
+            byte[] activeTemplateBytes = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.ASSET_TERMINATED_MULTI, user);
             terminatedAppraisalFile = exportTerminatedAppraisalService.export(selectedIds, activeTemplateBytes);
         } catch (IllegalStateException e) {
             WebUtil.addErrorMessage(e.getMessage());

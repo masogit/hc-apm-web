@@ -73,6 +73,28 @@ public interface AuditHandler {
                     systemEventAuditEnum = SystemEventAuditEnum.TENANT_ACTIVE;
                 }
                 break;
+            case "nurse_site_maintain_config":
+                if (operation.contains("delete")) {
+                    systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_DELETE;
+                } else {
+                    if (uid != null) {
+                        systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_UPDATE;
+                    } else {
+                        systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_CREATE;
+                    }
+                }
+                break;
+            case "nurse_site_maintain_config_item":
+                if (operation.contains("delete")) {
+                    systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE;
+                } else {
+                    if (uid != null) {
+                        systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_UPDATE;
+                    } else {
+                        systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_CREATE;
+                    }
+                }
+                break;
             case "shared_asset_request":
                 SharedAssetRequest sharedAssetRequest = (SharedAssetRequest) args[0];
                 switch (sharedAssetRequest.getState()){
