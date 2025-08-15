@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
 
 import java.util.*;
 
@@ -37,45 +38,54 @@ public class SystemEventAuditAopAspect {
 
     @Around("execution(* com.ge.apm.dao.ContractInfoRepository.save(..))   || execution(* com.ge.apm.dao.ContractInfoRepository.delete(..))")
     public Object contractInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"contract_info");
+        return repositorySystemEventAopPointcutAround(pjp,AuditBoTypeEnum.CONTRACT_INFO.getBoType());
     }
 
 
 
     @Around("execution(* com.ge.apm.dao.BlobObjectRepository.delete(..)) || execution(* com.ge.apm.dao.BlobObjectRepository.save(..))")
     public Object blobObjectSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"v2_blob_object");
+        return repositorySystemEventAopPointcutAround(pjp,AuditBoTypeEnum.V2_BLOB_OBJECT.getBoType());
     }
 
     @Around("execution(* com.ge.apm.dao.SupplierRepository.delete(..)) || execution(* com.ge.apm.dao.SupplierRepository.save(..))")
     public Object supplierSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"supplier");
+        return repositorySystemEventAopPointcutAround(pjp,AuditBoTypeEnum.SUPPLIER.getBoType());
     }
 
     @Around("execution(* com.ge.apm.dao.TenantInfoRepository.save(..))   || execution(* com.ge.apm.dao.TenantInfoRepository.delete(..))")
     public Object tenantInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp  ) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp,"tenant_info");
+        return repositorySystemEventAopPointcutAround(pjp,AuditBoTypeEnum.TENANT_INFO.getBoType());
     }
 
     @Around("execution(* com.ge.apm.dao.AdminFeatureActiveRepository.save(..))")
     public Object orgInfoSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp, "admin_feature_active");
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.ADMIN_FEATURE_ACTIVE.getBoType());
     }
 
     @Around("execution(* com.ge.apm.dao.OrgInfoRepository.delete(..)) || execution(* com.ge.apm.dao.OrgInfoRepository.save(..))")
     public Object adminFeatureActiveSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp, "org_info");
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.ORG_INFO.getBoType());
     }
 
     @Around("execution(* com.ge.apm.dao.SupplierContactPersonRepository.delete(..)) || execution(* com.ge.apm.dao.SupplierContactPersonRepository.save(..))")
     public Object supplierContactPersonSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp, "supplier_contact_person");
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.SUPPLIER_CONTACT_PERSON.getBoType());
     }
 
+    @Around("execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.delete(..)) || execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.save(..))")
+    public Object nurseSiteMaintainConfigSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG.getBoType());
+    }
+
+    @Around("execution(* com.ge.apm.dao.NurseSiteMaintainConfigItemRepository.delete*(..)) || execution(* com.ge.apm.dao.NurseSiteMaintainConfigItemRepository.save(..))")
+    public Object nurseSiteMaintainConfigItemSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType());
+    }
 
 //    @Around("execution(* com.ge.apm.dao.SharedAssetRequestRepository.save(..))")
     public Object sharedAssetRequestSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
-        return repositorySystemEventAopPointcutAround(pjp, "shared_asset_request");
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.SHARED_ASSET_REQUEST.getBoType());
     }
 
 

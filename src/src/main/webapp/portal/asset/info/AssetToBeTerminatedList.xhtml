@@ -594,7 +594,16 @@
                                      oncomplete="PF('TerminationCauseEditDlg').show()"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}"/>
                     <p:commandButton id="toBeTerminatedAppraisalButton" icon="ui-icon-arrow-1-s"
-                                     actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile}"
+                                     actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile(true)}"
+                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
+                                     onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
+                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"
+                                     rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}">
+                        <p:fileDownload value="#{assetInfoToBeTerminatedListController.toBeTerminatedAppraisalFile}"/>
+                    </p:commandButton>
+
+                    <p:commandButton id="toBeTerminatedAppraisalButton1" icon="ui-icon-arrow-1-s"
+                                     actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile(false)}"
                                      class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
                                      onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"

@@ -50,7 +50,7 @@ public class ExportTerminatedAppraisalService {
     protected enum ASSET_DETAIL {
         site_name, asset_name, depart_num, financing_num, maker_short_name, function_type, serial_num, location_name,
         install_date, salvage_value, lifecycle,used_lifecycle, purchase_price, clinical_dept_name, apply_name, apply_date, applyResone,
-        approvalResone, approvaAauditSignature, approvaAauditSignature1, approvaAauditSignature2, approvaAauditSignature3
+        approvalResone,applyAuditSignature, approvaAauditSignature, approvaAauditSignature1, approvaAauditSignature2, approvaAauditSignature3
     }
 
     @Autowired
@@ -220,6 +220,7 @@ public class ExportTerminatedAppraisalService {
         byte[] defaultSignatureBytes = getDefaultSignatureBytes();
         String signature="signature.png";
         map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, PictureType.PNG, defaultSignatureBytes));
+        map.put(applyAuditSignature.name(), new PictureRenderData(100, 70, PictureType.PNG, defaultSignatureBytes));
 //        map.put(approvaAauditSignature1.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
 //        map.put(approvaAauditSignature2.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
 //        map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
@@ -231,7 +232,9 @@ public class ExportTerminatedAppraisalService {
             map.put(approvalResone.name(), assetScrap.getApprovalReason());
             if(StringUtils.isNotBlank(assetScrap.getApprovalAuditSignature())){
                 byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
+                byte[] applySignatureBytes = getSignatureBytes(assetScrap.getApplyAuditSignature());
                 map.put(approvaAauditSignature.name(), new PictureRenderData(100, 70, PictureType.PNG, signatureBytes));
+                map.put(applyAuditSignature.name(), new PictureRenderData(100, 70, PictureType.PNG, applySignatureBytes));
             }
 //            List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
 
