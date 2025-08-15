@@ -18,6 +18,7 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.web.cboard.CBoardController;
 import com.ge.healthcare.cn.common.cons.*;
+import com.ge.healthcare.cn.common.utils.menu.MenuAnalysis;
 import com.google.common.base.Strings;
 import javaslang.control.Option;
 import org.apache.commons.collections.CollectionUtils;
@@ -271,12 +272,18 @@ public class UserContextService implements Serializable {
     public List<String> menuOrder() {
         List<String> defaultMenuOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(ApmFeatureDefaultOrder::name).collect(Collectors.toList());
         if (getTenantInfo().getEnablesMenuOrder()) {
-            defaultMenuOrder = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class)
+            //
+            List<String> featureList = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class);
+            /*defaultMenuOrder = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class)
                     .stream().filter(defaultMenuOrder::contains)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList());*/
+            HashMap<String, String> defaultOrderMap = MenuAnalysis.defaultOrderToMap();
+            defaultMenuOrder = featureList.stream().filter(t -> defaultOrderMap.containsKey(t)).map(t -> defaultOrderMap.get(t)).distinct().collect(Collectors.toList());
         }
         return defaultMenuOrder;
     }
+
+
 
     public boolean accessContainsFunctionMenu(String functionName) {
         Set<String> functions = getFunctionListByFeatureAndRoles();

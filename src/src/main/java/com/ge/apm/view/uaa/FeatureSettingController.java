@@ -15,6 +15,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.*;
+import com.ge.healthcare.cn.common.utils.menu.MenuAnalysis;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -144,17 +145,24 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
 
     public void changeTab(TabChangeEvent event) {
         if (tabIndex == 2) {
-            List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+            List<String> featureList = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class);
+            List<ApmFeatureDefaultOrder> apmFeatureDefaultOrderList =  Arrays.stream(ApmFeatureDefaultOrder.values()).collect(Collectors.toList());
             List<String> defaultOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(Enum::name).collect(Collectors.toList());
             if (tenantInfo.getEnablesMenuOrder()) {
-                orderedItems = featureList.stream()
+                HashMap<String, String> defaultOrderMap = MenuAnalysis.defaultOrderToMap();
+                orderedItems = featureList.stream().filter(t -> defaultOrderMap.containsKey(t)).map(t -> defaultOrderMap.get(t)).distinct().collect(Collectors.toList());
+                /*orderedItems = featureList.stream()
                         .filter(defaultOrder::contains)  // 移除不在 defaultOrder 中的字符串
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toList());*/
+
             } else {
-                orderedItems = featureList.stream()
+                /*orderedItems = featureList.stream()
                         .sorted(Comparator.comparingInt(defaultOrder::indexOf))  // 根据 defaultOrder 的顺序排序
                         .filter(defaultOrder::contains)  // 移除不在 defaultOrder 中的字符串
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toList());*/
+                orderedItems =  apmFeatureDefaultOrderList.stream()
+                        .filter(t -> MenuAnalysis.existOrderByFeature(t, featureList))
+                        .map(ApmFeatureDefaultOrder::name).collect(Collectors.toList());
             }
         } else {
             orderedItems = new ArrayList<>();
@@ -191,13 +199,6 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         List<String> featureList = JSONArray.parseArray(features).toJavaList(String.class);
         tenantFeatureMap = Arrays.asList(ApmFeature.values()).stream()
                 .collect(Collectors.toMap(ApmFeature::name, i-> featureList.contains(i.name())));
-        if(!tenantFeatureMap.get("ADVERSE_MANAGE")){
-            if(tenantFeatureMap.get("ASSET_ADVERSE_EVENT") || tenantFeatureMap.get("REPAIR_ADVERSE")){
-                tenantFeatureMap.put("ADVERSE_MANAGE", true);
-            }else{
-                tenantFeatureMap.put("ADVERSE_MANAGE", false);
-            }
-        }
         if (StringUtils.hasText(selectedFeature) && !selectedFeature.equals("ALL")) {
             changeActiveListener();
         }
@@ -251,14 +252,6 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             case "PARTS_APPLY":
                 if (tenantFeatureMap.get("PARTS_APPLY")) {
                     tenantFeatureMap.put("PARTS", false);
-                }
-                break;
-            case "ASSET_ADVERSE_EVENT":
-            case "REPAIR_ADVERSE":
-                if(tenantFeatureMap.get("ASSET_ADVERSE_EVENT") || tenantFeatureMap.get("REPAIR_ADVERSE")){
-                    tenantFeatureMap.put("ADVERSE_MANAGE", true);
-                }else{
-                    tenantFeatureMap.put("ADVERSE_MANAGE", false);
                 }
                 break;
         }
