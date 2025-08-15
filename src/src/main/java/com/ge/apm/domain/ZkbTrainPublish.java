@@ -17,12 +17,23 @@ public class ZkbTrainPublish {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    @Column(name = "course_id")
     private String courseId;
 
+    @Column(name = "train_date")
     private Date trainDate;
 
+    //培训地点
+    @Column(name = "location")
     private String location;
 
+    //培训方式
+    @Column(name = "train_mode")
+    private String trainMode;
+
+    //报名截止日期
+    @Column(name = "sign_deadline")
+    private Date signDeadline;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -36,6 +47,9 @@ public class ZkbTrainPublish {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable=false, updatable=false, name = "course_id", referencedColumnName = "id")
+    private ZkbTrainCourse zkbTrainCourse;
 
     @Override
     public int hashCode() {
