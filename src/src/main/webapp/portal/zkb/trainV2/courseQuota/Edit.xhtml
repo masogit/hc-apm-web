@@ -39,15 +39,16 @@
                     <label class="label">课程CatNo*</label>
                     <p:autoComplete dropdown="true" value="#{zkbTrainCourseQuotaController.selectedCourse}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="课程 #{msg.ValidationRequire}"
                                     completeMethod="#{zkbTrainCourseQuotaController.autoCompleteCourse}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbTrainCourseConverter">
+                        <p:ajax event="itemSelect" update="name courseType" listener="#{zkbTrainCourseQuotaController.courseSelect}" />
                     </p:autoComplete>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程名称*</label>
-                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.zkbTrainCourse.name}" disabled="true"  />
+                    <p:inputText  id="name" value="#{zkbTrainCourseQuotaController.selected.zkbTrainCourse.name}" disabled="true"  />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程类型*</label>
-                    <p:inputText  value="#{fieldMsg.fieldValue('ZkbTrainCourseType',zkbTrainCourseQuotaController.selected.zkbTrainCourse.courseType)}" disabled="true"  />
+                    <p:inputText  id="courseType" value="#{fieldMsg.fieldValue('ZkbTrainCourseType',zkbTrainCourseQuotaController.selected.zkbTrainCourse.courseType)}" disabled="true"  />
                 </h:panelGroup>
                 <h:panelGroup >
                     <label class="label">总额*</label>
