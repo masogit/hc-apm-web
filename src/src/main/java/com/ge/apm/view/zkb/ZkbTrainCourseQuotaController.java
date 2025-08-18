@@ -93,6 +93,10 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
         return zkbTrainCourseQuotaService.getSourceTenantInfoList();
     }
 
+    public void courseSelect(){
+        selected.setZkbTrainCourse(selectedCourse);
+    }
+
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
