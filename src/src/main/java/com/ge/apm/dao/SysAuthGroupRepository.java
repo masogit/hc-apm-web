@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface SysAuthGroupRepository extends GenericRepository<SysAuthGroup> {
 
-    @Query(value="select uid,classification_code,encoded,split_part(encoded, '-', length(replace(encoded, '-', '//')) - length(encoded) +1) || name as name,parent_uid from sys_auth_group where parent_uid is not null",nativeQuery=true)
+    @Query(value="select uid,classification_code,encoded,name,parent_uid from sys_auth_group where parent_uid is not null",nativeQuery=true)
     List<SysAuthGroup> listSysAuthGroup();
 
 //    SysAuthGroup findByEncoded(String encoded);
