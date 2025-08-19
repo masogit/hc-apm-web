@@ -447,7 +447,7 @@ public class AssetInfoDetailController {
         if (null == selectedAuthGroup) {
             return null;
         } else {
-            return selectedAuthGroup.getDisplayName();
+            return selectedAuthGroup.getName();
         }
     }
     public String getSelectedAssetTypeGroupName() {
