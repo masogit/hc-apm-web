@@ -12,8 +12,10 @@ import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +75,7 @@ public class SystemEventAuditAopAspect {
         return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.SUPPLIER_CONTACT_PERSON.getBoType());
     }
 
-    @Around("execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.delete(..)) || execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.save(..))")
+    @Around("execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.delete*(..)) || execution(* com.ge.apm.dao.NurseSiteMaintainConfigRepository.save(..))")
     public Object nurseSiteMaintainConfigSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
         return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG.getBoType());
     }
@@ -166,7 +168,8 @@ public class SystemEventAuditAopAspect {
     }
 
     public Object repositorySystemEventAopPointcutAround(ProceedingJoinPoint pjp,String boType  ) throws Throwable {
-        String operation = pjp.getSignature().getName();
+        MethodSignature signature = (MethodSignature)pjp.getSignature();
+        String operation = signature.getName();
         boolean isSuccess = true;
         String exceptionMessage = null;
         Object result ;
@@ -193,7 +196,7 @@ public class SystemEventAuditAopAspect {
             throw e;
         } finally {
             try {
-                boUid = auditHandler.extractBoUid(args );
+                boUid = auditHandler.extractBoUid(signature,args );
                 isSaveAudit = auditHandler.isSave(args, boType, operation);
                  if(isSaveAudit && systemEventAuditEnum!=null){
                     UserAccount userAccount = getUserAccount();

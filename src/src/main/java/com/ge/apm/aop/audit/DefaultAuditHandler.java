@@ -1,6 +1,7 @@
 package com.ge.apm.aop.audit;
 
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Service;
 
 @Service("defaultAuditHandler")
@@ -21,8 +22,8 @@ public class DefaultAuditHandler implements AuditHandler{
     }
 
     @Override
-    public String extractBoUid(Object[] args) {
-        return AuditHandler.super.extractBoUid(args);
+    public String extractBoUid(MethodSignature signature,Object[] args) {
+        return AuditHandler.super.extractBoUid(signature,args);
     }
 
     @Override
