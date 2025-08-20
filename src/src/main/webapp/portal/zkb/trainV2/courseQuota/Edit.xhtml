@@ -38,7 +38,7 @@
                 <h:panelGroup>
                     <label class="label">课程CatNo*</label>
                     <p:autoComplete dropdown="true" value="#{zkbTrainCourseQuotaController.selectedCourse}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="课程 #{msg.ValidationRequire}"
-                                    completeMethod="#{zkbTrainCourseQuotaController.autoCompleteCourse}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbTrainCourseConverter">
+                                    completeMethod="#{zkbTrainCourseQuotaController.autoCompleteCourse}" var="t" itemLabel="#{t.catNo}" itemValue="#{t}" converter="zkbTrainCourseConverter">
                         <p:ajax event="itemSelect" update="name courseType" listener="#{zkbTrainCourseQuotaController.courseSelect}" />
                     </p:autoComplete>
                 </h:panelGroup>
