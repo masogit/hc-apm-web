@@ -1,14 +1,11 @@
 package com.ge.apm.service.train;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.OrgDto;
 import com.ge.apm.domain.dto.TrainRoleDto;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -20,20 +17,10 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.xpath.operations.Bool;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.ultima.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
@@ -42,12 +29,12 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.ge.apm.domain.V2_BlobObject.BO_TYPE_TRAIN_DETAIL;
+import static com.ge.apm.domain.V2_BlobObject.BO_TYPE_TRAIN_RESULT;
 
 @Service
 public class TrainManageService extends MicroServiceInvoker {
@@ -231,7 +218,7 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     @Transactional
-    public List<TrainDetail> saveDetail(TrainDetail trainDetail,String detailActionName, List<V2_BlobObject> blobObjects, TrainInfo trainInfo){
+    public List<TrainDetail> saveDetail(TrainDetail trainDetail,String detailActionName, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, List<V2_BlobObject> resultBlobObjectList){
         if("Create".equals(detailActionName)){
             trainDetail.setCreatedDate(new Date());
         }else{
@@ -242,7 +229,13 @@ public class TrainManageService extends MicroServiceInvoker {
         for(V2_BlobObject blobObject : blobObjects){
             if(StrUtil.isEmpty(blobObject.getBoUuid())){
                 blobObject.setBoUuid(trainDetail.getId());
-                blobObjectRepository.save(blobObjects);
+                blobObjectRepository.save(blobObject);
+            }
+        }
+        for(V2_BlobObject blobObject : resultBlobObjectList){
+            if(StrUtil.isEmpty(blobObject.getBoUuid())){
+                blobObject.setBoUuid(trainDetail.getId());
+                blobObjectRepository.save(blobObject);
             }
         }
 
@@ -255,11 +248,17 @@ public class TrainManageService extends MicroServiceInvoker {
         return trainDetailList;
     }
 
-    public void completeDetail(TrainDetail trainDetail, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, UserAccount userAccount){
+    public void completeDetail(TrainDetail trainDetail, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, UserAccount userAccount, List<V2_BlobObject> resultBlobObjectList){
         trainDetail.setStatus(TrainDetail.Status.Completed.name());
         trainDetail.setLastModifiedDate(new Date());
         trainDetailRepository.save(trainDetail);
         for(V2_BlobObject blobObject : blobObjects){
+            if(StrUtil.isEmpty(blobObject.getBoUuid())){
+                blobObject.setBoUuid(trainDetail.getId());
+                blobObjectRepository.save(blobObjects);
+            }
+        }
+        for(V2_BlobObject blobObject : resultBlobObjectList){
             if(StrUtil.isEmpty(blobObject.getBoUuid())){
                 blobObject.setBoUuid(trainDetail.getId());
                 blobObjectRepository.save(blobObjects);
@@ -330,18 +329,23 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     public List<V2_BlobObject> queryBlobByDetailId(String detailId){
-        return blobObjectRepository.findByBoUuid(detailId);
+        return blobObjectRepository.fetchBlobObjectByUuidAndType(detailId, BO_TYPE_TRAIN_DETAIL);
+    }
+
+    public List<V2_BlobObject> queryResultBlobByDetailId(String detailId){
+        return blobObjectRepository.fetchBlobObjectByUuidAndType(detailId, BO_TYPE_TRAIN_RESULT);
     }
 
     public void removeBlob(V2_BlobObject v2BlobObject){
         blobFileService.deleteBlobFile(v2BlobObject);
     }
 
-    public V2_BlobObject handleFileUpload(FileUploadEvent event){
+    public V2_BlobObject handleFileUpload(FileUploadEvent event, String boType){
         V2_BlobObject v2_blobObject = blobFileService.uploadFile(event);
         if (null != v2_blobObject) {
-            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_TRAIN_DETAIL);
-            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_TRAIN_DETAIL);
+            v2_blobObject.setBoType(boType);
+            //v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_TRAIN_DETAIL);
+            v2_blobObject.setBoSubType(boType);
             v2_blobObject.setBoUuid(null);
             WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
