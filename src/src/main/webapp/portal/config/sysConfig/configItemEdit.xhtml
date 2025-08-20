@@ -76,7 +76,7 @@
                             <f:selectItems value="#{systemConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"  itemDisabled="#{item.get('value') eq 'MaintenanceFee'}"/>
                         </p:selectManyMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 9}">
+                    <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 9 and systemConfigItemController.selected.key ne 'pmEntryTypeSet' }">
                         <label class="label">#{msg.ConfigItemValue}</label>
                         <p:fieldset>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -110,6 +110,26 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 9 and systemConfigItemController.selected.key eq 'pmEntryTypeSet' }">
+                        <h:panelGroup>
+                            <label class="label">保养工时设置</label>
+                            <p:selectOneRadio value="#{systemConfigItemController.selected.fieldColumnDto.entryType}" style="width: 30%;">
+                                <p:ajax update="manHoursGroup"/>
+                                <f:selectItem itemLabel="工时段" itemValue="1"/>
+                                <f:selectItem itemLabel="总工时" itemValue="0"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="manHoursGroup" >
+                            <h:panelGroup rendered="#{systemConfigItemController.selected.fieldColumnDto.entryType == 0}">
+                                <label class="label">默认工时(小时)</label>
+                                <p:inputNumber id="manHours_input" maxValue="999" value="#{systemConfigItemController.selected.fieldColumnDto.hours}"  >
+                                    <p:ajax />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                        </h:panelGroup>
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{systemConfigItemController.selected.key eq 'assetScrap' or systemConfigItemController.selected.key eq 'showAssetScrapNo'}">

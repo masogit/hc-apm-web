@@ -114,6 +114,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Column(name = "total_price")
     private Double totalPrice;
 
+    /**
+     * 填写工时选择方式 0 输入填写 , 1 多个工时段填写
+     */
+    @Column(name="entry_type")
+    private Integer entryType;
+
     @Column(name = "man_hours")
     private Double manHours;
 
@@ -284,6 +290,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     private String parentWoId;
     @Column(name="main_sub")
     private String mainSub;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails;
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
@@ -847,5 +859,19 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
         this.originalPmNum = originalPmNum;
     }
 
+    public Integer getEntryType() {
+        return entryType;
+    }
 
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
+    }
+
+    public List<V2_PmOrderManHoursDetail> getPmOrderManHoursDetails() {
+        return pmOrderManHoursDetails;
+    }
+
+    public void setPmOrderManHoursDetails(List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails) {
+        this.pmOrderManHoursDetails = pmOrderManHoursDetails;
+    }
 }

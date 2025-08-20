@@ -1,10 +1,12 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
@@ -40,6 +42,8 @@ import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateField;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
@@ -69,6 +73,7 @@ import org.springframework.util.ObjectUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -83,6 +88,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -305,6 +311,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private ConfigCacheService configCacheService;
 
     private FileDownloadService fileDownloadService;
+
+    @Getter@Setter
+    private V2_PmOrderManHoursDetail selectedPmOrderManHoursDetail;
+
+
 
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
@@ -2490,6 +2501,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         accessoryList = getWorkOrderDetail(woid);
         coWorkerList = getWorkOrderCoworker(woid);
         loadHmCheck(selectedPmOrder);
+        if(selectedPmOrder.getEntryType() == null){
+            String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectedPmOrder.getSiteUID(), selectedPmOrder.getHospitalUID(), selectedPmOrder.getInstitutionUID(), selectedPmOrder.getTenantUID(), "pmEntryTypeSet");
+            if(StrUtil.isNotEmpty(value)){
+                FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
+                if(fieldColumnDto.getEntryType() != null){
+                    selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
+                    if(fieldColumnDto.getEntryType() == 0){
+                        selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                    }
+                }
+            }
+            if(selectedPmOrder.getEntryType() == null){
+                selectedPmOrder.setEntryType(0);
+                selectedPmOrder.setManHours(Double.parseDouble("1"));
+            }
+        }
+
 //        if (pmCheckItemList != null){
 //        pmCheckItemList.stream().filter(item-> !hmCheck.containsKey(item.getUid()))
 //                .forEach(item -> {
@@ -2671,7 +2699,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList,picBeforeList,picAfterList);
+        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList,picBeforeList,picAfterList, pmHoursList);
         //保存检查项
         saveCheckItemData();
         cancel();
@@ -3091,6 +3119,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void cancelWorkdetail() {
         itemDetail = null;
         coWorkerDetail = null;
+        selectedPmOrderManHoursDetail = null;
     }
 
     public boolean accessoryListEmpty() {
@@ -3847,6 +3876,135 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private List<V2_PmOrderManHoursDetail> pmHoursList;
+    public List<V2_PmOrderManHoursDetail> getPmHoursList() {
+        if (pmHoursList == null) {
+            pmHoursList = new ArrayList<>();
+        }
+        V2_PmOrderManHoursDetail newDetail = new V2_PmOrderManHoursDetail();
+        newDetail.setId("000");
+        boolean flag = false;
+        for (V2_PmOrderManHoursDetail info : pmHoursList) {
+            String id = info.getId();
+            if ("000".equals(id)) {
+                flag = true;
+                break;
+            }
+        }
+        if (flag) {
+            pmHoursList = pmHoursList.stream()
+                    .filter(item -> !"000".equals(item.getId()))
+                    .collect(Collectors.toList());
+            pmHoursList.add(newDetail);
+        } else {
+            pmHoursList.add(newDetail);
+        }
+        return pmHoursList;
+    }
+
+    public void updateEntryType(Integer entryType) {
+        if (selectedPmOrder == null) {
+            selectedPmOrder = new V2_PmOrder();
+        }
+        selectedPmOrder.setEntryType(entryType);
+        if (entryType == 1) {
+            selectedPmOrder.setManHours(null);
+            pmHoursList = null;
+        }
+    }
+
+    public void prepareEditPmOrderManHoursDetail(String itemId) {
+        if ("new".equals(itemId)) {
+            selectedPmOrderManHoursDetail = new V2_PmOrderManHoursDetail();
+            selectedPmOrderManHoursDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+        } else {
+            selectedPmOrderManHoursDetail = pmHoursList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+        }
+    }
+
+    public void deletePmOrderManHoursDetail(String itemId) {
+        pmHoursList.removeAll(pmHoursList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
+        Double hours = 0d;
+        for (V2_PmOrderManHoursDetail info : pmHoursList) {
+            if (info != null && info.getHours() != null) {
+                hours = hours + info.getHours();
+            }
+        }
+        selectedPmOrder.setManHours(hours);
+    }
+
+    public void addManHoursDetail(Date firstDate, Date secondDate) {
+        String strHours = "0";
+        long milliSeconds = secondDate.getTime() - firstDate.getTime();
+        if (milliSeconds > 0) {
+            DecimalFormat df = new DecimalFormat("0.0");
+            strHours = df.format((float) milliSeconds / (1000 * 60 * 60));
+            BigDecimal b = new BigDecimal(strHours);
+            float f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+            f1 = Float.parseFloat(df.format(f1));
+            strHours = df.format(f1);
+        } else {
+            WebUtil.addErrorMessage("结束时间不能小于开始时间");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        selectedPmOrderManHoursDetail.setHours(Double.valueOf(strHours));
+        selectedPmOrderManHoursDetail.setStartTime(firstDate);
+        selectedPmOrderManHoursDetail.setEndTime(secondDate);
+        if (pmHoursList.contains(selectedPmOrderManHoursDetail)) {
+            pmHoursList.remove(selectedPmOrderManHoursDetail);
+        }
+
+        // 重复性校验
+        boolean check = false;
+        for (V2_PmOrderManHoursDetail detail : pmHoursList) {
+            if("000".equals(detail.getId())){
+                continue;
+            }
+            // 开始时间结束时间不能相等
+            if(firstDate.getTime() == detail.getStartTime().getTime()
+                    || secondDate.getTime() == detail.getEndTime().getTime()){
+                check = true;
+                break;
+            }
+            // 当前开始时间小于结束时间 && 大于开始时间
+            if(firstDate.getTime() < detail.getEndTime().getTime()
+                    && firstDate.getTime() > detail.getStartTime().getTime()){
+                check = true;
+                break;
+            }
+            // 当前结束时间大于开始时间 && 小于结束时间
+            if(secondDate.getTime() > detail.getStartTime().getTime()
+                    && firstDate.getTime() < detail.getEndTime().getTime()){
+                check = true;
+                break;
+            }
+        }
+        if(check){
+            WebUtil.addErrorMessage("工时段重复，请重新填写");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        pmHoursList.add(selectedPmOrderManHoursDetail);
+        Double hours = 0d;
+        for (V2_PmOrderManHoursDetail info : pmHoursList) {
+            if (info != null && info.getHours() != null) {
+                hours = hours + info.getHours();
+            }
+        }
+        selectedPmOrder.setManHours(hours);
+        cancelWorkdetail();
+    }
+
+    public Date getMaxDate(){
+        if(selectedPmOrderManHoursDetail.getStartTime() != null){
+            Date date = DateUtil.offset(selectedPmOrderManHoursDetail.getStartTime(), DateField.HOUR, 24);
+            return date;
+        }
+        return TimeUtil.now();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.ge.apm.web;
 
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.V2_PmOrderManHoursDetail;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,10 +36,14 @@ public class PmOrderActionForm {
     @Getter@Setter
     String remarks;
 
+    Integer entryType;
+
     //附件
     private List<V2_BlobObject> attachmentsTwo = new ArrayList<>();
     //保养前照片
     private List<V2_BlobObject> prePmAttachments = new ArrayList<>();
+
+    private List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails;
 
     /**
      * 创建方式 1:医院创建  2:供应商创建
@@ -55,8 +60,15 @@ public class PmOrderActionForm {
 
     private String signature;
 
+    public List<V2_PmOrderManHoursDetail> getPmOrderManHoursDetails() {
+        return pmOrderManHoursDetails;
+    }
 
-//V2_WorkOrder_Coworker[] coworkes //optional
+    public void setPmOrderManHoursDetails(List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails) {
+        this.pmOrderManHoursDetails = pmOrderManHoursDetails;
+    }
+
+    //V2_WorkOrder_Coworker[] coworkes //optional
     public String getPmOrderId() {
         return pmOrderId;
     }
@@ -271,5 +283,13 @@ public class PmOrderActionForm {
 
     public void setPrePmAttachments(List<V2_BlobObject> prePmAttachments) {
         this.prePmAttachments = prePmAttachments;
+    }
+
+    public Integer getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
     }
 }

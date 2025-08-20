@@ -7,7 +7,7 @@
     <ui:define name="content">
     <div class="ui-g">
         <div class="ui-g-12 card cardTitle">
-            <p:outputLabel class="pageTitle" value="培训报名"/>
+            <p:outputLabel class="pageTitle" value="培训发布"/>
         </div>
         <div class="ui-g-12 card">
             <h:form id="listForm">
@@ -31,11 +31,11 @@
                     <p:column headerText="课程名称" filterBy="#{item.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.zkbTrainCourse.name}"/>
                     </p:column>
-                    <p:column headerText="培训时间" filterBy="#{item.trainDate}" sortBy="#{item.trainDate}" filterMatchMode="GTE">
+                    <p:column headerText="培训开始时间" filterBy="#{item.trainDate}" sortBy="#{item.trainStartDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterTrainDate" widgetVar="varFilterTrainDate" />
                         </f:facet>
-                        <h:outputText value="#{item.trainDate}">
+                        <h:outputText value="#{item.trainStartDate}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
