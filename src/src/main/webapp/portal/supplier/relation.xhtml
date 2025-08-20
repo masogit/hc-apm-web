@@ -20,7 +20,7 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-                <p:ajax event="rowSelect" update="supplierTab:VenderCompanyDetailForm"/>
+                <p:ajax event="rowSelect" update="supplierTab:VenderCompanyDetailForm" listener="#{venderCompanyController.onRowSelect}"/>
                 <p:ajax event="filter" listener="#{venderCompanyController.onFilter}" oncomplete="rc();"/>
                 <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.name}"/>

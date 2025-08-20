@@ -41,7 +41,7 @@
                 and source.device_dept_code like concat('%',#{deviceDeptCode},'%')
             </if>
             <if test="execDeptCode!=null">
-                and  source.exec_dept_code like concat('%',#{deviceDeptCode},'%')
+                and  source.exec_dept_code like concat('%',#{execDeptCode},'%')
             </if>
 
             <if test="sfxmName!=null">

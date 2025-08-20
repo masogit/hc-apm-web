@@ -452,12 +452,12 @@ public class UserContextService implements Serializable {
     public void setAssetTypeGroup() {
         if (apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
             userAccount.setEnableAssetTypeGroup(true);
-            AssetTypeGroupRepository assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
-            List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(userAccount.getUid());
-            Map<String, AssetTypeGroup> assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
-            userAccount.setAssetTypeGroupList(assetTypeGroupList);
-            userAccount.setAssetTypeGroupMap(assetTypeGroupMap);
         }
+        AssetTypeGroupRepository assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(userAccount.getUid());
+        Map<String, AssetTypeGroup> assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
+        userAccount.setAssetTypeGroupList(assetTypeGroupList);
+        userAccount.setAssetTypeGroupMap(assetTypeGroupMap);
     }
 
     public boolean isIBTenant() {

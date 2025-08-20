@@ -122,13 +122,14 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
             this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
-            this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
-            this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
+            this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
             this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
-//            this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
+            this.updateSearchFilter(new SearchFilter("registrationNo", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
+            this.updateSearchFilter(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, oneSearchStr, "1*8+"));
+
         }
         if (user.isEnableAssetTypeGroup()) {
             if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
@@ -160,13 +161,13 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         if (StringUtils.isEmpty(oneSearchStr)) {
             this.removeFilterOnField("name");
             this.removeFilterOnField("namePyCode");
-            this.removeFilterOnField("departNum");
-            this.removeFilterOnField("financingNum");
+            this.removeFilterOnField("functionType");
+            this.removeFilterOnField("registrationNo");
+            this.removeFilterOnField("makerShortName");
             this.removeFilterOnField("qrCode");
             this.removeFilterOnField("serialNum");
             this.removeFilterOnField("manufacture");
             this.removeFilterOnField("clinicalDeptName");
-            this.removeFilterOnField("assetTags.tag");
         }
     }
 

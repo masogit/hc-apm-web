@@ -55,8 +55,7 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <p:inputText id="searchText" value="#{equipmentExpiryManagementController.oneSearchStr}"
-                                     placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}"
-                                     maxlength="100" style="width: 500px">
+                                     placeholder = "#{msg.name}/#{msg.clinicalDeptName}/#{msg.manufacture}/#{msg.makerShortName}/#{msg.functionType}/#{msg.registrationNo}/#{msg.serialNum}/#{msg.qrCode}" maxlength="100" style="width: 520px">
                             <p:ajax event="keyup"
                                     update=":equipmentExpiryManagementForm searchButtons"/>
                         </p:inputText>
@@ -214,6 +213,22 @@
         </p:dialog>
         <p:dialog id="editUsageDateDlg" widgetVar="editUsageDateDialog" width="1000" height="500" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.editUsageYear}" closable="true">
             <h:form id="editUsageDateForm">
+                <p:fieldset legend="#{msg.AssetArrivalListAssetInfo}" rendered="#{!empty equipmentExpiryManagementController.selected}">
+                    <p:panelGrid id ="selectedInfo" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.registrationNo}</label>
+                            <p:inputText id="registrationNo" value="#{equipmentExpiryManagementController.selected.registrationNo}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.functionType}</label>
+                            <p:inputText id="functionType" value="#{equipmentExpiryManagementController.selected.functionType}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.makerShortName}</label>
+                            <p:inputText id="makerShortName" value="#{equipmentExpiryManagementController.selected.makerShortName}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
                 <p:fieldset legend="#{msg.usageYearDate}">
                     <p:inputNumber id="lifecycle" value="#{equipmentExpiryManagementController.lifecycle}" decimalPlaces="0" emptyValue="0" minValue="0" maxValue="100" style="width: 500px" />#{msg.usageYear}
                     &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
@@ -236,7 +251,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="5" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="5">
-                        <p:column headerText="#{msg.RegistrationNumber}">
+                        <p:column headerText="#{msg.medicalDeviceRegistrationCertificate}">
                             <h:outputText value="#{item.registerNo}"/>
                         </p:column>
                         <p:column headerText="#{msg.functionType}">

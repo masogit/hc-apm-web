@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.ge.apm.service.asset.ExportTerminatedAppraisalService.ASSET_DETAIL.approvaAauditSignature;
 import static com.ge.apm.service.asset.ExportTerminatedAppraisalService.ASSET_DETAIL.lifecycle;
 import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSET_DETAIL.*;
 
@@ -56,7 +57,7 @@ public class ExportToBeTerminatedAppraisalService {
         financing_num, asset_name, function_type, install_date, manufacture, vendor,
         maintenance, national_standard_code, serial_num, depart_num, system_id, purchase_price, purchase_date,
         asset_dept_name,asset_dept_owner_name,salvage_value,termination_cause,comments,num,accumulated_depreciation,
-        application_date,clinical_dept_name,site,unit_price,qr_code,apply_audit_signature
+        application_date,clinical_dept_name,site,unit_price,qr_code,apply_audit_signature,approval_audit_signature
     }
 
     @Autowired
@@ -263,6 +264,9 @@ public class ExportToBeTerminatedAppraisalService {
                 map.put(comments, assetScrap.getApprovalReason());   //维修部门意见
                 byte[] applySignatureBytes = getSignatureBytes(assetScrap.getApplyAuditSignature());
                 map.put(apply_audit_signature, new PictureRenderData(100, 70, PictureType.PNG, applySignatureBytes));
+
+                byte[] signatureBytes = getSignatureBytes(assetScrap.getApprovalAuditSignature());
+                map.put(approval_audit_signature, new PictureRenderData(100, 70, PictureType.PNG, signatureBytes));
             }
             map.put(num, 1);   //数量
             String assetUsedLifecycle = assetInfo.getAssetUsedLifecycle();

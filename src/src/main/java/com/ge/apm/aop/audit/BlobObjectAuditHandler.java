@@ -5,6 +5,7 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import org.apache.commons.collections.CollectionUtils;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -115,7 +116,7 @@ public class BlobObjectAuditHandler implements AuditHandler {
     }
 
     @Override
-    public String extractBoUid(Object[] args) {
+    public String extractBoUid(MethodSignature signature,Object[] args) {
 
         List<V2_BlobObject> blobList = new ArrayList<>();
         if (args.length > 0 && args[0] instanceof Iterable) {
