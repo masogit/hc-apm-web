@@ -103,6 +103,8 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
         this.actionName = "Create";
         selected = new ZkbTrainCourseQuota();
         zkbTrainCourseList = zkbTrainCourseQuotaService.queryTrainCourse();
+        selectedCourse = null;
+        zkbTrainCourseQuotaDetails = new ArrayList<>();
     }
 
     @Override
@@ -127,6 +129,7 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
         selected = null;
         selectedCourse = null;
         zkbTrainCourseQuotaDetails = new ArrayList<>();
+
     }
 
     public void uploadDataFile(FileUploadEvent event) {
