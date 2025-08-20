@@ -122,6 +122,7 @@ public class TrainInfo implements Serializable {
     @Column(name = "comment")
     private String comment;
 
+
     @Override
     public int hashCode() {
         int hash = 0;

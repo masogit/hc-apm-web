@@ -80,6 +80,9 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     @Getter@Setter
     List<V2_BlobObject> blobObjectList = new ArrayList<>();
 
+    @Getter@Setter
+    List<V2_BlobObject> resultBlobObjectList = new ArrayList<>();
+
     @Getter @Setter
     private boolean canEdit = true;
     @Getter@Setter
@@ -191,6 +194,7 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         selectedTrainDetail.setStatus(TrainDetail.Status.Planned.name());
         //selectedTrainDetail.setDataStatus(TrainDetail.DataStatus.Create.name());
         blobObjectList = new ArrayList<>();
+        resultBlobObjectList = new ArrayList<>();
         //selectedTrainDetail.setCreatedDate(new Date());
     }
 
@@ -198,6 +202,12 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         detailActionName = "Edit";
         blobObjectList = trainManageService.queryBlobByDetailId(selectedTrainDetail.getId());
         trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetail.getId());
+        resultBlobObjectList = trainManageService.queryResultBlobByDetailId(selectedTrainDetail.getId());
+        if(CollectionUtils.isNotEmpty(trainDetailSignList)){
+            if(StrUtil.isEmpty(selectedTrainDetail.getCompleteRecorder())){
+                selectedTrainDetail.setCompleteRecorder(loginUser.getName());
+            }
+        }
     }
 
     public List<V2_BlobObject> queryFileByDetailId(String id ){
@@ -218,18 +228,30 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     }
 
     public void handleFileUpload(FileUploadEvent event){
-        V2_BlobObject v2BlobObject = trainManageService.handleFileUpload(event);
+        V2_BlobObject v2BlobObject = trainManageService.handleFileUpload(event, V2_BlobObject.BO_TYPE_TRAIN_DETAIL);
         if(v2BlobObject != null){
             blobObjectList.add(v2BlobObject);
         }
     }
+    public void handleResultFileUpload(FileUploadEvent event){
+        V2_BlobObject v2BlobObject = trainManageService.handleFileUpload(event, V2_BlobObject.BO_TYPE_TRAIN_RESULT);
+        if(v2BlobObject != null){
+            resultBlobObjectList.add(v2BlobObject);
+        }
+    }
+
     public void removeFile(V2_BlobObject v2BlobObject){
         trainManageService.removeBlob(v2BlobObject);
-        blobObjectList.remove(v2BlobObject);
+        resultBlobObjectList.remove(v2BlobObject);
+    }
+
+    public void removeResultFile(V2_BlobObject v2BlobObject){
+        trainManageService.removeBlob(v2BlobObject);
+        resultBlobObjectList.remove(v2BlobObject);
     }
 
     public void saveDetail(){
-        trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected);
+        trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, resultBlobObjectList);
 
        /* if("Create".equals(detailActionName)){
             selectedTrainDetail.setId(UUID.randomUUID().toString());//临时插入id,方便列表操作
@@ -251,7 +273,15 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
     }
 
     public void completeDetail(){
-        trainManageService.completeDetail(selectedTrainDetail, blobObjectList, selected,loginUser);
+        if(CollectionUtils.isEmpty(trainDetailSignList)){
+            WebUtil.addErrorMessage("签到信息不能为空！");
+            return;
+        }
+        if(selectedTrainDetail.getActualTrainDate() == null){
+            WebUtil.addErrorMessage("实际培训完成日期不能为空！");
+            return;
+        }
+        trainManageService.completeDetail(selectedTrainDetail, blobObjectList, selected,loginUser, resultBlobObjectList);
         selectedTrainDetail = null;
     }
 

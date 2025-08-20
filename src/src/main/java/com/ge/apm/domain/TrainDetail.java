@@ -92,6 +92,16 @@ public class TrainDetail implements Serializable {
     @Transient
     List<V2_BlobObject> blobObjectList = new ArrayList<>();
 
+    @Column(name = "actual_train_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date actualTrainDate;
+
+    @Column(name = "complete_recorder")
+    private String completeRecorder;
+
+
+
     @Override
     public int hashCode() {
         int hash = 0;
