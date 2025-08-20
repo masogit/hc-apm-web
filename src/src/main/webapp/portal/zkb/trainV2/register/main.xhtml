@@ -1,0 +1,27 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+    	<h:outputScript name="js/commonUtils.js"/>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.trainManage}"/>
+            </div>
+
+            <div class="ui-g-12 ">
+                <p:tabView class="ui-g-12" id="trainTab" dynamic="true" cache="false" activeIndex="0" >
+
+                    <p:tab class="ui-g-12" title="未报名" id="insite" >
+                        <ui:include src="trainList.xhtml"/>
+                    </p:tab>
+                    <p:tab class="ui-g-12" title="已报名" id="mvsWorkOrder" rendered="#{trainMainController.showMvs()}" >
+                        <ui:include src="mvs/mvsList.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
