@@ -1,7 +1,9 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
@@ -14,6 +16,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
@@ -36,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +78,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private SupplierController supplierController;
     private ArrivalListRepository arrivalListRepository;
     private ConfigItemValueRepository configItemValueRepository;
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
     private HttpServletRequest request;
 
     private List<V2_BlobObject> attachements;
@@ -143,6 +146,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         supplierController = WebUtil.getBean(SupplierController.class);
         arrivalListRepository = WebUtil.getBean(ArrivalListRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
@@ -439,6 +443,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                         newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
                         allItemList.add(newItem);
                         contractItemDao.save(newItem);
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("assetUid", newItem.getAssetUid());
+                        jsonObject.put("contractId", newItem.getContractId());
+                        jsonObject.put("ItemType", ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
+                        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.CONTRACT_ASSET_INFO_ADD, newItem.getId(), Boolean.TRUE, "","contract_info_item", JSONObject.toJSONString(jsonObject));
+                        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
                     }
                 }
             }
@@ -476,6 +486,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         // ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
         allItemList.remove(item);
         if (!Strings.isNullOrEmpty(item.getId())) {
+            if (ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("assetUid", item.getAssetUid());
+                jsonObject.put("contractId", item.getContractId());
+                jsonObject.put("ItemType", ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
+                SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.CONTRACT_ASSET_INFO_DELETE, item.getId(), Boolean.TRUE, "","contract_info_item", JSONObject.toJSONString(jsonObject));
+                systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+            }
             contractService.removeContractInfoItem(item);
             //contractItemDao.delete(item);
             //removedItemList.add(item);
