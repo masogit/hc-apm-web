@@ -261,11 +261,6 @@ public class SupplierController extends JpaCRUDController<Supplier> {
                     }
                 }
             }
-            for (SupplierContactPerson contactPerson : contactPersonList) {
-                contactPerson.setSupplierId(object.getId());
-                contactPerson.setSupplierUid(object.getUid());
-            }
-            supplierContactPersonRepository.save(contactPersonList);
         }
     }
 
