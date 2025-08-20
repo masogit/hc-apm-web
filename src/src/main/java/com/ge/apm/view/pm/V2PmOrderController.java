@@ -749,7 +749,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (type == 1) {
             cancelInt = "2";
         }
-        if (type == 2 || type ==3 ) {
+        if (type == 2 || type == 3 || selected.isFinished()) {
             cancelInt = "1";
         }
     }

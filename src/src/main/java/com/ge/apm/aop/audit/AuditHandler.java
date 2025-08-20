@@ -3,6 +3,12 @@ package com.ge.apm.aop.audit;
 
 import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import org.apache.ibatis.annotations.Param;
+import org.aspectj.lang.reflect.MethodSignature;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 public interface AuditHandler {
 
@@ -11,7 +17,7 @@ public interface AuditHandler {
     default SystemEventAuditEnum determineEventEnum(Object[] args, String boType, String operation) {
         SystemEventAuditEnum systemEventAuditEnum = null;
 
-        String uid = extractBoUid(args);
+        String uid = extractBoUid(null,args);
         switch (boType) {
             case "contract_info":
                 if ("delete".equals(operation)) {
@@ -157,7 +163,7 @@ public interface AuditHandler {
         return null;
     }
 
-    default String extractBoUid(Object[] args) {
+    default String extractBoUid(MethodSignature signature, Object[] args) {
         Object entity = args[0];
 
         try {
@@ -180,7 +186,22 @@ public interface AuditHandler {
         } catch (Exception e) {
 
         }
+        try{
+            Method method = signature.getMethod();
+            Parameter[] parameters = method.getParameters();
+            for (int i=0;i<parameters.length;i++) {
+                Parameter parameter = parameters[i];
+                if (parameter.isAnnotationPresent(Param.class)) {
+                    Param annotation = parameter.getAnnotation(Param.class);
+                    String value = annotation.value();
+                    if("uid".equals(value) || "id".equals(value)) {
+                        return  args[i].toString();
+                    }
+                }
+            }
+        }catch (Exception e){
 
+        }
         return null;
     }
 

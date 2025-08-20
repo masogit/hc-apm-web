@@ -595,7 +595,7 @@
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}"/>
                     <p:commandButton id="toBeTerminatedAppraisalButton" icon="ui-icon-arrow-1-s"
                                      actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile(true)}"
-                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
+                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}(单)"
                                      onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"
                                      rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}">
@@ -604,7 +604,7 @@
 
                     <p:commandButton id="toBeTerminatedAppraisalButton1" icon="ui-icon-arrow-1-s"
                                      actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile(false)}"
-                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
+                                     class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}(多)"
                                      onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"
                                      rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}">

@@ -64,7 +64,7 @@ public class MedicalInstrumentsClassificationCompCtrl implements ServerEventInte
         if (null == selectedSysAuthGroup) {
             return "";
         } else {
-            return selectedSysAuthGroup.getDisplayName();
+            return selectedSysAuthGroup.getName();
         }
     }
 

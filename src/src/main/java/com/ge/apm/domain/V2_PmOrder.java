@@ -235,6 +235,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Column(name = "cancel_reason")
     private String cancelReason;
 
+    @Column(name = "cancel_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date cancelTime;//取消时间
+
     @Column(name = "auto_ack_maintenance")
     private Boolean autoAckMaintenance;
 
@@ -785,6 +790,14 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public Date getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(Date cancelTime) {
+        this.cancelTime = cancelTime;
     }
 
     public Boolean getAutoAckMaintenance() {

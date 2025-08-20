@@ -1,8 +1,10 @@
 package com.ge.apm.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -36,4 +38,9 @@ public interface NurseSiteMaintainConfigRepository extends GenericRepositoryUUID
 
 	@Query(value="select o.* from nurse_site_maintain_config o where o.deleted = true and o.delete_result = false",nativeQuery=true)
 	public List<NurseSiteMaintainConfig> findByDeletedStatus();
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_config set deleted=?1,delete_result=?2,modify_by=?3,modify_date=?4 where id=?5 ", nativeQuery = true)
+	public void deleteToSoft(boolean deleted, boolean deleteResult, String modifyByUid, Date modifyDate,@Param("uid") String uid);
 }

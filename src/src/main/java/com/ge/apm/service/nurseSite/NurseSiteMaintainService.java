@@ -1663,7 +1663,7 @@ public class NurseSiteMaintainService {
 			tempConfig.setModifyByUid(currentUser.getUid());
 			tempConfig.setModifyBy(currentUser);
 			tempConfig.setModifyDate(new Date());
-			this.save(tempConfig);
+			nurseSiteMaintainConfigRepository.deleteToSoft(tempConfig.getDeleted(),tempConfig.getDeleteResult(),tempConfig.getModifyByUid(),tempConfig.getModifyDate(),tempConfig.getId());
 		}
 		addBatchJob("deleteCheckConfig", null, null, null, currentUser.getUid(),null);
 	}

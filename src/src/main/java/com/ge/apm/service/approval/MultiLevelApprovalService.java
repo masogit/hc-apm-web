@@ -416,6 +416,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         switch (approvableTarget.getBusinessType()){
             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetInfo approvalAssetInfo = approvableTarget.getApprovalAssetInfo();
                 org = configCacheService.findOrgByUid(approvalAssetInfo.getClinicalDeptUID());
                 break;

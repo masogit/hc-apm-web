@@ -213,7 +213,7 @@
                     <p:commandButton value="#{msg.Maintenance}" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.approvalStatus==5 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
                     <p:commandButton value="#{msg.Reassign}" class="transButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.approvalStatus==5 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
                     <p:commandButton  class="planedCompleteButton" value="#{msg.Complete}"  disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5' or v2PmOrderController.isChecked()}"  rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
-                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_CANCEL')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
+                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{!userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_CANCEL')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
                 </p:column>
 
                 <!--待审核 8-->
@@ -227,7 +227,12 @@
                 <!--待验收 11-->
                 <p:column headerText="#{msg.Operation}"  style="width: 100px" rendered="#{v2PmOrderController.queryIndex==11}" exportable="false">
                     <p:commandButton  class="planedCompleteButton" value="验收"  disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:ackDialogForm" oncomplete="PF('ackDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_ACCEPT')}"/>
-                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_CANCEL')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
+                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{!userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_CANCEL')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
+                </p:column>
+
+                <!--已关单 7-->
+                <p:column headerText="#{msg.Operation}"  style="width: 100px" rendered="#{v2PmOrderController.queryIndex==7}" exportable="false">
+                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{!userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_CANCEL')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
                 </p:column>
 
                 <f:facet name="{Toolbar}" >
@@ -282,7 +287,7 @@
                 <p:selectOneRadio id="cancelRadio" value="#{v2PmOrderController.cancelInt}">
                     <f:selectItem itemDisabled="false" itemLabel="#{msg.CancelCurrentWorkorder}" itemValue="1"/>
                     <!--批量类型是2 和3 的话非周期性-->
-                    <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
+                    <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3 or v2PmOrderController.selected.finished eq true}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
                 </p:selectOneRadio>
                 <h:panelGroup>
                     <label class="label">#{msg.CancellationReason}<span style="color:red">#{v2PmOrderController.selected.pmType eq 4 ? '*' : ''} </span></label>

@@ -1,8 +1,12 @@
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONArray;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ReceiveBorrowConstant;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -42,6 +46,8 @@ public class AssetInfoBulkEditCheckService {
     private WorkflowConfigRepository workflowConfigRepository;
     @Autowired
     private AssetInfoRepository assetInfoRepository;
+    @Autowired
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
@@ -228,7 +234,13 @@ public class AssetInfoBulkEditCheckService {
             if(CollectionUtils.isEmpty(idsByParentId)) nurseSiteMaintainItemRepository.deleteMaintainById(item.getParentId());
         }
         //删除检查项配置相关数据
-        nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
+        List<NurseSiteMaintainConfigItem> configItemList = nurseSiteMaintainConfigItemRepository.findByAssetUid(assetInfo.getUid());
+        if(!CollectionUtils.isEmpty(configItemList)){
+            nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(configItemList));
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }
+
         /*List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(assetInfo.getUid());
         for(String parentId : parentIds) {
             int configItemCountByParentId = nurseSiteMaintainItemRepository.findConfigItemCountByParentId(parentId);
