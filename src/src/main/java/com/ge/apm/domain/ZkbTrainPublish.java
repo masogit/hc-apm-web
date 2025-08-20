@@ -20,8 +20,11 @@ public class ZkbTrainPublish {
     @Column(name = "course_id")
     private String courseId;
 
-    @Column(name = "train_date")
-    private Date trainDate;
+    @Column(name = "train_start_date")
+    private Date trainStartDate;
+
+    @Column(name = "train_end_date")
+    private Date trainEndDate;
 
     //培训地点
     @Column(name = "location")

@@ -25,13 +25,62 @@
                 </p:panelGrid>
 
                 <p:fieldset legend="#{msg.ExpenseDetails}" >
-                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+                    <!-- 工时类型填写-->
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="entryTypeFlag">
                         <h:panelGroup>
+                            <label class="label">#{msg.manHoursEntryType}*</label>
+                            <p:selectOneRadio id="entryType" required="true" disabled="false" value="#{v2PmOrderController.selectedPmOrder.entryType}"  requiredMessage="#{msg.manHoursEntryType} #{msg.ValidationRequire}">
+                                <p:ajax event="change" process="@this" update=":growl pmTab:pmrepairCompleteDialogForm:entryType pmTab:pmrepairCompleteDialogForm:workHourDetail pmTab:pmrepairCompleteDialogForm:entryTypeFlag"  listener="#{v2PmOrderController.updateEntryType(v2PmOrderController.selectedPmOrder.entryType)}" />
+                                <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
+                                <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.entryType==0 || v2PmOrderController.selectedPmOrder.entryType==null}">
                             <label class="label">#{msg.Manhours}*</label>
                             <p:inputNumber id="manHoursId" validatorMessage="#{msg.ManhoursCannotL1}" value="#{v2PmOrderController.selectedPmOrder.manHours}"  required="true" requiredMessage="#{msg.Manhours} #{msg.ValidationRequire}">
+                                <p:ajax />
+                            </p:inputNumber>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.entryType==1}">
+                            <label class="label">#{msg.Manhours}*</label>
+                            <p:inputNumber id="manHours_input2" readonly="true" maxValue="999" value="#{v2PmOrderController.selectedPmOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
+                                <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
                     </p:panelGrid>
+                    <p:panelGrid id="workHourDetail" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup  rendered="#{v2PmOrderController.selectedPmOrder.entryType==1}">
+                            <label class="label">#{msg.addManHoursSection}</label>
+                            <p:dataTable id="pmHourDetailList" class="pmHourDetailList" value="#{v2PmOrderController.pmHoursList}" var="item" widgetVar="pmHourDetailList"
+                                         lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                <p:column headerText="#{msg.startTime}">
+                                    <h:outputText value="#{item.startTime}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.endTime}">
+                                    <h:outputText value="#{item.endTime}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.manHours}">
+                                    <h:outputText value="#{item.hours}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.Remark}">
+                                    <h:outputText value="#{item.remark}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.Actions}">
+                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{v2PmOrderController.prepareEditPmOrderManHoursDetail('new')}" update="@(.manHoursDetailDlg)" oncomplete="PF('manHoursDetailDlg').show()" rendered="#{item.id eq '000'}"/>
+                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditPmOrderManHoursDetail(item.id)}" update="@(.manHoursDetailDlg)" oncomplete="PF('manHoursDetailDlg').show()" rendered="#{item.id ne '000'}" />
+                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2PmOrderController.deletePmOrderManHoursDetail(item.id)}" update="@(.pmHourDetailList) pmTab:pmrepairCompleteDialogForm:manHoursId pmTab:pmrepairCompleteDialogForm:manHours_input2" rendered="#{item.id ne '000'}">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.AddParts}</label>
@@ -357,6 +406,7 @@
 
     <ui:include src="pmMoreAccDialog.xhtml"/>
     <ui:include src="pmCoWorkDialog.xhtml"/>
+    <ui:include src="manHoursDetail.xhtml"/>
 
 </ui:composition>
 </html>

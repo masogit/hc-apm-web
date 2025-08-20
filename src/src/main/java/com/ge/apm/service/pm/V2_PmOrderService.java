@@ -746,7 +746,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
 
-    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment,List<V2_BlobObject> picBeforeList,List<V2_BlobObject> picAfterList) {
+    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment,List<V2_BlobObject> picBeforeList,List<V2_BlobObject> picAfterList, List<V2_PmOrderManHoursDetail> pmHoursList) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         //formData.setAttachments(attachment);
@@ -764,6 +764,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setAttachments(picAfterList);
         formData.setPrePmAttachments(picBeforeList);
         formData.setComments(selectedPmOrder.getComments());
+        formData.setEntryType(selectedPmOrder.getEntryType());
+        if(selectedPmOrder.getEntryType() == 1){
+            formData.setPmOrderManHoursDetails(pmHoursList);
+        }
         String res = srApi.invokePmOrderAction(token,formData,"tempRepair",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));

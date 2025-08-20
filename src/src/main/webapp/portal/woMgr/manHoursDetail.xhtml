@@ -14,11 +14,13 @@
 
                     <h:panelGroup>
                         <label class="label">开始时间*</label>
-                        <p:calendar  timeZone="GMT+8" id="startDate2" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.selectedWorkOrderManHoursDetail.startTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="GMT+8" id="startDate2" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.selectedWorkOrderManHoursDetail.startTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}">
+                            <p:ajax update="endDate2"/>
+                        </p:calendar>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">结束时间*</label>
-                       <p:calendar  timeZone="GMT+8" id="endDate2" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.selectedWorkOrderManHoursDetail.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="结束时间#{msg.ValidationRequire}"></p:calendar>
+                       <p:calendar  timeZone="GMT+8" id="endDate2" maxdate="#{v2PmOrderController.getMaxDate()}" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.selectedWorkOrderManHoursDetail.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="结束时间#{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
 
                     <h:panelGroup>

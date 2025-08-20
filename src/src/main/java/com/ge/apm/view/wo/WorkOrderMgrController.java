@@ -38,6 +38,8 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateField;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
@@ -66,6 +68,7 @@ import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -1557,9 +1560,20 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         //如果是远东本地版推过来的mvs工单，因为ServiceRequest中RequestorId为本地版的数据，所以ua1为空那么久默认取当前登录人
         if("3".equals(selectedWorkOrder.getServiceRequest().getExternalWorkOrder())){
             ua1 = loginUser;
-        };
+        }
+        //工时类型从配置下读取 YHAAO-25807
+        String  key= "repairEntryTypeSet";
+        String repairEntryTypeSet = configItemValueRepository.findByKeyAndSiteForUseParent(selectedWorkOrder.getSiteUID(), selectedWorkOrder.getHospitalUID(), selectedWorkOrder.getInstitutionUID(), selectedWorkOrder.getTenantUID(), key);
         if (selectedWorkOrder.getEntryType() == null) {
-            selectedWorkOrder.setEntryType(0);
+            if(StrUtil.isNotEmpty(repairEntryTypeSet)){
+                try {
+                    selectedWorkOrder.setEntryType(Integer.parseInt(repairEntryTypeSet));
+                } catch (NumberFormatException e) {
+                    selectedWorkOrder.setEntryType(0);
+                }
+            }else{
+                selectedWorkOrder.setEntryType(0);
+            }
         }
         if(selectedWorkOrder.getCoworkerEntryType() == null){
             selectedWorkOrder.setCoworkerEntryType(0);
@@ -4163,6 +4177,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public boolean approvedCompleted(){
         return approveList.stream().anyMatch(item -> item.getApprovalStatus() == 0 || item.getApprovalStatus() == 1);
+    }
+    public Date getMaxDate(){
+        if(selectedWorkOrderManHoursDetail.getStartTime() != null){
+            Date date = DateUtil.offset(selectedWorkOrderManHoursDetail.getStartTime(), DateField.HOUR, 24);
+            return date;
+        }
+        return TimeUtil.now();
     }
 }
 

@@ -16,4 +16,6 @@ public class FieldColumnDto {
     private String datePattern;
     // 字段类型
     private String type;
+    private Integer entryType;
+    private Double hours;
 }

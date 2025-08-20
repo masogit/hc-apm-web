@@ -12,7 +12,7 @@
                 <h:panelGroup>
                     <label class="label">课程CatNo*</label>
                     <p:autoComplete dropdown="true" value="#{zkbTrainPublishController.selectedCourse}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="课程 #{msg.ValidationRequire}"
-                                    completeMethod="#{zkbTrainPublishController.autoCompleteCourse}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbTrainCourseConverter">
+                                    completeMethod="#{zkbTrainPublishController.autoCompleteCourse}" var="t" itemLabel="#{t.catNo}" itemValue="#{t}" converter="zkbTrainCourseConverter">
                         <p:ajax event="itemSelect" update="name courseType" listener="#{zkbTrainPublishController.courseSelect}" />
 
                     </p:autoComplete>
@@ -34,12 +34,17 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">培训地点</label>
-                    <p:inputText  value="#{zkbTrainPublishController.selected.zkbTrainCourse.name}"  />
+                    <p:inputText  value="#{zkbTrainPublishController.selected.location}"  />
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">培训时间*</label>
-                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" value="#{zkbTrainPublishController.selected.trainDate}" required="true" requiredMessage="培训时间 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    <label class="label">培训开始时间*</label>
+                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbTrainPublishController.selected.trainStartDate}" required="true" requiredMessage="培训开始时间 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">培训结束时间*</label>
+                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbTrainPublishController.selected.trainEndDate}" required="true" requiredMessage="培训结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+
                 <h:panelGroup>
                     <label class="label">报名截止日期*</label>
                     <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbTrainPublishController.selected.signDeadline}" required="true" requiredMessage="报名截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
