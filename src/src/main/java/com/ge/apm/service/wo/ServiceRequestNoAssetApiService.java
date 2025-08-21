@@ -6,6 +6,7 @@ import com.ge.apm.domain.V2_ServiceRequestNoAsset;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.healthcare.cn.common.cons.RepairSourceEnum;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class ServiceRequestNoAssetApiService  extends MicroServiceInvoker {
         formData.setComment(newServiceRequest.getComment());
         formData.setRequestorPhone(newServiceRequest.getRequestorPhone());
         formData.setAssetStatus(newServiceRequest.getAssetStatus());
+        formData.setRepairSource(RepairSourceEnum.ServiceRequestNoAsset.name());
         if (null != newServiceRequest.getConfirmedDownTime()) {
             formData.setConfirmedDownTime(TimeUtils.getStrDate(newServiceRequest.getConfirmedDownTime(), "yyyy-MM-dd HH:mm:ss"));
         }
@@ -107,6 +109,8 @@ class ServiceRequestNoAssetForm {
     String confirmedDownTime;
 
     Integer assetStatus;
+
+    String repairSource;
 }
 
 @Data

@@ -25,6 +25,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.RepairSourceEnum;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
