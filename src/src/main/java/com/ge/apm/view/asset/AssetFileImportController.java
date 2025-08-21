@@ -326,6 +326,17 @@ public class AssetFileImportController {
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(true);
+
+        List<String> assetSheetHeads = template.getAssetSheetHead();
+        if(CollectionUtils.isNotEmpty(assetSheetHeads)){
+            List<String> finalExportFields = exportFields;
+            exportFields= assetSheetHeads.stream().filter(finalExportFields::contains).collect(Collectors.toList());
+            if(!exportFields.contains("UUID")){
+                exportFields.add("UUID");
+            }
+        }
+
+
         template.exportSampleAsset(orgList, exportFields);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if (userContextService.isLocale()) {

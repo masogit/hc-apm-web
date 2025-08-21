@@ -817,7 +817,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportAssetExcel() throws IOException {
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-//        insertCrossSiteColumns(exportFields);
+        insertCrossSiteColumns(exportFields);
         export1(exportFields);
     }
 
