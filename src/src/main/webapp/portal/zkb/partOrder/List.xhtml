@@ -133,7 +133,7 @@
                         <p:column headerText="申请人" filterBy="#{item.requestUser}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.requestUser}"/>
                         </p:column>
-                        <p:column headerText="审批人" filterBy="#{item.techAuditer}"  filterMatchMode="LIKE">
+                        <p:column headerText="技术审批人" filterBy="#{item.techAuditer}"  filterMatchMode="LIKE">
                             <h:outputText value="#{zkbPartOrderController.techAuditField(item)}"/>
                         </p:column>
                         <!--rendered="#{!zkbPartOrderController.showStatusBtn}"-->
