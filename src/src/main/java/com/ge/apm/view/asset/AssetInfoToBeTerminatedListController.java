@@ -647,6 +647,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         for (AssetInfo assetInfo : assetInfos) {
             terminateAsset(assetInfo);
         }
+        WebUtil.addSuccessMessage("设备批量报废成功");
         this.selectedMap.clear();
     }
 
