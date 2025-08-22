@@ -58,7 +58,7 @@
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.RequestingDepartment}" filterBy="#{item.applicationDepartment}" filterMatchMode="LIKE"  >
+                    <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.applicationDepartment}" filterMatchMode="LIKE"  >
 <!--                        <c:if test="#{item.applyUser.org.orgType eq 4}">-->
                             <h:outputText value="#{item.applicationDepartment}"/>
 <!--                        </c:if>-->
