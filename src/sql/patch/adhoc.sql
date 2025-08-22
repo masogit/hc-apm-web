@@ -3,4 +3,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 update v2_pm_order set cancel_time = end_time where current_step_name = '已取消';
 
+--YHAAO-25896 报废申请人取用户名且需要更新历史数据
+update asset_scrap scrap  set created_by=ua.name  from user_account ua  where scrap.request_user_uid=ua.uid;
+update asset_scrap scrap  set approval_by=ua.name  from user_account ua  where scrap.approval_uid=ua.uid;
 
