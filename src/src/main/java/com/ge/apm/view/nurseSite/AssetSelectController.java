@@ -351,6 +351,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         assets5Maintain.clear();
         selectedAssets5.clear();
         selectedAssetUids5.clear();
+        this.tiggerEvent();
     }
 
     public void removePermitAssetInfo(){
