@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
+import com.ge.apm.domain.*;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.dao.*;
@@ -23,16 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.ContractInfo;
-import com.ge.apm.domain.ContractInfoItem;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.google.common.base.Strings;
 
@@ -66,6 +60,8 @@ public class ContractInfoService {
     private UserAccountService userAccountService;
     @Autowired
     private AssetInfoRepository assetInfoDao;
+    @Autowired
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     @Autowired
     private MqUtils mqUtils;
@@ -145,6 +141,15 @@ public class ContractInfoService {
         sendMq(contract,"contract_info");
         sendMq(contractItems,"contract_info_item");
         return true;
+    }
+
+    public void sendItemMq(ContractInfoItem item, SystemEventAuditEnum systemEventAuditEnum) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("assetUid", item.getAssetUid());
+        jsonObject.put("contractId", item.getContractId());
+        jsonObject.put("ItemType", ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), systemEventAuditEnum, item.getId(), Boolean.TRUE, "","contract_info_item", JSONObject.toJSONString(jsonObject));
+        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
     }
 
     private void sendMq(Object object,String objectType) {
