@@ -80,7 +80,7 @@ public interface AuditHandler {
                 }
                 break;
             case "nurse_site_maintain_config":
-                if (operation.contains("delete")) {
+                if ("delete".equals(operation)) {
                     systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_DELETE;
                 } else {
                     if (uid != null) {
@@ -91,7 +91,7 @@ public interface AuditHandler {
                 }
                 break;
             case "nurse_site_maintain_config_item":
-                if (operation.contains("delete")) {
+                if ("delete".equals(operation)) {
                     systemEventAuditEnum = SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE;
                 } else {
                     if (uid != null) {

@@ -1,8 +1,13 @@
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +68,9 @@ public class AssetInfoBulkEditService {
 
     @Autowired
     private AssetHistoryService assetHistoryService;
+
+    @Autowired
+    private SystemEventAuditAopAspect systemEventAuditUtil;
 
     @Transactional(rollbackFor = Exception.class)
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
@@ -474,6 +482,8 @@ public class AssetInfoBulkEditService {
             if (assetinfos != null && !assetinfos.isEmpty()) {
                 Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
                 nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
+                SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, JSONObject.toJSONString(uids), true, null, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(assetinfos));
+                systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
                 Set<String> parentIds = assetinfos.stream().map(p -> p.getParentId()).collect(Collectors.toSet());
                 List<NurseSiteMaintainConfigItem> items = nurseSiteMaintainConfigItemRepository.findByParentIds(parentIds);
                 if (items != null && !items.isEmpty()) {

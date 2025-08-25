@@ -1664,6 +1664,8 @@ public class NurseSiteMaintainService {
 			tempConfig.setModifyBy(currentUser);
 			tempConfig.setModifyDate(new Date());
 			nurseSiteMaintainConfigRepository.deleteToSoft(tempConfig.getDeleted(),tempConfig.getDeleteResult(),tempConfig.getModifyByUid(),tempConfig.getModifyDate(),tempConfig.getId());
+			SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_DELETE, tempConfig.getId(), true, null, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(tempConfig));
+			systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
 		}
 		addBatchJob("deleteCheckConfig", null, null, null, currentUser.getUid(),null);
 	}
