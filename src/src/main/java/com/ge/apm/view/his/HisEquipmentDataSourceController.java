@@ -106,6 +106,9 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         hisEquipmentDataSourceMapper = WebUtil.getBean(HisEquipmentDataSourceMapper.class);
         orgComponentController.registerController(this);
         initExcelImportRecords();
+        hisRequestParamsDto.setEndDate(new Date());
+        hisRequestParamsDto.setStartDate(DateUtil.addMonth(new Date(), -3));
+
     }
 
     public void initExcelImportRecords() {
@@ -182,9 +185,15 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
                 case "execDeptCode":
                     orderBy.append("source."+("exec_dept_code")).append(ascending ? " ASC" : " DESC").append(" nulls last").append(",");
                     break;
+                default:
+                    orderBy.append("source."+("id")).append(ascending ? " ASC" : " DESC").append(",");
+                    break;
             }
         }
-        param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
+        if(orderBy.length()>0){
+            param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
+
+        }
 
 
 
@@ -552,6 +561,24 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 
     public void setExcelImportRecords(List<ExcelImportRecord> excelImportRecords) {
         this.excelImportRecords = excelImportRecords;
+    }
+
+    public Date getMaxDate() {
+        if(hisRequestParamsDto.getStartDate()!=null){
+            return DateUtil.addMonth(hisRequestParamsDto.getStartDate(),12);
+        }
+        return null;
+    }
+
+    public void getEndDateChange() {
+        if(hisRequestParamsDto.getStartDate()!=null){
+            if(hisRequestParamsDto.getEndDate()!=null &&  !hisRequestParamsDto.getEndDate().before(DateUtil.addMonth(hisRequestParamsDto.getStartDate(),12))){
+                hisRequestParamsDto.setEndDate(DateUtil.addMonth(hisRequestParamsDto.getStartDate(),12));
+            }
+
+        }
+
+
     }
 }
 
