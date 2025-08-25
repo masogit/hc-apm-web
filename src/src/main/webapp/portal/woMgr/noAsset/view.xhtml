@@ -68,6 +68,10 @@
                      <label class="label">#{msg.comment}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.comment}"/>
                   </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.repairSource}</label>
+                     <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',serviceRequestNoAssetController.selected.srRepairSource)}"/>
+                  </h:panelGroup>
                </p:panelGrid>
                <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
                   <p:dataGrid id="requestImage" var="fileitem" value="#{serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}" columns="5" layout="grid" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
