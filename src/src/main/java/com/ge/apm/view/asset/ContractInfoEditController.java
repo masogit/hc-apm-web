@@ -376,6 +376,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
         allItemList.stream().forEach(item -> item.setContractId(selected.getId()));
         contractItemDao.save(allItemList);
+        for (ContractInfoItem item : allItemList) {
+            if (ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())) {
+                contractService.sendItemMq(item, SystemEventAuditEnum.CONTRACT_ASSET_INFO_DELETE);
+            }
+        }
         allItemList = contractService.getContractItems(selected.getId());
         if(isEdit && CollectionUtils.isNotEmpty(allItemList)) {
             List<String> itemIds = new ArrayList<>();
@@ -477,10 +482,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         // ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
         allItemList.remove(item);
         if (!Strings.isNullOrEmpty(item.getId())) {
+            contractService.removeContractInfoItem(item);
             if (ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())) {
                 contractService.sendItemMq(item, SystemEventAuditEnum.CONTRACT_ASSET_INFO_DELETE);
             }
-            contractService.removeContractInfoItem(item);
             //contractItemDao.delete(item);
             //removedItemList.add(item);
         }
