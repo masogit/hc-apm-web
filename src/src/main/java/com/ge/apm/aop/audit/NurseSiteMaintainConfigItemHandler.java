@@ -34,7 +34,7 @@ public class NurseSiteMaintainConfigItemHandler implements AuditHandler {
                 NurseSiteMaintainConfigItem configItem= (NurseSiteMaintainConfigItem) entity;
                 Map<String, String> eventData = new HashMap<>();
                 eventData.put("assetUid", configItem.getAssetUid());
-                eventData.put("parentId", configItem.getParentId());
+                eventData.put("configId", configItem.getParentId());
                 return JSON.toJSONString(eventData);
             }else{
                 return null;
