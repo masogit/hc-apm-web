@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
 
 <ui:composition>
-    <p:dialog id="editDlg" widgetVar="editDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainPublishController.CRUDActionName} 课程" width="600" height="370">
+    <p:dialog id="editDlg" widgetVar="editDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainPublishController.CRUDActionName} 课程" width="600" height="400">
         <h:form id="zkbCourseEditForm">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainPublishController.selected != null}">
                 <h:panelGroup>
@@ -33,8 +33,16 @@
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
+                    <label class="label">培训老师</label>
+                    <p:inputText  value="#{zkbTrainPublishController.selected.trainPeople}"  />
+                </h:panelGroup>
+                <h:panelGroup>
                     <label class="label">培训地点</label>
                     <p:inputText  value="#{zkbTrainPublishController.selected.location}"  />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">培训容量</label>
+                    <p:spinner  value="#{zkbTrainPublishController.selected.trainCount}"  min="0" max="10000000" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">培训开始时间*</label>

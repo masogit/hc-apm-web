@@ -53,7 +53,12 @@
                     <p:column headerText="培训方式" filterBy="#{item.trainMode}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{fieldMsg.fieldValue('trainMode',item.trainMode)}"/>
                     </p:column>
-                    
+                    <p:column headerText="培训老师" filterBy="#{item.trainPeople}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.trainPeople}"/>
+                    </p:column>
+                    <p:column headerText="培训容量" >
+                        <h:outputText value="#{item.trainCount}"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增" actionListener="#{zkbTrainPublishController.prepareCreate}" update=":editDlg" oncomplete="PF('editDialog').show()" />
                          <p:commandButton id="editButton"  icon="ui-icon-pencil" title="编辑" actionListener="#{zkbTrainPublishController.prepareEdit}" update="editDlg" oncomplete="PF('editDialog').show()" disabled="#{empty zkbTrainPublishController.selected.id}" />

@@ -34,6 +34,12 @@ public class ZkbTrainPublishInfo {
     @Column(name = "train_mode")
     private String trainMode;
 
+    @Column(name = "train_people")
+    private String trainPeople;
+
+    @Column(name = "train_count")
+    private Integer trainCount = 0;
+
     //报名截止日期
     @Column(name = "sign_deadline")
     private Date signDeadline;
