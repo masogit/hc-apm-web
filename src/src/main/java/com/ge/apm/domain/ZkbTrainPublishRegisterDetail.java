@@ -1,15 +1,17 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "zkb_train_publish")
-public class ZkbTrainPublish {
+@Table(name = "zkb_train_publish_register_detail")
+public class ZkbTrainPublishRegisterDetail {
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -17,42 +19,43 @@ public class ZkbTrainPublish {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
-    @Column(name = "course_id")
-    private String courseId;
+    @Column(name = "register_id")
+    private String registerId;
 
-    @Column(name = "train_start_date")
-    private Date trainStartDate;
+    @Column(name = "engineer_id")
+    private String engineerId;
 
-    @Column(name = "train_end_date")
-    private Date trainEndDate;
+    @Column(name = "engineer_name")
+    private String engineerName;
 
-    //培训地点
-    @Column(name = "location")
-    private String location;
-
-    //培训方式
-    @Column(name = "train_mode")
-    private String trainMode;
-
-    //报名截止日期
-    @Column(name = "sign_deadline")
-    private Date signDeadline;
+    @Column(name = "engineer_phone")
+    private String engineerPhone;
+    @Column(name = "engineer_email")
+    private String engineerEmail;
+    @Column(name = "engineer_age")
+    private Integer engineerAge;
+    @Column(name = "engineer_sso")
+    private String engineerSso;
 
     @Column(name = "created_by")
     private String createdBy;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "created_date")
     private Date createdDate;
 
     @Column(name = "last_modified_by")
     private String lastModifiedBy;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(insertable=false, updatable=false, name = "course_id", referencedColumnName = "id")
-    private ZkbTrainCourse zkbTrainCourse;
+    @Transient
+    List<V2_BlobObject> v2_blobObjectList;
+
 
     @Override
     public int hashCode() {
@@ -64,14 +67,13 @@ public class ZkbTrainPublish {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ZkbTrainPublish)) {
+        if (!(object instanceof ZkbTrainPublishRegisterDetail)) {
             return false;
         }
-        ZkbTrainPublish other = (ZkbTrainPublish) object;
+        ZkbTrainPublishRegisterDetail other = (ZkbTrainPublishRegisterDetail) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
     }
-
 }

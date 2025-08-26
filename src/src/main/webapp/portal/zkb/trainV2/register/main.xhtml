@@ -12,16 +12,18 @@
             </div>
 
             <div class="ui-g-12 ">
-                <p:tabView class="ui-g-12" id="trainTab" dynamic="true" cache="false" activeIndex="0" >
-
+                <p:tabView class="ui-g-12" id="tab" dynamic="true" cache="false" activeIndex="0" >
+                    <p:ajax event="tabChange" listener="#{v2PmOrderController.onTabChange}"/>
                     <p:tab class="ui-g-12" title="未报名" id="insite" >
-                        <ui:include src="trainList.xhtml"/>
+                        <ui:include src="UnRegisterList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="已报名" id="mvsWorkOrder" rendered="#{trainMainController.showMvs()}" >
-                        <ui:include src="mvs/mvsList.xhtml"/>
+                    <p:tab class="ui-g-12" title="已报名" id="mvsWorkOrder" >
+                        <ui:include src="RegisteredList.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>
         </div>
+        <ui:include src="RegisterEdit.xhtml"/>
     </ui:define>
+
 </ui:composition>

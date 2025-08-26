@@ -136,6 +136,7 @@ public class V2_BlobObject implements Serializable {
 
     public static final String BO_TYPE_MC_SUBSCRIBE = "MC_SUBSCRIBE";
     public static final String BO_TYPE_MC_SUBSCRIBE_APPLY = "MC_SUBSCRIBE_APPLY";
+    public static final String BO_TYPE_TRAIN_REGISTER = "TRAIN_REGISTER";
 
 
     @Id
