@@ -6179,4 +6179,12 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 --ZKB 培训V2 i18
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','normal','基础课程','normal',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','advance','进阶课程','advance',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','EquipmentHasUnfinishedDailyInspectionDelete','设备存在未完成的日常检查，需要删除吗？','Equipment HasUnfinished Daily Inspection Delete?',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','CurrentEquipmentHasUnfinishedWorkOrder','当前设备有未完成工单,请进行处理','Current Equipment HasUnfinished Work Order',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','UnfinishedMaintenanceWorkOrderNumber','未完成维修工单号','Unfinished Maintenance Work Order Number',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ApplicationReason','申请理由','Application Reason',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ScrapApplication','报废申请','Scrap Application',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AppraisalReason','鉴定理由','Appraisal Reason',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','DisposalMethod','处置方式','Disposal Method',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AutoProcessUnfinishedClinicalAssistantWorkOrder','自动处理未完成临床助手工单','Auto Process Unfinished Clinical Assistant Work Order',NULL,-1);
 

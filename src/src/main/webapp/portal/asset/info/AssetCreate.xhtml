@@ -640,7 +640,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:dataGrid id="pictureListScrap" var="fileitem" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap')}" columns="5" layout="grid">
-                            <f:facet name="header">#{msg.Attachment}<p:outputLabel value="(#{msg.MaximumFiveImagesCanBeUploaded})" style="color: red"></p:outputLabel></f:facet>
+                            <f:facet name="header">#{msg.Attachment}<p:outputLabel value="(#{msg.maxUpload5Pics})" style="color: red"></p:outputLabel></f:facet>
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
                                     <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
@@ -653,7 +653,7 @@
 
                         </p:dataGrid>
                         <p:fileUpload id="typeScrap" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                      multiple="true" sizeLimit="10000000" fileLimit="#{5-assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size()}" fileLimitMessage="#{msg.MaximumFiveImagesCanBeUploaded}" update="pictureListScrap @this" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size() ge 5}"/>
+                                      multiple="true" sizeLimit="10000000" fileLimit="#{5-assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size()}" fileLimitMessage="#{msg.maxUpload5Pics}" update="pictureListScrap @this" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size() ge 5}"/>
                     </h:panelGroup>
                 </p:panelGrid>
 

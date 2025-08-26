@@ -1,6 +1,6 @@
 package com.ge.apm.service.asset;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -237,7 +237,7 @@ public class AssetInfoBulkEditCheckService {
         List<NurseSiteMaintainConfigItem> configItemList = nurseSiteMaintainConfigItemRepository.findByAssetUid(assetInfo.getUid());
         if(!CollectionUtils.isEmpty(configItemList)){
             nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
-            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(configItemList));
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(configItemList));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         }
 
