@@ -354,6 +354,10 @@ public class TrainManageService extends MicroServiceInvoker {
         return v2_blobObject;
     }
 
+    public void saveModifyFileName(V2_BlobObject v2_blobObject){
+        blobFileService.saveBlobObject(v2_blobObject);
+    }
+
     public List<TrainDetail> queryDetailByTrainId(String trainId){
         List<TrainDetail> trainDetailList = trainDetailRepository.findByTrainId(trainId);
         for(TrainDetail td :trainDetailList){

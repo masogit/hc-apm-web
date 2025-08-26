@@ -106,8 +106,11 @@
                   <p:commandButton actionListener="#{trainInSiteController.removeResultFile(fileitem)}" update="uploadCompleteList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}">
                      <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                   </p:commandButton>
+                  <p:commandButton actionListener="#{trainInSiteController.prepareEditFile(fileitem)}" update="trainTab:modifyFileDlg" oncomplete="PF('modifyFileDlg').show()" icon="ui-icon-pencil" title="修改文件名称" class="popupIconButton" process="@this" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}">
+
+                  </p:commandButton>
                </p:dataList>
-               <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF)$/" fileUploadListener="#{trainInSiteController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+               <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|mp4|avi|AVI|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF|MP4)$/" fileUploadListener="#{trainInSiteController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                              multiple="true"  sizeLimit="31000000"  update="uploadCompleteList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}"/>
             </h:panelGroup>
          </p:fieldset>
@@ -116,6 +119,25 @@
          <p:commandButton validateClient="true" value="完成" action="#{trainInSiteController.completeDetail}" oncomplete="PF('detailEditDialog').hide()" update=":growl trainTab:editForm:detailDatalist trainTab:editForm:trainQty" icon="ui-icon-check" rendered="#{not empty trainInSiteController.selectedTrainDetail.id and trainInSiteController.selectedTrainDetail.status eq 'Planned'}" />
          <p:commandButton validateClient="true" value="#{msg.Cancel}" icon="ui-icon-cancel" oncomplete="PF('cancelDlg').show();" update="trainTab:cancelForm  trainTab:editForm:detailDatalist" rendered="#{not empty trainInSiteController.selectedTrainDetail.id and trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
          <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back" action="#{trainInSiteController.backDetail}" oncomplete="PF('detailEditDialog').hide()"  update=" trainTab:editForm:detailDatalist"/>
+      </h:form>
+   </p:dialog>
+   <p:dialog id="modifyFileDlg" widgetVar="modifyFileDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="附件名称修改" width="600" height="200">
+      <h:form id="modifyFileForm">
+         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+            <h:panelGroup>
+               <label class="label">附件名称*</label>
+            </h:panelGroup>
+            <h:panelGroup>
+               <p:inputText value="#{trainInSiteController.fileName}" required="true" requiredMessage="附件名称不能为空"/>
+            </h:panelGroup>
+            <h:panelGroup>
+               <p:inputText value="#{trainInSiteController.fileType}" disabled="true"/>
+            </h:panelGroup>
+         </p:panelGrid>
+         <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trainInSiteController.saveModifyFileName}" oncomplete="PF('modifyFileDlg').hide()" update=":growl trainTab:detailEditForm:uploadCompleteList " icon="ui-icon-check" rendered="#{empty trainInSiteController.selectedTrainDetail.status or trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
+         <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back"  oncomplete="PF('modifyFileDlg').hide()"  update=" "/>
+
+
       </h:form>
    </p:dialog>
 

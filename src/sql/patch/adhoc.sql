@@ -33,3 +33,6 @@ update asset_info set asset_dept_uid = clinical_dept_uid,asset_dept_id = clinica
 update shared_asset_req_detail  set  clinical_dept_for_return_name = '肾内科',clinical_dept_for_return_uid='7d4873666fe94dde965f1dbe25cc510b',clinical_dept_name='肾内科',clinical_dept_uid='7d4873666fe94dde965f1dbe25cc510b',charging_begin_time='2025-08-20 17:19:44',charging_end_time='2025-08-20 18:44:10'  where id='2c9b858298a36e380198cb7df77d7929';
 update shared_asset_request  set clinical_dept_name = '肾内科',clinical_dept_uid='7d4873666fe94dde965f1dbe25cc510b',remark='' where id in('2c9b858298a36e380198cb7df77d7928','2c9b858298a36e380198cb7e2fd8792e');
 
+
+
+ALTER TABLE adverse_events ALTER COLUMN harm_perform TYPE VARCHAR(300);
