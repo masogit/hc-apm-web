@@ -159,13 +159,14 @@ public interface AuditHandler {
     }
 
     default String generateEventData(Object[] args) {
-        try {
-            Object entity = args[0];
-            return entity != null ? JSON.toJSONString(entity) : null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+//        try {
+//            Object entity = args[0];
+//            return entity != null ? JSON.toJSONString(entity) : null;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+        return null;
     }
 
     default String extractBoUid(MethodSignature signature, Object[] args) {

@@ -237,7 +237,13 @@ public class AssetInfoBulkEditCheckService {
         List<NurseSiteMaintainConfigItem> configItemList = nurseSiteMaintainConfigItemRepository.findByAssetUid(assetInfo.getUid());
         if(!CollectionUtils.isEmpty(configItemList)){
             nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
-            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(configItemList));
+            List<Object> collect = configItemList.stream().map(item -> {
+                Map<String, String> data = new HashMap<>();
+                data.put("assetUid", item.getAssetUid());
+                data.put("configId", item.getParentId());
+                return data;
+            }).collect(Collectors.toList());
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(collect));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         }
 
