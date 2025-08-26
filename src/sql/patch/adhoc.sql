@@ -9,3 +9,6 @@ update asset_scrap scrap  set approval_by=ua.name  from user_account ua  where s
 -- 质控日历优化 v2_pm_order添加asset_uid索引
 CREATE INDEX if not exists v2_pm_order_asset_uid_idx ON public.v2_pm_order (asset_uid);
 
+
+
+ALTER TABLE adverse_events ALTER COLUMN harm_perform TYPE VARCHAR(300);
