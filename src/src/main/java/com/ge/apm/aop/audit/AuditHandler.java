@@ -1,6 +1,7 @@
 package com.ge.apm.aop.audit;
 
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import org.apache.ibatis.annotations.Param;
@@ -158,9 +159,13 @@ public interface AuditHandler {
     }
 
     default String generateEventData(Object[] args) {
-//        Object entity = args[0];
-//        return entity != null ? JSON.toJSONString(entity) : null;
-        return null;
+        try {
+            Object entity = args[0];
+            return entity != null ? JSON.toJSONString(entity) : null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     default String extractBoUid(MethodSignature signature, Object[] args) {
