@@ -250,6 +250,27 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
         resultBlobObjectList.remove(v2BlobObject);
     }
 
+    @Getter@Setter
+    V2_BlobObject selectedBlobObject;
+    @Getter@Setter
+    String fileName;
+    @Getter@Setter
+    String fileType;
+
+
+    public void prepareEditFile(V2_BlobObject v2BlobObject){
+        selectedBlobObject = v2BlobObject;
+
+        int index = selectedBlobObject.getObjectName().lastIndexOf(".");
+        fileName = selectedBlobObject.getObjectName().substring(0, index);
+        fileType = selectedBlobObject.getObjectName().substring(index, selectedBlobObject.getObjectName().length());
+    }
+    public void saveModifyFileName(){
+        String fn = fileName + fileType;
+        selectedBlobObject.setObjectName(fn);
+        trainManageService.saveModifyFileName(selectedBlobObject);
+    }
+
     public void saveDetail(){
         trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, resultBlobObjectList);
 
