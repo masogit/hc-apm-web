@@ -41,7 +41,7 @@ public class ZkbTrainCourseQuotaService {
 
     public void delete(ZkbTrainCourseQuota zkbTrainCourseQuota){
         //先删掉detail表
-        List<ZkbTrainCourseQuotaDetail> details = zkbTrainCourseQuotaDetailRepository.findByQuotaId(zkbTrainCourseQuota.getId());
+        List<ZkbTrainCourseQuotaDetail> details = zkbTrainCourseQuotaDetailRepository.findByQuotaIdOrderByUniqueIDDesc(zkbTrainCourseQuota.getId());
         if(CollectionUtils.isNotEmpty(details)){
             zkbTrainCourseQuotaDetailRepository.delete(details);
         }
@@ -305,7 +305,7 @@ public class ZkbTrainCourseQuotaService {
     }
 
     public List<ZkbTrainCourseQuotaDetail> queryDetailByQuota(String id){
-        return zkbTrainCourseQuotaDetailRepository.findByQuotaId(id);
+        return zkbTrainCourseQuotaDetailRepository.findByQuotaIdOrderByUniqueIDDesc(id);
     }
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail

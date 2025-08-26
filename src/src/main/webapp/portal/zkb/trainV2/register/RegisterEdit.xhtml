@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition>
+    <p:dialog id="registerEngineerListDlg" widgetVar="registerEngineerListDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程报名信息" width="800" height="570">
+        <h:form id="engineerListForm">
+            <p:dataTable id="detailDatalist" value="#{zkbTrainRegisterMainController.zkbTrainPublishRegisterDetailList}" var="item"
+                         widgetVar="detailDatalist" selectionMode="single" sortOrder="descending" sortBy="#{item.createdDate}" selection="#{zkbTrainRegisterMainController.selectedDetail}"
+                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single"
+                         paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                <p:ajax event="rowSelect" update=":engineerListForm:detailDatalist:editeEngineerButton :engineerListForm:detailDatalist:deleteeEngineerButton"/>
+                <p:column headerText="姓名">
+                    <h:outputText value="#{item.engineerName}"/>
+                </p:column>
+                <p:column headerText="年龄">
+                    <h:outputText value="#{item.engineerAge}"/>
+                </p:column>
+                <p:column headerText="电话">
+                    <h:outputText value="#{item.engineerPhone}"/>
+                </p:column>
+                <p:column headerText="邮箱">
+                    <h:outputText value="#{item.engineerEmail}"/>
+                </p:column>
+                <p:column headerText="SSO">
+                    <h:outputText value="#{item.engineerSso}"/>
+                </p:column>
+
+                <f:facet name="{Toolbar}">
+                    <p:commandButton immediate="false" process="@this" id="createEngineerButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbTrainRegisterMainController.prepareDetailCreate}" update=":growl :registerEngineerEditDlg" oncomplete="PF('registerEngineerEditDialog').show()"  />
+                    <p:commandButton immediate="false" process="@this" id="editeEngineerButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbTrainRegisterMainController.prepareDetailEdit}" update=":growl :registerEngineerEditDlg"  oncomplete="PF('registerEngineerEditDialog').show()" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}" />
+                    <p:commandButton immediate="false" process="@this" id="deleteeEngineerButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbTrainRegisterMainController.deleteDetail()}" update=":growl :engineerListForm:detailDatalist" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}">
+                        <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+                    </p:commandButton>
+                </f:facet>
+
+            </p:dataTable>
+
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainRegisterMainController.saveData}" update=":tab:listForm:datalist :tab:registeredListForm:datalist" icon="ui-icon-check" oncomplete="PF('registerEngineerListDialog').hide()" rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('registerEngineerListDialog').hide()" rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"
+            />
+        </h:form>
+    </p:dialog>
+    <ui:include src="AddEngineer.xhtml"></ui:include>
+
+</ui:composition>
+
+</html>

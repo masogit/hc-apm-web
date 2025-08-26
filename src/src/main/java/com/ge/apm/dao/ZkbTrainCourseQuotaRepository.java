@@ -11,4 +11,7 @@ public interface ZkbTrainCourseQuotaRepository extends GenericRepositoryUUID<Zkb
 
 
     List<ZkbTrainCourseQuota> findByCourseId(String courseId);
+    ZkbTrainCourseQuota findFirstByTenantUidAndCourseId(String tenantUid, String courseId);
+
+
 }

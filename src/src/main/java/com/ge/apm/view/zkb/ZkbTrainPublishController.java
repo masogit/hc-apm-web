@@ -3,8 +3,7 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.ZkbTrainPublishRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbTrainCourse;
-import com.ge.apm.domain.ZkbTrainCourseQuota;
-import com.ge.apm.domain.ZkbTrainPublish;
+import com.ge.apm.domain.ZkbTrainPublishInfo;
 import com.ge.apm.service.zkb.ZkbTrainCourseQuotaService;
 import com.ge.apm.service.zkb.ZkbTrainPublishService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrainPublish> {
+public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrainPublishInfo> {
     private ZkbTrainPublishRepository dao;
     private String actionName;
 
@@ -52,7 +51,7 @@ public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrai
     }
 
     @Override
-    protected Page<ZkbTrainPublish> loadData(PageRequest pageRequest) {
+    protected Page<ZkbTrainPublishInfo> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = this.searchFilters;
 
         if (searchFilters == null) {
@@ -66,7 +65,7 @@ public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrai
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
         this.actionName = "Create";
-        selected = new ZkbTrainPublish();
+        selected = new ZkbTrainPublishInfo();
         zkbTrainCourseList = zkbTrainCourseQuotaService.queryTrainCourse();
     }
 
@@ -95,7 +94,7 @@ public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrai
     }
 
     @Override
-    protected GenericRepositoryUUID<ZkbTrainPublish> getDAO() {
+    protected GenericRepositoryUUID<ZkbTrainPublishInfo> getDAO() {
         return dao;
     }
 }

@@ -61,7 +61,7 @@
             </p:panelGrid>
             <p:fieldset id="detailFieldset" legend="名额详情" rendered="#{!userContextService.zkbUser}">
                 <p:dataTable id="detailDatalist" value="#{zkbTrainCourseQuotaController.zkbTrainCourseQuotaDetails}" var="item"
-                             widgetVar="detailDatalist" selectionMode="single" sortOrder="descending" sortBy="#{item.createdDate}" selection="#{zkbTrainCourseQuotaController.selectedCourseQuotaDetail}"
+                             widgetVar="detailDatalist" selectionMode="single" sortOrder="descending" sortBy="#{item.uniqueID}" selection="#{zkbTrainCourseQuotaController.selectedCourseQuotaDetail}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
                     <p:ajax event="rowSelect" update=":editForm:detailDatalist:editDetailButton :editForm:detailDatalist:deleteDetailButton"/>

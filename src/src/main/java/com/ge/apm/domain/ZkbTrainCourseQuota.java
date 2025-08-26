@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,9 +29,13 @@ public class ZkbTrainCourseQuota {
     @Column(name = "contract_no")
     private String contractNo;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "start_date")
     private Date startDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "end_date")
     private Date endDate;
 
@@ -46,12 +51,16 @@ public class ZkbTrainCourseQuota {
     @Column(name = "created_by")
     private String createdBy;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "created_date")
     private Date createdDate;
 
     @Column(name = "last_modified_by")
     private String lastModifiedBy;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
