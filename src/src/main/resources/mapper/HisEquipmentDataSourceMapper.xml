@@ -47,6 +47,10 @@
             <if test="sfxmName!=null">
                 and sfxm.sfxm_name like concat('%',#{sfxmName},'%')
             </if>
+
+            <if test="category!=null">
+                and source.category like concat('%',#{category},'%')
+            </if>
             <if test="execTime!=null">
                 and  source.exec_time <![CDATA[<=]]>  #{execTime}
             </if>

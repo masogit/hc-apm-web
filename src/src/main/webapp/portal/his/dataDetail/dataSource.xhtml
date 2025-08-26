@@ -105,7 +105,10 @@
                                                   filterBy="#{item.sfxmName}" filterMatchMode="LIKE">
                                             <h:outputText value="#{item.sfxmName}"/>
                                         </p:column>
-
+                                        <p:column headerText="收费项目分类"
+                                                  filterBy="#{item.category}" filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.category}"/>
+                                        </p:column>
 
                                         <p:column headerText="数量"
                                                   filterBy="#{item.receiptNum}"
