@@ -10,6 +10,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import javaslang.Tuple2;
 import lombok.Getter;
@@ -349,7 +350,13 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
 
 
     public void deleteContract(){
+        List<ContractInfoItem> contractItems = contractService.getContractItems(selected.getId());
         if(contractService.deleteContract(selected)){
+            for (ContractInfoItem item : contractItems) {
+                if (ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())) {
+                    contractService.sendItemMq(item, SystemEventAuditEnum.CONTRACT_ASSET_INFO_DELETE);
+                }
+            }
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
         }else{
             WebUtil.addErrorMessage(WebUtil.getMessage("CannotBeDeleted"));

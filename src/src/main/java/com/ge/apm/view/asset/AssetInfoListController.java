@@ -691,6 +691,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);
         assetHistoryService.deleteAsset(asset);
+        WebUtil.addSuccessMessage("设备成功删除");
+
         logger.info("delete asset successful. assetName: {}", asset.getName());
 //        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
     }
@@ -817,7 +819,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportAssetExcel() throws IOException {
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-//        insertCrossSiteColumns(exportFields);
+        insertCrossSiteColumns(exportFields);
         export1(exportFields);
     }
 

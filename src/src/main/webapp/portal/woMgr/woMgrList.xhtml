@@ -286,6 +286,7 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_EDIT') and workOrderMgrController.queryIndex==8}"><!--已关单-->
                     <p:commandButton value="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
+                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="handleCancelOrderSubmit(xhr, status, args);"/>
                 </p:column>
 
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and workOrderMgrController.queryIndex==0}">
