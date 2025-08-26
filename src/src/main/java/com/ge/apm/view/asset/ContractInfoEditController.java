@@ -378,7 +378,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         contractItemDao.save(allItemList);
         for (ContractInfoItem item : allItemList) {
             if (ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())) {
-                contractService.sendItemMq(item, SystemEventAuditEnum.CONTRACT_ASSET_INFO_DELETE);
+                contractService.sendItemMq(item, SystemEventAuditEnum.CONTRACT_ASSET_INFO_ADD);
             }
         }
         allItemList = contractService.getContractItems(selected.getId());
