@@ -350,8 +350,8 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
 
 
     public void deleteContract(){
+        List<ContractInfoItem> contractItems = contractService.getContractItems(selected.getId());
         if(contractService.deleteContract(selected)){
-            List<ContractInfoItem> contractItems = contractService.getContractItems(selected.getId());
             for (ContractInfoItem item : contractItems) {
                 if (ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())) {
                     contractService.sendItemMq(item, SystemEventAuditEnum.CONTRACT_ASSET_INFO_DELETE);
