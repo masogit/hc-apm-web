@@ -112,7 +112,8 @@ public class HisEquipmentDataSource implements Serializable {
 
     @Transient
     private String sfxmName;
-
+    @Transient
+    private String sfxmLb;
 
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumns({
