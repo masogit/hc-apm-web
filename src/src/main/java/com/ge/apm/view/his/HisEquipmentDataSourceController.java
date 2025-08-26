@@ -235,6 +235,10 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
                 case "sfxmName":
                     param.put("sfxmName", searchFilter.value);
                     break;
+
+                case "category":
+                    param.put("category", searchFilter.value);
+                    break;
                 case "patientRegistrationNum":
                     param.put("patientRegistrationNum", searchFilter.value);
                     break;
