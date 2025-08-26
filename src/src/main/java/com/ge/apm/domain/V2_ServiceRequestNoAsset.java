@@ -165,6 +165,9 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name = "wo_id")
     private String woId;
 
+    @Column(name="sr_repair_source")
+    private String srRepairSource;
+
     @Override
     public int hashCode() {
         Integer hash = 0;
