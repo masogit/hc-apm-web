@@ -8,6 +8,7 @@ update asset_scrap scrap  set created_by=ua.name  from user_account ua  where sc
 update asset_scrap scrap  set approval_by=ua.name  from user_account ua  where scrap.approval_uid=ua.uid;
 -- 质控日历优化 v2_pm_order添加asset_uid索引
 CREATE INDEX if not exists v2_pm_order_asset_uid_idx ON public.v2_pm_order (asset_uid);
+CREATE INDEX if not exists v2_work_order_asset_uid_idx ON public.v2_work_order (asset_uid);
 
 -- YHAAO-25895 无人值守调剂中心，数据异常问题处理
 -- cs002
