@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.ge.apm.service.asset.AssetInfoBulkEditUtils.*;
@@ -482,7 +479,13 @@ public class AssetInfoBulkEditService {
             if (assetinfos != null && !assetinfos.isEmpty()) {
                 Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
                 nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
-                SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, JSONObject.toJSONString(uids), true, null, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(assetinfos));
+                List<Map<String, String>> eventData = assetinfos.stream().map(item -> {
+                    Map<String, String> eventDataItem = new HashMap<>();
+                    eventDataItem.put("assetUid", item.getAssetUid());
+                    eventDataItem.put("configId", item.getParentId());
+                    return eventDataItem;
+                }).collect(Collectors.toList());
+                SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, JSONObject.toJSONString(uids), true, null, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(eventData));
                 systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
                 Set<String> parentIds = assetinfos.stream().map(p -> p.getParentId()).collect(Collectors.toSet());
                 List<NurseSiteMaintainConfigItem> items = nurseSiteMaintainConfigItemRepository.findByParentIds(parentIds);
