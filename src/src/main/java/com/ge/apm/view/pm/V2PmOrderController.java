@@ -2493,9 +2493,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             logger.info("保养------------多级审核已激活");
             hasConfigMultiLevelApproval = true;
         }
-        if (selectedPmOrder.getManHours() == null) {
-            selectedPmOrder.setManHours(0.1);
-        }
         confirmedUpDate = null;
         endTime = selectedPmOrder.getEndTime();
         planTime = selectedPmOrder.getPlanTime();
@@ -2515,7 +2512,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             if(selectedPmOrder.getEntryType() == null){
                 selectedPmOrder.setEntryType(0);
-                selectedPmOrder.setManHours(Double.parseDouble("1"));
+            }
+            if(selectedPmOrder.getManHours() == null){
+                selectedPmOrder.setManHours(0.1);
             }
         }
 
@@ -3912,8 +3911,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         selectedPmOrder.setEntryType(entryType);
         if (entryType == 1) {
-            selectedPmOrder.setManHours(null);
             pmHoursList = null;
+            selectedPmOrder.setManHours(null);
+        }else if(entryType == 0){
+            selectedPmOrder.setManHours(null);
+            String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectedPmOrder.getSiteUID(), selectedPmOrder.getHospitalUID(), selectedPmOrder.getInstitutionUID(), selectedPmOrder.getTenantUID(), "pmEntryTypeSet");
+            if(StrUtil.isNotEmpty(value)){
+                FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
+                if(fieldColumnDto.getEntryType() != null){
+                    if(fieldColumnDto.getEntryType() == 0){
+                        selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                    }
+                }
+            }
+            if(selectedPmOrder.getManHours() == null){
+                selectedPmOrder.setManHours(0.1);
+            }
         }
     }
 
