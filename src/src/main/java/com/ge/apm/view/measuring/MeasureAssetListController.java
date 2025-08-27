@@ -181,6 +181,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         wrapper.andNew();
         if (scrapped) {
             wrapper.eq("ai.status", 4);
+            wrapper.eq("ai.is_valid", false);
         } else {
             wrapper.ne("ai.status", 4);
             wrapper.eq("ai.is_valid", true);
