@@ -6,6 +6,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ReceiveBorrowConstant;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -237,7 +238,13 @@ public class AssetInfoBulkEditCheckService {
         List<NurseSiteMaintainConfigItem> configItemList = nurseSiteMaintainConfigItemRepository.findByAssetUid(assetInfo.getUid());
         if(!CollectionUtils.isEmpty(configItemList)){
             nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
-            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(configItemList));
+            List<Object> collect = configItemList.stream().map(item -> {
+                Map<String, String> data = new HashMap<>();
+                data.put("assetUid", item.getAssetUid());
+                data.put("configId", item.getParentId());
+                return data;
+            }).collect(Collectors.toList());
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "", AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(collect));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         }
 
