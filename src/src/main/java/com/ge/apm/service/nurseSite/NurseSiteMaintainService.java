@@ -627,7 +627,10 @@ public class NurseSiteMaintainService {
 		userAccount.setHospitalUID(nurseSiteMaintainConfigItem.getHospitalUID());
 		userAccount.setSiteUID(nurseSiteMaintainConfigItem.getSiteUID());
 		for (NurseSiteMaintainConfigItem item : result) {
-			SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(userAccount, SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, item.getId(), true, null, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(item));
+			Map<String, String> eventData = new HashMap<>();
+			eventData.put("assetUid", item.getAssetUid());
+			eventData.put("configId", item.getParentId());
+			SystemEventAudit systemEventAudit = systemEventAuditUtil.buildEventAudit(userAccount, SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, item.getId(), true, null, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(eventData));
 			systemEventAuditUtil.sendSystemAuditMessage(systemEventAudit);
 		}
 	}
