@@ -14,7 +14,7 @@
                     <label class="label">#{msg.zkbEngineer_name}*</label>
 
                     <p:autoComplete id="engineerName" value="#{zkbTrainRegisterMainController.selectedEngineer}" converter="zkbEngineerConverter" dropdown="true"
-                                    forceSelection="true" required="true" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
+                                    forceSelection="true" required="true"
                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{zkbTrainRegisterMainController.autoCompleteEngineer}">
                         <p:ajax event="itemSelect" listener="#{zkbTrainRegisterMainController.engineerChange()}" process="@this" update="@(.engineerNameChange)" />
                         <p:ajax listener="#{zkbTrainRegisterMainController.engineerChange()}" process="@this" update="@(.engineerNameChange)" />

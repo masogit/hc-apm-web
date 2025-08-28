@@ -48,8 +48,11 @@
                     <p:column headerText="Modality" filterBy="#{item.Modality}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.modality}"/>
                     </p:column>
-                    <p:column headerText="课程名称"  filterBy="#{item.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
+                    <p:column headerText="课程名称"  filterBy="#{item.zkbTrainCourse.name}"  filterMatchMode="LIKE" rendered="#{userContextService.zkbAdmin}">
                         <h:outputText value="#{item.zkbTrainCourse.name}"/>
+                    </p:column>
+                    <p:column headerText="课程名称"  filterBy="#{item.zkbTrainCourse.shortName}"  filterMatchMode="LIKE" rendered="#{userContextService.zkbUser}">
+                        <h:outputText value="#{item.zkbTrainCourse.shortName}"/>
                     </p:column>
                     <p:column headerText="课程类型"   filterBy="#{item.zkbTrainCourse.courseType}" filterMatchMode="EQ" >
                         <f:facet name="filter">
