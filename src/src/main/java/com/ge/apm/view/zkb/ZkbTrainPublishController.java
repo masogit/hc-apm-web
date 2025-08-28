@@ -4,12 +4,15 @@ import com.ge.apm.dao.ZkbTrainPublishRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbTrainCourse;
 import com.ge.apm.domain.ZkbTrainPublishInfo;
+import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.zkb.ZkbTrainCourseQuotaService;
 import com.ge.apm.service.zkb.ZkbTrainPublishService;
+import com.ge.apm.view.budget.BudgetApplicationBapController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -19,8 +22,11 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -39,6 +45,9 @@ public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrai
 
     @Getter@Setter
     private List<ZkbTrainCourse> zkbTrainCourseList = new ArrayList<>();
+
+    @Getter @Setter
+    private StreamedContent exportFile;
 
     @Override
     protected void init() {
@@ -91,6 +100,14 @@ public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrai
 
     public void saveData(){
         zkbTrainPublishService.save(selected, currentUser,selectedCourse);
+    }
+
+    public void exportAll()  {
+        try {
+            exportFile = zkbTrainPublishService.exportZipFile(selected);
+        }catch (IOException ex) {
+            java.util.logging.Logger.getLogger(BudgetApplicationBapController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
