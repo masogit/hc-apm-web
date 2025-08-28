@@ -140,6 +140,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             selectedDetail = null;
             v2_blobObjectList = new ArrayList<>();
         }else{
+            selectedDetail.setRegisterId(zkbTrainPublishRegister.getId());
             zkbTrainPublishRegisterService.modifyDetail(selectedDetail, v2_blobObjectList);
         }
 
