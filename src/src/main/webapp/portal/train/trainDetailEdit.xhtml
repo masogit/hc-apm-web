@@ -114,8 +114,8 @@
 
                   </p:commandButton>
                </p:dataList>
-               <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|mp4|avi|pptx|PPTX|AVI|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF|MP4)$/" fileUploadListener="#{trainInSiteController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                             multiple="true"  sizeLimit="11000000"  update="uploadCompleteList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}"/>
+               <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|mp4|avi|pptx|zip|ZIP|PPTX|AVI|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF|MP4)$/" fileUploadListener="#{trainInSiteController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                             multiple="true"  sizeLimit="110000000"  update="uploadCompleteList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}"/>
             </h:panelGroup>
          </p:fieldset>
          <br/>
