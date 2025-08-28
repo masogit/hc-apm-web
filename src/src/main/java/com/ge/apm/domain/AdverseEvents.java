@@ -245,7 +245,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 伤害程度描述
      */
     @Column(name = "harm_degree_desc")
-    @Size(max = 100)
+    @Size(max = 1000)
     private String harmDegreeDesc;
 
     /**
@@ -351,28 +351,28 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 使用过程
      */
     @Column(name = "use_process")
-    @Size(min = 1, max = 500)
+    @Size(max = 1000)
     private String useProcess;
 
     /**
      * 合并用药/器械情况说明
      */
     @Column(name = "device_desc")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String deviceDesc;
 
     /**
      * 事件原因分析
      */
     @Column(name = "event_cause_analyze")
-    @Size(min = 1, max = 500)
+    @Size(max = 1000)
     private String eventCauseAnalyze;
 
     /**
      * 事件原因分析描述
      */
     @Column(name = "event_cause_desc")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String eventCauseDesc;
 
     /**
@@ -386,7 +386,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 初步处置情况
      */
     @Column(name = "init_dispose_situ")
-    @Size(min = 1, max = 500)
+    @Size(max = 1000)
     private String initDisposeSitu;
 
     /**
@@ -427,7 +427,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 调查情况
      */
     @Column(name = "survey_situ")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String surveySitu;
 
     /**
@@ -441,14 +441,14 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 关联性评价
      */
     @Column(name = "relevance_eval")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String relevanceEval;
 
     /**
      * 评价结果-事件原因分析
      */
     @Column(name = "eval_cause_analyze")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String evalCauseAnalyze;
 
     /**
@@ -468,7 +468,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 具体控制措施
      */
     @Column(name = "control_measure_desc")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String controlMeasureDesc;
 
     /**
@@ -482,7 +482,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 未采取控制措施原因
      */
     @Column(name = "not_control_cause")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String notControlCause;
 
     /**
@@ -495,7 +495,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 错报误报原因
      */
     @Column(name = "false_report_cause")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String falseReportCause;
 
     /**
@@ -522,7 +522,7 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
      * 退回原因
      */
     @Column(name = "return_reason")
-    @Size(max = 500)
+    @Size(max = 1000)
     private String returnReason;
 
     /**
