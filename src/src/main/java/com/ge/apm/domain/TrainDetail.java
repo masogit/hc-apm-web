@@ -100,6 +100,9 @@ public class TrainDetail implements Serializable {
     @Column(name = "complete_recorder")
     private String completeRecorder;
 
+    @Column(name = "vedio_url")
+    private String vedioUrl;
+
     @Override
     public int hashCode() {
         int hash = 0;
