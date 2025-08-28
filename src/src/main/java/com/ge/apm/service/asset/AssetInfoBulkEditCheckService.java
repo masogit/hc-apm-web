@@ -224,7 +224,7 @@ public class AssetInfoBulkEditCheckService {
         }
         return flag;
     }
-
+    
     public void deleteNursiteMaintain(AssetInfo assetInfo) {
         //删除检查项工单相关数据
         List<NurseSiteMaintainItem> noCheckedByAssetUidAAndScheduleDate = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidAAndScheduleDate(assetInfo.getUid(), new Date());
@@ -235,6 +235,16 @@ public class AssetInfoBulkEditCheckService {
             if(CollectionUtils.isEmpty(idsByParentId)) nurseSiteMaintainItemRepository.deleteMaintainById(item.getParentId());
         }
         //删除检查项配置相关数据
+        deleteNurseSiteMaintainConfigItem(assetInfo);
+
+        /*List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(assetInfo.getUid());
+        for(String parentId : parentIds) {
+            int configItemCountByParentId = nurseSiteMaintainItemRepository.findConfigItemCountByParentId(parentId);
+            if(configItemCountByParentId < 1) nurseSiteMaintainItemRepository.deleteMaintainConfigById(parentId);
+        }*/
+    }
+
+    public void deleteNurseSiteMaintainConfigItem(AssetInfo assetInfo) {
         List<NurseSiteMaintainConfigItem> configItemList = nurseSiteMaintainConfigItemRepository.findByAssetUid(assetInfo.getUid());
         if(!CollectionUtils.isEmpty(configItemList)){
             nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
@@ -247,13 +257,8 @@ public class AssetInfoBulkEditCheckService {
             SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), SystemEventAuditEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM_DELETE, assetInfo.getUid(), Boolean.TRUE, "", AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType(), JSONObject.toJSONString(collect));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         }
-
-        /*List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(assetInfo.getUid());
-        for(String parentId : parentIds) {
-            int configItemCountByParentId = nurseSiteMaintainItemRepository.findConfigItemCountByParentId(parentId);
-            if(configItemCountByParentId < 1) nurseSiteMaintainItemRepository.deleteMaintainConfigById(parentId);
-        }*/
     }
+
     /**
      * 批量导入资产时
      * @param assets
