@@ -113,7 +113,7 @@
 			<br />
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:maintainConfigListForm" icon="ui-icon-check"
-				oncomplete="PF('maintainConfigEditDialog').hide();handleSubmit(args, 'maintainConfigEditDialog')" action="#{maintainConfigController.update}"
+				oncomplete="handleSubmitMaintainConfigEdit(args, 'maintainConfigEditDialog')" action="#{maintainConfigController.update}"
 				disabled="#{maintainConfigController.saveDisable}" timeout="180000" />
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainConfigEditDialog').hide()" />
 		</h:form>
@@ -229,6 +229,15 @@
                  <p:commandButton  immediate="true"  value="#{msg.Cancel}" update=":growl,:maintainConfigEditForm:addCheckItem2,:maintainConfigEditForm:saveButtonId" icon="ui-icon-cancel" onclick="PF('checkItemEditDlg').hide()" />
 			</h:panelGroup>
 		</h:form>
+
+		<h:outputScript>
+			function handleSubmitMaintainConfigEdit(args,t){
+				var complete = args.complete;
+				if(complete==true) {
+					PF(t).hide();
+                }
+			}
+		</h:outputScript>
 	</p:dialog>
 </ui:composition>
 </html>

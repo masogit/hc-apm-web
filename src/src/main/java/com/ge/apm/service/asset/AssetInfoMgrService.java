@@ -107,6 +107,7 @@ public class AssetInfoMgrService {
         clearAssetLinkUid(asset);
         assetDao.save(asset);
         updateNurseSiteMaintain(asset.getUid());
+        WebUtil.addSuccessMessage("设备成功删除");
         logger.info("delete asset info successful. assetName: {}", asset.getName());
     }
 
