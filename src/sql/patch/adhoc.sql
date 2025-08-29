@@ -11,6 +11,14 @@ CREATE INDEX if not exists v2_pm_order_asset_uid_idx ON public.v2_pm_order (asse
 CREATE INDEX if not exists v2_pm_order_plan_time_idx ON public.v2_pm_order (plan_time);
 CREATE INDEX if not exists v2_work_order_asset_uid_idx ON public.v2_work_order (asset_uid);
 
+
+ALTER TABLE adverse_events ALTER COLUMN harm_perform TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN device_fault_perform TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN event_cause_analyze TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN harm_degree_desc TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN return_reason TYPE VARCHAR(1000);
+
+
 -- YHAAO-25895 无人值守调剂中心，数据异常问题处理
 -- cs002
 UPDATE shared_asset_req_detail SET charging_begin_time='2025-8-20 7:58:20',clinical_dept_for_return_name='心胸血管外科',clinical_dept_for_return_uid='d1772a767a704a16bd767dd0e2a8da7a',clinical_dept_name='心胸血管外科',clinical_dept_uid='d1772a767a704a16bd767dd0e2a8da7a',create_by='81980f81f880483da9aa38da53adf7fe',create_date='2025-8-20 7:58:20' WHERE ID='2c9b858298a36e380198cb7ddd8e7925';
@@ -34,11 +42,3 @@ update asset_info set asset_dept_uid = clinical_dept_uid,asset_dept_id = clinica
 -- HJX008
 update shared_asset_req_detail  set  clinical_dept_for_return_name = '肾内科',clinical_dept_for_return_uid='7d4873666fe94dde965f1dbe25cc510b',clinical_dept_name='肾内科',clinical_dept_uid='7d4873666fe94dde965f1dbe25cc510b',charging_begin_time='2025-08-20 17:19:44',charging_end_time='2025-08-20 18:44:10'  where id='2c9b858298a36e380198cb7df77d7929';
 update shared_asset_request  set clinical_dept_name = '肾内科',clinical_dept_uid='7d4873666fe94dde965f1dbe25cc510b',remark='' where id in('2c9b858298a36e380198cb7df77d7928','2c9b858298a36e380198cb7e2fd8792e');
-
-
-
-ALTER TABLE adverse_events ALTER COLUMN harm_perform TYPE VARCHAR(1000);
-ALTER TABLE adverse_events ALTER COLUMN device_fault_perform TYPE VARCHAR(1000);
-ALTER TABLE adverse_events ALTER COLUMN event_cause_analyze TYPE VARCHAR(1000);
-ALTER TABLE adverse_events ALTER COLUMN harm_degree_desc TYPE VARCHAR(1000);
-ALTER TABLE adverse_events ALTER COLUMN return_reason TYPE VARCHAR(1000);
