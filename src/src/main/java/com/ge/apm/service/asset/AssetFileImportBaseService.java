@@ -217,6 +217,11 @@ public class AssetFileImportBaseService {
             assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
         }
     }
+    public void deleteNurseSiteMaintainConfigItem(List<AssetInfo> uncheckedNursiteMaintainAssetList) {
+        for (AssetInfo assetInfo : uncheckedNursiteMaintainAssetList) {
+            assetInfoBulkEditCheckService.deleteNurseSiteMaintainConfigItem(assetInfo);
+        }
+    }
 
     @Transactional
     public List<AssetInfo> importAssetData(List<Map<String, Object>> importAssetMap,

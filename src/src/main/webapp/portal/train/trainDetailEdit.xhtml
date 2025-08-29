@@ -98,6 +98,10 @@
                   <label class="label">记录者*</label>
                   <p:inputText value="#{trainInSiteController.selectedTrainDetail.completeRecorder}" disabled="true"/>
                </h:panelGroup>
+               <h:panelGroup>
+                  <label class="label">视频链接</label>
+                  <p:inputText value="#{trainInSiteController.selectedTrainDetail.vedioUrl}" />
+               </h:panelGroup>
             </p:panelGrid>
             <h:panelGroup >
                <p:dataList id="uploadCompleteList" value="#{trainInSiteController.resultBlobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
@@ -110,8 +114,8 @@
 
                   </p:commandButton>
                </p:dataList>
-               <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|mp4|avi|AVI|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF|MP4)$/" fileUploadListener="#{trainInSiteController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                             multiple="true"  sizeLimit="31000000"  update="uploadCompleteList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}"/>
+               <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|mp4|avi|pptx|PPTX|AVI|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF|MP4)$/" fileUploadListener="#{trainInSiteController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                             multiple="true"  sizeLimit="11000000"  update="uploadCompleteList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}"/>
             </h:panelGroup>
          </p:fieldset>
          <br/>

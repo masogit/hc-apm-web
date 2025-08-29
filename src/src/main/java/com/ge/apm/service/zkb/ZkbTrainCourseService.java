@@ -2,10 +2,8 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.ZkbTrainCourseQuotaRepository;
 import com.ge.apm.dao.ZkbTrainCourseRepository;
-import com.ge.apm.domain.UploadFileErrorTypeEnum;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbTrainCourse;
-import com.ge.apm.domain.ZkbTrainCourseQuota;
+import com.ge.apm.dao.ZkbTrainPublishRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -34,6 +32,9 @@ public class ZkbTrainCourseService {
 
     @Autowired
     ZkbTrainCourseQuotaRepository zkbTrainCourseQuotaRepository;
+
+    @Autowired
+    ZkbTrainPublishRepository zkbTrainPublishRepository;
 
     public boolean checkCourse(ZkbTrainCourse zkbTrainCourse){
         if(StrUtil.isEmpty(zkbTrainCourse.getId())){
@@ -195,6 +196,11 @@ public class ZkbTrainCourseService {
         boolean rs = true;
         List<ZkbTrainCourseQuota> zkbTrainCourseQuotas = zkbTrainCourseQuotaRepository.findByCourseId(zkbTrainCourse.getId());
         if(CollectionUtils.isNotEmpty(zkbTrainCourseQuotas)){
+            rs = false;
+        }
+
+        List<ZkbTrainPublishInfo> zkbTrainPublishInfos = zkbTrainPublishRepository.findByCourseId(zkbTrainCourse.getId());
+        if(CollectionUtils.isNotEmpty(zkbTrainPublishInfos)){
             rs = false;
         }
         return rs;

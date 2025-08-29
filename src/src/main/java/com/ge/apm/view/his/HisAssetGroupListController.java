@@ -128,11 +128,15 @@ public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroup
     }
 
     public Integer getAssetCountsByhisAssetGroupAssetMatch(HisAssetGroupAssetMatch hisAssetGroupAssetMatch){
-        if(hisAssetGroupAssetMatch.getHisAssetGroup().getType().equals("Cost")){
-          return    getAssetCountsByGroupUidAndOrgInfoUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getOrgInfoUid());
-        }else{
-            return    getAssetCountsByGroupUidAndDeptUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getClinicalDeptUid());
+        if(hisAssetGroupAssetMatch.getHisAssetGroup()!=null){
+            if(hisAssetGroupAssetMatch.getHisAssetGroup().getType().equals("Cost")){
+                return    getAssetCountsByGroupUidAndOrgInfoUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getOrgInfoUid());
+            }else{
+                return    getAssetCountsByGroupUidAndDeptUid(hisAssetGroupAssetMatch.getAssetGroupUid(),hisAssetGroupAssetMatch.getClinicalDeptUid());
+            }
         }
+        return null;
+
     }
 
 }

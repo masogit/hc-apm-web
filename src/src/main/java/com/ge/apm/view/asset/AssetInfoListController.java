@@ -690,10 +690,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void deleteAsset(AssetInfo asset) {
         int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);
-        assetHistoryService.deleteAsset(asset);
-        WebUtil.addSuccessMessage("设备成功删除");
-
-        logger.info("delete asset successful. assetName: {}", asset.getName());
+        if(Boolean.TRUE.equals(asset.getIsDeleted())){
+            assetHistoryService.deleteAsset(asset);
+        }
 //        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
     }
 
