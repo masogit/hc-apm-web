@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
 
 <ui:composition>
-    <p:dialog id="editDlg" widgetVar="editDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainPublishController.CRUDActionName} 课程" width="600" height="400">
+    <p:dialog id="editDlg" widgetVar="editDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainPublishController.CRUDActionName} 培训发布信息" width="600" height="400">
         <h:form id="zkbCourseEditForm">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainPublishController.selected != null}">
                 <h:panelGroup>

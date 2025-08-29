@@ -37,4 +37,8 @@ update shared_asset_request  set clinical_dept_name = '肾内科',clinical_dept_
 
 
 
-ALTER TABLE adverse_events ALTER COLUMN harm_perform TYPE VARCHAR(300);
+ALTER TABLE adverse_events ALTER COLUMN harm_perform TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN device_fault_perform TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN event_cause_analyze TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN harm_degree_desc TYPE VARCHAR(1000);
+ALTER TABLE adverse_events ALTER COLUMN return_reason TYPE VARCHAR(1000);

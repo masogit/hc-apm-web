@@ -14,7 +14,7 @@
                     <label class="label">#{msg.zkbEngineer_name}*</label>
 
                     <p:autoComplete id="engineerName" value="#{zkbTrainRegisterMainController.selectedEngineer}" converter="zkbEngineerConverter" dropdown="true"
-                                    forceSelection="true" required="true" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
+                                    forceSelection="true" required="true"
                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{zkbTrainRegisterMainController.autoCompleteEngineer}">
                         <p:ajax event="itemSelect" listener="#{zkbTrainRegisterMainController.engineerChange()}" process="@this" update="@(.engineerNameChange)" />
                         <p:ajax listener="#{zkbTrainRegisterMainController.engineerChange()}" process="@this" update="@(.engineerNameChange)" />
@@ -37,17 +37,22 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbEngineer_email}</label>
-                    <p:inputText id="email" value="#{zkbTrainRegisterMainController.selectedDetail.engineerEmail}" required="false" requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}" class="engineerNameChange"/>
+                    <p:inputText id="email" value="#{zkbTrainRegisterMainController.selectedDetail.engineerEmail}" required="false" requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}" class="engineerNameChange">
+                    <p:ajax />
+                    </p:inputText>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbEngineer_age}*</label>
                     <p:inputNumber id="age"  decimalPlaces="0" minValue="0" maxValue="999" value="#{zkbTrainRegisterMainController.selectedDetail.engineerAge}" required="true" requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}" class="engineerNameChange">
                         <f:convertNumber pattern="0" type="number"/>
+                        <p:ajax />
                     </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">SSO</label>
-                    <p:inputText id="sso" disabled="true" value="#{zkbTrainRegisterMainController.selectedDetail.engineerSso}" class="engineerNameChange"/>
+                    <p:inputText id="sso" disabled="true" value="#{zkbTrainRegisterMainController.selectedDetail.engineerSso}" class="engineerNameChange">
+                        <p:ajax />
+                    </p:inputText>
                 </h:panelGroup>
             </p:panelGrid>
 

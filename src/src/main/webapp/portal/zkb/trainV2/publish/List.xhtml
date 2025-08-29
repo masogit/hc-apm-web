@@ -20,7 +20,7 @@
                              currentPageReportTemplate="总行数: {totalRecords}"
                              rowsPerPageTemplate="20,50,100,500">
 
-                    <p:ajax event="rowSelect"  update="deleteButton editButton"/>
+                    <p:ajax event="rowSelect"  update="deleteButton editButton exportButton"/>
                     <p:ajax event="filter" listener="#{zkbTrainPublishController.onFilter}" />
                     <p:column headerText="CatNo" filterBy="#{item.zkbTrainCourse.catNo}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.zkbTrainCourse.catNo}"/>
@@ -64,6 +64,9 @@
                          <p:commandButton id="editButton"  icon="ui-icon-pencil" title="编辑" actionListener="#{zkbTrainPublishController.prepareEdit}" update="editDlg" oncomplete="PF('editDialog').show()" disabled="#{empty zkbTrainPublishController.selected.id}" />
                         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbTrainPublishController.delete}" update=":listForm:datalist" >
                             <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                        <p:commandButton id="exportButton" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{zkbTrainPublishController.exportAll()}" ajax="false" disabled="#{empty zkbTrainPublishController.selected.id}" >
+                            <p:fileDownload value="#{zkbTrainPublishController.exportFile}"/>
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>

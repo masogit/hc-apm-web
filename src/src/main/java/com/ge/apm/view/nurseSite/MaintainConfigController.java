@@ -248,23 +248,34 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
     @Override
     public void save(){
+
+		boolean complete=false;
 		if(CollectionUtils.isEmpty(listCheckAssets)){
 			WebUtil.addWarnMessage("设备绑定不能为空");
-			return;
+
+		}else{
+			saveMaintainConfig(this.selected,true);
+			this.selected=null;
+			WebUtil.addSuccessMessage("保存成功");
+			complete=true;
 		}
-    	saveMaintainConfig(this.selected,true);
-        this.selected=null;
-        WebUtil.addSuccessMessage("保存成功");
+		RequestContext requestContext = RequestContext.getCurrentInstance();
+		requestContext.addCallbackParam("complete", complete);
     }
     
     public void update(){
+		boolean complete=false;
 		if(CollectionUtils.isEmpty(listCheckAssets)){
 			WebUtil.addWarnMessage("设备绑定不能为空");
-			return;
+		}else{
+			saveMaintainConfig(this.selected,false);
+			this.selected=null;
+			WebUtil.addSuccessMessage("保存成功");
+			complete=true;
 		}
-    	saveMaintainConfig(this.selected,false);
-        this.selected=null;
-        WebUtil.addSuccessMessage("保存成功");
+		RequestContext requestContext = RequestContext.getCurrentInstance();
+		requestContext.addCallbackParam("complete", complete);
+
     }
     
     @Override

@@ -263,6 +263,7 @@ public class AssetFileImportController {
                 streamingService.deleteNursiteMaintain(unCheckNurseSiteMaintainList);
                 toDeleteCheckedNurseSite = false;
             }
+            deleteNurseSiteMaintainConfigItem(saveList);
             //importU seCacheService.importAssetData(crossSite, selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
             isImported = true;
 
@@ -278,7 +279,12 @@ public class AssetFileImportController {
             logger.error(e.getMessage(), e);
         }
     }
-
+    public void deleteNurseSiteMaintainConfigItem(List<AssetInfo> assetInfos) {
+        if(toDeleteCheckedNurseSite) return;
+        List<AssetInfo> scrappedEquipment = assetInfos.stream().filter(item -> Integer.valueOf(4).equals(item.getStatus())).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(scrappedEquipment)) return;
+        streamingService.deleteNurseSiteMaintainConfigItem(scrappedEquipment);
+    }
     public void exportAssetExcelTemplate() throws IOException {
 
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());

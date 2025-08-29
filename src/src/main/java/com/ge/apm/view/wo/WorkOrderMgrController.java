@@ -3185,9 +3185,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         selectedWorkOrder.setEntryType(entryType);
         if (entryType == 1) {
-            selectedWorkOrder.setManHours(null);
             workHoursList = null;
         }
+        selectedWorkOrder.setManHours(null);
     }
 
     public void updateCoworkerEntryType(Integer entryType) {

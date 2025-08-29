@@ -101,7 +101,7 @@
 			<br />
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:maintainConfigListForm" icon="ui-icon-check"
-				oncomplete="PF('maintainConfigCreateDialog').hide();handleSubmit(args, 'maintainConfigCreateDialog')" actionListener="#{maintainConfigController.save}"
+				oncomplete="handleSubmitMaintainConfigEdit(args, 'maintainConfigCreateDialog')" actionListener="#{maintainConfigController.save}"
                 disabled="#{maintainConfigController.saveDisable}" timeout="180000" />
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainConfigCreateDialog').hide()" />
 		</h:form>
@@ -217,6 +217,15 @@
                  <p:commandButton immediate="true"  value="#{msg.Cancel}" update=":maintainConfigCreateForm :checkItemCreateForm :editOptionDialogForm :growl" icon="ui-icon-cancel" onclick="PF('checkItemCreateDlg').hide()" />
 			</h:panelGroup>
 		</h:form>
+
+		<h:outputScript>
+			function handleSubmitMaintainConfigEdit(args,t){
+				var complete = args.complete;
+				if(complete==true) {
+					PF(t).hide();
+				}
+			}
+		</h:outputScript>
 	</p:dialog>
 	<ui:include src="configItemList.xhtml" />
 </ui:composition>
