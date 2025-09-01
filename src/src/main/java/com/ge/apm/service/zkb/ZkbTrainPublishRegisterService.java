@@ -130,4 +130,8 @@ public class ZkbTrainPublishRegisterService {
         return blobObjectRepository.findByBoUuid(boUUid);
     }
 
+    public List<ZkbTrainPublishRegisterDetail> queryDetailByRegister(String id){
+        return zkbTrainPublishRegisterDetailRepository.findByRegisterId(id);
+    }
+
 }

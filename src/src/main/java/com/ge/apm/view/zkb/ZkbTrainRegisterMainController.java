@@ -107,6 +107,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         selectedDetail = null;
     }
 
+    public void removeFile(V2_BlobObject v2BlobObject){
+        v2_blobObjectList.remove(v2BlobObject);
+        blobService.deleteBlobFile(v2BlobObject);
+    }
+
     public void chooseEngineerData(){
 
     }
@@ -142,6 +147,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         }else{
             selectedDetail.setRegisterId(zkbTrainPublishRegister.getId());
             zkbTrainPublishRegisterService.modifyDetail(selectedDetail, v2_blobObjectList);
+            zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
         }
 
     }
