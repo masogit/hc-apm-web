@@ -17,6 +17,7 @@ import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.pm.V2PmOrderController;
@@ -116,6 +117,8 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private OrgInfoTreeService orgInfoTreeService;
     private Map<String, Integer> woStatus = new HashMap<String, Integer>();
     private FileDownloadService fileDownloadService;
+
+    private UaaService uaaService;
 
     public List<V2_BlobObject> getAttachListEhmeFile() {
         return attachListEhmeFile;
@@ -247,6 +250,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
+            uaaService = WebUtil.getBean(UaaService.class);
             assetTypeGroupList = loginUser.getAssetTypeGroupList();
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -969,24 +973,52 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     }
 
     private void loadMVSClinicalDeptList() {
-        try {
-            logger.info("loadMVSClinicalDeptList.mvs {} "+CollectionUtils.isEmpty(bySearchFilterMVS));
-            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                logger.info("loadMVSClinicalDeptList.size {} "+bySearchFilterMVS.size());
-                clinicalDeptListMVS = bySearchFilterMVS.stream()
-                        .map(item -> Optional.ofNullable(item.getAssetInfo())
-                                .map(AssetInfo::getClinicalDeptUID)
-                                .orElse(null)) // 如果 getClinicalDeptUID() 为 null，则使用 null
-                        .filter(Objects::nonNull) // 过滤掉所有 null 值
-                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                        .stream()
-                        .map(val -> cacheService.findOrgByUid(val))
-                        .collect(Collectors.toList());
-                logger.info("loadMVSClinicalDeptList.clinicalDeptListMVS {} "+JSONObject.toJSONString(clinicalDeptListMVS));
+//        try {
+//            logger.info("loadMVSClinicalDeptList.mvs {} "+CollectionUtils.isEmpty(bySearchFilterMVS));
+//            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+//                logger.info("loadMVSClinicalDeptList.size {} "+bySearchFilterMVS.size());
+//                clinicalDeptListMVS = bySearchFilterMVS.stream()
+//                        .map(item -> Optional.ofNullable(item.getAssetInfo())
+//                                .map(AssetInfo::getClinicalDeptUID)
+//                                .orElse(null)) // 如果 getClinicalDeptUID() 为 null，则使用 null
+//                        .filter(Objects::nonNull) // 过滤掉所有 null 值
+//                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+//                        .stream()
+//                        .map(val -> cacheService.findOrgByUid(val))
+//                        .collect(Collectors.toList());
+//                logger.info("loadMVSClinicalDeptList.clinicalDeptListMVS {} "+JSONObject.toJSONString(clinicalDeptListMVS));
+//
+//            }
+//        } catch (Exception e) {
+//            logger.info("暂无MVS列表");
+//        }
 
+        try {
+            clinicalDeptListMVS = Collections.emptyList();
+            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+            if (!CollectionUtils.isEmpty(deptList)) {
+                clinicalDeptListMVS = deptList.stream()
+                        .filter(item ->
+                        {
+                            if (item == null) {
+                                LOGGER.info("null");
+                            }
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
+                        .collect(Collectors.toList());
+            }
+
+            if (null != selectSite && !clinicalDeptListMVS.isEmpty()) {
+                clinicalDeptListMVS = clinicalDeptListMVS.stream()
+                        .filter(item -> StringUtils.equals(item.getSiteUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getHospitalUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getInstitutionUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getTenantUID(), selectSite.getSiteUID()))
+                        .collect(Collectors.toList());
             }
         } catch (Exception e) {
-            logger.info("暂无MVS列表");
+            LOGGER.error("loadClinicalDeptList occur exception", e);
+            throw e;
         }
     }
 
