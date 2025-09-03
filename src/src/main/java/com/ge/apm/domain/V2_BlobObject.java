@@ -208,6 +208,9 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
+    @Column(name = "lock")
+    private Boolean lock;
+
     @Transient
     private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
 
@@ -391,6 +394,14 @@ public class V2_BlobObject implements Serializable {
 
     public void setTenantUid(String tenantUid) {
         this.tenantUid = tenantUid;
+    }
+
+    public Boolean getLock() {
+        return lock;
+    }
+
+    public void setLock(Boolean lock) {
+        this.lock = lock;
     }
 
     public boolean showPreview() {

@@ -326,6 +326,13 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
+    public void lockAttachmentById(String blobId) {
+        blobService.updateBlobLock(blobId,Boolean.TRUE);
+    }
+    public void unlockAttachmentById(String blobId) {
+        blobService.updateBlobLock(blobId,Boolean.FALSE);
+    }
+
     public void removeUploadedFileObjects(String blobId) {
         blobService.deleteBlobFileById(blobId);
         uploadedFileObjects = uploadedFileObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
