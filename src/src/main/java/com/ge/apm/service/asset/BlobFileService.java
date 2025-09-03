@@ -339,6 +339,11 @@ public class BlobFileService {
         blobDao.save(blobObjects);
     }
 
+    public void updateBlobLock(String blobId, Boolean lock) {
+        blobDao.updateBlobLock(blobId, lock);
+    }
+
+
     public StreamedContent getBlobObjectByStorageId(String storageId){
         return microService.downloadSingleFile(storageId);
     }
