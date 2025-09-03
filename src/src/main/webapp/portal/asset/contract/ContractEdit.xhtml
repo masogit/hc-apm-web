@@ -239,6 +239,8 @@
                                     <p:commandLink value="#{msg.Delete}" update="AttachList" actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this" rendered="#{contractInfoEditController.canBeEdit}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandLink>
+                                    <p:commandLink value="#{msg.lockAttactments}" style="margin-right: 5px;"  process="@this" actionListener="#{contractInfoEditController.lockAttachmentById(fileitem.id)}" disabled="#{contractInfoEditController.lock}" />
+                                    <p:commandLink value="#{msg.unlockAttactments}" style="margin-right: 5px;"  process="@this" actionListener="#{contractInfoEditController.unlockAttachmentById(fileitem.id)}" disabled="#{!contractInfoEditController.lock}" />
                                 </div>
                             </p:dataList>
 

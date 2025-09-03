@@ -421,7 +421,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 org = configCacheService.findOrgByUid(approvalAssetInfo.getClinicalDeptUID());
                 break;
             default:
-                org = configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
                 break;
         }
 
