@@ -77,4 +77,8 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
 
     List<V2_BlobObject> findByObjectStorageIdIn(Set<String> objectIds);
 
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE v2_blob_object SET lock= ?2 WHERE id= ?1", nativeQuery = true)
+    public void updateBlobLock(String id, Boolean lock);
 }
