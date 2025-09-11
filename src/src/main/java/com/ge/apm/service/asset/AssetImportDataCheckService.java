@@ -195,7 +195,10 @@ public class AssetImportDataCheckService {
                 AssetInfo existAsset = assetDao.findByUid(assetImport.getUid());
                 if(existAsset !=null && !StringUtils.isEmpty(existAsset.getAssetDeptUID())){
                     OrgInfo org = configCacheService.findOrgByUid(existAsset.getAssetDeptUID());
-                    existAsset.setAssetDeptName(org.getName());
+                    if(org!=null){
+                        existAsset.setAssetDeptName(org.getName());
+                    }
+
                 }
                 assetImport.setOldQrCode(existAsset.getQrCode());
                 BeanUtils.copyProperties(assetImport, existAsset, beanNullProperty(assetImport));
