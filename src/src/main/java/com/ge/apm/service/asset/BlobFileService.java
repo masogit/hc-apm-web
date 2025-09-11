@@ -5,41 +5,35 @@
  */
 package com.ge.apm.service.asset;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.utils.FileScanService;
+import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.asset.AssetFileAttachmentController;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
-import com.ge.apm.mq.MqUtils;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.service.utils.FileScanService;
-import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.view.asset.AssetFileAttachmentController;
-import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
-import javax.tools.FileObject;
+import java.io.File;
+import java.io.InputStream;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
  * @author 212579464
  */
 @Component
@@ -57,13 +51,13 @@ public class BlobFileService {
 
     @Autowired
     private MqUtils mqUtils;
-    
+
     public V2_BlobObject uploadFile(FileUploadEvent event) {
         return uploadFile(event.getFile());
     }
-    
+
     public V2_BlobObject uploadFile(UploadedFile file) {
-    
+
         String path = "";
         try {
             path = fsService.saveUploadedFile(file);
@@ -140,11 +134,11 @@ public class BlobFileService {
 
     }
 
-    public V2_BlobObject uploadFile(InputStream input,String fileName) {
-        
+    public V2_BlobObject uploadFile(InputStream input, String fileName) {
+
         String path = "";
         try {
-            path = fsService.saveUploadedFile(input,fileName);
+            path = fsService.saveUploadedFile(input, fileName);
         } catch (Exception ex) {
 //            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
             Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
@@ -174,7 +168,7 @@ public class BlobFileService {
         }
 
     }
-    
+
     public V2_BlobObject uploadFileString(String str) {
         String path = "";
         try {
@@ -207,121 +201,123 @@ public class BlobFileService {
     }
 
     public Boolean deleteBlobFile(V2_BlobObject blobObject) {
-        
-        if(null == blobObject){
+
+        if (null == blobObject) {
             return false;
         }
-        
+
         String token = UserContextService.getAccessToken();
         if (token == null || token.isEmpty()) {
             WebUtil.addErrorMessage("do not have premission");
             return false;
         }
 
-        return deleteBlobFile(token,blobObject);
+        return deleteBlobFile(token, blobObject);
     }
-    
-    public void deleteBlobFile(List<V2_BlobObject> listBlobObject){
-    	if(listBlobObject!=null && listBlobObject.size()>0){
-    		for(int i=0;i<listBlobObject.size();++i){
-    			deleteBlobFile(listBlobObject.get(i));
-    		}
-    	}
+
+    public void deleteBlobFile(List<V2_BlobObject> listBlobObject) {
+        if (listBlobObject != null && listBlobObject.size() > 0) {
+            for (int i = 0; i < listBlobObject.size(); ++i) {
+                deleteBlobFile(listBlobObject.get(i));
+            }
+        }
     }
 
 
     public List<V2_BlobObject> getBlobObjectsByStorageId(String storagedId) {
         return blobDao.findAllByObjectStorageId(storagedId);
     }
-    
+
     public List<V2_BlobObject> getBlobObjectsByStorageId(Set<String> storagedId) {
         return blobDao.findAllByObjectStorageId(storagedId);
     }
 
-    public List<V2_BlobObject> findBlobObjectsByBoUid(String uid){
+    public List<V2_BlobObject> findBlobObjectsByBoUid(String uid) {
         return blobDao.findByBoUuid(uid);
     }
-    public List<V2_BlobObject> findBlobObjectsByBoUids(Set<String> uid){
-        List<SearchFilter> searchFilters=new ArrayList<>();
-        searchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.IN,uid));
+
+    public List<V2_BlobObject> findBlobObjectsByBoUids(Set<String> uid) {
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.IN, uid));
         return blobDao.findBySearchFilter(searchFilters);
     }
 
-    public Boolean deleteBlobFileById(String id){
+    public Boolean deleteBlobFileById(String id) {
         V2_BlobObject blobObject = blobDao.findById(id);
-        if(blobObject==null){
+        if (blobObject == null) {
             return null;
         }
         List<V2_BlobObject> blobList = getBlobObjectsByStorageId(blobObject.getObjectStorageId());
-        if(blobList!=null && blobList.size()==1){
+        if (blobList != null && blobList.size() == 1) {
             return deleteBlobFile(blobObject);
-        }else{
+        } else {
             blobDao.delete(blobObject);
             return true;
         }
     }
-    
-    public Boolean deleteBlobFileByBoUuid(String boUuid){
+
+    public Boolean deleteBlobFileByBoUuid(String boUuid) {
         List<V2_BlobObject> listBlobObject = blobDao.findByBoUuid(boUuid);
-        if(listBlobObject==null){
+        if (listBlobObject == null) {
             return null;
         }
-        if(listBlobObject!=null && listBlobObject.size()>0){
-            for(int i=0;i<listBlobObject.size();++i){
-            	deleteBlobFile(listBlobObject.get(i));
+        if (listBlobObject != null && listBlobObject.size() > 0) {
+            for (int i = 0; i < listBlobObject.size(); ++i) {
+                deleteBlobFile(listBlobObject.get(i));
             }
         }
         return true;
     }
-    
-    public Boolean deleteBlobFileByBoUuidAndType(String boUuid,String boType,String subType){
-        List<V2_BlobObject> listBlobObject = blobDao.fetchBlobObjectByUuidAndType(boUuid,boType,subType);
-        if(listBlobObject==null){
+
+    public Boolean deleteBlobFileByBoUuidAndType(String boUuid, String boType, String subType) {
+        List<V2_BlobObject> listBlobObject = blobDao.fetchBlobObjectByUuidAndType(boUuid, boType, subType);
+        if (listBlobObject == null) {
             return null;
         }
-        if(listBlobObject!=null && listBlobObject.size()>0){
-            for(int i=0;i<listBlobObject.size();++i){
-            	deleteBlobFile(listBlobObject.get(i));
+        if (listBlobObject != null && listBlobObject.size() > 0) {
+            for (int i = 0; i < listBlobObject.size(); ++i) {
+                deleteBlobFile(listBlobObject.get(i));
             }
         }
         return true;
     }
-    
-    public List<V2_BlobObject> fetchBlobObject(String boUuid,String boType,String subType){
-    	return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType, subType);
+
+    public List<V2_BlobObject> fetchBlobObject(String boUuid, String boType, String subType) {
+        return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType, subType);
     }
-    
-    public List<V2_BlobObject> fetchBlobObject(String boUuid,String boType){
-    	return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType);
+
+    public List<V2_BlobObject> fetchBlobObject(String boUuid, String boType) {
+        return blobDao.fetchBlobObjectByUuidAndType(boUuid, boType);
     }
 
     /**
      * Need to investigate why the same object storage id occurs more than once
+     *
      * @param objectId
      * @return
      */
     public Boolean deleteBlobFilesByStorageId(String objectId) {
         List<V2_BlobObject> objects = getBlobObjectsByStorageId(objectId);
-        for (V2_BlobObject object: objects) {
-            if(!deleteBlobFile(object)){
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    public Boolean deleteBlobFilesByStorageId(Set<String> setObjectIds) {
-        List<V2_BlobObject> objects = getBlobObjectsByStorageId(setObjectIds);
-        for (V2_BlobObject object: objects) {
-            if(!deleteBlobFile(object)){
+        for (V2_BlobObject object : objects) {
+            if (!deleteBlobFile(object)) {
                 return false;
             }
         }
         return true;
     }
 
-    
-    public Boolean deleteBlobFile(String token,V2_BlobObject blobObject) {
+    public Boolean deleteBlobFilesByStorageId(Set<String> setObjectIds) {
+        List<V2_BlobObject> objects = getBlobObjectsByStorageId(setObjectIds);
+        for (V2_BlobObject object : objects) {
+            if (!deleteBlobFile(object)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public Boolean deleteBlobFile(String token, V2_BlobObject blobObject) {
         if (microService.deleteFileObject(token, blobObject.getObjectStorageId())) {
             blobDao.delete(blobObject);
             return true;
@@ -330,12 +326,12 @@ public class BlobFileService {
             return false;
         }
     }
-    
-    public void saveBlobObject(V2_BlobObject blobObject){
+
+    public void saveBlobObject(V2_BlobObject blobObject) {
         blobDao.save(blobObject);
     }
-    
-    public void saveBlobObject(List<V2_BlobObject> blobObjects){
+
+    public void saveBlobObject(List<V2_BlobObject> blobObjects) {
         blobDao.save(blobObjects);
     }
 
@@ -343,13 +339,18 @@ public class BlobFileService {
         blobDao.updateBlobLock(blobId, lock);
     }
 
+    public boolean lock(String blobId) {
+        V2_BlobObject byId = blobDao.findById(blobId);
+        return ObjectUtil.isNotEmpty(byId) ? byId.getLock() : false;
+    }
 
-    public StreamedContent getBlobObjectByStorageId(String storageId){
+
+    public StreamedContent getBlobObjectByStorageId(String storageId) {
         return microService.downloadSingleFile(storageId);
     }
 
 
-    public V2_BlobObject compressByObjectId( String objectStorageId ) {
+    public V2_BlobObject compressByObjectId(String objectStorageId) {
         Map<String, Object> fileObject = microService.compressByObjectId(objectStorageId);
         if (null != fileObject) {
             V2_BlobObject blobObject = new V2_BlobObject();
@@ -400,8 +401,8 @@ public class BlobFileService {
 
     }
 
-    public void sendImageCompressMQ(V2_BlobObject blobObject){
-        if(null == blobObject){
+    public void sendImageCompressMQ(V2_BlobObject blobObject) {
+        if (null == blobObject) {
             return;
         }
         MqContext mqContext = new MqContext();
