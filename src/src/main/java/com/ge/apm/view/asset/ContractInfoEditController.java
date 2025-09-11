@@ -18,7 +18,27 @@ import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import javaslang.Tuple2;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.io.IOUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,34 +49,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.io.IOUtils;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javaslang.Tuple2;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
@@ -107,24 +104,31 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private Boolean canBeEdit;
 
     private Boolean terminate;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean displayMaintenanceField;
     private UserAccount currentUser;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean sortFlag = Boolean.TRUE;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Supplier newSupplier;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String newSupplierType;
 
     private List<I18nMessage> contractAttachmentTypeList;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<String> selectedBlobIdList;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Boolean> blobObjectSelectedMap;
-    @Getter @Setter
+    @Getter
+    @Setter
     private StreamedContent attachListFile;
 
     @Override
@@ -193,14 +197,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
         displayMaintenanceField = Boolean.valueOf(configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(),
                 currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "displayMaintenanceField"));
-        if(selected!=null) clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+        if (selected != null) clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
         // supplierList =
         // aimService.getSuplierListBySiteUid(selected.getTenantUID());
         supplierList = supplierDao.findBySupplierTAndTenantUID(Boolean.TRUE, currentUser.getTenantUID());
         manufactureList = supplierDao.findByManufacturerTAndTenantUID(Boolean.TRUE, currentUser.getTenantUID());
         initOrgTree();
         List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("contractAttachmentType");
-        contractAttachmentTypeList =contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+        contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
         blobObjectSelectedMap = new HashMap();
     }
 
@@ -230,7 +234,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 break;
             case "bidWinner":
                 Supplier bidWinner = (Supplier) selectedObjectMap.get(idx);
-                if(bidWinner != null ) {
+                if (bidWinner != null) {
                     selected.setBidWinner(bidWinner.getUid());
                     selected.setBidWinnerPerson(bidWinner.getContactor());
                     selected.setBidWinnerTelphone(bidWinner.getTel());
@@ -327,10 +331,15 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void lockAttachmentById(String blobId) {
-        blobService.updateBlobLock(blobId,Boolean.TRUE);
+        blobService.updateBlobLock(blobId, Boolean.TRUE);
     }
-    public void unlockAttachmentById(String blobId) {
-        blobService.updateBlobLock(blobId,Boolean.FALSE);
+
+    public Boolean canLock(String blobId) {
+        return getCanBeEdit() && !blobService.lock(blobId);
+    }
+
+    public Boolean canUnLock(String blobId) {
+        return getCanBeEdit() && blobService.lock(blobId);
     }
 
     public void removeUploadedFileObjects(String blobId) {
@@ -362,7 +371,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             this.selected.setCreatedDate(DateUtil.now());
         }
         selected = dao.save(this.selected);
-        attachements= attachements.stream().filter(item->item.getBoUuid()==null).collect(Collectors.toList());
+        attachements = attachements.stream().filter(item -> item.getBoUuid() == null).collect(Collectors.toList());
         attachements.stream().forEach(item -> {
             item.setBoUuid(selected.getId());
         });
@@ -389,14 +398,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             }
         }
         allItemList = contractService.getContractItems(selected.getId());
-        if(isEdit && CollectionUtils.isNotEmpty(allItemList)) {
+        if (isEdit && CollectionUtils.isNotEmpty(allItemList)) {
             List<String> itemIds = new ArrayList<>();
-            for(ContractInfoItem item : allItemList) {
+            for (ContractInfoItem item : allItemList) {
                 itemIds.add(item.getId());
             }
             List<ArrivalList> arrivalLists = arrivalListRepository.findByContractItemIdIn(itemIds);
-            if(CollectionUtils.isNotEmpty(arrivalLists)) {
-                for(ArrivalList arrivalList : arrivalLists) {
+            if (CollectionUtils.isNotEmpty(arrivalLists)) {
+                for (ArrivalList arrivalList : arrivalLists) {
                     arrivalList.setContractNum(selected.getContractNum());
                 }
                 arrivalListRepository.save(arrivalLists);
@@ -479,9 +488,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public void remomveContractItem(AssetInfo assetInfo) {
         // ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
         listSelectedAssetInfo.remove(assetInfo);
-        List<ContractInfoItem> removeList =allItemList.stream().filter(item-> Objects.equals(item.getAssetUid(),assetInfo.getUid())).collect(Collectors.toList());
+        List<ContractInfoItem> removeList = allItemList.stream().filter(item -> Objects.equals(item.getAssetUid(), assetInfo.getUid())).collect(Collectors.toList());
         allItemList.removeAll(removeList);
-        removedItemList.addAll(removeList.stream().filter(item-> StringUtils.isNotEmpty(item.getId())).collect(Collectors.toList()));
+        removedItemList.addAll(removeList.stream().filter(item -> StringUtils.isNotEmpty(item.getId())).collect(Collectors.toList()));
 
     }
 
@@ -512,7 +521,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return supplier == null ? null : supplier.getName();
     }
 
-    public String getParentName(String parentId){
+    public String getParentName(String parentId) {
         ContractInfoItem contractInfoItem = contractItemDao.findOne(parentId);
         return contractInfoItem == null ? null : contractInfoItem.getContractAssetName();
     }
@@ -527,6 +536,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
         return url;
     }
+
     //==============================================
     public String getDetailPageLinkByUid(String uid) {
         AssetInfo viewAsset = assetDao.findByUid(uid);
@@ -534,7 +544,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 + viewAsset.getUid()
                 + "&asset_name=" + viewAsset.getName()
                 + "&terminate=" + this.terminate;
-        url ="/portal/asset/info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        url = "/portal/asset/info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         logger.info(url);
         return url;
     }
@@ -711,39 +721,38 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public Boolean getCanBeEdit() {
-        if(null == canBeEdit){
+        if (null == canBeEdit) {
             canBeEdit = uaaService.getOrgListByUser(currentUser.getUid()).stream()
-                    .map(item -> item.getSiteUID()).distinct().anyMatch(item-> Objects.equals(item, selected.getTenantUID()) ||
-                            Objects.equals(item, selected.getInstitutionUID()) ||Objects.equals(item, selected.getHospitalUID()) ||
+                    .map(item -> item.getSiteUID()).distinct().anyMatch(item -> Objects.equals(item, selected.getTenantUID()) ||
+                            Objects.equals(item, selected.getInstitutionUID()) || Objects.equals(item, selected.getHospitalUID()) ||
                             Objects.equals(item, selected.getSiteUID()));
         }
         return canBeEdit;
     }
 
-    public List<ContractInfoItem> getParentAssetList(){
+    public List<ContractInfoItem> getParentAssetList() {
         return contractItemDao.findParentByPurchaseAndContractId(selected.getId(), selectedContractItem.getId());
     }
 
-    public Boolean isYunNanFuWai(){
+    public Boolean isYunNanFuWai() {
         TenantInfo tenantInfo = tenantInfoDao.findByuid(currentUser.getTenantUID());
-        if("云南省阜外心血管病医院".equals(tenantInfo.getName().trim())){
+        if ("云南省阜外心血管病医院".equals(tenantInfo.getName().trim())) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
     }
 
 
-
     public void prepareCreateSupplier(String type) {
         newSupplier = new Supplier();
         newSupplierType = type;
-        if("manufacturer".equals(type)){
+        if ("manufacturer".equals(type)) {
             newSupplier.setManufacturerT(true);
         }
-        if("supplier".equals(type)){
+        if ("supplier".equals(type)) {
             newSupplier.setSupplierT(true);
         }
-        if("maintainer".equals(type)){
+        if ("maintainer".equals(type)) {
             newSupplier.setMaintainerT(true);
         }
 
@@ -795,12 +804,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
 
-        if("manufacturer".equals(newSupplierType)){
+        if ("manufacturer".equals(newSupplierType)) {
             if (ObjectUtil.isNotEmpty(newSupplier.getId())) {
                 manufactureList.removeIf(t -> t.getId().equals(newSupplier.getId()));
             }
             manufactureList.add(newSupplier);
-        }else if("supplier".equals(newSupplierType)){
+        } else if ("supplier".equals(newSupplierType)) {
             if (ObjectUtil.isNotEmpty(newSupplier.getId())) {
                 supplierList.removeIf(t -> t.getId().equals(newSupplier.getId()));
             }
@@ -816,7 +825,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return disable;
     }
 
-    public void pick(String itemId){
+    public void pick(String itemId) {
         selectedBlobIdList = new ArrayList<>();
         blobObjectSelectedMap.forEach((k, v) -> {
             if (v)
@@ -864,7 +873,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 V2_BlobObject blobObject = blobObjectMap.get(blobId);
                 String name = FieldValueMessageController.fieldValue("contractAttachmentType", blobObject.getBoSubType()).replaceAll("/", "或") + "_" + blobObject.getObjectName();
                 zipOut.putNextEntry(new ZipEntry(name));
-                byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(blobObject.getObjectStorageId()).getStream());
+                byte[] bytess = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(blobObject.getObjectStorageId()).getStream());
                 IOUtils.write(bytess, zipOut);
                 zipOut.closeEntry();
             }
@@ -880,7 +889,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         sortFlag = !sortFlag;
     }
 
-    public BigDecimal getBigDecimal(BigDecimal amount){
+    public BigDecimal getBigDecimal(BigDecimal amount) {
 //        return BigDecimal.valueOf(amount);
         return amount;
     }
