@@ -236,11 +236,11 @@
                                     </h:outputText>
                                     <h:outputText value="#{contractInfoEditController.getUserNameByUid(fileitem.createdBy)}" class="ui-g-2" />
                                     <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()"/>
-                                    <p:commandLink value="#{msg.Delete}" update="AttachList" actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this" rendered="#{contractInfoEditController.canBeEdit}">
+                                    <p:commandLink value="#{msg.Delete}" style="margin-right: 5px;" update="AttachList" actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this" rendered="#{contractInfoEditController.canBeEdit}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandLink>
-                                    <p:commandLink value="#{msg.lockAttactments}" style="margin-right: 5px;"  process="@this" actionListener="#{contractInfoEditController.lockAttachmentById(fileitem.id)}" disabled="#{contractInfoEditController.canLock(fileitem.id)}" />
-                                    <p:commandLink value="#{msg.unlockAttactments}" style="margin-right: 5px;"  process="@this" actionListener="#{contractInfoEditController.unlockAttachmentById(fileitem.id)}" disabled="#{contractInfoEditController.canUnLock(fileitem.id)}" />
+                                    <p:commandLink value="#{msg.approveAttactments}" style="margin-right: 5px;"  update="AttachList" process="@this" actionListener="#{contractInfoEditController.approveAttachmentById(fileitem.id)}" rendered="#{contractInfoEditController.canApprove(fileitem.id)}" />
+                                    <p:commandLink value="#{msg.attactmentsApproved}" style="margin-right: 5px;"  process="@this"  rendered="#{!contractInfoEditController.canApprove(fileitem.id)}" disabled="true"/>
                                 </div>
                             </p:dataList>
 

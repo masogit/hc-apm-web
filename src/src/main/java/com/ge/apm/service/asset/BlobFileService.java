@@ -335,13 +335,13 @@ public class BlobFileService {
         blobDao.save(blobObjects);
     }
 
-    public void updateBlobLock(String blobId, Boolean lock) {
-        blobDao.updateBlobLock(blobId, lock);
+    public void approveBlob(String blobId, String approveStatus) {
+        blobDao.updateBlobApprove(blobId, approveStatus);
     }
 
-    public boolean lock(String blobId) {
+    public boolean approved(String blobId) {
         V2_BlobObject byId = blobDao.findById(blobId);
-        return ObjectUtil.isNotEmpty(byId) ? byId.getLock() : false;
+        return ObjectUtil.isNotEmpty(byId) ? "1".equals(byId.getApproveStatus()) : false;
     }
 
 

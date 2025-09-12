@@ -79,6 +79,6 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE v2_blob_object SET lock= ?2 WHERE id= ?1", nativeQuery = true)
-    public void updateBlobLock(String id, Boolean lock);
+    @Query(value = "UPDATE v2_blob_object SET approve_status = ?2 WHERE id= ?1", nativeQuery = true)
+    public void updateBlobApprove(String id, String approveStatus);
 }

@@ -212,12 +212,21 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
                         <h:panelGroup>
+                            <p:outputLabel class="label" render="">
+                                以下附件尚未审核，是否仍确认审核？
+                            </p:outputLabel>
+                            <ui:repeat value="#{contractInfoEditController.attachements}" var="attachement">
+                                <ul class="" style="display: #{attachement.approveStatus !=1 ? '' : 'none'}; list-style: none; padding-left: 0px;">
+                                    <li >#{attachement.objectName}</li>
+                                </ul>
+                            </ui:repeat>
                             <label class="label">审核状态<span style="color:red">*</span></label>
                             <p:selectOneRadio id="auditStatus" value="#{contractInfoEditController.selected.approvalStatus}" required="true" requiredMessage="请选择审核状态">
                                 <f:selectItem itemLabel="通过" itemValue="true"/>
                                 <f:selectItem itemLabel="不通过" itemValue="false"/>
                             </p:selectOneRadio>
                         </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">审核结果</label>
                             <p:inputText id="city" value="#{contractInfoEditController.selected.approvalResult}"/>
