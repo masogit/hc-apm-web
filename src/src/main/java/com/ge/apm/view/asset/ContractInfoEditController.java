@@ -18,6 +18,7 @@ import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
@@ -330,16 +331,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
-    public void lockAttachmentById(String blobId) {
-        blobService.updateBlobLock(blobId, Boolean.TRUE);
+    public void approveAttachmentById(String blobId) {
+        blobService.approveBlob(blobId, "1");
     }
 
-    public Boolean canLock(String blobId) {
-        return getCanBeEdit() && !blobService.lock(blobId);
-    }
-
-    public Boolean canUnLock(String blobId) {
-        return getCanBeEdit() && blobService.lock(blobId);
+    public Boolean canApprove(String blobId) {
+        return getCanBeEdit() && !blobService.approved(blobId);
     }
 
     public void removeUploadedFileObjects(String blobId) {
@@ -760,17 +757,22 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public void prepareApproval(ContractInfo contractInfo) {
         this.selected = contractInfo;
+        this.attachements = blobService.findBlobObjectsByBoUid(selected.getId());
     }
 
     public void approval() {
         this.selected.setApprovalTime(new Date());
         this.selected.setAuditor(currentUser.getName());
         if (Boolean.TRUE.equals(this.selected.getApprovalStatus())) {
+            attachements.forEach(f->{
+                f.setApproveStatus("1");
+            });
             this.selected.setStatus(4);
         } else {
             this.selected.setStatus(3);
         }
         dao.save(this.selected);
+        blobService.saveBlobObject(attachements);
     }
 
     public void onBlur() {
@@ -903,6 +905,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public List<V2_BlobObject> getAttachements() {
+        if(CollectionUtils.isEmpty(attachements)) return Lists.newArrayList();
         for (V2_BlobObject att : attachements) {
             att.setBoSubTypeValue(WebUtil.getFieldValueMessage("contractAttachmentType", att.getBoSubType()));
         }

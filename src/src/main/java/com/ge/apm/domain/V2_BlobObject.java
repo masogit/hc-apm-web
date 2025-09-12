@@ -208,8 +208,8 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
-    @Column(name = "lock")
-    private Boolean lock;
+    @Column(name = "approve_status")
+    private String approveStatus;
 
     @Transient
     private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
@@ -396,12 +396,12 @@ public class V2_BlobObject implements Serializable {
         this.tenantUid = tenantUid;
     }
 
-    public Boolean getLock() {
-        return lock;
+    public String getApproveStatus() {
+        return approveStatus;
     }
 
-    public void setLock(Boolean lock) {
-        this.lock = lock;
+    public void setApproveStatus(String approveStatus) {
+        this.approveStatus = approveStatus;
     }
 
     public boolean showPreview() {

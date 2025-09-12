@@ -6175,8 +6175,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('inventoryMethod','rfid','RFID','RFID',NULL, -1);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('inventoryMethod','scanCode','扫码盘点','Scan Code',NULL ,-1);
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','lockAttactments','锁定','lock',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','unlockAttactments','解除','unlock',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','approveAttactments','审核','lock',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','attactmentsApproved','审核通过','unlock',NULL,-1);
 
 --ZKB 培训V2 i18
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbTrainCourseType','normal','基础课程','normal',NULL,-1);
