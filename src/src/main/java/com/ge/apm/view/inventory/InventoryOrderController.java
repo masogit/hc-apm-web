@@ -167,7 +167,7 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         List<OrgInfo> orgInfos = orgInfoRepository.getOrgInfosByParentId(currentUser.getSiteUID());
         orgsForSelected.forEach(org -> org.setName(org.getOrgName()));
         orgInfos.addAll(orgsForSelected);
-        orgTree = uaaService.getOrgTreeNodes(currentUser.getSiteUID(), orgInfos);
+        orgTree = uaaService.getOrgTreeNodesByAssetType(currentUser.getSiteUID(), orgInfos, null);
         TreeNodeUtil.expandTreeNode(orgTree);
     }
 
