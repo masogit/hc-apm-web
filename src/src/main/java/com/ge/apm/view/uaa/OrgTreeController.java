@@ -127,9 +127,9 @@ public class OrgTreeController {
     }
 
     public TreeNode createSiteOrgTree() {
-        List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+        List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid());
         TreeNode siteTree = buildTree(siteList);
-        expandedByOrgType(siteTree, 2);
+        expandedByOrgType(siteTree, 3);
         return siteTree;
     }
 
