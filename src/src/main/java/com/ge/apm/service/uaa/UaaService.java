@@ -633,6 +633,49 @@ public class UaaService {
         return root;
     }
 
+    public TreeNode getOrgTreeNodesByAssetType(String siteUID, List<OrgInfo> orgList,List<String> orgUid) {
+        TreeNode root = new DefaultTreeNode("root", null, null);
+
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+        for (OrgInfo org : orgList) {
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setRowKey("org_" + org.getId());
+            if(CollectionUtils.isNotEmpty(orgUid)){
+                node.setSelectable( orgUid.contains(org.getUid()));
+            }
+            treeMap.put(org.getUid() + "#" + org.getAssetType(), node);
+        }
+        for (Map.Entry<String, TreeNode> nodeItem : treeMap.entrySet()) {
+            TreeNode node = nodeItem.getValue();
+            OrgInfo org = (OrgInfo) node.getData();
+            if (org.getParentUID() != null) {
+                TreeNode parentNode = null;
+                for (String key : treeMap.keySet()) {
+                    String str = key.split("#")[0];
+                    if (str.equals(org.getParentUID())) {
+                        parentNode = treeMap.get(key);
+                    }
+                }
+                if (parentNode != null) {
+                    parentNode.getChildren().add(node);
+                }
+            }
+        }
+
+        for (String key : treeMap.keySet()) {
+            String str = key.split("#")[0];
+            if (str.equals(siteUID)) {
+                root.getChildren().add(treeMap.get(key));
+            }
+        }
+
+        if (!root.getChildren().isEmpty()) {
+            OrgInfo temp = (OrgInfo) root.getChildren().get(0).getData();
+            rootUID = temp.getUid();
+        }
+        return root;
+    }
+
     public TreeNode getOrgTreeBySiteWithoutClinical(String siteUID){
         List<OrgInfo> orgList =  orgInfoDao.getOrgInfosByParentId(siteUID);
         return getOrgTreeNodes(siteUID, orgList);
