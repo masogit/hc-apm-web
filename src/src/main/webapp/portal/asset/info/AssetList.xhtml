@@ -72,7 +72,7 @@
                                 <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                                 <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="true">
                                         <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
@@ -241,6 +241,11 @@
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
                                             <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
                                         </p:autoComplete>
+<!--                                        <p:selectCheckboxMenu-->
+<!--                                                value="#{assetInfoListController.selectDeptList}">-->
+<!--                                            <f:selectItems value="#{assetInfoListController.autoCompleteDeptName(null)}"/>-->
+<!--                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange2()}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>-->
+<!--                                        </p:selectCheckboxMenu>-->
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
                                 </p:column>

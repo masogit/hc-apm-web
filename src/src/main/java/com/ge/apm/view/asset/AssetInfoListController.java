@@ -36,6 +36,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -118,6 +119,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Set<String> spare05Set;
 
 
+    @Getter
+    @Setter
+    private List<String> selectDeptList;
+
+    private TreeNode[] selectedAccessOrgNodes;
 
     private Set<String> assetDeptOrgUidSet;
     //复选的设备
@@ -1207,6 +1213,22 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void onClinicalDeptNameFilterChange2( ) {
+        if (CollectionUtils.isNotEmpty(selectDeptList)) {
+            clinicalDeptOrgUidSet = new HashSet<>();
+            for (String deptName : selectDeptList) {
+               if( clinicalDeptList.stream().anyMatch(item -> deptName.equals(item.getName()))) {
+                   List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).collect(Collectors.toList());
+                   Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+                   clinicalDeptOrgUidSet.addAll(matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet()));
+               }
+            }
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
+
     public void onAccountingDeptOrgNameFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
@@ -1826,5 +1848,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setFilterAccountingDeptOrgOrg(String filterAccountingDeptOrgOrg) {
         this.filterAccountingDeptOrgOrg = filterAccountingDeptOrgOrg;
+    }
+
+    public TreeNode[] getSelectedAccessOrgNodes() {
+        return selectedAccessOrgNodes;
+    }
+
+    public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
+        this.selectedAccessOrgNodes = selectedAccessOrgNodes;
     }
 }
