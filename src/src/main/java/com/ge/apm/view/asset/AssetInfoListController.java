@@ -32,6 +32,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -89,7 +90,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private QRPreViewerBean qrPreViewerBean;
     //选定的院区
-    private OrgInfo selectSite;
+//    private OrgInfo selectSite;
 
     //选定科室过滤
     private String filterClinicalDeptOrg;
@@ -124,7 +125,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<String> selectDeptList;
 
     private TreeNode[] selectedAccessOrgNodes;
-
+    @Getter
+    @Setter
+    private List<String> selectSiteDeptList;
     private Set<String> assetDeptOrgUidSet;
     //复选的设备
     @Getter
@@ -528,11 +531,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "accountingDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
-        if (null != selectSite) {
-            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+        if (CollectionUtils.isNotEmpty(selectSiteDeptList)) {
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectSiteDeptList, "1*5+"));
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectSiteDeptList, "1*5+"));
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectSiteDeptList, "1*5+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, selectSiteDeptList, "1*5+"));
+//            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectSite.getUid(), "1*5+"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
         }
@@ -586,19 +590,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-
+        TreeNode treeNode = event.getTreeNode();
         this.searchFilters.clear();
 
-        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            selectSite = (OrgInfo) event.getTreeNode().getData();
-        } else {
-            selectSite = null;
-        }
-
-        //如果是mvs role,选择了所有租户选项，则清空所选机构
-        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-            selectSite = null;
-        }
+//        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+//            selectSite = (OrgInfo) event.getTreeNode().getData();
+//        } else {
+//            selectSite = null;
+//        }
+//
+//        //如果是mvs role,选择了所有租户选项，则清空所选机构
+//        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+//            selectSite = null;
+//        }
 
         loadClinicalDeptList();
 
@@ -614,21 +618,51 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+
+    public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
+
+        TreeNode treeNode = event.getTreeNode();
+        this.searchFilters.clear();
+
+//        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+//            selectSite = (OrgInfo) event.getTreeNode().getData();
+//        } else {
+//            selectSite = null;
+//        }
+//
+//        //如果是mvs role,选择了所有租户选项，则清空所选机构
+//        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+//            selectSite = null;
+//        }
+
+        loadClinicalDeptList();
+
+        //table header dropdown needs to clear manually, table filters cleared by clear method above.
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        assetDeptOrgUidSet = null;
+        clinicalDeptOrgUidSet = null;
+
+        assetGroup = null;
+        assetGroupSecondary = null;
+        filterAssetStatus = null;
+    }
+
     public void onSelectSiteTreeNode2(NodeSelectEvent event) {
         // Compared with the above method "onSelectSiteTreeNode", 
         // this method does not clear existing filters
-        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            selectSite = (OrgInfo) event.getTreeNode().getData();
-        } else {
-            selectSite = null;
-        }
-
-        //如果是mvs role,选择了所有租户选项，则清空所选机构
-        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-            selectSite = null;
-        }
-
-        if(selectSite==null) this.removeFilterOnField("siteUID");
+//        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+//            selectSite = (OrgInfo) event.getTreeNode().getData();
+//        } else {
+//            selectSite = null;
+//        }
+//
+//        //如果是mvs role,选择了所有租户选项，则清空所选机构
+//        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+//            selectSite = null;
+//        }
+//
+//        if(selectSite==null) this.removeFilterOnField("siteUID");
 
         loadClinicalDeptList();
     }
@@ -636,9 +670,29 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
-        if (null != selectSite) {
-            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
-                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+//        if (null != selectSite) {
+//            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+//                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+//        }
+        if (selectedAccessOrgNodes!=null && selectedAccessOrgNodes.length>0){
+            Set<OrgInfo> orgInfos = new HashSet<>();
+            selectSiteDeptList=new ArrayList<>();
+            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+               if(!orgInfo.getOrgType().equals(4)){
+                   Set<OrgInfo> collect = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(orgInfo.getSiteUID()) || item.getHospitalUID().equals(orgInfo.getSiteUID())
+                           || item.getInstitutionUID().equals(orgInfo.getSiteUID()) || item.getTenantUID().equals(orgInfo.getSiteUID())).collect(Collectors.toSet());
+                   orgInfos.addAll(collect);
+               }else{
+                   orgInfos.add(orgInfo);
+               }
+
+                selectSiteDeptList.add(orgInfo.getUid());
+
+            }
+            clinicalDeptList=new ArrayList<>(orgInfos);
+        }else{
+            selectSiteDeptList=null;
         }
     }
 
@@ -1559,13 +1613,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.filterAssetTypeGroup = filterAssetTypeGroup;
     }
 
-    public OrgInfo getSelectSite() {
-        return selectSite;
-    }
-
-    public void setSelectSite(OrgInfo selectSite) {
-        this.selectSite = selectSite;
-    }
+//    public OrgInfo getSelectSite() {
+//        return selectSite;
+//    }
+//
+//    public void setSelectSite(OrgInfo selectSite) {
+//        this.selectSite = selectSite;
+//    }
 
     public String getFilterWarrantyDate() {
         return filterWarrantyDate;
