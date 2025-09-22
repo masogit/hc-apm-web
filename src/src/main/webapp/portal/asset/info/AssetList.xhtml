@@ -67,13 +67,14 @@
 
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup rendered="#{!userContextService.hasAnyRoleByApmRoles('MVSAdmin','MVSFE')}">
-                            <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:commandButton id="btnOrg" value="院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                                 <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="true">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteClinicalDeptOrgTree}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"    dynamic="false"  cache="false" >
                                         <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="unselect" listener="#{assetInfoListController.onUnSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -85,11 +86,13 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('MVSAdmin','MVSFE')}">
-                            <p:commandButton id="btnTenant" value="#{empty assetInfoListController.selectSite? msg.AllTenants:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
+                            <p:commandButton id="btnTenant" value="院区" type="button" icon="fa fa-angle-down" iconPos="right" />
                             <p:overlayPanel appendTo="searchForm" widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
+                                    <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"    dynamic="false"  cache="false" >
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}"  update=":AssetInfoListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
+                                        <p:ajax process="@this" event="unselect" listener="#{assetInfoListController.onUnSelectSiteTreeNode}"  update=":AssetInfoListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
+
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -541,9 +544,9 @@
                             <c:if test="#{columnItem eq 'siteUID'}">
                                 <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
                                     <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
-                                    <f:facet name="filter">
-                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" widgetVar="varPanelOrg2"/>
-                                    </f:facet>
+<!--                                    <f:facet name="filter">-->
+<!--                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" widgetVar="varPanelOrg2"/>-->
+<!--                                    </f:facet>-->
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'parentAssetId'}">

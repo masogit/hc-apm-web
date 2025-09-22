@@ -127,6 +127,26 @@ public class OrgTreeController {
     }
 
     public TreeNode createSiteOrgTree() {
+        List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+        TreeNode siteTree = buildTree(siteList);
+        expandedByOrgType(siteTree, 2);
+        return siteTree;
+    }
+
+
+
+    public TreeNode getSiteClinicalDeptOrgTree() {
+        if (null == siteOrgTree) {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            if (uaaService.isIbSiteAdmin(currentUserAccount)) {
+                return null;
+            }
+            siteOrgTree = createSiteListWithClinicalDeptOrgTree();
+        }
+        return siteOrgTree;
+    }
+
+    public TreeNode createSiteListWithClinicalDeptOrgTree() {
         List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid());
         TreeNode siteTree = buildTree(siteList);
         expandedByOrgType(siteTree, 3);
