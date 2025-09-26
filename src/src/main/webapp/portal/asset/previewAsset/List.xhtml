@@ -31,15 +31,23 @@
 
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
+                    <h:panelGrid id="filterType" columns="4" style="float: right">
+                        <h:panelGroup>
+                            <p:commandButton process="@this" update="assetPreviewListForm filterType" actionListener="#{assetPreviewController.setQueryType(1)}"  rendered="true" disabled="#{assetPreviewController.queryType == 1}" value="#{msg.All}" />
+                            <p:commandButton process="@this" update="assetPreviewListForm filterType" actionListener="#{assetPreviewController.setQueryType(2)}"  rendered="true" disabled="#{assetPreviewController.queryType == 2}" value="#{msg.ParentDevice}"/>
+                            <p:commandButton process="@this" update="assetPreviewListForm filterType" actionListener="#{assetPreviewController.setQueryType(3)}"  rendered="true" disabled="#{assetPreviewController.queryType == 3}" value="#{msg.ChildDevice}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
-                            <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                            <p:commandButton id="btnOrg" value="#{msg.Site}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                                 <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteClinicalDeptOrgTree}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false" >
                                         <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":assetPreviewListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="unselect" listener="#{assetInfoListController.onUnSelectSiteTreeNode}" update=":assetPreviewListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -51,11 +59,12 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{userContextService.hasAnyRole('MVSAdmin,MVSFE')}">
-                            .                            <p:commandButton id="btnTenant" value="#{empty assetInfoListController.selectSite? msg.AllTenants:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
-                            <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
+                            <p:commandButton id="btnTenant" value="#{msg.Site}" type="button" icon="fa fa-angle-down" iconPos="right" />
+                            <p:overlayPanel appendTo="searchForm" widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":assetPreviewListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
+                                    <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"    dynamic="false"  cache="false" >
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}"  update=":assetPreviewListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
+                                        <p:ajax process="@this" event="unselect" listener="#{assetInfoListController.onUnSelectSiteTreeNode}"  update=":assetPreviewListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">

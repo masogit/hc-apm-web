@@ -35,6 +35,13 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
     @Setter
     private List<AssetInfo> assetInfoList = new ArrayList<>();
     private Map<String, Boolean> selectedMap = new HashMap<>();
+    //显示子设备，主设备，或者全部类型的设备
+    @Getter
+    private int queryType = 1;
+    public void setQueryType(int queryType) {
+        assetInfoListController.searchFilters.clear();
+        this.queryType = queryType;
+    }
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         assetInfoListController = WebUtil.getBean(AssetInfoListController.class);
@@ -47,39 +54,52 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
 
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         List<AssetInfo> assetInfos = getAssetInfos();
+        List<AssetInfo> content = new ArrayList<>();
         assetInfoList = assetInfos;
-        if((pageRequest.getPageNumber()+1)*pageRequest.getPageSize()>assetInfos.size()){
+        if(CollectionUtils.isEmpty(assetInfos)) {
+            pageRequest = new PageRequest(0,pageRequest.getPageSize(),pageRequest.getSort());
+        }else if((pageRequest.getPageNumber()+1)*pageRequest.getPageSize() > assetInfos.size()){
             pageRequest = new PageRequest(assetInfos.size()%pageRequest.getPageSize() == 0 ? assetInfos.size()/pageRequest.getPageSize()-1:assetInfos.size()/pageRequest.getPageSize(),pageRequest.getPageSize(),pageRequest.getSort());
         }
-        return new PageImpl(assetInfos.subList(pageRequest.getPageNumber()*pageRequest.getPageSize(),Math.min((pageRequest.getPageNumber()+1)*pageRequest.getPageSize(),assetInfos.size())), pageRequest, assetInfos.size());
+        if(CollectionUtils.isNotEmpty(assetInfos)) {
+            content = assetInfos.subList(pageRequest.getPageNumber()*pageRequest.getPageSize(),Math.min((pageRequest.getPageNumber()+1)*pageRequest.getPageSize(),assetInfos.size()));
+        }
+        return new PageImpl(content, pageRequest, assetInfos.size());
     }
 
     public List<AssetInfo> getAssetInfos(){
         Set<Integer> tempRootIds = getRootIds();
-        Set<Integer> rootIds = new HashSet<>();
-        rootIds = removeOnlyParentAsset(tempRootIds,rootIds);
-        List<AssetInfo> assetInfos = new ArrayList<>();
-        if(CollectionUtils.isNotEmpty(rootIds)) {
-            List<Object> assetInfoObjects = dao.findParentAndChildrenAsset1(rootIds);
-            assetInfoObjects.stream().forEach(e -> {
-                convertToAssetInfo(assetInfos, (Object[]) e);
-            });
+        if(CollectionUtils.isNotEmpty(tempRootIds)){
+            Set<Integer> rootIds = removeOnlyParentAsset(tempRootIds);
+            List<AssetInfo> assetInfos = new ArrayList<>();
+            if(CollectionUtils.isNotEmpty(rootIds)) {
+                List<Object> assetInfoObjects = dao.findParentAndChildrenAsset1(rootIds);
+                assetInfoObjects.stream().forEach(e -> {
+                    convertToAssetInfo(assetInfos, (Object[]) e);
+                });
 
-            Map<Integer, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, v -> v, (o1, o2) -> o2));
-            List<SearchFilter> temp = new ArrayList<>();
-            temp.add(new SearchFilter("id", SearchFilter.Operator.IN,assetInfoMap.keySet()));
-            List<AssetInfo> infos = dao.findBySearchFilter(temp);
-            infos.stream().forEach(e->{
-                e.setRank(assetInfoMap.get(e.getId()).getRank());
-                e.setBranchIds(assetInfoMap.get(e.getId()).getBranchIds());
-            });
-            return infos.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
+                Map<Integer, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, v -> v, (o1, o2) -> o2));
+                List<SearchFilter> temp = new ArrayList<>();
+                temp.add(new SearchFilter("id", SearchFilter.Operator.IN,assetInfoMap.keySet()));
+                List<AssetInfo> infos = dao.findBySearchFilter(temp);
+                infos.stream().forEach(e->{
+                    e.setRank(assetInfoMap.get(e.getId()).getRank());
+                    e.setBranchIds(assetInfoMap.get(e.getId()).getBranchIds());
+                });
+
+                if(queryType == 2){
+                    infos = infos.stream().filter(a -> a.getRank() == 0).collect(Collectors.toList());
+                }else if (queryType == 3){
+                    infos = infos.stream().filter(a -> a.getRank() != 0).collect(Collectors.toList());
+                }
+
+                return infos.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
+            }
         }
-
         return Collections.EMPTY_LIST;
     }
 
-    private Set<Integer> removeOnlyParentAsset(Set<Integer> tempRootIds, Set<Integer> rootIds) {
+    private Set<Integer> removeOnlyParentAsset(Set<Integer> tempRootIds) {
         List<SearchFilter> tempFilters = new ArrayList<>();
         tempFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IN,tempRootIds));
         List<AssetInfo> assetInfos = dao.findBySearchFilter(tempFilters);
