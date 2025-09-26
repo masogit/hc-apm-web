@@ -25,6 +25,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
@@ -1365,11 +1366,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         Map<String, String> orgMap = orgInfos.stream().collect(Collectors.toMap(OrgInfo::getUid, o -> o.getName()));
         for (QrCodeLib qrCodeLib : bySearchFilter) {
             AssetInfo assetInfo = new AssetInfo();
-            assetInfo.setSiteUID(qrCodeLib.getSiteUID());
-            assetInfo.setQrCode(qrCodeLib.getQrCode());
             List<ArrivalListItem> arrivalListItems = listMap.get(qrCodeLib.getQrCode());
             if(!CollectionUtils.isEmpty(arrivalListItems)){
                 ArrivalListItem arrivalListItem = arrivalListItems.get(0);
+                BeanUtils.copyProperties(arrivalListItem,assetInfo);
                 assetInfo.setSerialNum(arrivalListItem.getSerialNum());
                 assetInfo.setFinancingNum(arrivalListItem.getFinancingNum());
                 assetInfo.setDepartNum(arrivalListItem.getDepartNum());
@@ -1378,6 +1378,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 assetInfo.setClinicalDeptUID(arrivalListItem.getClinicalDeptUID());
                 assetInfo.setAssetGroup(selected.getAssetGroup());
             }
+            assetInfo.setSiteUID(qrCodeLib.getSiteUID());
+            assetInfo.setQrCode(qrCodeLib.getQrCode());
             assetInfos.add(assetInfo);
         }
         QrCodeExportStream exportStream = new QrCodeExportStream(assetInfos.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
