@@ -280,7 +280,7 @@
                            <p:menuitem id="um527" value="#{msg.AssetClassificationManagement}" outcome="/portal/assetTypeGroup/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}"/>
                            <p:menuitem id="um528" value="系统模板配置" outcome="/portal/config/sysTemplate/systemTemplate.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_SYSTEM_TEMPLATE')}"/>
                            <p:menuitem id="um529" value="大屏版本管理" outcome="/portal/config/largeScreen/managementList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_NATIONAL_EXAMINATION_MANAGEMENT')}"/>
-
+                           <p:menuitem id="um530" value="OCR模板管理" outcome="/portal/ocr/templateList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MEASUREOCR_IDENTIFICATION') and userContextService.canRender('MEASUREOCR')}"/>
                        </p:submenu>
                    </c:when>
                    <!-- 效期管理 -->
@@ -391,7 +391,7 @@
                 <p:menuitem id="um5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/I18nTypeManageList.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin') and userContextService.accessContainsFunctionMenu('PLATFORM_DICTIONARY_BINDING')}"/>
                 <p:menuitem id="um5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_JMREPORT_EDIT')}"   />
                 <p:menuitem id="um5029" value="系统模板管理" outcome="/portal/config/template/systemTemplate.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>
-                <p:menuitem id="um530" value="OCR模板管理" outcome="/portal/ocr/templateList.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>
+<!--                <p:menuitem id="um530" value="OCR模板管理" outcome="/portal/ocr/templateList.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>-->
             </p:submenu>
             <!-- IoT设备使用概览 -->
             <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('IOT_DEVICE_OVERVIEW')}" outcome="/portal/iframe/dispensingCenter.xhtml"/>
