@@ -194,6 +194,18 @@ public class OrgTreeController {
         }
     }
 
+    public void filterTreeNodeByNameType4() {
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        if (uaaService.isIbSiteAdmin(currentUserAccount)) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid(), treeNodeNameFilter, currentUserAccount.getSiteId());
+            TreeNode siteTree = buildTree(siteList);
+            expandedByOrgType(siteTree, 2);
+            siteOrgTree = siteTree;
+        } else {
+            uaaService.filterTreeNode(siteOrgTree, treeNodeNameFilter, 4, 4);
+        }
+    }
+
     public TreeNode getSiteOrgTree() {
         if (null == siteOrgTree) {
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
