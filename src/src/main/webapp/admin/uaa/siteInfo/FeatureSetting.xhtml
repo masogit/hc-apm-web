@@ -366,6 +366,17 @@
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['MEASUREOCR']}"
+                                        itemLabel="计量OCR识别">
+                                    <p:ajax update="measure"
+                                            listener="#{featureSettingController.featureChange('MEASUREOCR')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>计量OCR识别</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                            </p:panelGrid>
                         </p:fieldset>
 
                         <p:fieldset id="nursesite" legend="日常检查">
