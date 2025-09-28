@@ -56,6 +56,13 @@
                                         <!--maxdate="#{sharedAssetRequestV2Controller.selected.applyTime}" timeOnly="true" readonlyInput="true" showButtonPanel="false"/>-->
                         </h:panelGroup>
 
+                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').rendered}">
+                            <label class='label'>#{msg.RentReason}</label>
+                            <p:inputTextarea id="rentReason" rows="1"  cols="100"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selected.rentReason}"
+                            required="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').required}"
+                            requiredMessage="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').requiredMessage}"/>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class='label'>备注</label>
                             <p:inputTextarea id="remark" rows="1"  cols="100"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selected.remark}" />
@@ -144,7 +151,7 @@
                    
                     <!--<p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.save}" value="#{msg.Save}"  style="float:left"  icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 0 }"/>-->
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.submmit0}"  oncomplete="openSwapTypeViewWindow(xhr, status, args)" 
-                                     update="datalistDetail ,display" value="提交"  style="float:left"  icon="ui-icon-check" />
+                                     update="datalistDetail ,display :growl" process="@form" value="提交"  style="float:left"  icon="ui-icon-check" />
 <!--                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.refers}" action="List?faces-redirect=true" value="取消借用" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1 or sharedAssetRequestV2Controller.selected.state  eq 2}"/>-->
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true" immediate="true" icon="ui-icon-arrow-back"/>
                     <script>

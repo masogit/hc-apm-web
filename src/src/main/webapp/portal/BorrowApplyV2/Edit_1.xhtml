@@ -42,6 +42,11 @@
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.createDate}"></h:outputText>
                             <!--<p:inputText id="createDate" readonly="true" value="#{sharedAssetRequestV2Controller.selected.createDate}" />-->
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').rendered}">
+                            <label class='label'>#{msg.RentReason}</label>
+                            <p:inputTextarea id="rentReason" rows="1"  cols="100" readonly="true" queryDelay="750" minQueryLength="4"
+                                             value="#{sharedAssetRequestV2Controller.selected.rentReason}" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>备注</label>
                             <p:inputTextarea id="remark" readonly="true" rows="1"  cols="100"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selected.remark}" />
