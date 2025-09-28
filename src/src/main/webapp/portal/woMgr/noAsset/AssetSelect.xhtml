@@ -5,7 +5,8 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
     <p:dialog id="AssetSelectDlg" widgetVar="AssetSelectDlg" modal="true" resizable="false"
@@ -95,6 +96,20 @@
                 <f:facet name="{Toolbar}">
                 </f:facet>
             </p:dataTable>
+
+
+            <h:panelGroup id="assetstatus">
+                <label class="label">#{msg.status}</label>
+                <p:selectOneRadio id="status" value="#{serviceRequestNoAssetController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                    <p:ajax listener="#{serviceRequestNoAssetController.onStatusChange()}" update="assetstatus" />
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    <c:if test="#{userContextService.countyArea}">
+                        <f:selectItem itemLabel="#{msg.NormalUsage}" itemValue="1"/>
+                    </c:if>
+                </p:selectOneRadio>
+                <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{serviceRequestNoAssetController.needConfirmTime}" id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{serviceRequestNoAssetController.newServiceRequest.confirmedDownTime}" showOn="button"
+                            readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
+            </h:panelGroup>
             <p:commandButton validateClient="true" actionListener="#{serviceRequestNoAssetController.saveSelectedAsset}"
                              value="确定" update=":AssetSelectDlg, :listForm:datalist :growl" oncomplete="handleSubmit(args, 'AssetSelectDlg');"/>
             <p:commandButton immediate="true" value="#{msg.Cancel}" onclick="PF('AssetSelectDlg').hide()"/>

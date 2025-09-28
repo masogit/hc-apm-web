@@ -268,6 +268,9 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
     public String getStepName(V2_ServiceRequestNoAsset serviceRequestNoAsset){
         Integer stepId =serviceRequestNoAsset.getCurrentStepId();
+        if(stepId==null){
+            return "";
+        }
         switch(stepId){
             case 2:
                 return "待派工";
@@ -714,6 +717,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
     public void prepareAct(String id) {
         selectedSr = dao.findById(id);
+        currentStatus=selectedSr.getAssetStatus();
         needConfirmTime = false;
         Long time = System.currentTimeMillis();
         time += 120*1000*60;
@@ -805,6 +809,10 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     }
 
     public void turnWorkOrder() {
+        if(currentStatus!=null &&  !currentStatus.equals(selectedSr.getAssetStatus())){
+            selectedSr.setAssetStatus(currentStatus);
+            dao.save(selectedSr);
+        }
         serviceRequestNoAssetService.turnWorkOrder(selectedSr, selectAsset.getUid());
         cancel();
     }
