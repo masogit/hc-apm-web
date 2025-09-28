@@ -156,6 +156,11 @@ public class SharedAssetRequest implements Serializable, ApprovableTarget {
     @Column(name="signature_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date signatureTime;
+
+    // 借用原因
+    @Column(name = "rent_reason")
+    private String rentReason;
+
     @Transient
     @JsonProperty
     private List<V2_BlobObject> attachments;
@@ -628,5 +633,11 @@ public class SharedAssetRequest implements Serializable, ApprovableTarget {
 
     public void setSignatureTime(Date signatureTime) {
         this.signatureTime = signatureTime;
+    }
+
+    public String getRentReason() { return rentReason; }
+
+    public void setRentReason(String rentReason) {
+        this.rentReason = rentReason;
     }
 }
