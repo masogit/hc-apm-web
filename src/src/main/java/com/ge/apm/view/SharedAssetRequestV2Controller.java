@@ -111,6 +111,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String signatureContent;
     private StreamedContent signatureContentStream;
     private V2_WorkOrderService v2_workOrderService;
+    private OrgInfoRepository orgDao;
     List<Map<String, String>> userSignature;
     String lastSignatureId ;
     @Getter
@@ -133,6 +134,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
+    @Getter @Setter
+    private OrgInfo currentUserOrgInfo;
 
     public String getFilterApplyTime() {
         return filterApplyTime;
@@ -239,6 +242,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         nurseSiteMaintainService = WebUtil.getBean( NurseSiteMaintainService.class);
         v2_workOrderService = WebUtil.getBean(V2_WorkOrderService.class);
         systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+
+        currentUserOrgInfo = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+
         sharedAssetRequests = new ArrayList<>();
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();

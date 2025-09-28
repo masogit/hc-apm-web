@@ -6189,3 +6189,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','DisposalMethod','处置方式','Disposal Method',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AutoProcessUnfinishedClinicalAssistantWorkOrder','自动处理未完成临床助手工单','Auto Process Unfinished Clinical Assistant Work Order',NULL,-1);
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RentReason','借用原因','Rent Reason',NULL,-1);
