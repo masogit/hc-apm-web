@@ -50,7 +50,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').rendered}">
                             <label class='label'>
-                                #{msg.RentReason}
+                                #{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').label}
                                 <span style="color: red;">
                                     #{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').required ? '*' : ''}
                                 </span>
