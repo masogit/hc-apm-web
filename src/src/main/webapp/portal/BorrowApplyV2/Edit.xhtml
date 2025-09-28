@@ -57,7 +57,12 @@
                         </h:panelGroup>
 
                         <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').rendered}">
-                            <label class='label'>#{msg.RentReason}</label>
+                            <label class='label'>
+                                #{msg.RentReason}
+                                <span style="color: red;">
+                                    #{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').required ? '*' : ''}
+                                </span>
+                            </label>
                             <p:inputTextarea id="rentReason" rows="1"  cols="100"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selected.rentReason}"
                             required="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').required}"
                             requiredMessage="#{systemConfigItemController.getFieldColumn(sharedAssetRequestV2Controller.currentUserOrgInfo, 'rentReason').requiredMessage}"/>
