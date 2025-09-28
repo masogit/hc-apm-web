@@ -2,16 +2,23 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.*;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDController;
+import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -21,13 +28,15 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
+public class AssetPreviewController extends JpaCRUDController<AssetInfo> {
 
     private static final Logger logger = Logger.getLogger(AssetPreviewController.class);
     private static final long serialVersionUID = 1L;
 
     private AssetInfoRepository dao = null;
     private AssetInfoListController assetInfoListController = null;
+    private UaaService uaaService;
+
     @Getter
     @Setter
     private String oneSearchStr;
@@ -39,12 +48,27 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
     @Getter
     private int queryType = 1;
     public void setQueryType(int queryType) {
-        assetInfoListController.searchFilters.clear();
+        this.searchFilters.clear();
         this.queryType = queryType;
     }
+    private UserAccount user;
+    @Getter
+    @Setter
+    private OrgInfo selectSite;
+    @Getter
+    @Setter
+    private String treeNodeNameFilter;
+    @Getter
+    private TreeNode selectedNode;
+
     protected void init() {
+        user = UserContextService.getCurrentUserAccount();
+
         dao = WebUtil.getBean(AssetInfoRepository.class);
         assetInfoListController = WebUtil.getBean(AssetInfoListController.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+
+        this.filterBySite = false;
     }
 
     @Override
@@ -107,13 +131,11 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
     }
 
     private Set<Integer> getRootIds() {
-        if (assetInfoListController.searchFilters == null) {
-            assetInfoListController.searchFilters = new ArrayList<SearchFilter>();
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
         }
-        assetInfoListController.setQueryType(1);
-        assetInfoListController.setOneSearchStr(oneSearchStr);
-        assetInfoListController.setUserSearchFilters();
-        List<AssetInfo> assetInfoList = dao.findBySearchFilter(assetInfoListController.searchFilters);
+        this.setUserSearchFilters();
+        List<AssetInfo> assetInfoList = dao.findBySearchFilter(this.searchFilters);
         Set<Integer> rootIds = new HashSet<>();
         getRootIdsByRecursion(assetInfoList, rootIds);
         return rootIds;
@@ -143,16 +165,6 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
         assetInfo.setParentAssetId(Integer.parseInt(checkData(o[2] == null ? -1 : o[2])));
         assetInfo.setBranchIds(checkData(o[3]));
         assetInfo.setRank(Integer.parseInt(checkData(o[4])));
-//        assetInfo.setFunctionType(checkData(o[5]));
-//        assetInfo.setSerialNum(checkData(o[6]));
-//        assetInfo.setDepartNum(checkData(o[7]));
-//        assetInfo.setAssetGroup(Integer.parseInt(checkData(o[8])));
-//        if (o[9] != null) {
-//            assetInfo.setAssetDeptId(Integer.parseInt(checkData(o[9])));
-//        }
-//        assetInfo.setClinicalDeptName(checkData(o[10]));
-//        assetInfo.setManufacture(checkData(o[11]));
-//        assetInfo.setVendor(checkData(o[12]));
         assetInfos.add(assetInfo);
     }
 
@@ -184,4 +196,68 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
         assetInfoListController.setSelected(selected);
         assetInfoListController.onSelectAsset();
     }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        if (selectedNode == null) {
+            return;
+        }
+        this.selectedNode = selectedNode;
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        this.searchFilters.clear();
+        selected = null;
+        TreeNode node = event.getTreeNode();
+        selectSite = (OrgInfo) node.getData();
+    }
+
+    public void setUserSearchFilters() {
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
+        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+
+        if (!UserContextService.isMVSRole()) {
+            if (!this.hasFilterOnField("siteUID")) {
+                List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            }
+        }
+
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "parentAssetId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+
+        if (null != selectSite) {
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
+        }
+
+        if (UserContextService.isMVSRole()) {
+            this.updateSearchFilter(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
+        }
+    }
+
 }
