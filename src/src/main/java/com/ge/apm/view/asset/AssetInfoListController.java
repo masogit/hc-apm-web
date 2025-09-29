@@ -615,6 +615,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetGroup = null;
         assetGroupSecondary = null;
         filterAssetStatus = null;
+        setTreeNodes(event.getTreeNode(), true);
 
     }
 
@@ -646,6 +647,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetGroup = null;
         assetGroupSecondary = null;
         filterAssetStatus = null;
+
+
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+
+
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
     }
 
     public void onSelectSiteTreeNode2(NodeSelectEvent event) {

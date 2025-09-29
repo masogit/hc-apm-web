@@ -13,6 +13,8 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.asset.QrCodeLibController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -54,6 +56,10 @@ public class OrgTreeController {
     private String retrieval;
     private String tenantUid="";
     int siteId;
+
+    @Getter
+    @Setter
+    private boolean propagateSelectionUp = true;
 
     public int getTenantId() {
         return siteId;
@@ -195,6 +201,14 @@ public class OrgTreeController {
     }
 
     public void filterTreeNodeByNameType4() {
+
+        if (StringUtils.isEmpty(treeNodeNameFilter)) {
+            propagateSelectionUp = true;
+        } else {
+            if (!siteOrgTree.getChildren().get(0).isSelected()) {
+                propagateSelectionUp = false;
+            }
+        }
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         if (uaaService.isIbSiteAdmin(currentUserAccount)) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid(), treeNodeNameFilter, currentUserAccount.getSiteId());

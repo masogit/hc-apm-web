@@ -72,7 +72,7 @@
                                 <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                                 <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteClinicalDeptOrgTree}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"     dynamic="false"  cache="false"     >
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteClinicalDeptOrgTree}" selection="#{assetInfoListController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"     dynamic="false"  cache="false"   propagateSelectionUp="#{orgTreeController.propagateSelectionUp}"    >
                                         <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) " />
                                         <p:ajax process="@this" event="unselect" listener="#{assetInfoListController.onUnSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital)"/>
                                         <p:ajax process="@this" event="expand"/>
