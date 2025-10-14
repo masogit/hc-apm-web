@@ -33,7 +33,7 @@ public class FileScanService {
     //save for file scan
     public String saveUploadedFile(UploadedFile file) throws Exception {
         String folderName = FILE_SCAN_FOLDER.concat(File.separator).concat(UUID.randomUUID().toString());
-        return saveFile(file, folderName, URLEncoder.encode(file.getFileName(),"UTF-8"));
+        return saveFile(file, folderName, file.getFileName());
     }
 
     public String saveBatchUploadedFile(UploadedFile file, String fileType) throws Exception {
