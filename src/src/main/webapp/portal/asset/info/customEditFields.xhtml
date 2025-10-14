@@ -1019,6 +1019,15 @@
             </p:calendar>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'startUsingDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.startUsingDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['startUsingDate'].required? '*':''}</span></label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="startUsingDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.startUsingDate}" readonly="#{!assetInfoEditController.needEdit('startUsingDate')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="#{assetInfoEditController.customConfig.assetFields['startUsingDate'].required}" requiredMessage="#{msg.startUsingDate} #{msg.ValidationRequire}">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'factoryWarrantyDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.factoryWarrantyDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required? '*':''}</span></label>
