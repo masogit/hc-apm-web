@@ -74,6 +74,7 @@ public enum CustomConfigFields {
     purchaseDate(fieldName, "purchaseDate" ,Text),   //采购日期
     arriveDate(fieldName, "arriveDate" ,Text),    //到货日期
     installDate(fieldName, "installDate" ,Text),   //启用日期
+    startUsingDate(fieldName,"startUsingDate" ,Text), //
     factoryWarrantyDate(fieldName, "factoryWarrantyDate" ,Text),  //质保截止日期
     warrantyDate(fieldName, "warrantyDate" ,Text),    //维保截止日期
     terminateDate(fieldName, "terminateDate" ,Text),  //报废日期
