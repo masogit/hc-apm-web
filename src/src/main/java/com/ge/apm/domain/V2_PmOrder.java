@@ -297,7 +297,7 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     private String mainSub;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "pm_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
     @Fetch(FetchMode.SUBSELECT)
     private List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails;
