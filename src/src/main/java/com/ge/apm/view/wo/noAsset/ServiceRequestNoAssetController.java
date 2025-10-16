@@ -87,6 +87,8 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Getter@Setter
     private List<V2_BlobObject> picList;
     @Getter@Setter
+    private List<V2_BlobObject> audioList;
+    @Getter@Setter
     private V2_ServiceRequestNoAsset newServiceRequest;
     @Getter @Setter
     private String searchDeptName;
@@ -169,6 +171,10 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         if (selectedId != null) {
             selected = dao.findById(selectedId);
             picList = blobService.findBlobObjectsByBoUid(selectedId);
+            if(!CollectionUtils.isEmpty(picList)){
+                audioList = picList.stream().filter(item -> "ServiceRequestNoAsset".equals(item.getBoType())  && item.getObjectType().contains("audio")   ).collect
+                        (Collectors.toList());
+            }
             currentStatus = selected.getAssetStatus();
 
         }

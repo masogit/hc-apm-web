@@ -73,6 +73,18 @@
                      <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',serviceRequestNoAssetController.selected.srRepairSource)}"/>
                   </h:panelGroup>
                </p:panelGrid>
+               <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.audioList}" columns="2" layout="grid" rendered="#{not empty serviceRequestNoAssetController.audioList}">
+                  <f:facet name="header">#{msg.requestVoice}</f:facet>
+                  <p:panel  style="text-align:center">
+                     <h:panelGrid columns="1" style="width:100%">
+                        <audio controls="controls">
+                           <source src="#{fileDownloadService.getFileUrl(audioItem.objectStorageId)}" />
+                        </audio>
+                     </h:panelGrid>
+                  </p:panel>
+               </p:dataGrid>
+
+
                <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
                   <p:dataGrid id="requestImage" var="fileitem" value="#{serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}" columns="5" layout="grid" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
                      <p:panel  style="text-align:center">
