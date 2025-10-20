@@ -459,7 +459,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
     public List<V2_BlobObject> getPicListByBoType(String boType) {
         if (picList != null) {
-            List<V2_BlobObject> collect = picList.stream().filter(item -> boType.equals(item.getBoType())).collect
+            List<V2_BlobObject> collect = picList.stream().filter(item -> boType.equals(item.getBoType())  && item.getObjectType().contains("image") ).collect
                     (Collectors.toList());
             return collect;
         } else {
