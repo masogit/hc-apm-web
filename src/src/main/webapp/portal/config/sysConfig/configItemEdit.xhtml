@@ -123,7 +123,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup id="manHoursGroup" >
-                            <h:panelGroup rendered="#{systemConfigItemController.selected.fieldColumnDto.entryType == 0}">
+                            <h:panelGroup>
                                 <label class="label">默认工时(小时)</label>
                                 <p:inputNumber id="manHours_input" maxValue="999" value="#{systemConfigItemController.selected.fieldColumnDto.hours}"  >
                                     <p:ajax />

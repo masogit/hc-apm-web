@@ -11,3 +11,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','measureocr','计量OCR识别','Measurement Information',NULL,-1);
 
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)select replace(uuid_generate_v4()::text,'-',''), 2, '{"rendered":false,"label":"借用原因","required":"false","requiredMessage":"借用原因必填！"}', '借用原因字段配置', 'rentReason', '借用原因', 'f','t',9 where not exists(select * from config_item where key = 'rentReason');
+
+
+update  config_item  set default_value='{"entryType": 0,"hours":0.1}' where key='pmEntryTypeSet';

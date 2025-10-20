@@ -173,7 +173,7 @@
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup id="manHoursGroup" >
-                            <h:panelGroup rendered="#{systemConfigItemController.configItemMap.get('pmEntryTypeSet').fieldColumnDto.entryType == 0}">
+                            <h:panelGroup>
                                 <label class="label">默认工时(小时)</label>
                                 <p:inputNumber id="manHours_input" maxValue="999" value="#{systemConfigItemController.configItemMap.get('pmEntryTypeSet').fieldColumnDto.hours}"  >
                                     <p:ajax />
