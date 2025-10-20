@@ -685,6 +685,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setComments(selectedPmOrder.getComments());//工作备注
         formData.setEntryType(selectedPmOrder.getEntryType());
         if(selectedPmOrder.getEntryType() == 1){
+            pmHoursList = pmHoursList.stream()
+                    .filter(item -> !"000".equals(item.getId()))
+                    .collect(Collectors.toList());
             formData.setPmOrderManHoursDetails(pmHoursList);
         }
         String res = srApi.invokePmOrderAction(token,formData,"保养",selectedPmOrder.getId());
@@ -770,6 +773,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setComments(selectedPmOrder.getComments());
         formData.setEntryType(selectedPmOrder.getEntryType());
         if(selectedPmOrder.getEntryType() == 1){
+            pmHoursList = pmHoursList.stream()
+                    .filter(item -> !"000".equals(item.getId()))
+                    .collect(Collectors.toList());
             formData.setPmOrderManHoursDetails(pmHoursList);
         }
         String res = srApi.invokePmOrderAction(token,formData,"tempRepair",selectedPmOrder.getId());
