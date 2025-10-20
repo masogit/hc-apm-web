@@ -2487,6 +2487,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareCompleteOrder(String woid) throws Exception {
         accessoryList = getWorkOrderDetail(woid);
         selectedPmOrder = dao.findById(woid);
+        pmHoursList=selectedPmOrder.getPmOrderManHoursDetails();
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedPmOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
