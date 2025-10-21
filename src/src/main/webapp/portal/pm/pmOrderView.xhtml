@@ -127,6 +127,29 @@
                         </h:outputText>
                     </p:column>
                 </p:dataTable>
+                <h:panelGroup rendered="#{not empty v2PmOrderController.selected.pmOrderManHoursDetails}">
+                    <label class="label">#{msg.workTimePeriod}</label>
+                    <p:dataTable id="x4" class="cl4" value="#{v2PmOrderController.selected.pmOrderManHoursDetails}" var="detailItem">
+                        <p:column headerText="#{msg.startTime}">
+                            <h:outputText value="#{detailItem.startTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.endTime}">
+                            <h:outputText value="#{detailItem.endTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.hourslb}">
+                            <h:outputText value="#{detailItem.hours}" />
+                        </p:column>
+                        <p:column headerText="#{msg.remark}">
+                            <h:outputText value="#{detailItem.remark}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+
                 <h:panelGroup rendered="#{v2PmOrderController.maintenancePersonInformation != null}">
                     <label class="label">#{msg.maintenancePersonInformation}</label>
                     <p:dataTable styleClass="header1" id="qrCodeEditForm" var="person" value="#{v2PmOrderController.maintenancePersonInformation}" editable="true" rowKey="#{person.fieldName}">
