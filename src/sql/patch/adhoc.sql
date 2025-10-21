@@ -14,3 +14,7 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 
 
 update  config_item  set default_value='{"entryType": 0,"hours":0.1}' where key='pmEntryTypeSet';
+
+
+insert into admin_feature_active values (id,create_date,modify_date,tenant_uid,hospital_uid,active_role,feature_key)
+values (replace(uuid_generate_v4()::text,'-',''),now(),now(),'d574bc0dd0834b73b41c13dcd8b8866e','678deba8a33844b9b9f372be83d21d9d','SuperAdmin','MEASUREOCR');
