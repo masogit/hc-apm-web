@@ -3919,15 +3919,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectedPmOrder.getSiteUID(), selectedPmOrder.getHospitalUID(), selectedPmOrder.getInstitutionUID(), selectedPmOrder.getTenantUID(), "pmEntryTypeSet");
             if(StrUtil.isNotEmpty(value)){
                 FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
-                if(fieldColumnDto.getEntryType() != null){
-                    if(fieldColumnDto.getEntryType() == 0){
-                        selectedPmOrder.setManHours(fieldColumnDto.getHours());
-                    }
+                if(fieldColumnDto != null){
+                    selectedPmOrder.setManHours(fieldColumnDto.getHours());
                 }
             }
-            if(selectedPmOrder.getManHours() == null){
-                selectedPmOrder.setManHours(0.1);
-            }
+//            if(selectedPmOrder.getManHours() == null){
+//                selectedPmOrder.setManHours(0.1);
+//            }
         }
     }
 
