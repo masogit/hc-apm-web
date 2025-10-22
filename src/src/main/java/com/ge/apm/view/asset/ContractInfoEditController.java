@@ -888,6 +888,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public boolean showText(){
+        List<V2_BlobObject> attachements = getAttachements();
         return attachements.stream().anyMatch(atts ->
               !"1".equals(atts.getApproveStatus())
         );
