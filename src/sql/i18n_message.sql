@@ -3053,7 +3053,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AutomaticallyClosed', '工单完工自动关单', 'Automatically closed upon completion of the workorder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RatingRequired', '是否必须评价', 'Rating Required', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AutomaticallyClosedForNoPart', '无备件自动关单', 'Automatically closed for no part', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ManhoursRequired', '是否工时必填', 'Manhours required', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'IsWorkingHoursRequired', '是否工时必填', 'Is working hours required', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NoTemporaryAccountAllowed', '不允许临时账号', 'No  temporary account allowed', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TelephoneBasedRequestForRepairRequired', '是否电话报修', 'Telephone-based request for repair required', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TelephoneBasedRequestStartTime', '电话报修开始时间', 'Telephone-based Request Start Time', NULL, '-1');
