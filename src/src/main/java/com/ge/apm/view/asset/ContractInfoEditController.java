@@ -887,6 +887,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     }
 
+    public boolean showText(){
+        return attachements.stream().anyMatch(atts ->
+              !"1".equals(atts.getApproveStatus())
+        );
+    }
+
     public void attachSort() {
         sortFlag = !sortFlag;
     }

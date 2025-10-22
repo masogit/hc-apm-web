@@ -212,7 +212,7 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
                         <h:panelGroup>
-                            <p:outputLabel class="label" render="">
+                            <p:outputLabel class="label" rendered="#{contractInfoEditController.showText()}">
                                 以下附件尚未审核，是否仍确认审核？
                             </p:outputLabel>
                             <ui:repeat value="#{contractInfoEditController.attachements}" var="attachement">
