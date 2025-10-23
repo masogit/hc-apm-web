@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -10,7 +11,14 @@
 <ui:composition>
     <div class="ui-g-12 card">
         <h:form id="listForm">
-            <p:dataTable id="datalist" value="#{zkbTrainUnRegisterController.lazyModel}" var="item" widgetVar="varDataList"
+
+            <f:metadata>
+                <!-- 进入页面时设置 filterBySignDeadline = true -->
+                <f:viewAction action="#{zkbTrainUnRegisterController.setFilterBySignDeadline(true)}" />
+            </f:metadata>
+
+            <p:dataTable id="datalist" value="#{zkbTrainUnRegisterController.lazyModel}" var="item"
+                         widgetVar="varDataList"
                          selectionMode="single" selection="#{zkbTrainUnRegisterController.selected}"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
@@ -19,83 +27,119 @@
                          currentPageReportTemplate="总行数: {totalRecords}"
                          rowsPerPageTemplate="20,50,100,500">
 
-                <p:ajax event="rowSelect"  update=""/>
-                <p:ajax event="filter" listener="#{zkbTrainUnRegisterController.onFilter}" />
-                <p:column headerText="CatNo" filterBy="#{item.zkbTrainCourse.catNo}"  filterMatchMode="LIKE" >
-                    <h:outputText value="#{item.zkbTrainCourse.catNo}"/>
+                <p:ajax event="rowSelect" update=""/>
+                <p:ajax event="filter" listener="#{zkbTrainUnRegisterController.onFilter}"/>
+                <p:column headerText="课程类型" filterBy="#{item.zkbTrainCourse.courseType}"
+                          filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbTrainCourseType')}" var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText
+                            value="#{fieldMsg.fieldValue('ZkbTrainCourseType',item.zkbTrainCourse.courseType)}"/>
                 </p:column>
-                <p:column headerText="Modality" filterBy="#{item.zkbTrainCourse.Modality}"  filterMatchMode="LIKE" >
+                <p:column headerText="Modality" filterBy="#{item.zkbTrainCourse.Modality}"
+                          filterMatchMode="LIKE">
                     <h:outputText value="#{item.zkbTrainCourse.modality}"/>
                 </p:column>
-                <p:column headerText="课程名称" filterBy="#{item.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
+                <p:column headerText="课程简称信息" filterBy="#{item.zkbTrainCourse.name}"
+                          filterMatchMode="LIKE">
                     <h:outputText value="#{item.zkbTrainCourse.name}"/>
                 </p:column>
-                <p:column headerText="培训开始时间" filterBy="#{item.trainStartDate}" sortBy="#{item.trainStartDate}" filterMatchMode="GTE">
+                <p:column headerText="培训开始时间" filterBy="#{item.trainStartDate}" sortBy="#{item.trainStartDate}"
+                          filterMatchMode="GTE">
                     <f:facet name="filter">
-                        <p:inputText id="filterTrainStartDate" widgetVar="varFilterTrainStartDate" />
+                        <p:inputText id="filterTrainStartDate" widgetVar="varFilterTrainStartDate"/>
                     </f:facet>
                     <h:outputText value="#{item.trainStartDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="培训结束时间" filterBy="#{item.trainEndDate}" sortBy="#{item.trainEndDate}" filterMatchMode="GTE">
+                <p:column headerText="培训结束时间" filterBy="#{item.trainEndDate}" sortBy="#{item.trainEndDate}"
+                          filterMatchMode="GTE">
                     <f:facet name="filter">
-                        <p:inputText id="filterTrainEndDate" widgetVar="varFilterTrainEndDate" />
+                        <p:inputText id="filterTrainEndDate" widgetVar="varFilterTrainEndDate"/>
                     </f:facet>
                     <h:outputText value="#{item.trainEndDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="报名截止日期" filterBy="#{item.signDeadline}" sortBy="#{item.signDeadline}" filterMatchMode="GTE">
+                <p:column headerText="报名截止日期" filterBy="#{item.signDeadline}" sortBy="#{item.signDeadline}"
+                          filterMatchMode="GTE">
                     <f:facet name="filter">
-                        <p:inputText id="filterSignDeadline" widgetVar="varFilterSignDeadline" />
+                        <p:inputText id="filterSignDeadline" widgetVar="varFilterSignDeadline"/>
                     </f:facet>
                     <h:outputText value="#{item.signDeadline}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="培训地点" filterBy="#{item.location}"  filterMatchMode="LIKE" >
+                <p:column headerText="培训地点" filterBy="#{item.location}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.location}"/>
                 </p:column>
-                <p:column headerText="培训方式" filterBy="#{item.trainMode}"  filterMatchMode="LIKE" >
+                <p:column headerText="培训方式" filterBy="#{item.trainMode}" filterMatchMode="LIKE">
                     <h:outputText value="#{fieldMsg.fieldValue('trainMode',item.trainMode)}"/>
                 </p:column>
                 <p:column headerText="操作">
-                    <p:commandButton value="报名" style="width: 70px;" action="#{zkbTrainRegisterMainController.prepareRegister(item.id)}" update=":registerEngineerListDlg" oncomplete="PF('registerEngineerListDialog').show()" />
+                    <p:commandButton value="报名" style="width: 70px;"
+                                     action="#{zkbTrainRegisterMainController.prepareRegister(item.id)}"
+                                     update=":registerEngineerListDlg"
+                                     oncomplete="PF('registerEngineerListDialog').show()"/>
 
                 </p:column>
 
             </p:dataTable>
         </h:form>
-        <p:overlayPanel widgetVar="panelFilterTrainStartDate" for=":tab:listForm:datalist:filterTrainStartDate" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterTrainStartDate" for=":tab:listForm:datalist:filterTrainStartDate"
+                        dismissable="false">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varTrainStartDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="GMT+8" widgetVar="varTrainStartDateFrom" pattern="yyyy/MM/dd" showOn="button"
+                            showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varTrainStartDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="GMT+8" widgetVar="varTrainStartDateTo" pattern="yyyy/MM/dd" showOn="button"
+                            showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
             </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList','varFilterTrainStartDate','varTrainStartDateFrom','varTrainStartDateTo'); PF('panelFilterTrainStartDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterTrainStartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            <p:commandButton
+                    onclick="setDateFilter('varDataList','varFilterTrainStartDate','varTrainStartDateFrom','varTrainStartDateTo'); PF('panelFilterTrainStartDate').hide();"
+                    title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterTrainStartDate').hide()" title="#{msg.Close}" icon="ui-icon-close"
+                             immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
-        <p:overlayPanel widgetVar="panelFilterTrainEndDate" for=":tab:listForm:datalist:filterTrainEndDate" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterTrainEndDate" for=":tab:listForm:datalist:filterTrainEndDate"
+                        dismissable="false">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varTrainEndDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="GMT+8" widgetVar="varTrainEndDateFrom" pattern="yyyy/MM/dd" showOn="button"
+                            showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varTrainEndDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="GMT+8" widgetVar="varTrainEndDateTo" pattern="yyyy/MM/dd" showOn="button"
+                            showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
             </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList','varFilterTrainEndDate','varTrainEndDateFrom','varTrainEndDateTo'); PF('panelFilterEndDateDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterEndDateDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            <p:commandButton
+                    onclick="setDateFilter('varDataList','varFilterTrainEndDate','varTrainEndDateFrom','varTrainEndDateTo'); PF('panelFilterEndDateDate').hide();"
+                    title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterEndDateDate').hide()" title="#{msg.Close}" icon="ui-icon-close"
+                             immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
-        <p:overlayPanel widgetVar="panelFilterSignDeadline" for=":tab:listForm:datalist:filterSignDeadline" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterSignDeadline" for=":tab:listForm:datalist:filterSignDeadline"
+                        dismissable="false">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varSignDeadlineFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="GMT+8" widgetVar="varSignDeadlineFrom" pattern="yyyy/MM/dd" showOn="button"
+                            showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varSignDeadlineTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="GMT+8" widgetVar="varSignDeadlineTo" pattern="yyyy/MM/dd" showOn="button"
+                            showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
             </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList','varFilterSignDeadline','varSignDeadlineFrom','varSignDeadlineTo'); PF('panelFilterSignDeadline').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterSignDeadline').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            <p:commandButton
+                    onclick="setDateFilter('varDataList','varFilterSignDeadline','varSignDeadlineFrom','varSignDeadlineTo'); PF('panelFilterSignDeadline').hide();"
+                    title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterSignDeadline').hide()" title="#{msg.Close}" icon="ui-icon-close"
+                             immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
 

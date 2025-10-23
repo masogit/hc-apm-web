@@ -1,20 +1,21 @@
 package com.ge.apm.service.zkb;
 
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.ZkbTrainCourseQuotaDetailRepository;
-import com.ge.apm.dao.ZkbTrainCourseQuotaRepository;
-import com.ge.apm.dao.ZkbTrainCourseRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ZkbTrainCourseQuotaService {
@@ -31,6 +32,9 @@ public class ZkbTrainCourseQuotaService {
 
     @Autowired
     private ZkbTrainCourseQuotaDetailRepository zkbTrainCourseQuotaDetailRepository;
+
+    @Autowired
+    private ZkbTrainPublishRepository zkbTrainPublishRepository;
 
 
     public static final String SHEET_NAME = "名额";
@@ -65,13 +69,15 @@ public class ZkbTrainCourseQuotaService {
             zkbTrainCourseQuota.setCreatedDate(new Date());
             zkbTrainCourseQuota.setCourseId(zkbTrainCourse.getId());
             zkbTrainCourseQuota.setZkbTrainCourse(zkbTrainCourse);
+            zkbTrainCourseQuota.setModality(zkbTrainCourse.getModality());
             zkbTrainCourseQuota = zkbTrainCourseQuotaRepository.save(zkbTrainCourseQuota);
         }else{
             zkbTrainCourseQuota.setLastModifiedBy(userAccount.getUid());
             zkbTrainCourseQuota.setLastModifiedDate(new Date());
-            if(!zkbTrainCourse.getId().equals(zkbTrainCourseQuota.getZkbTrainCourse().getId())){
+            if (!zkbTrainCourse.getId().equals(zkbTrainCourseQuota.getCourseId())) {
                 zkbTrainCourseQuota.setCourseId(zkbTrainCourse.getId());
                 zkbTrainCourseQuota.setZkbTrainCourse(zkbTrainCourse);
+                zkbTrainCourseQuota.setModality(zkbTrainCourse.getModality());
             }
             zkbTrainCourseQuotaRepository.save(zkbTrainCourseQuota);
         }
@@ -307,7 +313,33 @@ public class ZkbTrainCourseQuotaService {
     public List<ZkbTrainCourseQuotaDetail> queryDetailByQuota(String id){
         return zkbTrainCourseQuotaDetailRepository.findByQuotaIdOrderByUniqueIDDesc(id);
     }
+
+    public List<ZkbTrainCourseQuota> findAll() {
+        return StreamSupport.stream(zkbTrainCourseQuotaRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+    }
+
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }
+
+    public void adjustQuota(String tenantUid, String courseId, int delta, UserAccount operator) {
+        if (delta == 0) return;
+
+        ZkbTrainCourseQuota mainQuota = zkbTrainCourseQuotaRepository.findFirstByTenantUidAndCourseId(tenantUid, courseId);
+        if (mainQuota == null) {
+            throw new BusinessException("未配置该课程配额，无法调整");
+        }
+
+        int newQuota = mainQuota.getQuota() + delta;
+        if (newQuota < 0) {
+            throw new BusinessException("配额不足，无法完成操作，当前剩余：" + mainQuota.getQuota());
+        }
+
+        mainQuota.setQuota(newQuota);
+        mainQuota.setLastModifiedBy(operator.getName());
+        mainQuota.setLastModifiedDate(new Date());
+        zkbTrainCourseQuotaRepository.save(mainQuota);
+    }
+
 }

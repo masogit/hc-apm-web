@@ -152,4 +152,8 @@ public class ZkbEngineerService {
         return zkbEngineer;
     }
 
+    @Transactional
+    public void save(ZkbEngineer engineer) {
+        zkbEngineerRepository.save(engineer);
+    }
 }

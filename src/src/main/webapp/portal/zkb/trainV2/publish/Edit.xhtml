@@ -7,7 +7,7 @@
 
 <ui:composition>
     <p:dialog id="editDlg" widgetVar="editDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbTrainPublishController.CRUDActionName} 培训发布信息" width="600" height="400">
-        <h:form id="zkbCourseEditForm">
+        <h:form id="zkbPublishViewForm">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbTrainPublishController.selected != null}">
                 <h:panelGroup>
                     <label class="label">课程CatNo*</label>
