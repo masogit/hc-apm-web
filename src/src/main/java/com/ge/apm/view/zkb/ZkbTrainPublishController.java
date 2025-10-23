@@ -12,6 +12,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +24,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -113,5 +113,28 @@ public class ZkbTrainPublishController extends GenericCRUDUUIDController<ZkbTrai
     @Override
     protected GenericRepositoryUUID<ZkbTrainPublishInfo> getDAO() {
         return dao;
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        this.cancel();
+    }
+
+    public String deletePublish() {
+        if (CollectionUtils.isNotEmpty(zkbTrainPublishService.getRegisteredByPublishId(selected.getId()))) {
+            WebUtil.addErrorMessage("当前课程已有报名信息，无法删除！");
+            this.selected = null;
+            return "";
+        } else {
+            zkbTrainPublishService.delete(selected);
+            WebUtil.addSuccessMessage("删除成功！");
+            this.cancel();
+            return "List?faces-redirect=true";
+        }
+    }
+
+    public void cancel() {
+        this.selected = null;
     }
 }

@@ -72,14 +72,14 @@
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增" actionListener="#{zkbTrainCourseQuotaController.prepareCreate}" update=":zkbCourseQuotaEditDlg" oncomplete="PF('zkbCourseQuotaEditDialog').show()" />
                         <p:commandButton id="editButton"  icon="ui-icon-pencil" title="编辑" actionListener="#{zkbTrainCourseQuotaController.prepareEdit}" update="zkbCourseQuotaEditDlg" oncomplete="PF('zkbCourseQuotaEditDialog').show()" disabled="#{empty zkbTrainCourseQuotaController.selected.id}" />
-                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbTrainCourseQuotaController.delete}" update=":listForm:datalist" >
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbTrainCourseQuotaController.delete}" update=":listForm:datalist"  disabled="true">
                             <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
                         </p:commandButton>
                         <p:commandButton id="importButton" ajax="false" title="课程导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
 
                         </p:commandButton>
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalist" fileName="Zkb_Train_Course_Quota"/>
+                        <p:commandButton ajax="false" actionListener="#{zkbTrainCourseQuotaController.exportWithExtraColumns}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" >
+                            <p:fileDownload value="#{zkbTrainCourseQuotaController.exportFileWithExtraColumns}" />
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
