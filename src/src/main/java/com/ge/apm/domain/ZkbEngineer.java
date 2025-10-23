@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "zkb_engineer")
-public class ZkbEngineer {
+public class ZkbEngineer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

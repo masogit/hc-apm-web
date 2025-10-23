@@ -162,6 +162,7 @@
                 <p:menuitem value="培训课程名额管理" outcome="/portal/zkb/trainV2/courseQuota/List.xhtml" />
                 <p:menuitem value="培训课程发布" outcome="/portal/zkb/trainV2/publish/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>
                 <p:menuitem value="培训课程报名" outcome="/portal/zkb/trainV2/register/main.xhtml" rendered="#{userContextService.zkbUser}"/>
+                <p:menuitem value="培训记录管理" outcome="/portal/zkb/trainV2/trainRecord/List.xhtml" />
 
             </p:submenu>
             <p:submenu label="#{msg.ZKBBasicInfo} New" icon="fa fa-clipboard" rendered="#{userContextService.accessContains('zkbBasicInfo')}">

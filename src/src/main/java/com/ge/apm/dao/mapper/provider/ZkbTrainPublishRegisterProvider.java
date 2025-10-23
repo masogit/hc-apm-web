@@ -30,6 +30,9 @@ public class ZkbTrainPublishRegisterProvider {
             if("tenantUid".equals(tempColumn)) {
                 continue;
             }
+            if("zkbTrainCourse.courseType".equals(tempColumn)) {
+                sb.append(" and p.course_id  in (select id from zkb_train_course where course_type = '" + value + "') ");
+            }
             if ("signDeadline".equals(tempColumn)) {
                 if (value instanceof Date) {
                     String formatted = new SimpleDateFormat("yyyy-MM-dd").format(value);

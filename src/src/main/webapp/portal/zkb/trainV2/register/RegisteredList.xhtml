@@ -33,8 +33,8 @@
                     <p:column headerText="Modality" filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.Modality}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.zkbTrainPublishInfo.zkbTrainCourse.modality}"/>
                     </p:column>
-                    <p:column headerText="课程简称信息" filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.zkbTrainPublishInfo.zkbTrainCourse.name}"/>
+                    <p:column headerText="课程简称信息" filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.shortName}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.zkbTrainPublishInfo.zkbTrainCourse.shortName}"/>
                     </p:column>
                     <p:column headerText="培训开始时间" filterBy="#{item.zkbTrainPublishInfo.trainStartDate}" sortBy="#{item.zkbTrainPublishInfo.trainStartDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
