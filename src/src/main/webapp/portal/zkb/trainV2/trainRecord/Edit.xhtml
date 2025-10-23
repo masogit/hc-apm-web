@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+<ui:composition>
+    <p:dialog id="zkbTrainRecordEditDlg"
+              widgetVar="zkbTrainRecordEditDialog"
+              modal="true"
+              resizable="false"
+              draggable="true"
+              appendTo="@(body)"
+              header="#{zkbTrainAttendanceRecordController.CRUDActionName} 培训记录"
+              width="650"
+              height="600">
+        <h:form id="zkbTrainRecordEditForm">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                         rendered="#{zkbTrainAttendanceRecordController.selected != null}">
+                <!-- 基础信息 -->
+                <h:panelGroup>
+                    <label class="label">学员姓名*</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.traineeName}"
+                                 required="true" requiredMessage="学员姓名 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">SSO</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.sso}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">电话</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.phone}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">邮箱</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.email}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">身份证号</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.idCardNo}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">商备邮件</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.businessEmail}"/>
+                </h:panelGroup>
+
+                <!-- 公司与合同 -->
+                <h:panelGroup>
+                    <label class="label">公司名称</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.companyName}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">合同号</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.contractNo}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">合同唯一号</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.contractUniqueId}"/>
+                </h:panelGroup>
+
+                <!-- 培训信息 -->
+                <h:panelGroup>
+                    <label class="label">课程名称*</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.courseName}"
+                                 required="true" requiredMessage="课程名称 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">Modality</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.modality}"
+                                 requiredMessage="Modality #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">培训地点</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.location}"
+                                 requiredMessage="培训地点 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">培训形式*</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.trainFormat}"
+                                 required="true" requiredMessage="培训形式 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">培训老师</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.trainerName}"
+                                 requiredMessage="培训老师 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">Modality</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.modality}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">学员类型</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.traineeType}"/>
+                </h:panelGroup>
+
+                <!-- 时间 -->
+                <h:panelGroup>
+                    <label class="label">培训开始时间</label>
+                    <p:calendar value="#{zkbTrainAttendanceRecordController.selected.trainStartDate}"
+                                pattern="yyyy-MM-dd HH:mm"
+                                requiredMessage="培训开始时间 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">培训结束时间</label>
+                    <p:calendar value="#{zkbTrainAttendanceRecordController.selected.trainEndDate}"
+                                pattern="yyyy-MM-dd HH:mm"
+                                requiredMessage="培训结束时间 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+
+                <!-- 状态与结果 -->
+                <h:panelGroup>
+                    <label class="label">状态*</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.status}"
+                                 required="true" requiredMessage="状态 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">是否通过*</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.isPassed}"
+                                 required="true" requiredMessage="是否通过 #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">Final 成绩</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.finalScore}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">Lab+笔试</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.labWrittenScore}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">Online 成绩</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.onlineScore}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">评级（Degree）</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.degree}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">原因</label>
+                    <p:inputTextarea value="#{zkbTrainAttendanceRecordController.selected.reason}" rows="2" cols="30"/>
+                </h:panelGroup>
+            </p:panelGrid>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <p:commandButton validateClient="true"
+                                 value="#{msg.Save}"
+                                 action="#{zkbTrainAttendanceRecordController.saveRecord}"
+                                 update=":growl :listForm:datalist"
+                                 icon="ui-icon-check"
+                                 oncomplete="if (!args.validationFailed) PF('zkbTrainRecordEditDialog').hide();"/>
+                <p:commandButton immediate="true"
+                                 value="#{msg.Cancel}"
+                                 icon="ui-icon-cancel"
+                                 onclick="PF('zkbTrainRecordEditDialog').hide(); return false;"/>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>
