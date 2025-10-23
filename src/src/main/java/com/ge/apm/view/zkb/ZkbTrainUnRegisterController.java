@@ -7,6 +7,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -14,6 +15,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @ManagedBean
@@ -40,6 +42,8 @@ public class ZkbTrainUnRegisterController extends GenericCRUDUUIDController<ZkbT
         if(this.searchFilters == null){
             this.searchFilters = new ArrayList<>();
         }
+        // 过滤：报名截止日期 >= 当前时间
+        searchFilters.add(new SearchFilter("signDeadline", SearchFilter.Operator.GTE, new Date()));
         List<ZkbTrainPublishInfo> list = zkbTrainPublishRegisterService.loadUnRegisterDataList(this.searchFilters, currentUser.getTenantUID());
         return pageUtil.pageNum(list,pageRequest);
     }

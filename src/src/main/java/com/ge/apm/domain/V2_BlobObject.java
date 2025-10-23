@@ -138,6 +138,10 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_MC_SUBSCRIBE_APPLY = "MC_SUBSCRIBE_APPLY";
     public static final String BO_TYPE_TRAIN_REGISTER = "TRAIN_REGISTER";
 
+    public static final String BO_SUB_TYPE_PHYSICAL_EXAM = "PHYSICAL_EXAM";       // 放射体检证明
+    public static final String BO_SUB_TYPE_SAFETY_CERT = "SAFETY_CERT";           // 安全防护证书
+    public static final String BO_SUB_TYPE_RECOMMENDATION = "RECOMMENDATION";     // 公司推荐函
+
 
     @Id
     @GeneratedValue(generator = "uuid")

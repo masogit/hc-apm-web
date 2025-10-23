@@ -130,4 +130,12 @@ public class ZkbTrainPublishService {
         }
 
     }
+
+    public void delete(ZkbTrainPublishInfo zkbTrainPublishInfo) {
+        zkbTrainPublishRepository.delete(zkbTrainPublishInfo);
+    }
+
+    public List<ZkbTrainPublishRegister> getRegisteredByPublishId(String publishId) {
+        return zkbTrainPublishRegisterRepository.findByPid(publishId);
+    }
 }

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+<ui:composition>
+
+    <p:dialog
+            id="viewRegisteredDlg"
+            widgetVar="viewRegisteredDlg"
+            modal="true"
+            resizable="true"
+            draggable="true"
+            header="查看 - 所有代理商报名信息"
+            width="900"
+            height="600">
+
+        <h:form id="registrationForm">
+
+            <!-- ✅ 关键：用 panelGroup 包裹，用于 update -->
+            <h:panelGroup id="registeredDetailsPanel">
+
+                <!-- ✅ 使用 p:accordionPanel 的 value + var 动态生成 tab -->
+                <p:accordionPanel
+                        value="#{zkbTrainRegisterMainController.allRegistrations}"
+                        var="reg"
+                        multiple="true"
+                        style="font-size:14px"
+                        rendered="#{not empty zkbTrainRegisterMainController.allRegistrations}">
+
+                    <!-- 每个 tab 对应一个 reg -->
+                    <p:tab title="代理商: #{empty zkbTrainCourseQuotaController.getTenantInfo(reg.tenantUid).name ? reg.createdBy : zkbTrainCourseQuotaController.getTenantInfo(reg.tenantUid).name} (共#{reg.zkbTrainPublishRegisterDetails.size()}人)">
+
+                        <!-- 代理商信息 -->
+                        <h:panelGrid columns="2" cellpadding="5"
+                                     style="width:100%; background:#f8f9fa; padding:10px; border-radius:5px">
+                            <h:outputText value="供应商名称：" style="font-weight:bold"/>
+                            <h:outputText
+                                    value="#{empty zkbTrainCourseQuotaController.getTenantInfo(reg.tenantUid).name ? reg.createdBy : zkbTrainCourseQuotaController.getTenantInfo(reg.tenantUid).name}"/>
+
+                            <h:outputText value="报名时间：" style="font-weight:bold"/>
+                            <h:outputText value="#{reg.registerDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                            </h:outputText>
+                        </h:panelGrid>
+
+                        <br/>
+
+                        <!-- 工程师明细表 -->
+                        <p:dataTable
+                                value="#{reg.zkbTrainPublishRegisterDetails}"
+                                var="detail"
+                                paginator="true"
+                                rows="5"
+                                style="margin-top:10px"
+                                emptyMessage="该代理商暂无工程师报名信息">
+
+                            <p:column headerText="工程师姓名">
+                                <h:outputText value="#{detail.engineerName}"/>
+                            </p:column>
+                            <p:column headerText="年龄">
+                                <h:outputText value="#{detail.engineerAge}"/>
+                            </p:column>
+                            <p:column headerText="电话">
+                                <h:outputText value="#{detail.engineerPhone}"/>
+                            </p:column>
+                            <p:column headerText="邮箱">
+                                <h:outputText value="#{detail.engineerEmail}"/>
+                            </p:column>
+                            <p:column headerText="SSO">
+                                <h:outputText value="#{detail.engineerSso}"/>
+                            </p:column>
+                        </p:dataTable>
+
+                    </p:tab>
+
+                </p:accordionPanel>
+
+                <!-- 无数据提示 -->
+                <h:outputText value="⚠️ 暂无代理商报名信息可展示"
+                              rendered="#{empty zkbTrainRegisterMainController.allRegistrations}"
+                              style="color:orange; font-style:italic;"/>
+
+                <!-- 关闭按钮 -->
+                <div style="text-align:center; margin-top:20px">
+                    <p:commandButton value="关闭"
+                                     icon="ui-icon-close"
+                                     onclick="PF('viewRegisteredDlg').hide();"
+                                     type="button"/>
+                </div>
+
+            </h:panelGroup>
+
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+</html>

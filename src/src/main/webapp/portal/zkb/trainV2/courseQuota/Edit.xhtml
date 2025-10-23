@@ -33,13 +33,13 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">Modality*</label>
-                    <p:inputText  value="#{zkbTrainCourseQuotaController.selected.modality}"  required="true" requiredMessage="Modality 不能为空！" />
+                    <p:inputText  id="modality" value="#{zkbTrainCourseQuotaController.selected.zkbTrainCourse.modality}"  disabled="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程CatNo*</label>
                     <p:autoComplete dropdown="true" value="#{zkbTrainCourseQuotaController.selectedCourse}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="课程 #{msg.ValidationRequire}"
                                     completeMethod="#{zkbTrainCourseQuotaController.autoCompleteCourse}" var="t" itemLabel="#{t.catNo}" itemValue="#{t}" converter="zkbTrainCourseConverter">
-                        <p:ajax event="itemSelect" update="name courseType" listener="#{zkbTrainCourseQuotaController.courseSelect}" />
+                        <p:ajax event="itemSelect" update="name courseType modality" listener="#{zkbTrainCourseQuotaController.courseSelect}" />
                     </p:autoComplete>
                 </h:panelGroup>
                 <h:panelGroup>
