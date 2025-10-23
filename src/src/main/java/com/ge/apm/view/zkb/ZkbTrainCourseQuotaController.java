@@ -6,6 +6,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.service.zkb.ZkbTrainCourseQuotaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.zkb.utils.ExcelExporter;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -60,6 +63,12 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
     private ZkbTrainCourseQuotaDetail selectedCourseQuotaDetail;
     @Getter@Setter
     private List<ZkbTrainCourseQuotaDetail> zkbTrainCourseQuotaDetails = new ArrayList<>();
+
+    private static final Map<String, String> COURSE_TYPE_DISPLAY = new HashMap<>();
+    static {
+        COURSE_TYPE_DISPLAY.put("normal", "普通课程");
+        COURSE_TYPE_DISPLAY.put("advance", "进阶课程");
+    }
 
 
     @Override
@@ -260,4 +269,70 @@ public class ZkbTrainCourseQuotaController extends GenericCRUDUUIDController<Zkb
     protected GenericRepositoryUUID<ZkbTrainCourseQuota> getDAO() {
         return dao;
     }
+
+
+    @Setter
+    @Getter
+    private StreamedContent exportFileWithExtraColumns;
+
+
+    /**
+     * 导出包含额外三列的 Excel 文件
+     */
+    public StreamedContent exportWithExtraColumns() {
+
+        List<ZkbTrainCourseQuota> allData = zkbTrainCourseQuotaService.findAll();
+
+        List<Map<String, Object>> exportData = new ArrayList<>();
+
+        for (ZkbTrainCourseQuota quota : allData) {
+            List<ZkbTrainCourseQuotaDetail> details = zkbTrainCourseQuotaService.queryDetailByQuota(quota.getId());
+
+            if (details.isEmpty()) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                populateQuotaFields(row, quota);
+                row.put("UniqueID", null);
+                row.put("总额", null);
+                row.put("剩余名额", null);
+                exportData.add(row);
+            } else {
+                for (ZkbTrainCourseQuotaDetail detail : details) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    populateQuotaFields(row, quota);
+                    row.put("UniqueID", detail.getUniqueID());
+                    row.put("已使用名额", detail.getTotalQuota() - detail.getQuota());
+                    row.put("可用名额", detail.getQuota());
+                    exportData.add(row);
+                }
+            }
+        }
+
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            ExcelExporter.exportToExcel(outputStream, exportData, "培训课程名额数据");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("导出失败", e);
+        }
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(outputStream.toByteArray());
+
+        exportFileWithExtraColumns = new DefaultStreamedContent(bis, "application/vnd.ms-excel", "Zkb_Train_Course_Quota_With_Extra_Columns.xlsx");
+
+        return exportFileWithExtraColumns;
+    }
+
+    private void populateQuotaFields(Map<String, Object> row, ZkbTrainCourseQuota quota) {
+        row.put("租户", getTenantInfo(quota.getTenantUid()).getName());
+        row.put("合同号", quota.getContractNo());
+        row.put("合同开始日期", quota.getStartDate());
+        row.put("合同结束日期", quota.getEndDate());
+        row.put("Modality", quota.getModality());
+        row.put("课程名称", quota.getZkbTrainCourse() != null ? quota.getZkbTrainCourse().getName() : "");
+        row.put("课程类型", COURSE_TYPE_DISPLAY.get(quota.getZkbTrainCourse() != null ? quota.getZkbTrainCourse().getCourseType() : ""));
+        row.put("总额", quota.getTotalQuota());
+        row.put("名额", quota.getQuota());
+    }
+
 }

@@ -21,13 +21,19 @@
 
                     <p:ajax event="rowSelect"  update=""/>
                     <p:ajax event="filter" listener="#{zkbTrainRegisteredController.onFilter}" />
-                    <p:column headerText="CatNo2" filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.catNo}"  filterMatchMode="LIKE" >
-                        <h:outputText value="#{item.zkbTrainPublishInfo.zkbTrainCourse.catNo}"/>
+                    <p:column headerText="课程类型"   filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.courseType}" filterMatchMode="EQ" >
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbTrainCourseType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('ZkbTrainCourseType',item.zkbTrainPublishInfo.zkbTrainCourse.courseType)}"/>
                     </p:column>
                     <p:column headerText="Modality" filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.Modality}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.zkbTrainPublishInfo.zkbTrainCourse.modality}"/>
                     </p:column>
-                    <p:column headerText="课程名称" filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
+                    <p:column headerText="课程简称信息" filterBy="#{item.zkbTrainPublishInfo.zkbTrainCourse.name}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.zkbTrainPublishInfo.zkbTrainCourse.name}"/>
                     </p:column>
                     <p:column headerText="培训开始时间" filterBy="#{item.zkbTrainPublishInfo.trainStartDate}" sortBy="#{item.zkbTrainPublishInfo.trainStartDate}" filterMatchMode="GTE">
@@ -62,7 +68,11 @@
                     </p:column>
                     <p:column headerText="操作">
                         <p:commandButton value="修改" style="width: 70px;" action="#{zkbTrainRegisterMainController.prepareModifyRegister(item.id)}" update=":registerEngineerListDlg" oncomplete="PF('registerEngineerListDialog').show()" />
-
+                        <p:commandButton id="deleteButton" value="取消" actionListener="#{zkbTrainRegisterMainController.cancelRegister(item.id)}"
+                                         update=":tab:registeredListForm:datalist"
+                                         process="@this">
+                            <p:confirm header="取消确认" message="确定要取消此报名吗？" icon="ui-icon-warning"/>
+                        </p:commandButton>
                     </p:column>
 
                 </p:dataTable>

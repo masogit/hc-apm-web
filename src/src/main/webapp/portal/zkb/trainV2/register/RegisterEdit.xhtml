@@ -31,9 +31,9 @@
                 </p:column>
 
                 <f:facet name="{Toolbar}">
-                    <p:commandButton immediate="false" process="@this" id="createEngineerButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbTrainRegisterMainController.prepareDetailCreate}" update=":growl :registerEngineerEditDlg" oncomplete="PF('registerEngineerEditDialog').show()"  />
-                    <p:commandButton immediate="false" process="@this" id="editeEngineerButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbTrainRegisterMainController.prepareDetailEdit}" update=":growl :registerEngineerEditDlg"  oncomplete="PF('registerEngineerEditDialog').show()" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}" />
-                    <p:commandButton immediate="false" process="@this" id="deleteeEngineerButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbTrainRegisterMainController.deleteDetail()}" update=":growl :engineerListForm:detailDatalist" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}">
+                    <p:commandButton immediate="false" process="@this" id="createEngineerButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbTrainRegisterMainController.prepareDetailCreate}" update=":growl :registerEngineerEditDlg" oncomplete="PF('registerEngineerEditDlg').show()"  />
+                    <p:commandButton immediate="false" process="@this" id="editeEngineerButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbTrainRegisterMainController.prepareDetailEdit}" update=":growl :registerEngineerEditDlg"  oncomplete="PF('registerEngineerEditDlg').show()" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}" />
+                    <p:commandButton immediate="false" process="@this" id="deleteeEngineerButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbTrainRegisterMainController.deleteDetail()}" update=":growl :engineerListForm:detailDatalist" oncomplete="PF('registerEngineerListDialog').show();" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}">
                         <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
                     </p:commandButton>
                 </f:facet>
@@ -41,7 +41,7 @@
             </p:dataTable>
 
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainRegisterMainController.saveData}" update=":tab:listForm:datalist :tab:registeredListForm:datalist" icon="ui-icon-check" oncomplete="PF('registerEngineerListDialog').hide()" rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainRegisterMainController.saveData}" update=":tab:listForm:datalist :tab:registeredListForm:datalist" icon="ui-icon-check" oncomplete="PF('registerEngineerListDialog').hide();location.reload();" rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('registerEngineerListDialog').hide()" rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"
             />
         </h:form>
