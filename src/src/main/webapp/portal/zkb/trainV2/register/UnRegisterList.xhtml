@@ -46,9 +46,9 @@
                           filterMatchMode="LIKE">
                     <h:outputText value="#{item.zkbTrainCourse.modality}"/>
                 </p:column>
-                <p:column headerText="课程简称信息" filterBy="#{item.zkbTrainCourse.name}"
+                <p:column headerText="课程简称信息" filterBy="#{item.zkbTrainCourse.shortName}"
                           filterMatchMode="LIKE">
-                    <h:outputText value="#{item.zkbTrainCourse.name}"/>
+                    <h:outputText value="#{item.zkbTrainCourse.shortName}"/>
                 </p:column>
                 <p:column headerText="培训开始时间" filterBy="#{item.trainStartDate}" sortBy="#{item.trainStartDate}"
                           filterMatchMode="GTE">

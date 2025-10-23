@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="工程师培训记录列表"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="listForm">
+                    <p:dataTable id="datalist" value="#{zkbTrainAttendanceRecordController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbTrainAttendanceRecordController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 rows="20" emptyMessage="数据为空"
+                                 currentPageReportTemplate="总行数: {totalRecords}"
+                                 rowsPerPageTemplate="20,50,100,500"
+                                 >
+
+                        <p:ajax event="rowSelect" update="deleteButton editButton :zkbTrainRecordEditForm"/>
+                        <p:ajax event="filter" listener="#{zkbTrainAttendanceRecordController.onFilter}" />
+                        <p:column headerText="学员姓名" filterBy="#{item.traineeName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.traineeName}"/>
+                        </p:column>
+                        <p:column headerText="课程名称" filterBy="#{item.courseName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.courseName}"/>
+                        </p:column>
+                        <p:column headerText="培训开始时间" filterBy="#{item.trainStartDate}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.trainStartDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="培训结束时间" filterBy="#{item.trainEndDate}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.trainEndDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="状态" filterBy="#{item.status}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.status}"/>
+                        </p:column>
+                        <p:column headerText="培训地点" filterBy="#{item.location}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.location}"/>
+                        </p:column>
+                        <p:column headerText="培训老师" filterBy="#{item.trainerName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.trainerName}"/>
+                        </p:column>
+                        <p:column headerText="公司名称" filterBy="#{item.companyName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.companyName}"/>
+                        </p:column>
+                        <p:column headerText="SSO 账号" filterBy="#{item.sso}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.sso}"/>
+                        </p:column>
+                        <p:column headerText="Online 成绩" filterBy="#{item.onlineScore}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.onlineScore}"/>
+                        </p:column>
+                        <p:column headerText="Lab + 笔试成绩" filterBy="#{item.labWrittenScore}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.labWrittenScore}"/>
+                        </p:column>
+                        <p:column headerText="Final 成绩" filterBy="#{item.finalScore}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.finalScore}"/>
+                        </p:column>
+                        <p:column headerText="是否通过" filterBy="#{item.isPassed}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.isPassed}"/>
+                        </p:column>
+                        <p:column headerText="评级" filterBy="#{item.degree}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.degree}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增"
+                                             actionListener="#{zkbTrainAttendanceRecordController.prepareCreate}"
+                                             update=":zkbTrainRecordEditDlg" oncomplete="PF('zkbTrainRecordEditDialog').show()" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="编辑"
+                                             actionListener="#{zkbTrainAttendanceRecordController.prepareEdit}"
+                                             update="zkbTrainRecordEditDlg" oncomplete="PF('zkbTrainRecordEditDialog').show()"
+                                             disabled="#{empty zkbTrainAttendanceRecordController.selected.id}" />
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除"
+                                             actionListener="#{zkbTrainAttendanceRecordController.delete}"
+                                             update=":listForm:datalist">
+                                <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:commandButton id="importButton" ajax="false" title="导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="Zkb_Train_Attendance_Record"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
