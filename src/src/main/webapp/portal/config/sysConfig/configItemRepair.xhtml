@@ -267,7 +267,6 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('defaultRepairPerson').name.concat('(').concat(systemConfigItemController.configItemMap.get('defaultRepairPerson').key).concat(')')}</label>
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('defaultRepairPerson').showValue}" style="width: 50%;">
-                    <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('defaultRepairPerson').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
             </h:panelGroup>
