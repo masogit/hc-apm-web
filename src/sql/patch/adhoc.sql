@@ -1,6 +1,6 @@
 -- YHAAO-26029 添加默认维修验收人、保养验收人
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation)select replace(uuid_generate_v4()::text,'-',''), 4, '', '默认维修验收人', 'defaultRepairPerson', '默认维修验收人', 'f','t',7,'[{"key":"维修人","value":"4"}]' where not exists(select * from config_item where key = 'defaultRepairPerson');
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 5, '', '默认保养验收人', 'defaultMaintainPerson', '默认保养验收人', 'f','t',7,'[{"key":"保养人","value":"Maintain"}]' where not exists(select * from config_item where key = 'defaultMaintainPerson');
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation)select replace(uuid_generate_v4()::text,'-',''), 4, '', '默认维修验收人', 'defaultRepairPerson', '默认维修验收人', 'f','t',7,'[{"key":"报修人","value":"default"},{"key":"维修人","value":"4"}]' where not exists(select * from config_item where key = 'defaultRepairPerson');
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 5, '', '默认保养验收人', 'defaultMaintainPerson', '默认保养验收人', 'f','t',7,'[{"key":"创建人","value":"default"},{"key":"保养人","value":"Maintain"}]' where not exists(select * from config_item where key = 'defaultMaintainPerson');
 
 
 -- YHAAO-26102
