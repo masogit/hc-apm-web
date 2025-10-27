@@ -179,6 +179,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             selectedDetail.setEngineerAge(selectedEngineer.getAge());
             selectedDetail.setEngineerSso(selectedEngineer.getSso());
         }
+        selectedDetail.setV2_blobObjectList(null);
     }
 
     public void handleFileUpload(FileUploadEvent event) {
