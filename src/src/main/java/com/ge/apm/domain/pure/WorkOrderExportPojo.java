@@ -1,5 +1,9 @@
 package com.ge.apm.domain.pure;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.Column;
 import java.util.Date;
 import java.util.List;
 
@@ -186,6 +190,29 @@ public class WorkOrderExportPojo {
     private String coworkerEntryDetail;
 
     private Integer riskGrade;
+
+
+    private String spare01;
+
+    private String spare02;
+
+    private String spare03;
+
+    private String spare04;
+
+    private String spare05;
+
+    private String spare06;
+
+    private String spare07;
+
+    private String spare08;
+
+    private String spare09;
+
+    private String spare10;
+
+    private String mainSub;
 
     public String getCoworkerEntryDetail() {
         return coworkerEntryDetail;
@@ -891,5 +918,93 @@ public class WorkOrderExportPojo {
 
     public void setRiskGrade(Integer riskGrade) {
         this.riskGrade = riskGrade;
+    }
+
+    public String getSpare01() {
+        return spare01;
+    }
+
+    public void setSpare01(String spare01) {
+        this.spare01 = spare01;
+    }
+
+    public String getSpare02() {
+        return spare02;
+    }
+
+    public void setSpare02(String spare02) {
+        this.spare02 = spare02;
+    }
+
+    public String getSpare03() {
+        return spare03;
+    }
+
+    public void setSpare03(String spare03) {
+        this.spare03 = spare03;
+    }
+
+    public String getSpare04() {
+        return spare04;
+    }
+
+    public void setSpare04(String spare04) {
+        this.spare04 = spare04;
+    }
+
+    public String getSpare05() {
+        return spare05;
+    }
+
+    public void setSpare05(String spare05) {
+        this.spare05 = spare05;
+    }
+
+    public String getSpare06() {
+        return spare06;
+    }
+
+    public void setSpare06(String spare06) {
+        this.spare06 = spare06;
+    }
+
+    public String getSpare07() {
+        return spare07;
+    }
+
+    public void setSpare07(String spare07) {
+        this.spare07 = spare07;
+    }
+
+    public String getSpare08() {
+        return spare08;
+    }
+
+    public void setSpare08(String spare08) {
+        this.spare08 = spare08;
+    }
+
+    public String getSpare09() {
+        return spare09;
+    }
+
+    public void setSpare09(String spare09) {
+        this.spare09 = spare09;
+    }
+
+    public String getSpare10() {
+        return spare10;
+    }
+
+    public void setSpare10(String spare10) {
+        this.spare10 = spare10;
+    }
+
+    public String getMainSub() {
+        return mainSub;
+    }
+
+    public void setMainSub(String mainSub) {
+        this.mainSub = mainSub;
     }
 }

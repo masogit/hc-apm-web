@@ -5,17 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
 import com.deepoove.poi.policy.RenderPolicy;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
-import com.ge.apm.dao.UnstructuredDataRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.bo.parser.SchemaParser;
-import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
-import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
-import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
-import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
+import com.ge.apm.domain.bo.render.*;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
@@ -23,7 +17,6 @@ import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.ConfigItemService;
-import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
@@ -98,6 +91,9 @@ public class PmReportService {
 
     @Autowired
     private ConfigItemService configItemService;
+
+    @Autowired
+    private V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
 
     /**
      * Render Dynamic Table content.
@@ -464,6 +460,23 @@ public class PmReportService {
         }
         content.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), maintenanceInfoTable);
 
+        // coworker hours pmOrder
+        List<Map<String, Object>> coworkerHoursInfoTable = new ArrayList<>();
+        if(pmOrder.getCoworkerEntryType() == 1){
+            List<V2_WorkOrderCoworker> v2WorkOrderCoworkers = workOrderCoworkerDao.findByWoIdOrderByCreatedDateDesc(pmOrder.getId());
+            for (V2_WorkOrderCoworker item : v2WorkOrderCoworkers) {
+                Map<String, Object> coworkerHoursInfoMap = new HashMap<>();
+                coworkerHoursInfoMap.put(MaintenanceTemplate.CoworkerHours.COWORKER_USER_NAME.toString(), item.getCowokerUserName());
+                coworkerHoursInfoMap.put(MaintenanceTemplate.CoworkerHours.START_TIME.toString(), item.getStartTime());
+                coworkerHoursInfoMap.put(MaintenanceTemplate.CoworkerHours.END_TIME.toString(), item.getEndTime());
+                coworkerHoursInfoMap.put(MaintenanceTemplate.CoworkerHours.MAN_HOURS.toString(), item.getManHours());
+                coworkerHoursInfoMap.put(MaintenanceTemplate.CoworkerHours.REMARK.toString(), item.getRemark());
+
+                coworkerHoursInfoTable.add(coworkerHoursInfoMap);
+            }
+        }
+        content.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(), coworkerHoursInfoTable);
+
         // Check List
         List<Map<String, Object>> checkListTable = new ArrayList<>();
         for (UnstructuredData data : dataList) {
@@ -726,6 +739,7 @@ public class PmReportService {
         Map<String, RenderPolicy> bindings = new HashMap<>();
         bindings.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
+        bindings.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(), new CoworkerHoursRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1));

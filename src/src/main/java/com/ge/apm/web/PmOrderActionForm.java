@@ -60,6 +60,16 @@ public class PmOrderActionForm {
 
     private String signature;
 
+    Integer coworkerEntryType;
+
+    public Integer getCoworkerEntryType() {
+        return coworkerEntryType;
+    }
+
+    public void setCoworkerEntryType(Integer coworkerEntryType) {
+        this.coworkerEntryType = coworkerEntryType;
+    }
+
     public List<V2_PmOrderManHoursDetail> getPmOrderManHoursDetails() {
         return pmOrderManHoursDetails;
     }

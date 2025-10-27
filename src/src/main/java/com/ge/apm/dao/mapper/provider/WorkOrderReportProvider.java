@@ -183,7 +183,9 @@ public class WorkOrderReportProvider {
                 " wo.coworker_entry_type as coworkerEntryType, "+
                 " case when wo.coworker_entry_type = 0 THEN (SELECT string_agg(concat('协作者:',woc.cowoker_user_name,CAST(woc.man_hours AS DECIMAL(10,2)),'备注:',woc.remark,';'),'') FROM V2_Work_Order_Coworker woc WHERE woc.wo_id=wo.ID GROUP BY woc.wo_id) " +
                 " when wo.coworker_entry_type = 1 THEN (SELECT string_agg(concat('协作者:',woc.cowoker_user_name,'开始时间:', woc.start_time, '结束时间:', woc.end_time,CAST(woc.man_hours AS DECIMAL(10,2)),'备注:',woc.remark,';'),'') FROM V2_Work_Order_Coworker woc WHERE woc.wo_id=wo.ID GROUP BY woc.wo_id) end as coworkerEntryDetail, " +
-                "wo.work_order_type as workOrderType " +
+                "wo.work_order_type as workOrderType, " +
+                "wo.main_sub as mainSub, " +
+                "ai.spare01,ai.spare02,ai.spare03,ai.spare04,ai.spare05,ai.spare06,ai.spare07,ai.spare08,ai.spare09,ai.spare10 " +
                 "from v2_work_order wo " +
                 "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
                 "INNER JOIN asset_info ai ON ai.id = wo.asset_id " +
