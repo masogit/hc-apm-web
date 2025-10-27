@@ -121,6 +121,20 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("part_table", "PartInformation");
         COPY_KEY_MAPPING.put("parts_picture_table", "parts_picture_table");
         //COPY_KEY_MAPPING.put("proceed_table", "维修流程");
+
+        COPY_KEY_MAPPING.put("main_sub", "main_sub");
+        COPY_KEY_MAPPING.put("spare01", "spare01");
+        COPY_KEY_MAPPING.put("spare02", "spare02");
+        COPY_KEY_MAPPING.put("spare03", "spare03");
+        COPY_KEY_MAPPING.put("spare04", "spare04");
+        COPY_KEY_MAPPING.put("spare05", "spare05");
+        COPY_KEY_MAPPING.put("spare06", "spare06");
+        COPY_KEY_MAPPING.put("spare07", "spare07");
+        COPY_KEY_MAPPING.put("spare08", "spare08");
+        COPY_KEY_MAPPING.put("spare09", "spare09");
+        COPY_KEY_MAPPING.put("spare10", "spare10");
+        COPY_KEY_MAPPING.put("related_order_number","related_order_number");
+
     }
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {

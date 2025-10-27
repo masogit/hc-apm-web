@@ -259,6 +259,7 @@ public class WorkOrderExportService {
             return isReturn;
         }).collect(Collectors.toList());
 
+        Map<String, List<WorkOrderExportPojo>> srMap = workOrderList.stream().collect(Collectors.groupingBy(WorkOrderExportPojo::getSrId));
         for (WorkOrderExportPojo workOrderExportPojo : workOrderList) {
             Map<String, Object> workOrderMap = new HashedMap();
 
@@ -391,6 +392,18 @@ public class WorkOrderExportService {
             if(workOrderExportPojo.getRiskGrade() != null){
                 workOrderMap.put(WebUtil.getMessage("riskGrade"), FieldValueMessageController.fieldValue("riskGrade", workOrderExportPojo.getRiskGrade().toString()));
             }
+            workOrderMap.put("spare01", workOrderExportPojo.getSpare01());
+            workOrderMap.put("spare02", workOrderExportPojo.getSpare02());
+            workOrderMap.put("spare03", workOrderExportPojo.getSpare03());
+            workOrderMap.put("spare04", workOrderExportPojo.getSpare04());
+            workOrderMap.put("spare05", workOrderExportPojo.getSpare05());
+            workOrderMap.put("spare06", workOrderExportPojo.getSpare06());
+            workOrderMap.put("spare07", workOrderExportPojo.getSpare07());
+            workOrderMap.put("spare08", workOrderExportPojo.getSpare08());
+            workOrderMap.put("spare09", workOrderExportPojo.getSpare09());
+            workOrderMap.put("spare10", workOrderExportPojo.getSpare10());
+            workOrderMap.put("main_sub", "sub".equals(workOrderExportPojo.getMainSub())?"子工单":"主工单");
+            workOrderMap.put("related_order_number", Optional.of(srMap.get(workOrderExportPojo.getSrId()).size()-1).orElse(null));
             resultList.add(workOrderMap);
         }
         return resultList;
