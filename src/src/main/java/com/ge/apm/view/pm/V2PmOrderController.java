@@ -2514,6 +2514,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if(selectedPmOrder.getEntryType() == null){
                 selectedPmOrder.setEntryType(0);
             }
+            if(selectedPmOrder.getCoworkerEntryType() == null){
+                selectedPmOrder.setCoworkerEntryType(0);
+            }
 //            if(selectedPmOrder.getManHours() == null){
 //                selectedPmOrder.setManHours(0.1);
 //            }
@@ -3104,6 +3107,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private V2_WorkOrderCoworkerRepository coWorkerDao;
 
     public void addCoWokerItem() {
+        if(selectedPmOrder.getCoworkerEntryType() == 1){
+            String strHours = "0";
+            long milliSeconds = coWorkerDetail.getEndTime().getTime() - coWorkerDetail.getStartTime().getTime();
+            if (milliSeconds > 0) {
+                DecimalFormat df = new DecimalFormat("0.0");
+                strHours = df.format((float) milliSeconds / (1000 * 60 * 60));
+                BigDecimal b = new BigDecimal(strHours);
+                float f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+                f1 = Float.parseFloat(df.format(f1));
+                strHours = df.format(f1);
+            } else {
+                WebUtil.addErrorMessage("结束时间不能小于开始时间");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+            coWorkerDetail.setManHours(Double.valueOf(strHours));
+        }
         if (!coWorkerList.contains(coWorkerDetail)) {
             UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
             coWorkerDetail.setCowokerUserName(coWorker.getName());
@@ -3927,6 +3947,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //                selectedPmOrder.setManHours(0.1);
 //            }
         }
+    }
+
+    public void updateCoworkerEntryType(Integer entryType) {
+        if (selectedPmOrder == null) {
+            selectedPmOrder = new V2_PmOrder();
+        }
+        selectedPmOrder.setCoworkerEntryType(entryType);
+        coWorkerList = new ArrayList<>();
+        V2_WorkOrderCoworker emptyDetail = new V2_WorkOrderCoworker();
+        emptyDetail.setId("000");
+        coWorkerList.add(emptyDetail);
     }
 
     public void prepareEditPmOrderManHoursDetail(String itemId) {

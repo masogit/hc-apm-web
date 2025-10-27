@@ -684,6 +684,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setPrePmAttachments(picBeforeList);
         formData.setComments(selectedPmOrder.getComments());//工作备注
         formData.setEntryType(selectedPmOrder.getEntryType());
+        formData.setCoworkerEntryType(selectedPmOrder.getCoworkerEntryType());
         if(selectedPmOrder.getEntryType() == 1){
             pmHoursList = pmHoursList.stream()
                     .filter(item -> !"000".equals(item.getId()))
@@ -772,6 +773,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setPrePmAttachments(picBeforeList);
         formData.setComments(selectedPmOrder.getComments());
         formData.setEntryType(selectedPmOrder.getEntryType());
+        formData.setCoworkerEntryType(selectedPmOrder.getCoworkerEntryType());
         if(selectedPmOrder.getEntryType() == 1){
             pmHoursList = pmHoursList.stream()
                     .filter(item -> !"000".equals(item.getId()))

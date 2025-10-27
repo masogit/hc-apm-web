@@ -151,11 +151,31 @@
                                 </p:column>
                             </p:dataTable>
                         </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.coworkerManHoursEntryType}</label>
+                            <p:selectOneRadio id="coworkerEntryType" required="true" value="#{v2PmOrderController.selectedPmOrder.coworkerEntryType}"  requiredMessage="#{msg.coworkerManHoursEntryType} #{msg.ValidationRequire}">
+                                <p:ajax event="change" process="@this" update=":growl pmTab:pmrepairCompleteDialogForm:coworkerEntryType pmTab:pmrepairCompleteDialogForm:pmcoworkerList"  listener="#{v2PmOrderController.updateCoworkerEntryType(v2PmOrderController.selectedPmOrder.coworkerEntryType)}" />
+                                <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
+                                <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.AddCoworker}</label>
                             <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}" var="item" widgetVar="pmcoworkerDataList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                 <p:column headerText="#{msg.coworker}">
                                     <h:outputText value="#{item.cowokerUserName}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.startTime}" rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1}">
+                                    <h:outputText value="#{item.startTime}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.endTime}" rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1}">
+                                    <h:outputText value="#{item.endTime}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                    </h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.manHours}">
                                     <h:outputText value="#{item.manHours}" />
