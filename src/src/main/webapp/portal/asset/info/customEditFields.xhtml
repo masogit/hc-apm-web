@@ -943,7 +943,7 @@
         <h:panelGroup>
             <label class="label">#{msg.measuringItemCategory}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringItemCategory'].required? '*':''}</span></label>
             <p:selectOneMenu id="measuringItemCategory" value="#{assetInfoEditController.selected.measuringItemCategory}" required="#{assetInfoEditController.customConfig.assetFields['measuringItemCategory'].required}"
-                             requiredMessage="#{msg.measuringItemCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('measuringItemCategory')}" >
+                             requiredMessage="#{msg.measuringItemCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('measuringItemCategory')}" filter="true" filterMatchMode="contains" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
