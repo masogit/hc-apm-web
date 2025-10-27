@@ -21,9 +21,10 @@ public class DifyStreamService {
 
     private static final Logger log = LoggerFactory.getLogger(DifyStreamService.class);
 
-    public String processDifyStream(DiFyChatRequest chatRequest) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public String processDifyStream(DiFyChatRequest chatRequest) throws Exception {
         log.info("start post dify...");
         RestTemplate restTemplate = SSLUtils.getIgnoreSSLRestTemplate();
+        log.info("restTemplate get success...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer app-k9zaJQ2wAqEV5oI7vie2M5wU");
@@ -34,6 +35,7 @@ public class DifyStreamService {
         requestBody.put("conversation_id", "");
         requestBody.put("user", chatRequest.getUserName());
         StringBuffer result = new StringBuffer();
+        log.info("start restTemplate post...");
         // 使用RestTemplate执行流式请求
         restTemplate.execute(
                 "https://apm-dify-stg.gehealthcloud.cn/v1/chat-messages",
