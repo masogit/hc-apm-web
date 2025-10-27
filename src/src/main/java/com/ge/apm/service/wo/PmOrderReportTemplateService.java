@@ -243,6 +243,7 @@ public class PmOrderReportTemplateService {
         Map<String, Object> data = builder.build().data();
         data.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(),null);
         data.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(),null);
+        data.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(),null);
         data.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(),null);
         data.put(MaintenanceTemplate.Component.CHECK_LIST.toString(),null);
 

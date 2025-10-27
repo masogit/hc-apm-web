@@ -171,6 +171,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrderCoworker> coworkers;
 
+    /**
+     * 填写工时选择方式 0 输入填写 , 1 多个工时段填写
+     */
+    @Column(name="coworker_entry_type")
+    private Integer coworkerEntryType;
+
     @Column(name = "nearest_sr_days")
     private Integer nearestSrDays;//此次保养后，最近的报修距此保养天数
     @Column(name = "nearest_sr_id")
@@ -617,6 +623,14 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setCoworkers(List<V2_WorkOrderCoworker> coworkers) {
         this.coworkers = coworkers;
+    }
+
+    public Integer getCoworkerEntryType() {
+        return coworkerEntryType;
+    }
+
+    public void setCoworkerEntryType(Integer coworkerEntryType) {
+        this.coworkerEntryType = coworkerEntryType;
     }
 
     public String getCurrentPersonId() {
