@@ -162,6 +162,7 @@ public class MaintenanceTemplate {
             this.content.put(Component.ACCEPTANCE_SIGNATURE.toString(), Component.ACCEPTANCE_SIGNATURE.value());
             this.content.put(Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), Component.ACCEPTANCE_SIGNATURE_TITLE.value());
             this.content.put(Component.MAINTENANCE_WORKFLOW.toString(), Component.MAINTENANCE_WORKFLOW.value());
+            this.content.put(Component.COWORKER_HOURS_TABLE.toString(), Component.COWORKER_HOURS_TABLE.value());
             this.content.put(Component.AUDIT_RECORDS.toString(), Component.AUDIT_RECORDS.value());
             this.content.put(Component.CHECK_LIST.toString(), Component.CHECK_LIST.value());
         }
@@ -277,6 +278,25 @@ public class MaintenanceTemplate {
         }
     }
 
+    public enum CoworkerHours {
+        COWORKER_USER_NAME("coworker_user_name"),
+        START_TIME("start_time"),
+        END_TIME("end_time"),
+        MAN_HOURS("man_hours"),
+        REMARK("remark");
+
+        private final String key;
+
+        CoworkerHours(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
     /**
      * Component in Maintenance Report.
      */
@@ -376,6 +396,7 @@ public class MaintenanceTemplate {
         ACCEPTANCE_SIGNATURE("acceptance_signature", Widget.PICTURE),
         ACCEPTANCE_SIGNATURE_TITLE("acceptance_signature_title", Widget.TEXT),
         MAINTENANCE_WORKFLOW("maintenance_workflow", Widget.TABLE),
+        COWORKER_HOURS_TABLE("coworker_hours_table", Widget.TABLE),
         AUDIT_RECORDS("audit_records", Widget.TABLE),
         CHECK_LIST("check_list", Widget.TABLE),
         SAFETY_REPORT("safety_report", Widget.DYNAMIC),

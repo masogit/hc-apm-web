@@ -110,19 +110,19 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
 
-    public void prepareRegister(String pid){
+    public void prepareRegister(String pid) {
         zkbTrainPublishRegister = new ZkbTrainPublishRegister();
         zkbTrainPublishRegister.setPid(pid);
         this.actionName = "Register";
     }
 
-    public void prepareModifyRegister(String id){
+    public void prepareModifyRegister(String id) {
         zkbTrainPublishRegister = zkbTrainPublishRegisterService.getRegisterById(id);
         zkbTrainPublishRegisterDetailList = zkbTrainPublishRegister.getZkbTrainPublishRegisterDetails();
         this.actionName = "Modify";
     }
 
-    public void prepareDetailCreate(){
+    public void prepareDetailCreate() {
         initEngineerList();
         selectedEngineer = null;
         selectedDetail = new ZkbTrainPublishRegisterDetail();
@@ -130,12 +130,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         engineerFormView = "edit"; // 重置为编辑视图
     }
 
-    public void prepareDetailEdit(){
+    public void prepareDetailEdit() {
         initEngineerList();
         selectedEngineer = zkbTrainPublishRegisterService.findEngineerById(selectedDetail.getEngineerId());
-        if("Register".equals(actionName)){
+        if ("Register".equals(actionName)) {
             v2_blobObjectList = selectedDetail.getV2_blobObjectList();
-        }else{
+        } else {
             v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
             selectedDetail.setV2_blobObjectList(v2_blobObjectList);
         }
@@ -150,12 +150,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
                 .collect(Collectors.toList());
     }
 
-    public void initEngineerList(){
+    public void initEngineerList() {
         engineerList = zkbTrainPublishRegisterService.queryEngineerListByTenant(currentUser);
     }
 
-    public void deleteDetail(){
-        if("Register".equals(actionName)){
+    public void deleteDetail() {
+        if ("Register".equals(actionName)) {
             zkbTrainPublishRegisterDetailList.remove(selectedDetail);
         } else {
             zkbTrainPublishRegisterService.deleteDetail(selectedDetail, currentUser);
@@ -164,7 +164,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         selectedDetail = null;
     }
 
-    public void removeFile(V2_BlobObject v2BlobObject){
+    public void removeFile(V2_BlobObject v2BlobObject) {
         v2_blobObjectList.remove(v2BlobObject);
         blobService.deleteBlobFile(v2BlobObject);
         refreshSpecialFiles(); // 重新绑定引用
@@ -178,6 +178,13 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             selectedDetail.setEngineerEmail(selectedEngineer.getEmail());
             selectedDetail.setEngineerAge(selectedEngineer.getAge());
             selectedDetail.setEngineerSso(selectedEngineer.getSso());
+
+            this.v2_blobObjectList.clear();
+            this.physicalExamFile = null;
+            this.safetyCertificateFile = null;
+            this.recommendationFile = null;
+            selectedDetail.setV2_blobObjectList(new ArrayList<>());
+            refreshSpecialFiles();
         }
     }
 
@@ -263,8 +270,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         selectedDetail = null;
     }
 
-    public void saveData(){
-        zkbTrainPublishRegisterService.saveData(zkbTrainPublishRegister,zkbTrainPublishRegisterDetailList,currentUser);
+    public void saveData() {
+        zkbTrainPublishRegisterService.saveData(zkbTrainPublishRegister, zkbTrainPublishRegisterDetailList, currentUser);
     }
 
 
@@ -312,6 +319,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             this.engineerChange();
 
             this.newEngineer = new ZkbEngineer();
+            this.v2_blobObjectList = new ArrayList<>();
             this.newEngineerV2BlobObjectList.clear();
             this.removeNewEngineerFileList.clear();
             refreshSpecialFiles();
