@@ -2,8 +2,6 @@ package com.ge.apm.service.difyHttp;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.web.difyChat.DiFyChatRequest;
-import com.ge.apm.web.difyChat.DifyChatApi;
-import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
