@@ -178,12 +178,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             selectedDetail.setEngineerEmail(selectedEngineer.getEmail());
             selectedDetail.setEngineerAge(selectedEngineer.getAge());
             selectedDetail.setEngineerSso(selectedEngineer.getSso());
-        }
-        if(CollectionUtils.isNotEmpty(v2_blobObjectList)) {
-            v2_blobObjectList.forEach(this::removeFile);
-            physicalExamFile = new V2_BlobObject();
-            safetyCertificateFile = new V2_BlobObject();
-            recommendationFile = new V2_BlobObject();
+
+            this.v2_blobObjectList.clear();
+            this.physicalExamFile = null;
+            this.safetyCertificateFile = null;
+            this.recommendationFile = null;
             selectedDetail.setV2_blobObjectList(new ArrayList<>());
             refreshSpecialFiles();
         }
