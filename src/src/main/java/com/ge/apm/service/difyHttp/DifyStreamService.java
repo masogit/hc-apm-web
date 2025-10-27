@@ -1,16 +1,14 @@
 package com.ge.apm.service.difyHttp;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.difyChat.DiFyChatRequest;
+import com.ge.apm.web.difyChat.DifyChatApi;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import webapp.framework.web.WebUtil;
 
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -20,11 +18,13 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-@Component
-@Log4j2
+@Service
 public class DifyStreamService {
 
+    private static final Logger log = LoggerFactory.getLogger(DifyStreamService.class);
+
     public String processDifyStream(DiFyChatRequest chatRequest) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        log.info("start post dify...");
         RestTemplate restTemplate = SSLUtils.getIgnoreSSLRestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
