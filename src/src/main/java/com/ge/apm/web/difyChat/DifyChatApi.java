@@ -24,6 +24,8 @@ public class DifyChatApi {
         String result = difyStreamService.processDifyStream(request);
         return ResponseEntity.ok(result);
       } catch (Exception e) {
+        e.printStackTrace();
+        log.info(e.getMessage());
         FacesContext.getCurrentInstance().addMessage(null,
                 new javax.faces.application.FacesMessage(
                         javax.faces.application.FacesMessage.SEVERITY_INFO,
