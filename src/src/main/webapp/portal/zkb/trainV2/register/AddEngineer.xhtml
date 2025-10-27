@@ -100,7 +100,7 @@
                                         value="#{zkbTrainRegisterMainController.v2_blobObjectList}"
                                         var="fileitem"
                                         type="definition"
-                                        emptyMessage="#{msg.noRecordFound}">
+                                        emptyMessage="#{msg.noRecordFound}" class="engineerNameChange">
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                     <!-- 类型标签 -->
                                     <h:outputText value="放射体检"
@@ -112,10 +112,9 @@
                                     <h:outputText value="推荐函"
                                                   style="background:#4caf50; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"
                                                   rendered="#{fileitem.boSubType == 'RECOMMENDATION'}"/>
-                                    <h:outputText value="通用附件"
-                                                  style="background:#9e9e9e; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"
-                                                  rendered="#{empty fileitem.boSubType or fileitem.boSubType == 'TRAIN_REGISTER'}"/>
-
+<!--                                    <h:outputText value="通用附件"-->
+<!--                                                  style="background:#9e9e9e; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"-->
+<!--                                                  rendered="#{empty fileitem.boSubType or fileitem.boSubType == 'TRAIN_REGISTER'}"/>-->
                                     <!-- 文件链接 -->
                                     <p:commandLink value="#{fileitem.objectName}"
                                                    ajax="false"
