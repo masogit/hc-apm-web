@@ -37,6 +37,25 @@
                     throw new Error('setIframeHeight Error');
                 }
             },1000);
+            // 监听来自 iframe 的 postMessage
+            window.addEventListener("message", function (event) {
+            // 安全验证：检查消息来源
+            // if (event.origin !== 'https://xxxxx.com') {
+            //   console.warn(event.origin);
+            //   return;
+            // }
+            console.log("Received message:", event.data);
+            // 处理导航消息
+            if (event.data && event.data.type === "navigate") {
+                const targetUrl = event.data.payload.url;
+                console.log("Navigate to:", targetUrl);
+            // 在当前窗口中导航
+                                window.location.href = targetUrl;
+            // 或者在新窗口中打开
+            // window.open(targetUrl, '_blank');
+                }
+            });
+
         </script>
     </ui:define>
 
