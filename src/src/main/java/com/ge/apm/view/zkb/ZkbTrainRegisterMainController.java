@@ -136,8 +136,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if ("Register".equals(actionName)) {
             v2_blobObjectList = selectedDetail.getV2_blobObjectList();
         } else {
-            v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
-            selectedDetail.setV2_blobObjectList(v2_blobObjectList);
+            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
+                v2_blobObjectList = selectedDetail.getV2_blobObjectList();
+            } else {
+                v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
+                selectedDetail.setV2_blobObjectList(v2_blobObjectList);
+            }
         }
         refreshSpecialFiles();
         engineerFormView = "edit";
