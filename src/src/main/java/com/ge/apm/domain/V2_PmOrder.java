@@ -75,6 +75,8 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Size(max = 64)
     @Column(name = "owner_name")
     private String ownerName;
+    @Column(name = "accept_person")
+    private String acceptPerson;
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -447,6 +449,14 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public String getAcceptPerson() {
+        return acceptPerson;
+    }
+
+    public void setAcceptPerson(String acceptPerson) {
+        this.acceptPerson = acceptPerson;
     }
 
     public Date getStartTime() {
