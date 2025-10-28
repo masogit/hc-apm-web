@@ -251,6 +251,34 @@
             </h:panelGroup>
 
             <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('enableMaintenanceContract').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableMaintenanceContract').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableMaintenanceContract').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableMaintenanceContract'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableMaintenanceContract'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('enableMaintenanceContract').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('enableMaintenanceDate').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableMaintenanceDate').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableMaintenanceDate').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableMaintenanceDate'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableMaintenanceDate'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('enableMaintenanceDate').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('repairEntryTypeSet').name.concat('(').concat(systemConfigItemController.configItemMap.get('repairEntryTypeSet').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('repairEntryTypeSet').showValue}" style="width: 25%;">
                     <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>

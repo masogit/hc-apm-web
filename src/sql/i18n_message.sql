@@ -6190,3 +6190,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AutoProcessUnfinishedClinicalAssistantWorkOrder','自动处理未完成临床助手工单','Auto Process Unfinished Clinical Assistant Work Order',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RentReason','借用原因','Rent Reason',NULL,-1);
+
+-- YHAAO-26026 维修消息提示
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','notFoundMaintenanceContract','未查询到维保合同信息','Not Found Maintenance Contract',NULL,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','warrantyDateExpired','维保截止日期已过期','Warranty Date Expired',NULL,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','confirmRepair','请确认是否继续维修','Confirm Repair',NULL,-1);
