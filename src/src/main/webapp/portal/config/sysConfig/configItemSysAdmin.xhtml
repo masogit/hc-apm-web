@@ -160,7 +160,7 @@
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('showHomepageAverageResponseTime'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showHomepageAverageResponseTime'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').configItemValue == null}"/>
+                               disabled="#{systemConfigItemController.configItemMap.get('showHomepageAverageResponseTime').configItemValue == null}"/>
             </h:panelGroup>
             <!---->
         </p:panelGrid>

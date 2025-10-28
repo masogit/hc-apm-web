@@ -356,6 +356,8 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Transient
     private Integer repairPersonId;
+    @Transient
+    private ExternalTempUser externalTempUser;
 
     public Integer getCoworkerEntryType() {
         return coworkerEntryType;
@@ -1114,5 +1116,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setBusinessDigest(String businessDigest) {
         this.businessDigest = businessDigest;
+    }
+
+    public ExternalTempUser getExternalTempUser() {
+        return externalTempUser;
+    }
+
+    public void setExternalTempUser(ExternalTempUser externalTempUser) {
+        this.externalTempUser = externalTempUser;
     }
 }

@@ -312,6 +312,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private String newMessage;
 
+    @Getter @Setter
+    private boolean enableEngineersWriteRepairOutside;
+
     private V2_WorkOrderDetailRepository v2WorkOrderDetailRepository;
 
     private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
@@ -1207,7 +1210,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     private void initExternalTempUser(){
-        externalTempUser = externalTempUserDao.findByWoId(selected.getId());
+        initExternalTempUser(selected);
         if(ObjectUtil.isNotEmpty(externalTempUser)){
             maintenancePersonInformation = new ArrayList<>();
             maintenancePersonInformation.add(initMap("userName","姓名",externalTempUser.getUserName()));
@@ -1216,6 +1219,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
     }
+
+    private void initExternalTempUser(V2_WorkOrder workOrder) {
+        externalTempUser = externalTempUserDao.findByWoId(workOrder.getId());
+    }
+
     private Map<String,String> initMap(String fieldName,String key,String label){
         Map<String,String> row=new HashMap<>();
         row.put("fieldName",fieldName);
@@ -1611,6 +1619,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
         workHoursList = getWorkOrderManHoursDetail(selectedWorkOrder.getId());
+        enableEngineersWriteRepairOutside =Boolean.TRUE.toString().equalsIgnoreCase(userContextService.getConfigItemValue("enableEngineersWriteRepairOutside"));
+        if(enableEngineersWriteRepairOutside){
+            initExternalTempUser(selectedWorkOrder);
+            if(ObjectUtil.isEmpty(externalTempUser)){
+                externalTempUser = new ExternalTempUser();
+                externalTempUser.setId("000");
+            }
+        }
     }
 
     public List<V2_WorkOrderManHoursDetail> getWorkOrderManHoursDetail(String woId) {
@@ -1760,6 +1776,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         if(subStatus==ApmConstant.SUBSTATUS3) {
             selectedWorkOrder.setStatus(ApmConstant.SUBSTATUS3);
+        }
+        if(ObjectUtil.isNotEmpty(externalTempUser) && ObjectUtil.isNotEmpty(externalTempUser.getWoId())){
+            selectedWorkOrder.setExternalTempUser(externalTempUser);
         }
     }
 
@@ -1911,12 +1930,23 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
             }
         }
-
+        if(enableEngineersWriteRepairOutside && !accessoryList.isEmpty()){
+            boolean  externalPurchase = accessoryList.stream().anyMatch(item -> "3".equals(item.getPartsType()));
+            if(externalPurchase){ // 外修采购
+                if(ObjectUtil.isNotEmpty(externalTempUser) && ObjectUtil.isEmpty(externalTempUser.getWoId())){
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                    RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
+                    WebUtil.addSuccessMessage("增加外修人记录不能为空");
+                    valid = false;
+                }
+            }
+        }
 
         if (!valid) {
             return;
         }
         assigneeId =ua1.getId().toString();
+
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -4185,6 +4215,31 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return date;
         }
         return TimeUtil.now();
+    }
+
+    public ExternalTempUser getExternalTempUser() {
+        return externalTempUser;
+    }
+
+    public void setExternalTempUser(ExternalTempUser externalTempUser) {
+        this.externalTempUser = externalTempUser;
+    }
+
+    public void editContractor() {
+        String id = externalTempUser.getId();
+        if ("000".equals(id)) {
+            externalTempUser.setId(UUID.randomUUID().toString().replace("-", ""));
+        }
+        externalTempUser.setWoId(selectedWorkOrder.getId());
+    }
+
+    public  void deleteContractorl(){
+        externalTempUser.setId("000");
+        externalTempUser.setUserName(null);
+        externalTempUser.setSignature(null);
+        externalTempUser.setTel(null);
+        externalTempUser.setComName(null);
+        externalTempUser.setWoId(null);
     }
 }
 

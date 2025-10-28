@@ -11,6 +11,7 @@ import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -477,6 +478,12 @@ public class V2_WorkOrderService {
         formData.setExternalExpense(selectedWorkOrder.getExternalExpense());
         formData.setAttachments(attachments);
         formData.setWorkOrderType(selectedWorkOrder.getWorkOrderType());
+        ExternalTempUser externalTempUser = null;
+        if((externalTempUser = selectedWorkOrder.getExternalTempUser())!= null && ObjectUtil.isNotEmpty(externalTempUser.getWoId())){
+            formData.setUserName(externalTempUser.getUserName());
+            formData.setComName(externalTempUser.getComName());
+            formData.setTel(externalTempUser.getTel());
+        }
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "保存"));
@@ -524,6 +531,12 @@ public class V2_WorkOrderService {
         }
         //【最新进展】
         formData.setComment(selectedWorkOrder.getComment());
+        ExternalTempUser externalTempUser = null;
+        if((externalTempUser = selectedWorkOrder.getExternalTempUser())!= null && ObjectUtil.isNotEmpty(externalTempUser.getWoId())){
+            formData.setUserName(externalTempUser.getUserName());
+            formData.setComName(externalTempUser.getComName());
+            formData.setTel(externalTempUser.getTel());
+        }
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "完成"));
