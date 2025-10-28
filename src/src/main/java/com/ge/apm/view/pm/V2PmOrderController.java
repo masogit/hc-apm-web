@@ -2535,6 +2535,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //
 //        }
 //        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
+        // 验收人
+        currentPersonIdBatch = selectedPmOrder.getAcceptPerson();
         if (ObjectUtil.isNotEmpty(pmCheckItemList)) {
             for (UnstructuredData data : pmCheckItemList) {
                 hmCheck.put(data.getKey(), data);
@@ -2695,7 +2697,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch,picBeforeList,picAfterList,pmHoursList);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch, picBeforeList, picAfterList, pmHoursList);
     }
 
     public void stagingPmOrder() {
@@ -2703,7 +2705,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList,picBeforeList,picAfterList, pmHoursList);
+        pmOrderService.stagingPmOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch, picBeforeList, picAfterList, pmHoursList);
         //保存检查项
         saveCheckItemData();
         cancel();
