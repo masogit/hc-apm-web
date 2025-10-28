@@ -4,11 +4,9 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template_withoutGrowl.xhtml">
     <ui:define name="content">
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+        <link rel="stylesheet" href="all.min.css"/>
         <script src="#{request.contextPath}/portal/js/axios.min.js"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="all.chat.js"></script>
         <script src="chat.js"></script>
         <style>
             /* 聊天容器样式 */
@@ -183,6 +181,16 @@
                 background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
                 border-radius: 10px;
             }
+            .dropdown-transition {
+                transition: all 0.3s ease-in-out;
+            }
+            .dropdown-shadow {
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            }
+            .option-hover:hover {
+                background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+                transform: translateX(4px);
+            }
         </style>
         <div class="ui-g-12 card cardTitle bg-white shadow-lg">
 <!--            <div class="ui-g-12 card cardTitle">-->
@@ -205,6 +213,53 @@
 
                 <!-- 控制面板 -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6 mt-4">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                        <div class="mb-6">
+                            <label for="knowledgeBaseSelect" class="block text-lg font-semibold text-gray-700 mb-3">
+                                <i class="fa fa-database text-blue-500 mr-2"></i>
+                                选择知识库类型
+                            </label>
+
+                            <!-- 下拉选择框 -->
+                            <div class="relative">
+                                <select
+                                        id="knowledgeBaseSelect"
+                                        class="w-full p-4 border-2 border-blue-200 rounded-xl bg-white text-gray-700
+                               focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none
+                               transition-all duration-300 appearance-none cursor-pointer
+                               hover:border-blue-300 dropdown-shadow"
+
+                                >
+                                    <option value="soft_endoscope">软式内窥镜知识库</option>
+                                    <option value="hard_endoscope">硬式内窥镜知识库</option>
+                                    <option value="braun_dialysis">贝朗品牌血透机</option>
+                                    <option value="fresenius_dialysis">费森尤斯品牌血透机</option>
+                                    <option value="gambro_dialysis">金宝品牌血透机</option>
+                                    <option value="nippro_dialysis">尼普洛品牌血透机</option>
+                                    <option value="weiga_dialysis">威高日机装品牌血透机</option>
+                                    <option value="dialysis_tools">血透机工具</option>
+                                    <option value="ultrasound_manual">超声手册</option>
+                                    <option value="logiq_ultrasound">logiq超声手册</option>
+                                    <option value="vivid_ultrasound">VIVID超声手册</option>
+                                    <option value="voluson_ultrasound">Voluson超声知识库</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-700">
+                                    <i class="fa fa-chevron-down dropdown-transition"></i>
+                                </div>
+                            </div>
+                        </div>
+
+<!--                        &lt;!&ndash; 当前选择显示 &ndash;&gt;-->
+<!--                        <div id="currentSelection" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">-->
+<!--                            <div class="flex items-center">-->
+<!--                                <i class="fa fa-check-circle text-green-500 text-xl mr-3"></i>-->
+<!--                                <div>-->
+<!--                                    <h3 class="font-semibold text-blue-800">当前选择</h3>-->
+<!--                                    <p class="text-blue-600" id="selectedText">软式内窥镜知识库</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                    </div>
                     <form id="logForm" class="space-y-4">
                         <!-- 新日志输入 -->
                         <div class="w-full h-32 bg-gray-50 rounded-lg border border-gray-200 p-4">
@@ -224,7 +279,7 @@
                                     class="p-button-primary bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center"
                                     onclick="sendMessage()"
                             >
-                                <i class="fas fa-paper-plane mr-2"></i>
+                                <i class="fa fa-paper-plane mr-2"></i>
                                 发送
                             </button>
 
@@ -234,19 +289,18 @@
                                     class="p-button-warning bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center"
                                     onclick="clearChat()"
                             >
-                                <i class="fas fa-trash mr-2"></i>
+                                <i class="fa fa-trash mr-2"></i>
                                 清空记录
                             </button>
+                            <button
 
-<!--                            <button-->
-<!--                                    type="button"-->
-<!--                                    id="simulateButton"-->
-<!--                                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center"-->
-<!--                                    onclick="simulateChat()"-->
-<!--                            >-->
-<!--                                <i class="fas fa-magic mr-2"></i>-->
-<!--                                模拟对话-->
-<!--                            </button>-->
+                                    id="simulateButton"
+                                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center"
+                                    onclick="simulateChat()"
+                            >
+                                <i class="fa fa-magic mr-2"></i>
+                                模拟对话
+                            </button>
                         </div>
                     </form>
                 </div>
