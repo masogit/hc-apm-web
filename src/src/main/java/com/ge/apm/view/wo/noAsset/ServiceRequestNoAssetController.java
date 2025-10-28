@@ -228,14 +228,12 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
             OrgInfo orgInfo = orgDao.findByUid(loginUser.getOrgInfoUID());
             List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
-            if(orgInfo.getOrgLevel() == 3 && orgInfo.getOrgType() == 4){
-                updateSearchFilter(new SearchFilter("deptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            }else{
-                updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-                updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-                updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-                updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            }
+            updateSearchFilter(new SearchFilter("deptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
         }
     }
 
@@ -246,30 +244,32 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         }else if (queryIndex == 1) { //已报修
             searchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, loginUser.getId()));
         }else if (queryIndex == 2) { //待派工
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+//            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
         }else if (queryIndex == 3) { //待接单
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+6*"));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3));
-            /*searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, loginUser.getId(), "1*3+4*A+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+4*A+B*"));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+4*A+B*"));
             //去除派工模式4且待派工的单子
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+5*"));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+5*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+7*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*"));
             //当前责任人是自己且已经派工的单子
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+6*"));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+6*"));*/
-        } if (queryIndex == 4) {
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+9*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
+        } if (queryIndex == 4) {//待关单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
-        } if (queryIndex == 5) {
+        } if (queryIndex == 5) {//已关单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));*/
-        }
+        } else if (queryIndex == 9) { //已取消
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
+       }
     }
 
     public String getStepName(V2_ServiceRequestNoAsset serviceRequestNoAsset){
