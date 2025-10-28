@@ -587,6 +587,12 @@ class WorkOrderActionForm {
 
     Integer coworkerEntryType;
 
+    String userName;
+
+    String tel;
+
+    String comName;
+
     public Integer getCoworkerEntryType() {
         return coworkerEntryType;
     }
@@ -867,6 +873,29 @@ class WorkOrderActionForm {
         this.workHoursList = workHoursList;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    public String getComName() {
+        return comName;
+    }
+
+    public void setComName(String comName) {
+        this.comName = comName;
+    }
 }
 
 class WorkOrderForm {

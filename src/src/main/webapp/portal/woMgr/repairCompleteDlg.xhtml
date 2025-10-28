@@ -325,6 +325,28 @@
                                 </p:column>
                             </p:dataTable>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{workOrderMgrController.enableEngineersWriteRepairOutside}">
+                            <label class="label">#{msg.addContractor}</label>
+                            <p:dataTable id="externalTempUserList" class="externalTempUserList" value="#{workOrderMgrController.externalTempUser}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
+                                         rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                <p:column headerText="#{msg.userName}">
+                                    <h:outputText value="#{item.userName}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.contactPhone}">
+                                    <h:outputText value="#{item.tel}" />
+                                </p:column>
+                                <p:column headerText="#{msg.zkbEngineer_companyName}">
+                                    <h:outputText value="#{item.comName}" />
+                                </p:column>
+                                <p:column headerText="#{msg.Actions}">
+                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"  update="@(.contractorDlg)" oncomplete="PF('contractorDlg').show()" rendered="#{item.id eq '000'}"/>
+                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  update="@(.contractorDlg)" oncomplete="PF('contractorDlg').show()" rendered="#{item.id ne '000'}" />
+<!--                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteContractorl()}" update="@(.externalTempUserList)" rendered="#{item.id ne '000'}">-->
+<!--                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+<!--                                    </p:commandButton>-->
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGroup>
                     </p:panelGrid>
 
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -384,6 +406,7 @@
     <ui:include src="moreAccDialog.xhtml"/>
     <ui:include src="coWorkDialog.xhtml"/>
     <ui:include src="manHoursDetail.xhtml"/>
+    <ui:include src="contractorDialog.xhtml"/>
 
     <script type="text/javascript">
         function handleValidFields(xhr, status, args) {
