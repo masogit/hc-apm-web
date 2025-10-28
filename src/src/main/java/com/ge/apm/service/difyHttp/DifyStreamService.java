@@ -7,10 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,7 +19,7 @@ public class DifyStreamService {
 
     public String processDifyStream(DiFyChatRequest chatRequest) throws Exception {
         log.info("start post dify...");
-        RestTemplate restTemplate = SSLUtils.getIgnoreSSLRestTemplate();
+        RestTemplate restTemplate = new RestTemplate();//SSLUtils.getIgnoreSSLRestTemplate();
         log.info("restTemplate get success...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -38,7 +34,7 @@ public class DifyStreamService {
         log.info("start restTemplate post...");
         // 使用RestTemplate执行流式请求
         restTemplate.execute(
-                "https://apm-dify-stg.gehealthcloud.cn/v1/chat-messages",
+                "http://dify_ib/v1/chat-messages",
                 HttpMethod.POST,
                 request -> {
                     request.getHeaders().putAll(headers);
