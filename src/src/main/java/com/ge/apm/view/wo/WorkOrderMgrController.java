@@ -304,6 +304,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private boolean enableMaintenanceContract = false;
     @Getter @Setter
+    private boolean enableMaintenanceDate = false;
+    @Getter @Setter
     boolean showLocationNameFlag;
     @Getter @Setter
     boolean enableSignNeedScanQrCode;
@@ -311,6 +313,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgInfo currentUserOrgInfo;
     @Getter @Setter
     private String newMessage;
+    @Getter @Setter
+    private String repairTipMessage = "";
 
     @Getter @Setter
     private boolean enableEngineersWriteRepairOutside;
@@ -370,10 +374,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
-            ConfigItemValue configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid("enableMaintenanceContract", loginUser.getSiteUID());
-            if (ObjectUtil.isNotEmpty(configItemValue)) {
-                enableMaintenanceContract = "true".equals(configItemValue.getValue());
-            }
+            ConfigItemValue enableMaintenanceContractValue = configItemValueRepository.findFirstByKeyAndSiteUid("enableMaintenanceContract", loginUser.getSiteUID());
+            enableMaintenanceContract = Optional.ofNullable(enableMaintenanceContractValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
+            ConfigItemValue enableMaintenanceDateValue = configItemValueRepository.findFirstByKeyAndSiteUid("enableMaintenanceDate", loginUser.getSiteUID());
+            enableMaintenanceDate = Optional.ofNullable(enableMaintenanceDateValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
             selectedBatchMap = new HashMap<>();
             currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
             enableAuditGroupConfiguration();
@@ -2210,8 +2214,21 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (enableMaintenanceContract) {
             AssetInfo curAsset = curWorkOrder.getAssetInfo();
             List<ContractInfo> contractInfos = contractInfoRepository.findByAssetUidAndRequestTime(curAsset.getUid());
-            disable = ObjectUtil.isNotEmpty(contractInfos);
+            if (ObjectUtil.isEmpty(contractInfos)) {
+                repairTipMessage += WebUtil.getMessage("notFoundMaintenanceContract") + "，";
+                disable = false;
+            }
         }
+        if (enableMaintenanceContract) {
+            AssetInfo curAsset = curWorkOrder.getAssetInfo();
+            Date warrantyDate = curAsset.getWarrantyDate();
+            boolean dateDisable = Optional.ofNullable(warrantyDate).map(date -> DateUtil.now().before(date)).orElse(false);
+            if (!dateDisable) {
+                repairTipMessage += WebUtil.getMessage("warrantyDateExpired") + "，";
+                disable = false;
+            }
+        }
+        repairTipMessage += WebUtil.getMessage("confirmRepair") + "！";
         return disable;
     }
 
