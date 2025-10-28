@@ -95,7 +95,7 @@ class APMChatApp {
 
     // 获取消息HTML
     getMessageHTML(message, isUser, index) {
-        const iconClass = isUser ? 'fas fa-user-circle' : 'fa fa-slideshare';
+        const iconClass = isUser ? 'fa fa-user-o' : 'fa fa-slideshare';
         const nameClass = isUser ? 'user-name' : 'user-name assistant-name';
         const color = isUser ? 'color: #0e77ca' : 'color: #7252bc';
         const nameText = isUser ? message.userName : 'APM小管家';
@@ -133,9 +133,12 @@ class APMChatApp {
     // 模拟助手回复
     simulateAssistantResponse(userMessage) {
         this.showTypingIndicator();
+        const select = document.getElementById('knowledgeBaseSelect');
+        const selectedText = select.options[select.selectedIndex].text;
+        console.log(selectedText);
         const userName = document.getElementById('userName').value;
         axios.post( this.origin+`/geapm/web/apmChat/chat`,{
-            paramStr: userMessage,
+            paramStr: selectedText + '|' + userMessage,
             userName: userName
         }).then(res => {
             if (res) {
@@ -147,8 +150,6 @@ class APMChatApp {
                 });
             }
         });
-        // setTimeout(() => {
-        // }, 1500 + Math.random() * 2000);
     }
 
     // 生成智能回复
@@ -206,16 +207,11 @@ class APMChatApp {
                             <div class="message-content">
                                 <div class="user-info">
                                     <i class="fa fa-slideshare" style="color: #7252bc"></i>
-<!--                                    <span class="user-name assistant-name">-->
-<!--                                        <h:outputText value="APM小管家"/>-->
-<!--                                    </span>-->
                                 </div>
-                              <!--   <p class="message-text">APM小管家</p> -->
                             </div>
                             ${this.getTypingIndicator()}
                         </div>
         `;
-
         document.getElementById('messagesList').appendChild(indicator);
         this.scrollToBottom();
     }
@@ -314,3 +310,21 @@ function simulateChat() {
         window.chatApp.simulateChat();
     }
 }
+// function handleKnowledgeBaseChange(value) {
+//     const select = document.getElementById('knowledgeBaseSelect');
+//     const selectedText = select.options[select.selectedIndex].text;
+//     document.getElementById('selectedText').textContent = selectedText;
+//
+//     // 添加视觉反馈
+//     const selectionDiv = document.getElementById('currentSelection');
+//     selectionDiv.classList.add('animate-pulse');
+//     setTimeout(() => {
+//         selectionDiv.classList.remove('animate-pulse');
+//     }, 300);
+//
+//     // 保存选择到本地存储
+//     localStorage.setItem('selectedKnowledgeBase', value);
+//     localStorage.setItem('selectedKnowledgeBaseText', selectedText);
+//
+//     console.log(`切换到知识库: ${selectedText} (${value})`);
+// }

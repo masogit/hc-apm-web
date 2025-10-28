@@ -23,7 +23,7 @@ public class DifyStreamService {
         log.info("restTemplate get success...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer app-k9zaJQ2wAqEV5oI7vie2M5wU");
+        headers.set("Authorization", "Bearer app-2oLSFgUgKtjjSjTNkCCz6pSY");
         JSONObject requestBody = new JSONObject();
         requestBody.put("inputs", new ArrayList<>());
         requestBody.put("query", chatRequest.getParamStr());
@@ -34,7 +34,7 @@ public class DifyStreamService {
         log.info("start restTemplate post...");
         // 使用RestTemplate执行流式请求
         restTemplate.execute(
-                "http://dify_ib/v1/chat-messages",
+                "http://172.25.0.5/v1/chat-messages",
                 HttpMethod.POST,
                 request -> {
                     request.getHeaders().putAll(headers);
