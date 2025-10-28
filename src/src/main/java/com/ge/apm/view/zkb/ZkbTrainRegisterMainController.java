@@ -190,7 +190,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             this.safetyCertificateFile = null;
             this.recommendationFile = null;
             selectedDetail.setV2_blobObjectList(new ArrayList<>());
-            logger.info("engineerChange----this.v2_blobObjectList.size:{}", this.v2_blobObjectList.size());
+            logger.info("engineerChange----this.v2_blobObjectList.size:{}", v2_blobObjectList.size());
             logger.info("engineerChange----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
             refreshSpecialFiles();
         }
@@ -245,10 +245,14 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     private void refreshSpecialFiles() {
-        if (v2_blobObjectList == null) return;
+        if (CollectionUtils.isEmpty(v2_blobObjectList)) return;
+        logger.info("refreshSpecialFiles----v2_blobObjectList.size:{}", v2_blobObjectList.size());
         physicalExamFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
         safetyCertificateFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
         recommendationFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
+        logger.info("refreshSpecialFiles----v2_blobObjectList.size:{}", v2_blobObjectList.size());
+        logger.info("refreshSpecialFiles----selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
+
     }
 
     private V2_BlobObject getFileBySubType(List<V2_BlobObject> list, String subType) {
@@ -259,8 +263,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveEngineer() {
-        logger.info("saveEngineer----this.v2_blobObjectList.size:{}", this.v2_blobObjectList.size());
-        logger.info("saveEngineer----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
+        logger.info("saveEngineer1----this.v2_blobObjectList.size:{}", v2_blobObjectList.size());
+        logger.info("saveEngineer1----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
         selectedDetail.setV2_blobObjectList(v2_blobObjectList);
         selectedDetail.setRegisterId(zkbTrainPublishRegister.getId());
         if (StringUtils.isNotBlank(selectedDetail.getId())) {
@@ -276,6 +280,9 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         } else {
             zkbTrainPublishRegisterService.modifyDetail(selectedDetail, v2_blobObjectList, currentUser);
             zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
+            logger.info("saveEngineer2----this.v2_blobObjectList.size:{}", v2_blobObjectList.size());
+            logger.info("saveEngineer2----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
+
         }
         selectedDetail = null;
     }
