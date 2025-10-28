@@ -32,6 +32,9 @@
                                                 requiredMessage="#{msg.zkbEngineer_name} #{msg.ValidationRequire}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}"
                                                 completeMethod="#{zkbTrainRegisterMainController.autoCompleteEngineer}">
+                                    <p:ajax event="blur"
+                                            listener="#{zkbTrainRegisterMainController.engineerChange}"
+                                            process="@this" update="@(.engineerNameChange)"/>
                                     <p:ajax event="itemSelect"
                                             listener="#{zkbTrainRegisterMainController.engineerChange}"
                                             process="@this" update="@(.engineerNameChange)"/>
