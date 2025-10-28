@@ -34,7 +34,7 @@ public class DifyStreamService {
         log.info("start restTemplate post...");
         // 使用RestTemplate执行流式请求
         restTemplate.execute(
-                "http://172.25.0.5/v1/chat-messages",
+                "http://dify-ib/v1/chat-messages",
                 HttpMethod.POST,
                 request -> {
                     request.getHeaders().putAll(headers);
