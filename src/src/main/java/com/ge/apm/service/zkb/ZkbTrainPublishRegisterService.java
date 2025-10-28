@@ -53,8 +53,8 @@ public class ZkbTrainPublishRegisterService {
 
     public List<ZkbTrainPublishInfo> loadUnRegisterDataList(List<SearchFilter> searchFilters, String tenantUid) {
         List<ZkbTrainPublishInfo> list = zkbTrainPublishRegisterMapper.loadUnRegisterDataList(searchFilters, tenantUid);
-        if(CollectionUtils.isNotEmpty(list)){
-            for(ZkbTrainPublishInfo p : list){
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (ZkbTrainPublishInfo p : list) {
                 ZkbTrainCourse zkbTrainCourse = zkbTrainCourseRepository.findById(p.getCourseId());
                 p.setZkbTrainCourse(zkbTrainCourse);
             }
@@ -62,11 +62,11 @@ public class ZkbTrainPublishRegisterService {
         return list;
     }
 
-    public List<ZkbEngineer> queryEngineerListByTenant(UserAccount userAccount){
+    public List<ZkbEngineer> queryEngineerListByTenant(UserAccount userAccount) {
         return zkbEngineerRepository.findByTenantUID(userAccount.getTenantUID());
     }
 
-    public ZkbEngineer findEngineerById(String id){
+    public ZkbEngineer findEngineerById(String id) {
         return zkbEngineerRepository.findById(id);
     }
 
@@ -184,6 +184,8 @@ public class ZkbTrainPublishRegisterService {
             String tenantUid = register.getTenantUid();
             String courseId = publishInfo.getCourseId();
             zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -1, currentUser);
+        } else {
+            blobObjectRepository.deleteByBoUuid(detail.getId());
         }
 
         zkbTrainPublishRegisterDetailRepository.save(detail);
@@ -201,7 +203,7 @@ public class ZkbTrainPublishRegisterService {
         }
     }
 
-    public ZkbTrainPublishRegister getRegisterById(String id){
+    public ZkbTrainPublishRegister getRegisterById(String id) {
         return zkbTrainPublishRegisterRepository.findById(id);
     }
 
@@ -229,11 +231,11 @@ public class ZkbTrainPublishRegisterService {
         zkbTrainPublishRegisterDetailRepository.delete(detail);
     }
 
-    public List<V2_BlobObject> queryBlobObject(String boUUid){
+    public List<V2_BlobObject> queryBlobObject(String boUUid) {
         return blobObjectRepository.findByBoUuid(boUUid);
     }
 
-    public List<ZkbTrainPublishRegisterDetail> queryDetailByRegister(String id){
+    public List<ZkbTrainPublishRegisterDetail> queryDetailByRegister(String id) {
         return zkbTrainPublishRegisterDetailRepository.findByRegisterId(id);
     }
 
