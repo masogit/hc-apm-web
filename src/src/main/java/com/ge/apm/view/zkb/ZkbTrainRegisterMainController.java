@@ -213,7 +213,9 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
             file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
-            v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM.equals(f.getBoSubType()));
+            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
+                v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM.equals(f.getBoSubType()));
+            }
             v2_blobObjectList.add(file);
             physicalExamFile = file;
             WebUtil.addSuccessMessage("放射体检证明上传成功");
@@ -225,7 +227,9 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
             file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
-            v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT.equals(f.getBoSubType()));
+            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
+                v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT.equals(f.getBoSubType()));
+            }
             v2_blobObjectList.add(file);
             safetyCertificateFile = file;
             WebUtil.addSuccessMessage("安全证书上传成功");
@@ -237,7 +241,9 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
             file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
-            v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION.equals(f.getBoSubType()));
+            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
+                v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION.equals(f.getBoSubType()));
+            }
             v2_blobObjectList.add(file);
             recommendationFile = file;
             WebUtil.addSuccessMessage("推荐函上传成功");
