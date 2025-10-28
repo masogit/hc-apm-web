@@ -137,12 +137,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if ("Register".equals(actionName)) {
             v2_blobObjectList = selectedDetail.getV2_blobObjectList();
         } else {
-            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
-                v2_blobObjectList = selectedDetail.getV2_blobObjectList();
-            } else {
-                v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
-                selectedDetail.setV2_blobObjectList(v2_blobObjectList);
-            }
+            v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
+            selectedDetail.setV2_blobObjectList(v2_blobObjectList);
         }
         refreshSpecialFiles();
         engineerFormView = "edit";
@@ -190,8 +186,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             this.safetyCertificateFile = null;
             this.recommendationFile = null;
             selectedDetail.setV2_blobObjectList(new ArrayList<>());
-            logger.info("engineerChange----this.v2_blobObjectList.size:{}", v2_blobObjectList.size());
-            logger.info("engineerChange----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
             refreshSpecialFiles();
         }
     }
@@ -252,14 +246,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
 
     private void refreshSpecialFiles() {
         if (CollectionUtils.isEmpty(v2_blobObjectList)) return;
-        logger.info("refreshSpecialFiles----v2_blobObjectList.size:{}", v2_blobObjectList.size());
         physicalExamFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
         safetyCertificateFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
         recommendationFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
-        logger.info("refreshSpecialFiles----v2_blobObjectList.size:{}", v2_blobObjectList.size());
-        logger.info("refreshSpecialFiles----selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
-
-    }
+     }
 
     private V2_BlobObject getFileBySubType(List<V2_BlobObject> list, String subType) {
         return list.stream()
