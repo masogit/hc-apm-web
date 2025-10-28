@@ -16,6 +16,8 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController<E> {
+
+    private Logger logger = LoggerFactory.getLogger(ZkbTrainRegisterMainController.class);
 
     private ZkbTrainPublishRegisterService zkbTrainPublishRegisterService;
     private ZkbTrainPublishRepository dao;
@@ -96,14 +100,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
 
     private BlobFileService blobService;
 
-    private ZkbTrainCourseQuotaService zkbTrainCourseQuotaService;
-
     @Override
     protected void init() {
         super.init();
         zkbTrainPublishRegisterService = WebUtil.getBean(ZkbTrainPublishRegisterService.class);
         zkbEngineerService = WebUtil.getBean(ZkbEngineerService.class);
-        zkbTrainCourseQuotaService = WebUtil.getBean(ZkbTrainCourseQuotaService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         this.selectionTenantInfo = UserContextService.getCurrentUserAccount().getTenantUID();
         this.selectedDetail = null;
@@ -184,10 +185,13 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             selectedDetail.setEngineerSso(selectedEngineer.getSso());
 
             this.v2_blobObjectList.clear();
+            this.v2_blobObjectList = new ArrayList<>();
             this.physicalExamFile = null;
             this.safetyCertificateFile = null;
             this.recommendationFile = null;
             selectedDetail.setV2_blobObjectList(new ArrayList<>());
+            logger.info("engineerChange----this.v2_blobObjectList.size:{}", this.v2_blobObjectList.size());
+            logger.info("engineerChange----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
             refreshSpecialFiles();
         }
     }
@@ -255,6 +259,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveEngineer() {
+        logger.info("saveEngineer----this.v2_blobObjectList.size:{}", this.v2_blobObjectList.size());
+        logger.info("saveEngineer----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
         selectedDetail.setV2_blobObjectList(v2_blobObjectList);
         selectedDetail.setRegisterId(zkbTrainPublishRegister.getId());
         if (StringUtils.isNotBlank(selectedDetail.getId())) {
