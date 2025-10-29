@@ -512,8 +512,11 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         checkFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
         List<UserAccount> userList = userDao.findBySearchFilter(checkFilters);
         if (userList != null && !userList.isEmpty()) {
-            WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
-            return false;
+            boolean b = userList.stream().anyMatch(item -> item.getIsDeleted() == null || !item.getIsDeleted());
+            if(b){
+                WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
+                return false;
+            }
         }
 
         //检查是否有用户选择了该组织作为可见组织。
@@ -523,9 +526,16 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         List<UserOrgInfo> userOrgInfoList = userOrgDao.findBySearchFilter(checkFilters);
         if (!userOrgInfoList.isEmpty()) {
-            failureType=2;
-            WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
-            return false;
+            List<String> collect = userOrgInfoList.stream().map(UserOrgInfo::getUserUid).collect(Collectors.toList());
+            List<UserAccount> userAccounts = userDao.findByUidIn(collect);
+            if(CollectionUtils.isNotEmpty(userAccounts)){
+                boolean b = userAccounts.stream().anyMatch(item -> item.getIsDeleted() == null || !item.getIsDeleted());
+                if(b){
+                    failureType=2;
+                    WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
+                    return false;
+                }
+            }
         }
 
         //检查该组织是否已经有资产属于该组织。
