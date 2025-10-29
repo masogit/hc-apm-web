@@ -6,10 +6,12 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -65,8 +67,15 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private List<ConfigItem> configItemList;
     private Map<String, ConfigItem> configItemMap = MapUtil.newHashMap();
     private OrgInfo assetOutStockDept;
+
+    private UserCommonService userCommonService;
+    private UserAccountRepository userAccountRepository;
     private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
     private List<OrgInfo> deptList;
+
+    private List<UserAccount> assetStaffList;
+
+    private List<UserAccount> assetHeadList;
     private final List<String> textAloneHandleType = ListUtil.newArrayList("setAssetOutStockDept", "systemLogo");
 
     private static final String VALUE ="value";
@@ -80,9 +89,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         uaaService = WebUtil.getBean(UaaService.class);
         sharedAssetService = WebUtil.getBean(SharedAssetService.class);
         user = UserContextService.getCurrentUserAccount();
-
+        userCommonService = WebUtil.getBean(UserCommonService.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
         loadClinicalDept();
+        loadAssetStaff();
+        loadAssetHead();
         categoryMap = new LinkedHashMap<>();
         categoryMap.put(1,"设备档案");
         categoryMap.put(2,"设备调剂");
@@ -197,6 +209,17 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 selectedObjectMap.put("assetOutStockDept", orgInfoRepository.getByUid(configItem.getShowValue()));
                 assetOutStockDept = orgInfoRepository.getByUid(configItem.getShowValue());
             }
+
+            if (category.equals("4")) {
+                ConfigItem configItem = configItemMap.get("NoAssetDispatchWorkers1");
+                selectedObjectMap.put("NoAssetDispatchWorkers1", userAccountRepository.getByUid(configItem.getShowValue()));
+
+                ConfigItem configItem2 = configItemMap.get("NoAssetDispatchWorkers2");
+                selectedObjectMap.put("NoAssetDispatchWorkers2", userAccountRepository.getByUid(configItem2.getShowValue()));
+
+                ConfigItem configItem3 = configItemMap.get("AssetHead");
+                selectedObjectMap.put("AssetHead", userAccountRepository.getByUid(configItem3.getShowValue()));
+            }
             this.searchFilters = null;
         } else {
             RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -259,6 +282,15 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 configItem.setConfigItemValue(null);
                 if ("setAssetOutStockDept".equals(configItem.getKey())) {
                     selectedObjectMap.remove("assetOutStockDept");
+                }
+                if ("NoAssetDispatchWorkers2".equals(configItem.getKey())) {
+                    selectedObjectMap.remove("NoAssetDispatchWorkers2");
+                }
+                if ("NoAssetDispatchWorkers1".equals(configItem.getKey())) {
+                    selectedObjectMap.remove("NoAssetDispatchWorkers1");
+                }
+                if ("AssetHead".equals(configItem.getKey())) {
+                    selectedObjectMap.remove("AssetHead");
                 }
                 configItem.setShowValue(configItem.getDefaultValue());
                 if (3 == configItem.getValueType()) {
@@ -333,6 +365,18 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
             if ("setAssetOutStockDept".equals(this.selected.getKey())) {
                 this.selected.setShowValue(Optional.ofNullable(assetOutStockDept).map(OrgInfo::getUid).orElse(null));
+            }
+
+            if ("NoAssetDispatchWorkers1".equals(this.selected.getKey())) {
+                this.selected.setShowValue(Optional.ofNullable((UserAccount)selectedObjectMap.get("NoAssetDispatchWorkers1")).map(UserAccount::getUid).orElse(null));
+            }
+
+            if ("NoAssetDispatchWorkers2".equals(this.selected.getKey())) {
+                this.selected.setShowValue(Optional.ofNullable((UserAccount)selectedObjectMap.get("NoAssetDispatchWorkers2")).map(UserAccount::getUid).orElse(null));
+            }
+
+            if ("AssetHead".equals(this.selected.getKey())) {
+                this.selected.setShowValue(Optional.ofNullable((UserAccount)selectedObjectMap.get("AssetHead")).map(UserAccount::getUid).orElse(null));
             }
 
             if(4 == this.selected.getValueType() || 5 == this.selected.getValueType() || 6 == this.selected.getValueType()){
@@ -460,6 +504,53 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
+    }
+
+    private void loadAssetStaff(){
+        if(null == selectSite){
+            assetStaffList = Collections.EMPTY_LIST;
+        }else{
+            assetStaffList = userCommonService.getWorkerList(0, selectSite.getUid());
+        }
+    }
+
+    private void loadAssetHead(){
+        if(null == selectSite){
+            assetHeadList = Collections.EMPTY_LIST;
+        }else{
+            assetHeadList = userAccountRepository.findBySiteUidAndRoleName(selectSite.getUid(), ApmSystemRole.AssetHead.name());
+        }
+    }
+
+    public List<UserAccount> autoCompleteDispatchWorkers(String query) {
+        if (assetStaffList == null) {
+            return Collections.emptyList();
+        }
+        List<UserAccount> res = this.assetStaffList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public List<UserAccount> autoCompleteAssetHead(String query) {
+        if (assetHeadList == null) {
+            return Collections.emptyList();
+        }
+        List<UserAccount> res = this.assetHeadList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public UserAccount findByUid(String uid){
+        if (StringUtils.isBlank(uid) || CollectionUtils.isEmpty(assetStaffList)) {
+            return new UserAccount();
+        }
+
+        return assetStaffList.stream()
+                .filter(i -> uid.equals(i.getUid()))
+                .findFirst()
+                .orElse(new UserAccount());
     }
 
     public void onDeptChange(String idx) {

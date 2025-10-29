@@ -318,6 +318,63 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableEngineersWriteRepairOutside'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('enableEngineersWriteRepairOutside').configItemValue == null}"/>
             </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers1').name.concat('(').concat(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers1').key).concat(')')}</label>
+                <p:autoComplete id="NoAssetDispatchWorkers1" dropdown="true"
+                                value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers1']}"
+                                scrollHeight="300" forceSelection="true"
+                                completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                    <p:ajax event="itemSelect"/>
+                </p:autoComplete>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers1'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers1'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers1').configItemValue == null}"/>
+            </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers2').name.concat('(').concat(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers2').key).concat(')')}</label>
+                <p:autoComplete id="NoAssetDispatchWorkers2" dropdown="true"
+                                value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers2']}"
+                                scrollHeight="300" forceSelection="true"
+                                completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                    <p:ajax event="itemSelect"/>
+                </p:autoComplete>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers2'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers2'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers2').configItemValue == null}"/>
+            </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('AssetHead').name.concat('(').concat(systemConfigItemController.configItemMap.get('AssetHead').key).concat(')')}</label>
+                <p:autoComplete id="AssetHead" dropdown="true"
+                                value="#{systemConfigItemController.selectedObjectMap['AssetHead']}"
+                                scrollHeight="300" forceSelection="true"
+                                completeMethod="#{systemConfigItemController.autoCompleteAssetHead}"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                    <p:ajax event="itemSelect"/>
+                </p:autoComplete>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('AssetHead'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('AssetHead'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('AssetHead').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 
