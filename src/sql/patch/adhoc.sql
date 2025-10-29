@@ -13,13 +13,9 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 -- YHAAO-26115 批量添加协作者工时类型
 update v2_pm_order set coworker_entry_type = '0' where coworker_entry_type is null;
 
---  YHAAO-26159  无台账报修派工人
+
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 4, '', '无台账报修派工人1', 'NoAssetDispatchWorkers1', '无台账报修派工人1', 'f', 't', 1 where not exists(select * from config_item where key = 'NoAssetDispatchWorkers1');
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 4, '', '无台账报修派工人2', 'NoAssetDispatchWorkers2', '无台账报修派工人2', 'f', 't', 1 where not exists(select * from config_item where key = 'NoAssetDispatchWorkers2');
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 4, '', '医学工程处主任', 'AssetHead', '医学工程处主任', 'f', 't', 1 where not exists(select * from config_item where key = 'AssetHead');
+select replace(uuid_generate_v4()::text,'-',''), 4, '', '无台账报修工单没有所属科室时，读取配置项“无台账报修派工人1”、“无台账报修派工人2” 和医学工程处主任派工', 'NoAssetDispatchWorkers', '无台账报修派工人', 'f', 't', 1 where not exists(select * from config_item where key = 'NoAssetDispatchWorkers');
 
 -- YHAAO-26026 添加设备维保截止日期工单提醒配置项
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '工单维修是否需要判断维保截止日期', 'enableMaintenanceDate', '工单维修是否需要判断维保截止日期', 'f','t',3,'' where not exists(select * from config_item where key = 'enableMaintenanceDate');
