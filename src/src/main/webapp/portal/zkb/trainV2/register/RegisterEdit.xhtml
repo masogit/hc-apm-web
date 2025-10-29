@@ -9,11 +9,25 @@
 <ui:composition>
     <p:dialog id="registerEngineerListDlg" widgetVar="registerEngineerListDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程报名信息" width="800" height="570">
         <h:form id="engineerListForm">
-            <p:dataTable id="detailDatalist" value="#{zkbTrainRegisterMainController.zkbTrainPublishRegisterDetailList}" var="item"
-                         widgetVar="detailDatalist" selectionMode="single" sortOrder="descending" sortBy="#{item.createdDate}" selection="#{zkbTrainRegisterMainController.selectedDetail}"
-                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single"
-                         paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                <p:ajax event="rowSelect" update=":engineerListForm:detailDatalist:editeEngineerButton :engineerListForm:detailDatalist:deleteeEngineerButton"/>
+            <p:dataTable id="detailDatalist"
+                         value="#{zkbTrainRegisterMainController.zkbTrainPublishRegisterDetailList}"
+                         var="item"
+                         widgetVar="detailDatalist"
+                         selectionMode="single"
+                         sortOrder="descending"
+                         sortBy="#{item.createdDate}"
+                         selection="#{zkbTrainRegisterMainController.selectedDetail}"
+                         lazy="false"
+                         paginator="true"
+                         rowKey="#{item.id}"
+                         sortMode="single"
+                         paginatorTemplate="{Toolbar}"
+                         rows="20"
+                         emptyMessage="#{msg.noRecordFound}">
+
+                <p:ajax event="rowSelect"
+                        update=":engineerListForm:detailDatalist:editeEngineerButton :engineerListForm:detailDatalist:deleteeEngineerButton :engineerListForm:detailDatalist:viewEngineerButton"/>
+
                 <p:column headerText="姓名">
                     <h:outputText value="#{item.engineerName}"/>
                 </p:column>
@@ -30,23 +44,77 @@
                     <h:outputText value="#{item.engineerSso}"/>
                 </p:column>
 
+                <!-- 工具栏按钮：仅非查看模式显示 -->
                 <f:facet name="{Toolbar}">
-                    <p:commandButton immediate="false" process="@this" id="createEngineerButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbTrainRegisterMainController.prepareDetailCreate}" update=":growl :registerEngineerEditDlg" oncomplete="PF('registerEngineerEditDlg').show()"  />
-                    <p:commandButton immediate="false" process="@this" id="editeEngineerButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbTrainRegisterMainController.prepareDetailEdit}" update=":growl :registerEngineerEditDlg"  oncomplete="PF('registerEngineerEditDlg').show()" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}" />
-                    <p:commandButton immediate="false" process="@this" id="deleteeEngineerButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbTrainRegisterMainController.deleteDetail()}" update=":growl :engineerListForm:detailDatalist" oncomplete="PF('registerEngineerListDialog').show();" disabled="#{empty zkbTrainRegisterMainController.selectedDetail}">
-                        <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+
+                    <p:commandButton immediate="false"
+                                     process="@this"
+                                     id="viewEngineerButton"
+                                     icon="ui-icon-search"
+                                     title="#{msg.view}"
+                                     actionListener="#{zkbTrainRegisterMainController.prepareViewRegister(zkbTrainRegisterMainController.selectedDetail.id)}"
+                                     update=":growl :registerEngineerEditDlg"
+                                     oncomplete="PF('registerEngineerEditDlg').show()"
+                                     disabled="#{empty zkbTrainRegisterMainController.selectedDetail}"
+                                     rendered="#{zkbTrainRegisterMainController.actionName eq 'View'}"/>
+
+                    <!-- 创建按钮：仅在非查看模式且 actionName 不是 View 时显示 -->
+                    <p:commandButton immediate="false"
+                                     process="@this"
+                                     id="createEngineerButton"
+                                     icon="ui-icon-plus"
+                                     validateClient="false"
+                                     title="#{msg.Create}"
+                                     actionListener="#{zkbTrainRegisterMainController.prepareDetailCreate}"
+                                     update=":growl :registerEngineerEditDlg"
+                                     oncomplete="PF('registerEngineerEditDlg').show()"
+                                     rendered="#{zkbTrainRegisterMainController.actionName ne 'View'}"/>
+
+                    <p:commandButton immediate="false"
+                                     process="@this"
+                                     id="editeEngineerButton"
+                                     icon="ui-icon-pencil"
+                                     title="#{msg.Edit}"
+                                     actionListener="#{zkbTrainRegisterMainController.prepareDetailEdit}"
+                                     update=":growl :registerEngineerEditDlg"
+                                     oncomplete="PF('registerEngineerEditDlg').show()"
+                                     disabled="#{empty zkbTrainRegisterMainController.selectedDetail}"
+                                     rendered="#{zkbTrainRegisterMainController.actionName ne 'View'}"/>
+
+                    <p:commandButton immediate="false"
+                                     process="@this"
+                                     id="deleteeEngineerButton"
+                                     icon="ui-icon-close"
+                                     title="#{msg.Delete}"
+                                     actionListener="#{zkbTrainRegisterMainController.deleteDetail()}"
+                                     update=":growl :engineerListForm:detailDatalist"
+                                     oncomplete="PF('registerEngineerListDialog').show();"
+                                     disabled="#{empty zkbTrainRegisterMainController.selectedDetail}"
+                                     rendered="#{zkbTrainRegisterMainController.actionName ne 'View'}">
                     </p:commandButton>
                 </f:facet>
-
             </p:dataTable>
 
-            <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbTrainRegisterMainController.saveData}" update=":tab:listForm:datalist :tab:registeredListForm:datalist" icon="ui-icon-check" oncomplete="PF('registerEngineerListDialog').hide();location.reload();" rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"/>
-            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('registerEngineerListDialog').hide()" rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"
-            />
+            <!-- 保存 & 取消按钮：仅在注册或修改模式显示 -->
+            <p:commandButton validateClient="true"
+                             value="#{msg.Save}"
+                             action="#{zkbTrainRegisterMainController.saveData}"
+                             update=":tab:listForm:datalist :tab:registeredListForm:datalist"
+                             icon="ui-icon-check"
+                             oncomplete="PF('registerEngineerListDialog').hide();location.reload();"
+                             rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"/>
+
+            <p:commandButton immediate="true"
+                             process="@this"
+                             value="#{msg.Cancel}"
+                             icon="ui-icon-cancel"
+                             onclick="PF('registerEngineerListDialog').hide()"
+                             rendered="#{zkbTrainRegisterMainController.actionName eq 'Register'}"/>
         </h:form>
     </p:dialog>
-    <ui:include src="AddEngineer.xhtml"></ui:include>
+
+    <ui:include src="AddEngineer.xhtml"/>
+
 
 </ui:composition>
 
