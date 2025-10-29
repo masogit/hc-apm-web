@@ -4258,5 +4258,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         externalTempUser.setComName(null);
         externalTempUser.setWoId(null);
     }
+
+    public boolean showEnableEngineersWriteRepairOutside(){
+        boolean  externalPurchase = accessoryList.stream().anyMatch(item -> "3".equals(item.getPartsType()));
+        return enableEngineersWriteRepairOutside && externalPurchase;
+    }
 }
 
