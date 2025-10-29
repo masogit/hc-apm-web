@@ -15,8 +15,8 @@ import java.util.List;
  */
 public interface InventoryOrderDetailAssetInfoRepository extends GenericRepositoryUUID<InventoryOrderDetail> {
 
-    @Query(value = "SELECT count(1) FROM inventory_order_detail LEFT JOIN inventory_order ON inventory_order_detail.inventory_order_id = inventory_order.\"id\" WHERE asset_id IN (?1) AND status = 0 AND inventory_order.is_finished = FALSE",nativeQuery = true)
-    int getInventoryingAssetCount(List<Integer> assetIds);
+    @Query(value = "SELECT * FROM inventory_order_detail t1 LEFT JOIN inventory_order t2 ON t1.inventory_order_id = t2.\"id\" WHERE t1.asset_id IN (?1) AND t1.status = 0 AND t2.is_finished = FALSE",nativeQuery = true)
+    List<InventoryOrderDetail> getInventoryingAssetCount(List<Integer> assetIds);
 
     @Query(value = "SELECT asset_id FROM inventory_order_detail LEFT JOIN inventory_order ON inventory_order_detail.inventory_order_id = inventory_order.\"id\" WHERE asset_id IN (?1) AND status = 0 AND inventory_order.is_finished = FALSE",nativeQuery = true)
     List<Integer> getInventoryingAssetCountByBatchEdit(List<Integer> assetIds);

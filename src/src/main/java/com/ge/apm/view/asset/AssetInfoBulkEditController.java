@@ -1657,21 +1657,27 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         //commit changes after validated
         List<AssetInfo> selectedAssets = assets.getTarget();
-
+        List<AssetInfo> notPass =new ArrayList<>();
         //验证
-        if(!assetInfoBulkEditCheckService.verify(selectedAssets)){
-            WebUtil.addErrorMessage("有设备正在调剂中，不能更换院区!");
+        if(!assetInfoBulkEditCheckService.verify(selectedAssets,notPass)){
+            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
+            WebUtil.addErrorMessage("设备: "+collect+", 正在调剂中，不能更换院区!");
             errFlag = true;
+            notPass.clear();
         }
 
-        if(!assetInfoBulkEditCheckService.verifyForMaintain(selectedAssets)){
-            WebUtil.addErrorMessage("有设备正在保养中，不能更换院区！");
+        if(!assetInfoBulkEditCheckService.verifyForMaintain(selectedAssets,notPass)){
+            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
+            WebUtil.addErrorMessage("设备: "+collect+", 正在保养中，不能更换院区！");
             errFlag = true;
+            notPass.clear();
         }
 
-        if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets)){
-            WebUtil.addErrorMessage("有设备正在盘点中，不能更换院区!");
+        if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets,notPass)){
+            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
+            WebUtil.addErrorMessage("设备: "+collect+", 正在盘点中，不能更换院区!");
             errFlag = true;
+            notPass.clear();
         }
 
         for(AssetInfo as:selectedAssets){
@@ -1686,14 +1692,20 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 if(assetFlag){
                     continue;
                 }else{
-                    WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+                    notPass.add(as);
                     errFlag = true;
                 }
             }
         }
+        if(CollectionUtils.isNotEmpty(notPass)){
+            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
+            WebUtil.addErrorMessage("设备: "+collect+", 正在维修中，不能更换院区!");
+            notPass.clear();
+        }
 
-        if(!assetInfoBulkEditCheckService.verifySiteToSite(selectedAssets)){
-            WebUtil.addErrorMessage("有设备科室借调中，不能更换院区!");
+        if(!assetInfoBulkEditCheckService.verifySiteToSite(selectedAssets,notPass)){
+            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
+            WebUtil.addErrorMessage("设备: "+collect+", 正在科室借调中，不能更换院区!");
             errFlag = true;
         }
         //临床助手检查进行中
