@@ -66,14 +66,58 @@
                     <p:column headerText="培训方式" filterBy="#{item.zkbTrainPublishInfo.trainMode}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{fieldMsg.fieldValue('trainMode',item.zkbTrainPublishInfo.trainMode)}"/>
                     </p:column>
-                    <p:column headerText="操作">
-                        <p:commandButton value="修改" style="width: 70px;" action="#{zkbTrainRegisterMainController.prepareModifyRegister(item.id)}" update=":registerEngineerListDlg" oncomplete="PF('registerEngineerListDialog').show()" />
-                        <p:commandButton id="deleteButton" value="取消" actionListener="#{zkbTrainRegisterMainController.cancelRegister(item.id)}"
-                                         update=":tab:registeredListForm:datalist"
-                                         process="@this">
+<!--                    <p:column headerText="操作">-->
+<!--                        <p:commandButton value="查看" style="width: 70px;" action="#{zkbTrainRegisterMainController.prepareModifyRegister(item.id)}" update=":registerEngineerListDlg" oncomplete="PF('registerEngineerListDialog').show()" />-->
+<!--                        <p:commandButton value="修改" style="width: 70px;" action="#{zkbTrainRegisterMainController.prepareModifyRegister(item.id)}" update=":registerEngineerListDlg" oncomplete="PF('registerEngineerListDialog').show()" />-->
+<!--                        <p:commandButton id="deleteButton" value="取消" actionListener="#{zkbTrainRegisterMainController.cancelRegister(item.id)}"-->
+<!--                                         update=":tab:registeredListForm:datalist"-->
+<!--                                         process="@this">-->
+<!--                            <p:confirm header="取消确认" message="确定要取消此报名吗？" icon="ui-icon-warning"/>-->
+<!--                        </p:commandButton>-->
+<!--                    </p:column>-->
+                    <p:column headerText="操作" >
+                        <!-- 查看按钮 -->
+                        <p:commandButton icon="ui-icon-search" title="查看"
+                                         action="#{zkbTrainRegisterMainController.prepareViewRegister(item.id)}"
+                                         update=":registerEngineerListDlg"
+                                         oncomplete="PF('registerEngineerListDialog').show()" />
+
+                        <!-- 修改按钮：根据条件禁用 -->
+                        <p:commandButton icon="ui-icon-pencil" title="修改"
+                                         action="#{zkbTrainRegisterMainController.prepareModifyRegister(item.id)}"
+                                         update=":registerEngineerListDlg"
+                                         oncomplete="PF('registerEngineerListDialog').show()"
+                                         disabled="#{not zkbTrainRegisterMainController.canModify(item.id)}"/>
+
+                        <!-- 取消按钮：带确认 + 禁用逻辑 -->
+                        <p:commandButton id="deleteButton" icon="ui-icon-close" title="取消"
+                                         actionListener="#{zkbTrainRegisterMainController.cancelRegister(item.id)}"
+                                         update=":tab:registeredListForm:datalist :growl"
+                                         process="@this"
+                                         disabled="#{not zkbTrainRegisterMainController.canModify(item.id)}">
                             <p:confirm header="取消确认" message="确定要取消此报名吗？" icon="ui-icon-warning"/>
                         </p:commandButton>
                     </p:column>
+
+<!--                    <f:facet name="{Toolbar}">-->
+<!--                        <p:commandButton id="viewButton" icon="ui-icon-search" title="查看"-->
+<!--                                         actionListener="#{zkbTrainRegisterMainController.prepareViewRegister(zkbTrainRegisteredController.selected.id)}"-->
+<!--                                         update=":registerEngineerListDlg"-->
+<!--                                         oncomplete="PF('registerEngineerListDialog').show()"-->
+<!--                                         disabled="#{empty zkbTrainRegisteredController.selected.id or not zkbTrainRegisterMainController.canModify(zkbTrainRegisteredController.selected.id)}"/>-->
+<!--                        <p:commandButton id="editButton"  icon="ui-icon-pencil" title="修改"-->
+<!--                                         action="#{zkbTrainRegisterMainController.prepareModifyRegister(zkbTrainRegisteredController.selected.id)}"-->
+<!--                                         update=":registerEngineerListDlg"-->
+<!--                                         oncomplete="PF('registerEngineerListDialog').show()"-->
+<!--                                         disabled="#{empty zkbTrainRegisteredController.selected.id or not zkbTrainRegisterMainController.canModify(zkbTrainRegisteredController.selected.id)}"/>-->
+<!--                        <p:commandButton id="deleteButton" title="取消" icon="ui-icon-close"-->
+<!--                                         actionListener="#{zkbTrainRegisterMainController.cancelRegister(zkbTrainRegisteredController.selected.id)}"-->
+<!--                                         update=":tab:registeredListForm:datalist :growl"-->
+<!--                                         process="@this"-->
+<!--                                         disabled="#{empty zkbTrainRegisteredController.selected.id or not zkbTrainRegisterMainController.canModify(zkbTrainRegisteredController.selected.id)}">-->
+<!--                            <p:confirm header="取消确认" message="确定要取消此报名吗？" icon="ui-icon-warning"/>-->
+<!--                        </p:commandButton>-->
+<!--                    </f:facet>-->
 
                 </p:dataTable>
             </h:form>
