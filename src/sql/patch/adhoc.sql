@@ -23,3 +23,6 @@ select replace(uuid_generate_v4()::text,'-',''), 4, '', '医学工程处主任',
 
 -- YHAAO-26026 添加设备维保截止日期工单提醒配置项
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '工单维修是否需要判断维保截止日期', 'enableMaintenanceDate', '工单维修是否需要判断维保截止日期', 'f','t',3,'' where not exists(select * from config_item where key = 'enableMaintenanceDate');
+
+-- YHAAO-26051
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation)select replace(uuid_generate_v4()::text,'-',''), 13, 'true', '科室借调是否可调整归还时间', 'enableDeptSecondmentAdjustReturnTime', '科室借调是否可调整归还时间', 'f','t',3,'' where not exists(select * from config_item where key = 'enableDeptSecondmentAdjustReturnTime');
