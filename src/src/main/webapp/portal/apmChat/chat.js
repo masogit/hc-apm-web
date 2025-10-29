@@ -138,8 +138,9 @@ class APMChatApp {
         console.log(selectedText);
         const userName = document.getElementById('userName').value;
         axios.post( this.origin+`/geapm/web/apmChat/chat`,{
-            paramStr: selectedText + '|' + userMessage,
-            userName: userName
+            paramStr: userMessage,
+            userName: userName,
+            selectStorage: selectedText
         }).then(res => {
             if (res) {
                 this.hideTypingIndicator();
