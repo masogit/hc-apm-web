@@ -73,17 +73,17 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增"
                                              actionListener="#{zkbTrainAttendanceRecordController.prepareCreate}"
-                                             update=":zkbTrainRecordEditDlg" oncomplete="PF('zkbTrainRecordEditDialog').show()" />
+                                             update=":zkbTrainRecordEditDlg" oncomplete="PF('zkbTrainRecordEditDialog').show()" rendered="#{userContextService.zkbAdmin}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="编辑"
                                              actionListener="#{zkbTrainAttendanceRecordController.prepareEdit}"
                                              update="zkbTrainRecordEditDlg" oncomplete="PF('zkbTrainRecordEditDialog').show()"
-                                             disabled="#{empty zkbTrainAttendanceRecordController.selected.id}" />
+                                             disabled="#{empty zkbTrainAttendanceRecordController.selected.id}" rendered="#{userContextService.zkbAdmin}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除"
                                              actionListener="#{zkbTrainAttendanceRecordController.delete}"
-                                             update=":listForm:datalist">
+                                             update=":listForm:datalist" rendered="#{userContextService.zkbAdmin}">
                                 <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
                             </p:commandButton>
-                            <p:commandButton id="importButton" ajax="false" title="导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n"/>
+                            <p:commandButton id="importButton" ajax="false" title="导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n" rendered="#{userContextService.zkbAdmin}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="Zkb_Train_Attendance_Record"/>
                             </p:commandButton>
