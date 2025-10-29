@@ -18,7 +18,7 @@ public class DifyStreamService {
 
     public String processDifyStream(DiFyChatRequest chatRequest) throws Exception {
         log.info("start post dify...");
-        RestTemplate restTemplate = SSLUtils.getIgnoreSSLRestTemplate(); //new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();//SSLUtils.getIgnoreSSLRestTemplate();
         log.info("restTemplate get success...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -35,7 +35,7 @@ public class DifyStreamService {
         log.info("start restTemplate post...");
         // 使用RestTemplate执行流式请求
         restTemplate.execute(
-                "https://apm-dify-stg.gehealthcloud.cn/v1/chat-messages",
+                "http://dify-ib/v1/chat-messages",
                 HttpMethod.POST,
                 request -> {
                     request.getHeaders().putAll(headers);
