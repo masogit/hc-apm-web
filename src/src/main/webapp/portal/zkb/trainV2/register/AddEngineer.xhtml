@@ -23,7 +23,7 @@
                     <h:form id="engineerEditForm">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"
                                      style="width:100%">
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbTrainRegisterMainController.actionName != 'View'}">
                                 <label class="label">#{msg.zkbEngineer_name}*</label>
                                 <p:autoComplete id="engineerName"
                                                 value="#{zkbTrainRegisterMainController.selectedEngineer}"
@@ -52,13 +52,20 @@
                                                  style="margin-left: 2px;position: relative;top: -8px;"/>
                             </h:panelGroup>
 
+                            <h:panelGroup rendered="#{zkbTrainRegisterMainController.actionName == 'View'}">
+                                <label class="label">#{msg.zkbEngineer_name}*</label>
+                                <p:inputText value="#{zkbTrainRegisterMainController.selectedDetail.engineerName}"
+                                             disabled="true" style="font-weight:bold;"/>
+                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbEngineer_phone}</label>
                                 <p:inputText id="phone"
                                              value="#{zkbTrainRegisterMainController.selectedDetail.engineerPhone}"
                                              required="false"
                                              requiredMessage="#{msg.zkbEngineer_phone} #{msg.ValidationRequire}"
-                                             class="engineerNameChange">
+                                             class="engineerNameChange"
+                                             disabled="#{zkbTrainRegisterMainController.actionName == 'View'}">
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -69,7 +76,8 @@
                                              value="#{zkbTrainRegisterMainController.selectedDetail.engineerEmail}"
                                              required="false"
                                              requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}"
-                                             class="engineerNameChange">
+                                             class="engineerNameChange"
+                                             disabled="#{zkbTrainRegisterMainController.actionName == 'View'}">
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -80,7 +88,8 @@
                                                value="#{zkbTrainRegisterMainController.selectedDetail.engineerAge}"
                                                required="true"
                                                requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}"
-                                               class="engineerNameChange">
+                                               class="engineerNameChange"
+                                               disabled="#{zkbTrainRegisterMainController.actionName == 'View'}">
                                     <p:ajax/>
                                     <f:convertNumber pattern="0" type="number"/>
                                 </p:inputNumber>
@@ -131,47 +140,55 @@
                                                  icon="ui-icon-clear"
                                                  title="#{msg.Delete}"
                                                  class="popupIconButton"
-                                                 process="@this">
+                                                 process="@this"
+                                                 rendered="#{zkbTrainRegisterMainController.actionName != 'View'}">
                                     <p:confirm header="#{msg.DeleteConformation}"
                                                message="#{msg.DeleteFileConformationMsg}"
                                                icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </p:dataList>
 
-                            <!-- 专项上传按钮 -->
+                            <!-- 上传按钮：仅非查看模式显示 -->
                             <p:fileUpload mode="advanced" label="上传放射体检" auto="true" multiple="false"
                                           fileUploadListener="#{zkbTrainRegisterMainController.handlePhysicalExamUpload}"
                                           update="uploadList" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
-                                          sizeLimit="100000000" dragDropSupport="false"/>
+                                          sizeLimit="100000000" dragDropSupport="false"
+                                          rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
                             <p:fileUpload mode="advanced" label="上传安全证书" auto="true" multiple="false"
                                           fileUploadListener="#{zkbTrainRegisterMainController.handleSafetyCertificateUpload}"
                                           update="uploadList" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
-                                          sizeLimit="100000000" dragDropSupport="false"/>
+                                          sizeLimit="100000000" dragDropSupport="false"
+                                          rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
                             <p:fileUpload mode="advanced" label="上传推荐函" auto="true" multiple="false"
                                           fileUploadListener="#{zkbTrainRegisterMainController.handleRecommendationUpload}"
                                           update="uploadList" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
-                                          sizeLimit="100000000" dragDropSupport="false"/>
+                                          sizeLimit="100000000" dragDropSupport="false"
+                                          rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
 
                             <p:commandButton value="推荐函模板下载" icon="ui-icon-download"
                                              styleClass="ui-button-success"
                                              actionListener="#{zkbTrainRegisterMainController.downLoadTemplate}"
-                                             ajax="false">
+                                             ajax="false"
+                                             rendered="#{zkbTrainRegisterMainController.actionName != 'View'}">
                                 <p:fileDownload value="#{zkbTrainRegisterMainController.exportFile}"/>
                             </p:commandButton>
                         </p:panelGrid>
 
-                        <!-- 按钮：保存 & 取消 -->
+                        <!-- 按钮：仅非查看模式显示 -->
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" validateClient="true"
                                          action="#{zkbTrainRegisterMainController.saveEngineer}"
                                          update=":engineerListForm:detailDatalist"
-                                         oncomplete="PF('registerEngineerEditDlg').hide()"/>
+                                         oncomplete="PF('registerEngineerEditDlg').hide()"
+                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
+
                         <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                         onclick="PF('registerEngineerEditDlg').hide()" process="@this"/>
+                                         onclick="PF('registerEngineerEditDlg').hide()" process="@this"
+                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
                     </h:form>
                 </div>
             </ui:fragment>
 
-            <!-- 视图2：新建工程师 -->
+            <!-- 视图2：新建工程师（仅在非查看模式可用） -->
             <ui:fragment rendered="#{zkbTrainRegisterMainController.engineerFormView == 'create'}">
                 <div id="createEngineerView" style="padding:2px;">
                     <h:form id="engineerCreateForm">
