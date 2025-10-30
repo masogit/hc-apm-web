@@ -104,7 +104,7 @@ class APMChatApp {
             <div class="message-content">
                 <div class="user-info">
                     <i class="${iconClass}" style="${color}"></i>
-                    <span class="${nameClass}" style="${color}">${nameText}</span>
+                    <span class="${nameClass}" style="${color};white-space: pre-wrap;">${nameText}</span>
                 </div>
                 <p class="message-text">${message.message}</p>
                 ${!isUser && index === this.messages.length - 1 ? this.getTypingIndicator() : ''}
