@@ -52,8 +52,12 @@ public class AssetInfoBulkEditCheckService {
 
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
+        return verify(assets);
+    }
+
+    public boolean verify(List<AssetInfo> assets,List<AssetInfo> notPass) {
         if(assets != null && !assets.isEmpty()){
-            for (AssetInfo assetInfo:assets) {
+            for (AssetInfo assetInfo: assets) {
                 String assetDeptUID = assetInfo.getAssetDeptUID();
                 String clinicalDeptUID = assetInfo.getClinicalDeptUID();
                 if(assetDeptUID!=null && clinicalDeptUID !=null &&!assetDeptUID.equals(clinicalDeptUID)){
@@ -77,14 +81,16 @@ public class AssetInfoBulkEditCheckService {
             if(!CollectionUtils.isEmpty(sharedAssetReqDetailGroup)){
                 Set<Map.Entry<String, List<SharedAssetReqDetail>>> sharedAssetReqDetailEntries = sharedAssetReqDetailGroup.entrySet();
                 for (Map.Entry<String, List<SharedAssetReqDetail>> sharedAssetReqDetailEntry : sharedAssetReqDetailEntries) {
+                    String key = sharedAssetReqDetailEntry.getKey();
                     List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailEntry.getValue();
                     if(undone(sharedAssetReqDetailList)){
-                        return false;
+                        AssetInfo assetInfo = assets.stream().filter(item -> item.getUid().equals(key)).findFirst().get();
+                        notPass.add(assetInfo);
                     }
                 }
             }
         }
-        return true;
+        return CollectionUtils.isEmpty(notPass);
     }
 
     private boolean undone(List<SharedAssetReqDetail> sharedAssetReqDetailList) {
@@ -118,6 +124,10 @@ public class AssetInfoBulkEditCheckService {
         return null;
     }
     public boolean verifyForMaintain(List<AssetInfo> assets) {
+        return verifyForMaintain(assets, new ArrayList<>());
+    }
+
+    public boolean verifyForMaintain(List<AssetInfo> assets,List<AssetInfo> notPass) {
         if(assets != null && !assets.isEmpty()){
             Set<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toSet());
             List<String> status = new ArrayList<>();
@@ -140,12 +150,13 @@ public class AssetInfoBulkEditCheckService {
                 for(V2_PmOrder order:v2_pmOrders){
                     List list = status.stream().filter(u -> u.equalsIgnoreCase(order.getCurrentStepId())).collect(Collectors.toList());
                     if (list !=null && !list.isEmpty()) {
-                        return false;
+                        AssetInfo assetInfo = order.getAssetInfo();
+                        notPass.add(assetInfo);
                     }
                 }
             }
         }
-        return true;
+        return CollectionUtils.isEmpty(notPass);
     }
 
     public List<String> verifyForMaintainByBatchEdit(List<AssetInfo> assets) {
@@ -173,14 +184,20 @@ public class AssetInfoBulkEditCheckService {
 
     //验证是否有正在盘点的设备
     public boolean verifyForInventory(List<AssetInfo> assets) {
+        return verifyForInventory(assets,new ArrayList<>());
+    }
+
+    public boolean verifyForInventory(List<AssetInfo> assets,List<AssetInfo> notPass) {
         if(assets != null && !assets.isEmpty()){
             List<Integer> assetIds = assets.stream().map(assetInfo -> assetInfo.getId()).collect(Collectors.toList());
-            int inventoryingAssetCount = inventoryOrderDetailAssetInfoRepository.getInventoryingAssetCount(assetIds);
-            if(inventoryingAssetCount > 0)
-                return false;
+            List<InventoryOrderDetail> inventoryingAssetCount = inventoryOrderDetailAssetInfoRepository.getInventoryingAssetCount(assetIds);
+            inventoryingAssetCount.forEach(item->{
+                notPass.add(item.getAssetInfo());
+            });
         }
-        return true;
+        return CollectionUtils.isEmpty(notPass);
     }
+
     //验证是否有正在盘点的设备
     public List<Integer> verifyForInventoryByBatchEdit(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
@@ -214,17 +231,20 @@ public class AssetInfoBulkEditCheckService {
         return Optional.empty();
     }
     public boolean verifySiteToSite(List<AssetInfo> assets){
+        return verifySiteToSite(assets);
+    }
+
+    public boolean verifySiteToSite(List<AssetInfo> assets,List<AssetInfo> notPass) {
         boolean flag=true;
-        if(CollectionUtils.isEmpty(assets)) return flag;
+        if(CollectionUtils.isEmpty(assets)) return Boolean.TRUE;
         for (AssetInfo asset : assets) {
             if(assetInfoRepository.secondment(asset.getUid()) > 0){
-                flag=false;
-                break;
+                notPass.add(asset);
             }
         }
-        return flag;
+        return CollectionUtils.isEmpty(notPass);
     }
-    
+
     public void deleteNursiteMaintain(AssetInfo assetInfo) {
         //删除检查项工单相关数据
         List<NurseSiteMaintainItem> noCheckedByAssetUidAAndScheduleDate = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidAAndScheduleDate(assetInfo.getUid(), new Date());

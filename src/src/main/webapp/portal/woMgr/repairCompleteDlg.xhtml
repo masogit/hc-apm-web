@@ -8,6 +8,11 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
+    <h:outputStylesheet>
+        .display-none{
+            display: none;
+        }
+    </h:outputStylesheet>
 
     <p:dialog class="repairCompleteDialog" id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
         <h:form id="repairCompleteDialogForm" class="tform">
@@ -279,7 +284,7 @@
                                 <p:column headerText="#{msg.Actions}">
                                     <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
                                     <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditAccDetail(item)}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />
-                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,1)}" update="@(.accessList)" rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}">
+                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,1)}" update="@(.accessList) woTab:repairCompleteDialogForm:addContractor" rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                     <h:outputText value="#{msg.Approved2}" rendered="#{item.id ne '000' and ( empty item.approved? false: item.approved)}" />
@@ -325,28 +330,28 @@
                                 </p:column>
                             </p:dataTable>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrController.enableEngineersWriteRepairOutside}">
-                            <label class="label">#{msg.addContractor}</label>
-                            <p:dataTable id="externalTempUserList" class="externalTempUserList" value="#{workOrderMgrController.externalTempUser}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
-                                         rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                <p:column headerText="#{msg.userName}">
-                                    <h:outputText value="#{item.userName}"/>
-                                </p:column>
-                                <p:column headerText="#{msg.contactPhone}">
-                                    <h:outputText value="#{item.tel}" />
-                                </p:column>
-                                <p:column headerText="#{msg.zkbEngineer_companyName}">
-                                    <h:outputText value="#{item.comName}" />
-                                </p:column>
-                                <p:column headerText="#{msg.Actions}">
-                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"  update="@(.contractorDlg)" oncomplete="PF('contractorDlg').show()" rendered="#{item.id eq '000'}"/>
-                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  update="@(.contractorDlg)" oncomplete="PF('contractorDlg').show()" rendered="#{item.id ne '000'}" />
-<!--                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteContractorl()}" update="@(.externalTempUserList)" rendered="#{item.id ne '000'}">-->
-<!--                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
-<!--                                    </p:commandButton>-->
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
+                            <h:panelGroup id="addContractor" styleClass="#{workOrderMgrController.showEnableEngineersWriteRepairOutside()?'':'display-none'}">
+                                <label class="label">#{msg.addContractor}</label>
+                                <p:dataTable id="externalTempUserList" class="externalTempUserList" value="#{workOrderMgrController.externalTempUser}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
+                                             rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.userName}">
+                                        <h:outputText value="#{item.userName}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.contactPhone}">
+                                        <h:outputText value="#{item.tel}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.zkbEngineer_companyName}">
+                                        <h:outputText value="#{item.comName}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.Actions}">
+                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"  update="@(.contractorDlg)" oncomplete="PF('contractorDlg').show()" rendered="#{item.id eq '000'}"/>
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"  update="@(.contractorDlg)" oncomplete="PF('contractorDlg').show()" rendered="#{item.id ne '000'}" />
+    <!--                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteContractorl()}" update="@(.externalTempUserList)" rendered="#{item.id ne '000'}">-->
+    <!--                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+    <!--                                    </p:commandButton>-->
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
                     </p:panelGrid>
 
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">

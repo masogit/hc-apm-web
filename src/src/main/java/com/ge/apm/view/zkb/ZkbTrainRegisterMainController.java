@@ -4,7 +4,6 @@ import com.ge.apm.dao.ZkbTrainPublishRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.ZkbEngineerService;
-import com.ge.apm.service.zkb.ZkbTrainCourseQuotaService;
 import com.ge.apm.service.zkb.ZkbTrainPublishRegisterService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -97,6 +96,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     @Getter
     @Setter
     private String engineerFormView = "edit"; // 默认为编辑视图
+
+    @Getter
+    @Setter
+    private String viewMode = "";
 
     private BlobFileService blobService;
 
@@ -249,7 +252,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         physicalExamFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
         safetyCertificateFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
         recommendationFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
-     }
+    }
 
     private V2_BlobObject getFileBySubType(List<V2_BlobObject> list, String subType) {
         return list.stream()
@@ -438,6 +441,50 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         } catch (Exception e) {
             logger.error("取消报名失败，ID: " + id, e);
             WebUtil.addErrorMessage("取消报名失败。");
+        }
+    }
+
+    /**
+     * 判断当前用户是否可以修改或取消该报名
+     */
+    public boolean canModify(String registerId) {
+        if (Strings.isNullOrEmpty(registerId)) return false;
+
+        try {
+            ZkbTrainPublishRegister register = zkbTrainPublishRegisterService.getRegisterById(registerId);
+            if (register == null || register.getZkbTrainPublishInfo() == null) {
+                return false;
+            }
+            Date trainStartDate = register.getZkbTrainPublishInfo().getTrainStartDate();
+            if (trainStartDate == null) return true; // 若无日期，默认允许
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(trainStartDate);
+            cal.add(Calendar.DAY_OF_MONTH, -3); // 开始前3天为最后修改时间
+            Date latestCancelDate = cal.getTime();
+
+            return new Date().before(latestCancelDate);
+        } catch (Exception e) {
+            logger.error("检查修改权限失败", e);
+            return false;
+        }
+    }
+
+    /**
+     * 准备查看报名信息（只读）
+     */
+    public void prepareViewRegister(String id) {
+        zkbTrainPublishRegister = zkbTrainPublishRegisterService.getRegisterById(id);
+        if (zkbTrainPublishRegister != null) {
+            zkbTrainPublishRegisterDetailList = zkbTrainPublishRegister.getZkbTrainPublishRegisterDetails();
+            // === 关键：为每个 detail 加载附件 ===
+            for (ZkbTrainPublishRegisterDetail detail : zkbTrainPublishRegisterDetailList) {
+                List<V2_BlobObject> files = zkbTrainPublishRegisterService.queryBlobObject(detail.getId());
+                detail.setV2_blobObjectList(files);
+                v2_blobObjectList = files;
+            }
+            this.actionName = "View";
+            this.viewMode = "view";
         }
     }
 
