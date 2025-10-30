@@ -434,10 +434,10 @@
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth' });
                     } else {
-                        console.log("未找到ID包含 'um5027' 的元素");
+                        console.log("未找到ID包含 '"+targetId+"' 的元素");
                     }
                 }
-            }, 1000); // 调整延迟时间以适应应用加载速度
+            }, 100); // 调整延迟时间以适应应用加载速度
         });
     </script>
 </ui:composition>
