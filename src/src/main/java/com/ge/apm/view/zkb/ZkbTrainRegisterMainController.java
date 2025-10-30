@@ -252,7 +252,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         physicalExamFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
         safetyCertificateFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
         recommendationFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
-     }
+    }
 
     private V2_BlobObject getFileBySubType(List<V2_BlobObject> list, String subType) {
         return list.stream()
@@ -481,6 +481,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             for (ZkbTrainPublishRegisterDetail detail : zkbTrainPublishRegisterDetailList) {
                 List<V2_BlobObject> files = zkbTrainPublishRegisterService.queryBlobObject(detail.getId());
                 detail.setV2_blobObjectList(files);
+                v2_blobObjectList = files;
             }
             this.actionName = "View";
             this.viewMode = "view";
