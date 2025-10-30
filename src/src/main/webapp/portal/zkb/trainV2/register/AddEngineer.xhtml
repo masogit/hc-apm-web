@@ -170,17 +170,17 @@
                             <!-- 上传按钮：仅非查看模式显示 -->
                             <p:fileUpload mode="advanced" label="上传放射体检" auto="true" multiple="false"
                                           fileUploadListener="#{zkbTrainRegisterMainController.handlePhysicalExamUpload}"
-                                          update="uploadList" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
+                                          update="uploadList :engineerEditForm" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
                                           sizeLimit="100000000" dragDropSupport="false"
                                           rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
                             <p:fileUpload mode="advanced" label="上传安全证书" auto="true" multiple="false"
                                           fileUploadListener="#{zkbTrainRegisterMainController.handleSafetyCertificateUpload}"
-                                          update="uploadList" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
+                                          update="uploadList :engineerEditForm" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
                                           sizeLimit="100000000" dragDropSupport="false"
                                           rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
                             <p:fileUpload mode="advanced" label="上传推荐函" auto="true" multiple="false"
                                           fileUploadListener="#{zkbTrainRegisterMainController.handleRecommendationUpload}"
-                                          update="uploadList" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
+                                          update="uploadList :engineerEditForm" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
                                           sizeLimit="100000000" dragDropSupport="false"
                                           rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
 
@@ -208,6 +208,14 @@
                                 </li>
                             </ul>
                         </div>
+
+                        <h:panelGroup>
+                            <h:outputText value="physicalExamFile: #{zkbTrainRegisterMainController.physicalExamFile}"/>
+                            <br/>
+                            <h:outputText value="safetyCertificateFile: #{zkbTrainRegisterMainController.safetyCertificateFile}"/>
+                            <br/>
+                            <h:outputText value="recommendationFile: #{zkbTrainRegisterMainController.recommendationFile}"/>
+                        </h:panelGroup>
 
                         <!-- 按钮：仅非查看模式显示 -->
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" validateClient="true"
