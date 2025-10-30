@@ -263,10 +263,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveEngineer() {
-        if (checkAttachments()) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "附件不全", "请上传放射体检和安全证书和推荐函"));
+        if (!checkAttachments()) {
+            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
             return;
         }
         selectedDetail.setV2_blobObjectList(v2_blobObjectList);
@@ -289,10 +287,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveData() {
-        if (checkAttachments()) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "附件不全", "请上传放射体检和安全证书和推荐函"));
+        if (!checkAttachments()) {
+            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
             return;
         }
         zkbTrainPublishRegisterService.saveData(zkbTrainPublishRegister, zkbTrainPublishRegisterDetailList, currentUser);
@@ -502,7 +498,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
                 .anyMatch(f -> "PHYSICAL_EXAM".equals(f.getBoSubType()));
         boolean hasSafety = v2_blobObjectList.stream()
                 .anyMatch(f -> "SAFETY_CERT".equals(f.getBoSubType()));
-
         return hasPhysical && hasSafety && hasRecommendation;
     }
 
