@@ -104,12 +104,13 @@
 
                         <!-- 附件上传区域 -->
                         <p:panelGrid style="width:100%">
-                            <f:facet name="header">附件上传</f:facet>
+                            <f:facet name="header">附件上传 <span style="color:red">*</span></f:facet>
                             <p:dataList id="uploadList"
                                         value="#{zkbTrainRegisterMainController.v2_blobObjectList}"
                                         var="fileitem"
                                         type="definition"
-                                        emptyMessage="#{msg.noRecordFound}" class="engineerNameChange">
+                                        emptyMessage="#{msg.noRecordFound}" class="engineerNameChange"
+                                        rendered="#{zkbTrainRegisterMainController.actionName != 'View'}">
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                     <!-- 类型标签 -->
                                     <h:outputText value="放射体检"
@@ -121,9 +122,6 @@
                                     <h:outputText value="推荐函"
                                                   style="background:#4caf50; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"
                                                   rendered="#{fileitem.boSubType == 'RECOMMENDATION'}"/>
-<!--                                    <h:outputText value="通用附件"-->
-<!--                                                  style="background:#9e9e9e; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"-->
-<!--                                                  rendered="#{empty fileitem.boSubType or fileitem.boSubType == 'TRAIN_REGISTER'}"/>-->
                                     <!-- 文件链接 -->
                                     <p:commandLink value="#{fileitem.objectName}"
                                                    ajax="false"
@@ -143,6 +141,30 @@
                                                message="#{msg.DeleteFileConformationMsg}"
                                                icon="ui-icon-warning"/>
                                 </p:commandButton>
+                            </p:dataList>
+
+                            <p:dataList id="uploadAttachList"
+                                        value="#{zkbTrainRegisterMainController.selectedDetail.v2_blobObjectList}"
+                                        var="fileitem"
+                                        type="definition"
+                                        emptyMessage="#{msg.noRecordFound}" class="engineerNameChange"
+                                        rendered="#{zkbTrainRegisterMainController.actionName == 'View'}">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <!-- 类型标签 -->
+                                    <h:outputText value="放射体检"
+                                                  style="background:#e91e63; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"
+                                                  rendered="#{fileitem.boSubType == 'PHYSICAL_EXAM'}"/>
+                                    <h:outputText value="安全证书"
+                                                  style="background:#2196f3; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"
+                                                  rendered="#{fileitem.boSubType == 'SAFETY_CERT'}"/>
+                                    <h:outputText value="推荐函"
+                                                  style="background:#4caf50; color:white; padding:2px 6px; border-radius:3px; font-size:0.8em;"
+                                                  rendered="#{fileitem.boSubType == 'RECOMMENDATION'}"/>
+                                    <p:commandLink value="#{fileitem.objectName}"
+                                                   ajax="false"
+                                                   actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"
+                                                   styleClass="p-mr-2"/>
+                                </div>
                             </p:dataList>
 
                             <!-- 上传按钮：仅非查看模式显示 -->
@@ -286,7 +308,6 @@
             </ui:fragment>
 
         </p:outputPanel>
-
     </p:dialog>
 
 </ui:composition>

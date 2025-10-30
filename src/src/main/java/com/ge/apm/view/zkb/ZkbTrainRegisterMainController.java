@@ -21,6 +21,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -262,8 +263,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveEngineer() {
-        logger.info("saveEngineer1----this.v2_blobObjectList.size:{}", v2_blobObjectList.size());
-        logger.info("saveEngineer1----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
+        if (checkAttachments()) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "附件不全", "请上传放射体检和安全证书和推荐函"));
+            return;
+        }
         selectedDetail.setV2_blobObjectList(v2_blobObjectList);
         selectedDetail.setRegisterId(zkbTrainPublishRegister.getId());
         if (StringUtils.isNotBlank(selectedDetail.getId())) {
@@ -279,14 +284,17 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         } else {
             zkbTrainPublishRegisterService.modifyDetail(selectedDetail, v2_blobObjectList, currentUser);
             zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
-            logger.info("saveEngineer2----this.v2_blobObjectList.size:{}", v2_blobObjectList.size());
-            logger.info("saveEngineer2----this.selectedDetail.v2_blobObjectList.size:{}", selectedDetail.getV2_blobObjectList().size());
-
         }
         selectedDetail = null;
     }
 
     public void saveData() {
+        if (checkAttachments()) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "附件不全", "请上传放射体检和安全证书和推荐函"));
+            return;
+        }
         zkbTrainPublishRegisterService.saveData(zkbTrainPublishRegister, zkbTrainPublishRegisterDetailList, currentUser);
     }
 
@@ -481,11 +489,21 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             for (ZkbTrainPublishRegisterDetail detail : zkbTrainPublishRegisterDetailList) {
                 List<V2_BlobObject> files = zkbTrainPublishRegisterService.queryBlobObject(detail.getId());
                 detail.setV2_blobObjectList(files);
-                v2_blobObjectList = files;
             }
             this.actionName = "View";
             this.viewMode = "view";
         }
+    }
+
+    public boolean checkAttachments() {
+        boolean hasRecommendation = v2_blobObjectList.stream()
+                .anyMatch(f -> "RECOMMENDATION".equals(f.getBoSubType()));
+        boolean hasPhysical = v2_blobObjectList.stream()
+                .anyMatch(f -> "PHYSICAL_EXAM".equals(f.getBoSubType()));
+        boolean hasSafety = v2_blobObjectList.stream()
+                .anyMatch(f -> "SAFETY_CERT".equals(f.getBoSubType()));
+
+        return hasPhysical && hasSafety && hasRecommendation;
     }
 
 }
