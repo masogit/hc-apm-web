@@ -196,12 +196,32 @@
                             </p:commandButton>
                         </p:panelGrid>
 
+                        <!-- 在上传按钮之后、保存按钮之前插入 -->
+                        <div style="margin: 10px 0; padding: 8px; background-color: #fef6e6; border: 1px solid #f8c87c; border-radius: 4px;">
+                            <strong>附件上传状态：</strong>
+                            <ul style="margin: 5px 0; list-style: none; padding-left: 0;">
+                                <li style="color: #{empty zkbTrainRegisterMainController.physicalExamFile ? 'red' : 'green'}">
+                                    🔹 放射体检：#{empty zkbTrainRegisterMainController.physicalExamFile ? '未上传' : '已上传'}
+                                </li>
+                                <li style="color: #{empty zkbTrainRegisterMainController.safetyCertificateFile ? 'red' : 'green'}">
+                                    🔹 安全证书：#{empty zkbTrainRegisterMainController.safetyCertificateFile ? '未上传' : '已上传'}
+                                </li>
+                                <li style="color: #{empty zkbTrainRegisterMainController.recommendationFile ? 'red' : 'green'}">
+                                    🔹 推荐函：#{empty zkbTrainRegisterMainController.recommendationFile ? '未上传' : '已上传'}
+                                </li>
+                            </ul>
+                        </div>
+
                         <!-- 按钮：仅非查看模式显示 -->
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" validateClient="true"
-                                         action="#{zkbTrainRegisterMainController.saveEngineer}"
-                                         update=":engineerListForm:detailDatalist"
-                                         oncomplete="PF('registerEngineerEditDlg').hide()"
-                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
+                                          action="#{zkbTrainRegisterMainController.saveEngineer}"
+                                          update=":engineerListForm:detailDatalist"
+                                          oncomplete="PF('registerEngineerEditDlg').hide()"
+                                          rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"
+                                          disabled="#{empty zkbTrainRegisterMainController.physicalExamFile
+                            or empty zkbTrainRegisterMainController.safetyCertificateFile
+                            or empty zkbTrainRegisterMainController.recommendationFile}"
+                                          title="请上传放射体检、安全证书和推荐函后才能保存"/>
 
                         <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"
                                          onclick="PF('registerEngineerEditDlg').hide()" process="@this"
@@ -231,48 +251,24 @@
                                 </h:panelGroup>
 
                                 <h:panelGroup>
-                                    <label class="label">电话</label>
-                                    <p:inputText value="#{zkbTrainRegisterMainController.newEngineer.phone}"/>
+                                    <label class="label">电话*</label>
+                                    <p:inputText value="#{zkbTrainRegisterMainController.newEngineer.phone}"
+                                                 required="true"
+                                                 requiredMessage="#{msg.zkbEngineer_phone} #{msg.ValidationRequire}"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup>
-                                    <label class="label">邮箱</label>
-                                    <p:inputText value="#{zkbTrainRegisterMainController.newEngineer.email}"/>
+                                    <label class="label">邮箱*</label>
+                                    <p:inputText value="#{zkbTrainRegisterMainController.newEngineer.email}"
+                                                 required="true"
+                                                 requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup>
-                                    <label class="label">年龄 *</label>
+                                    <label class="label">年龄*</label>
                                     <p:inputNumber value="#{zkbTrainRegisterMainController.newEngineer.age}"
                                                    decimalPlaces="0" minValue="0" maxValue="999" required="true"
                                                    requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}"/>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <label class="label">学历 *</label>
-                                    <p:inputText
-                                            value="#{zkbTrainRegisterMainController.newEngineer.educationalBackground}"
-                                            required="true"
-                                            requiredMessage="#{msg.zkbEngineer_educationalBackground} #{msg.ValidationRequire}"/>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <label class="label">毕业院校 *</label>
-                                    <p:inputText value="#{zkbTrainRegisterMainController.newEngineer.graduateSchool}"
-                                                 required="true"
-                                                 requiredMessage="#{msg.zkbEngineer_graduateSchool} #{msg.ValidationRequire}"/>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <label class="label">专业 *</label>
-                                    <p:inputText value="#{zkbTrainRegisterMainController.newEngineer.specialty}"
-                                                 required="true"
-                                                 requiredMessage="#{msg.zkbEngineer_specialty} #{msg.ValidationRequire}"/>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <label class="label">SSO</label>
-                                    <p:inputText value="#{zkbTrainRegisterMainController.newEngineer.sso}"
-                                                 disabled="true"/>
                                 </h:panelGroup>
                             </p:panelGrid>
 
