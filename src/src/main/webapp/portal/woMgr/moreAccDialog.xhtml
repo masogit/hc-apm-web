@@ -316,7 +316,7 @@
 
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList @(.cl3) :growl woTab:repairCompleteDialogForm:commandButtonId" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addAcessItem}" value="#{msg.Save}" update="woTab:repairCompleteDialogForm:accessList @(.cl3) :growl woTab:repairCompleteDialogForm:commandButtonId woTab:repairCompleteDialogForm:addContractor" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{workOrderMgrController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogDlg');"/>
                     <p:commandButton actionListener="#{workOrderMgrController.saveAndadd(1)}" rendered="#{workOrderMgrController.switchTmp}" value="#{msg.SaveAndAdd}" update="woTab:moreAccDialogForm woTab:repairCompleteDialogForm:accessList :growl woTab:repairCompleteDialogForm:commandButtonId" icon="ui-icon-check"/>
                 </h:panelGroup>

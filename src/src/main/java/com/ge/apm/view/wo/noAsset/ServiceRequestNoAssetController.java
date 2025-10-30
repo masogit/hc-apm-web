@@ -512,7 +512,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     }
 
     public void onStatusChange() {
-        if (newServiceRequest == null) {
+        if (newServiceRequest == null && selectedSr==null) {
             return;
         }
         if(currentStatus==2){ //选择停机状态

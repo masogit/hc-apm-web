@@ -1,6 +1,7 @@
 package com.ge.apm.view;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -211,14 +212,24 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             }
 
             if (category.equals("4")) {
-                ConfigItem configItem = configItemMap.get("NoAssetDispatchWorkers1");
-                selectedObjectMap.put("NoAssetDispatchWorkers1", userAccountRepository.getByUid(configItem.getShowValue()));
+                ConfigItem configItem = configItemMap.get("NoAssetDispatchWorkers");
+                String showValue = configItem.getShowValue();
+                JSONObject jsonObject = JSONObject.parseObject(showValue);
+                if(jsonObject!=null){
+                    String NoAssetDispatchWorkers1 = (String)jsonObject.get("NoAssetDispatchWorkers1");
+                    String NoAssetDispatchWorkers2 = (String)jsonObject.get("NoAssetDispatchWorkers2");
+                    String AssetHead = (String)jsonObject.get("AssetHead");
+                    if(StringUtils.isNotBlank(NoAssetDispatchWorkers1)){
+                        selectedObjectMap.put("NoAssetDispatchWorkers1", userAccountRepository.getByUid(NoAssetDispatchWorkers1));
+                    }
+                    if(StringUtils.isNotBlank(NoAssetDispatchWorkers2)){
+                        selectedObjectMap.put("NoAssetDispatchWorkers2", userAccountRepository.getByUid(NoAssetDispatchWorkers2));
+                    }
+                    if(StringUtils.isNotBlank(AssetHead)){
+                        selectedObjectMap.put("AssetHead", userAccountRepository.getByUid(AssetHead));
+                    }
+                }
 
-                ConfigItem configItem2 = configItemMap.get("NoAssetDispatchWorkers2");
-                selectedObjectMap.put("NoAssetDispatchWorkers2", userAccountRepository.getByUid(configItem2.getShowValue()));
-
-                ConfigItem configItem3 = configItemMap.get("AssetHead");
-                selectedObjectMap.put("AssetHead", userAccountRepository.getByUid(configItem3.getShowValue()));
             }
             this.searchFilters = null;
         } else {
@@ -283,13 +294,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 if ("setAssetOutStockDept".equals(configItem.getKey())) {
                     selectedObjectMap.remove("assetOutStockDept");
                 }
-                if ("NoAssetDispatchWorkers2".equals(configItem.getKey())) {
+                if ("NoAssetDispatchWorkers".equals(configItem.getKey())) {
                     selectedObjectMap.remove("NoAssetDispatchWorkers2");
-                }
-                if ("NoAssetDispatchWorkers1".equals(configItem.getKey())) {
                     selectedObjectMap.remove("NoAssetDispatchWorkers1");
-                }
-                if ("AssetHead".equals(configItem.getKey())) {
                     selectedObjectMap.remove("AssetHead");
                 }
                 configItem.setShowValue(configItem.getDefaultValue());
@@ -367,16 +374,17 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 this.selected.setShowValue(Optional.ofNullable(assetOutStockDept).map(OrgInfo::getUid).orElse(null));
             }
 
-            if ("NoAssetDispatchWorkers1".equals(this.selected.getKey())) {
-                this.selected.setShowValue(Optional.ofNullable((UserAccount)selectedObjectMap.get("NoAssetDispatchWorkers1")).map(UserAccount::getUid).orElse(null));
-            }
+            if ("NoAssetDispatchWorkers".equals(this.selected.getKey())) {
+                String  NoAssetDispatchWorkers1 = Optional.ofNullable((UserAccount)selectedObjectMap.get("NoAssetDispatchWorkers1")).map(UserAccount::getUid).orElse(null);
+                String  NoAssetDispatchWorkers2 =Optional.ofNullable((UserAccount)selectedObjectMap.get("NoAssetDispatchWorkers2")).map(UserAccount::getUid).orElse(null);
+                String  AssetHead =Optional.ofNullable((UserAccount)selectedObjectMap.get("AssetHead")).map(UserAccount::getUid).orElse(null);
 
-            if ("NoAssetDispatchWorkers2".equals(this.selected.getKey())) {
-                this.selected.setShowValue(Optional.ofNullable((UserAccount)selectedObjectMap.get("NoAssetDispatchWorkers2")).map(UserAccount::getUid).orElse(null));
-            }
+                JSONObject jsonObject = new JSONObject();
 
-            if ("AssetHead".equals(this.selected.getKey())) {
-                this.selected.setShowValue(Optional.ofNullable((UserAccount)selectedObjectMap.get("AssetHead")).map(UserAccount::getUid).orElse(null));
+                jsonObject.put("NoAssetDispatchWorkers1",NoAssetDispatchWorkers1);
+                jsonObject.put("NoAssetDispatchWorkers2",NoAssetDispatchWorkers2);
+                jsonObject.put("AssetHead",AssetHead);
+                this.selected.setShowValue(jsonObject.toJSONString());
             }
 
             if(4 == this.selected.getValueType() || 5 == this.selected.getValueType() || 6 == this.selected.getValueType()){
