@@ -265,10 +265,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
             return;
         }
-
         // 附件已绑定到editingDetail，无需额外操作
         editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
-
         if (StringUtils.isBlank(editingDetail.getId())) {
             editingDetail.setId(UUID.randomUUID().toString());
             editingDetail.setCreatedBy(currentUser.getName());
@@ -278,8 +276,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             editingDetail.setLastModifiedDate(new Date());
             zkbTrainPublishRegisterDetailList.removeIf(detail -> detail.getId().equals(editingDetail.getId()));
         }
-
-        zkbTrainPublishRegisterDetailList.add(editingDetail);
+        if ("Register".equals(actionName)) {
+            zkbTrainPublishRegisterDetailList.add(editingDetail);
+        } else {
+            zkbTrainPublishRegisterService.modifyDetail(editingDetail, currentUser);
+            zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
+        }
         resetEditState();
     }
 
