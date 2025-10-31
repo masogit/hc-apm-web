@@ -23,7 +23,6 @@ import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
@@ -66,6 +65,7 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 	private List<OrgInfo> clinicalDeptList;
 	@Getter @Setter
 	private Boolean enableInventoryMethod = Boolean.FALSE;
+	private List<InventoryOrderDetail> selectedItems;
 
 	@Override
 	protected void init() {
@@ -187,6 +187,24 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
 			filterClinicalDeptOrg = "-1";
 		}
+	}
+
+	public void delete(InventoryOrderDetail inventoryOrderDetail) {
+		dao.delete(inventoryOrderDetail);
+		WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
+	}
+
+	public void bathDelete() {
+		dao.delete(selectedItems);
+		WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
+	}
+
+	public List<InventoryOrderDetail> getSelectedItems() {
+		return selectedItems;
+	}
+
+	public void setSelectedItems(List<InventoryOrderDetail> selectedItems) {
+		this.selectedItems = selectedItems;
 	}
 
 	public List<String> getListClinicalDeptName() {

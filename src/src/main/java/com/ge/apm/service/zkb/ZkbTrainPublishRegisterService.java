@@ -274,4 +274,11 @@ public class ZkbTrainPublishRegisterService {
         }
         zkbTrainPublishRegisterRepository.delete(register);
     }
+
+    public ZkbTrainPublishRegisterDetail getDetailById(String id) {
+        ZkbTrainPublishRegisterDetail detail = zkbTrainPublishRegisterDetailRepository.findById(id);
+        List<V2_BlobObject> files = queryBlobObject(detail.getId());
+        detail.setV2_blobObjectList(files);
+        return detail;
+    }
 }
