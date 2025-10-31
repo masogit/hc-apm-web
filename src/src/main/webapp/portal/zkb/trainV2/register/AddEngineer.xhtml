@@ -215,9 +215,7 @@
                                          update=":engineerListForm:detailDatalist"
                                          oncomplete="PF('registerEngineerEditDlg').hide()"
                                          rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"
-                                         disabled="#{not zkbTrainRegisterMainController.hasPhysicalExam()
-                            or not zkbTrainRegisterMainController.hasSafetyCertificate()
-                            or not zkbTrainRegisterMainController.hasRecommendation()}"
+                                         disabled="#{zkbTrainRegisterMainController.isSaveButtonEnabled()}"
                                          title="请上传放射体检、安全证书和推荐函后才能保存"/>
 
                         <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"
