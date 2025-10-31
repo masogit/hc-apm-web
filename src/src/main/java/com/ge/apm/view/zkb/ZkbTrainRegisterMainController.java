@@ -278,7 +278,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             zkbTrainPublishRegisterDetailList.removeIf(detail -> detail.getId().equals(editingDetail.getId()));
         }
         if (!"Register".equals(actionName)) {
-            zkbTrainPublishRegisterService.modifyDetail(editingDetail, v2_blobObjectList, currentUser);
+            logger.info("this editingDetail.obj size:{},this v2_blobObjectList size:{}", editingDetail.getV2_blobObjectList().size(), v2_blobObjectList.size());
+            zkbTrainPublishRegisterService.modifyDetail(editingDetail, currentUser);
             zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
         }
         zkbTrainPublishRegisterDetailList.add(editingDetail);

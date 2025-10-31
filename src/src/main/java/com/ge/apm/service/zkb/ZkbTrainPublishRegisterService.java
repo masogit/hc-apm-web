@@ -169,7 +169,7 @@ public class ZkbTrainPublishRegisterService {
 //        }
 //    }
 
-    public void modifyDetail(ZkbTrainPublishRegisterDetail detail, List<V2_BlobObject> v2_blobObjectList, UserAccount currentUser) {
+    public void modifyDetail(ZkbTrainPublishRegisterDetail detail, UserAccount currentUser) {
 
         boolean isCreate = detail.getId() == null;
         if (isCreate) {
@@ -184,15 +184,12 @@ public class ZkbTrainPublishRegisterService {
             String tenantUid = register.getTenantUid();
             String courseId = publishInfo.getCourseId();
             zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -1, currentUser);
-        } else {
-            blobObjectRepository.deleteByBoUuid(detail.getId());
         }
 
         zkbTrainPublishRegisterDetailRepository.save(detail);
-
         // 保存新上传的文件
-        if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
-            for (V2_BlobObject blob : v2_blobObjectList) {
+        if (CollectionUtils.isNotEmpty(detail.getV2_blobObjectList())) {
+            for (V2_BlobObject blob : detail.getV2_blobObjectList()) {
                 if (StrUtil.isEmpty(blob.getBoUuid())) {
                     blob.setBoUuid(detail.getId());
                     blob.setCreatedBy(currentUser.getName());
