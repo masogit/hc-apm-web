@@ -69,13 +69,30 @@ public class ZkbTrainPublishService extends MicroServiceInvoker {
             zkbTrainPublishRepository.save(zkbTrainPublishInfo);
             // 课程发布成功, 需要推送短信邮件通知给各个代理商的负责人发短信、邮件通知
             String subject = "培训管理-培训课程发布成功";
-            String content = zkbTrainPublishInfo.getZkbTrainCourse().getCourseType() + "已经发布。请登录APM系统-培训管理进行报名。课程可能会出现调整，请以APM系统显示为准。";
+            String content = "课程 : " + zkbTrainPublishInfo.getZkbTrainCourse().getName() + " 已经发布。请登录APM系统-培训管理进行报名。课程可能会出现调整，请以APM系统显示为准。";
             String token = UserContextService.getAccessToken();
-            this.sendEmail(subject, content, token);
+            sendEmail(subject, content, token); //发邮件通知
+            sendMessage(subject, content, token); //发短信通知
         } else {
             zkbTrainPublishInfo.setLastModifiedBy(userAccount.getUid());
             zkbTrainPublishInfo.setLastModifiedDate(new Date());
             zkbTrainPublishRepository.save(zkbTrainPublishInfo);
+        }
+    }
+
+    private void sendMessage(String subject, String content, String token) {
+        try {
+            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("subject", subject);
+            emailWrapperMap.put("content", content);
+            emailWrapperMap.put("to", "18317125760");
+            String url = getGatewayURL(GatewayURL.SEND_MESSAGE_FOR_TEXT);
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info("content = {}, sendMessage result = {}", content, response.toString());
+        } catch (Exception e) {
+            logger.error("trainPublishSendMessage error", e);
         }
     }
 
@@ -91,7 +108,7 @@ public class ZkbTrainPublishService extends MicroServiceInvoker {
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
             logger.info("content = {}, sendEmail result = {}", content, response.toString());
         } catch (Exception e) {
-            logger.error("train publish sendEmail error", e);
+            logger.error("trainPublishSendEmail error", e);
         }
     }
 
