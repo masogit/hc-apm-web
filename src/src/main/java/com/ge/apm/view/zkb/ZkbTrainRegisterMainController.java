@@ -215,6 +215,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             physicalExamFile = null;
             safetyCertificateFile = null;
             recommendationFile = null;
+
+            PrimeFaces.current().ajax().update("engineerEditForm");
         }
     }
 
