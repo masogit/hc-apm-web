@@ -22,4 +22,6 @@ public interface ZkbEngineerRepository extends GenericRepositoryUUID<ZkbEngineer
     List<ZkbEngineer> findBySso(String sso);
 
     List<ZkbEngineer> findByTenantUID(String tenantUid);
+
+    List<ZkbEngineer> findByPhone(String phone);
 }
