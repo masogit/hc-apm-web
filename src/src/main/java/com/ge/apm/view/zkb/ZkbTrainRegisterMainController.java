@@ -499,6 +499,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         this.newEngineer = new ZkbEngineer();
         this.newEngineerV2BlobObjectList = new ArrayList<>();
         this.removeNewEngineerFileList.clear();
+        this.v2_blobObjectList.clear();
         this.engineerFormView = "edit";
     }
 
