@@ -51,15 +51,15 @@
 
                             <h:panelGroup rendered="#{zkbTrainRegisterMainController.actionName == 'View'}">
                                 <label class="label">#{msg.zkbEngineer_name}*</label>
-                                <p:inputText value="#{zkbTrainRegisterMainController.selectedDetail.engineerName}"
+                                <p:inputText value="#{zkbTrainRegisterMainController.editingDetail.engineerName}"
                                              disabled="true" style="font-weight:bold;"/>
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class="label">#{msg.zkbEngineer_phone}</label>
+                                <label class="label">#{msg.zkbEngineer_phone}*</label>
                                 <p:inputText id="phone"
-                                             value="#{zkbTrainRegisterMainController.selectedDetail.engineerPhone}"
-                                             required="false"
+                                             value="#{zkbTrainRegisterMainController.editingDetail.engineerPhone}"
+                                             required="true"
                                              requiredMessage="#{msg.zkbEngineer_phone} #{msg.ValidationRequire}"
                                              class="engineerNameChange"
                                              disabled="#{zkbTrainRegisterMainController.actionName == 'View'}">
@@ -68,10 +68,10 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class="label">#{msg.zkbEngineer_email}</label>
+                                <label class="label">#{msg.zkbEngineer_email}*</label>
                                 <p:inputText id="email"
-                                             value="#{zkbTrainRegisterMainController.selectedDetail.engineerEmail}"
-                                             required="false"
+                                             value="#{zkbTrainRegisterMainController.editingDetail.engineerEmail}"
+                                             required="true"
                                              requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}"
                                              class="engineerNameChange"
                                              disabled="#{zkbTrainRegisterMainController.actionName == 'View'}">
@@ -82,7 +82,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbEngineer_age}*</label>
                                 <p:inputNumber id="age" decimalPlaces="0" minValue="0" maxValue="999"
-                                               value="#{zkbTrainRegisterMainController.selectedDetail.engineerAge}"
+                                               value="#{zkbTrainRegisterMainController.editingDetail.engineerAge}"
                                                required="true"
                                                requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}"
                                                class="engineerNameChange"
@@ -95,7 +95,7 @@
                             <h:panelGroup>
                                 <label class="label">SSO</label>
                                 <p:inputText id="sso" disabled="true"
-                                             value="#{zkbTrainRegisterMainController.selectedDetail.engineerSso}"
+                                             value="#{zkbTrainRegisterMainController.editingDetail.engineerSso}"
                                              class="engineerNameChange">
                                     <p:ajax/>
                                 </p:inputText>
@@ -144,7 +144,7 @@
                             </p:dataList>
 
                             <p:dataList id="uploadAttachList"
-                                        value="#{zkbTrainRegisterMainController.selectedDetail.v2_blobObjectList}"
+                                        value="#{zkbTrainRegisterMainController.editingDetail.v2_blobObjectList}"
                                         var="fileitem"
                                         type="definition"
                                         emptyMessage="#{msg.noRecordFound}" class="engineerNameChange"
@@ -219,14 +219,14 @@
 
                         <!-- 按钮：仅非查看模式显示 -->
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" validateClient="true"
-                                          action="#{zkbTrainRegisterMainController.saveEngineer}"
-                                          update=":engineerListForm:detailDatalist"
-                                          oncomplete="PF('registerEngineerEditDlg').hide()"
-                                          rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"
-                                          disabled="#{empty zkbTrainRegisterMainController.physicalExamFile
-                            or empty zkbTrainRegisterMainController.safetyCertificateFile
-                            or empty zkbTrainRegisterMainController.recommendationFile}"
-                                          title="请上传放射体检、安全证书和推荐函后才能保存"/>
+                                         action="#{zkbTrainRegisterMainController.saveEngineer}"
+                                         update=":engineerListForm:detailDatalist"
+                                         oncomplete="PF('registerEngineerEditDlg').hide()"
+                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
+<!--                                         disabled="#{empty zkbTrainRegisterMainController.physicalExamFile-->
+<!--                            or empty zkbTrainRegisterMainController.safetyCertificateFile-->
+<!--                            or empty zkbTrainRegisterMainController.recommendationFile}"-->
+<!--                                         title="请上传放射体检、安全证书和推荐函后才能保存"/>-->
 
                         <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"
                                          onclick="PF('registerEngineerEditDlg').hide()" process="@this"
@@ -317,3 +317,6 @@
 </ui:composition>
 
 </html>
+
+
+

@@ -48,6 +48,9 @@ public class ZkbTrainCourseQuota {
     @Column(name = "total_quota")
     private Integer totalQuota = 0;
 
+    @Column(name = "apply_quota")
+    private Integer applyQuota = 0;
+
     @Column(name = "created_by")
     private String createdBy;
 
