@@ -32,9 +32,6 @@
                                                 requiredMessage="#{msg.zkbEngineer_name} #{msg.ValidationRequire}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}"
                                                 completeMethod="#{zkbTrainRegisterMainController.autoCompleteEngineer}">
-                                    <p:ajax event="blur"
-                                            listener="#{zkbTrainRegisterMainController.engineerChange}"
-                                            process="@this" update="@(.engineerNameChange)"/>
                                     <p:ajax event="itemSelect"
                                             listener="#{zkbTrainRegisterMainController.engineerChange}"
                                             process="@this" update="@(.engineerNameChange)"/>
@@ -134,7 +131,7 @@
 
                                 <!-- 删除按钮 -->
                                 <p:commandButton actionListener="#{zkbTrainRegisterMainController.removeFile(fileitem)}"
-                                                 update="uploadList"
+                                                 update="uploadList :engineerEditForm"
                                                  icon="ui-icon-clear"
                                                  title="#{msg.Delete}"
                                                  class="popupIconButton"
@@ -200,36 +197,28 @@
                         <div style="margin: 10px 0; padding: 8px; background-color: #fef6e6; border: 1px solid #f8c87c; border-radius: 4px;">
                             <strong>附件上传状态：</strong>
                             <ul style="margin: 5px 0; list-style: none; padding-left: 0;">
-                                <li style="color: #{empty zkbTrainRegisterMainController.physicalExamFile ? 'red' : 'green'}">
-                                    🔹 放射体检：#{empty zkbTrainRegisterMainController.physicalExamFile ? '未上传' : '已上传'}
+                                <li style="color: #{zkbTrainRegisterMainController.hasPhysicalExam() ? 'green' : 'red'}">
+                                    🔹 放射体检：#{zkbTrainRegisterMainController.hasPhysicalExam() ? '已上传' : '未上传'}
                                 </li>
-                                <li style="color: #{empty zkbTrainRegisterMainController.safetyCertificateFile ? 'red' : 'green'}">
-                                    🔹 安全证书：#{empty zkbTrainRegisterMainController.safetyCertificateFile ? '未上传' : '已上传'}
+                                <li style="color: #{zkbTrainRegisterMainController.hasSafetyCertificate() ? 'green' : 'red'}">
+                                    🔹 安全证书：#{zkbTrainRegisterMainController.hasSafetyCertificate() ? '已上传' : '未上传'}
                                 </li>
-                                <li style="color: #{empty zkbTrainRegisterMainController.recommendationFile ? 'red' : 'green'}">
-                                    🔹 推荐函：#{empty zkbTrainRegisterMainController.recommendationFile ? '未上传' : '已上传'}
+                                <li style="color: #{zkbTrainRegisterMainController.hasRecommendation() ? 'green' : 'red'}">
+                                    🔹 推荐函：#{zkbTrainRegisterMainController.hasRecommendation() ? '已上传' : '未上传'}
                                 </li>
                             </ul>
                         </div>
-
-                        <h:panelGroup>
-                            <h:outputText value="physicalExamFile: #{zkbTrainRegisterMainController.physicalExamFile}"/>
-                            <br/>
-                            <h:outputText value="safetyCertificateFile: #{zkbTrainRegisterMainController.safetyCertificateFile}"/>
-                            <br/>
-                            <h:outputText value="recommendationFile: #{zkbTrainRegisterMainController.recommendationFile}"/>
-                        </h:panelGroup>
 
                         <!-- 按钮：仅非查看模式显示 -->
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" validateClient="true"
                                          action="#{zkbTrainRegisterMainController.saveEngineer}"
                                          update=":engineerListForm:detailDatalist"
                                          oncomplete="PF('registerEngineerEditDlg').hide()"
-                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
-<!--                                         disabled="#{empty zkbTrainRegisterMainController.physicalExamFile-->
-<!--                            or empty zkbTrainRegisterMainController.safetyCertificateFile-->
-<!--                            or empty zkbTrainRegisterMainController.recommendationFile}"-->
-<!--                                         title="请上传放射体检、安全证书和推荐函后才能保存"/>-->
+                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"
+                                         disabled="#{not zkbTrainRegisterMainController.hasPhysicalExam()
+                            or not zkbTrainRegisterMainController.hasSafetyCertificate()
+                            or not zkbTrainRegisterMainController.hasRecommendation()}"
+                                         title="请上传放射体检、安全证书和推荐函后才能保存"/>
 
                         <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"
                                          onclick="PF('registerEngineerEditDlg').hide()" process="@this"
