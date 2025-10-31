@@ -503,6 +503,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
         boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
         boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
-        return hasPhysical && hasSafety && hasRecommendation;
+        return !hasPhysical || !hasSafety || !hasRecommendation;
     }
 }
