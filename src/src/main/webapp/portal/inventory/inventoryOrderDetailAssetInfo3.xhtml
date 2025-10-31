@@ -4,12 +4,13 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <h:form id="inventoryOrderDetailAssetInfo3ListForm">
-	<p:dataTable id="datalist3" value="#{inventoryOrderDetailAssetInfoController3.lazyModel}" var="item" widgetVar="varDataList3" selectionMode="single"
-		selection="#{inventoryOrderDetailAssetInfoController3.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+	<p:dataTable id="datalist3" value="#{inventoryOrderDetailAssetInfoController3.lazyModel}" var="item" widgetVar="varDataList3"
+        selection="#{inventoryOrderDetailAssetInfoController3.selectedItems}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController3.onFilter}" />
+        <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
         <p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}">
             <h:outputText value="#{item.qrCode}" />
         </p:column>
@@ -47,7 +48,18 @@
                 </p:selectOneMenu>
             </f:facet>
         </p:column>
+        <p:column headerText="#{msg.Actions}" style="width: 130px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_NO_LEDGER_DELETE')}">
+            <p:commandButton id="deleteButton" value="删除" actionListener="#{inventoryOrderDetailAssetInfoController3.delete(item)}"
+                             update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm"
+                             process="@this">
+                <p:confirm header="删除确认" message="您确定要删除么？" icon="ui-icon-warning"/>
+            </p:commandButton>
+        </p:column>
 		<f:facet name="{Toolbar}">
+            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.BatchDelete}" process="@this" update=":growl :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"
+                             rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_NO_LEDGER_DELETE')}" validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoController3.bathDelete()}">
+                <p:confirm header="#{msg.DeleteConfirmation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
+            </p:commandButton>
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist3" fileName="InventoryOrderDetailAssetInfo3_export" />
 			</p:commandButton>
