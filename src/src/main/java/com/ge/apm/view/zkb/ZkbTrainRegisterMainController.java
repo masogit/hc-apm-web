@@ -211,11 +211,14 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             editingDetail.setEngineerSso(selectedEngineer.getSso());
 
             // 清空附件（因为选择了新的工程师）
-            v2_blobObjectList.clear();
-            physicalExamFile = null;
-            safetyCertificateFile = null;
-            recommendationFile = null;
-
+            this.v2_blobObjectList.clear();
+            this.v2_blobObjectList = new ArrayList<>();
+            this.physicalExamFile = null;
+            this.safetyCertificateFile = null;
+            this.recommendationFile = null;
+            selectedDetail.setV2_blobObjectList(new ArrayList<>());
+            editingDetail.setV2_blobObjectList(new ArrayList<>());
+            refreshSpecialFiles();
             PrimeFaces.current().ajax().update("engineerEditForm");
         }
     }
