@@ -335,8 +335,20 @@ public class ZkbTrainCourseQuotaService {
         if (newQuota < 0) {
             throw new BusinessException("配额不足，无法完成操作，当前剩余：" + mainQuota.getQuota());
         }
+        if (newQuota > mainQuota.getTotalQuota()) {
+            throw new BusinessException("配额有误，无法完成操作，当前剩余名额大于总名额");
+        }
+
+        int applyQuota = mainQuota.getApplyQuota() + delta;
+        if (applyQuota < 0) {
+            throw new BusinessException("配额有误，无法完成操作，当前申请中名额：" + mainQuota.getApplyQuota());
+        }
+        if (applyQuota > mainQuota.getTotalQuota()) {
+            throw new BusinessException("配额有误，无法完成操作，当前申请中名额大于总名额");
+        }
 
         mainQuota.setQuota(newQuota);
+        mainQuota.setApplyQuota(applyQuota);
         mainQuota.setLastModifiedBy(operator.getName());
         mainQuota.setLastModifiedDate(new Date());
         zkbTrainCourseQuotaRepository.save(mainQuota);
