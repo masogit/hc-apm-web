@@ -281,6 +281,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             logger.info("this editingDetail.obj size:{},this v2_blobObjectList size:{}", editingDetail.getV2_blobObjectList().size(), v2_blobObjectList.size());
             zkbTrainPublishRegisterService.modifyDetail(editingDetail, currentUser);
         }
+        logger.info("saveEngineer v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         zkbTrainPublishRegisterDetailList.add(editingDetail);
         resetEditState();
     }
@@ -486,9 +487,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
 
     // 重置编辑状态（关键优化：避免全局状态残留）
     private void resetEditState() {
+        this.v2_blobObjectList.clear();
         this.editingDetail = null;
         this.selectedDetail = null;
         this.v2_blobObjectList = new ArrayList<>();
+        logger.info("resetEditState v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         PrimeFaces.current().ajax().update("engineerListForm:detailDatalist");
     }
 
