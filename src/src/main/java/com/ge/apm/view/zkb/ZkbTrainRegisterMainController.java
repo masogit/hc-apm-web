@@ -195,6 +195,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             // 同步更新UI显示的附件列表
             this.v2_blobObjectList = new ArrayList<>(currentAttachments);
             editingDetail.setV2_blobObjectList(new ArrayList<>());
+            // 关键修复：更新包含保存按钮的面板
+            PrimeFaces.current().ajax().update("engineerFormPanel");
         }
     }
 
