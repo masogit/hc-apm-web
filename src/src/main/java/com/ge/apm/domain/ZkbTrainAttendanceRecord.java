@@ -85,9 +85,9 @@ public class ZkbTrainAttendanceRecord {
     @Column(name = "sso")
     private String sso;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(insertable=false, updatable=false, name = "sso", referencedColumnName = "sso")
-    private ZkbEngineer zkbEngineer;
+    // 代理商租户Id
+    @Column(name = "tenant_uid")
+    private String tenantUid;
 
     // 电话
     @Column(name = "phone")
