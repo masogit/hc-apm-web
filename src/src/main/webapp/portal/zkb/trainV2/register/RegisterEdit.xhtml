@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -7,7 +8,8 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-    <p:dialog id="registerEngineerListDlg" widgetVar="registerEngineerListDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程报名信息" width="800" height="570">
+    <p:dialog id="registerEngineerListDlg" widgetVar="registerEngineerListDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@(body)" header="课程报名信息" width="800" height="570">
         <h:form id="engineerListForm">
             <p:dataTable id="detailDatalist"
                          value="#{zkbTrainRegisterMainController.zkbTrainPublishRegisterDetailList}"
@@ -52,7 +54,7 @@
                                      id="viewEngineerButton"
                                      icon="ui-icon-search"
                                      title="#{msg.view}"
-                                     actionListener="#{zkbTrainRegisterMainController.prepareViewRegister(zkbTrainRegisterMainController.selectedDetail.id)}"
+                                     actionListener="#{zkbTrainRegisterMainController.prepareViewDetail(zkbTrainRegisterMainController.selectedDetail.id)}"
                                      update=":growl :registerEngineerEditDlg"
                                      oncomplete="PF('registerEngineerEditDlg').show()"
                                      disabled="#{empty zkbTrainRegisterMainController.selectedDetail}"

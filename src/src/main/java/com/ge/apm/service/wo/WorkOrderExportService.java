@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.V2WorkOrderReportDto;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceInvoker;
@@ -100,6 +101,9 @@ public class WorkOrderExportService {
 
     @Autowired
     private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
+
+    @Autowired
+    private I18nMessageService i18nMessageService;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg, OrgInfo clinicalDepte) {
         String token = UserContextService.getAccessToken();
@@ -197,6 +201,11 @@ public class WorkOrderExportService {
             searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, mvsAssetIds));
             workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
         }
+        List<I18nMessage> spare01 = i18nMessageService.getByMsgType("spare01");
+        List<I18nMessage> spare02 = i18nMessageService.getByMsgType("spare02");
+        List<I18nMessage> spare03 = i18nMessageService.getByMsgType("spare03");
+        List<I18nMessage> spare04 = i18nMessageService.getByMsgType("spare04");
+        List<I18nMessage> spare05 = i18nMessageService.getByMsgType("spare05");
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             workOrderExportPojo.setMVSWorkOrder(assetIds.contains(workOrderExportPojo.getAssetId()));
             boolean isReturn = true;
@@ -392,11 +401,12 @@ public class WorkOrderExportService {
             if(workOrderExportPojo.getRiskGrade() != null){
                 workOrderMap.put(WebUtil.getMessage("riskGrade"), FieldValueMessageController.fieldValue("riskGrade", workOrderExportPojo.getRiskGrade().toString()));
             }
-            workOrderMap.put("spare01", workOrderExportPojo.getSpare01());
-            workOrderMap.put("spare02", workOrderExportPojo.getSpare02());
-            workOrderMap.put("spare03", workOrderExportPojo.getSpare03());
-            workOrderMap.put("spare04", workOrderExportPojo.getSpare04());
-            workOrderMap.put("spare05", workOrderExportPojo.getSpare05());
+
+            workOrderMap.put("spare01", findI18nValue(spare01, workOrderExportPojo.getSpare01()));
+            workOrderMap.put("spare02", findI18nValue(spare02, workOrderExportPojo.getSpare02()));
+            workOrderMap.put("spare03", findI18nValue(spare03, workOrderExportPojo.getSpare03()));
+            workOrderMap.put("spare04", findI18nValue(spare04, workOrderExportPojo.getSpare04()));
+            workOrderMap.put("spare05", findI18nValue(spare05, workOrderExportPojo.getSpare05()));
             workOrderMap.put("spare06", workOrderExportPojo.getSpare06());
             workOrderMap.put("spare07", workOrderExportPojo.getSpare07());
             workOrderMap.put("spare08", workOrderExportPojo.getSpare08());
@@ -408,7 +418,14 @@ public class WorkOrderExportService {
         }
         return resultList;
     }
-
+    private String findI18nValue(List<I18nMessage> messages, String key) {
+        return messages == null || key == null ? "" :
+                messages.stream()
+                        .filter(ite -> key.equals(ite.getMsgKey()))
+                        .findFirst()
+                        .map(I18nMessage::getValueZh)
+                        .orElse("");
+    }
     public List<Map<String, Object>> supplementWorkOrder(List<Map<String, Object>> workOrderdata) {
 
         final List<String> woId = workOrderdata.stream()

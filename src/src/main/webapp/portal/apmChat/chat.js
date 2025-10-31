@@ -75,20 +75,51 @@ class APMChatApp {
         const container = document.getElementById('messagesList');
         container.innerHTML = '';
 
+        // 中断上一次正在进行的打字
+        if (this._typingAbort) this._typingAbort.aborted = true;
+        this._typingAbort = { aborted: false };
+
         this.messages.forEach((msg, index) => {
-            const element = this.createMessageElement(msg, index);
+            const element = this.createMessageElement(msg, index, this._typingAbort);
             container.appendChild(element);
         });
     }
-
     // 创建单个消息元素
-    createMessageElement(message, index) {
+    createMessageElement(message, index, abortFlag) {
         const isUser = message.type === 'user';
         const messageClass = isUser ? 'message-right' : 'message-left';
 
         const messageDiv = document.createElement('div');
         messageDiv.className = messageClass;
+
+        // 用模板渲染外壳（包含头像/名字/typing指示器容器）
         messageDiv.innerHTML = this.getMessageHTML(message, isUser, index);
+
+        // 找到文字容器：我们接下来只操作 <p class="message-text">
+        const p = messageDiv.querySelector('.message-text');
+
+        if (isUser) {
+            // 用户消息：一次性渲染（安全：textContent）
+            p.textContent = message.message ?? '';
+        } else {
+            const isLastAssistant = (index === this.messages.length - 1);
+            if (isLastAssistant) {
+                // 助手最后一条：打字机效果
+                // 先确保有 typing 指示器（你已有 getTypingIndicator）
+                // 逐字渲染
+                typeInto(p, message.message ?? '', 15, abortFlag).then(() => {
+                    // 结束后移除 typing 指示器
+                    const typing = messageDiv.querySelector('.typing-indicator');
+                    if (typing) typing.remove();
+                });
+            } else {
+                // 历史助手消息：一次性渲染
+                p.textContent = message.message ?? '';
+                // 历史消息不应显示 typing 指示器，保守移除一下
+                const typing = messageDiv.querySelector('.typing-indicator');
+                if (typing) typing.remove();
+            }
+        }
 
         return messageDiv;
     }
@@ -100,16 +131,21 @@ class APMChatApp {
         const color = isUser ? 'color: #0e77ca' : 'color: #7252bc';
         const nameText = isUser ? message.userName : 'APM小管家';
 
+        // 注意：这里保留 message-text 的占位 <p>，但不在这里塞 innerHTML
+        // 文本在 createMessageElement 里用 textContent/打字函数渲染，避免 XSS
+        // typing 指示器只给“最后一条助手消息”显示
+        const shouldShowTyping = !isUser && index === this.messages.length - 1;
+
         return `
-            <div class="message-content">
-                <div class="user-info">
-                    <i class="${iconClass}" style="${color}"></i>
-                    <span class="${nameClass}" style="${color}">${nameText}</span>
-                </div>
-                <p class="message-text">${message.message}</p>
-                ${!isUser && index === this.messages.length - 1 ? this.getTypingIndicator() : ''}
-            </div>
-        `;
+    <div class="message-content">
+      <div class="user-info">
+        <i class="${iconClass}" style="${color}"></i>
+        <span class="${nameClass}" style="${color};white-space: pre-wrap;">${nameText}</span>
+      </div>
+      <p class="message-text"></p>
+      ${shouldShowTyping ? this.getTypingIndicator() : ''}
+    </div>
+  `;
     }
 
     // 获取输入指示器HTML
@@ -287,6 +323,14 @@ class APMChatApp {
     handleResize() {
         this.scrollToBottom();
     }
+
+    // 安全：避免把外部文本当作 HTML 注入
+    createSafeP(text, className = 'message-text') {
+        const p = document.createElement('p');
+        p.className = className;
+        p.textContent = text ?? '';
+        return p;
+    }
 }
 // 初始化应用
 document.addEventListener('DOMContentLoaded', () => {
@@ -329,3 +373,15 @@ function simulateChat() {
 //
 //     console.log(`切换到知识库: ${selectedText} (${value})`);
 // }
+// 逐字输出（纯前端模拟）
+async function typeInto(el, text, speed = 15, abortFlag) {
+    // 先清空
+    el.textContent = '';
+    // 一次 append 文本节点，CSS 用 pre-wrap 处理换行与空格
+    for (let i = 0; i < text.length; i++) {
+        if (abortFlag?.aborted) return;
+        el.textContent += text[i];
+        // 控制速度
+        await new Promise(r => setTimeout(r, speed));
+    }
+}
