@@ -31,8 +31,9 @@
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">电话</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.phone}"/>
+                    <label class="label">电话*</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.phone}"
+                                 required="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">邮箱</label>
@@ -80,9 +81,9 @@
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">培训形式*</label>
+                    <label class="label">培训形式</label>
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.trainFormat}"
-                                 required="true" requiredMessage="培训形式 #{msg.ValidationRequire}"/>
+                                 requiredMessage="培训形式 #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">培训老师</label>

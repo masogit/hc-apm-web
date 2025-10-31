@@ -1,10 +1,11 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.ZkbContractRepository;
+import com.ge.apm.dao.ZkbEngineerRepository;
 import com.ge.apm.dao.ZkbTrainAttendanceRecordRepository;
-import com.ge.apm.domain.UploadFileErrorTypeEnum;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbTrainAttendanceRecord;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelParser;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -30,6 +31,12 @@ public class ZkbTrainAttendanceRecordService {
 
     @Autowired
     private ZkbTrainAttendanceRecordRepository dao;
+
+    @Autowired
+    private ZkbContractRepository zkbContractRepository;
+
+    @Autowired
+    private ZkbEngineerRepository zkbEngineerRepository;
 
     public List<ZkbTrainAttendanceRecord> handleExcel(UploadedFile file, UserAccount currentUser) {
         List<ZkbTrainAttendanceRecord> importFailedDataList = new ArrayList<>();
@@ -146,8 +153,8 @@ public class ZkbTrainAttendanceRecordService {
                         record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程名称不能为空；");
                         valid = false;
                     }
-                    if (StringUtils.isEmpty(trainFormat)) {
-                        record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "培训形式不能为空；");
+                    if (StringUtils.isEmpty(phone)) {
+                        record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "电话不能为空；");
                         valid = false;
                     }
                     if (StringUtils.isEmpty(traineeName)) {
@@ -201,11 +208,19 @@ public class ZkbTrainAttendanceRecordService {
                     record.setLastModifiedDate(new Date());
                     record.setLastModifiedBy(currentUser.getLoginName());
 
+                    // 设置代理商租户Id
+                    ZkbContract zkbContract= zkbContractRepository.findFirstByContractNo(contractNo);
+                    if (zkbContract != null) {
+                        record.setTenantUid(zkbContract.getTenantUID());
+                    }
+
                     if (!valid) {
                         importFailedDataList.add(record);
                     } else {
                         // 保存成功记录
                         dao.save(record);
+                        // 更新工程师SSO
+                        this.writeSsoToEngineer(record.getPhone(), record.getSso());
                     }
 
                 } catch (Exception e) {
@@ -243,9 +258,40 @@ public class ZkbTrainAttendanceRecordService {
             selected.setCreatedDate(new Date());
             selected.setCreatedBy(currentUser.getLoginName());
         }
+        // 设置代理商租户Id
+        ZkbContract zkbContract= zkbContractRepository.findFirstByContractNo(selected.getContractNo());
+        if (zkbContract != null) {
+            selected.setTenantUid(zkbContract.getTenantUID());
+        }
         selected.setLastModifiedDate(new Date());
         selected.setLastModifiedBy(currentUser.getLoginName());
 
         dao.save(selected);
+
+        // 更新工程师SSO
+        this.writeSsoToEngineer(selected.getPhone(), selected.getSso());
+    }
+
+    private void writeSsoToEngineer(String phone, String sso) {
+        if (StringUtils.isEmpty(phone) || StringUtils.isEmpty(sso)) {
+            return;
+        }
+        List<ZkbEngineer> engineerList = zkbEngineerRepository.findByPhone(phone);
+        if (engineerList == null || engineerList.isEmpty()) {
+            return; // 无匹配工程师，直接返回
+        }
+
+        boolean updated = false;
+        for (ZkbEngineer engineer : engineerList) {
+            if (StringUtils.isEmpty(engineer.getSso())) {
+                engineer.setSso(sso);
+                updated = true;
+            }
+        }
+
+        // 只有在有更新的情况下才保存
+        if (updated) {
+            zkbEngineerRepository.save(engineerList);
+        }
     }
 }

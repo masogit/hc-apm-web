@@ -63,7 +63,7 @@ public class ZkbTrainAttendanceRecordController extends GenericCRUDUUIDControlle
             searchFilters = new ArrayList<>();
         }
         if(this.selectionTenantInfo != null){
-            searchFilters.add(new SearchFilter("zkbEngineer.tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, selectionTenantInfo));
         }
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }

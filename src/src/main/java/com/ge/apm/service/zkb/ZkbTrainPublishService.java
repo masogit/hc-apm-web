@@ -3,8 +3,11 @@ package com.ge.apm.service.zkb;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.budget.BudgetApplicationExportService;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -14,6 +17,10 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
 
@@ -22,15 +29,12 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
-public class ZkbTrainPublishService {
+public class ZkbTrainPublishService extends MicroServiceInvoker {
 
     private static Logger logger = LoggerFactory.getLogger(ZkbTrainPublishService.class);
 
@@ -58,19 +62,38 @@ public class ZkbTrainPublishService {
     }
 
     public void save(ZkbTrainPublishInfo zkbTrainPublishInfo, UserAccount userAccount, ZkbTrainCourse zkbTrainCourse){
-        if(StrUtil.isEmpty(zkbTrainPublishInfo.getId())){
+        if (StrUtil.isEmpty(zkbTrainPublishInfo.getId())){
             zkbTrainPublishInfo.setCreatedBy(userAccount.getUid());
             zkbTrainPublishInfo.setCreatedDate(new Date());
             zkbTrainPublishInfo.setCourseId(zkbTrainCourse.getId());
-        }else{
+            zkbTrainPublishRepository.save(zkbTrainPublishInfo);
+            // 课程发布成功, 需要推送短信邮件通知给各个代理商的负责人发短信、邮件通知
+            String subject = "培训管理-培训课程发布成功";
+            String content = zkbTrainPublishInfo.getZkbTrainCourse().getCourseType() + "已经发布。请登录APM系统-培训管理进行报名。课程可能会出现调整，请以APM系统显示为准。";
+            String token = UserContextService.getAccessToken();
+            this.sendEmail(subject, content, token);
+        } else {
             zkbTrainPublishInfo.setLastModifiedBy(userAccount.getUid());
             zkbTrainPublishInfo.setLastModifiedDate(new Date());
+            zkbTrainPublishRepository.save(zkbTrainPublishInfo);
         }
-        zkbTrainPublishRepository.save(zkbTrainPublishInfo);
     }
 
-
-
+    public void sendEmail(String subject, String content, String token) {
+        try {
+            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("subject", subject);
+            emailWrapperMap.put("content", content);
+            emailWrapperMap.put("to", "550004857@gehealthcare.com");
+            String url = getGatewayURL(GatewayURL.SEND_EMAIL_FOR_TEXT);
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info("content = {}, sendEmail result = {}", content, response.toString());
+        } catch (Exception e) {
+            logger.error("train publish sendEmail error", e);
+        }
+    }
 
     public StreamedContent exportZipFile(ZkbTrainPublishInfo zkbTrainPublishInfo) throws IOException {
         List<ZkbTrainPublishRegister> registerList = zkbTrainPublishRegisterRepository.findByPid(zkbTrainPublishInfo.getId());
