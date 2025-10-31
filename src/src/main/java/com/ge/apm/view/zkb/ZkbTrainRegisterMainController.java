@@ -81,6 +81,9 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     private String selectionTenantInfo;
 
     private static final String ssoStartWith = "ZKB";
+    private static final String PHYSICAL_EXAM = "PHYSICAL_EXAM";
+    private static final String SAFETY_CERT = "SAFETY_CERT";
+    private static final String RECOMMENDATION = "RECOMMENDATION";
 
     // 控制当前视图：edit（编辑）或 create（新建）
     @Getter
@@ -123,10 +126,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     public void prepareDetailCreate() {
         initEngineerList();
         selectedEngineer = null;
-
-        // 创建一个新的临时对象，而不是直接赋给 selectedDetail
         this.editingDetail = new ZkbTrainPublishRegisterDetail();
-        this.v2_blobObjectList = new ArrayList<>();
+        this.editingDetail.setV2_blobObjectList(new ArrayList<>());
         engineerFormView = "edit";
     }
 
@@ -134,23 +135,20 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (selectedDetail == null) return;
 
         initEngineerList();
-
-        // 复制 selectedDetail 到 editingDetail
         this.editingDetail = new ZkbTrainPublishRegisterDetail();
         BeanUtils.copyProperties(selectedDetail, editingDetail);
-
-        // 设置工程师信息
         selectedEngineer = zkbTrainPublishRegisterService.findEngineerById(selectedDetail.getEngineerId());
 
-        // 加载附件 - 区分不同操作模式
-        if ("Register".equals(actionName)) {
-            // 在注册模式下，使用 selectedDetail 的附件
-            this.v2_blobObjectList = new ArrayList<>(selectedDetail.getV2_blobObjectList());
-        } else {
-            // 在修改模式下，查询数据库获取附件
-            this.v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
-            editingDetail.setV2_blobObjectList(new ArrayList<>(v2_blobObjectList));
-        }
+        // 关键优化：使用局部变量处理附件，避免全局污染
+        List<V2_BlobObject> detailAttachments = "Register".equals(actionName)
+                ? new ArrayList<>(selectedDetail.getV2_blobObjectList())
+                : zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
+
+        // 设置附件到临时对象
+        editingDetail.setV2_blobObjectList(new ArrayList<>(detailAttachments));
+        // 仅用于UI显示（不再使用全局变量）
+        this.v2_blobObjectList = new ArrayList<>(detailAttachments);
+
         engineerFormView = "edit";
     }
 
@@ -176,8 +174,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void removeFile(V2_BlobObject v2BlobObject) {
-        v2_blobObjectList.remove(v2BlobObject);
+        // 直接操作当前编辑详情的附件（不再依赖全局变量）
+        List<V2_BlobObject> currentAttachments = editingDetail.getV2_blobObjectList();
+        currentAttachments.remove(v2BlobObject);
         blobService.deleteBlobFile(v2BlobObject);
+        // 同步更新UI显示的附件列表
+        this.v2_blobObjectList = new ArrayList<>(currentAttachments);
     }
 
     public void engineerChange() {
@@ -188,9 +190,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             editingDetail.setEngineerEmail(selectedEngineer.getEmail());
             editingDetail.setEngineerAge(selectedEngineer.getAge());
             editingDetail.setEngineerSso(selectedEngineer.getSso());
-            // 清空附件（因为选择了新的工程师）
-            this.v2_blobObjectList.clear();
-            editingDetail.setV2_blobObjectList(new ArrayList<>());
+
+            // 清空附件（使用当前编辑详情的附件列表）
+            List<V2_BlobObject> currentAttachments = editingDetail.getV2_blobObjectList();
+            currentAttachments.clear();
+            // 同步更新UI显示的附件列表
+            this.v2_blobObjectList = new ArrayList<>(currentAttachments);
         }
     }
 
@@ -199,7 +204,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
             file.setBoSubType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
-            v2_blobObjectList.add(file);
+            // 直接操作当前编辑详情的附件
+            editingDetail.getV2_blobObjectList().add(file);
+            // 同步更新UI显示的附件列表
+            this.v2_blobObjectList = new ArrayList<>(editingDetail.getV2_blobObjectList());
             WebUtil.addSuccessMessage("上传成功: " + file.getObjectName());
         } else {
             WebUtil.addErrorMessage("上传失败");
@@ -210,12 +218,13 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         V2_BlobObject file = blobService.uploadFile(event);
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
-            file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
+            file.setBoSubType(PHYSICAL_EXAM);
             // 移除已存在的同类附件
-            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
-                v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM.equals(f.getBoSubType()));
-            }
-            v2_blobObjectList.add(file);
+            List<V2_BlobObject> attachments = editingDetail.getV2_blobObjectList();
+            attachments.removeIf(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
+            attachments.add(file);
+            // 同步更新UI显示的附件列表
+            this.v2_blobObjectList = new ArrayList<>(attachments);
             WebUtil.addSuccessMessage("放射体检证明上传成功");
         }
     }
@@ -224,12 +233,13 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         V2_BlobObject file = blobService.uploadFile(event);
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
-            file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
+            file.setBoSubType(SAFETY_CERT);
             // 移除已存在的同类附件
-            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
-                v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT.equals(f.getBoSubType()));
-            }
-            v2_blobObjectList.add(file);
+            List<V2_BlobObject> attachments = editingDetail.getV2_blobObjectList();
+            attachments.removeIf(f -> SAFETY_CERT.equals(f.getBoSubType()));
+            attachments.add(file);
+            // 同步更新UI显示的附件列表
+            this.v2_blobObjectList = new ArrayList<>(attachments);
             WebUtil.addSuccessMessage("安全证书上传成功");
         }
     }
@@ -238,21 +248,15 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         V2_BlobObject file = blobService.uploadFile(event);
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
-            file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
+            file.setBoSubType(RECOMMENDATION);
             // 移除已存在的同类附件
-            if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
-                v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION.equals(f.getBoSubType()));
-            }
-            v2_blobObjectList.add(file);
+            List<V2_BlobObject> attachments = editingDetail.getV2_blobObjectList();
+            attachments.removeIf(f -> RECOMMENDATION.equals(f.getBoSubType()));
+            attachments.add(file);
+            // 同步更新UI显示的附件列表
+            this.v2_blobObjectList = new ArrayList<>(attachments);
             WebUtil.addSuccessMessage("推荐函上传成功");
         }
-    }
-
-    private V2_BlobObject getFileBySubType(List<V2_BlobObject> list, String subType) {
-        return list.stream()
-                .filter(f -> subType.equals(f.getBoSubType()))
-                .findFirst()
-                .orElse(null);
     }
 
     public void saveEngineer() {
@@ -261,36 +265,21 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             return;
         }
 
-        // 将附件绑定到 editingDetail
-        editingDetail.setV2_blobObjectList(new ArrayList<>(v2_blobObjectList));
-
-        // 设置 registerId（临时）
+        // 附件已绑定到editingDetail，无需额外操作
         editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
 
-        // 如果是新建，生成 ID
         if (StringUtils.isBlank(editingDetail.getId())) {
             editingDetail.setId(UUID.randomUUID().toString());
             editingDetail.setCreatedBy(currentUser.getName());
             editingDetail.setCreatedDate(new Date());
         } else {
-            // 如果是编辑，更新信息
             editingDetail.setLastModifiedBy(currentUser.getName());
             editingDetail.setLastModifiedDate(new Date());
-
-            // 从主列表中移除旧的详情记录
             zkbTrainPublishRegisterDetailList.removeIf(detail -> detail.getId().equals(editingDetail.getId()));
         }
 
-        // 添加到主列表
         zkbTrainPublishRegisterDetailList.add(editingDetail);
-
-        // 重置编辑状态
-        this.editingDetail = null;
-        this.selectedDetail = null;
-        this.v2_blobObjectList.clear();
-
-        // 刷新 UI 列表
-        PrimeFaces.current().ajax().update("engineerListForm:detailDatalist");
+        resetEditState();
     }
 
     public void saveData() {
@@ -320,7 +309,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         this.zkbEngineerService.fullSso(this.newEngineer, ssoStartWith);
         this.newEngineerV2BlobObjectList = new ArrayList<>();
         this.removeNewEngineerFileList = new ArrayList<>();
-        this.engineerFormView = "create"; // 切换到新建视图
+        this.engineerFormView = "create";
     }
 
     public void createEngineer() {
@@ -339,19 +328,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             }
 
             this.engineerList = zkbTrainPublishRegisterService.queryEngineerListByTenant(currentUser);
-
             WebUtil.addSuccessMessage("工程师 [" + newEngineer.getName() + "] 创建成功");
-
             this.engineerChange();
-
-            // 清空新建工程师的附件列表
-            this.newEngineer = new ZkbEngineer();
-            this.newEngineerV2BlobObjectList = new ArrayList<>();
-            this.removeNewEngineerFileList.clear();
-            this.engineerFormView = "edit";
-
+            resetNewEngineerState();
             PrimeFaces.current().executeScript("PF('registerEngineerEditDlg').show();");
-
         } catch (Exception e) {
             WebUtil.addErrorMessage("创建失败: " + e.getMessage());
         }
@@ -376,10 +356,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void cancelCreateEngineer() {
-        this.newEngineer = new ZkbEngineer();
-        this.newEngineerV2BlobObjectList = new ArrayList<>();
-        this.removeNewEngineerFileList.clear();
-        this.engineerFormView = "edit";
+        resetNewEngineerState();
     }
 
     public TenantInfo getTenantInfo(String tenantInfoUID) {
@@ -395,12 +372,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         exportFile = new DefaultStreamedContent(stream, "application/vnd.ms-word", "公司培训学员推荐函.doc");
     }
 
-    /**
-     * 取消报名：删除指定的报名记录
-     * 限制：培训开始前3天内不允许取消
-     *
-     * @param id ZkbTrainPublishRegister 的主键 ID
-     */
     public void cancelRegister(String id) {
         if (Strings.isNullOrEmpty(id)) {
             WebUtil.addErrorMessage("报名记录ID无效，无法取消。");
@@ -500,34 +471,45 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         this.viewMode = "view";
     }
 
+
+    // 优化后的校验逻辑：使用常量确保匹配
     public boolean checkAttachments() {
-        boolean hasRecommendation = v2_blobObjectList.stream()
-                .anyMatch(f -> "RECOMMENDATION".equals(f.getBoSubType()));
-        boolean hasPhysical = v2_blobObjectList.stream()
-                .anyMatch(f -> "PHYSICAL_EXAM".equals(f.getBoSubType()));
-        boolean hasSafety = v2_blobObjectList.stream()
-                .anyMatch(f -> "SAFETY_CERT".equals(f.getBoSubType()));
+        List<V2_BlobObject> attachments = editingDetail.getV2_blobObjectList();
+        boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
+        boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
+        boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
         return !hasPhysical || !hasSafety || !hasRecommendation;
     }
 
     public boolean hasPhysicalExam() {
-        if (v2_blobObjectList == null || v2_blobObjectList.isEmpty()) {
-            return false;
-        }
-        return v2_blobObjectList.stream().anyMatch(f -> "PHYSICAL_EXAM".equals(f.getBoSubType()));
+        return getAttachments().stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
     }
 
     public boolean hasSafetyCertificate() {
-        if (v2_blobObjectList == null || v2_blobObjectList.isEmpty()) {
-            return false;
-        }
-        return v2_blobObjectList.stream().anyMatch(f -> "SAFETY_CERT".equals(f.getBoSubType()));
+        return getAttachments().stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
     }
 
     public boolean hasRecommendation() {
-        if (v2_blobObjectList == null || v2_blobObjectList.isEmpty()) {
-            return false;
-        }
-        return v2_blobObjectList.stream().anyMatch(f -> "RECOMMENDATION".equals(f.getBoSubType()));
+        return getAttachments().stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
+    }
+
+    // 专用方法：获取当前编辑详情的附件（避免直接访问全局变量）
+    private List<V2_BlobObject> getAttachments() {
+        return editingDetail != null ? editingDetail.getV2_blobObjectList() : Collections.emptyList();
+    }
+
+    // 重置编辑状态（关键优化：避免全局状态残留）
+    private void resetEditState() {
+        this.editingDetail = null;
+        this.selectedDetail = null;
+        this.v2_blobObjectList = new ArrayList<>();
+        PrimeFaces.current().ajax().update("engineerListForm:detailDatalist");
+    }
+
+    private void resetNewEngineerState() {
+        this.newEngineer = new ZkbEngineer();
+        this.newEngineerV2BlobObjectList = new ArrayList<>();
+        this.removeNewEngineerFileList.clear();
+        this.engineerFormView = "edit";
     }
 }
