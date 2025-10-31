@@ -128,6 +128,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         selectedEngineer = null;
         this.editingDetail = new ZkbTrainPublishRegisterDetail();
         this.editingDetail.setV2_blobObjectList(new ArrayList<>());
+        this.v2_blobObjectList = new ArrayList<>();
         engineerFormView = "edit";
     }
 
