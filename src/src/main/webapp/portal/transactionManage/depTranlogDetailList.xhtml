@@ -52,6 +52,9 @@
                          <h:outputText value="#{item2.remark}"/>
                      </p:column>
                     <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="depTranDetailList_export"  />
+                        </p:commandButton>
 
                     <p:commandButton id="addButton" actionListener="#{depTranDetailController.prepareCreate()}"
                                      update="@(.newTrFormGrNew)" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  oncomplete="PF('newTransactionDlg').show()"/>
