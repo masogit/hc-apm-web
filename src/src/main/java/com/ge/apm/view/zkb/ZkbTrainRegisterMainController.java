@@ -267,6 +267,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         }
         // 附件已绑定到editingDetail，无需额外操作
         editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
+
         if (StringUtils.isBlank(editingDetail.getId())) {
             editingDetail.setId(UUID.randomUUID().toString());
             editingDetail.setCreatedBy(currentUser.getName());
@@ -276,12 +277,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             editingDetail.setLastModifiedDate(new Date());
             zkbTrainPublishRegisterDetailList.removeIf(detail -> detail.getId().equals(editingDetail.getId()));
         }
-        if ("Register".equals(actionName)) {
-            zkbTrainPublishRegisterDetailList.add(editingDetail);
-        } else {
-            zkbTrainPublishRegisterService.modifyDetail(editingDetail, currentUser);
+        if (!"Register".equals(actionName)) {
+            zkbTrainPublishRegisterService.modifyDetail(editingDetail, v2_blobObjectList, currentUser);
             zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
         }
+        zkbTrainPublishRegisterDetailList.add(editingDetail);
         resetEditState();
     }
 
