@@ -184,6 +184,8 @@ public class ZkbTrainPublishRegisterService {
             String tenantUid = register.getTenantUid();
             String courseId = publishInfo.getCourseId();
             zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -1, currentUser);
+        } else {
+            blobObjectRepository.deleteByBoUuid(detail.getId());
         }
 
         zkbTrainPublishRegisterDetailRepository.save(detail);
