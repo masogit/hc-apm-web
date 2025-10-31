@@ -154,7 +154,6 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
-                <p:commandButton icon="ui-icon-refresh" actionListener="#{systemConfigItemController.siteToSiteAutoAck(systemConfigItemController.configItemMap.get('showHomepageAverageResponseTime'))}" rendered="#{'true'.equalsIgnoreCase(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').showValue)}" value="自动处理历史未完成工单" style="position: relative;left: 20%;bottom: 42%" />
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
