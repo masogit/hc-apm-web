@@ -13,7 +13,7 @@
     <!-- 单一对话框，包含两个视图：编辑视图 和 新建视图 -->
     <p:dialog id="registerEngineerEditDlg" widgetVar="registerEngineerEditDlg" modal="true" resizable="true"
               draggable="true" appendTo="@(this)" header="工程师信息" width="700" height="550"
-              close="zkbTrainRegisterMainController.cancelCreateEngineer()">
+              close="zkbTrainRegisterMainController.resetNewEngineerState()">
 
         <p:outputPanel id="engineerFormPanel" layout="block">
 
@@ -203,7 +203,7 @@
                                          title="请上传放射体检、安全证书和推荐函后才能保存"/>
 
                         <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                         onclick="PF('registerEngineerEditDlg').hide()" process="@this"
+                                         onclick="zkbTrainRegisterMainController.resetNewEngineerState()" process="@this"
                                          rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
                     </h:form>
                 </div>

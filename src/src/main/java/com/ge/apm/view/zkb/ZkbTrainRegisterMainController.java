@@ -359,10 +359,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         WebUtil.addSuccessMessage("已删除: " + file.getObjectName());
     }
 
-    public void cancelCreateEngineer() {
-        resetNewEngineerState();
-    }
-
     public TenantInfo getTenantInfo(String tenantInfoUID) {
         return zkbEngineerService.getTenantInfo(tenantInfoUID);
     }
@@ -496,10 +492,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     private void resetNewEngineerState() {
+        logger.info("resetNewEngineerState v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         this.newEngineer = new ZkbEngineer();
         this.newEngineerV2BlobObjectList = new ArrayList<>();
         this.removeNewEngineerFileList.clear();
-        this.v2_blobObjectList.clear();
+        this.v2_blobObjectList = new ArrayList<>();
         this.engineerFormView = "edit";
     }
 
