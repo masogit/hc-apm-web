@@ -49,7 +49,7 @@
             </f:facet>
         </p:column>
         <p:column headerText="#{msg.Actions}" style="width: 130px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_NO_LEDGER_DELETE')}">
-            <p:commandButton id="deleteButton" value="删除" actionListener="#{inventoryOrderDetailAssetInfoController3.delete(item)}"
+            <p:commandButton id="deleteButton" value="删除" actionListener="#{inventoryOrderDetailAssetInfoController3.delete(item)}" disabled="#{not empty inventoryOrderDetailAssetInfoController3.inventoryOrder and inventoryOrderDetailAssetInfoController3.inventoryOrder.isFinished}"
                              update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm"
                              process="@this">
                 <p:confirm header="删除确认" message="您确定要删除么？" icon="ui-icon-warning"/>
@@ -57,7 +57,7 @@
         </p:column>
 		<f:facet name="{Toolbar}">
             <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.BatchDelete}" process="@this" update=":growl :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"
-                             rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_NO_LEDGER_DELETE')}" validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoController3.bathDelete()}">
+                             rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_NO_LEDGER_DELETE')}" disabled="#{not empty inventoryOrderDetailAssetInfoController3.inventoryOrder and inventoryOrderDetailAssetInfoController3.inventoryOrder.isFinished}" validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoController3.bathDelete()}">
                 <p:confirm header="#{msg.DeleteConfirmation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
             </p:commandButton>
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
