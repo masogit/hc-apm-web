@@ -219,7 +219,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             selectedDetail.setV2_blobObjectList(new ArrayList<>());
             editingDetail.setV2_blobObjectList(new ArrayList<>());
             refreshSpecialFiles();
-            PrimeFaces.current().ajax().update("engineerEditForm");
         }
     }
 
