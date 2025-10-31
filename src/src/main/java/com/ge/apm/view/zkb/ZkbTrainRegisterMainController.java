@@ -148,7 +148,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         editingDetail.setV2_blobObjectList(new ArrayList<>(detailAttachments));
         // 仅用于UI显示（不再使用全局变量）
         this.v2_blobObjectList = new ArrayList<>(detailAttachments);
-
         engineerFormView = "edit";
     }
 
@@ -190,12 +189,12 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             editingDetail.setEngineerEmail(selectedEngineer.getEmail());
             editingDetail.setEngineerAge(selectedEngineer.getAge());
             editingDetail.setEngineerSso(selectedEngineer.getSso());
-
             // 清空附件（使用当前编辑详情的附件列表）
             List<V2_BlobObject> currentAttachments = editingDetail.getV2_blobObjectList();
             currentAttachments.clear();
             // 同步更新UI显示的附件列表
             this.v2_blobObjectList = new ArrayList<>(currentAttachments);
+            editingDetail.setV2_blobObjectList(new ArrayList<>());
         }
     }
 
@@ -481,23 +480,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         return !hasPhysical || !hasSafety || !hasRecommendation;
     }
 
-    public boolean hasPhysicalExam() {
-        return getAttachments().stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
-    }
-
-    public boolean hasSafetyCertificate() {
-        return getAttachments().stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
-    }
-
-    public boolean hasRecommendation() {
-        return getAttachments().stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
-    }
-
-    // 专用方法：获取当前编辑详情的附件（避免直接访问全局变量）
-    private List<V2_BlobObject> getAttachments() {
-        return editingDetail != null ? editingDetail.getV2_blobObjectList() : Collections.emptyList();
-    }
-
     // 重置编辑状态（关键优化：避免全局状态残留）
     private void resetEditState() {
         this.editingDetail = null;
@@ -511,5 +493,16 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         this.newEngineerV2BlobObjectList = new ArrayList<>();
         this.removeNewEngineerFileList.clear();
         this.engineerFormView = "edit";
+    }
+
+    public boolean isSaveButtonEnabled() {
+        if (editingDetail == null) {
+            return false;
+        }
+        List<V2_BlobObject> attachments = editingDetail.getV2_blobObjectList();
+        boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
+        boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
+        boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
+        return hasPhysical && hasSafety && hasRecommendation;
     }
 }
