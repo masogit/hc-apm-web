@@ -280,7 +280,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (!"Register".equals(actionName)) {
             logger.info("this editingDetail.obj size:{},this v2_blobObjectList size:{}", editingDetail.getV2_blobObjectList().size(), v2_blobObjectList.size());
             zkbTrainPublishRegisterService.modifyDetail(editingDetail, currentUser);
-            zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
         }
         zkbTrainPublishRegisterDetailList.add(editingDetail);
         resetEditState();
