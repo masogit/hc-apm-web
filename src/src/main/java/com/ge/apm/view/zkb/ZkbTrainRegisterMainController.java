@@ -17,11 +17,11 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -104,6 +104,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
 
     private BlobFileService blobService;
 
+    @Getter
+    @Setter
+    private ZkbTrainPublishRegisterDetail editingDetail; // 用于当前正在编辑的临时对象
+
     @Override
     protected void init() {
         super.init();
@@ -119,6 +123,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         zkbTrainPublishRegister = new ZkbTrainPublishRegister();
         zkbTrainPublishRegister.setPid(pid);
         this.actionName = "Register";
+        this.zkbTrainPublishRegisterDetailList = new ArrayList<>(); // 重置详情列表
     }
 
     public void prepareModifyRegister(String id) {
@@ -130,21 +135,42 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     public void prepareDetailCreate() {
         initEngineerList();
         selectedEngineer = null;
-        selectedDetail = new ZkbTrainPublishRegisterDetail();
-        v2_blobObjectList = new ArrayList<>();
-        engineerFormView = "edit"; // 重置为编辑视图
+
+        // 创建一个新的临时对象，而不是直接赋给 selectedDetail
+        this.editingDetail = new ZkbTrainPublishRegisterDetail();
+        this.v2_blobObjectList = new ArrayList<>();
+        this.physicalExamFile = null;
+        this.safetyCertificateFile = null;
+        this.recommendationFile = null;
+
+        engineerFormView = "edit";
     }
 
     public void prepareDetailEdit() {
+        if (selectedDetail == null) return;
+
         initEngineerList();
+
+        // 复制 selectedDetail 到 editingDetail
+        this.editingDetail = new ZkbTrainPublishRegisterDetail();
+        BeanUtils.copyProperties(selectedDetail, editingDetail);
+
+        // 设置工程师信息
         selectedEngineer = zkbTrainPublishRegisterService.findEngineerById(selectedDetail.getEngineerId());
+
+        // 加载附件 - 区分不同操作模式
         if ("Register".equals(actionName)) {
-            v2_blobObjectList = selectedDetail.getV2_blobObjectList();
+            // 在注册模式下，使用 selectedDetail 的附件
+            this.v2_blobObjectList = new ArrayList<>(selectedDetail.getV2_blobObjectList());
         } else {
-            v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
-            selectedDetail.setV2_blobObjectList(v2_blobObjectList);
+            // 在修改模式下，查询数据库获取附件
+            this.v2_blobObjectList = zkbTrainPublishRegisterService.queryBlobObject(selectedDetail.getId());
+            editingDetail.setV2_blobObjectList(new ArrayList<>(v2_blobObjectList));
         }
+
+        // 刷新专项附件引用
         refreshSpecialFiles();
+
         engineerFormView = "edit";
     }
 
@@ -176,21 +202,19 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void engineerChange() {
-        if (selectedEngineer != null) {
-            selectedDetail.setEngineerId(selectedEngineer.getId());
-            selectedDetail.setEngineerName(selectedEngineer.getName());
-            selectedDetail.setEngineerPhone(selectedEngineer.getPhone());
-            selectedDetail.setEngineerEmail(selectedEngineer.getEmail());
-            selectedDetail.setEngineerAge(selectedEngineer.getAge());
-            selectedDetail.setEngineerSso(selectedEngineer.getSso());
+        if (selectedEngineer != null && editingDetail != null) {
+            editingDetail.setEngineerId(selectedEngineer.getId());
+            editingDetail.setEngineerName(selectedEngineer.getName());
+            editingDetail.setEngineerPhone(selectedEngineer.getPhone());
+            editingDetail.setEngineerEmail(selectedEngineer.getEmail());
+            editingDetail.setEngineerAge(selectedEngineer.getAge());
+            editingDetail.setEngineerSso(selectedEngineer.getSso());
 
-            this.v2_blobObjectList.clear();
-            this.v2_blobObjectList = new ArrayList<>();
-            this.physicalExamFile = null;
-            this.safetyCertificateFile = null;
-            this.recommendationFile = null;
-            selectedDetail.setV2_blobObjectList(new ArrayList<>());
-            refreshSpecialFiles();
+            // 清空附件（因为选择了新的工程师）
+            v2_blobObjectList.clear();
+            physicalExamFile = null;
+            safetyCertificateFile = null;
+            recommendationFile = null;
         }
     }
 
@@ -211,6 +235,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
             file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
+            // 移除已存在的同类附件
             if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
                 v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM.equals(f.getBoSubType()));
             }
@@ -225,6 +250,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
             file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
+            // 移除已存在的同类附件
             if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
                 v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT.equals(f.getBoSubType()));
             }
@@ -239,6 +265,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (file != null) {
             file.setBoType(V2_BlobObject.BO_TYPE_TRAIN_REGISTER);
             file.setBoSubType(V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
+            // 移除已存在的同类附件
             if (CollectionUtils.isNotEmpty(v2_blobObjectList)) {
                 v2_blobObjectList.removeIf(f -> V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION.equals(f.getBoSubType()));
             }
@@ -249,7 +276,13 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     private void refreshSpecialFiles() {
-        if (CollectionUtils.isEmpty(v2_blobObjectList)) return;
+        if (CollectionUtils.isEmpty(v2_blobObjectList)) {
+            physicalExamFile = null;
+            safetyCertificateFile = null;
+            recommendationFile = null;
+            return;
+        }
+
         physicalExamFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_PHYSICAL_EXAM);
         safetyCertificateFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_SAFETY_CERT);
         recommendationFile = getFileBySubType(v2_blobObjectList, V2_BlobObject.BO_SUB_TYPE_RECOMMENDATION);
@@ -267,23 +300,40 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
             return;
         }
-        selectedDetail.setV2_blobObjectList(v2_blobObjectList);
-        selectedDetail.setRegisterId(zkbTrainPublishRegister.getId());
-        if (StringUtils.isNotBlank(selectedDetail.getId())) {
-            selectedDetail.setCreatedBy(currentUser.getName());
-            selectedDetail.setCreatedDate(new Date());
+
+        // 将附件绑定到 editingDetail
+        editingDetail.setV2_blobObjectList(new ArrayList<>(v2_blobObjectList));
+
+        // 设置 registerId（临时）
+        editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
+
+        // 如果是新建，生成 ID
+        if (StringUtils.isBlank(editingDetail.getId())) {
+            editingDetail.setId(UUID.randomUUID().toString());
+            editingDetail.setCreatedBy(currentUser.getName());
+            editingDetail.setCreatedDate(new Date());
         } else {
-            selectedDetail.setLastModifiedBy(currentUser.getName());
-            selectedDetail.setLastModifiedDate(new Date());
+            // 如果是编辑，更新信息
+            editingDetail.setLastModifiedBy(currentUser.getName());
+            editingDetail.setLastModifiedDate(new Date());
+
+            // 从主列表中移除旧的详情记录
+            zkbTrainPublishRegisterDetailList.removeIf(detail -> detail.getId().equals(editingDetail.getId()));
         }
-        if ("Register".equals(actionName)) {
-            selectedDetail.setId(UUID.randomUUID().toString());
-            zkbTrainPublishRegisterDetailList.add(selectedDetail);
-        } else {
-            zkbTrainPublishRegisterService.modifyDetail(selectedDetail, v2_blobObjectList, currentUser);
-            zkbTrainPublishRegisterDetailList = zkbTrainPublishRegisterService.queryDetailByRegister(zkbTrainPublishRegister.getId());
-        }
-        selectedDetail = null;
+
+        // 添加到主列表
+        zkbTrainPublishRegisterDetailList.add(editingDetail);
+
+        // 重置编辑状态
+        this.editingDetail = null;
+        this.selectedDetail = null;
+        this.v2_blobObjectList.clear();
+        this.physicalExamFile = null;
+        this.safetyCertificateFile = null;
+        this.recommendationFile = null;
+
+        // 刷新 UI 列表
+        PrimeFaces.current().ajax().update("engineerListForm:detailDatalist");
     }
 
     public void saveData() {
@@ -482,13 +532,20 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         if (zkbTrainPublishRegister != null) {
             zkbTrainPublishRegisterDetailList = zkbTrainPublishRegister.getZkbTrainPublishRegisterDetails();
             // === 关键：为每个 detail 加载附件 ===
-            for (ZkbTrainPublishRegisterDetail detail : zkbTrainPublishRegisterDetailList) {
-                List<V2_BlobObject> files = zkbTrainPublishRegisterService.queryBlobObject(detail.getId());
-                detail.setV2_blobObjectList(files);
-            }
+//            for (ZkbTrainPublishRegisterDetail detail : zkbTrainPublishRegisterDetailList) {
+//                List<V2_BlobObject> files = zkbTrainPublishRegisterService.queryBlobObject(detail.getId());
+//                detail.setV2_blobObjectList(files);
+//            }
             this.actionName = "View";
             this.viewMode = "view";
         }
+    }
+
+    public void prepareViewDetail(String id) {
+        this.selectedDetail = zkbTrainPublishRegisterService.getDetailById(id);
+        this.editingDetail = this.selectedDetail;
+        this.actionName = "View";
+        this.viewMode = "view";
     }
 
     public boolean checkAttachments() {
