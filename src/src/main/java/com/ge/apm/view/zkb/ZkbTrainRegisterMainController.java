@@ -475,11 +475,14 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
 
     // 优化后的校验逻辑：使用常量确保匹配
     public boolean checkAttachments() {
-        List<V2_BlobObject> attachments = editingDetail.getV2_blobObjectList();
-        boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
-        boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
-        boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
-        return !hasPhysical || !hasSafety || !hasRecommendation;
+        if (editingDetail != null) {
+            List<V2_BlobObject> attachments = Optional.ofNullable(editingDetail.getV2_blobObjectList()).orElse(Collections.emptyList());
+            boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
+            boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
+            boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
+            return !hasPhysical || !hasSafety || !hasRecommendation;
+        }
+       return false;
     }
 
     // 重置编辑状态（关键优化：避免全局状态残留）
