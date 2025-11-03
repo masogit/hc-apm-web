@@ -2220,7 +2220,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 disable = false;
             }
         }
-        if (enableMaintenanceContract) {
+        if (enableMaintenanceDate) {
             AssetInfo curAsset = curWorkOrder.getAssetInfo();
             Date warrantyDate = curAsset.getWarrantyDate();
             boolean dateDisable = Optional.ofNullable(warrantyDate).map(date -> DateUtil.now().before(date)).orElse(false);
