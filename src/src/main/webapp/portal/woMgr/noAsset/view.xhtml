@@ -34,14 +34,15 @@
                      <h:outputText value="#{serviceRequestNoAssetController.selected.assetName}" />
                   </h:panelGroup>
                   <h:panelGroup>
+                     <label class="label">#{msg.requestorName}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.requestorName}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
                      <label class="label">#{msg.RepairReporterPhone}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.requestorPhone}" />
                   </h:panelGroup>
 
-                  <h:panelGroup>
-                     <label class="label">#{msg.requestorName}</label>
-                     <h:outputText value="#{serviceRequestNoAssetController.selected.requestorName}" />
-                  </h:panelGroup>
+
                   <h:panelGroup>
                      <label class="label">#{msg.casePriority}*</label>
                      <h:outputText value="#{fieldMsg.fieldValue('casePriority',serviceRequestNoAssetController.selected.casePriority)}" />
