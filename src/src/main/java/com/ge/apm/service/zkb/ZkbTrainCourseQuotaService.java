@@ -341,7 +341,7 @@ public class ZkbTrainCourseQuotaService {
         if (mainQuota.getApplyQuota() == null) {
             mainQuota.setApplyQuota(0);
         }
-        int applyQuota = mainQuota.getApplyQuota() + delta;
+        int applyQuota = mainQuota.getApplyQuota() - delta;
         if (applyQuota < 0) {
             throw new BusinessException("配额有误，无法完成操作，当前申请中名额：" + mainQuota.getApplyQuota());
         }
