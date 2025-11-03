@@ -7,6 +7,8 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class ZkbTrainCourseQuotaService {
+
+    private Logger logger = LoggerFactory.getLogger(ZkbTrainCourseQuotaService.class);
 
 
     @Autowired
@@ -323,7 +327,9 @@ public class ZkbTrainCourseQuotaService {
         New, Exist, Created, Failure, CheckFail
     }
 
+    @Transactional
     public void adjustQuota(String tenantUid, String courseId, int delta, UserAccount operator) {
+
         if (delta == 0) return;
 
         ZkbTrainCourseQuota mainQuota = zkbTrainCourseQuotaRepository.findFirstByTenantUidAndCourseId(tenantUid, courseId);
@@ -348,6 +354,7 @@ public class ZkbTrainCourseQuotaService {
         if (applyQuota > mainQuota.getTotalQuota()) {
             throw new BusinessException("配额有误，无法完成操作，当前申请中名额大于总名额");
         }
+        logger.info("adjustQuota newQuota: {},applyQuota: {}",newQuota,applyQuota);
 
         mainQuota.setQuota(newQuota);
         mainQuota.setApplyQuota(applyQuota);
