@@ -177,7 +177,11 @@ public class ZkbTrainPublishRegisterService {
     @Transactional
     public void modifyDetail(ZkbTrainPublishRegisterDetail detail, UserAccount currentUser) {
 
-        boolean isCreate = detail.getId() == null;
+        boolean isCreate = false;
+        if (detail.getId() == null || detail.getId().contains("temp")) {
+            isCreate = true;
+            detail.setId(null);
+        }
         if (isCreate) {
             ZkbTrainPublishRegister register = zkbTrainPublishRegisterRepository.findById(detail.getRegisterId());
             if (register == null) {
