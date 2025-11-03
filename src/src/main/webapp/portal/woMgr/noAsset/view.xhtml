@@ -34,6 +34,10 @@
                      <h:outputText value="#{serviceRequestNoAssetController.selected.assetName}" />
                   </h:panelGroup>
                   <h:panelGroup>
+                     <label class="label">#{msg.repairSource}</label>
+                     <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',serviceRequestNoAssetController.selected.srRepairSource)}"/>
+                  </h:panelGroup>
+                  <h:panelGroup>
                      <label class="label">#{msg.requestorName}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.requestorName}" />
                   </h:panelGroup>
@@ -74,10 +78,7 @@
                      <label class="label">#{msg.comment}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.comment}"/>
                   </h:panelGroup>
-                  <h:panelGroup>
-                     <label class="label">#{msg.repairSource}</label>
-                     <p:outputLabel value="#{fieldMsg.doGetFieldValue('RepairSource',serviceRequestNoAssetController.selected.srRepairSource)}"/>
-                  </h:panelGroup>
+
                </p:panelGrid>
                <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.audioList}" columns="2" layout="grid" rendered="#{not empty serviceRequestNoAssetController.audioList}">
                   <f:facet name="header">#{msg.requestVoice}</f:facet>
