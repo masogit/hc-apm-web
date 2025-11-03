@@ -262,14 +262,15 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveEngineer() {
-        if (checkAttachments()) {
-            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
-            return;
-        }
+//        if (checkAttachments()) {
+//            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
+//            return;
+//        }
         // 附件已绑定到editingDetail，无需额外操作
         editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
 
         if (StringUtils.isBlank(editingDetail.getId())) {
+            editingDetail.setId("temp_" + UUID.randomUUID().toString().replace("-", ""));
             editingDetail.setCreatedBy(currentUser.getName());
             editingDetail.setCreatedDate(new Date());
         } else {
@@ -285,10 +286,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveData() {
-        if (checkAttachments()) {
-            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
-            return;
-        }
+//        if (checkAttachments()) {
+//            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
+//            return;
+//        }
         zkbTrainPublishRegisterService.saveData(zkbTrainPublishRegister, zkbTrainPublishRegisterDetailList, currentUser);
         WebUtil.addSuccessMessage("报名成功");
     }
