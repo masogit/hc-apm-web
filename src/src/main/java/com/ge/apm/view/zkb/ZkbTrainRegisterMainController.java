@@ -270,7 +270,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
 
         if (StringUtils.isBlank(editingDetail.getId())) {
-            editingDetail.setId(UUID.randomUUID().toString());
             editingDetail.setCreatedBy(currentUser.getName());
             editingDetail.setCreatedDate(new Date());
         } else {
