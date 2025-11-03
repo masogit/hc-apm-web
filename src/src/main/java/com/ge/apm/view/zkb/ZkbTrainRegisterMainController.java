@@ -128,6 +128,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         selectedEngineer = null;
         this.editingDetail = new ZkbTrainPublishRegisterDetail();
         this.editingDetail.setV2_blobObjectList(new ArrayList<>());
+        this.v2_blobObjectList = new ArrayList<>();
         engineerFormView = "edit";
     }
 
@@ -195,6 +196,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             // 同步更新UI显示的附件列表
             this.v2_blobObjectList = new ArrayList<>(currentAttachments);
             editingDetail.setV2_blobObjectList(new ArrayList<>());
+            // 关键修复：更新包含保存按钮的面板
+            PrimeFaces.current().ajax().update("engineerFormPanel");
         }
     }
 
@@ -263,7 +266,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
             return;
         }
-
         // 附件已绑定到editingDetail，无需额外操作
         editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
 
@@ -276,7 +278,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             editingDetail.setLastModifiedDate(new Date());
             zkbTrainPublishRegisterDetailList.removeIf(detail -> detail.getId().equals(editingDetail.getId()));
         }
-
+        if (!"Register".equals(actionName)) {
+            logger.info("this editingDetail.obj size:{},this v2_blobObjectList size:{}", editingDetail.getV2_blobObjectList().size(), v2_blobObjectList.size());
+            zkbTrainPublishRegisterService.modifyDetail(editingDetail, currentUser);
+        }
+        logger.info("saveEngineer v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         zkbTrainPublishRegisterDetailList.add(editingDetail);
         resetEditState();
     }
@@ -352,10 +358,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             removeNewEngineerFileList.add(file);
         }
         WebUtil.addSuccessMessage("已删除: " + file.getObjectName());
-    }
-
-    public void cancelCreateEngineer() {
-        resetNewEngineerState();
     }
 
     public TenantInfo getTenantInfo(String tenantInfoUID) {
@@ -473,25 +475,32 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
 
     // 优化后的校验逻辑：使用常量确保匹配
     public boolean checkAttachments() {
-        List<V2_BlobObject> attachments = editingDetail.getV2_blobObjectList();
-        boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
-        boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
-        boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
-        return !hasPhysical || !hasSafety || !hasRecommendation;
+        if (editingDetail != null) {
+            List<V2_BlobObject> attachments = Optional.ofNullable(editingDetail.getV2_blobObjectList()).orElse(Collections.emptyList());
+            boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
+            boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
+            boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
+            return !hasPhysical || !hasSafety || !hasRecommendation;
+        }
+       return false;
     }
 
     // 重置编辑状态（关键优化：避免全局状态残留）
     private void resetEditState() {
+        this.v2_blobObjectList.clear();
         this.editingDetail = null;
         this.selectedDetail = null;
         this.v2_blobObjectList = new ArrayList<>();
+        logger.info("resetEditState v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         PrimeFaces.current().ajax().update("engineerListForm:detailDatalist");
     }
 
     private void resetNewEngineerState() {
+        logger.info("resetNewEngineerState v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         this.newEngineer = new ZkbEngineer();
         this.newEngineerV2BlobObjectList = new ArrayList<>();
         this.removeNewEngineerFileList.clear();
+        this.v2_blobObjectList = new ArrayList<>();
         this.engineerFormView = "edit";
     }
 
@@ -503,6 +512,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         boolean hasPhysical = attachments.stream().anyMatch(f -> PHYSICAL_EXAM.equals(f.getBoSubType()));
         boolean hasSafety = attachments.stream().anyMatch(f -> SAFETY_CERT.equals(f.getBoSubType()));
         boolean hasRecommendation = attachments.stream().anyMatch(f -> RECOMMENDATION.equals(f.getBoSubType()));
-        return hasPhysical && hasSafety && hasRecommendation;
+        return !hasPhysical || !hasSafety || !hasRecommendation;
     }
 }

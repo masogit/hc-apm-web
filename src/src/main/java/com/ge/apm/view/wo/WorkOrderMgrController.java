@@ -41,6 +41,7 @@ import com.ge.healthcare.cn.common.cons.RepairSourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateField;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
@@ -90,7 +91,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -314,7 +314,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private String newMessage;
     @Getter @Setter
-    private String repairTipMessage = "";
+    private Map<String, String> repairTipMessageMap = MapUtil.newHashMap();
 
     @Getter @Setter
     private boolean enableEngineersWriteRepairOutside;
@@ -2211,6 +2211,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public boolean repairTip(V2_WorkOrder  curWorkOrder) {
         boolean disable = true;
+        String repairTipMessage = "";
         if (enableMaintenanceContract) {
             AssetInfo curAsset = curWorkOrder.getAssetInfo();
             List<ContractInfo> contractInfos = contractInfoRepository.findByAssetUidAndRequestTime(curAsset.getUid());
@@ -2229,6 +2230,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         repairTipMessage += WebUtil.getMessage("confirmRepair") + "！";
+        repairTipMessageMap.put(curWorkOrder.getId(), repairTipMessage);
         return disable;
     }
 

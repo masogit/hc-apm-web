@@ -39,39 +39,39 @@ public class ZkbTrainCourseQuotaService {
 
     public static final String SHEET_NAME = "名额";
 
-    public TenantInfo getTenantInfo(String tenantUID){
+    public TenantInfo getTenantInfo(String tenantUID) {
         return tenantInfoDao.findByuid(tenantUID);
     }
 
-    public void delete(ZkbTrainCourseQuota zkbTrainCourseQuota){
+    public void delete(ZkbTrainCourseQuota zkbTrainCourseQuota) {
         //先删掉detail表
         List<ZkbTrainCourseQuotaDetail> details = zkbTrainCourseQuotaDetailRepository.findByQuotaIdOrderByUniqueIDDesc(zkbTrainCourseQuota.getId());
-        if(CollectionUtils.isNotEmpty(details)){
+        if (CollectionUtils.isNotEmpty(details)) {
             zkbTrainCourseQuotaDetailRepository.delete(details);
         }
         zkbTrainCourseQuotaRepository.delete(zkbTrainCourseQuota);
     }
 
-    public List<TenantInfo> getSourceTenantInfoList(){
+    public List<TenantInfo> getSourceTenantInfoList() {
 
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
         return tenantInfoDao.findBySearchFilter(searchFilters);
     }
 
-    public List<ZkbTrainCourse> queryTrainCourse(){
+    public List<ZkbTrainCourse> queryTrainCourse() {
         return zkbTrainCourseRepository.find();
     }
 
-    public void saveData(ZkbTrainCourseQuota zkbTrainCourseQuota, ZkbTrainCourse zkbTrainCourse, UserAccount userAccount, List<ZkbTrainCourseQuotaDetail> zkbTrainCourseQuotaDetails){
-        if(StrUtil.isEmpty(zkbTrainCourseQuota.getId())){
+    public void saveData(ZkbTrainCourseQuota zkbTrainCourseQuota, ZkbTrainCourse zkbTrainCourse, UserAccount userAccount, List<ZkbTrainCourseQuotaDetail> zkbTrainCourseQuotaDetails) {
+        if (StrUtil.isEmpty(zkbTrainCourseQuota.getId())) {
             zkbTrainCourseQuota.setCreatedBy(userAccount.getUid());
             zkbTrainCourseQuota.setCreatedDate(new Date());
             zkbTrainCourseQuota.setCourseId(zkbTrainCourse.getId());
             zkbTrainCourseQuota.setZkbTrainCourse(zkbTrainCourse);
             zkbTrainCourseQuota.setModality(zkbTrainCourse.getModality());
             zkbTrainCourseQuota = zkbTrainCourseQuotaRepository.save(zkbTrainCourseQuota);
-        }else{
+        } else {
             zkbTrainCourseQuota.setLastModifiedBy(userAccount.getUid());
             zkbTrainCourseQuota.setLastModifiedDate(new Date());
             if (!zkbTrainCourse.getId().equals(zkbTrainCourseQuota.getCourseId())) {
@@ -82,9 +82,9 @@ public class ZkbTrainCourseQuotaService {
             zkbTrainCourseQuotaRepository.save(zkbTrainCourseQuota);
         }
 
-        if(CollectionUtils.isNotEmpty(zkbTrainCourseQuotaDetails)){
-            for(ZkbTrainCourseQuotaDetail detail : zkbTrainCourseQuotaDetails){
-                if(StrUtil.isEmpty(detail.getQuotaId())){
+        if (CollectionUtils.isNotEmpty(zkbTrainCourseQuotaDetails)) {
+            for (ZkbTrainCourseQuotaDetail detail : zkbTrainCourseQuotaDetails) {
+                if (StrUtil.isEmpty(detail.getQuotaId())) {
                     detail.setQuotaId(zkbTrainCourseQuota.getId());
                 }
             }
@@ -98,23 +98,23 @@ public class ZkbTrainCourseQuotaService {
 
     public List<Map<String, Object>> getMapFromTemplate(ExcelDocument doc) throws Exception {
         List<Map<String, Object>> result = new ArrayList<>();
-        for (int i = EXCEL_CONTRACT_DATA_ROW ; i <= doc.getWorkBook().getSheetAt(0).getLastRowNum() + 1 ; i++) {
-            Map< String, Object> rowMap = doc.getDataRowMap(EXCEL_CONTRACT_HEADER_ROW, i);
+        for (int i = EXCEL_CONTRACT_DATA_ROW; i <= doc.getWorkBook().getSheetAt(0).getLastRowNum() + 1; i++) {
+            Map<String, Object> rowMap = doc.getDataRowMap(EXCEL_CONTRACT_HEADER_ROW, i);
 
             Map<String, Object> map = new LinkedHashMap();
             ZkbTrainCourseQuotaImportVO zkbTrainCourseQuotaImportVO = new ZkbTrainCourseQuotaImportVO();
 
             ZkbTrainCourseQuotaRow zkbTrainCourseQuotaRow = new ZkbTrainCourseQuotaRow(zkbTrainCourseQuotaImportVO, rowMap);
             zkbTrainCourseQuotaRow.setFieldStringValue("ContractNo", "setContractNo");
-            zkbTrainCourseQuotaRow.setFieldStringValue("Dealer Name","setTenantName");
-            zkbTrainCourseQuotaRow.setFieldNumValue("总数","setTotalQuota");
+            zkbTrainCourseQuotaRow.setFieldStringValue("Dealer Name", "setTenantName");
+            zkbTrainCourseQuotaRow.setFieldNumValue("总数", "setTotalQuota");
             zkbTrainCourseQuotaRow.setFieldNumValue("剩余名额", "setQuota");
             zkbTrainCourseQuotaRow.setFieldStringValue("CatNO", "setCatNo");
             zkbTrainCourseQuotaRow.setFieldDateValue("SVCStartDate", "setStartDate");
             zkbTrainCourseQuotaRow.setFieldDateValue("SVCEndDate", "setEndDate");
             zkbTrainCourseQuotaRow.setFieldStringValue("UniqueID", "setUniqueID");
             zkbTrainCourseQuotaRow.setFieldStringValue("Modality", "setModality");
-            if(zkbTrainCourseQuotaImportVO.isNull()){
+            if (zkbTrainCourseQuotaImportVO.isNull()) {
                 break;
             }
 
@@ -130,9 +130,9 @@ public class ZkbTrainCourseQuotaService {
     }
 
 
-    protected void importOne(ZkbTrainCourseQuotaImportVO zkbTrainCourseQuotaImportVO,UserAccount currentUser) {
-        ZkbTrainCourseQuota quota = zkbTrainCourseQuotaRepository.findFirstByTenantUidAndContractNoAndCourseId(zkbTrainCourseQuotaImportVO.getTenantUid(),zkbTrainCourseQuotaImportVO.getContractNo(), zkbTrainCourseQuotaImportVO.getCourseId());
-        if(quota == null){
+    protected void importOne(ZkbTrainCourseQuotaImportVO zkbTrainCourseQuotaImportVO, UserAccount currentUser) {
+        ZkbTrainCourseQuota quota = zkbTrainCourseQuotaRepository.findFirstByTenantUidAndContractNoAndCourseId(zkbTrainCourseQuotaImportVO.getTenantUid(), zkbTrainCourseQuotaImportVO.getContractNo(), zkbTrainCourseQuotaImportVO.getCourseId());
+        if (quota == null) {
             quota = new ZkbTrainCourseQuota();
             quota.setContractNo(zkbTrainCourseQuotaImportVO.getContractNo());
             quota.setTenantUid(zkbTrainCourseQuotaImportVO.getTenantUid());
@@ -152,7 +152,7 @@ public class ZkbTrainCourseQuotaService {
             zkbTrainCourseQuotaDetail.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
             zkbTrainCourseQuotaDetail.setQuota(zkbTrainCourseQuotaImportVO.getQuota());
             zkbTrainCourseQuotaDetailRepository.save(zkbTrainCourseQuotaDetail);
-        }else{
+        } else {
             quota.setModality(zkbTrainCourseQuotaImportVO.getModality());
             quota.setStartDate(zkbTrainCourseQuotaImportVO.getStartDate());
             quota.setEndDate(zkbTrainCourseQuotaImportVO.getEndDate());
@@ -163,11 +163,11 @@ public class ZkbTrainCourseQuotaService {
 
 
             List<ZkbTrainCourseQuotaDetail> details = zkbTrainCourseQuotaDetailRepository.findByUniqueID(zkbTrainCourseQuotaImportVO.getUniqueID());
-            if(CollectionUtils.isNotEmpty(details)){
+            if (CollectionUtils.isNotEmpty(details)) {
                 ZkbTrainCourseQuotaDetail detail = details.get(0);
                 int oldTotalQuota = detail.getTotalQuota();
                 int oldQuota = detail.getQuota();
-                if(oldQuota != zkbTrainCourseQuotaImportVO.getQuota() || oldTotalQuota != zkbTrainCourseQuotaImportVO.getTotalQuota()){
+                if (oldQuota != zkbTrainCourseQuotaImportVO.getQuota() || oldTotalQuota != zkbTrainCourseQuotaImportVO.getTotalQuota()) {
                     detail.setQuota(zkbTrainCourseQuotaImportVO.getQuota());
                     detail.setTotalQuota(zkbTrainCourseQuotaImportVO.getTotalQuota());
                     zkbTrainCourseQuotaDetailRepository.save(detail);
@@ -177,7 +177,7 @@ public class ZkbTrainCourseQuotaService {
                     quota.setTotalQuota(quota.getTotalQuota() + cq);
                     quota.setQuota(quota.getQuota() + ctq);
                 }
-            }else{
+            } else {
                 ZkbTrainCourseQuotaDetail zkbTrainCourseQuotaDetail = new ZkbTrainCourseQuotaDetail();
                 zkbTrainCourseQuotaDetail.setUniqueID(zkbTrainCourseQuotaImportVO.getUniqueID());
                 zkbTrainCourseQuotaDetail.setQuotaId(quota.getId());
@@ -193,12 +193,12 @@ public class ZkbTrainCourseQuotaService {
         }
     }
 
-    public void importData(List<Map<String, Object>> importContractMapList,UserAccount currentUser) {
+    public void importData(List<Map<String, Object>> importContractMapList, UserAccount currentUser) {
         try {
             for (Map<String, Object> item : importContractMapList) {
-                if(checkData(item, importContractMapList)) {
-                    ZkbTrainCourseQuotaImportVO vo = (ZkbTrainCourseQuotaImportVO)item.get("vo");
-                    importOne(vo,currentUser);
+                if (checkData(item, importContractMapList)) {
+                    ZkbTrainCourseQuotaImportVO vo = (ZkbTrainCourseQuotaImportVO) item.get("vo");
+                    importOne(vo, currentUser);
                 }
             }
         } catch (Exception e) {
@@ -212,59 +212,59 @@ public class ZkbTrainCourseQuotaService {
         Integer hashCode = Integer.valueOf(item.get("hashCode").toString());
 
         ZkbTrainCourseQuotaRow.clearErrMessage(item);
-        if(vo.getContractNo() == null){
+        if (vo.getContractNo() == null) {
             item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, "合同号不能为空！");
             isValidateData = false;
         }
-        if(StrUtil.isEmpty(vo.getTenantName())){
+        if (StrUtil.isEmpty(vo.getTenantName())) {
             item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, "租户不能为空！");
             isValidateData = false;
-        }else {
-            List<TenantInfo> tenantInfoList = tenantInfoDao.findByNameAndType(vo.getTenantName(),3);
-            if(tenantInfoList == null || tenantInfoList.size() == 0){
+        } else {
+            List<TenantInfo> tenantInfoList = tenantInfoDao.findByNameAndType(vo.getTenantName(), 3);
+            if (tenantInfoList == null || tenantInfoList.size() == 0) {
                 item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTenantUIDExist"));
                 isValidateData = false;
-            }else if(tenantInfoList.size() > 1) {
+            } else if (tenantInfoList.size() > 1) {
                 item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("该代理商名称存在多条数据！"));
                 isValidateData = false;
-            }else{
+            } else {
                 TenantInfo tenantInfo = tenantInfoList.get(0);
                 vo.setTenantUid(tenantInfo.getUid());
             }
         }
-        if(StrUtil.isEmpty(vo.getCatNo())){
+        if (StrUtil.isEmpty(vo.getCatNo())) {
             item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, "CatNO不能为空！");
             isValidateData = false;
-        }else{
+        } else {
             List<ZkbTrainCourse> courseList = zkbTrainCourseRepository.findByCatNo(vo.getCatNo());
-            if(courseList == null || courseList.size() == 0){
+            if (courseList == null || courseList.size() == 0) {
                 item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, "CatNO不存在！");
                 isValidateData = false;
-            }else if(courseList.size() > 1) {
+            } else if (courseList.size() > 1) {
                 item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("该课程名称存在多条数据！"));
                 isValidateData = false;
-            }else{
+            } else {
                 vo.setCourseId(courseList.get(0).getId());
             }
         }
-        if(StrUtil.isEmpty(vo.getModality())){
+        if (StrUtil.isEmpty(vo.getModality())) {
             item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, "Modality不能为空！");
             isValidateData = false;
         }
 
 
-        for (Map<String, Object> tempContractMap: importContractMapList) {
-            ZkbTrainCourseQuotaImportVO tempVO = (ZkbTrainCourseQuotaImportVO)tempContractMap.get("vo");
+        for (Map<String, Object> tempContractMap : importContractMapList) {
+            ZkbTrainCourseQuotaImportVO tempVO = (ZkbTrainCourseQuotaImportVO) tempContractMap.get("vo");
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());
-            if(hashCode.equals(tempHashCode) && vo.getLineNum() != tempVO.getLineNum()){
+            if (hashCode.equals(tempHashCode) && vo.getLineNum() != tempVO.getLineNum()) {
                 item.put("status", ZkbTrainCourseQuotaService.ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorDuplicatedData"));
                 isValidateData = false;
@@ -276,7 +276,7 @@ public class ZkbTrainCourseQuotaService {
 
     public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importMapList) {
         List<Map<String, Object>> result = new ArrayList<>();
-        for (Map<String, Object> map: importMapList) {
+        for (Map<String, Object> map : importMapList) {
             String importStatus = map.get("status").toString();
             if (importStatus == null) {
                 continue;
@@ -310,7 +310,7 @@ public class ZkbTrainCourseQuotaService {
         return hasFailData;
     }
 
-    public List<ZkbTrainCourseQuotaDetail> queryDetailByQuota(String id){
+    public List<ZkbTrainCourseQuotaDetail> queryDetailByQuota(String id) {
         return zkbTrainCourseQuotaDetailRepository.findByQuotaIdOrderByUniqueIDDesc(id);
     }
 
@@ -338,7 +338,9 @@ public class ZkbTrainCourseQuotaService {
         if (newQuota > mainQuota.getTotalQuota()) {
             throw new BusinessException("配额有误，无法完成操作，当前剩余名额大于总名额");
         }
-
+        if (mainQuota.getApplyQuota() == null) {
+            mainQuota.setApplyQuota(0);
+        }
         int applyQuota = mainQuota.getApplyQuota() + delta;
         if (applyQuota < 0) {
             throw new BusinessException("配额有误，无法完成操作，当前申请中名额：" + mainQuota.getApplyQuota());
