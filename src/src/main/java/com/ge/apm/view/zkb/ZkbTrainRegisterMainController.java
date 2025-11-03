@@ -278,10 +278,8 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             zkbTrainPublishRegisterDetailList.removeIf(detail -> detail.getId().equals(editingDetail.getId()));
         }
         if (!"Register".equals(actionName)) {
-            logger.info("this editingDetail.obj size:{},this v2_blobObjectList size:{}", editingDetail.getV2_blobObjectList().size(), v2_blobObjectList.size());
             zkbTrainPublishRegisterService.modifyDetail(editingDetail, currentUser);
         }
-        logger.info("saveEngineer v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         zkbTrainPublishRegisterDetailList.add(editingDetail);
         resetEditState();
     }
@@ -491,13 +489,11 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         this.editingDetail = null;
         this.selectedDetail = null;
         this.v2_blobObjectList = new ArrayList<>();
-        logger.info("resetEditState v2_blobObjectList size:{}", this.v2_blobObjectList.size());
         PrimeFaces.current().ajax().update("engineerListForm:detailDatalist");
     }
 
     private void resetNewEngineerState() {
-        logger.info("resetNewEngineerState v2_blobObjectList size:{}", this.v2_blobObjectList.size());
-        this.newEngineer = new ZkbEngineer();
+         this.newEngineer = new ZkbEngineer();
         this.newEngineerV2BlobObjectList = new ArrayList<>();
         this.removeNewEngineerFileList.clear();
         this.v2_blobObjectList = new ArrayList<>();
