@@ -1752,7 +1752,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             displayAssetsNew.forEach(item->{
                 if(uids.contains(item.getUid())){
                     String errorMessage = item.getErrorMessage();
-                    errorMessage = StringUtils.isNotBlank(errorMessage)?"设备正在科室借调中，不能更换院区!\n":errorMessage+"设备正在科室借调中，不能更换院区!\n";
+                    errorMessage = StringUtils.isBlank(errorMessage)?"设备正在科室借调中，不能更换院区!\n":errorMessage+"设备正在科室借调中，不能更换院区!\n";
                     item.setErrorMessage(errorMessage);
                     displayErrorAssets.add(item);
                 }
