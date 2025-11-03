@@ -43,6 +43,17 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	@Query(value="select pm.* from v2_pm_order pm where id in ?1",nativeQuery = true)
 	public  List<V2_PmOrder> getBatchPmOrderList(List<String> idList);
 
+	@Query(value="select vpo.* from v2_pm_order vpo ,asset_info ai where ai.uid=vpo.asset_uid \n" +
+			"\tand ai.is_deleted != true\n" +
+			"\tand ai.is_valid = true\n" +
+			"\tand (ai.tenant_uid in (?1)\n" +
+			"\tor ai.institution_uid in (?1)\n" +
+			"\tor ai.clinical_dept_uid in (?1)\n" +
+			"\tor ai.asset_dept_uid in (?1)\n" +
+			"\tor ai.hospital_uid in (?1)\n" +
+			"\tor ai.site_uid in (?1)) order by vpo.plan_time asc nulls last,vpo.pm_num asc",nativeQuery = true)
+	public  List<V2_PmOrder> getPmOrderListAll(List<String >OrgUid);
+
 	public V2_PmOrder findById(String Id);
 
 	public List<V2_PmOrder> getByAssetUid(String asset_uid);

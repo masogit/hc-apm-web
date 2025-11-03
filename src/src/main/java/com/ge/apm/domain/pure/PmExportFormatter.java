@@ -70,6 +70,8 @@ public class PmExportFormatter<T> {
 
         Map<String, Object> map = new HashMap<>();
         if(userContextService.isLocale()){
+            map.put(ExportFields.SITENAME.getChinese(), this.getSiteName());
+
             map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
@@ -97,6 +99,8 @@ public class PmExportFormatter<T> {
             }
 
         }else {
+            map.put(ExportFields.SITENAME.getEnglish(), this.getSiteName());
+
             map.put(ExportFields.ASSETNAME.getEnglish(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getEnglish(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getEnglish(), this.getAssetNumber());
@@ -191,6 +195,11 @@ public class PmExportFormatter<T> {
 
     public String getAssetName() {
         return v2_pmOrder.getAssetInfo().getName();
+    }
+
+
+    public String getSiteName() {
+        return v2_pmOrder.getAssetInfo().getClinicalDeptName();
     }
 
     public void setAssetName(String assetName) {

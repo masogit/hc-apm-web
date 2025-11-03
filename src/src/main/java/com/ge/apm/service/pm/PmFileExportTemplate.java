@@ -4,11 +4,13 @@ import com.ge.apm.domain.SystemTemplate;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.pure.PmExportFormatter;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +32,9 @@ public class PmFileExportTemplate extends AssetFileImportBaseService {
     SXSSFWorkbook workBook;
 
     SXSSFSheet pmSheet;
+
+    XSSFWorkbook workBookRead;
+    XSSFSheet sheetXs;
 
     private static final Logger logger = LoggerFactory.getLogger(PmFileExportTemplate.class);
     public InputStream getInputStream() throws IOException {
@@ -43,8 +49,14 @@ public class PmFileExportTemplate extends AssetFileImportBaseService {
         webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
 //        InputStream inputStream = PmFileExportTemplate.class.getClassLoader().getResourceAsStream("template/PmOrder_export.xlsx");
         InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.PM_ORDER_EXPORT.getCode(), SystemTemplateEnum.PM_ORDER_EXPORT.getFileType());
-        workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+//        workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
+
+
+        workBookRead = new XSSFWorkbook(inputStream);
+
+        workBook = new SXSSFWorkbook(workBookRead);
         pmSheet = workBook.getSheet("Sheet1");
+        sheetXs = workBookRead.getSheet("Sheet1");
     }
     public void exportPm(List<V2_PmOrder> assetList, List<String> exportFields,int queryIndex) throws IOException {
         logger.info("export asset list");
@@ -60,6 +72,40 @@ public class PmFileExportTemplate extends AssetFileImportBaseService {
 
         String[] columnTitles = exportFields.toArray(new String[] {});
         writer.writeRowData(EXCEL_PM_HEADER_ROW, columnTitles);
+        int startRow = EXCEL_PM_DATA_ROW;
+
+        for (V2_PmOrder v2PmOrder: pmList) {
+            PmExportFormatter fm = new PmExportFormatter(v2PmOrder);
+            Map<String, Object> rowMap = fm.buildExcelColumnKeyValueMap(queryIndex);
+            writer.writeRowData(startRow, rowMap);
+            if (startRow % 1000 == 0) {
+                logger.info("export PM order rows {}", startRow);
+            }
+            ++startRow;
+
+        }
+
+
+
+    }
+
+    public void writePm(List<V2_PmOrder> pmList,int queryIndex) {
+
+        List<String> columnTitles = new ArrayList<>();
+        if (sheetXs != null && sheetXs.getRow(0) != null) {
+            columnTitles=new ArrayList<>();
+            String[] keyRow = ExcelDocument.getKeyRow(sheetXs, 1);
+            if (keyRow.length > 0) {
+                for (String s : keyRow) {
+                    columnTitles.add(s);
+                }
+            }
+        }
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, pmSheet.getSheetName(),columnTitles);
+
+        int maxRows = pmList.size() + EXCEL_PM_DATA_ROW > ASSET_FORMULA_DEFAULT_MAX_ROWS ? pmList.size() + EXCEL_PM_HEADER_ROW : ASSET_FORMULA_DEFAULT_MAX_ROWS;
+
+
         int startRow = EXCEL_PM_DATA_ROW;
 
         for (V2_PmOrder v2PmOrder: pmList) {

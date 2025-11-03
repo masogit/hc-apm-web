@@ -17,7 +17,9 @@ public enum ExportFields {
     ORDERTYPE("工单类型", "Workorder Type"),
     ORDERCOMMENTS("工单备注", "Workorder Comments"),
     PLANTIME("计划完成时间", "Planned Completion Time"),
-    ACTUALCOMPLETIONTIME("实际完成时间", "Actual Completion Time");
+    ACTUALCOMPLETIONTIME("实际完成时间", "Actual Completion Time"),
+
+    SITENAME("所属院区","Site Name");
 
     private final String english;
 
