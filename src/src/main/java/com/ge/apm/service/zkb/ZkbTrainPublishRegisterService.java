@@ -6,6 +6,8 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ import java.util.List;
 
 @Service
 public class ZkbTrainPublishRegisterService {
+
+    private Logger logger = LoggerFactory.getLogger(ZkbTrainPublishRegisterService.class);
 
     @Autowired
     private ZkbTrainPublishRegisterMapper zkbTrainPublishRegisterMapper;
@@ -192,6 +196,7 @@ public class ZkbTrainPublishRegisterService {
         // 保存新上传的文件
         if (CollectionUtils.isNotEmpty(detail.getV2_blobObjectList())) {
             for (V2_BlobObject blob : detail.getV2_blobObjectList()) {
+                logger.info("modifyDetail V2_BlobObject:{},{},{}",blob.getBoSubType(),blob.getBoUuid(),blob.getBoType());
                 if (StrUtil.isEmpty(blob.getBoUuid())) {
                     blob.setBoUuid(detail.getId());
                     blob.setCreatedBy(currentUser.getName());
