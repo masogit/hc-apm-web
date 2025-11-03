@@ -917,6 +917,9 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     @TableField(exist = false)
     private String terminateBusinessNumber;
+    @Transient
+    @TableField(exist = false)
+    private String workOrderId;
 
 
     @Column(name = "supplier_py_code")
@@ -1114,6 +1117,14 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setTerminateBusinessNumber(String terminateBusinessNumber) {
         this.terminateBusinessNumber = terminateBusinessNumber;
+    }
+
+    public String getWorkOrderId() {
+        return workOrderId;
+    }
+
+    public void setWorkOrderId(String workOrderId) {
+        this.workOrderId = workOrderId;
     }
 
     public boolean isSpecialAsset() {

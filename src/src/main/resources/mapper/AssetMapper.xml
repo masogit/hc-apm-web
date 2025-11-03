@@ -70,7 +70,8 @@
         SELECT
             ai.*,
             al.modify_time AS terminateOperationDate,
-            al.modify_by terminateOperation
+            al.modify_by AS terminateOperation,
+            wo.id AS workOrderId
         FROM
             asset_info ai
         LEFT JOIN (
@@ -80,6 +81,13 @@
                 asset_lifecycle
             WHERE current_status = 4 AND tenant_uid = #{tenantUid}
         ) al ON ai.uid = al.asset_uid AND al.row_number = 1
+        LEFT JOIN (
+            SELECT
+                id, asset_id, row_number()over(partition by asset_id order by created_date desc)
+            FROM
+                v2_work_order
+            WHERE tenant_uid = #{tenantUid} AND status = 1
+        ) wo ON ai.id = wo.asset_id AND wo.row_number = 1
         <include refid="queryCondition"/>
         <if test="orderBy!=null">
            ${orderBy}
@@ -89,6 +97,13 @@
 
     <select id="toBeTerminatedListCount" resultType="long">
         select  count(*) from asset_info ai
+        LEFT JOIN (
+            SELECT
+                id, asset_id, row_number()over(partition by asset_id order by created_date desc)
+            FROM
+                v2_work_order
+            WHERE tenant_uid = #{tenantUid} AND status = 1
+        ) wo ON ai.id = wo.asset_id AND wo.row_number = 1
         <include refid="queryCondition"/>
 
     </select>
@@ -248,6 +263,12 @@
             </if>
             <if test="warrantyDate != null">
                 AND ai.warranty_date  ge #{warrantyDate}
+            </if>
+            <if test="workOrderId != null and workOrderId == 'true'">
+                AND wo.id is not null
+            </if>
+            <if test="workOrderId != null and workOrderId == 'false'">
+                AND wo.id is null
             </if>
 
            <if test="assetDeptOrgUidSet != null">

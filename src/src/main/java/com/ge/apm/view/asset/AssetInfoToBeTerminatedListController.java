@@ -37,8 +37,10 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -647,7 +649,15 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         for (AssetInfo assetInfo : assetInfos) {
             terminateAsset(assetInfo);
         }
-        WebUtil.addSuccessMessage("设备批量报废成功");
+        List<FacesMessage> messageList = FacesContext.getCurrentInstance().getMessageList();
+        long error = messageList.stream().filter(facesMessage -> facesMessage.getSeverity().toString().contains("ERROR")).count();
+        String successMessage;
+        if (error > 0) {
+            successMessage = "其他设备批量报废成功";
+        } else {
+            successMessage = "设备批量报废成功";
+        }
+        WebUtil.addSuccessMessage(successMessage);
         this.selectedMap.clear();
     }
 
@@ -677,7 +687,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
         int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
         if (workOrdersNum > 0) {
-            WebUtil.addErrorMessage(String.format(WebUtil.getMessage("UnfinishedWorkorderCandBeTerminated"), assetInfo.getName()));
+            WebUtil.addErrorMessage(String.format(WebUtil.getMessage("UnfinishedWorkorderCandBeTerminated"), ObjectUtil.isEmpty(assetInfo.getQrCode()) ? assetInfo.getDepartNum() : assetInfo.getQrCode()));
             return true;
         }
 
@@ -1070,6 +1080,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                     break;
                 case "warrantyDate":
                     param.put("warrantyDate", searchFilter.value);
+                    break;
+                case "workOrderId":
+                    param.put("workOrderId", searchFilter.value);
                     break;
 
 

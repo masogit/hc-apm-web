@@ -579,6 +579,16 @@
                 <p:column headerText="报废操作人">
                     <h:outputText value="#{item.terminateOperation}"/>
                 </p:column>
+                <p:column headerText="是否存在未完成工单" filterBy="#{item.workOrderId}" filterMatchMode="EQ">
+                    <h:outputText value="#{item.workOrderId == null ? '否' : '是'}"/>
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                </p:column>
                 <f:facet name="{Toolbar}">
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
                                      actionListener="#{assetInfoToBeTerminatedListController.exportExcel}"
