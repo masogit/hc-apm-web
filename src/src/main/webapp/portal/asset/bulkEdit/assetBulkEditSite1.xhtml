@@ -156,6 +156,47 @@
                 </h:panelGroup>
 
             </p:panelGrid>
+            <p:fieldset>
+                <h:panelGroup>
+                    <p:selectOneRadio id="status" value="#{assetInfoBulkEditController.displayErrorsOnly}">
+                        <p:ajax event="change" process="@this" update="bulkEditForm" />
+                        <f:selectItem itemValue="false" itemLabel="#{msg.AllRecord}"/>
+                        <f:selectItem itemValue="true" itemLabel="#{msg.ErrorRecord}"/>
+                    </p:selectOneRadio>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:dataTable id="assetTable" value="#{assetInfoBulkEditController.displayAssetsNew}"
+                                 var="item" rows="20" paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="#{msg.assetName}">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.departNum}">
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetOwnerName}">
+                            <h:outputText value="#{item.assetOwnerName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}">
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetGroup}">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.manufacture}">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.vendor}">
+                            <h:outputText value="#{item.vendor}"/>
+                        </p:column>
+                        <p:column
+                                headerText="#{msg.CheckResults}">
+                            <h:outputText value="#{item.errorMessage}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+            </p:fieldset>
             <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoBulkEditController.checkedIfNessesaryBeforeCommitBulkEditSite}"
                              disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}"
                              oncomplete="handleComplete(xhr, status, args);" update="bulkEditForm" class="clsBtnChangeSite"/>
@@ -164,6 +205,7 @@
 <!--                        <p:commandButton id="btnBulkEditSite" value="确认批量转科" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoBulkEditController.getSelectedUidList())}"-->
 <!--                                         disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" class="clsBtnChangeSite"/>-->
         </p:fieldset>
+
     </h:form>
         <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
             <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">

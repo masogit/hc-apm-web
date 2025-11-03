@@ -214,6 +214,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private String signatureId;
     @Getter
     private boolean newSignature = true;
+    @Setter
+    @Getter
+    private boolean displayErrorsOnly;
+
+    private List<AssetInfo>  displayErrorAssets;
+
+    private List<AssetInfo>  displayAssetsNew;
 
     @Override
     protected void init() {
@@ -1651,32 +1658,59 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     public void commitBulkEditSite() {
 
         boolean errFlag = false;
+        displayAssetsNew = new ArrayList<>();
+        displayErrorAssets = new ArrayList<>();
         if (!checkIsValidInput()) {
             errFlag = true;
         }
 
         //commit changes after validated
         List<AssetInfo> selectedAssets = assets.getTarget();
+        displayAssetsNew = selectedAssets;
         List<AssetInfo> notPass =new ArrayList<>();
         //验证
         if(!assetInfoBulkEditCheckService.verify(selectedAssets,notPass)){
-            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
-            WebUtil.addErrorMessage("设备: "+collect+", 正在调剂中，不能更换院区!");
+            List<String> uids= notPass.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            WebUtil.addErrorMessage("设备正在调剂中，不能更换院区!");
+            displayAssetsNew.forEach(item->{
+                if(uids.contains(item.getUid())){
+                    String errorMessage = item.getErrorMessage();
+                    errorMessage = StringUtils.isBlank(errorMessage)?"设备正在调剂中，不能更换院区!\n":errorMessage+"设备正在调剂中，不能更换院区!\n";
+                    item.setErrorMessage(errorMessage);
+                    displayErrorAssets.add(item);
+                }
+            });
             errFlag = true;
             notPass.clear();
         }
 
         if(!assetInfoBulkEditCheckService.verifyForMaintain(selectedAssets,notPass)){
-            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
-            WebUtil.addErrorMessage("设备: "+collect+", 正在保养中，不能更换院区！");
+            List<String> uids= notPass.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            WebUtil.addErrorMessage("设备正在保养中，不能更换院区！");
             errFlag = true;
+            displayAssetsNew.forEach(item->{
+                if(uids.contains(item.getUid())){
+                    String errorMessage = item.getErrorMessage();
+                    errorMessage = StringUtils.isBlank(errorMessage)?"设备正在保养中，不能更换院区!\n":errorMessage+"设备正在保养中，不能更换院区!\n";
+                    item.setErrorMessage(errorMessage);
+                    displayErrorAssets.add(item);
+                }
+            });
             notPass.clear();
         }
 
         if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets,notPass)){
-            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
-            WebUtil.addErrorMessage("设备: "+collect+", 正在盘点中，不能更换院区!");
+            List<String> uids= notPass.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            WebUtil.addErrorMessage("设备正在盘点中，不能更换院区!");
             errFlag = true;
+            displayAssetsNew.forEach(item->{
+                if(uids.contains(item.getUid())){
+                    String errorMessage = item.getErrorMessage();
+                    errorMessage = StringUtils.isBlank(errorMessage)?"设备正在盘点中，不能更换院区!\n":errorMessage+"设备正在盘点中，不能更换院区!\n";
+                    item.setErrorMessage(errorMessage);
+                    displayErrorAssets.add(item);
+                }
+            });
             notPass.clear();
         }
 
@@ -1698,15 +1732,32 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             }
         }
         if(CollectionUtils.isNotEmpty(notPass)){
-            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
-            WebUtil.addErrorMessage("设备: "+collect+", 正在维修中，不能更换院区!");
+            List<String> uids= notPass.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            WebUtil.addErrorMessage("设备正在维修中，不能更换院区!");
+            displayAssetsNew.forEach(item->{
+                if(uids.contains(item.getUid())){
+                    String errorMessage = item.getErrorMessage();
+                    errorMessage = StringUtils.isBlank(errorMessage)?"设备正在维修，不能更换院区!\n":errorMessage+"设备正在维修，不能更换院区!\n";
+                    item.setErrorMessage(errorMessage);
+                    displayErrorAssets.add(item);
+                }
+            });
             notPass.clear();
         }
 
         if(!assetInfoBulkEditCheckService.verifySiteToSite(selectedAssets,notPass)){
-            String collect = notPass.stream().map(AssetInfo::getName).collect(Collectors.joining(","));
-            WebUtil.addErrorMessage("设备: "+collect+", 正在科室借调中，不能更换院区!");
+            List<String> uids= notPass.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            WebUtil.addErrorMessage("设备正在科室借调中，不能更换院区!");
             errFlag = true;
+            displayAssetsNew.forEach(item->{
+                if(uids.contains(item.getUid())){
+                    String errorMessage = item.getErrorMessage();
+                    errorMessage = StringUtils.isNotBlank(errorMessage)?"设备正在科室借调中，不能更换院区!\n":errorMessage+"设备正在科室借调中，不能更换院区!\n";
+                    item.setErrorMessage(errorMessage);
+                    displayErrorAssets.add(item);
+                }
+            });
+            notPass.clear();
         }
         //临床助手检查进行中
         if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
@@ -1882,4 +1933,12 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
     }
 
+
+    public List<AssetInfo> getDisplayAssetsNew(){
+        logger.info("asset import result display error:{}", isDisplayErrorsOnly());
+        if (isDisplayErrorsOnly()) {
+            return displayErrorAssets;
+        }
+        return displayAssetsNew;
+    }
 }
