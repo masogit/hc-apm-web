@@ -293,6 +293,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             return;
         }
         zkbTrainPublishRegisterService.saveData(zkbTrainPublishRegister, zkbTrainPublishRegisterDetailList, currentUser);
+        WebUtil.addSuccessMessage("报名成功");
     }
 
     @Override
