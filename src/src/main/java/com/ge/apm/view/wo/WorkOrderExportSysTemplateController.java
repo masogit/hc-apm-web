@@ -161,7 +161,7 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
         }
         if (file == null || uploadedFileObject == null) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage("File has not been uploaded");
+            WebUtil.addErrorMessage("文件未上传");
             return;
         }
         onBeforeTemplateSave();

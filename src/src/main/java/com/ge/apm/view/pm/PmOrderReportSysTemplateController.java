@@ -190,7 +190,7 @@ public class PmOrderReportSysTemplateController extends GenericCRUDUUIDControlle
         }
         if (file == null || uploadedFileObject == null) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage("文件上传失败!");
+            WebUtil.addErrorMessage("文件未上传");
             return;
         }
         onBeforeTemplateSave();
