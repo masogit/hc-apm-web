@@ -198,9 +198,9 @@
                                          action="#{zkbTrainRegisterMainController.saveEngineer}"
                                          update=":engineerListForm:detailDatalist"
                                          oncomplete="PF('registerEngineerEditDlg').hide()"
-                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"
-                                         disabled="#{zkbTrainRegisterMainController.isSaveButtonEnabled()}"
-                                         title="请上传放射体检、安全证书和推荐函后才能保存"/>
+                                         rendered="#{zkbTrainRegisterMainController.actionName != 'View'}" title="请上传放射体检、安全证书和推荐函后才能保存"/>
+<!--                                         disabled="#{zkbTrainRegisterMainController.isSaveButtonEnabled()}"-->
+
 
                         <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"
                                          onclick="PF('registerEngineerEditDlg').hide()" process="@this"
