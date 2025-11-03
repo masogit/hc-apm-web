@@ -39,7 +39,7 @@
                              <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                          </h:outputText>
                      </p:column>
-                     <p:column headerText="类别" >
+                     <p:column headerText="类别"  >
                          <h:outputText value="#{fieldMsg.fieldValue('transaction',item2.category)}"/>
 
                      </p:column>
@@ -52,9 +52,6 @@
                          <h:outputText value="#{item2.remark}"/>
                      </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalist" fileName="depTranDetailList_export"  />
-                        </p:commandButton>
 
                     <p:commandButton id="addButton" actionListener="#{depTranDetailController.prepareCreate()}"
                                      update="@(.newTrFormGrNew)" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  oncomplete="PF('newTransactionDlg').show()"/>
@@ -65,6 +62,9 @@
                             <p:confirm header="#{msg.DeleteConformation}"
                                        message="确定删除该事务管理？"
                                        icon="ui-icon-warning"/>
+                        </p:commandButton>
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="科务管理"   postProcessor="#{depTranDetailController.postProcessXLS}" />
                         </p:commandButton>
                         <!--<p:commandButton title="#{msg.Delete}"   process="@this" icon="ui-icon-close"  actionListener="#{depTranDetailController.deleteKW()}">
                             <p:confirm
