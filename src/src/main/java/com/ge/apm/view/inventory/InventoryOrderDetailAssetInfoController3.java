@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -52,6 +53,7 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
     private UaaService uaaService;
 	private InventoryOrderService service;
 	private String orderId;
+	private InventoryOrder inventoryOrder;
 	private List<String> listClinicalDeptName;
 	private static final String ORG_NAME = "orgName";
 	private int inventoryStatus = 2;
@@ -86,6 +88,7 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
             listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+			inventoryOrder = inventoryOrderRepository.findById(orderId);
         }
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		loadClinicalDeptList();
@@ -195,7 +198,9 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 	}
 
 	public void bathDelete() {
-		dao.delete(selectedItems);
+		if (ObjectUtil.isNotEmpty(selectedItems)) {
+			dao.delete(selectedItems);
+		}
 		WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
 	}
 
@@ -223,4 +228,11 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		this.orderId = orderId;
 	}
 
+	public InventoryOrder getInventoryOrder() {
+		return inventoryOrder;
+	}
+
+	public void setInventoryOrder(InventoryOrder inventoryOrder) {
+		this.inventoryOrder = inventoryOrder;
+	}
 }

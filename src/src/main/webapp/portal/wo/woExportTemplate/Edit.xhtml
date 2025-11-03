@@ -46,7 +46,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
-                <p:commandButton validateClient="false"
+                <p:commandButton validateClient="true"
                                  actionListener="#{workOrderExportSysTemplateController.applyChange()}" value="#{msg.Save}"
                                  update="display,:WoExportTemplateEditDlg, :WoExportTemplateListForm:datalist, :growl"
                                  icon="ui-icon-check" oncomplete="handleSubmit(args, 'WoExportTemplateEditDialog');"/>
