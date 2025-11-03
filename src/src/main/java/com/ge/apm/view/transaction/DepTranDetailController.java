@@ -7,6 +7,8 @@ import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TransactionForm;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -306,4 +308,17 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     }*/
 
 
+
+
+    public void postProcessXLS(Object document) {
+        HSSFWorkbook wb = (HSSFWorkbook) document;
+        Sheet sheet = wb.getSheetAt(0);
+
+        sheet.setColumnWidth(0, 256 * 20);
+        sheet.setColumnWidth(1, 256 * 20);
+        sheet.setColumnWidth(2, 256 * 20);
+        sheet.setColumnWidth(3, 256 * 20);
+        sheet.setColumnWidth(4, 256 * 20);
+//        sheet.setDefaultRowHeightInPoints(30f);
+    }
 }
