@@ -78,7 +78,21 @@
                      <label class="label">#{msg.comment}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.comment}"/>
                   </h:panelGroup>
+                  <h:panelGroup >
+                     <label class="label">#{msg.Cancelor}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.cancelUserName}"/>
+                  </h:panelGroup>
+                  <h:panelGroup >
+                     <label class="label">#{msg.cancelWorkOrderReason}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.cancelReason}"/>
+                  </h:panelGroup>
 
+                  <h:panelGroup >
+                     <label class="label">#{msg.CloseTime_xlsx}</label>
+                     <p:outputLabel value="#{serviceRequestNoAssetController.selected.closeTime}" >
+                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
+                     </p:outputLabel>
+                  </h:panelGroup>
                </p:panelGrid>
                <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.audioList}" columns="2" layout="grid" rendered="#{not empty serviceRequestNoAssetController.audioList}">
                   <f:facet name="header">#{msg.requestVoice}</f:facet>
