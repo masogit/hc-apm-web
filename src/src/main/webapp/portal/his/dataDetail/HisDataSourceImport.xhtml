@@ -39,8 +39,9 @@
 
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
-
+                <span style="color: red; font-weight: bold;font-size: 16px ">请注意：因系统限制，导入表格中的执行时间必须大于系统当前最新执行时间【#{hisEquipmentDataSourceController.tenantMaxExecDate()}】;若有多台设备收费数据需要导入，请使用同一文件一次上传，谢谢。</span>
             <h:panelGroup>
+
             <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{hisEquipmentDataSourceController.uploadDataFile}" value="#{hisEquipmentDataSourceController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                            multiple="false" sizeLimit="10000000" update="HisDataSourceTab:importForm HisDataSourceTab:errorDataListForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
 
@@ -72,8 +73,8 @@
         <h:form id="errorDataListForm">
             <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
             <p:fieldset  legend="#{msg.ImportFailureData}">
-                <p:dataTable id="errorDatalist" rendered="#{not empty hisEquipmentDataSourceController.errorList}" value="#{hisEquipmentDataSourceController.errorList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                <p:dataTable id="errorDatalist" rendered="#{not empty hisEquipmentDataSourceController.errorList}" value="#{hisEquipmentDataSourceController.errorList}" var="item" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
 
@@ -108,7 +109,9 @@
                         <h:outputText value="#{item.get('hisEquipmentDataSource').totalAmount}" />
                     </p:column>
                     <p:column headerText="执行时间">
-                        <h:outputText value="#{item.get('hisEquipmentDataSource').execTime}" />
+                        <h:outputText value="#{item.get('hisEquipmentDataSource').execTime}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat8()}"  />
+                        </h:outputText>
                     </p:column>
                     <p:column headerText="执行科室">
                         <h:outputText value="#{item.get('hisEquipmentDataSource').execDept}" />
@@ -126,6 +129,12 @@
                         <!--<h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/><br/>-->
                         <h:outputText value="#{item.get('errmsg')}"/>
                     </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="errorDatalist" fileName="hisDataSourceImportError"  />
+                        </p:commandButton>
+                    </f:facet>
 
                 </p:dataTable>
             </p:fieldset>
