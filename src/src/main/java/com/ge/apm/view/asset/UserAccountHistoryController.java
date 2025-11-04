@@ -59,9 +59,10 @@ public class UserAccountHistoryController extends GenericCRUDController<UserAcco
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        String siteUid = currentUser.getSiteUID();
-        List<String> loginNameList = userAccountService.getLoginNameBySiteUid(siteUid);
-        searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNameList));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*2+"));
     }
 
     @Override
