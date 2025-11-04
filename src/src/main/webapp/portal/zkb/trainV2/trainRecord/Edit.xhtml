@@ -26,14 +26,15 @@
                                  required="true" requiredMessage="学员姓名 #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">SSO</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.sso}"/>
+                    <label class="label">SSO*</label>
+                    <p:inputText required="true" requiredMessage="SSO #{msg.ValidationRequire}"
+                                 value="#{zkbTrainAttendanceRecordController.selected.sso}"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
                     <label class="label">电话*</label>
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.phone}"
-                                 required="true"/>
+                                 required="true" requiredMessage="电话 #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">邮箱</label>
@@ -55,8 +56,9 @@
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.companyName}"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">合同号</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.contractNo}"/>
+                    <label class="label">合同号*</label>
+                    <p:inputText required="true" requiredMessage="合同号 #{msg.ValidationRequire}"
+                                 value="#{zkbTrainAttendanceRecordController.selected.contractNo}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">合同唯一号</label>
@@ -90,11 +92,6 @@
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.trainerName}"
                                  requiredMessage="培训老师 #{msg.ValidationRequire}"/>
                 </h:panelGroup>
-
-                <h:panelGroup>
-                    <label class="label">Modality</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.modality}"/>
-                </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">学员类型</label>
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.traineeType}"/>
@@ -102,28 +99,32 @@
 
                 <!-- 时间 -->
                 <h:panelGroup>
-                    <label class="label">培训开始时间</label>
+                    <label class="label">培训开始时间*</label>
                     <p:calendar value="#{zkbTrainAttendanceRecordController.selected.trainStartDate}"
-                                pattern="yyyy-MM-dd HH:mm"
+                                pattern="yyyy-MM-dd HH:mm" required="true"
                                 requiredMessage="培训开始时间 #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">培训结束时间</label>
+                    <label class="label">培训结束时间*</label>
                     <p:calendar value="#{zkbTrainAttendanceRecordController.selected.trainEndDate}"
-                                pattern="yyyy-MM-dd HH:mm"
+                                pattern="yyyy-MM-dd HH:mm" required="true"
                                 requiredMessage="培训结束时间 #{msg.ValidationRequire}"/>
                 </h:panelGroup>
 
                 <!-- 状态与结果 -->
                 <h:panelGroup>
                     <label class="label">状态*</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.status}"
-                                 required="true" requiredMessage="状态 #{msg.ValidationRequire}"/>
+                    <p:selectOneMenu value="#{zkbTrainAttendanceRecordController.selected.status}"
+                                     required="true"
+                                     requiredMessage="状态 #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="请选择..." itemValue="" />
+                        <f:selectItem itemLabel="Attended"    itemValue="Attended" />
+                        <f:selectItem itemLabel="UnAttended"  itemValue="UnAttended" />
+                    </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">是否通过*</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.isPassed}"
-                                 required="true" requiredMessage="是否通过 #{msg.ValidationRequire}"/>
+                    <label class="label">是否通过</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.isPassed}"/>
                 </h:panelGroup>
 
                 <h:panelGroup>

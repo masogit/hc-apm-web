@@ -47,13 +47,15 @@ public class ZkbTrainCourseSendMessageJob {
     @Autowired
     ZkbTrainPublishRepository zkbTrainPublishRepository;
 
-    @Scheduled(cron = "5/20 * * * * *")
+    @Scheduled(cron = "0 0 17 * * ?")
     public void execute() {
+        logger.info("ZkbTrainCourseSendMessageJob start...");
         try {
             doJob();
         } catch (Exception e) {
            logger.error("ZkbTrainCourseSendMessageJob error", e);
         }
+        logger.info("ZkbTrainCourseSendMessageJob end...");
     }
 
     private void doJob() {
