@@ -315,4 +315,10 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query("select u from UserAccount u, UserRole r, SysRole s where u.siteUID=?1 and u.id=r.userId and r.roleId=s.id and s.name=?2")
     List<UserAccount> findBySiteUidAndRoleName(String siteUid, String roleName);
 
+    @Query(value = "select distinct ua.* from user_account ua " +
+            "inner join zkb_train_course_quota zt on ua.tenant_uid  = zt.tenant_uid " +
+            "where ua.id in(select user_id from user_role ur where ur.role_id = 5) " +
+            "and zt.start_date <= now() and zt.end_date >= now() " +
+            "and zt.course_id = ?1", nativeQuery = true)
+    List<UserAccount> findByZkbCourseId(String courseId);
 }
