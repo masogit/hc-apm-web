@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.domain.*;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -109,4 +111,6 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
                     "</foreach>" +
                     "</script>"})
     List<Map<String, String>> findNameByLoginNames(@Param("loginNames") Set<String> loginNames);
+
+    List<UserAccountHistory> selectHistoryList(Pagination pagination, @Param("ew") Wrapper<UserAccountHistory> wrapper);
 }
