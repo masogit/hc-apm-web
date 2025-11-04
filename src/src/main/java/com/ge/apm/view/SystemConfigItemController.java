@@ -98,7 +98,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         loadAssetHead();
         categoryMap = new LinkedHashMap<>();
         categoryMap.put(1,"设备档案");
-        categoryMap.put(2,"设备调剂");
+        categoryMap.put(2,"集中调剂");
         categoryMap.put(3,"到货安装");
         categoryMap.put(4,"维修流程");
         categoryMap.put(5,"预防维护");
