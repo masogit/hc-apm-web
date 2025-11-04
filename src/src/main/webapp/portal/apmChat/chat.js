@@ -169,14 +169,14 @@ class APMChatApp {
     // 模拟助手回复
     simulateAssistantResponse(userMessage) {
         this.showTypingIndicator();
-        const select = document.getElementById('knowledgeBaseSelect');
-        const selectedText = select.options[select.selectedIndex].text;
-        console.log(selectedText);
+        // const select = document.getElementById('knowledgeBaseSelect');
+        // const selectedText = select.options[select.selectedIndex].text;
+        // console.log(selectedText);
         const userName = document.getElementById('userName').value;
         axios.post( this.origin+`/geapm/web/apmChat/chat`,{
             paramStr: userMessage,
-            userName: userName,
-            selectStorage: selectedText
+            userName: userName
+           // selectStorage: selectedText
         }).then(res => {
             if (res) {
                 this.hideTypingIndicator();
