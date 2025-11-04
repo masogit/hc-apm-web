@@ -31,3 +31,6 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 -- YHAAO-26195
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 2, '', '借出门锁密码', 'outDoorPassword', '借出门锁密码', 'f','t',1,'' where not exists(select * from config_item where key = 'outDoorPassword');
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 2, '', '归还门锁密码', 'inDoorPassword', '归还门锁密码', 'f','t',1,'' where not exists(select * from config_item where key = 'inDoorPassword');
+
+-- YHAAO-26222 批量更新用户修改记录user_uid
+update user_account_history set user_uid = user_account.uid from user_account where user_account_history.login_name = user_account.login_name and user_account_history.user_uid is null;
