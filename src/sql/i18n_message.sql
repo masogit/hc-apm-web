@@ -3029,7 +3029,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentOwnerB', '设备负责人B', 'Equipment Owner B', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FileUploadFailed', '文件上传失败!', 'File upload failed!', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentCannotBeTerminated', '设备[%s]未处于待报废状态，不能报废！', 'The equipment [%s] is not to be termianted and cannot be terminated!', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UnfinishedWorkorderCandBeTerminated', '设备名称[%s]存在未完成工单，不能报废！', 'The equipment name [%s] has an unfinished workorder and cannot be terminated!', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UnfinishedWorkorderCandBeTerminated', '设备[%s]存在未完成工单，不能报废！', 'The equipment name [%s] has an unfinished workorder and cannot be terminated!', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AttributeName', '属性名称', 'Attribute Name', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AttributeDescription', '属性描述', 'Attribute Description', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ModifiedOn', '修改时间', 'Modified on', NULL, '-1');
