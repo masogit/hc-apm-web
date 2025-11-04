@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,4 +47,10 @@ public interface HisEquipmentDataSourceRepository extends GenericRepositoryUUID<
 
     @Query(value = "select max(id) as id,org_code,max(exec_time) as exec_time from his_equipment_data_source group by org_code",nativeQuery = true)
     List<HisEquipmentDataSource> selectByOrgCodeAndExecTime();
+
+
+    @Query(value = "select max(exec_time)  from his_equipment_data_source where tenant_uid=?1",nativeQuery = true)
+    Date getTenantMaxExecDate(String tenantUID);
+
+
 }

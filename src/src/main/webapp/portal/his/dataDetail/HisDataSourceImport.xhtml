@@ -39,7 +39,7 @@
 
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
-                <span style="color: red; font-weight: bold;font-size: 18px ">请注意目前系统有限制，导入收费日期必须大于系统收费最大日期；若有多台设备收费数据需要导入，请使用同一文件一次上传，谢谢</span>
+                <span style="color: red; font-weight: bold;font-size: 16px ">请注意：因系统限制，导入表格中的执行时间必须大于系统当前最新执行时间【#{hisEquipmentDataSourceController.tenantMaxExecDate()}】;若有多台设备收费数据需要导入，请使用同一文件一次上传，谢谢。</span>
             <h:panelGroup>
 
             <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{hisEquipmentDataSourceController.uploadDataFile}" value="#{hisEquipmentDataSourceController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
