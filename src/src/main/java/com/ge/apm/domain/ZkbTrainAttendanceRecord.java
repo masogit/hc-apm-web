@@ -89,6 +89,10 @@ public class ZkbTrainAttendanceRecord {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
+    // 课程发布Id
+    @Column(name = "publish_id")
+    private String publishId;
+
     // 电话
     @Column(name = "phone")
     private String phone;
