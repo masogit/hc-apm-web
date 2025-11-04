@@ -443,23 +443,25 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     protected boolean persist(WebUtil.PersistAction persistAction, String successMessage) {
         if (selected != null) {
             try {
-                if (persistAction != WebUtil.PersistAction.DELETE) {
-                    getDAO().save(selected);
-                } else {
-                    getDAO().delete(selected);
-                }
                 if (selected instanceof UserAccount){
-                    UserAccount userAccount = (UserAccount)selected;
+                    UserAccount userAccount = new UserAccount();
+                    org.springframework.beans.BeanUtils.copyProperties(selected, userAccount);
                     UserAccount currentUser = UserContextService.getCurrentUserAccount();
                     userAccount.setLastModifiedBy(currentUser.getLoginName());
                     userAccount.setLastModifiedDate(new Date());
                     userAccountHistoryService.save(persistAction.name(), userAccount);
+                }
+                if (persistAction != WebUtil.PersistAction.DELETE) {
+                    getDAO().save(selected);
+                } else {
+                    getDAO().delete(selected);
                 }
 
                 onAfterDataChanged();
                 WebUtil.addSuccessMessage(successMessage);
                 return true;
             } catch (Exception ex) {
+                ex.printStackTrace();
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("validationFailed", true);
 

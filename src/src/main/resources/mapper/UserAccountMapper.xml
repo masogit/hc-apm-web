@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.UserAccountMapper">
+
+    <resultMap type="com.ge.apm.domain.AssetInfo" id="assetBean" autoMapping="true">
+        <result column="id" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="serial_num" property="serialNum"/>
+        <result column="depart_num" property="departNum"/>
+        <result column="financing_num" property="financingNum"/>
+        <result column="qr_code" property="qrCode"/>
+        <result column="function_type" property="functionType"/>
+        <result column="asset_group" property="assetGroup"/>
+        <result column="clinical_dept_name" property="clinicalDeptName"/>
+        <result column="measure_grade" property="measureGrade"/>
+        <result column="measuring_item_category" property="measuringItemCategory"/>
+        <result column="certificate_no" property="meteringNO"/>
+        <result column="status" property="verificationConclusion"/>
+        <result column="measuring_type" property="measuringType"/>
+        <result column="last_check_company" property="lastCheckCompany"/>
+        <result column="last_metering_date" property="lastMeteringDate"/>
+        <result column="next_metering_date" property="nextMeteringDate"/>
+        <result column="check_date" property="checkDate"/>
+        <result column="bo_uuid" property="boUuid"/>
+        <result column="tenant_uid" property="tenantUID"/>
+        <result column="institution_uid" property="institutionUID"/>
+        <result column="hospital_uid" property="hospitalUID"/>
+        <result column="site_uid" property="siteUID"/>
+        <result column="asset_dept_uid" property="assetDeptUID"/>
+        <result column="clinical_dept_uid" property="clinicalDeptUID"/>
+    </resultMap>
+
+    <select id="selectMeasureResult" resultMap="assetBean">
+        SELECT ai.id,
+        ai.uid,
+        ai.name,
+        ai.serial_num,
+        ai.financing_num,
+        ai.qr_code,
+        ai.function_type,
+        ai.asset_group,
+        ai.clinical_dept_name,
+        ai.measure_grade,
+        ai.measuring_item_category,
+        mcd.certificate_no,
+        mcd.status,
+        mcd.type measuring_type,
+        mcd.check_company last_check_company,
+        ai.last_metering_date,
+        mcd.valid_date_to next_metering_date,
+        mcd.check_date,
+        mcd.id as bo_uuid
+        FROM asset_info ai
+        INNER JOIN measuring_certificate_detail mcd ON mcd.asset_uid = ai.uid
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+    <select id="selectHistoryList" resultType="com.ge.apm.domain.UserAccountHistory">
+        SELECT
+            uah.*
+        FROM
+            user_account_history uah
+                JOIN user_account ua ON uah.user_uid = ua.uid
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+</mapper>
