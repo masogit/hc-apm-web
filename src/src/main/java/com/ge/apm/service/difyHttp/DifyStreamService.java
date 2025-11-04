@@ -23,7 +23,7 @@ public class DifyStreamService {
         log.info("restTemplate get success...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer app-b2nfWNKtRjMYkCWgHWp4wqfp");
+        headers.set("Authorization", "Bearer app-OJccYvgBi32jaw75uPygpHeA");
         JSONObject requestBody = new JSONObject();
 //        JSONObject inputs = new JSONObject();
 //        inputs.put("knowledge", chatRequest.getSelectStorage());
