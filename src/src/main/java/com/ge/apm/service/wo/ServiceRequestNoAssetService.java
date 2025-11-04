@@ -131,6 +131,7 @@ public class ServiceRequestNoAssetService {
         formData.setDesc(reason);
         formData.setAssetStatus(assetStatus);
         formData.setCurrentStepId(wo.getCurrentStepId());
+        formData.setCancelReason(reason);
         String res = serviceRequestNoAssetApiService.invokeAction(token, formData, "cancel", id);
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Cancel")));
