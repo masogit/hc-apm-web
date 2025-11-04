@@ -2,11 +2,10 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.budget.BudgetApplicationExportService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.apm.service.utils.NotificationExecutor;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -56,6 +55,9 @@ public class ZkbTrainPublishService extends MicroServiceInvoker {
     @Autowired
     TenantInfoRepository tenantInfoRepository;
 
+    @Autowired
+    UserAccountRepository userAccountRepository;
+
     @PostConstruct
     protected void init() {
         msService = WebUtil.getBean(MicroServiceUtil.class);
@@ -68,11 +70,7 @@ public class ZkbTrainPublishService extends MicroServiceInvoker {
             zkbTrainPublishInfo.setCourseId(zkbTrainCourse.getId());
             zkbTrainPublishRepository.save(zkbTrainPublishInfo);
             // 课程发布成功, 需要推送短信邮件通知给各个代理商的负责人发短信、邮件通知
-            String subject = "培训管理-培训课程发布成功";
-            String content = "课程 : " + zkbTrainPublishInfo.getZkbTrainCourse().getName() + " 已经发布。请登录APM系统-培训管理进行报名。课程可能会出现调整，请以APM系统显示为准。";
-            String token = UserContextService.getAccessToken();
-            sendEmail(subject, content, token); //发邮件通知
-            sendMessage(subject, content, token); //发短信通知
+            sendMessageByPublishInfo(zkbTrainPublishInfo);
         } else {
             zkbTrainPublishInfo.setLastModifiedBy(userAccount.getUid());
             zkbTrainPublishInfo.setLastModifiedDate(new Date());
@@ -80,35 +78,64 @@ public class ZkbTrainPublishService extends MicroServiceInvoker {
         }
     }
 
-    private void sendMessage(String subject, String content, String token) {
+    public void sendMessageByPublishInfo(ZkbTrainPublishInfo zkbTrainPublishInfo) {
+        if (zkbTrainPublishInfo.getZkbTrainCourse() == null) {
+            logger.info("课程发布成功，但是课程为空，不发送通知，Id = {}", zkbTrainPublishInfo.getId());
+            return;
+        }
+        String subject = "培训管理-培训课程发布成功";
+        String content = "课程 : " + zkbTrainPublishInfo.getZkbTrainCourse().getName() + " 已经发布。请登录APM系统-培训管理进行报名。课程可能会出现调整，请以APM系统显示为准。";
+        String token = UserContextService.getAccessToken();
+        // 查询需要短信和邮件通知的代理商负责人用户
+        List<UserAccount> userAccountList = userAccountRepository.findByZkbCourseId(zkbTrainPublishInfo.getCourseId());
+        if (CollectionUtils.isEmpty(userAccountList)) {
+            logger.info("courseId = {}, userAccountList is empty", zkbTrainPublishInfo.getCourseId());
+            return;
+        }
+        String courseId = zkbTrainPublishInfo.getZkbTrainCourse().getId();
+        String courseName = zkbTrainPublishInfo.getZkbTrainCourse().getName();
+        for (UserAccount agentAccount : userAccountList) {
+            // 发送邮件
+            NotificationExecutor.executeIfNotBlank("邮箱", agentAccount.getEmail(), courseId, courseName, agentAccount.getLoginName(),
+                    () -> sendEmail(agentAccount.getEmail(), subject, content, token)
+            );
+
+            // 发送短信
+            NotificationExecutor.executeIfNotBlank("电话", agentAccount.getTelephone(), courseId, courseName, agentAccount.getLoginName(),
+                    () -> sendMessage(agentAccount.getTelephone(), subject, content, token)
+            );
+        }
+    }
+
+    private void sendMessage(String telephone, String subject, String content, String token) {
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("subject", subject);
             emailWrapperMap.put("content", content);
-            emailWrapperMap.put("to", "18317125760");
+            emailWrapperMap.put("to", telephone);
             String url = getGatewayURL(GatewayURL.SEND_MESSAGE_FOR_TEXT);
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-            logger.info("content = {}, sendMessage result = {}", content, response.toString());
+            logger.info("telephone = {}, content = {}, sendMessage result = {}", telephone, content, response.toString());
         } catch (Exception e) {
-            logger.error("trainPublishSendMessage error", e);
+            logger.error("telephone = {}, content = {}, trainPublishSendMessage error", telephone, content, e);
         }
     }
 
-    public void sendEmail(String subject, String content, String token) {
+    public void sendEmail(String email, String subject, String content, String token) {
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("subject", subject);
             emailWrapperMap.put("content", content);
-            emailWrapperMap.put("to", "550004857@gehealthcare.com");
+            emailWrapperMap.put("to", email);
             String url = getGatewayURL(GatewayURL.SEND_EMAIL_FOR_TEXT);
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-            logger.info("content = {}, sendEmail result = {}", content, response.toString());
+            logger.info("emailAddress = {}, content = {}, sendEmail result = {}", email, content, response.toString());
         } catch (Exception e) {
-            logger.error("trainPublishSendEmail error", e);
+            logger.error("emailAddress = {}, content = {}, trainPublishSendEmail error", email, content, e);
         }
     }
 
