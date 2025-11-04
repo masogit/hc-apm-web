@@ -127,6 +127,15 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name = "repair_type")
     private Integer repairType;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @Column(name = "estimated_close_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date estimatedCloseTime;
+
+    @Column(name = "close_time")
+    private Date closeTime;
+
+
     //派工信息
     @Column(name="send_step_owner_Id")
     private Integer sendStepOwnerId;
@@ -154,6 +163,13 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name = "sr_id")
     private String srId;
 
+    //取消人
+    @Column(name = "cancel_user_uid")
+    private String cancelUserUid;
+
+    //取消人
+    @Column(name = "cancel_user_name")
+    private String cancelUserName;
     //取消原因
     @Column(name = "cancel_reason")
     private String cancelReason;
