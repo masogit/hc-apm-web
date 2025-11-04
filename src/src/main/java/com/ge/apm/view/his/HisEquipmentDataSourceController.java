@@ -584,6 +584,20 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 
 
     }
+
+    public String tenantMaxExecDate(){
+
+        String tenantUID = loginUser.getTenantUID();
+
+        Date  execDate=sourceDao.getTenantMaxExecDate(tenantUID);
+        if (execDate!=null){
+            String format = "yyyy-MM-dd";
+            String dateStr = DateUtil.getFormatStrByDate(execDate, format);
+            return dateStr;
+        }
+        return null;
+
+    }
 }
 
 
