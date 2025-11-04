@@ -27,3 +27,7 @@ ALTER TABLE inventory_order_detail DROP CONSTRAINT IF EXISTS fkhkghkgwklvpjs04m0
 
 -- YHAAO-26051
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation)select replace(uuid_generate_v4()::text,'-',''), 13, 'true', '科室借调是否可调整归还时间', 'enableDeptSecondmentAdjustReturnTime', '科室借调是否可调整归还时间', 'f','t',3,'' where not exists(select * from config_item where key = 'enableDeptSecondmentAdjustReturnTime');
+
+-- YHAAO-26195
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 2, '', '借出门锁密码', 'outDoorPassword', '借出门锁密码', 'f','t',1,'' where not exists(select * from config_item where key = 'outDoorPassword');
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation) select replace(uuid_generate_v4()::text,'-',''), 2, '', '归还门锁密码', 'inDoorPassword', '归还门锁密码', 'f','t',1,'' where not exists(select * from config_item where key = 'inDoorPassword');

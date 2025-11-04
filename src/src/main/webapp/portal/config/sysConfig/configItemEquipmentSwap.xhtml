@@ -134,6 +134,28 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('rentReason'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('rentReason').configItemValue == null}"/>
             </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('outDoorPassword').name.concat('(').concat(systemConfigItemController.configItemMap.get('outDoorPassword').key).concat(')')}</label>
+                <p:inputText value="#{systemConfigItemController.configItemMap.get('outDoorPassword').showValue}" style="width: 50%;"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('outDoorPassword'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('outDoorPassword'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('outDoorPassword').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('inDoorPassword').name.concat('(').concat(systemConfigItemController.configItemMap.get('inDoorPassword').key).concat(')')}</label>
+                <p:inputText value="#{systemConfigItemController.configItemMap.get('inDoorPassword').showValue}" style="width: 50%;"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('inDoorPassword'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('inDoorPassword'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('inDoorPassword').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 
