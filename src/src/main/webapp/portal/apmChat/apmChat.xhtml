@@ -5,6 +5,10 @@
                 template="/WEB-INF/template_withoutGrowl.xhtml">
     <ui:define name="content">
         <link rel="stylesheet" href="all.min.css"/>
+        <link rel="stylesheet" href="github.min.css"/>
+        <script src="highlight.min.js"></script>
+        <script src="marked.min.js"></script>
+        <script src="purify.min.js"></script>
         <script src="#{request.contextPath}/portal/js/axios.min.js"></script>
         <script src="all.chat.js"></script>
         <script src="chat.js"></script>
@@ -193,12 +197,56 @@
                 background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
                 transform: translateX(4px);
             }
+            .message-markdown {
+                line-height: 1.6;
+                white-space: normal;       /* Markdown 交给渲染控制 */
+            }
+
+            .message-markdown blockquote {
+                border-left: 4px solid #e0e0e0;
+                margin: 8px 0;
+                padding: 6px 12px;
+                color: #555;
+            }
+
+            .message-markdown table {
+                border-collapse: collapse;
+            }
+            .message-markdown table th,
+            .message-markdown table td {
+                border: 1px solid #e0e0e0;
+                padding: 6px 10px;
+            }
+            .message-markdown {
+                line-height: 1.5;
+                white-space: normal;
+            }
+
+            .message-markdown p {
+                margin: 0.3em 0;  /* 段落更紧凑 */
+            }
+
+            .message-markdown ul,
+            .message-markdown ol {
+                margin: 0.3em 0 0.3em 1.2em;
+            }
+
+            .message-markdown pre {
+                margin: 0.4em 0;
+                padding: 10px;
+                border-radius: 6px;
+                background: #f6f8fa;
+            }
+
+            .message-markdown code {
+                background: #f6f8fa;
+                padding: 2px 4px;
+                border-radius: 3px;
+                font-family: Menlo, Consolas, monospace;
+                font-size: 0.95em;
+            }
         </style>
         <div class="ui-g-12 card cardTitle bg-white shadow-lg">
-<!--            <div class="ui-g-12 card cardTitle">-->
-<!--                <i class="fas fa-robot mr-3"></i>-->
-<!--                <p:outputLabel class="pageTitle" value="APM小管家"/>-->
-<!--            </div>-->
             <div class="p-4" style="margin-top: -22px;">
                 <h1 class="pageTitle text-3xl font-bold text-purple-600">
                     <i class="fa fa-slideshare"></i>
@@ -215,54 +263,6 @@
 
                 <!-- 控制面板 -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6 mt-4">
-<!--                    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">-->
-<!--                        <div class="mb-6">-->
-<!--                            <label for="knowledgeBaseSelect" class="block text-lg font-semibold text-gray-700 mb-3">-->
-<!--                                <i class="fa fa-database text-blue-500 mr-2"></i>-->
-<!--                                选择知识库类型-->
-<!--                            </label>-->
-
-<!--                            &lt;!&ndash; 下拉选择框 &ndash;&gt;-->
-<!--                            <div class="relative">-->
-<!--                                <select-->
-<!--                                        id="knowledgeBaseSelect"-->
-<!--                                        class="w-full p-4 border-2 border-blue-200 rounded-xl bg-white text-gray-700-->
-<!--                               focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none-->
-<!--                               transition-all duration-300 appearance-none cursor-pointer-->
-<!--                               hover:border-blue-300 dropdown-shadow"-->
-
-<!--                                >-->
-<!--                                    <option value="soft_endoscope">通用知识库</option>-->
-<!--                                    <option value="soft_endoscope">软式内窥镜知识库</option>-->
-<!--                                    <option value="hard_endoscope">硬式内窥镜知识库</option>-->
-<!--                                    <option value="braun_dialysis">贝朗品牌血透机</option>-->
-<!--                                    <option value="fresenius_dialysis">费森尤斯品牌血透机</option>-->
-<!--                                    <option value="gambro_dialysis">金宝品牌血透机</option>-->
-<!--                                    <option value="nippro_dialysis">尼普洛品牌血透机</option>-->
-<!--                                    <option value="weiga_dialysis">威高日机装品牌血透机</option>-->
-<!--                                    <option value="dialysis_tools">血透机工具</option>-->
-<!--                                    <option value="ultrasound_manual">超声手册</option>-->
-<!--                                    <option value="logiq_ultrasound">logiq超声手册</option>-->
-<!--                                    <option value="vivid_ultrasound">VIVID超声手册</option>-->
-<!--                                    <option value="voluson_ultrasound">Voluson超声知识库</option>-->
-<!--                                </select>-->
-<!--                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-700">-->
-<!--                                    <i class="fa fa-chevron-down dropdown-transition"></i>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-
-<!--                        &lt;!&ndash; 当前选择显示 &ndash;&gt;-->
-<!--                        <div id="currentSelection" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">-->
-<!--                            <div class="flex items-center">-->
-<!--                                <i class="fa fa-check-circle text-green-500 text-xl mr-3"></i>-->
-<!--                                <div>-->
-<!--                                    <h3 class="font-semibold text-blue-800">当前选择</h3>-->
-<!--                                    <p class="text-blue-600" id="selectedText">软式内窥镜知识库</p>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
                     <form id="logForm" class="space-y-4">
                         <!-- 新日志输入 -->
                         <div class="w-full h-32 bg-gray-50 rounded-lg border border-gray-200 p-4">
