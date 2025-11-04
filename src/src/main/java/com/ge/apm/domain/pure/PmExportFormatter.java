@@ -199,7 +199,10 @@ public class PmExportFormatter<T> {
 
 
     public String getSiteName() {
-        return v2_pmOrder.getAssetInfo().getClinicalDeptName();
+       if(v2_pmOrder.getSiteOrg()!=null){
+           return v2_pmOrder.getSiteOrg().getName();
+       }
+       return null;
     }
 
     public void setAssetName(String assetName) {

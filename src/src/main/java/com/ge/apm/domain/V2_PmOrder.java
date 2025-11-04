@@ -155,6 +155,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @NotFound(action = NotFoundAction.IGNORE) // 没有关联实体时忽略
     private AssetInfo assetInfo;
 
+    @JoinColumn(name = "site_uid", referencedColumnName = "uid", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private OrgInfo siteOrg;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @Where(clause = "bo_type = 'PmOrder'")
