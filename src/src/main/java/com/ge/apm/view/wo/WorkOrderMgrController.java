@@ -1765,7 +1765,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (!attachList.isEmpty())
             picList.addAll(attachList);
         updateSelectedWorkOrder(selectedWorkOrder);
-        woService.saveRepairWorkOrder(selectedWorkOrder, assigneeId,confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        woService.saveRepairWorkOrder(selectedWorkOrder, assigneeId,confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList.stream().filter(ite-> V2_BlobObject.BO_TYPE_WorkOrder.equals(ite.getBoType())).collect(Collectors.toList()));
         cancel();
     }
 
@@ -2761,14 +2761,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void handleFileUpload(FileUploadEvent event) {
         synchronized (picList){
-            if(picList != null && picList.size() >= 5){
+            if(getPicListByBoType(V2_BlobObject.BO_TYPE_WorkOrder) != null && getPicListByBoType(V2_BlobObject.BO_TYPE_WorkOrder).size() >= 5){
                 WebUtil.addWarnMessage("上传图片数量不能超过5个！");
                 return;
             }
             V2_BlobObject blobObject = blobService.uploadFile(event);
             if (null != blobObject) {
                 picList.add(blobObject);
-                blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_WorkOrder);
                 blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
                 blobService.saveBlobObject(blobObject);
             } else {
@@ -2788,7 +2788,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             V2_BlobObject blobObject = blobService.uploadFile(event);
             if (null != blobObject) {
                 attachList.add(blobObject);
-                blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_WorkOrder);
                 blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
                 blobService.saveBlobObject(blobObject);
             } else {

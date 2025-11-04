@@ -123,7 +123,7 @@
                         </p:inputTextarea>
                     </h:panelGroup>
                 </p:panelGrid>
-                <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.picList}" columns="7" layout="grid">
+                <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="7" layout="grid">
                     <f:facet name="header">
                         #{msg.addPic}<p:outputLabel value="(#{msg.maxUpload5Pics})" style="color: red"></p:outputLabel>
                     </f:facet>
@@ -138,7 +138,7 @@
                 </p:dataGrid>
                 <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced"
                               dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="10000000"  update="pictureList type1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}"
-                              invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{workOrderMgrController.picList.size() ge 5}"/>
+                              invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{workOrderMgrController.getPicListByBoType('WorkOrder').size() ge 5}"/>
 
 
                 <p:dataGrid id="attachList" var="fileitem" value="#{workOrderMgrController.attachList}" columns="7" layout="grid">
