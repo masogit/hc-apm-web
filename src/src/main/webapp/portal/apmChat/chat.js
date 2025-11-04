@@ -1,4 +1,3 @@
-
 // APM小管家聊天应用核心逻辑
 
 class APMChatApp {
@@ -13,6 +12,22 @@ class APMChatApp {
         this.bindEvents();
         this.renderMessages();
         this.scrollToBottom();
+        marked.setOptions({
+            gfm: true,
+            breaks: false,
+            smartLists: true,
+            smartypants: false,
+            highlight: (code, lang) => {
+                try {
+                    if (lang && hljs.getLanguage(lang)) {
+                        return hljs.highlight(code, { language: lang }).value;
+                    }
+                    return hljs.highlightAuto(code).value;
+                } catch {
+                    return code;
+                }
+            }
+        });
     }
 
     // 绑定事件监听器
@@ -75,7 +90,7 @@ class APMChatApp {
         const container = document.getElementById('messagesList');
         container.innerHTML = '';
 
-        // 中断上一次正在进行的打字
+        // 中断上一次的打字
         if (this._typingAbort) this._typingAbort.aborted = true;
         this._typingAbort = { aborted: false };
 
@@ -84,38 +99,37 @@ class APMChatApp {
             container.appendChild(element);
         });
     }
-    // 创建单个消息元素
+
     createMessageElement(message, index, abortFlag) {
         const isUser = message.type === 'user';
         const messageClass = isUser ? 'message-right' : 'message-left';
 
         const messageDiv = document.createElement('div');
         messageDiv.className = messageClass;
-
-        // 用模板渲染外壳（包含头像/名字/typing指示器容器）
         messageDiv.innerHTML = this.getMessageHTML(message, isUser, index);
 
-        // 找到文字容器：我们接下来只操作 <p class="message-text">
-        const p = messageDiv.querySelector('.message-text');
+        const mdEl = messageDiv.querySelector('.message-markdown');
+
+        const scrollToBottom = () => {
+            const container = document.getElementById('messagesList');
+            if (container) container.scrollTop = container.scrollHeight;
+        };
 
         if (isUser) {
-            // 用户消息：一次性渲染（安全：textContent）
-            p.textContent = message.message ?? '';
+            // 用户消息：一次性把纯文本当作 Markdown 渲染也没问题
+            renderMarkdownInto(mdEl, message.message ?? '');
         } else {
             const isLastAssistant = (index === this.messages.length - 1);
             if (isLastAssistant) {
-                // 助手最后一条：打字机效果
-                // 先确保有 typing 指示器（你已有 getTypingIndicator）
-                // 逐字渲染
-                typeInto(p, message.message ?? '', 15, abortFlag).then(() => {
-                    // 结束后移除 typing 指示器
+                // 打字 + Markdown 流式
+                typeMarkdown(mdEl, message.message ?? '', 12, abortFlag, scrollToBottom).then(() => {
                     const typing = messageDiv.querySelector('.typing-indicator');
                     if (typing) typing.remove();
+                    scrollToBottom();
                 });
             } else {
-                // 历史助手消息：一次性渲染
-                p.textContent = message.message ?? '';
-                // 历史消息不应显示 typing 指示器，保守移除一下
+                // 历史消息：一次性渲染 Markdown
+                renderMarkdownInto(mdEl, message.message ?? '');
                 const typing = messageDiv.querySelector('.typing-indicator');
                 if (typing) typing.remove();
             }
@@ -130,22 +144,19 @@ class APMChatApp {
         const nameClass = isUser ? 'user-name' : 'user-name assistant-name';
         const color = isUser ? 'color: #0e77ca' : 'color: #7252bc';
         const nameText = isUser ? message.userName : 'APM小管家';
-
-        // 注意：这里保留 message-text 的占位 <p>，但不在这里塞 innerHTML
-        // 文本在 createMessageElement 里用 textContent/打字函数渲染，避免 XSS
-        // typing 指示器只给“最后一条助手消息”显示
         const shouldShowTyping = !isUser && index === this.messages.length - 1;
 
         return `
-    <div class="message-content">
-      <div class="user-info">
-        <i class="${iconClass}" style="${color}"></i>
-        <span class="${nameClass}" style="${color};white-space: pre-wrap;">${nameText}</span>
-      </div>
-      <p class="message-text"></p>
-      ${shouldShowTyping ? this.getTypingIndicator() : ''}
-    </div>
-  `;
+            <div class="message-content">
+              <div class="user-info">
+                <i class="${iconClass}" style="${color}"></i>
+                <span class="${nameClass}" style="${color}">${nameText}</span>
+              </div>
+              <!-- 用 div 容纳 Markdown -->
+              <div class="message-text message-markdown"></div>
+              ${shouldShowTyping ? this.getTypingIndicator() : ''}
+            </div>
+          `;
     }
 
     // 获取输入指示器HTML
@@ -187,50 +198,6 @@ class APMChatApp {
                 });
             }
         });
-    }
-
-    // 生成智能回复
-    generateSmartResponse(userMessage) {
-        const responses = {
-            greeting: [
-                '您好！很高兴见到您。我是APM小管家，随时为您提供帮助和支持！',
-                '欢迎使用APM小管家服务！有什么我可以为您做的吗？',
-                '你好！我是您的智能助手APM小管家，很高兴为您服务！'
-            ],
-            help: [
-                '我可以为您提供技术咨询、问题解答、学习指导等服务。请告诉我您具体需要什么帮助？',
-                '请详细描述您遇到的问题，我会尽力为您提供最佳的解决方案！'
-            ],
-            thanks: [
-                '不客气！能够帮助您是我的荣幸。如果您还有其他问题，请随时提问！',
-                '很高兴为您服务！有什么需要随时联系我！'
-            ],
-            default: [
-                '这是一个很好的问题，让我为您详细解答...',
-                '根据您的需求，我建议采用以下方案...',
-                '这个问题涉及到多个方面，我将逐一为您分析...',
-                '感谢您的提问，这是一个常见的技术问题...',
-                '基于您之前的对话记录，我为您提供更深入的解答...',
-                '我理解您的困惑，让我用更简单的方式解释...'
-            ]
-        };
-
-        // 关键词匹配
-        if (userMessage.includes('你好') || userMessage.includes('您好')) {
-            return this.getRandomResponse(responses.greeting);
-        } else if (userMessage.includes('帮助') || userMessage.includes('支持')) {
-            return this.getRandomResponse(responses.help);
-        } else if (userMessage.includes('谢谢') || userMessage.includes('感谢')) {
-            return this.getRandomResponse(responses.thanks);
-        } else {
-            return this.getRandomResponse(responses.default);
-        }
-    }
-
-    // 获取随机回复
-    getRandomResponse(responseArray) {
-        const index = Math.floor(Math.random() * responseArray.length);
-        return responseArray[index];
     }
 
     // 显示输入指示器
@@ -355,24 +322,7 @@ function simulateChat() {
         window.chatApp.simulateChat();
     }
 }
-// function handleKnowledgeBaseChange(value) {
-//     const select = document.getElementById('knowledgeBaseSelect');
-//     const selectedText = select.options[select.selectedIndex].text;
-//     document.getElementById('selectedText').textContent = selectedText;
-//
-//     // 添加视觉反馈
-//     const selectionDiv = document.getElementById('currentSelection');
-//     selectionDiv.classList.add('animate-pulse');
-//     setTimeout(() => {
-//         selectionDiv.classList.remove('animate-pulse');
-//     }, 300);
-//
-//     // 保存选择到本地存储
-//     localStorage.setItem('selectedKnowledgeBase', value);
-//     localStorage.setItem('selectedKnowledgeBaseText', selectedText);
-//
-//     console.log(`切换到知识库: ${selectedText} (${value})`);
-// }
+
 // 逐字输出（纯前端模拟）
 async function typeInto(el, text, speed = 15, abortFlag) {
     // 先清空
@@ -382,6 +332,49 @@ async function typeInto(el, text, speed = 15, abortFlag) {
         if (abortFlag?.aborted) return;
         el.textContent += text[i];
         // 控制速度
+        await new Promise(r => setTimeout(r, speed));
+    }
+}
+
+function renderMarkdownInto(el, mdText) {
+    const rawHtml = marked.parse(mdText ?? '');
+    const safeHtml = DOMPurify.sanitize(rawHtml, {
+        ADD_ATTR: ['target', 'rel', 'class', 'id'],
+        ADD_TAGS: ['span']
+    });
+    el.innerHTML = safeHtml;
+}
+
+async function typeMarkdown(el, fullText, speed = 12, abortFlag, onTick) {
+    el.innerHTML = '';
+    let buf = '';
+    let lastRender = 0;
+
+    const shouldRender = (now) => (now - lastRender) > 50; // 每 ~50ms 重渲染一次
+
+    for (let i = 0; i < fullText.length; i++) {
+        if (abortFlag?.aborted) return;
+
+        buf += fullText[i];
+
+        // 轻微“聪明停顿”：遇到标点/换行时更容易渲染一次
+        const ch = fullText[i];
+        const now = performance.now();
+        const isPunct = (ch === '\n' || ch === '，' || ch === '。' || ch === ',' || ch === '.' || ch === '!' || ch === '?' || ch === '；' || ch === ';' );
+
+        if (isPunct || shouldRender(now) || i === fullText.length - 1) {
+            renderMarkdownInto(el, buf);
+
+            // 仅在```成对闭合后再跑高亮，减少抖动
+            const fencedCount = (buf.match(/```/g) || []).length;
+            if (fencedCount % 2 === 0) {
+                document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+            }
+
+            lastRender = now;
+            onTick && onTick();
+        }
+
         await new Promise(r => setTimeout(r, speed));
     }
 }
