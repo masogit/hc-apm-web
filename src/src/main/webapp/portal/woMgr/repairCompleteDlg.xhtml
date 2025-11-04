@@ -331,7 +331,7 @@
                             </p:dataTable>
                         </h:panelGroup>
                             <h:panelGroup id="addContractor" styleClass="#{workOrderMgrController.showEnableEngineersWriteRepairOutside()?'':'display-none'}">
-                                <label class="label">#{msg.addContractor}</label>
+                                <label class="label">#{msg.addContractor}*</label>
                                 <p:dataTable id="externalTempUserList" class="externalTempUserList" value="#{workOrderMgrController.externalTempUser}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
                                              rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.userName}">
