@@ -41,6 +41,9 @@ public class ZkbTrainCourseQuotaDetail {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
+    @Column(name = "engineer_id")
+    private String engineerId;
+
     @Override
     public int hashCode() {
         int hash = 0;

@@ -11,12 +11,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ZkbTrainPublishRegisterService {
@@ -121,7 +125,6 @@ public class ZkbTrainPublishRegisterService {
 //        }
 //    }
 
-    @Transactional
     public void saveData(ZkbTrainPublishRegister register, List<ZkbTrainPublishRegisterDetail> registerDetails, UserAccount userAccount) {
 
         if (CollectionUtils.isEmpty(registerDetails)) {
@@ -134,7 +137,11 @@ public class ZkbTrainPublishRegisterService {
         }
         String tenantUid = userAccount.getTenantUID();
         String courseId = publishInfo.getCourseId();
-        zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -personCount, userAccount);
+        // 提取所有工程师ID（按报名顺序）
+        List<String> engineerIds = registerDetails.stream()
+                .map(ZkbTrainPublishRegisterDetail::getEngineerId)
+                .collect(Collectors.toList());
+        zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -personCount, engineerIds, userAccount);
 
         // 保存主表
         register.setCreatedBy(userAccount.getName());
@@ -174,8 +181,49 @@ public class ZkbTrainPublishRegisterService {
 //        }
 //    }
 
-    @Transactional
     public void modifyDetail(ZkbTrainPublishRegisterDetail detail, UserAccount currentUser) {
+
+        // 1. 获取原始明细
+        ZkbTrainPublishRegisterDetail originalDetail = zkbTrainPublishRegisterDetailRepository.findById(detail.getId());
+        if (originalDetail == null) {
+            throw new BusinessException("未找到原始明细记录");
+        }
+
+        // 2. 检查是否需要处理工程师ID变更
+        boolean engineerIdChanged = false;
+        if (detail.getEngineerId() != null && !detail.getEngineerId().equals(originalDetail.getEngineerId())) {
+            engineerIdChanged = true;
+        }
+
+        // ✅ 关键修改：直接处理工程师ID变更
+        if (engineerIdChanged) {
+            // 获取课程信息
+            ZkbTrainPublishRegister register = zkbTrainPublishRegisterRepository.findById(detail.getRegisterId());
+            if (register == null) {
+                throw new BusinessException("未找到报名主表");
+            }
+            ZkbTrainPublishInfo publishInfo = zkbTrainPublishRepository.findById(register.getPid());
+            if (publishInfo == null) {
+                throw new BusinessException("未找到课程信息");
+            }
+            String tenantUid = register.getTenantUid();
+            String courseId = publishInfo.getCourseId();
+            String oldEngineerId = originalDetail.getEngineerId();
+            String newEngineerId = detail.getEngineerId();
+
+            // 处理ID变更的配额调整
+            if (StringUtils.hasText(oldEngineerId) && !StringUtils.hasText(newEngineerId)) {
+                zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, 1, Collections.singletonList(oldEngineerId), currentUser);
+            } else if (!StringUtils.hasText(oldEngineerId) && StringUtils.hasText(newEngineerId)) {
+                zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -1, Collections.singletonList(newEngineerId), currentUser);
+            } else if (StringUtils.hasText(oldEngineerId) && StringUtils.hasText(newEngineerId)) {
+                zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, 1, Collections.singletonList(oldEngineerId), currentUser);
+                zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -1, Collections.singletonList(newEngineerId), currentUser);
+            }
+
+            // ✅ 直接更新detail的engineerId（关键！）
+            detail.setEngineerId(newEngineerId);
+        }
 
         boolean isCreate = false;
         if (detail.getId() == null || detail.getId().contains("temp")) {
@@ -194,7 +242,11 @@ public class ZkbTrainPublishRegisterService {
             String tenantUid = register.getTenantUid();
             String courseId = publishInfo.getCourseId();
             logger.info("modifyDetail adjustQuota:{}", courseId);
-            zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -1, currentUser);
+
+            // 获取当前明细的工程师ID（精确匹配的关键）
+            String engineerId = detail.getEngineerId();
+            List<String> engineerIds = Collections.singletonList(engineerId);
+            zkbTrainCourseQuotaService.adjustQuota(tenantUid, courseId, -1, engineerIds, currentUser);
         } else {
             blobObjectRepository.deleteByBoUuid(detail.getId());
         }
@@ -217,7 +269,6 @@ public class ZkbTrainPublishRegisterService {
         return zkbTrainPublishRegisterRepository.findById(id);
     }
 
-    @Transactional
     public void deleteDetail(ZkbTrainPublishRegisterDetail detail, UserAccount currentUser) {
         if (detail == null || detail.getId() == null) return;
 
@@ -237,8 +288,11 @@ public class ZkbTrainPublishRegisterService {
             blobObjectRepository.delete(files);
         }
 
-        zkbTrainCourseQuotaService.adjustQuota(register.getTenantUid(), publishInfo.getCourseId(), +1, currentUser);
+        // 获取当前明细的工程师ID（精确匹配的关键）
+        String engineerId = detail.getEngineerId();
+        List<String> engineerIds = Collections.singletonList(engineerId);
 
+        zkbTrainCourseQuotaService.adjustQuota(register.getTenantUid(), publishInfo.getCourseId(), +1, engineerIds, currentUser);
         zkbTrainPublishRegisterDetailRepository.delete(detail);
     }
 
@@ -271,9 +325,15 @@ public class ZkbTrainPublishRegisterService {
 
         List<ZkbTrainPublishRegisterDetail> details = zkbTrainPublishRegisterDetailRepository.findByRegisterId(register.getId());
         int personCount = CollectionUtils.size(details);
+        logger.info("cancelRegister personCount:{}", personCount);
 
         if (personCount > 0) {
-            zkbTrainCourseQuotaService.adjustQuota(register.getTenantUid(), publishInfo.getCourseId(), +personCount, currentUser);
+            // 提取所有工程师ID
+            List<String> engineerIds = details.stream()
+                    .map(ZkbTrainPublishRegisterDetail::getEngineerId)
+                    .collect(Collectors.toList());
+
+            zkbTrainCourseQuotaService.adjustQuota(register.getTenantUid(), publishInfo.getCourseId(), +personCount, engineerIds, currentUser);
 
             for (ZkbTrainPublishRegisterDetail detail : details) {
                 List<V2_BlobObject> files = blobObjectRepository.findByBoUuid(detail.getId());
