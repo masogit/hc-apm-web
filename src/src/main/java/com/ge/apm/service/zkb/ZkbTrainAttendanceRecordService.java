@@ -6,6 +6,7 @@ import com.ge.apm.dao.ZkbTrainAttendanceRecordRepository;
 import com.ge.apm.dao.ZkbTrainPublishRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelParser;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -40,6 +41,9 @@ public class ZkbTrainAttendanceRecordService {
 
     @Autowired
     private ZkbTrainPublishRepository zkbTrainPublishRepository;
+
+    @Autowired
+    private ZkbTrainCourseQuotaService zkbTrainCourseQuotaService;
 
     private final List<String> statusList = Arrays.asList("Attended", "UnAttended");
 
@@ -235,7 +239,7 @@ public class ZkbTrainAttendanceRecordService {
                         importFailedDataList.add(record);
                     } else {
                         // 设置代理商租户Id
-                        ZkbContract zkbContract= zkbContractRepository.findFirstByContractNo(contractNo);
+                        ZkbContract zkbContract = zkbContractRepository.findFirstByContractNo(contractNo);
                         if (zkbContract != null) {
                             record.setTenantUid(zkbContract.getTenantUID());
                         }
@@ -286,7 +290,7 @@ public class ZkbTrainAttendanceRecordService {
             selected.setCreatedBy(currentUser.getLoginName());
         }
         // 设置代理商租户Id
-        ZkbContract zkbContract= zkbContractRepository.findFirstByContractNo(selected.getContractNo());
+        ZkbContract zkbContract = zkbContractRepository.findFirstByContractNo(selected.getContractNo());
         if (zkbContract != null) {
             selected.setTenantUid(zkbContract.getTenantUID());
         }
@@ -303,6 +307,32 @@ public class ZkbTrainAttendanceRecordService {
 
         // 更新工程师SSO
         this.writeSsoToEngineer(selected.getPhone(), selected.getSso());
+
+        // 关键修改：处理未参加状态
+        if ("unattended".equals(selected.getStatus())) {
+            processUnattendedRecord(selected, zkbTrainPublishInfo, currentUser);
+        }
+    }
+
+    private void processUnattendedRecord(ZkbTrainAttendanceRecord selected, ZkbTrainPublishInfo zkbTrainPublishInfo, UserAccount currentUser) {
+
+        // 验证必要条件
+        if (StringUtils.isEmpty(selected.getTenantUid()) || zkbTrainPublishInfo == null) {
+            logger.warn("TenantUid or course info missing for unattended record: {}", selected.getId());
+            return;
+        }
+
+        List<ZkbEngineer> engineerList = zkbEngineerRepository.findByPhone(selected.getPhone());
+        if (CollectionUtils.isEmpty(engineerList)) {
+            logger.warn("No engineer found for phone: {}", selected.getPhone());
+            return;
+        }
+
+        String engineerId = engineerList.get(0).getId();
+
+        // 3. 精确返还对应工程师的配额
+        zkbTrainCourseQuotaService.adjustQuota(selected.getTenantUid(), zkbTrainPublishInfo.getCourseId(), 1, Collections.singletonList(engineerId), currentUser);
+        logger.info("Returned quota for engineer: {}, course: {}", engineerId, zkbTrainPublishInfo.getCourseId());
     }
 
     private void writeSsoToEngineer(String phone, String sso) {

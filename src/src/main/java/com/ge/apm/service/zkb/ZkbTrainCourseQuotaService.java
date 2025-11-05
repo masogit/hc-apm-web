@@ -328,8 +328,7 @@ public class ZkbTrainCourseQuotaService {
     }
 
     @Transactional
-    public void adjustQuota(String tenantUid, String courseId, int delta, UserAccount operator) {
-
+    public void adjustQuota(String tenantUid, String courseId, int delta, List<String> engineerIds, UserAccount operator) {
         if (delta == 0) return;
 
         ZkbTrainCourseQuota mainQuota = zkbTrainCourseQuotaRepository.findFirstByTenantUidAndCourseId(tenantUid, courseId);
@@ -337,6 +336,7 @@ public class ZkbTrainCourseQuotaService {
             throw new BusinessException("未配置该课程配额，无法调整");
         }
 
+        // 验证配额逻辑（保持不变）
         int newQuota = mainQuota.getQuota() + delta;
         if (newQuota < 0) {
             throw new BusinessException("配额不足，无法完成操作，当前剩余：" + mainQuota.getQuota());
@@ -344,6 +344,7 @@ public class ZkbTrainCourseQuotaService {
         if (newQuota > mainQuota.getTotalQuota()) {
             throw new BusinessException("配额有误，无法完成操作，当前剩余名额大于总名额");
         }
+
         if (mainQuota.getApplyQuota() == null) {
             mainQuota.setApplyQuota(0);
         }
@@ -354,13 +355,77 @@ public class ZkbTrainCourseQuotaService {
         if (applyQuota > mainQuota.getTotalQuota()) {
             throw new BusinessException("配额有误，无法完成操作，当前申请中名额大于总名额");
         }
-        logger.info("adjustQuota newQuota: {},applyQuota: {}",newQuota,applyQuota);
+        logger.info("adjustQuota newQuota: {}, applyQuota: {}", newQuota, applyQuota);
 
+        // 更新主配额
         mainQuota.setQuota(newQuota);
         mainQuota.setApplyQuota(applyQuota);
         mainQuota.setLastModifiedBy(operator.getName());
         mainQuota.setLastModifiedDate(new Date());
         zkbTrainCourseQuotaRepository.save(mainQuota);
+
+        // 获取配额详情（按最新批次排序）
+        List<ZkbTrainCourseQuotaDetail> quotaDetails =
+                zkbTrainCourseQuotaDetailRepository.findByQuotaIdOrderByUniqueIDDesc(mainQuota.getId());
+
+        int adjustAmount = Math.abs(delta);
+        int remaining = adjustAmount;
+        int index = 0;
+
+        boolean isDeduct = delta < 0; // true: 扣除, false: 返还
+
+        if (isDeduct) {
+            // 扣除操作：按顺序分配工程师ID
+            for (ZkbTrainCourseQuotaDetail detail : quotaDetails) {
+                if (remaining <= 0) break;
+                if (detail.getQuota() <= 0) continue;
+
+                int adjustThisTime = Math.min(remaining, detail.getQuota());
+
+                // 分配工程师ID（按顺序）
+                for (int i = 0; i < adjustThisTime; i++) {
+                    if (index < engineerIds.size()) {
+                        detail.setEngineerId(engineerIds.get(index++));
+                    } else {
+                        detail.setEngineerId(null); // 不足时置空
+                    }
+                }
+
+                detail.setQuota(detail.getQuota() - adjustThisTime);
+                detail.setLastModifiedBy(operator.getName());
+                zkbTrainCourseQuotaDetailRepository.save(detail);
+                remaining -= adjustThisTime;
+            }
+        } else {
+            // 返还操作：精确匹配工程师ID
+            if (engineerIds == null || engineerIds.isEmpty()) {
+                throw new BusinessException("返还配额时需要指定工程师ID");
+            }
+
+            // 遍历配额详情，精确匹配工程师ID
+            for (ZkbTrainCourseQuotaDetail detail : quotaDetails) {
+                if (remaining <= 0) break;
+                if (detail.getEngineerId() == null) continue;
+
+                // 检查当前详情的engineerId是否匹配
+                for (String targetEngineerId : engineerIds) {
+                    if (detail.getEngineerId().equals(targetEngineerId)) {
+                        // 清空匹配到的详情的engineerId
+                        detail.setEngineerId(null);
+                        detail.setQuota(detail.getQuota() + 1);
+                        detail.setLastModifiedBy(operator.getName());
+                        zkbTrainCourseQuotaDetailRepository.save(detail);
+                        remaining--;
+                        break; // 一个详情只匹配一个工程师ID
+                    }
+                }
+            }
+
+            // 验证是否全部匹配成功
+            if (remaining > 0) {
+                throw new BusinessException("未找到匹配的工程师ID: " + engineerIds);
+            }
+        }
     }
 
 }

@@ -79,8 +79,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     @Getter
     @Setter
     private String selectionTenantInfo;
-
-    private static final String ssoStartWith = "ZKB";
     private static final String PHYSICAL_EXAM = "PHYSICAL_EXAM";
     private static final String SAFETY_CERT = "SAFETY_CERT";
     private static final String RECOMMENDATION = "RECOMMENDATION";
@@ -262,10 +260,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveEngineer() {
-//        if (checkAttachments()) {
-//            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
-//            return;
-//        }
+        if (checkAttachments()) {
+            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
+            return;
+        }
         // 附件已绑定到editingDetail，无需额外操作
         editingDetail.setRegisterId(zkbTrainPublishRegister.getId());
 
@@ -286,10 +284,10 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
     }
 
     public void saveData() {
-//        if (checkAttachments()) {
-//            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
-//            return;
-//        }
+        if (checkAttachments()) {
+            WebUtil.addErrorMessage("附件不全，请上传放射体检、安全证书和推荐函");
+            return;
+        }
         zkbTrainPublishRegisterService.saveData(zkbTrainPublishRegister, zkbTrainPublishRegisterDetailList, currentUser);
         WebUtil.addSuccessMessage("报名成功");
     }
@@ -310,7 +308,6 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
         this.newEngineer.setTenantUID(this.selectionTenantInfo);
         this.newEngineer.setCreatedBy(this.currentUser.getLoginName());
         this.newEngineer.setCreatedDate(new Date());
-        this.zkbEngineerService.fullSso(this.newEngineer, ssoStartWith);
         this.newEngineerV2BlobObjectList = new ArrayList<>();
         this.removeNewEngineerFileList = new ArrayList<>();
         this.engineerFormView = "create";
