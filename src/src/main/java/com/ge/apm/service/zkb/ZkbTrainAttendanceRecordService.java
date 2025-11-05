@@ -309,7 +309,7 @@ public class ZkbTrainAttendanceRecordService {
         this.writeSsoToEngineer(selected.getPhone(), selected.getSso());
 
         // 关键修改：处理未参加状态
-        if ("unattended".equals(selected.getStatus())) {
+        if ("Unattended".equals(selected.getStatus())) {
             processUnattendedRecord(selected, zkbTrainPublishInfo, currentUser);
         }
     }
