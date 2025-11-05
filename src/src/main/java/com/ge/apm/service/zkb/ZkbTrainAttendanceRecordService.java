@@ -45,7 +45,7 @@ public class ZkbTrainAttendanceRecordService {
     @Autowired
     private ZkbTrainCourseQuotaService zkbTrainCourseQuotaService;
 
-    private final List<String> statusList = Arrays.asList("Attended", "UnAttended");
+    private final List<String> statusList = Arrays.asList("Attended", "Unattended");
 
     public List<ZkbTrainAttendanceRecord> handleExcel(UploadedFile file, UserAccount currentUser) {
         List<ZkbTrainAttendanceRecord> importFailedDataList = new ArrayList<>();
@@ -200,7 +200,7 @@ public class ZkbTrainAttendanceRecordService {
 
                     // 状态校验
                     if (!statusList.contains(status)) {
-                        record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "状态只能是：Attended 或 UnAttended；");
+                        record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "状态只能是：Attended 或 Unattended；");
                         valid = false;
                     }
 
