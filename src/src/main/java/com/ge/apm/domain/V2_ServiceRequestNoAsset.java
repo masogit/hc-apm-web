@@ -184,6 +184,9 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name="sr_repair_source")
     private String srRepairSource;
 
+    @Column(name = "voice_to_Text", columnDefinition = "text")
+    private String voiceToText;
+
     @Override
     public int hashCode() {
         Integer hash = 0;
