@@ -45,7 +45,7 @@ public class ZkbTrainAttendanceRecordService {
     @Autowired
     private ZkbTrainCourseQuotaService zkbTrainCourseQuotaService;
 
-    private final List<String> statusList = Arrays.asList("Attended", "UnAttended");
+    private final List<String> statusList = Arrays.asList("Attended", "Unattended");
 
     public List<ZkbTrainAttendanceRecord> handleExcel(UploadedFile file, UserAccount currentUser) {
         List<ZkbTrainAttendanceRecord> importFailedDataList = new ArrayList<>();
@@ -200,7 +200,7 @@ public class ZkbTrainAttendanceRecordService {
 
                     // 状态校验
                     if (!statusList.contains(status)) {
-                        record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "状态只能是：Attended 或 UnAttended；");
+                        record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "状态只能是：Attended 或 Unattended；");
                         valid = false;
                     }
 
@@ -309,28 +309,23 @@ public class ZkbTrainAttendanceRecordService {
         this.writeSsoToEngineer(selected.getPhone(), selected.getSso());
 
         // 关键修改：处理未参加状态
-        if ("unattended".equals(selected.getStatus())) {
+        if ("Unattended".equals(selected.getStatus())) {
             processUnattendedRecord(selected, zkbTrainPublishInfo, currentUser);
         }
     }
 
     private void processUnattendedRecord(ZkbTrainAttendanceRecord selected, ZkbTrainPublishInfo zkbTrainPublishInfo, UserAccount currentUser) {
 
-        // 验证必要条件
         if (StringUtils.isEmpty(selected.getTenantUid()) || zkbTrainPublishInfo == null) {
             logger.warn("TenantUid or course info missing for unattended record: {}", selected.getId());
             return;
         }
-
         List<ZkbEngineer> engineerList = zkbEngineerRepository.findByPhone(selected.getPhone());
         if (CollectionUtils.isEmpty(engineerList)) {
             logger.warn("No engineer found for phone: {}", selected.getPhone());
             return;
         }
-
         String engineerId = engineerList.get(0).getId();
-
-        // 3. 精确返还对应工程师的配额
         zkbTrainCourseQuotaService.adjustQuota(selected.getTenantUid(), zkbTrainPublishInfo.getCourseId(), 1, Collections.singletonList(engineerId), currentUser);
         logger.info("Returned quota for engineer: {}, course: {}", engineerId, zkbTrainPublishInfo.getCourseId());
     }
