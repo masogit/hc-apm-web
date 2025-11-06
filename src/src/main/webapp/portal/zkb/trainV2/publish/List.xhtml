@@ -96,6 +96,7 @@
                                              disabled="#{empty zkbTrainPublishController.selected.id}"/>
                             <p:commandButton id="exportButton" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
                                              class="btn btn-sm btn-gray"
+                                             disabled="#{empty zkbTrainPublishController.selected.id}"
                                              actionListener="#{zkbTrainPublishController.exportAll()}" ajax="false">
                                 <p:fileDownload value="#{zkbTrainPublishController.exportFile}"/>
                             </p:commandButton>
