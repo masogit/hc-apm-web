@@ -1,6 +1,7 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbEngineerRepository;
+import com.ge.apm.dao.ZkbTrainAttendanceRecordRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer> {
 
     private ZkbEngineerRepository dao;
+    private ZkbTrainAttendanceRecordRepository zkbTrainAttendanceRecordRepository;
     private ZkbEngineerService zkbEngineerService;
     private ZkbEngineerExportService zkbEngineerExportService;
     private UserContextService userContextService;
@@ -52,7 +54,7 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
     private Page<ZkbEngineer> zkbEngineerPage;
 
     private List<ZkbEngineerTrackRecord> zkbEngineerTrackRecordList;
-
+    private List<ZkbTrainAttendanceRecord> zkbTrainAttendanceRecordList;
 
     /**
      * 培训记录
@@ -137,6 +139,7 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
         this.selected.setLastModifiedBy(this.currentUser.getLoginName());
         this.selected.setLastModifiedDate(new Date());
 
+        zkbTrainAttendanceRecordList = zkbTrainAttendanceRecordRepository.find(selected.getPhone());
         zkbEngineerTrackRecordList = zkbEngineerService.getZkbEngineerTrackRecordList(this.selected.getId());
         zkbEngineerTrainRecordList = zkbEngineerService.getZkbEngineerTrainRecordList(this.selected.getId());
         this.initBlobObjectList(this.selected.getId());
@@ -318,5 +321,13 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
 
     public void setZkbContractCourseSchedule(ZkbContractCourseSchedule zkbContractCourseSchedule) {
         this.zkbContractCourseSchedule = zkbContractCourseSchedule;
+    }
+
+    public List<ZkbTrainAttendanceRecord> getZkbTrainAttendanceRecordList() {
+        return zkbTrainAttendanceRecordList;
+    }
+
+    public void setZkbTrainAttendanceRecordList(List<ZkbTrainAttendanceRecord> zkbTrainAttendanceRecordList) {
+        this.zkbTrainAttendanceRecordList = zkbTrainAttendanceRecordList;
     }
 }
