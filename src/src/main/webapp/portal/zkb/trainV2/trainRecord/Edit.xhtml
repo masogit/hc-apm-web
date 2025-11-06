@@ -37,7 +37,7 @@
                                  required="true" requiredMessage="电话 #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">邮箱</label>
+                    <label class="label">个人邮箱</label>
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.email}"/>
                 </h:panelGroup>
 
@@ -46,7 +46,7 @@
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.idCardNo}"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">商备邮件</label>
+                    <label class="label">商务邮箱</label>
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.businessEmail}"/>
                 </h:panelGroup>
 
@@ -122,27 +122,25 @@
                         <f:selectItem itemLabel="Unattended"  itemValue="Unattended" />
                     </p:selectOneMenu>
                 </h:panelGroup>
+
                 <h:panelGroup>
-                    <label class="label">是否通过</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.isPassed}"/>
+                    <label class="label">课堂实验</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.labScore}"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">Final 成绩</label>
+                    <label class="label">考试</label>
+                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.writtenScore}"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">总分</label>
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.finalScore}"/>
                 </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">Lab+笔试</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.labWrittenScore}"/>
-                </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">Online 成绩</label>
+                    <label class="label">Online</label>
                     <p:inputText value="#{zkbTrainAttendanceRecordController.selected.onlineScore}"/>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">评级（Degree）</label>
-                    <p:inputText value="#{zkbTrainAttendanceRecordController.selected.degree}"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
