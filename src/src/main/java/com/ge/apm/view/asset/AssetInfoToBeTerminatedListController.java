@@ -43,6 +43,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,6 +151,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         return dao;
     }
 
+    private List<Field> fieldList = new ArrayList<>();
+
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+
     @Override
     protected void init() {
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
@@ -180,6 +187,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         this.selectedObject = new HashMap<>();
         loadCustomConfig();
         loadClinicalDeptList();
+        fieldList = Arrays.stream(AssetInfo.class.getDeclaredFields()).collect(Collectors.toList());
 
     }
 
@@ -1078,17 +1086,46 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 case "terminationCause":
                     param.put("terminationCause", searchFilter.value);
                     break;
-                case "warrantyDate":
-                    param.put("warrantyDate", searchFilter.value);
-                    break;
                 case "workOrderId":
                     param.put("workOrderId", searchFilter.value);
                     break;
-
-
-
                 default:
-                    break;
+                Optional<Field> firstField = fieldList.stream().filter(item -> item.getName().equalsIgnoreCase(fieldName)).findFirst();
+                if(firstField.isPresent()){
+                    Field field = firstField.get();
+                    String name = field.getName();
+                    Class<?> type = field.getType();
+                    if(name.equals("warrantyDate")){
+                        String[] split = filterWarrantyDate.split("~");
+                        try {
+                            if(ObjectUtil.isNotEmpty(split[0])){
+                                param.put(name, format.parse(split[0]));
+                                param.put(name+"1", format.parse(split[1]));
+                            }else{
+                                param.put(name, format.parse(split[1]));
+                            }
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }else if (type == Date.class){
+                        String filterDate =(String) selectedObject.get(name);
+                        String[] split = filterDate.split("~");
+                        try {
+                            if(ObjectUtil.isNotEmpty(split[0])){
+                                param.put(name, format.parse(split[0]));
+                                param.put(name+"1", format.parse(split[1]));
+                            }else{
+                                param.put(name, format.parse(split[1]));
+                            }
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }else{
+                        param.put(name,  searchFilter.value);
+                    }
+
+                }
+                break;
             }
         }
 
