@@ -74,8 +74,8 @@ public class ZkbTrainAttendanceRecordService {
             List<String> headers = Arrays.asList(
                     "Status", "原因", "学员类型", "开始时间", "结束时间", "课程名称", "Modality",
                     "培训老师", "培训形式", "培训地点", "公司", "合同号", "合同唯一号/Unic ID",
-                    "姓名", "SSO", "电话", "邮箱", "身份证号", "商备邮件",
-                    "Online", "Lab+笔试", "Final", "Degree", "是否通过"
+                    "姓名", "SSO", "电话", "个人邮箱", "身份证号", "商务邮箱",
+                    "Online", "课堂实验", "考试", "总分"
             );
 
             Map<String, Integer> headerMap = ExcelParser.findHeader(sheet, headers);
@@ -103,14 +103,13 @@ public class ZkbTrainAttendanceRecordService {
             int traineeNameIdx = headerMap.get("姓名");
             int ssoIdx = headerMap.get("SSO");
             int phoneIdx = headerMap.get("电话");
-            int emailIdx = headerMap.get("邮箱");
+            int emailIdx = headerMap.get("个人邮箱");
             int idCardNoIdx = headerMap.get("身份证号");
-            int businessEmailIdx = headerMap.get("商备邮件");
+            int businessEmailIdx = headerMap.get("商务邮箱");
             int onlineScoreIdx = headerMap.get("Online");
-            int labWrittenScoreIdx = headerMap.get("Lab+笔试");
-            int finalScoreIdx = headerMap.get("Final");
-            int degreeIdx = headerMap.get("Degree");
-            int isPassedIdx = headerMap.get("是否通过");
+            int labScoreIdx = headerMap.get("课堂实验");
+            int writtenScoreIdx = headerMap.get("考试");
+            int finalScoreIdx = headerMap.get("总分");
 
             int headerRow = headerMap.get("HEADER_ROW");
             int lastRowNum = sheet.getLastRowNum();
@@ -143,10 +142,9 @@ public class ZkbTrainAttendanceRecordService {
                     String idCardNo = StringUtils.trim(ExcelParser.getCellStringValue(row, idCardNoIdx));
                     String businessEmail = StringUtils.trim(ExcelParser.getCellStringValue(row, businessEmailIdx));
                     String onlineScore = StringUtils.trim(ExcelParser.getCellStringValue(row, onlineScoreIdx));
-                    String labWrittenScore = StringUtils.trim(ExcelParser.getCellStringValue(row, labWrittenScoreIdx));
+                    String labScoreStr = StringUtils.trim(ExcelParser.getCellStringValue(row, labScoreIdx));
+                    String writtenScoreStr = StringUtils.trim(ExcelParser.getCellStringValue(row, writtenScoreIdx));
                     String finalScoreStr = StringUtils.trim(ExcelParser.getCellStringValue(row, finalScoreIdx));
-                    String degree = StringUtils.trim(ExcelParser.getCellStringValue(row, degreeIdx));
-                    String isPassed = StringUtils.trim(ExcelParser.getCellStringValue(row, isPassedIdx));
 
                     // 日期解析
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
@@ -187,13 +185,35 @@ public class ZkbTrainAttendanceRecordService {
                         valid = false;
                     }
 
-                    // Final 成绩数字校验
+                    // 实验成绩数字校验
+                    Double labScore = null;
+                    if (StringUtils.isNotEmpty(labScoreStr)) {
+                        try {
+                            labScore = Double.parseDouble(labScoreStr.trim());
+                        } catch (NumberFormatException e) {
+                            record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "实验成绩必须为数值型；");
+                            valid = false;
+                        }
+                    }
+
+                    // 考试成绩数字校验
+                    Double writtenScore = null;
+                    if (StringUtils.isNotEmpty(writtenScoreStr)) {
+                        try {
+                            writtenScore = Double.parseDouble(writtenScoreStr.trim());
+                        } catch (NumberFormatException e) {
+                            record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "考试成绩必须为数值型；");
+                            valid = false;
+                        }
+                    }
+
+                    // 总分成绩数字校验
                     Double finalScore = null;
                     if (StringUtils.isNotEmpty(finalScoreStr)) {
                         try {
                             finalScore = Double.parseDouble(finalScoreStr.trim());
                         } catch (NumberFormatException e) {
-                            record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "Final 成绩必须为数值型；");
+                            record.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "总分成绩必须为数值型；");
                             valid = false;
                         }
                     }
@@ -225,10 +245,9 @@ public class ZkbTrainAttendanceRecordService {
                     record.setIdCardNo(idCardNo);
                     record.setBusinessEmail(businessEmail);
                     record.setOnlineScore(onlineScore);
-                    record.setLabWrittenScore(labWrittenScore);
+                    record.setLabScore(labScore);
+                    record.setWrittenScore(writtenScore);
                     record.setFinalScore(finalScore);
-                    record.setDegree(degree);
-                    record.setIsPassed(isPassed);
 
                     record.setCreatedBy(currentUser.getLoginName());
                     record.setCreatedDate(new Date());
