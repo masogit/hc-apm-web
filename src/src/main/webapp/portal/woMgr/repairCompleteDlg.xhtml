@@ -123,6 +123,20 @@
                         </p:inputTextarea>
                     </h:panelGroup>
                 </p:panelGrid>
+
+
+                <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
+                    <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                                </p:graphicImage>
+                            </h:panelGrid>
+                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                        </p:panel>
+                    </p:dataGrid>
+                </p:fieldset>
                 <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="7" layout="grid">
                     <f:facet name="header">
                         #{msg.addPic}<p:outputLabel value="(#{msg.maxUpload5Pics})" style="color: red"></p:outputLabel>
