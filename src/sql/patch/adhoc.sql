@@ -34,3 +34,8 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 
 -- YHAAO-26222 批量更新用户修改记录user_uid
 update user_account_history set user_uid = user_account.uid from user_account where user_account_history.login_name = user_account.login_name and user_account_history.user_uid is null;
+
+-- YHAAO-26164 查询安徽臻徽医疗器械有限公司KPI得分显示的问题
+update zkb_part_order_return set data_satus = 'Accept' where part_order_id = '2c9288957edde390017f01c4c4a63f6d';
+update zkb_part_order_return set qty = 2 where part_order_id = '2c9b8584944a68ac01944df10a6e040c';
+delete from zkb_key_behavior_index where tenant_uid = 'e1f36960972d4251bb92fd61d7afe1af' and kbi_date > '2025-01-01';
