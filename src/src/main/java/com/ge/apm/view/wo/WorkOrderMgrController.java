@@ -1625,11 +1625,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         String repairEntryTypeSet = configItemValueRepository.findByKeyAndSiteForUseParent(selectedWorkOrder.getSiteUID(), selectedWorkOrder.getHospitalUID(), selectedWorkOrder.getInstitutionUID(), selectedWorkOrder.getTenantUID(), key);
         if (StrUtil.isNotEmpty(repairEntryTypeSet)) {
             Integer oldCoworkerEntryType = selectedWorkOrder.getCoworkerEntryType();
+            Integer oldEntryType = selectedWorkOrder.getEntryType();
             if (selectedWorkOrder.getEntryType() == null) {
                 selectedWorkOrder.setEntryType(Integer.parseInt(repairEntryTypeSet));
             } else {
                 if (Integer.parseInt(repairEntryTypeSet) == 2 || Integer.parseInt(repairEntryTypeSet) == 3) {
                     selectedWorkOrder.setEntryType(Integer.parseInt(repairEntryTypeSet));
+                }
+                if((oldEntryType==0 || oldEntryType==2) &&  Integer.parseInt(repairEntryTypeSet)  ==3){
+                    selectedWorkOrder.setManHours(null);
+                }
+                if((oldEntryType==1 || oldEntryType==3) &&  Integer.parseInt(repairEntryTypeSet) ==2){
+                    selectedWorkOrder.setManHours(null);
                 }
             }
 

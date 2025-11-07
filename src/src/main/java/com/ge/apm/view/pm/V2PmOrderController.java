@@ -2544,6 +2544,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                         if((oldEntryType==1 || oldEntryType==3) &&  fieldColumnDto.getEntryType() ==2){
                             selectedPmOrder.setManHours(fieldColumnDto.getHours());
                         }
+                        if((oldEntryType==0 || oldEntryType==2) && fieldColumnDto.getEntryType() ==3){
+                            selectedPmOrder.setManHours(null);
+                        }
                     }
 
                     if(selectedPmOrder.getCoworkerEntryType() == null){
