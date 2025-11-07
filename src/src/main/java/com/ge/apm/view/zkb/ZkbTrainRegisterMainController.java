@@ -186,7 +186,7 @@ public class ZkbTrainRegisterMainController<E> extends GenericCRUDUUIDController
             editingDetail.setEngineerName(selectedEngineer.getName());
             editingDetail.setEngineerPhone(selectedEngineer.getPhone());
             editingDetail.setEngineerEmail(selectedEngineer.getEmail());
-            editingDetail.setEngineerAge(selectedEngineer.getAge());
+            editingDetail.setEngineerIdentityNumber(selectedEngineer.getIdentityNumber());
             editingDetail.setEngineerSso(selectedEngineer.getSso());
             // 清空附件（使用当前编辑详情的附件列表）
             List<V2_BlobObject> currentAttachments = editingDetail.getV2_blobObjectList();
