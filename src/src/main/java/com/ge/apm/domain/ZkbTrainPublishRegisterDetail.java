@@ -32,10 +32,10 @@ public class ZkbTrainPublishRegisterDetail {
     private String engineerPhone;
     @Column(name = "engineer_email")
     private String engineerEmail;
-    @Column(name = "engineer_age")
-    private Integer engineerAge;
     @Column(name = "engineer_sso")
     private String engineerSso;
+    @Column(name = "engineer_identity_number")
+    private String engineerIdentityNumber;
 
     @Column(name = "created_by")
     private String createdBy;
