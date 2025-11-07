@@ -21,11 +21,13 @@
                     </h:panelGroup>
                     <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1 || v2PmOrderController.selectedPmOrder.coworkerEntryType==3}">
                         <label class="label">开始时间*</label>
-                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{v2PmOrderController.coWorkerDetail.startTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{v2PmOrderController.coWorkerDetail.startTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}">
+                            <p:ajax update="endDate2"/>
+                        </p:calendar>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1 || v2PmOrderController.selectedPmOrder.coworkerEntryType==3}">
                         <label class="label">结束时间*</label>
-                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{v2PmOrderController.coWorkerDetail.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="结束时间#{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="GMT+8" id="endDate2" pattern="yyyy-MM-dd HH:mm"  value="#{v2PmOrderController.coWorkerDetail.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="结束时间#{msg.ValidationRequire}"  maxdate="#{v2PmOrderController.getCoWorkMaxDate()}"></p:calendar>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==0 || v2PmOrderController.selectedPmOrder.coworkerEntryType==2}">
                         <label class="label">#{msg.InternalManhoursHours}*</label>

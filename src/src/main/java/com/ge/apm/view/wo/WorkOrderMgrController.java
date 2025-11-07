@@ -2706,6 +2706,38 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             coWorkerList.remove(coWorkerDetail);
         }
         if(selectedWorkOrder.getCoworkerEntryType() == 1 || selectedWorkOrder.getCoworkerEntryType() == 3){
+
+            // 重复性校验
+            boolean check = false;
+            for (V2_WorkOrderCoworker detail : coWorkerList) {
+                if("000".equals(detail.getId())){
+                    continue;
+                }
+                // 开始时间结束时间不能相等
+                if(coWorkerDetail.getStartTime().getTime() == detail.getStartTime().getTime()
+                        || coWorkerDetail.getEndTime().getTime() == detail.getEndTime().getTime()){
+                    check = true;
+                    break;
+                }
+                // 当前开始时间小于结束时间 && 大于开始时间
+                if(coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()
+                        && coWorkerDetail.getStartTime().getTime() > detail.getStartTime().getTime()){
+                    check = true;
+                    break;
+                }
+                // 当前结束时间大于开始时间 && 小于结束时间
+                if(coWorkerDetail.getEndTime().getTime() > detail.getStartTime().getTime()
+                        && coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()){
+                    check = true;
+                    break;
+                }
+            }
+            if(check){
+                WebUtil.addErrorMessage("工时段重复，请重新填写");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+
             String strHours = "0";
             long milliSeconds = coWorkerDetail.getEndTime().getTime() - coWorkerDetail.getStartTime().getTime();
             if (milliSeconds > 0) {
@@ -4286,6 +4318,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public boolean showEnableEngineersWriteRepairOutside(){
         boolean  externalPurchase = accessoryList.stream().anyMatch(item -> "3".equals(item.getPartsType()));
         return enableEngineersWriteRepairOutside && externalPurchase;
+    }
+
+
+    public Date getCoWorkMaxDate(){
+        if(coWorkerDetail.getStartTime() != null){
+            Date date = DateUtil.offset(coWorkerDetail.getStartTime(), DateField.HOUR, 24);
+            return date;
+        }
+        return TimeUtil.now();
     }
 }
 
