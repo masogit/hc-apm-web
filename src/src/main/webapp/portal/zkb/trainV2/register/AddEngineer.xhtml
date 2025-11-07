@@ -80,16 +80,15 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class="label">#{msg.zkbEngineer_age}*</label>
-                                <p:inputNumber id="age" decimalPlaces="0" minValue="0" maxValue="999"
-                                               value="#{zkbTrainRegisterMainController.editingDetail.engineerAge}"
+                                <label class="label">#{msg.zkbEngineer_identityNumber}*</label>
+                                <p:inputText id="identityNumber"
+                                               value="#{zkbTrainRegisterMainController.editingDetail.engineerIdentityNumber}"
                                                required="true"
-                                               requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}"
+                                               requiredMessage="#{msg.zkbEngineer_identityNumber} #{msg.ValidationRequire}"
                                                class="engineerNameChange"
                                                disabled="#{zkbTrainRegisterMainController.actionName == 'View'}">
                                     <p:ajax/>
-                                    <f:convertNumber pattern="0" type="number"/>
-                                </p:inputNumber>
+                                </p:inputText>
                             </h:panelGroup>
 
                             <h:panelGroup>
@@ -178,7 +177,7 @@
                                           update="uploadList :engineerEditForm" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
                                           sizeLimit="100000000" dragDropSupport="false"
                                           rendered="#{zkbTrainRegisterMainController.actionName != 'View'}"/>
-                            <p:fileUpload mode="advanced" label="上传推荐函" auto="true" multiple="false"
+                            <p:fileUpload mode="advanced" label="上传推荐函(需盖公司章)" auto="true" multiple="false"
                                           fileUploadListener="#{zkbTrainRegisterMainController.handleRecommendationUpload}"
                                           update="uploadList :engineerEditForm" allowTypes="/(\.|\/)(pdf|doc|docx|jpg|png)$/i"
                                           sizeLimit="100000000" dragDropSupport="false"
@@ -245,10 +244,10 @@
                                 </h:panelGroup>
 
                                 <h:panelGroup>
-                                    <label class="label">年龄*</label>
-                                    <p:inputNumber value="#{zkbTrainRegisterMainController.newEngineer.age}"
-                                                   decimalPlaces="0" minValue="0" maxValue="999" required="true"
-                                                   requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}"/>
+                                    <label class="label">身份证号*</label>
+                                    <p:inputNumber value="#{zkbTrainRegisterMainController.newEngineer.identityNumber}"
+                                                   required="true"
+                                                   requiredMessage="#{msg.zkbEngineer_identityNumber} #{msg.ValidationRequire}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
 
