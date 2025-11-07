@@ -585,7 +585,7 @@
 <!--                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
 <!--                    </h:outputText>-->
 <!--                </p:column>-->
-                <p:column headerText="报废操作人">
+                <p:column headerText="报废操作人" filterBy="#{item.terminateOperation}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.terminateOperation}"/>
                 </p:column>
                 <p:column headerText="是否存在未完成工单" filterBy="#{item.workOrderId}" filterMatchMode="EQ">

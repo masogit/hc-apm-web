@@ -1089,6 +1089,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 case "workOrderId":
                     param.put("workOrderId", searchFilter.value);
                     break;
+                case "terminateOperation":
+                    param.put("terminateOperation", searchFilter.value);
+                    break;
                 default:
                 Optional<Field> firstField = fieldList.stream().filter(item -> item.getName().equalsIgnoreCase(fieldName)).findFirst();
                 if(firstField.isPresent()){
