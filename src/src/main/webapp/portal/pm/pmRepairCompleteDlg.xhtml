@@ -31,18 +31,27 @@
                             <label class="label">#{msg.manHoursEntryType}*</label>
                             <p:selectOneRadio id="entryType" required="true" disabled="false" value="#{v2PmOrderController.selectedPmOrder.entryType}"  requiredMessage="#{msg.manHoursEntryType} #{msg.ValidationRequire}">
                                 <p:ajax event="change" process="@this" update=":growl pmTab:pmrepairCompleteDialogForm:entryType pmTab:pmrepairCompleteDialogForm:workHourDetail pmTab:pmrepairCompleteDialogForm:entryTypeFlag"  listener="#{v2PmOrderController.updateEntryType(v2PmOrderController.selectedPmOrder.entryType)}" />
+                                <c:if test="#{v2PmOrderController.selectedPmOrder.entryType==1 || v2PmOrderController.selectedPmOrder.entryType==0}">
                                 <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
                                 <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                </c:if>
+
+                                <c:if test="#{v2PmOrderController.selectedPmOrder.entryType==3}">
+                                    <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="3"/>
+                                </c:if>
+                                <c:if test="#{v2PmOrderController.selectedPmOrder.entryType==2}">
+                                    <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="2"/>
+                                </c:if>
                             </p:selectOneRadio>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.entryType==0 || v2PmOrderController.selectedPmOrder.entryType==null}">
+                        <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.entryType==0 || v2PmOrderController.selectedPmOrder.entryType==2  ||  v2PmOrderController.selectedPmOrder.entryType==null}">
                             <label class="label">#{msg.Manhours}*</label>
                             <p:inputNumber id="manHoursId" validatorMessage="#{msg.ManhoursCannotL1}" value="#{v2PmOrderController.selectedPmOrder.manHours}"  required="true" requiredMessage="#{msg.Manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.entryType==1}">
+                        <h:panelGroup rendered="#{v2PmOrderController.selectedPmOrder.entryType==1 || v2PmOrderController.selectedPmOrder.entryType==3      }">
                             <label class="label">#{msg.Manhours}*</label>
                             <p:inputNumber id="manHours_input2" readonly="true" maxValue="999" value="#{v2PmOrderController.selectedPmOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
@@ -50,7 +59,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid id="workHourDetail" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup  rendered="#{v2PmOrderController.selectedPmOrder.entryType==1}">
+                        <h:panelGroup  rendered="#{v2PmOrderController.selectedPmOrder.entryType==1 || v2PmOrderController.selectedPmOrder.entryType==3  }">
                             <label class="label">#{msg.addManHoursSection}</label>
                             <p:dataTable id="pmHourDetailList" class="pmHourDetailList" value="#{v2PmOrderController.pmHoursList}" var="item" widgetVar="pmHourDetailList"
                                          lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
@@ -156,8 +165,17 @@
                             <label class="label">#{msg.coworkerManHoursEntryType}</label>
                             <p:selectOneRadio id="coworkerEntryType" required="true" value="#{v2PmOrderController.selectedPmOrder.coworkerEntryType}"  requiredMessage="#{msg.coworkerManHoursEntryType} #{msg.ValidationRequire}">
                                 <p:ajax event="change" process="@this" update=":growl pmTab:pmrepairCompleteDialogForm:coworkerEntryType pmTab:pmrepairCompleteDialogForm:pmcoworkerList"  listener="#{v2PmOrderController.updateCoworkerEntryType(v2PmOrderController.selectedPmOrder.coworkerEntryType)}" />
-                                <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
-                                <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                <c:if test="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1 || v2PmOrderController.selectedPmOrder.coworkerEntryType==0}">
+                                    <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
+                                    <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                </c:if>
+
+                                <c:if test="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==3}">
+                                    <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="3"/>
+                                </c:if>
+                                <c:if test="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==2}">
+                                    <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="2"/>
+                                </c:if>
                             </p:selectOneRadio>
                         </h:panelGroup>
 
@@ -167,12 +185,12 @@
                                 <p:column headerText="#{msg.coworker}">
                                     <h:outputText value="#{item.cowokerUserName}"/>
                                 </p:column>
-                                <p:column headerText="#{msg.startTime}" rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1}">
+                                <p:column headerText="#{msg.startTime}" rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1 || v2PmOrderController.selectedPmOrder.coworkerEntryType==3}">
                                     <h:outputText value="#{item.startTime}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="#{msg.endTime}" rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1}">
+                                <p:column headerText="#{msg.endTime}" rendered="#{v2PmOrderController.selectedPmOrder.coworkerEntryType==1 || v2PmOrderController.selectedPmOrder.coworkerEntryType==3}">
                                     <h:outputText value="#{item.endTime}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
                                     </h:outputText>

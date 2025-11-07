@@ -1575,23 +1575,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             ua1 = loginUser;
         }
         //工时类型从配置下读取 YHAAO-25807
-        String  key= "repairEntryTypeSet";
-        String repairEntryTypeSet = configItemValueRepository.findByKeyAndSiteForUseParent(selectedWorkOrder.getSiteUID(), selectedWorkOrder.getHospitalUID(), selectedWorkOrder.getInstitutionUID(), selectedWorkOrder.getTenantUID(), key);
-        if (selectedWorkOrder.getEntryType() == null) {
-            if(StrUtil.isNotEmpty(repairEntryTypeSet)){
-                try {
-                    selectedWorkOrder.setEntryType(Integer.parseInt(repairEntryTypeSet));
-                } catch (NumberFormatException e) {
-                    selectedWorkOrder.setEntryType(0);
-                }
-            }else{
-                selectedWorkOrder.setEntryType(0);
-            }
-        }
-        if(selectedWorkOrder.getCoworkerEntryType() == null){
-            selectedWorkOrder.setCoworkerEntryType(0);
-        }
-
         String result = selectedWorkOrder.getRepairResult();
         if(result!=null) {
             if (result.equalsIgnoreCase("2")||result.equalsIgnoreCase("4")) {
@@ -1631,6 +1614,35 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 externalTempUser.setId("000");
             }
         }
+        workHoursConfig();
+    }
+
+    private void workHoursConfig() {
+        String key = "repairEntryTypeSet";
+        String repairEntryTypeSet = configItemValueRepository.findByKeyAndSiteForUseParent(selectedWorkOrder.getSiteUID(), selectedWorkOrder.getHospitalUID(), selectedWorkOrder.getInstitutionUID(), selectedWorkOrder.getTenantUID(), key);
+        if (StrUtil.isNotEmpty(repairEntryTypeSet)) {
+            Integer oldCoworkerEntryType = selectedWorkOrder.getCoworkerEntryType();
+            if (selectedWorkOrder.getEntryType() == null) {
+                selectedWorkOrder.setEntryType(Integer.parseInt(repairEntryTypeSet));
+            } else {
+                if (Integer.parseInt(repairEntryTypeSet) == 2 || Integer.parseInt(repairEntryTypeSet) == 3) {
+                    selectedWorkOrder.setEntryType(Integer.parseInt(repairEntryTypeSet));
+                }
+            }
+
+            if (selectedWorkOrder.getCoworkerEntryType() == null) {
+                selectedWorkOrder.setCoworkerEntryType(Integer.parseInt(repairEntryTypeSet));
+            } else {
+                if (Integer.parseInt(repairEntryTypeSet) == 2 || Integer.parseInt(repairEntryTypeSet) == 3) {
+                    selectedWorkOrder.setCoworkerEntryType(Integer.parseInt(repairEntryTypeSet));
+                }
+                if ((oldCoworkerEntryType == 0 && Integer.parseInt(repairEntryTypeSet) == 3) || (oldCoworkerEntryType == 1 && Integer.parseInt(repairEntryTypeSet) == 2)) {
+                    coWorkerList = new ArrayList<>();
+                }
+            }
+
+        }
+
     }
 
     public List<V2_WorkOrderManHoursDetail> getWorkOrderManHoursDetail(String woId) {
@@ -1736,7 +1748,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
 
-        if (selectedWorkOrder.getEntryType() == 1) {
+        if (selectedWorkOrder.getEntryType() == 1 || selectedWorkOrder.getEntryType() == 3) {
             workHoursList = workHoursList.stream()
                     .filter(item -> !"000".equals(item.getId()))
                     .collect(Collectors.toList());
@@ -2683,7 +2695,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (coWorkerList.contains(coWorkerDetail)) {
             coWorkerList.remove(coWorkerDetail);
         }
-        if(selectedWorkOrder.getCoworkerEntryType() == 1){
+        if(selectedWorkOrder.getCoworkerEntryType() == 1 || selectedWorkOrder.getCoworkerEntryType() == 3){
             String strHours = "0";
             long milliSeconds = coWorkerDetail.getEndTime().getTime() - coWorkerDetail.getStartTime().getTime();
             if (milliSeconds > 0) {

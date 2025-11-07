@@ -2524,27 +2524,46 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         accessoryList = getWorkOrderDetail(woid);
         coWorkerList = getWorkOrderCoworker(woid);
         loadHmCheck(selectedPmOrder);
-        if(selectedPmOrder.getEntryType() == null){
+
+        Integer oldEntryType=selectedPmOrder.getEntryType();
+        Integer oldCoworkerEntryType = selectedPmOrder.getCoworkerEntryType();
+//        if(selectedPmOrder.getEntryType() == null){
             String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectedPmOrder.getSiteUID(), selectedPmOrder.getHospitalUID(), selectedPmOrder.getInstitutionUID(), selectedPmOrder.getTenantUID(), "pmEntryTypeSet");
             if(StrUtil.isNotEmpty(value)){
                 FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
                 if(fieldColumnDto.getEntryType() != null){
-                    selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
-                    if(fieldColumnDto.getEntryType() == 0){
-                        selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                    if(selectedPmOrder.getEntryType() == null){
+                        selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
+                        if(fieldColumnDto.getEntryType()==0 || fieldColumnDto.getEntryType()==2){
+                            selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                        }
+                    }else{
+                        if(fieldColumnDto.getEntryType()==2 || fieldColumnDto.getEntryType()==3){
+                            selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
+                        }
+                        if((oldEntryType==1 || oldEntryType==3) &&  fieldColumnDto.getEntryType() ==2){
+                            selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                        }
+                    }
+
+                    if(selectedPmOrder.getCoworkerEntryType() == null){
+                        selectedPmOrder.setCoworkerEntryType(fieldColumnDto.getEntryType());
+                    }else{
+                        if(fieldColumnDto.getEntryType()==2 || fieldColumnDto.getEntryType()==3){
+                            selectedPmOrder.setCoworkerEntryType(fieldColumnDto.getEntryType());
+                        }
+
+                        if((oldCoworkerEntryType==0 &&  fieldColumnDto.getEntryType() ==3  ) ||  (oldCoworkerEntryType==1 &&  fieldColumnDto.getEntryType() ==2  )){
+                            coWorkerList=new ArrayList<>();
+                        }
                     }
                 }
             }
-            if(selectedPmOrder.getEntryType() == null){
-                selectedPmOrder.setEntryType(0);
-            }
-            if(selectedPmOrder.getCoworkerEntryType() == null){
-                selectedPmOrder.setCoworkerEntryType(0);
-            }
+
 //            if(selectedPmOrder.getManHours() == null){
 //                selectedPmOrder.setManHours(0.1);
 //            }
-        }
+//        }
 
 //        if (pmCheckItemList != null){
 //        pmCheckItemList.stream().filter(item-> !hmCheck.containsKey(item.getUid()))
@@ -3133,7 +3152,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private V2_WorkOrderCoworkerRepository coWorkerDao;
 
     public void addCoWokerItem() {
-        if(selectedPmOrder.getCoworkerEntryType() == 1){
+        if(selectedPmOrder.getCoworkerEntryType() == 1 ||  selectedPmOrder.getCoworkerEntryType() == 3){
             String strHours = "0";
             long milliSeconds = coWorkerDetail.getEndTime().getTime() - coWorkerDetail.getStartTime().getTime();
             if (milliSeconds > 0) {
