@@ -6101,6 +6101,11 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'manHoursEntryType', '工时填写方式', 'Man Hours Entry Type', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'addManHoursSection', '增加工时段', 'Add Man Hours Section', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'enterTotalManHours', '填写总工时', 'Enter Total Man Hours', NULL, -1);
+
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'totalHoursWorkedOnly', '仅总工时', 'Total hours worked only', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'duringWorkingHoursOnly', '仅工时段', 'During working hours only', NULL, -1);
+
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'coworkerManHoursEntryType', '协作者工时填写方式', 'Collaborator Man Hours Entry Type', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'partsDescription', '备件描述', 'Parts Description', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'manHoursManagement', '工时管理', 'Man Hours Management', NULL, -1);
