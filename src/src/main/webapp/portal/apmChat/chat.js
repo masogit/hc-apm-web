@@ -181,16 +181,21 @@ class APMChatApp {
     simulateAssistantResponse(userMessage) {
         this.showTypingIndicator();
         const userName = document.getElementById('userName').value;
+        let conversationId = document.getElementById('conversationId').value;
         axios.post( this.origin+`/geapm/web/apmChat/chat`,{
             paramStr: userMessage,
-            userName: userName
-           // selectStorage: selectedText
+            userName: userName,
+            conversationId: conversationId || null
         }).then(res => {
             if (res) {
+                if (res.data?.conversationId) {
+                    conversationId = res.data.conversationId;
+                    document.getElementById('conversationId').value = conversationId;
+                }
                 this.hideTypingIndicator();
                 this.addMessage({
                     type: 'assistant',
-                    message: res.data,
+                    message: res.data.result,
                     timestamp: new Date()
                 });
             }
