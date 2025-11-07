@@ -686,7 +686,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setEntryType(selectedPmOrder.getEntryType());
         formData.setCoworkerEntryType(selectedPmOrder.getCoworkerEntryType());
         normalizeEntryType(formData);
-        if(selectedPmOrder.getEntryType() == 1){
+        if(formData.getEntryType() == 1){
             pmHoursList = pmHoursList.stream()
                     .filter(item -> !"000".equals(item.getId()))
                     .collect(Collectors.toList());
@@ -777,7 +777,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setEntryType(selectedPmOrder.getEntryType());
         formData.setCoworkerEntryType(selectedPmOrder.getCoworkerEntryType());
         normalizeEntryType(formData);
-        if(selectedPmOrder.getEntryType() == 1){
+        if(formData.getEntryType() == 1){
             pmHoursList = pmHoursList.stream()
                     .filter(item -> !"000".equals(item.getId()))
                     .collect(Collectors.toList());
