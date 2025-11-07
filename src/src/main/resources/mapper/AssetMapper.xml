@@ -99,6 +99,13 @@
         select  count(*) from asset_info ai
         LEFT JOIN (
             SELECT
+            *, row_number()over(partition by asset_uid order by create_time desc)
+            FROM
+            asset_lifecycle
+            WHERE current_status = 4 AND tenant_uid = #{tenantUid}
+            ) al ON ai.uid = al.asset_uid AND al.row_number = 1
+        LEFT JOIN (
+            SELECT
                 id, asset_id, row_number()over(partition by asset_id order by created_date desc)
             FROM
                 v2_work_order
@@ -487,6 +494,9 @@
             </if>
             <if test="usageStatus != null">
                 AND ai.usage_status  = CAST( #{usageStatus} AS integer)
+            </if>
+            <if test="terminateOperation != null">
+                AND al.modify_by  like concat('%',#{terminateOperation},'%')
             </if>
             <if test="selectSite != null">
                 AND (
