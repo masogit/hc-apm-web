@@ -68,6 +68,9 @@ public class ZkbEngineer implements Serializable {
     @Column(name = "sso_index")
     private Integer ssoIndex;
 
+    @Column(name = "identity_number")
+    private String identityNumber;
+
     public String getId() {
         return id;
     }
@@ -194,6 +197,14 @@ public class ZkbEngineer implements Serializable {
 
     public void setSsoIndex(Integer ssoIndex) {
         this.ssoIndex = ssoIndex;
+    }
+
+    public String getIdentityNumber() {
+        return identityNumber;
+    }
+
+    public void setIdentityNumber(String identityNumber) {
+        this.identityNumber = identityNumber;
     }
 
     @Override
