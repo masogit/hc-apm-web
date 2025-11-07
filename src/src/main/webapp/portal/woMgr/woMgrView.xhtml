@@ -537,6 +537,17 @@
                                         <p:column headerText="#{msg.coworker}">
                                             <h:outputText value="#{coWorkerItem.cowokerUserName}"/>
                                         </p:column>
+
+                                        <p:column headerText="#{msg.startTime}" rendered="#{workOrderMgrController.selected.coworkerEntryType==1 || workOrderMgrController.selected.coworkerEntryType==3}">
+                                            <h:outputText value="#{coWorkerItem.startTime}">
+                                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="#{msg.endTime}" rendered="#{workOrderMgrController.selected.coworkerEntryType==1 || workOrderMgrController.selected.coworkerEntryType==3}">
+                                            <h:outputText value="#{coWorkerItem.endTime}">
+                                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
+                                            </h:outputText>
+                                        </p:column>
                                         <p:column headerText="#{msg.manHours}">
                                             <h:outputText value="#{coWorkerItem.manHours}" />
                                         </p:column>
