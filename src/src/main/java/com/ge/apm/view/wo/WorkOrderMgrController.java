@@ -124,6 +124,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Setter@Getter
     private Boolean needTwoSubStatus=false;
     private UserAccount ua1;
+    @Getter @Setter
+    private UserAccount acceptPerson;
     private V2_WorkOrderRepository dao;
     private String supplierName;
     private String fileterOrgName;
@@ -1558,6 +1560,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         acker=woService.getAckerList(selectedWorkOrder.getId());
+        acceptPerson = acker == null ? null : acker.get(0);
         //如果子状态为1 说明是等待备件 需要显示日期
 
         if(selectedWorkOrder.getSubStatus()!=null && selectedWorkOrder.getSubStatus()==1){
