@@ -39,3 +39,6 @@ update user_account_history set user_uid = user_account.uid from user_account wh
 update zkb_part_order_return set data_satus = 'Accept' where part_order_id = '2c9288957edde390017f01c4c4a63f6d';
 update zkb_part_order_return set qty = 2 where part_order_id = '2c9b8584944a68ac01944df10a6e040c';
 delete from zkb_key_behavior_index where tenant_uid = 'e1f36960972d4251bb92fd61d7afe1af' and kbi_date > '2025-01-01';
+
+-- YHAAO-26186 修和保养工时填写方式进一步优化
+update  config_item  set validation='[{"key":"工时段","value":"1"},{"key":"总工时","value":"0"},{"key":"仅总工时","value":"2"},{"key":"仅工时段","value":"3"}]' where key='repairEntryTypeSet';

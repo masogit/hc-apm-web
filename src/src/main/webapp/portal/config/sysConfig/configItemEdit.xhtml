@@ -115,10 +115,12 @@
                     <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 9 and systemConfigItemController.selected.key eq 'pmEntryTypeSet' }">
                         <h:panelGroup>
                             <label class="label">保养工时设置</label>
-                            <p:selectOneRadio value="#{systemConfigItemController.selected.fieldColumnDto.entryType}" style="width: 30%;">
+                            <p:selectOneRadio value="#{systemConfigItemController.selected.fieldColumnDto.entryType}"  layout="pageDirection" >
                                 <p:ajax update="manHoursGroup"/>
                                 <f:selectItem itemLabel="工时段" itemValue="1"/>
                                 <f:selectItem itemLabel="总工时" itemValue="0"/>
+                                <f:selectItem itemLabel="仅工时段" itemValue="3"/>
+                                <f:selectItem itemLabel="仅总工时" itemValue="2"/>
                             </p:selectOneRadio>
                         </h:panelGroup>
 
