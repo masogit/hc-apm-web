@@ -2579,7 +2579,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //        }
 //        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
         // 验收人
-        currentPersonIdBatch = selectedPmOrder.getAcceptPerson();
+        if (Boolean.TRUE.equals(selectedPmOrder.getSimplify())) {
+            currentPersonIdBatch = loginUser.getUid();
+        } else {
+            currentPersonIdBatch = selectedPmOrder.getAcceptPerson();
+        }
         if (ObjectUtil.isNotEmpty(pmCheckItemList)) {
             for (UnstructuredData data : pmCheckItemList) {
                 hmCheck.put(data.getKey(), data);
