@@ -124,8 +124,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Setter@Getter
     private Boolean needTwoSubStatus=false;
     private UserAccount ua1;
-    @Getter @Setter
-    private UserAccount acceptPerson;
     private V2_WorkOrderRepository dao;
     private String supplierName;
     private String fileterOrgName;
@@ -1560,7 +1558,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         acker=woService.getAckerList(selectedWorkOrder.getId());
-        acceptPerson = acker == null ? null : acker.get(0);
         //如果子状态为1 说明是等待备件 需要显示日期
 
         if(selectedWorkOrder.getSubStatus()!=null && selectedWorkOrder.getSubStatus()==1){
@@ -1570,8 +1567,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if( userId!=null){
             ua1 = userDao.getById(userId);
         }else{
-            ua1 = userDao.getById(selectedWorkOrder.getServiceRequest().getRequestorId());
-
+            ua1 = acker == null ? null : acker.get(0);
         }
         //如果是远东本地版推过来的mvs工单，因为ServiceRequest中RequestorId为本地版的数据，所以ua1为空那么久默认取当前登录人
         if("3".equals(selectedWorkOrder.getServiceRequest().getExternalWorkOrder())){
@@ -1749,7 +1745,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void saveRepairWorkOrder() throws Exception{
-        assigneeId =ua1.getId().toString();
+        assigneeId = ua1.getId().toString();
         if (hourRequired) {
             if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("TheCompletedManhoursTips"));
