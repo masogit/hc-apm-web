@@ -432,7 +432,7 @@
                     // 尝试匹配以 'um5027' 结尾的ID
                     var element = document.querySelector('[id$='+targetId+']');
                     if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
+                        element.scrollIntoView({ behavior: 'smooth',block: 'center' });
                     } else {
                         console.log("未找到ID包含 '"+targetId+"' 的元素");
                     }
