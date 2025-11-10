@@ -56,7 +56,7 @@
             </p:commandButton>
         </p:column>
 		<f:facet name="{Toolbar}">
-            <p:commandButton id="bathDeleteButton" icon="ui-icon-delete" class="btnEdit" title="#{msg.BatchDelete}" process="@this" update=":growl :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"
+            <p:commandButton id="bathDeleteButton" icon="ui-icon-delete" class="btnEdit" title="#{msg.BatchDelete}" update=":growl :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"
                              rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_NO_LEDGER_DELETE')}" disabled="#{not empty inventoryOrderDetailAssetInfoController3.inventoryOrder and inventoryOrderDetailAssetInfoController3.inventoryOrder.isFinished}" validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoController3.bathDelete()}">
                 <p:confirm header="#{msg.DeleteConfirmation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
             </p:commandButton>
