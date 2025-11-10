@@ -34,6 +34,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -235,7 +236,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         if(lastPageSort==null){
             sql="order by al.create_time desc nulls last";
         }else{
-            switch (lastPageSort.iterator().next().getProperty()) {
+            String property = lastPageSort.iterator().next().getProperty();
+            switch (property) {
                 case "namePyCode":
                     sql="order by ai.name_py_code ";
                     break;
@@ -299,9 +301,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 case "proprietaryClass":
                     sql="order by ai.proprietary_class ";
                     break;
-
-
                 default:
+                    sql="order by "+ StringUtil.camelToSnakeOptimized(property)+" ";
                     break;
 
             }

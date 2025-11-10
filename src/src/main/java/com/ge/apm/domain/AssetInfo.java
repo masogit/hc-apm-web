@@ -930,9 +930,6 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Temporal(TemporalType.DATE)
     private Date lastMeasuringDate;
-    @Size(max = 256)
-    @Column(name = "bar_code")
-    private String barCode;
 
     // 入库单号
     @Column(name = "receipt_number")
@@ -1153,14 +1150,6 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setLastMeasuringDate(Date lastMeasuringDate) {
         this.lastMeasuringDate = lastMeasuringDate;
-    }
-
-    public String getBarCode() {
-        return barCode;
-    }
-
-    public void setBarCode(String barCode) {
-        this.barCode = barCode;
     }
 
     public String getReceiptNumber() {

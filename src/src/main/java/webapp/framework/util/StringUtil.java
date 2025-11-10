@@ -80,5 +80,59 @@ public class StringUtil {
         }
         return joiner.toString();
     }
+    /**
+     * 下划线转驼峰
+     * @param snakeCase 下划线字段
+     * @return
+     */
+    public static String snakeToCamel(String snakeCase) {
+        if (snakeCase == null || snakeCase.isEmpty()) {
+            return snakeCase;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean nextUpper = false;
+        for (char ch : snakeCase.toCharArray()) {
+            if (ch == '_') {
+                nextUpper = true;
+            } else {
+                if (nextUpper) {
+                    sb.append(Character.toUpperCase(ch));
+                    nextUpper = false;
+                } else {
+                    sb.append(ch);
+                }
+            }
+        }
+        return sb.toString();
+    }
+    /**
+     * 驼峰转下划线
+     * @param camelCase 驼峰字段
+     * @return
+     */
+    public static String camelToSnakeOptimized(String camelCase) {
+        if (camelCase == null || camelCase.isEmpty()) {
+            return camelCase;
+        }
 
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < camelCase.length(); i++) {
+            char ch = camelCase.charAt(i);
+
+            if (Character.isUpperCase(ch)) {
+                // 情况1：不是首字母，且后面不是小写字母（说明是缩写结尾，如 XMLH → xml_h）
+                // 情况2：前面是小写（如 barCode → bar_code）
+                boolean prevIsLower = i > 0 && Character.isLowerCase(camelCase.charAt(i - 1));
+                boolean nextIsLower = i + 1 < camelCase.length() && Character.isLowerCase(camelCase.charAt(i + 1));
+
+                if (prevIsLower || (i > 0 && !prevIsLower && nextIsLower)) {
+                    sb.append('_');
+                }
+                sb.append(Character.toLowerCase(ch));
+            } else {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
 }

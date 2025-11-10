@@ -406,7 +406,7 @@
                 AND ai.device_status  = CAST( #{deviceStatus} AS integer)
             </if>
             <if test="registrationNo != null">
-                AND ai.registration_no  = #{registrationNo}
+                AND ai.registration_no  like concat('%',#{registrationNo},'%')
             </if>
             <if test="emergencyEquipment != null">
                 AND ai.emergency_equipment  = CAST(#{emergencyEquipment} AS integer)
@@ -415,7 +415,7 @@
                 AND ai.import_equipment  =CAST( #{importEquipment} AS integer)
             </if>
             <if test="systemId != null">
-                AND ai.system_id  = #{systemId}
+                AND ai.system_id  like concat('%',#{systemId},'%')
             </if>
             <if test="measuringItemCategory != null">
                 AND ai.measuring_item_category  = CAST( #{measuringItemCategory} AS integer)
@@ -442,13 +442,13 @@
                 AND ai.maitanance_tel  = #{maitananceTel}
             </if>
             <if test="barcode != null">
-                AND ai.bar_code  = #{barcode}
+                AND ai.barcode   like concat('%',#{barcode},'%')
             </if>
             <if test="locationCode != null">
-                AND ai.location_code  = #{locationCode}
+                AND ai.location_code  like concat('%',#{locationCode},'%')
             </if>
             <if test="locationName != null">
-                AND ai.location_name  = #{locationName}
+                AND ai.location_name  like concat('%',#{locationName},'%')
             </if>
             <if test="purchasePrice != null">
                 AND ai.purchase_price  = CAST(#{purchasePrice}  AS numeric)
@@ -475,7 +475,7 @@
                 AND ai.repair_form  = CAST( #{repairForm} AS integer)
             </if>
             <if test="comments != null">
-                AND ai.comments  = #{comments}
+                AND ai.comments   like concat('%',#{comments},'%')
             </if>
             <if test="isPm != null">
                 AND ai.is_pm  = #{isPm}
@@ -484,7 +484,7 @@
                 AND ai.is_checked  = #{isChecked}
             </if>
             <if test="pmOwnerName != null">
-                AND ai.pm_owner_name  = #{pmOwnerName}
+                AND ai.pm_owner_name  like concat('%',#{pmOwnerName},'%')
             </if>
             <if test="pmOwnerTel != null">
                 AND ai.pm_owner_tel  = #{pmOwnerTel}
