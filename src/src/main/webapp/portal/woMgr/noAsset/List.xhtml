@@ -121,6 +121,11 @@
 							<p:commandButton  value="#{msg.Cancel}"  actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
 
 						</p:column>
+						<f:facet name="{Toolbar}">
+							<p:commandButton rendered="#{serviceRequestNoAssetController.queryIndex==11}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+								<p:dataExporter type="xls" target="datalist" fileName="无台账记录"  />
+							</p:commandButton>
+						</f:facet>
 					</p:dataTable>
 				</h:form>
 
