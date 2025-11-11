@@ -162,11 +162,11 @@ public class WorkOrderExportService {
         ZoneId zone = ZoneId.systemDefault();
 
         if (v2WorkOrderReportDto.getStartTime() != null) {
-            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, v2WorkOrderReportDto.getStartTime()));
+            searchFilters.add(new SearchFilter("requestTime", SearchFilter.Operator.GTE, v2WorkOrderReportDto.getStartTime()));
         }
         if (v2WorkOrderReportDto.getEndTime() != null) {
             LocalDate endDate = LocalDateTime.ofInstant(v2WorkOrderReportDto.getEndTime().toInstant(), zone).toLocalDate();
-            searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
+            searchFilters.add(new SearchFilter("requestTime", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
         }
         if (v2WorkOrderReportDto.getClosedStartTime() != null) {
             searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.GTE, v2WorkOrderReportDto.getClosedStartTime()));

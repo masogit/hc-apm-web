@@ -344,6 +344,13 @@ public class WorkOrderReportProvider {
                 case "srNum":
                     sb.append(" and sr.sr_num = '").append(value).append("'");
                     break;
+                case "requestTime":
+                    if (op.equals(SearchFilter.Operator.GTE)) {
+                        sb.append(" and sr.request_time>='").append(value).append("' ");
+                    } else if (op.equals(SearchFilter.Operator.LT)) {
+                        sb.append(" and sr.request_time<'").append(value).append("' ");
+                    }
+                    break;
                 default:
                     break;
             }
