@@ -92,11 +92,38 @@
 						<p:column headerText="#{msg.requestReason}" sortBy="#{item.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
 							<h:outputText value="#{serviceRequestNoAssetController.getRequestReasonInShort(item.requestReason)}" title="#{item.requestReason}"/>
 						</p:column>
-						<p:column  headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+
+						<p:column rendered="#{serviceRequestNoAssetController.queryIndex eq 11 }" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepId}" filterMatchMode="EQ">
+
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" >
+									<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+									<f:selectItem itemLabel="待派工" itemValue="2" />
+									<f:selectItem itemLabel="待接单" itemValue="3" />
+									<f:selectItem itemLabel="待关单" itemValue="4" />
+									<f:selectItem itemLabel="已关单" itemValue="5" />
+									<f:selectItem itemLabel="已取消" itemValue="9" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText  value="#{serviceRequestNoAssetController.getStepName(item)}"/>
+
+						</p:column>
+						<p:column rendered="#{serviceRequestNoAssetController.queryIndex ne 11 }"  headerText="#{msg.currentStep}" width="186">
 							<h:outputText  value="#{serviceRequestNoAssetController.getStepName(item)}"/>
 						</p:column>
-						<p:column  headerText="是否已转成有台账报修" >
+						<p:column  headerText="是否已转成有台账报修" filterBy="#{item.srId}" filterMatchMode="EQ">
 							<h:outputText value="#{serviceRequestNoAssetController.getTurnWoFlag(item)}"/>
+
+							<f:facet name="filter">
+								<f:facet name="filter">
+									<p:selectOneMenu onchange="PF('varDataList').filter()">
+										<f:converter converterId="javax.faces.Boolean" />
+										<f:selectItem itemLabel="#{msg.All}" itemValue="" />
+										<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+										<f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+									</p:selectOneMenu>
+								</f:facet>
+							</f:facet>
 						</p:column>
 						<!-- 已报修 -->
 						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{serviceRequestNoAssetController.queryIndex==1 }">

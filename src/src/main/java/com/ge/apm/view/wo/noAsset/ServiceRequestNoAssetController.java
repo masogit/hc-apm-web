@@ -141,6 +141,8 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Getter  @Setter
     private TreeNode orgTreeSearch;
 
+    private List<V2_ServiceRequestNoAsset>  selectedItems;
+
 
     @Override
     protected void init() {
@@ -209,6 +211,19 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Override
     public void setSearchFilter() {
 
+        Boolean srId=null;
+        for (SearchFilter searchFilter : searchFilters) {
+            if ("srId".equals(searchFilter.fieldName)) {
+                srId = (Boolean) searchFilter.value;
+                break;
+            }
+        }
+        searchFilters.removeIf(e -> e.fieldName.equals("srId"));
+        if(Boolean.TRUE.equals(srId)){
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IsNotNull, null, "1*"));
+        }else  if(Boolean.FALSE.equals(srId)){
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IsNull,  "1*"));
+        }
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("deptUid", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
@@ -834,5 +849,13 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Override
     protected GenericRepositoryUUID<V2_ServiceRequestNoAsset> getDAO() {
         return dao;
+    }
+
+    public List<V2_ServiceRequestNoAsset> getSelectedItems() {
+        return selectedItems;
+    }
+
+    public void setSelectedItems(List<V2_ServiceRequestNoAsset> selectedItems) {
+        this.selectedItems = selectedItems;
     }
 }
