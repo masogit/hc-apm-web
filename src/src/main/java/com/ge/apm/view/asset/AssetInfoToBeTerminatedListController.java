@@ -263,7 +263,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                     sql="order by ai.vendor ";
                     break;
                 case "subjectProject":
-                    sql="ai.subject_project ";
+                    sql=" order by ai.subject_project ";
                     break;
                 case "warrantyDate":
                     sql="order by ai.warranty_date ";
