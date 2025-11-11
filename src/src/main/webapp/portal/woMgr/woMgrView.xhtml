@@ -156,7 +156,7 @@
                         <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
                     </p:panel>
                 </p:dataGrid>
-                <p:fieldset rendered="#{not empty workOrderMgrController.attachList}">
+                <p:fieldset rendered="#{not empty workOrderMgrController.audioList}">
                 <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}">
                     <f:facet name="header">#{msg.requestVoice}</f:facet>
                     <p:panel  style="text-align:center">

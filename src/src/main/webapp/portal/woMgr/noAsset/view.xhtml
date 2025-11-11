@@ -94,7 +94,7 @@
                      </p:outputLabel>
                   </h:panelGroup>
                </p:panelGrid>
-               <p:fieldset>
+               <p:fieldset rendered="#{not empty serviceRequestNoAssetController.audioList}">
                   <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.audioList}" columns="2" layout="grid" rendered="#{not empty serviceRequestNoAssetController.audioList}">
                      <f:facet name="header">#{msg.requestVoice}</f:facet>
                      <p:panel style="text-align:center">
