@@ -105,11 +105,13 @@
                         </h:panelGrid>
                      </p:panel>
                   </p:dataGrid>
-                  <h:panelGroup rendered="#{not empty serviceRequestNoAssetController.audioList and not empty serviceRequestNoAssetController.selected.voiceToText}">
-                        <label class="label">语音转文字</label>
+                  <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.selected.voiceToText}" rendered="#{not empty serviceRequestNoAssetController.audioList and not empty serviceRequestNoAssetController.selected.voiceToText}">
+                     <f:facet name="header">语音转文字</f:facet>
+                     <h:panelGroup>
                         <h:outputText value="#{serviceRequestNoAssetController.selected.voiceToText}"
                                       style="display: block; margin-top: 4px; white-space: pre-wrap;" />
-                  </h:panelGroup>
+                     </h:panelGroup>
+                  </p:dataGrid>
                </p:fieldset>
                <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
                   <p:dataGrid id="requestImage" var="fileitem" value="#{serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}" columns="5" layout="grid" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">

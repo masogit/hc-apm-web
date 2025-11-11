@@ -167,11 +167,13 @@
                         </h:panelGrid>
                     </p:panel>
                 </p:dataGrid>
-                <h:panelGroup rendered="#{not empty workOrderMgrController.audioList and not empty workOrderMgrController.selected.voiceToText}">
-                    <label class="label">语音转文字</label>
-                    <h:outputText value="#{workOrderMgrController.selected.voiceToText}"
-                                  style="display: block; margin-top: 4px; white-space: pre-wrap;" />
-                </h:panelGroup>
+                    <p:dataGrid var="audioItem" value="#{workOrderMgrController.selected.voiceToText}" rendered="#{not empty workOrderMgrController.audioList and not empty workOrderMgrController.selected.voiceToText}">
+                        <f:facet name="header">语音转文字</f:facet>
+                        <h:panelGroup>
+                            <h:outputText value="#{workOrderMgrController.selected.voiceToText}"
+                                          style="display: block; margin-top: 4px; white-space: pre-wrap;" />
+                        </h:panelGroup>
+                    </p:dataGrid>
             </p:fieldset>
                 <p:dataGrid var="audioItem" value="#{workOrderMgrController.videoList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.videoList}">
                     <f:facet name="header">#{msg.repairVideo}</f:facet>
