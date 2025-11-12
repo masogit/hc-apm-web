@@ -3172,18 +3172,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     check = true;
                     break;
                 }
-                // 当前开始时间小于结束时间 && 大于开始时间
-                if(coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()
-                        && coWorkerDetail.getStartTime().getTime() > detail.getStartTime().getTime()){
-                    check = true;
-                    break;
+                if(coWorkerDetail.getCowokerUserId().equals(detail.getCowokerUserId())){
+                    // 当前开始时间小于结束时间 && 大于开始时间
+                    if(coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()
+                            && coWorkerDetail.getStartTime().getTime() > detail.getStartTime().getTime()){
+                        check = true;
+                        break;
+                    }
+                    // 当前结束时间大于开始时间 && 小于结束时间
+                    if(coWorkerDetail.getEndTime().getTime() > detail.getStartTime().getTime()
+                            && coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()){
+                        check = true;
+                        break;
+                    }
                 }
-                // 当前结束时间大于开始时间 && 小于结束时间
-                if(coWorkerDetail.getEndTime().getTime() > detail.getStartTime().getTime()
-                        && coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()){
-                    check = true;
-                    break;
-                }
+
             }
             if(check){
                 WebUtil.addErrorMessage("工时段重复，请重新填写");
