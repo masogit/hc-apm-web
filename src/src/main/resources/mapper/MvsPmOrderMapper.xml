@@ -46,8 +46,14 @@
             <result property="clinicalDeptName" column="asset_clinical_dept_name"/>
             <result property="locationName" column="asset_location_name"/>
             <result property="mvsEquip" column="asset_mvs_equip"/>
+            <result property="departNum" column="depart_num"/>
             <result property="id" column="asset_id"/>
             <result property="status" column="asset_status"/>
+        </association>
+
+        <association property="siteOrg" javaType="com.ge.apm.domain.OrgInfo">
+            <id property="uid" column="site_uid"/>
+            <result property="name" column="site_name"/>
         </association>
     </resultMap>
     <select id="loadData" resultMap="v2_PmOrderMap">
@@ -79,6 +85,7 @@
         t.parent_wo_id,
         t.main_sub,
         a.name AS asset_name,
+        a.depart_num as depart_num,
         a.serial_num as asset_serial_num,
         a.depart_num as asset_depart_num,
         a.function_type as asset_function_type,
@@ -90,11 +97,13 @@
         a.mvs_equip as asset_mvs_equip,
         a.id as asset_id,
         a.status as asset_status,
-        a.uid AS asset_uid
+        a.uid AS asset_uid,
+        oi.name as site_name
         FROM v2_pm_order t
         JOIN mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
         JOIN asset_info a ON m1.ib_uid = a.uid
         JOIN user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
+        join org_info oi on a.site_uid=oi.uid
         WHERE 1=1
         <if test="ruleLevel != null">
             and t.rule_level = CAST(#{ruleLevel, jdbcType=INTEGER} AS INTEGER)
