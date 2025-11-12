@@ -187,6 +187,30 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
     }
 
+    public void exportExcel1() throws IOException{
+        PmFileExportTemplate template = new PmFileExportTemplate();
+        List<V2_PmOrder> pmOrderList= getPmListByselectedId();
+        if(pmOrderList ==null && queryIndex!=10){
+            WebUtil.addErrorMessage(WebUtil.getMessage("SelectExportFiles"));
+            RequestContext.getCurrentInstance().addCallbackParam("", true);
+            return;
+        }
+        template.writePm(pmOrderList,queryIndex);
+        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
+    }
+
+    private List<V2_PmOrder> getExportList() {
+        List<V2_PmOrder> pmList=null;
+        if(pmIdList.size()!=0 && queryIndex!=10 ) {
+            pmList = dao.getBatchPmOrderList(pmIdList);
+        }else{
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            pmList = dao.getPmOrderListAll(orgUidList);
+        }
+        return pmList;
+    }
+
+
     public String checkValue(Object obj){
         if(obj != null){
             return obj.toString();

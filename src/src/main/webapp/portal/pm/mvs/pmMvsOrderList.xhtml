@@ -153,7 +153,7 @@
                     <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
                 </p:column>
                 <f:facet name="{Toolbar}" >
-                    <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderMvsController.exportExcel}" disabled="#{v2PmOrderMvsController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                    <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderMvsController.exportExcel1}" disabled="#{v2PmOrderMvsController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
                         <p:fileDownload value="#{v2PmOrderMvsController.excelFile}"/>
                     </p:commandButton><!--
                      <p:commandButton  icon="ui-icon-arrow-1-s" actionListener="#{v2PmOrderMvsController.doExportMaintenanceReport()}" class=" btn-sm btn-gray btn-export-maintenance-report" title="#{msg.ExportMaintenanceWorkorder}" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false">
