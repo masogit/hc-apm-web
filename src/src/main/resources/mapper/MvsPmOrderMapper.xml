@@ -46,7 +46,6 @@
             <result property="clinicalDeptName" column="asset_clinical_dept_name"/>
             <result property="locationName" column="asset_location_name"/>
             <result property="mvsEquip" column="asset_mvs_equip"/>
-            <result property="departNum" column="depart_num"/>
             <result property="id" column="asset_id"/>
             <result property="status" column="asset_status"/>
         </association>
@@ -85,7 +84,6 @@
         t.parent_wo_id,
         t.main_sub,
         a.name AS asset_name,
-        a.depart_num as depart_num,
         a.serial_num as asset_serial_num,
         a.depart_num as asset_depart_num,
         a.function_type as asset_function_type,
