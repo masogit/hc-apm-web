@@ -347,9 +347,6 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @org.hibernate.annotations.ForeignKey(name = "none")
     @Fetch(FetchMode.SUBSELECT)
     private List<V2_WorkOrderManHoursDetail> workHoursList;
-
-    @Column(name = "voice_to_Text", columnDefinition = "text")
-    private String voiceToText;
     @Transient
     private String partApproveSignature;
 
@@ -1101,15 +1098,6 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setWorkOrderType(String workOrderType) {
         this.workOrderType = workOrderType;
     }
-
-    public String getVoiceToText() {
-        return voiceToText;
-    }
-
-    public void setVoiceToText(String voiceToText) {
-        this.voiceToText = voiceToText;
-    }
-
     @Transient
     private String businessDigest;
     @Override
