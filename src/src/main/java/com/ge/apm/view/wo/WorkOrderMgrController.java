@@ -2709,13 +2709,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 if("000".equals(detail.getId())){
                     continue;
                 }
-                // 开始时间结束时间不能相等
-                if(coWorkerDetail.getStartTime().getTime() == detail.getStartTime().getTime()
-                        || coWorkerDetail.getEndTime().getTime() == detail.getEndTime().getTime()){
-                    check = true;
-                    break;
-                }
+
                 if(coWorkerDetail.getCowokerUserId().equals(detail.getCowokerUserId())) {
+                    // 开始时间结束时间不能相等
+                    if(coWorkerDetail.getStartTime().getTime() == detail.getStartTime().getTime()
+                            || coWorkerDetail.getEndTime().getTime() == detail.getEndTime().getTime()){
+                        check = true;
+                        break;
+                    }
                     // 当前开始时间小于结束时间 && 大于开始时间
                     if (coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()
                             && coWorkerDetail.getStartTime().getTime() > detail.getStartTime().getTime()) {
