@@ -105,7 +105,7 @@
                         </h:panelGrid>
                      </p:panel>
                   </p:dataGrid>
-                  <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.selected.voiceToText}" rendered="#{not empty serviceRequestNoAssetController.audioList and not empty serviceRequestNoAssetController.selected.voiceToText}">
+                  <p:dataGrid var="voiceToText" value="#{serviceRequestNoAssetController.selected.voiceToText}" rendered="#{not empty serviceRequestNoAssetController.audioList and not empty serviceRequestNoAssetController.selected.voiceToText}">
                      <f:facet name="header">语音转文字</f:facet>
                      <h:panelGroup>
                         <h:outputText value="#{serviceRequestNoAssetController.selected.voiceToText}"
