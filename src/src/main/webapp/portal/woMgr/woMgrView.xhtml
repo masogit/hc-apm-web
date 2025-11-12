@@ -167,13 +167,13 @@
                         </h:panelGrid>
                     </p:panel>
                 </p:dataGrid>
-                    <p:dataGrid var="voiceToText" value="#{workOrderMgrController.selected.serviceRequest.voiceToText}" rendered="#{not empty workOrderMgrController.audioList and not empty workOrderMgrController.selected.serviceRequest.voiceToText}">
-                        <f:facet name="header">语音转文字</f:facet>
-                        <h:panelGroup>
-                            <h:outputText value="#{workOrderMgrController.selected.serviceRequest.voiceToText}"
-                                          style="display: block; margin-top: 4px; white-space: pre-wrap;" />
-                        </h:panelGroup>
-                    </p:dataGrid>
+<!--                    <p:dataGrid var="voiceToText" value="#{workOrderMgrController.selected.serviceRequest.voiceToText}" rendered="#{not empty workOrderMgrController.audioList and not empty workOrderMgrController.selected.serviceRequest.voiceToText}">-->
+<!--                        <f:facet name="header">语音转文字</f:facet>-->
+<!--                        <h:panelGroup>-->
+<!--                            <h:outputText value="#{workOrderMgrController.selected.serviceRequest.voiceToText}"-->
+<!--                                          style="display: block; margin-top: 4px; white-space: pre-wrap;" />-->
+<!--                        </h:panelGroup>-->
+<!--                    </p:dataGrid>-->
             </p:fieldset>
                 <p:dataGrid var="audioItem" value="#{workOrderMgrController.videoList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.videoList}">
                     <f:facet name="header">#{msg.repairVideo}</f:facet>
