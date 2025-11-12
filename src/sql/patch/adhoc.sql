@@ -42,3 +42,8 @@ delete from zkb_key_behavior_index where tenant_uid = 'e1f36960972d4251bb92fd61d
 
 -- YHAAO-26186 修和保养工时填写方式进一步优化
 update  config_item  set validation='[{"key":"工时段","value":"1"},{"key":"总工时","value":"0"},{"key":"仅总工时","value":"2"},{"key":"仅工时段","value":"3"}]' where key='repairEntryTypeSet';
+
+-- YHAAO-26342
+insert into i18n_type_manage (id,msg_type, name) select replace(uuid_generate_v4()::text,'-',''), 'spare03','备用字段03' where not exists(select * from i18n_type_manage where msg_type = 'spare03');
+insert into i18n_type_manage (id,msg_type, name) select replace(uuid_generate_v4()::text,'-',''), 'spare04','备用字段04' where not exists(select * from i18n_type_manage where msg_type = 'spare04');
+insert into i18n_type_manage (id,msg_type, name) select replace(uuid_generate_v4()::text,'-',''), 'spare05','备用字段05' where not exists(select * from i18n_type_manage where msg_type = 'spare05');
