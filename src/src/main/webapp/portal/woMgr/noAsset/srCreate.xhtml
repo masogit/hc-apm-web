@@ -43,6 +43,11 @@
                         <label class="label">#{msg.assetName}*</label>
                         <p:inputText id="assetName" value="#{serviceRequestNoAssetController.newServiceRequest.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.financingNum}*</label>
+                        <p:inputText id="financingNum" value="#{serviceRequestNoAssetController.newServiceRequest.financingNum}" required="false"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.requestorName}</label>
                         <p:outputLabel value="#{serviceRequestNoAssetController.newServiceRequest.requestorName}" />

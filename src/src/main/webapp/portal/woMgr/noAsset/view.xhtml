@@ -74,6 +74,25 @@
                         <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                      </p:outputLabel>
                   </h:panelGroup>
+
+                  <h:panelGroup>
+                     <label class="label">#{msg.financingNum}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.financingNum}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.functionType}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.functionType}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.serialNum}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.serialNum}" />
+                  </h:panelGroup>
+
+                  <h:panelGroup>
+                     <label class="label">#{msg.makerShortName}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.makerShortName}" />
+                  </h:panelGroup>
+
                   <h:panelGroup >
                      <label class="label">#{msg.comment}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.comment}"/>

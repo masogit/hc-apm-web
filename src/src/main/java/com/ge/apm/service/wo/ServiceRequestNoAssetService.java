@@ -107,6 +107,10 @@ public class ServiceRequestNoAssetService {
         ServiceRequestNoAssetActionForm formData = new ServiceRequestNoAssetActionForm();
         formData.setCurrentStepId(serviceRequestNoAsset.getCurrentStepId());
         formData.setDesc(comments == null ? "" : comments);
+        formData.setFinancingNum(serviceRequestNoAsset.getFinancingNum());
+        formData.setFunctionType(serviceRequestNoAsset.getFunctionType());
+        formData.setSerialNum(serviceRequestNoAsset.getSerialNum());
+        formData.setMakerShortName(serviceRequestNoAsset.getMakerShortName());
         String res = serviceRequestNoAssetApiService.invokeAction(token, formData, "close", serviceRequestNoAsset.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "关单"));
