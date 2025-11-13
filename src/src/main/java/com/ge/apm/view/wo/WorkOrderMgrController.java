@@ -4327,5 +4327,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         return TimeUtil.now();
     }
+
+    public List<OrgInfo> getClinicalDeptList() {
+        return clinicalDeptList;
+    }
+
+    public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+        this.clinicalDeptList = clinicalDeptList;
+    }
 }
 

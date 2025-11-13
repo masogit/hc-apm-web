@@ -102,7 +102,7 @@
                 </c:if>
                 <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{!userContextService.isYiMaiYangGuangTenant()}" visible="#{workOrderMgrController.hospitalShow}">
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilter}">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilter}" filter="true" filterMatchMode="contains" filterNormalize="true">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{workOrderMgrController.getLoadInternalSiteNameList()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
                         </p:selectOneMenu>
@@ -110,9 +110,9 @@
                     <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{!userContextService.isYiMaiYangGuangTenant()}">
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilter}">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilter}" filter="true" filterMatchMode="contains" filterNormalize="true">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{workOrderMgrController.LoadSiteNameList()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
                         </p:selectOneMenu>
@@ -120,29 +120,21 @@
                     <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
                 </p:column>
                 <!--所属科室-->
-                <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
-                    <f:facet name="header">
-                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                        <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}" appendTo="@(Body)"
-                                        scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDeptName}" size="5">
-                            <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
-
-                            <p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update="woTab:woMgrListForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
-
-                        </p:autoComplete>
+                <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
                     </f:facet>
                     <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                 </p:column>
-                <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{userContextService.hasCurrentTenantName('')}">
-                    <f:facet name="header">
-                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                        <p:autoComplete dropdown="true" value="#{workOrderMgrController.fileterOrgName}" appendTo="@(Body)"
-                                        scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderMgrController.autoCompleteDeptName}" size="5">
-                            <p:ajax event="itemSelect" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" process="@this"  update="woTab:woMgrListForm:datalist" />
-
-                            <p:ajax process="@this" listener="#{workOrderMgrController.onClinicalDeptNameFilterChange}" update="woTab:woMgrListForm:datalist" />
-
-                        </p:autoComplete>
+                <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{userContextService.hasCurrentTenantName('')}">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
                     </f:facet>
                     <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                 </p:column>
