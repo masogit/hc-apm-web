@@ -53,6 +53,10 @@
 						<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetName}"/>
 						</p:column>
+
+						<p:column headerText="#{msg.financingNum}" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.financingNum}"/>
+						</p:column>
 						<p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
 							<f:facet name="filter" >
 								<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{serviceRequestNoAssetController.siteUidFilter}">
@@ -277,10 +281,37 @@
 				</h:panelGroup>
 			</h:form>
 		</p:dialog>
-		<p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="300" appendTo="@(body)" header="#{msg.closeWo}" height="180">
+		<p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="600" appendTo="@(body)" header="#{msg.closeWo}" height="580">
 			<h:form id="toCloseDialogForm" >
+
+				<p:fieldset  >
+
 				<h:panelGroup id="display3" rendered="#{not empty serviceRequestNoAssetController.selectedSr}">
-					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+					<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">#{msg.financingNum}</label>
+							<p:inputText id="financingNum" value="#{serviceRequestNoAssetController.selectedSr.financingNum}"/>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<label class="label">#{msg.functionType}</label>
+							<p:inputText id="functionType" value="#{serviceRequestNoAssetController.selectedSr.functionType}">
+								<p:ajax />
+							</p:inputText>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<label class="label">#{msg.serialNum}</label>
+							<p:inputText id="serialNum" value="#{serviceRequestNoAssetController.selectedSr.serialNum}">
+
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup>
+							<label class="label">#{msg.makerShortName}</label>
+							<p:inputText id="makerShortName" value="#{serviceRequestNoAssetController.selectedSr.makerShortName}">
+								<p:ajax />
+							</p:inputText>
+						</h:panelGroup>
 						<h:panelGroup>
 							<label class="label">#{msg.Remark}</label>
 							<p:inputTextarea  value="#{serviceRequestNoAssetController.comments}" rows="4"  cols="30"  queryDelay="750" minQueryLength="4" maxlength="100"/>
@@ -291,6 +322,7 @@
 					<p:commandButton validateClient="true" actionListener="#{serviceRequestNoAssetController.closeSrNoAsset()}" value="#{msg.closeWo}" update=":toCloseDialogForm :growl :listForm:datalist " icon="ui-icon-check" oncomplete="handleSubmit(args, 'toCloseDialog');"/>
 					<p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{serviceRequestNoAssetController.cancel()}" icon="ui-icon-cancel" onclick="PF('toCloseDialog').hide()"/>
 				</h:panelGroup>
+				</p:fieldset>
 			</h:form>
 		</p:dialog>
 		<ui:include src="srCreate.xhtml" />
