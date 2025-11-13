@@ -304,10 +304,17 @@
                    <c:when test="#{item eq 'QUALITY_CONTROL_MANAGE'}">
                        <p:submenu id="qualityDataView" label="#{msg.DeviceQualityControl}" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_') and userContextService.canRender('QUALITY_CONTROL_MANAGE')}">
                            <!-- 质控日历 -->
-                           <p:menuitem fragment="qualityControlCalendar" id="qualityControlCalendar" value="#{msg.qualityControlCalendar}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
-                           <p:menuitem fragment="qualityControlRadBoard" id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}"  rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
+                           <p:menuitem fragment="qualityControlCalendar" id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
+                           <p:menuitem fragment="qualityControlRadBoard" id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
                        </p:submenu>
+                   </c:when>
 
+                   <!-- 外来设备管理 -->
+                   <c:when test="#{item eq 'EXTERNAL_ASSET_MANAGE'}">
+                       <p:submenu id="externalAssetView" label="#{msg.externalAssetManage}" icon="fa fa-external-link fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('EXTERNAL_ASSET_MANAGE_')}">
+                           <!-- 外来设备管理 -->
+                           <p:menuitem fragment="externalAssetManage" id="externalAssetManage" value="#{msg.externalAssetManage}" outcome="/portal/externalAssetMange/externalAssetList.xhtml"/>
+                       </p:submenu>
                    </c:when>
 
                    <c:when test="#{item eq 'AUDIT_CONFIG'}">
