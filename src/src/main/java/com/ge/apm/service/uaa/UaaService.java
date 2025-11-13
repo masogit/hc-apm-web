@@ -942,6 +942,11 @@ public class UaaService {
         return userAccountDao.getByOrgInfoUID(deptUid);
     }
 
+    public List<UserAccount> getUsersByDeptUidAndRole(String deptUid, String roleName){
+        UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        return userAccountDao.getUsersByDeptUidAndRole(deptUid, roleName);
+    }
+
     //用户可以显示的医院列表
     public List<OrgInfo> getUserAccessibleSiteList(String userUid, String name, Integer siteId) {
         List<String> institutions = orgInfoDao.findByInstitutionByNameLike(name, siteId); //TODO: fetch by user accessible site list
