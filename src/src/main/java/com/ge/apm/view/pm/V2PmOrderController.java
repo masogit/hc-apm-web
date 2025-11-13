@@ -450,8 +450,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(pmIdList.size()!=0 && queryIndex!=10 ) {
             pmList = dao.getBatchPmOrderList(pmIdList);
         }else{
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            pmList = dao.getPmOrderListAll(orgUidList);
+//            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+//            pmList = dao.getPmOrderListAll(orgUidList);
+
+
+            Sort.Order orders = new Sort.Order(Sort.Direction.DESC, "planTime");
+            Sort sort = new Sort(orders);
+            PageRequest    pageRequest = new PageRequest(0,30000,sort);
+            Page<V2_PmOrder> v2PmOrders = loadData(pageRequest);
+            pmList= v2PmOrders.getContent();
         }
         return pmList;
     }

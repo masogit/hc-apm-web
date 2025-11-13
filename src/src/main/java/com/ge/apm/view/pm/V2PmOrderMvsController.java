@@ -221,15 +221,22 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     List<String> pmIdList = new ArrayList<String>();
     private  List<V2_PmOrder> getPmListByselectedId(){
-        Map<String, Object> params = new HashMap<>();
+//        Map<String, Object> params = new HashMap<>();
         if(pmIdList.size()==0) {
             return null;
         }
-        params.put("userUid", loginUser.getUid());
-        params.put("tenantUid", loginUser.getTenantUID());
+//        params.put("userUid", loginUser.getUid());
+//        params.put("tenantUid", loginUser.getTenantUID());
+
+        Map<String, Object> params = initializeParams();
         if(queryIndex!=10){
             params.put("pmIdList", pmIdList.toArray());
         }
+        // 处理搜索过滤器
+        processSearchFilters(params);
+        // 根据查询索引设置参数
+        setParamsByQueryIndex(params);
+
         List<V2_PmOrder> pmList = mvsPmOrderMapper.loadData(params);
         return pmList;
     }
