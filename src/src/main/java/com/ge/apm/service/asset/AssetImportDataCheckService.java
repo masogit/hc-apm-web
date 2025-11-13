@@ -745,6 +745,27 @@ public class AssetImportDataCheckService {
                 }
             }
         }
+
+        if (!StringUtils.isEmpty(assetImport.getSpare01())) {
+            String value = assetImport.getSpare01().split(" ")[0];
+            assetImport.setSpare01(value);
+        }
+        if (!StringUtils.isEmpty(assetImport.getSpare02())) {
+            String value = spare02List.get(assetImport.getSpare02());
+            assetImport.setSpare02(value);
+        }
+        if (!StringUtils.isEmpty(assetImport.getSpare03())) {
+            String value = spare03List.get(assetImport.getSpare03());
+            assetImport.setSpare03(value);
+        }
+        if (!StringUtils.isEmpty(assetImport.getSpare04())) {
+            String value = spare04List.get(assetImport.getSpare04());
+            assetImport.setSpare04(value);
+        }
+        if (!StringUtils.isEmpty(assetImport.getSpare05())) {
+            String value = spare05List.get(assetImport.getSpare05());
+            assetImport.setSpare05(value);
+        }
     }
 
     public void setErrorMsg(AssetImport assetImport, String messageKey, String value) {
