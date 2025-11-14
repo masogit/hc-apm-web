@@ -427,6 +427,12 @@ public class WorkOrderReportProvider {
                         }
                     }else if(tempColumn.equals("srNum")){
                         sb.append(" and sr.sr_num = '").append(value).append("'");
+                    }else if(tempColumn.equals("requestTime")){
+                            if (op.equals(SearchFilter.Operator.GTE)) {
+                                sb.append(" and sr.request_time>='").append(value).append("' ");
+                            } else if (op.equals(SearchFilter.Operator.LT)) {
+                                sb.append(" and sr.request_time<'").append(value).append("' ");
+                            }
                     }
                 }
             }
