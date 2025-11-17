@@ -110,7 +110,7 @@
                     <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{!userContextService.isYiMaiYangGuangTenant()}">
+                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilter}" filter="true" filterMatchMode="contains" filterNormalize="true">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
