@@ -187,7 +187,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Date confirmedUpDate;
     private Date confirmedDownTime;
     private String checkInDate;
-    private Integer rating;
+    private Integer rating = 5;
     private String failReason;
     private String equipmentTaker;
     private Date takeTime;
@@ -1168,7 +1168,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         comments = null;
         selectedWorkOrder = null;
         failReason = null;
-        rating = null;
+        rating = 5;
         confirmedDownTime = null;
         selectedWorkOrderList = null;
         equipmentTaker = null;
@@ -1439,7 +1439,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         Long time = System.currentTimeMillis();
         time += 120*1000*60;
         esTime = new Date(time);
-
 
     }
 
