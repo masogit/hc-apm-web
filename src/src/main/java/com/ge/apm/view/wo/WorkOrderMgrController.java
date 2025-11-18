@@ -1086,16 +1086,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
-        if (StringUtils.isNotEmpty(siteUidFilter)) {
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
-        }
+//        if (StringUtils.isNotEmpty(siteUidFilter)) {
+//            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
+//        }
         if (!this.hasFilterOnField("siteUID")) {
             if(enableAuditGroupConfiguration && queryIndex == 10) {
                 String hospitalUID = loginUser.getHospitalUID();
                 updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
             }else {
                 List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-
+                if(StringUtils.isNotEmpty(siteUidFilter)){
+                    orgUidList.clear();
+                    orgUidList.add(siteUidFilter);
+                }
                 updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
