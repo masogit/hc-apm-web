@@ -322,6 +322,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private V2_WorkOrderDetailRepository v2WorkOrderDetailRepository;
 
     private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
+
+    private String displayModeCasePriority;
     @Override
     protected void init() {
         try {
@@ -378,6 +380,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             enableMaintenanceContract = Optional.ofNullable(enableMaintenanceContractValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
             ConfigItemValue enableMaintenanceDateValue = configItemValueRepository.findFirstByKeyAndSiteUid("enableMaintenanceDate", loginUser.getSiteUID());
             enableMaintenanceDate = Optional.ofNullable(enableMaintenanceDateValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
+            ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("displayModeCasePriority", loginUser.getSiteUID());
+            displayModeCasePriority = Optional.ofNullable(displayModeCasePriorityValue).map(ConfigItemValue::getValue).orElse("key");
             selectedBatchMap = new HashMap<>();
             currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
             enableAuditGroupConfiguration();
@@ -4334,6 +4338,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
         this.clinicalDeptList = clinicalDeptList;
+    }
+
+    public String getDisplayModeCasePriority() {
+        return displayModeCasePriority;
+    }
+
+    public void setDisplayModeCasePriority(String displayModeCasePriority) {
+        this.displayModeCasePriority = displayModeCasePriority;
     }
 }
 

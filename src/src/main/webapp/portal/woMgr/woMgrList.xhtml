@@ -70,7 +70,7 @@
                     </f:facet>
                     <c:choose>
                         <c:when test="#{!userContextService.hasCurrentTenantName('')}">
-                            <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
+                            <h:outputText value="#{workOrderMgrController.displayModeCasePriority.equals('key')?item.serviceRequest.casePriority:fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                         </c:when>
                         <c:otherwise>
                             <h:outputText value="#{fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"></h:outputText>
