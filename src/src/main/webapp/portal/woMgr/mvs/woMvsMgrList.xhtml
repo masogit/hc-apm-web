@@ -41,7 +41,7 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
+                    <h:outputText value="#{workOrderMgrMvsController.displayModeCasePriority.equals('key')?item.serviceRequest.casePriority:fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                 </p:column>
                 <p:column headerText="#{msg.assetName}" filterBy="#{item.mvsIbMapping.assetInfo.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.name}"/>

@@ -120,6 +120,8 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
 
     private UaaService uaaService;
 
+    private String displayModeCasePriority;
+
     public List<V2_BlobObject> getAttachListEhmeFile() {
         return attachListEhmeFile;
     }
@@ -252,6 +254,8 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
             uaaService = WebUtil.getBean(UaaService.class);
             assetTypeGroupList = loginUser.getAssetTypeGroupList();
+            ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("displayModeCasePriority", loginUser.getSiteUID());
+            displayModeCasePriority = Optional.ofNullable(displayModeCasePriorityValue).map(ConfigItemValue::getValue).orElse("key");
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
             String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
@@ -1065,5 +1069,12 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         return false;
     }
 
+    public String getDisplayModeCasePriority() {
+        return displayModeCasePriority;
+    }
+
+    public void setDisplayModeCasePriority(String displayModeCasePriority) {
+        this.displayModeCasePriority = displayModeCasePriority;
+    }
 }
 
