@@ -67,7 +67,22 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
             searchFilters = new ArrayList<>();
         }
         if (queryIndex >= 0) {
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryIndex, "1*"));
+            if (queryIndex == 7) {
+                searchFilters.add(new SearchFilter("cancel", SearchFilter.Operator.EQ, true, "1*"));
+            } else {
+                searchFilters.add(new SearchFilter("cancel", SearchFilter.Operator.EQ, false, "1*"));
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryIndex, "1*"));
+            }
+        }
+        if (super.hasFilterOnField("status")) {
+            SearchFilter statusFilter = searchFilters.stream().filter(item -> "status".equals(item.fieldName)).collect(Collectors.toList()).get(0);
+            super.removeFilterOnField("status");
+            if ("7".equals(statusFilter.value.toString())) {
+                searchFilters.add(new SearchFilter("cancel", SearchFilter.Operator.EQ, true, "1*"));
+            } else {
+                searchFilters.add(new SearchFilter("cancel", SearchFilter.Operator.EQ, false, "1*"));
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, statusFilter.value.toString(), "1*"));
+            }
         }
         List<String> roleNames = loginUser.getRoleNames();
         if (roleNames.contains("ProbationStaff")) {
@@ -85,8 +100,6 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
         } else {
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, -1, "1*"));
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
-        pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(),sort);
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -98,10 +111,12 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
     }
 
     public void cancelOrder() {
-        this.selected.setStatus(7);
+        this.selected.setCancel(true);
         this.selected.setCancelUserUid(loginUser.getUid());
         this.selected.setCancelUserName(loginUser.getName());
         this.selected.setCancelTime(DateUtil.now());
+        this.selected.setLastModifiedBy(loginUser.getName());
+        this.selected.setLastModifiedDate(DateUtil.now());
         dao.save(this.selected);
         WebUtil.addSuccessMessage(WebUtil.getMessage("SubmissionSuccessfullyCanceled"));
     }
@@ -111,6 +126,8 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
         assetProbation.setCloseUserUid(loginUser.getUid());
         assetProbation.setCloseUserName(loginUser.getName());
         assetProbation.setCloseTime(DateUtil.now());
+        assetProbation.setLastModifiedBy(loginUser.getName());
+        assetProbation.setLastModifiedDate(DateUtil.now());
         dao.save(assetProbation);
         WebUtil.addSuccessMessage(WebUtil.getMessage("CloseSuccess"));
     }

@@ -145,6 +145,8 @@ public class AssetProbation implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date closeTime;//关单时间
+    @Column(name = "cancel")
+    private Boolean cancel = false;//取消
     @Column(name = "cancel_user_uid")
     private String cancelUserUid;//取消人
     @Column(name = "cancel_user_name")
@@ -638,6 +640,14 @@ public class AssetProbation implements Serializable {
 
     public void setCloseTime(Date closeTime) {
         this.closeTime = closeTime;
+    }
+
+    public Boolean getCancel() {
+        return cancel;
+    }
+
+    public void setCancel(Boolean cancel) {
+        this.cancel = cancel;
     }
 
     public String getCancelUserUid() {
