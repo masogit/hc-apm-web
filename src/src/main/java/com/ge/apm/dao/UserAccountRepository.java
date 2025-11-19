@@ -112,7 +112,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<UserAccount> getByOrgInfoUID(String orgUID);
 
     @Query(value= "select * from user_account u join user_role r on u.id = r.user_id left join sys_role sr on sr.id = r.role_Id where u.org_uid = ?1 and sr.name = ?2 and (u.is_disable = false or u.is_disable is null) and (u.is_deleted = false or u.is_deleted is null )",nativeQuery=true)
-    public List<UserAccount> getUsersByDeptUidAndRole(String orgUID, String roleName);
+    public List<UserAccount> getUsersByDeptUidAndRole(String orgUid, String roleName);
 
     public Page<UserAccount> getByTenantUID(Pageable pageRequest,String tenantUID);
     public List<UserAccount> findBySiteUID(String id);
