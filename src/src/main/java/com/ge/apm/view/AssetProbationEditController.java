@@ -11,7 +11,10 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +25,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -37,9 +36,12 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     private BlobFileService blobService;
     private OrgInfoRepository orgInfoRepository;
 
+    @Getter @Setter
     private UserAccount loginUser;
     @Getter @Setter
     private OrgInfo assetDept;
+    @Getter @Setter
+    private UserAccount deptContact;
     @Getter @Setter
     private UserAccount detectionUser;
     @Getter @Setter
@@ -51,6 +53,8 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     @Getter @Setter
     private List<OrgInfo> assetDeptList;
     @Getter @Setter
+    private List<UserAccount> deptContactList;
+    @Getter @Setter
     private List<UserAccount> detectionUserList;
     @Getter @Setter
     private List<UserAccount> probationConfirmorList;
@@ -58,6 +62,10 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     private List<V2_BlobObject> attachments;
     @Getter @Setter
     private Integer action;
+    @Getter @Setter
+    private String actionName;
+    @Getter @Setter
+    private Boolean canEditBase;
 
     @Override
     protected void init() {
@@ -70,23 +78,34 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         assetDeptList = uaaService.getClinicalDeptListBySiteUID(loginUser.getSiteUID());
         String encodeStr = WebUtil.getRequestParameter("str");
         action = Integer.parseInt(UrlEncryptController.getValueFromMap(encodeStr, "action").toString());
-        if (-1 == action) {
+        actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
+        if (-1 == action && ObjectUtil.isEmpty(actionName)) {
             try {
                 prepareCreate();
+                this.selected.setCurrentPersonId(loginUser.getUid());
+                this.selected.setCurrentPersonName(loginUser.getName());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
         } else {
-            prepareEdit();
+            if ("View".equals(actionName)) {
+                prepareView();
+            } else {
+                prepareEdit();
+            }
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedId");
             this.selected = dao.findById(selectedId);
-            detectionUserList = uaaService.getUsersByDeptUidAndRole(this.selected.getAssetDeptUid(), "AssetStaff");
-            probationConfirmorList = uaaService.getUsersByDeptUidAndRole(this.selected.getAssetDeptUid(), "DeptHead");
-            this.assetDept = orgInfoRepository.getByUid(this.selected.getAssetDeptUid());
-            this.assetDept = orgInfoRepository.getByUid(this.selected.getAssetDeptUid());
-            this.specificationList = Arrays.asList(this.selected.getSpecification().split(","));
-            this.informationList = Arrays.asList(this.selected.getInformation().split(","));
+            deptContactList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
+            detectionUserList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "AssetStaff")).orElse(ListUtil.empty());
+            probationConfirmorList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
+            this.assetDept = Optional.ofNullable(this.selected.getAssetDeptUid()).map(orgInfoRepository::getByUid).orElse(new OrgInfo());
+            this.deptContact = Optional.ofNullable(this.selected.getDeptContactUid()).map(uaaService::getUserByUid).orElse(new UserAccount());
+            this.detectionUser = Optional.ofNullable(this.selected.getDetectionUserUid()).map(uaaService::getUserByUid).orElse(new UserAccount());
+            this.probationConfirmor = Optional.ofNullable(this.selected.getProbationStartUserUid()).map(uaaService::getUserByUid).orElse(new UserAccount());
+            this.specificationList = Optional.ofNullable(this.selected.getSpecification()).map(specification -> Arrays.asList(specification.split(","))).orElse(ListUtil.empty());
+            this.informationList = Optional.ofNullable(this.selected.getInformation()).map(information -> Arrays.asList(information.split(","))).orElse(ListUtil.empty());
         }
+        canEditBase = canEditBase();
     }
 
     @Override
@@ -97,6 +116,9 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     public void tempSave(boolean flag) {
         Date now = DateUtil.now();
         if (this.selected.getId() == null) {
+            String serialNumber = querySerialNumber(dao.queryOrderNum(loginUser.getTenantUID()));
+            String dateStr = DateUtil.format(new Date(), "yyyyMMdd");
+            this.selected.setOrderNum(dateStr + serialNumber);
             this.selected.setStatus(0);
             this.selected.setApplicantUserUid(loginUser.getUid());
             this.selected.setApplicantUserName(loginUser.getName());
@@ -108,13 +130,14 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setCreatedBy(loginUser.getName());
             this.selected.setCreatedDate(now);
         }
-        if (this.selected.getStatus() == 0) {
+        if (this.selected.getStatus() == 0 || action == -11) {
+            this.selected.setDeptContactUid(deptContact.getUid());
+            this.selected.setDeptContactName(deptContact.getName());
             this.selected.setSpecification(String.join(",", specificationList));
             this.selected.setInformation(String.join(",", informationList));
             this.selected.setAssetDeptUid(assetDept.getUid());
             this.selected.setAssetDeptName(assetDept.getName());
-        } else if(this.selected.getStatus() == 1) {
-            this.selected.setDetectionTime(now);
+        } else if(this.selected.getStatus() == 1 || action == -22) {
             this.selected.setProbationStartUserUid(probationConfirmor.getUid());
             this.selected.setProbationStartUserName(probationConfirmor.getName());
         }
@@ -127,17 +150,81 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     }
 
     public String submit() {
+        Date now = DateUtil.now();
         tempSave(false);
-        if (this.selected.getStatus() == 0) {
-            this.selected.setStatus(1);
-            this.selected.setDetectionUserUid(detectionUser.getUid());
-            this.selected.setDetectionUserName(detectionUser.getName());
-        } else if(this.selected.getStatus() == 1) {
-            this.selected.setStatus(2);
+        switch (this.selected.getStatus()) {
+            case 0:
+                this.selected.setStatus(1);
+                this.selected.setCurrentPersonId(detectionUser.getUid());
+                this.selected.setCurrentPersonName(detectionUser.getName());
+                this.selected.setDetectionUserUid(detectionUser.getUid());
+                this.selected.setDetectionUserName(detectionUser.getName());
+                break;
+            case 1:
+                this.selected.setStatus(2);
+                this.selected.setCurrentPersonId(probationConfirmor.getUid());
+                this.selected.setCurrentPersonName(probationConfirmor.getName());
+                this.selected.setDetectionTime(now);
+                break;
+            case 2:
+                this.selected.setStatus(3);
+                this.selected.setProbationStartTime(now);
+                break;
+            case 3:
+                this.selected.setStatus(4);
+                this.selected.setCurrentPersonId(this.selected.getDetectionUserUid());
+                this.selected.setCurrentPersonName(this.selected.getDetectionUserName());
+                this.selected.setProbationEndUserUid(loginUser.getUid());
+                this.selected.setProbationEndUserName(loginUser.getName());
+                this.selected.setProbationEndTime(now);
+                break;
+            case 4:
+                this.selected.setStatus(5);
+                this.selected.setCurrentPersonId(this.selected.getApplicantUserUid());
+                this.selected.setCurrentPersonName(this.selected.getApplicantUserName());
+                this.selected.setEvacuationUserUid(loginUser.getUid());
+                this.selected.setEvacuationUserName(loginUser.getName());
+                this.selected.setEvacuationEndTime(now);
+                break;
+            case 5:
+                this.selected.setStatus(6);
+                this.selected.setCloseUserUid(loginUser.getUid());
+                this.selected.setCloseUserName(loginUser.getName());
+                this.selected.setCloseTime(now);
+                break;
+            default:
+                break;
         }
         dao.save(this.selected);
         WebUtil.addSuccessMessage(WebUtil.getMessage("Submit") + WebUtil.getMessage("Success"));
         return "externalAssetList?faces-redirect=true";
+    }
+
+    public String updateUser(Integer status) {
+        tempSave(true);
+        if (status == 1) {
+            this.selected.setDetectionUserUid(detectionUser.getUid());
+            this.selected.setDetectionUserName(detectionUser.getName());
+            this.selected.setCurrentPersonId(detectionUser.getUid());
+            this.selected.setCurrentPersonName(detectionUser.getName());
+        } else {
+            this.selected.setProbationStartUserUid(probationConfirmor.getUid());
+            this.selected.setProbationEndUserName(probationConfirmor.getName());
+            this.selected.setCurrentPersonId(probationConfirmor.getUid());
+            this.selected.setCurrentPersonName(probationConfirmor.getName());
+        }
+        dao.save(this.selected);
+        return "externalAssetList?faces-redirect=true";
+    }
+
+    private String querySerialNumber(String serialNumber){
+        if(StrUtil.isEmpty(serialNumber)){
+            return "0001";
+        }else{
+            int index = Integer.parseInt(serialNumber);
+            index++;
+            return String.format("%04d",index);
+        }
     }
 
     public List<OrgInfo> autoCompleteDept(String query) {
@@ -151,6 +238,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
 
     public void onAssetDeptChange(String idx) {
         detectionUserList = uaaService.getUsersByDeptUidAndRole(this.assetDept.getUid(), "AssetStaff");
+        deptContactList = uaaService.getUsersByDeptUidAndRole(this.assetDept.getUid(), "ClinicalStaff");
     }
 
     public List<UserAccount> autoCompleteEngineer(String query) {
@@ -168,6 +256,15 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         }
 
         return this.probationConfirmorList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase()))).sorted(new PinYinComparatorByName()).collect(Collectors.toList());
+    }
+
+    public List<UserAccount> autoCompleteDeptContact(String query) {
+        if (deptContactList == null) {
+            return Collections.emptyList();
+        }
+
+        return this.deptContactList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase()))).sorted(new PinYinComparatorByName()).collect(Collectors.toList());
     }
 
@@ -197,5 +294,36 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
+    }
+
+    public boolean canEditBase() {
+        if (this.selected.getId() == null) {
+            return true;
+        }
+        if ("View".equals(actionName)) {
+            return false;
+        }
+        return loginUser.getUid().equals(this.selected.getApplicantUserUid()) && this.selected.getStatus() <= 1;
+    }
+
+    public boolean canEditDetection() {
+        if ("View".equals(actionName)) {
+            return false;
+        }
+        return loginUser.getUid().equals(this.selected.getDetectionUserUid()) && this.selected.getStatus() <= 2;
+    }
+
+    public boolean viewDetection() {
+        if ("View".equals(actionName) && this.selected.getStatus() == 1) {
+            return false;
+        }
+        return this.selected.getStatus() >= 1 && this.action != -11;
+    }
+
+    public boolean viewEvacuation() {
+        if ("View".equals(actionName) && this.selected.getStatus() == 3) {
+            return false;
+        }
+        return this.selected.getStatus() >= 3;
     }
 }

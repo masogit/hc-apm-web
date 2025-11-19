@@ -4,15 +4,20 @@ import com.ge.apm.dao.AssetProbationRepository;
 import com.ge.apm.domain.AssetProbation;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -31,6 +36,7 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
     private AssetProbationRepository dao;
     private UaaService uaaService;
 
+    @Getter @Setter
     private UserAccount loginUser;
     @Getter @Setter
     private Integer queryIndex = -1;
@@ -63,11 +69,24 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
         if (queryIndex >= 0) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryIndex, "1*"));
         }
-        Set<String> orgUidSet = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toSet());
-        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
-        searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
+        List<String> roleNames = loginUser.getRoleNames();
+        if (roleNames.contains("ProbationStaff")) {
+            Set<String> orgUidSet = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toSet());
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
+            searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
+        } else if (roleNames.contains("AssetStaff")) {
+            searchFilters.add(new SearchFilter("detectionUserUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*"));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.GTE, 1, "1*"));
+        } else if (roleNames.contains("ClinicalStaff")) {
+            searchFilters.add(new SearchFilter("probationStartUserUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*"));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.GTE, 2, "1*"));
+        } else {
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, -1, "1*"));
+        }
+        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
+        pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(),sort);
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -85,5 +104,57 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
         this.selected.setCancelTime(DateUtil.now());
         dao.save(this.selected);
         WebUtil.addSuccessMessage(WebUtil.getMessage("SubmissionSuccessfullyCanceled"));
+    }
+
+    public void closeOrder(AssetProbation assetProbation) {
+        assetProbation.setStatus(6);
+        assetProbation.setCloseUserUid(loginUser.getUid());
+        assetProbation.setCloseUserName(loginUser.getName());
+        assetProbation.setCloseTime(DateUtil.now());
+        dao.save(assetProbation);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("CloseSuccess"));
+    }
+
+    public void onSelectOrder(String selectedId) {
+        String url = "actionName=View&selectedId=" + selected.getId() + "&action=" + queryIndex;
+        url = "externalAssetEdit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
+    public boolean canOperation() {
+        if (ListUtil.newArrayList(-1, 6, 7).contains(queryIndex)) {
+            return false;
+        }
+        List<String> roleNames = loginUser.getRoleNames();
+        switch (queryIndex) {
+            case 0:
+            case 5:
+                if (roleNames.contains("ProbationStaff")) {
+                    return true;
+                }
+                break;
+            case 1:
+                if (roleNames.contains("AssetStaff") || roleNames.contains("ProbationStaff")) {
+                    return true;
+                }
+                break;
+            case 2:
+                if (roleNames.contains("ClinicalStaff") || roleNames.contains("ProbationStaff") || roleNames.contains("AssetStaff")) {
+                    return true;
+                }
+                break;
+            case 3:
+                if (roleNames.contains("ClinicalStaff")) {
+                    return true;
+                }
+                break;
+            case 4:
+                if (roleNames.contains("AssetStaff")) {
+                    return true;
+                }
+                break;
+        }
+        return false;
     }
 }

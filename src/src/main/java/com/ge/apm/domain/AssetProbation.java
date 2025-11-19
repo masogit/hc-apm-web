@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
@@ -66,6 +67,11 @@ public class AssetProbation implements Serializable {
     private Date planEndDate;//计划结束日期
     @Column(name = "current_step")
     private String currentStep;//当前步骤
+    @Column(name = "current_person_id")
+    private String currentPersonId;//当前处理人
+    @Size(max = 16)
+    @Column(name = "current_person_name")
+    private String currentPersonName;
     @Column(name = "has_certificate")
     private Boolean hasCertificate;//合格证
     @Size(max = 64)
@@ -83,7 +89,7 @@ public class AssetProbation implements Serializable {
     private String applicantUserName;
     @Column(name = "application_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date applicationTime;//申请时间
     @Column(name = "detection_situation")
     private String detectionSituation;//检测情况
@@ -400,6 +406,22 @@ public class AssetProbation implements Serializable {
 
     public void setCurrentStep(String currentStep) {
         this.currentStep = currentStep;
+    }
+
+    public String getCurrentPersonId() {
+        return currentPersonId;
+    }
+
+    public void setCurrentPersonId(String currentPersonId) {
+        this.currentPersonId = currentPersonId;
+    }
+
+    public String getCurrentPersonName() {
+        return currentPersonName;
+    }
+
+    public void setCurrentPersonName(String currentPersonName) {
+        this.currentPersonName = currentPersonName;
     }
 
     public Boolean getHasCertificate() {
