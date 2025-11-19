@@ -259,7 +259,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.feedbackRating}</label>
-                                        <p:outputLabel value="#{woItem.feedbackRating}"/>
+                                        <p:outputLabel value="#{woItem.feedbackRating != null and woItem.feedbackRating ==0 ?'':woItem.feedbackRating}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.feedbackComment}</label>
