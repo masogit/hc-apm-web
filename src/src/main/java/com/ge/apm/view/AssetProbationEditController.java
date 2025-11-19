@@ -59,7 +59,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     @Getter @Setter
     private List<UserAccount> probationConfirmorList;
     @Getter @Setter
-    private List<V2_BlobObject> attachments;
+    private List<V2_BlobObject> attachments = ListUtil.newArrayList();
     @Getter @Setter
     private Integer action;
     @Getter @Setter
@@ -137,14 +137,15 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setInformation(String.join(",", informationList));
             this.selected.setAssetDeptUid(assetDept.getUid());
             this.selected.setAssetDeptName(assetDept.getName());
-        } else if(this.selected.getStatus() == 1 || action == -22) {
-            this.selected.setProbationStartUserUid(probationConfirmor.getUid());
-            this.selected.setProbationStartUserName(probationConfirmor.getName());
         }
         this.selected.setLastModifiedBy(loginUser.getName());
         this.selected.setLastModifiedDate(now);
         if (flag) {
             dao.save(this.selected);
+            if (ObjectUtil.isNotEmpty(attachments) && "Create".equals(super.crudActionName)) {
+                attachments.forEach(att -> att.setBoUuid(this.selected.getId()));
+                blobService.saveBlobObject(attachments);
+            }
             WebUtil.addSuccessMessage(WebUtil.getMessage("tempSave") + WebUtil.getMessage("Success"));
         }
     }
@@ -196,13 +197,17 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 break;
         }
         dao.save(this.selected);
+        if (ObjectUtil.isNotEmpty(attachments) && "Create".equals(super.crudActionName)) {
+            attachments.forEach(att -> att.setBoUuid(this.selected.getId()));
+            blobService.saveBlobObject(attachments);
+        }
         WebUtil.addSuccessMessage(WebUtil.getMessage("Submit") + WebUtil.getMessage("Success"));
         return "externalAssetList?faces-redirect=true";
     }
 
     public String updateUser(Integer status) {
-        tempSave(true);
         if (status == 1) {
+            tempSave(false);
             this.selected.setDetectionUserUid(detectionUser.getUid());
             this.selected.setDetectionUserName(detectionUser.getName());
             this.selected.setCurrentPersonId(detectionUser.getUid());
@@ -270,7 +275,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
 
 
     public List<V2_BlobObject> getAttachList(String subType) {
-        if (attachments == null) {
+        if (this.selected.getId() != null) {
             attachments = blobService.findBlobObjectsByBoUid(this.selected.getId());
         }
         return attachments.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(subType)).collect(Collectors.toList());
@@ -282,9 +287,14 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     }
 
     public void handleFileUpload(FileUploadEvent event) {
+        String type = event.getComponent().getId();
+        long count = attachments.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).count();
+        if (count == 10) {
+            WebUtil.addErrorMessage("附件已达限制！");
+            return;
+        }
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
-            String type = event.getComponent().getId();
             attachments.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_SUB_TYPE_ASSET_PROBATION);
             blobObject.setBoSubType(type);

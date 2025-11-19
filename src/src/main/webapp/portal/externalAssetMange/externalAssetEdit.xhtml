@@ -127,8 +127,12 @@
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <p:dataList id="informationList" value="#{assetProbationEditController.getAttachList('information')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">#{msg.attachmentUrl}</f:facet>
+                                    <f:facet name="header">#{msg.attachmentUrl}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
                                     <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="informationList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditBase}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
@@ -189,8 +193,12 @@
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <p:dataList id="detectionList" value="#{assetProbationEditController.getAttachList('detection')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                        <f:facet name="header">#{msg.addPic}</f:facet>
+                                        <f:facet name="header">#{msg.addPic}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
                                         <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{venderCompanyController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                            <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                        </p:commandLink>
                                         <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="detectionList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditDetection()}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                         </p:commandButton>
@@ -282,6 +290,7 @@
                     </h:panelGroup>
                 </h:form>
             </div>
+            <ui:include src="/portal/preview/view.xhtml" />
             <!--提交对话框 -->
             <p:dialog id="submitDialog" widgetVar="submitDialog" modal="true" width="400" resizable="true" draggable="true" header="#{msg.Submit.concat(msg.probationApplication)}">
                 <h:panelGroup>

@@ -26,13 +26,16 @@
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{assetProbationController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{assetProbationController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.lastModifiedDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500" >
                         <p:ajax event="filter" listener="#{assetProbationController.onFilter}"/>
                         <p:ajax event="rowSelect" listener="#{assetProbationController.onSelectOrder(item.id)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)"/>
+                        <p:column headerText="#{msg.zkbPartOrder_srNum}" sortBy="#{item.orderNum}" filterBy="#{item.orderNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.orderNum}"/>
+                        </p:column>
                         <p:column headerText="#{msg.EquipmentName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
@@ -78,14 +81,14 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.probationStatus}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.probationStatus}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{assetProbationController.queryIndex eq -1}">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" rendered="#{assetProbationController.queryIndex == -1}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('probationStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{fieldMsg.doGetFieldValue('probationStatus', item.status)}"/>
+                            <h:outputText value="#{item.cancel ? fieldMsg.doGetFieldValue('probationStatus', 7) : fieldMsg.doGetFieldValue('probationStatus', item.status)}"/>
                         </p:column>
                         <p:column headerText="#{msg.Operation}" style="width: 100px" exportable="false" rendered="#{assetProbationController.canOperation()}">
                             <p:commandButton value="#{msg.modify}" actionListener="#{assetProbationController.setSelected(item)}" action="#{assetProbationController.editAction(0)}" rendered="#{userContextService.accessContainsFunctionMenu('EXTERNAL_ASSET_MANAGE_TEMP_SAVE') and item.status eq 0 and item.applicantUserUid eq assetProbationController.loginUser.uid}"/>
