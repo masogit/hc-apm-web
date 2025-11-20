@@ -142,7 +142,7 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset legend="#{msg.WorkorderInformation}" rendered="#{assetProbationEditController.selected.status ge 1}">
+                    <p:fieldset legend="#{msg.WorkorderInformation}" rendered="#{assetProbationEditController.selected.status ge 0}">
                         <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbPartOrder_srNum}</label>
@@ -167,6 +167,17 @@
                                 <p:inputText value="#{assetProbationEditController.selected.currentPersonName}" readonly="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
+                        <p:dataTable value="#{assetProbationEditController.getStepList()}" var="stepItem" rendered="#{assetProbationEditController.getStepList().size() gt 0}">
+                            <p:column headerText="#{msg.stepName}">
+                                <h:outputText value="#{stepItem.stepName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.ownerName}">
+                                <h:outputText value="#{stepItem.ownerName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.startTime}">
+                                <h:outputText value="#{stepItem.startTime}"/>
+                            </p:column>
+                        </p:dataTable>
                         <p:fieldset legend="#{msg.tempEngineerDetection}" rendered="#{assetProbationEditController.viewDetection()}">
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.selected.status ge 2 and assetProbationEditController.action ne -22}">
                                 <h:panelGroup>
