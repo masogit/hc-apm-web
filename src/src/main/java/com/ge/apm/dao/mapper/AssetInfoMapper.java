@@ -115,4 +115,7 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
 	@SelectProvider(type = AssetInfoProvider.class,method="getAssetInfoIsNotEfficiencyEquipment")
 	List<AssetInfo> getAssetInfoIsNotEfficiencyEquipment(@Param("tenantUid")  String tenantUid, @Param("orgList")  List<String> orgList, @Param("clinicalDeptUid")  String clinicalDeptUid,@Param("assetGroup")  Integer assetGroup, @Param("purchasePrice")   Double purchasePrice);
+
+    List<AssetInfo> queryAssetInfo(HashMap<String, Object> params);
+
 }

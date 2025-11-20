@@ -30,6 +30,9 @@
         <result column="site_uid" property="siteUID"/>
         <result column="asset_dept_uid" property="assetDeptUID"/>
         <result column="clinical_dept_uid" property="clinicalDeptUID"/>
+        <result column="make_short_name" property="makerShortName"/>
+        <result column="manufacture" property="manufacture"/>
+        <result column="asset_classification32" property="assetClassification32"/>
     </resultMap>
 
     <select id="selectMeasureResult" resultMap="assetBean">
@@ -509,6 +512,52 @@
         </where>
     </sql>
 
+    <select id="queryAssetInfo" resultMap="assetBean">
+
+
+        select
+
+        ai.id,
+        ai.uid,
+        ai.name,
+        ai.serial_num,
+        ai.financing_num,
+        ai.qr_code,
+        ai.function_type,
+        ai.asset_group,
+        ai.clinical_dept_name,
+        ai.measure_grade,
+        ai.measuring_item_category,
+        ai.make_short_name ,
+        ai.manufacture,
+        ai.asset_classification32
+
+
+
+            from asset_info       ai
+        <where>
+            ai.tenant_uid = #{tenantUid}
+            and ai.site_uid=#{siteUid}
+            <if test="clinicalDeptUid != null">
+                AND ai.clinical_dept_uid =#{clinicalDeptUid}
+            </if>
+            <if test="name != null">
+                AND ai.name like concat('%',#{name},'%')
+            </if>
+
+            <if test="functionType != null">
+                AND ai.function_type like concat('%',#{functionType},'%')
+            </if>
+
+            <if test="makerShortName != null">
+                AND ai.make_short_name like concat('%',#{makerShortName},'%')
+            </if>
+            <if test="manufacture != null">
+                AND ai.manufacture like concat('%',#{manufacture},'%')
+            </if>
+        </where>
+
+    </select>
 
 
 </mapper>
