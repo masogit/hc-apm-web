@@ -192,6 +192,11 @@ public enum GatewayURL {
     REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}"),
     USER_SIGNATURE("/hcapmmasterdataservice/api/apm/masterData/userSignature"),
     GET_CONFIG_BY_KEY_AND_SITE("/hcapmmasterdataservice/api/apm/masterData/configItem/getByKeyAndSite"),
+    ASSET_CLASSIFICATION_MODEL_SAVE("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/saveModel"),
+    ASSET_CLASSIFICATION_MODEL_EDIT("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/editModel"),
+    ASSET_CLASSIFICATION_MODEL_DELETE("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/deleteModel"),
+    ASSET_CLASSIFICATION_MODEL_GETRESMAPBYASSET("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/getResMapByAsset"),
+    ASSET_CLASSIFICATION_MODEL_UPLOAD_FILE("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/uploadFileModel"),
 
     //es查询设备修改历史记录分页
     ELASTICSEARCH_QUERY("/hcapmelasticservice/elasticSearch/query"),

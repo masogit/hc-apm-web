@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .ui-selectbooleanbutton{
+                background: #3e464c !important;
+                color: #fff !important;
+                border: none !important;
+            }
+            body.layout-compact .ui-chkbox{
+                width: 18px !important;
+            }
+            .vertical-radio-aligned .ui-radiobutton {
+                display: inline-block;
+                vertical-align: top;
+                margin-right: 8px;
+            }
+            .vertical-radio-aligned label {
+                display: block;
+                margin-bottom: 6px;
+                line-height: 1.4;
+            }
+            .vertical-radio-aligned .ui-radiobutton-box {
+                vertical-align: middle;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="分类AI模型训练"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <h:form id="AssetDetailListForm">
+
+                    <p:dataTable id="datalist" value="#{modelTrainingController.lazyModel}" var="item"
+                                 widgetVar="varDataList" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false"
+                                 selection="#{modelTrainingController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"      rowKey="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{modelTrainingController.onFilter}" />
+                        <p:column headerText="#{msg.Actions}" exportable="false" width="80" id="operatorColumn">
+
+                            <h:panelGroup style="white-space: nowrap;">
+                                <p:commandLink
+                                        style="display: inline-block; vertical-align: middle;"
+                                        target="_new"
+                                        title="#{msg.Edit}"
+                                        actionListener="#{modelTrainingController.edit(item)}"
+                                        update=":ModelAddDlg"
+                                        oncomplete="PF('ModelAddDlg').show()">
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                </p:commandLink>
+
+                                <p:commandLink
+                                        id="deleteButton"
+                                        style="display: inline-block; vertical-align: middle; margin-left: 4px;"
+                                        title="#{msg.Delete}"
+                                        actionListener="#{modelTrainingController.deleteModel(item)}"
+                                        update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                        </p:column>
+
+                        <p:column headerText="#{msg.manufacture}" sortBy="#{item.factory}" filterBy="#{item.factory}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.factory}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.brand}" sortBy="#{item.brand}" filterBy="#{item.brand}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.brand}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
+                                  sortBy="#{item.sourceName}" filterBy="#{item.sourceName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.sourceName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.pattern}"
+                                  filterBy="#{item.pattern}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.pattern}"/>
+                        </p:column>
+
+                        <p:column headerText="设备32分类" sortBy="#{item.category}" filterBy="#{item.category}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.category}"/>
+                        </p:column>
+
+                        <p:column headerText="上传人">
+                            <h:outputText value="#{item.createdName}"/>
+                        </p:column>
+
+                        <p:column headerText="上传时间">
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat8()}"  />
+                            </h:outputText>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+
+                            <p:commandButton id="createButton" icon="ui-icon-plus" title="添加分类模型" actionListener="#{modelTrainingController.prepareCreate}" process="@this"  update=":ModelAddDlg"  oncomplete="PF('ModelAddDlg').show()"  />
+
+                        </f:facet>
+                    </p:dataTable>
+
+
+                </h:form>
+                <ui:include src="Add.xhtml"/>
+            </div>
+        </div>
+
+        <script>
+
+        </script>
+    </ui:define>
+</ui:composition>
