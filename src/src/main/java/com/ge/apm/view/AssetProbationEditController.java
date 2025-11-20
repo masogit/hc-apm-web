@@ -13,6 +13,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
@@ -220,6 +221,60 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         }
         dao.save(this.selected);
         return "externalAssetList?faces-redirect=true";
+    }
+
+    public List<Map<String, Object>> getStepList() {
+        List<Map<String, Object>> stepList = ListUtil.newArrayList();
+        if (this.selected.getStatus() >= 0) {
+            Map<String, Object> step = MapUtil.newHashMap();
+            step.put("stepName", "已创建");
+            step.put("ownerName", this.selected.getCreatedBy());
+            step.put("startTime", DateUtil.formatDateTime(this.selected.getCreatedDate()));
+            stepList.add(step);
+        }
+        if (this.selected.getStatus() >= 1) {
+            Map<String, Object> step = MapUtil.newHashMap();
+            step.put("stepName", "待检测");
+            step.put("ownerName", this.selected.getDetectionUserName());
+            step.put("startTime", DateUtil.formatDateTime(this.selected.getDetectionTime()));
+            stepList.add(step);
+        }
+        if (this.selected.getStatus() >= 2) {
+            Map<String, Object> step = MapUtil.newHashMap();
+            step.put("stepName", "待试用");
+            step.put("ownerName", this.selected.getProbationStartUserName());
+            step.put("startTime", DateUtil.formatDateTime(this.selected.getProbationStartTime()));
+            stepList.add(step);
+        }
+        if (this.selected.getStatus() >= 3) {
+            Map<String, Object> step = MapUtil.newHashMap();
+            step.put("stepName", "试用中");
+            step.put("ownerName", this.selected.getProbationEndUserName());
+            step.put("startTime", DateUtil.formatDateTime(this.selected.getProbationEndTime()));
+            stepList.add(step);
+        }
+        if (this.selected.getStatus() >= 4) {
+            Map<String, Object> step = MapUtil.newHashMap();
+            step.put("stepName", "待撤离");
+            step.put("ownerName", this.selected.getEvacuationUserName());
+            step.put("startTime", DateUtil.formatDateTime(this.selected.getEvacuationEndTime()));
+            stepList.add(step);
+        }
+        if (this.selected.getStatus() >= 5) {
+            Map<String, Object> step = MapUtil.newHashMap();
+            step.put("stepName", "待关单");
+            step.put("ownerName", this.selected.getCloseUserName());
+            step.put("startTime", DateUtil.formatDateTime(this.selected.getCloseTime()));
+            stepList.add(step);
+        }
+        if (this.selected.getCancel()) {
+            Map<String, Object> step = MapUtil.newHashMap();
+            step.put("stepName", "已取消");
+            step.put("ownerName", this.selected.getCancelUserName());
+            step.put("startTime", DateUtil.formatDateTime(this.selected.getCancelTime()));
+            stepList.add(step);
+        }
+        return stepList;
     }
 
     private String querySerialNumber(String serialNumber){
