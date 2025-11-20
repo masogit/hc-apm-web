@@ -122,7 +122,6 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setStatus(0);
             this.selected.setApplicantUserUid(loginUser.getUid());
             this.selected.setApplicantUserName(loginUser.getName());
-            this.selected.setApplicationTime(now);
             this.selected.setTenantUid(loginUser.getTenantUID());
             this.selected.setInstitutionUid(loginUser.getInstitutionUID());
             this.selected.setHospitalUid(loginUser.getHospitalUID());
@@ -156,6 +155,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         switch (this.selected.getStatus()) {
             case 0:
                 this.selected.setStatus(1);
+                this.selected.setApplicationTime(now);
                 this.selected.setCurrentPersonId(detectionUser.getUid());
                 this.selected.setCurrentPersonName(detectionUser.getName());
                 this.selected.setDetectionUserUid(detectionUser.getUid());
