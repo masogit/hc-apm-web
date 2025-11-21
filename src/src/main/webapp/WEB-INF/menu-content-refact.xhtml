@@ -381,7 +381,7 @@
                    </c:when>
 
                    <c:when test="#{item eq 'ASSET_CLASSIFICATION_MANAGEMENT'}">
-                       <p:submenu id="um6000" label="设备分类管理" icon="fa fa-folder-open"  rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_')}">
+                       <p:submenu id="um6000" label="设备分类管理" icon="fa fa-folder-open fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_')}">
                            <p:menuitem fragment="um6100"  id="um6100" value="设备分类详情" outcome="/portal/assetClassificationManagement/details.xhtml" />
                            <p:menuitem fragment="um6200"  id="um6200" value="分类AI模型训练" outcome="/portal/assetClassificationManagement/modelTraining.xhtml" />
                        </p:submenu>
