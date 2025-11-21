@@ -109,6 +109,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
             param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
         }
+        inventoryOrderService.covQueryCondition(searchFilters, param);
         Long count = inventoryOrderMapper.findNoneOrderCount(param);
         Sort sort = pageRequest.getSort();
         StringBuilder orderBy = new StringBuilder();
@@ -118,7 +119,6 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
             orderBy.append(ZipUtil.camelToUnderline(property)).append(ascending ? " ASC" : " DESC").append(",");
         }
         param.put("orderBy", orderBy.substring(0, orderBy.length() - 1));
-        inventoryOrderService.covQueryCondition(searchFilters, param);
         List<AssetInfo> resultList = inventoryOrderMapper.findNoneOrderList(param);
         return new PageImpl<>(resultList, pageRequest, count);
     }
