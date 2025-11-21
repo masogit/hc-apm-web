@@ -233,6 +233,8 @@ public enum GatewayURL {
     OCR_RECOGNITION_DOC("/hcapmgateway/api/apm/ocr/recognition/doc"),
     OCR_DOC_RESULT("/hcapmgateway/api/apm/ocr/doc/result/{id}"),
 
+    FILES_UPLOAD_AND_WORKFLOWS_RUN("/hcapmgateway/api/apm/modle/filesUploadAndWorkflowsRun"),
+
     // site to site auto ack
     SITE_TO_SITE_AUTO_ACK("/hcapmworkflowservice/api/apm/siteToSiteAllocation/autoAck"),
     ;
