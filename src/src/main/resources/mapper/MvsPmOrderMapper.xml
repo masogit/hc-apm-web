@@ -48,6 +48,7 @@
             <result property="mvsEquip" column="asset_mvs_equip"/>
             <result property="id" column="asset_id"/>
             <result property="status" column="asset_status"/>
+            <result property="assetGroup" column="asset_group"/>
         </association>
 
         <association property="siteOrg" javaType="com.ge.apm.domain.OrgInfo">
@@ -96,6 +97,7 @@
         a.id as asset_id,
         a.status as asset_status,
         a.uid AS asset_uid,
+        a.asset_group AS asset_group,
         oi.name as site_name
         FROM v2_pm_order t
         JOIN mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid

@@ -6,6 +6,9 @@ public enum ExportFields {
     SERIALNUM("制造商序列号", "Manufacturer Serial Number"),
     ASSETNUM("设备编号(院方)", "Equipment ID (Hospital)"),
     RUNLEVEL("保养等级", "Measurement Grade"),
+
+    FUNCTIONTYPE("设备型号", "Function Type"),
+    ASSETGROUP("设备分类", "ASSET GROUP"),
     PMTYPE("保养类型", "Maintenance Type"),
     CLINICALNAME("所属科室", "Clinical Department"),
     PMRULE("保养规则", "PM Rule"),

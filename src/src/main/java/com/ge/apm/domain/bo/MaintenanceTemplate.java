@@ -436,6 +436,7 @@ public class MaintenanceTemplate {
         INSTALL_DATE("installDate", Widget.TEXT),
         LOCATION_NAME("locationName", Widget.TEXT),
         PERIOD("period", Widget.TEXT),
+        GROUP("group", Widget.TEXT),
         ;
 
         private final String key;
