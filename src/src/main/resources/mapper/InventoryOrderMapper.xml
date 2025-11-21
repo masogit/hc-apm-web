@@ -270,7 +270,7 @@
 
     <sql id="noneOrderCondition">
         (
-        SELECT ai.id,ai.name,ai.clinical_dept_uid clinicalDeptUid,ai.clinical_dept_name clinicalDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName
+        SELECT ai.id,ai.uid,ai.name,ai.clinical_dept_uid clinicalDeptUid,ai.clinical_dept_name clinicalDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName
         FROM asset_info ai LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id
         <if test="orderIdList != null and orderIdList.size > 0">
             AND iod.inventory_order_id IN
