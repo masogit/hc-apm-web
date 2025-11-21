@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.dao.OCRTemplateRepository;
 import com.ge.apm.domain.*;
@@ -15,6 +16,8 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import com.ge.healthcare.cn.common.llm.ApplicationType;
+import com.ge.healthcare.cn.common.llm.WorkflowResponse;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
@@ -75,6 +78,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     private List<StreamedContent> streamedContents = new ArrayList<>();
 
+    private ConfigItemValueRepository configItemValueRepository;
+
+    private String identifyPatterns;
+
     @Override
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
@@ -85,6 +92,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         measuringService = WebUtil.getBean(MeasuringService.class);
         ocrTemplateRepository = WebUtil.getBean(OCRTemplateRepository.class);
         systemEventAuditUtil = WebUtil.getBean(SystemEventAuditAopAspect.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+        ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("identifyPatterns", currentUser.getSiteUID());
+        identifyPatterns = Optional.ofNullable(displayModeCasePriorityValue).map(ConfigItemValue::getValue).orElse("local");
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         if("Create".equals(actionName)){
@@ -107,10 +117,22 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 WebUtil.addSuccessMessage("上传成功");
                 return;
             }
-
             Map<String, Object> params = new HashMap<>();
-            params.put("type", BusinessType.MEASURE.name());
-            if(fileName.toLowerCase().endsWith("pdf")){
+            if("AI".equalsIgnoreCase(identifyPatterns)){
+                params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
+                JSONObject jsonObject = templateService.upload(file, GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params);
+                String bizStatusCode = jsonObject.getString("bizStatusCode");
+                if("ok".equalsIgnoreCase(bizStatusCode)){
+                    JSONObject data = jsonObject.getJSONObject("data");
+                    WorkflowResponse workflowResponse = data.toJavaObject(WorkflowResponse.class);
+                    WorkflowResponse.Result result = workflowResponse.getData();
+                    JSONObject outputs = result.getOutputs();
+                    JSONObject output = outputs.getJSONObject("output");
+                    JSONObject content = output.getJSONObject("content");
+                    setObject(content);
+                }
+            }else if(fileName.toLowerCase().endsWith("pdf")){
+                params.put("type", BusinessType.MEASURE.name());
                JSONObject jsonObject = templateService.upload(file, GatewayURL.OCR_DOCUMENT,params);
                JSONArray data = jsonObject.getJSONArray("data");
                if(data != null && data.size() > 0){
@@ -122,6 +144,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 //               String source=JSON.toJSONString(data.getJSONObject(data.size() - 1),SerializerFeature.PrettyFormat);
 //               System.out.println("source:" + source);
             }else{
+                params.put("type", BusinessType.MEASURE.name());
                 JSONObject jsonObject = templateService.upload(file,GatewayURL.OCR_IMAGE,params);
                 JSONObject data = jsonObject.getJSONObject("data");
                 if(data != null){
@@ -144,27 +167,65 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
     }
     public void setObject(JSONObject object){
         MeasuringCertificateDetail selected1 = this.selected;
-        this.selected.setCertificateNo(object.getString("certificateNo"));
-        this.selected.setAssetManufacturer(object.getString("assetManufacturer"));
-        this.selected.setCheckPerson(object.getString("checkPerson"));
-        this.selected.setAssetModel(object.getString("assetModel"));
-        this.selected.setAssetSN(object.getString("assetSN"));
-        this.selected.setAssetName(object.getString("assetName"));
-        this.selected.setCheckCompany(object.getString("checkCompany"));
-        this.selected.setDepartment(object.getString("department"));
+        String certificateNo = object.getString("certificateNo");
+        if(certificateNo == null){
+            certificateNo = object.getString("cetification_id");
+        }
+        this.selected.setCertificateNo(certificateNo);
+        String assetManufacturer = object.getString("assetManufacturer");
+        if(assetManufacturer == null){
+            assetManufacturer = object.getString("manufactory");
+        }
+        this.selected.setAssetManufacturer(assetManufacturer);
+        String checkPerson = object.getString("checkPerson");
+        if(checkPerson == null){
+            checkPerson = object.getString("checked_by");
+        }
+        this.selected.setCheckPerson(checkPerson);
+        String assetModel = object.getString("assetModel");
+        if(assetModel == null){
+            assetModel = object.getString("pattern");
+        }
+        this.selected.setAssetModel(assetModel);
+        String assetSN = object.getString("assetSN");
+        if(assetSN == null){
+            assetSN = object.getString("serial_num");
+        }
+        this.selected.setAssetSN(assetSN);
+        String assetName = object.getString("assetName");
+        if(assetName == null){
+            assetName = object.getString("device_name");
+        }
+        this.selected.setAssetName(assetName);
+        String checkCompany = object.getString("checkCompany");
+        if(checkCompany == null){
+            checkCompany = object.getString("check_company");
+        }
+        this.selected.setCheckCompany(checkCompany);
+        String department = object.getString("department");
+        if(department == null){
+            department = object.getString("applicant");
+        }
+        this.selected.setDepartment(department);
         String status = object.getString("status");
+        if(ObjectUtil.isEmpty(status)){
+             status = object.getString("conclusion");
+        }
         if(ObjectUtil.isNotEmpty(status)){
+            String conclusion = status;
             List<I18nMessage> byMsgType = i18nMessageService.getByMsgType(MEASURING_STATUS);
-            Optional<I18nMessage> first = byMsgType.stream().filter(item -> item.getValue().equals(status)).findFirst();
+            Optional<I18nMessage> first = byMsgType.stream().filter(item -> item.getValue().equals(conclusion)).findFirst();
             if(first.isPresent()){
                 I18nMessage i18nMessage = first.get();
                 this.selected.setStatus(Integer.valueOf(i18nMessage.getMsgKey()));
             }
         }
-
         try {
             String validDateToStr = "";
             String validDateToVar = object.getString("validDateTo");
+            if(StringUtils.isEmpty(validDateToVar)){
+                validDateToVar = object.getString("valid_util");
+            }
             if(ObjectUtil.isNotEmpty(validDateToVar)){
                 Matcher matcher = pattern.matcher(validDateToVar);
                 while (matcher.find()) {
@@ -181,6 +242,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         try {
             String checkDateStr = "";
             String checkDateVar = object.getString("checkDate");
+            if(StringUtils.isEmpty(checkDateVar)){
+                checkDateVar = object.getString("verify_date");
+            }
             if(ObjectUtil.isNotEmpty(checkDateVar)) {
                 Matcher matcher = pattern.matcher(checkDateVar);
                 while (matcher.find()) {
