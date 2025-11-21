@@ -40,6 +40,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import webapp.framework.web.WebUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -235,6 +236,7 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Device.MAKER.toString(), pmOrder.getAssetInfo().getMakerShortName());
         content.put(MaintenanceTemplate.Device.INSTALL_DATE.toString(), pmOrder.getAssetInfo().getInstallDate() != null ? DEFAULT_DAY.print(pmOrder.getAssetInfo().getInstallDate().getTime()) : "");
         content.put(MaintenanceTemplate.Device.LOCATION_NAME.toString(), pmOrder.getAssetInfo().getLocationName());
+        content.put(MaintenanceTemplate.Device.GROUP.toString(), WebUtil.getFieldValueMessage("assetGroup",  pmOrder.getAssetInfo().getAssetGroup()!=null?  pmOrder.getAssetInfo().getAssetGroup().toString():""));
         String periodUnit = pmOrder.getPeriodUnit();
         String period = pmOrder.getPeriod() == null ?"":pmOrder.getPeriod().toString();
         periodUnit =(StringUtils.isEmpty(periodUnit)?"":"y".equalsIgnoreCase(periodUnit)?"年":"m".equalsIgnoreCase(periodUnit)?"月":"w".equalsIgnoreCase(periodUnit)?"周":"d".equalsIgnoreCase(periodUnit)?"日":"");
