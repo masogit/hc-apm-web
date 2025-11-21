@@ -447,6 +447,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private List<V2_PmOrder> getExportList() {
         List<V2_PmOrder> pmList=null;
+        pick(null);
         if(pmIdList.size()!=0 && queryIndex!=10 ) {
             pmList = dao.getBatchPmOrderList(pmIdList);
         }else{
