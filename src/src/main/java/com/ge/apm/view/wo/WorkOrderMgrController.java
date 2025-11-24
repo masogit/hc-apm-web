@@ -850,6 +850,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1)), "1*3+"));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
                     searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, loginUser.getOrgInfoUID(), "1*3+"));
+                    searchFilters.add(new SearchFilter("ackId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+"));
                 } else {
                     searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
