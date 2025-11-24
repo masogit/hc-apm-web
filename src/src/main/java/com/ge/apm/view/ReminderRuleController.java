@@ -305,6 +305,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
                 break;
             case "AdjustmentCenterReturn":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ADJUSTMENT_CENTER_RETURN_MSG, WechatParam.class));
+            case "ProbationExpiration":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_PROBATION_EXPIRATION_MSG, WechatParam.class));
                 break;
             default:
                 break;
