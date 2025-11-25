@@ -55,7 +55,10 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     @Getter @Setter
     private OrgInfo filterDeptOrg;
     @Getter @Setter
-    private List<OrgInfo> selectsDeptOrg;
+    private List<OrgInfo> selectsDeptOrg=new ArrayList<>();
+
+    @Getter @Setter
+    private List<String> selectsDeptOrgUid=new ArrayList<>();
 
     //采购原值(元)
     @Getter @Setter
@@ -369,6 +372,7 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
             boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
             if(!b){
                 selectAsset.add(assetInfo);
+                assetInfo.setCategoryRadio(assetInfo.getAssetClassification32());
                 if(org.springframework.util.CollectionUtils.isEmpty(assetInfo.getAvailableCategories())) {
                     AssetClassificationModel assetClassificationModel = new AssetClassificationModel();
                     assetClassificationModel.setBrand(assetInfo.getMakerShortName());
@@ -448,7 +452,32 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
         item.setAssetClassification32(selectedCategory);
     }
 
+    public void assetClassification32Change(AssetInfo asset) {
+        asset.setCategoryRadio(asset.getAssetClassification32());
+    }
+
+    public void categoryRadioChange(AssetInfo asset) {
+        asset.setAssetClassification32(asset.getCategoryRadio());
+    }
+
+    public List<OrgInfo> getSelectsDeptOrg() {
+        return selectsDeptOrg;
+    }
+
+    public void setSelectsDeptOrg(List<OrgInfo> selectsDeptOrg) {
+        this.selectsDeptOrg = selectsDeptOrg;
+    }
+
 //    public void selectCategory(AssetInfo iteme) {
 //        item.setAssetClassification32(selectedCategory);
 //    }
+
+
+    public List<String> getSelectsDeptOrgUid() {
+        return selectsDeptOrgUid;
+    }
+
+    public void setSelectsDeptOrgUid(List<String> selectsDeptOrgUid) {
+        this.selectsDeptOrgUid = selectsDeptOrgUid;
+    }
 }

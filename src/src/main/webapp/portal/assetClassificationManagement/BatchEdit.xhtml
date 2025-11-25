@@ -57,7 +57,7 @@
                                                   panelStyle="width:280px" style="width:100%" required="true" requiredMessage="科室不能为空！"
                                                   multiple="true" filter="true" updateLabel="true"
                                                   filterMatchMode="contains" converter="orgInfoConverter">
-                                <f:selectItems value="#{batchEditAssetClassificationController.autoCompleteDept(null)}" var="item"
+                                <f:selectItems value="#{batchEditAssetClassificationController.clinicalDeptList}" var="item"
                                                itemLabel="#{item.name}" itemValue="#{item}"/>
 
                                 <p:ajax process="@this" event="change" listener="#{batchEditAssetClassificationController.onClinicalDeptChange}" update="datalist"/>
@@ -205,74 +205,28 @@
                                                        var="cat"
                                                        itemLabel="#{cat}"
                                                        itemValue="#{cat}" />
-                                        <p:ajax event="change" process="@this" update="datalist1"/>
+                                        <p:ajax listener="#{batchEditAssetClassificationController.assetClassification32Change(item)}" event="change" process="@this" update="datalist1"/>
                                     </p:selectOneMenu>
                                 </p:column>
 
-                                <p:column headerText="AI推荐分类">
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-                                        <div>
-                                            <p:selectOneRadio id="categoryRadio" value="#{item.assetClassification32}" layout="custom" style="display:none;" >
-                                                <f:selectItem itemLabel="请选择" noSelectionOption="true" />
-                                                <f:selectItems value="#{item.availableCategories}"
-                                                               var="cat"
-                                                               itemLabel="#{cat}"
-                                                               itemValue="#{cat}" />
-                                                <p:ajax event="change"
-                                                        process="@this"
-                                                        update="datalist1" />
-                                            </p:selectOneRadio>
-                                            <p:radioButton for="categoryRadio" itemIndex="1" rendered="#{not empty item.category1}"/>
-                                            <h:outputText value="Top1: #{item.category1}" rendered="#{not empty item.category1}"/>
-                                            <h:outputText value="-" rendered="#{empty item.category1}"/>
-                                        </div>
-                                        <div>
-                                            <p:radioButton for="categoryRadio" itemIndex="2" rendered="#{not empty item.category2}"/>
-                                            <h:outputText value="Top2: #{item.category2}" rendered="#{not empty item.category2}"/>
-                                            <h:outputText value="-" rendered="#{empty item.category2}"/>
-                                        </div>
-                                        <div>
-                                            <p:radioButton for="categoryRadio" itemIndex="3" rendered="#{not empty item.category3}"/>
-                                            <h:outputText value="Top3: #{item.category3}" rendered="#{not empty item.category3}"/>
-                                            <h:outputText value="-" rendered="#{empty item.category3}"/>
-                                        </div>
-                                    </div>
+                                <p:column headerText="AI推荐分类Top1" >
+                                    <p:selectOneRadio id="category1" value="#{item.categoryRadio}"   >
+                                        <f:selectItem itemLabel="#{item.category1}" itemValue="#{item.category1}"/>
+                                        <p:ajax listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}" event="change" process="@this" update="datalist1"/>
+                                    </p:selectOneRadio>
                                 </p:column>
-                                <!-- Top1 列 -->
-                                <!-- 在每一行中 -->
-<!--                                <p:column headerText="AI推荐分类Top1">-->
-<!--                                    &lt;!&ndash; 隐藏的 radio 组 &ndash;&gt;-->
-<!--                                    <p:selectOneRadio id="categoryRadio"-->
-<!--                                                      value="#{item.assetClassification32}"-->
-<!--                                                      layout="custom"-->
-<!--                                                      style="display:none;">-->
-<!--                                        <f:selectItem itemValue="#{item.category1}" />-->
-<!--                                        <f:selectItem itemValue="#{item.category2}" />-->
-<!--                                        <f:selectItem itemValue="#{item.category3}" />-->
-<!--                                    </p:selectOneRadio>-->
-
-<!--                                    &lt;!&ndash; 使用 @parent 引用同级的 radio 组 &ndash;&gt;-->
-<!--                                    <p:radioButton for="@parent"-->
-<!--                                                   itemIndex="0"-->
-<!--                                                   rendered="#{not empty item.category1}"/>-->
-<!--                                    <h:outputText value="-" rendered="#{empty item.category1}"/>-->
-<!--                                </p:column>-->
-
-<!--                                &lt;!&ndash; Top2 列 &ndash;&gt;-->
-<!--                                <p:column headerText="AI推荐分类Top2">-->
-<!--                                    <p:radioButton for="@parent"-->
-<!--                                                   itemIndex="1"-->
-<!--                                                   rendered="#{not empty item.category2}"/>-->
-<!--                                    <h:outputText value="-" rendered="#{empty item.category2}"/>-->
-<!--                                </p:column>-->
-
-<!--                                &lt;!&ndash; Top3 列 &ndash;&gt;-->
-<!--                                <p:column headerText="AI推荐分类Top3">-->
-<!--                                    <p:radioButton for="@parent"-->
-<!--                                                   itemIndex="2"-->
-<!--                                                   rendered="#{not empty item.category3}"/>-->
-<!--                                    <h:outputText value="-" rendered="#{empty item.category3}"/>-->
-<!--                                </p:column>-->
+                                <p:column headerText="AI推荐分类Top2" >
+                                    <p:selectOneRadio id="category2" value="#{item.categoryRadio}"   >
+                                        <f:selectItem  itemLabel="#{item.category2}" itemValue="#{item.category2}"/>
+                                        <p:ajax  listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}" event="change" process="@this" update="datalist1"/>
+                                    </p:selectOneRadio>
+                                </p:column>
+                                <p:column headerText="AI推荐分类Top3" >
+                                    <p:selectOneRadio id="category3" value="#{item.categoryRadio}"   >
+                                        <f:selectItem  itemLabel="#{item.category3}" itemValue="#{item.category3}"/>
+                                        <p:ajax listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}"  event="change" process="@this" update="datalist1"/>
+                                    </p:selectOneRadio>
+                                </p:column>
                             </p:dataTable>
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group ">
@@ -280,10 +234,6 @@
                             <p:commandButton  value="全部清空" actionListener="#{batchEditAssetClassificationController.clearAll}"  icon="ui-icon-cancel" update="assetList assetList2 :growl" />
                         </p:panelGrid>
                     </p:fieldset>
-
-
-
-
                     <p:commandButton  actionListener="#{batchEditAssetClassificationController.batchEdit}"
                                      value="#{msg.Save}"
                                      icon="ui-icon-check"
@@ -293,14 +243,30 @@
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                      action="details?faces-redirect=true"
                     />
-                    <!--                update="#{batchEditAssetClassificationController.cancel}"-->
                 </h:form>
 
             </div>
         </div>
 
         <script>
-
+            // $(function() {
+            //     if (PF('deptMenu')) {
+            //         PF('deptMenu').jq.off('click.selectCheckboxMenuFix'); // 防止重复绑定
+            //         PF('deptMenu').jq.find('.ui-chkbox-all').on('click.selectCheckboxMenuFix', function() {
+            //             setTimeout(() => PF('deptMenu').fireChangeEvent(), 10);
+            //         });
+            //     }
+            // });
+            $(function() {
+                // 监听 "Select All" 按钮点击
+                PF('deptMenu').jq.find('.ui-chkbox-all').on('click.selectCheckboxMenuFix', function() {
+                    // 延迟一点，等 UI 更新完成
+                    setTimeout(function() {
+                        // 手动触发 change 事件
+                        PF('deptMenu').fireChangeEvent();
+                    }, 10);
+                });
+            });
         </script>
     </ui:define>
 </ui:composition>
