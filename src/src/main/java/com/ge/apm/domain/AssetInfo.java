@@ -1099,6 +1099,10 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Transient
     @TableField(exist = false)
+    private String categoryRadio;
+
+    @Transient
+    @TableField(exist = false)
     private boolean editing = false;
     @Transient
     @TableField(exist = false)
@@ -3442,4 +3446,12 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public boolean isEditing() { return editing; }
     public void setEditing(boolean editing) { this.editing = editing; }
+
+    public String getCategoryRadio() {
+        return categoryRadio;
+    }
+
+    public void setCategoryRadio(String categoryRadio) {
+        this.categoryRadio = categoryRadio;
+    }
 }
