@@ -387,6 +387,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         multiLevelApproval.setWorkflowConfigApproveUid(multiLevelApprovalConfig.getId());
                         multiLevelApproval.setInitiateApproverUid(userAccount.getUid());
                         multiLevelApproval.setApplicationUid(userAccount.getUid());
+                        multiLevelApproval.setApplicationName(userAccount.getName());
                         multiLevelApproval.setCreatedDate(TimeUtils.localDateTimeConverterToDate(LocalDateTime.now()));
                         multiLevelApproval.setCreatedBy(userAccount.getName());
                         multiLevelApproval.setTenantUID(userAccount.getTenantUID());
@@ -1245,7 +1246,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
                             date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
                             date.setApprovalLevel(level);
-                            date.setCreatedBy(userAccount.getLoginName());
+                            date.setCreatedBy(userAccount.getName());
                             date.setApprovalIng(false);
                             date.setApprovalLevelNow(level);
                             date.setInitiateApproverUid(null);
@@ -1403,7 +1404,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
                             date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
                             date.setApprovalLevel(level);
-                            date.setCreatedBy(userAccount.getLoginName());
+                            date.setCreatedBy(userAccount.getName());
                             date.setApprovalIng(false);
                             date.setApprovalLevelNow(level);
                             date.setInitiateApproverUid(null);
@@ -1569,7 +1570,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
                             date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
                             date.setApprovalLevel(level);
-                            date.setCreatedBy(userAccount.getLoginName());
+                            date.setCreatedBy(userAccount.getName());
                             date.setApprovalIng(false);
                             date.setApprovalLevelNow(level);
                             date.setInitiateApproverUid(null);
@@ -2024,7 +2025,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
                         date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
                         date.setApprovalLevel(level);
-                        date.setCreatedBy(userAccount.getLoginName());
+                        date.setCreatedBy(userAccount.getName());
                         date.setApprovalIng(false);
                         date.setApprovalLevelNow(level);
                         date.setInitiateApproverUid(null);
@@ -2165,7 +2166,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
                         date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
                         date.setApprovalLevel(level);
-                        date.setCreatedBy(userAccount.getLoginName());
+                        date.setCreatedBy(userAccount.getName());
                         date.setApprovalIng(false);
                         date.setApprovalLevelNow(level);
                         date.setInitiateApproverUid(null);
