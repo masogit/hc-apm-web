@@ -6,11 +6,14 @@ import com.ge.apm.domain.AssetProbation;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
@@ -36,6 +39,8 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     private UaaService uaaService;
     private BlobFileService blobService;
     private OrgInfoRepository orgInfoRepository;
+    private WxMessageService wxMessageService;
+    private MicroServiceUtil microServiceUtil;
 
     @Getter @Setter
     private UserAccount loginUser;
@@ -74,6 +79,8 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         uaaService = WebUtil.getBean(UaaService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        wxMessageService = WebUtil.getBean(WxMessageService.class);
+        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
         loginUser = UserContextService.getCurrentUserAccount();
 
         assetDeptList = uaaService.getClinicalDeptListBySiteUID(loginUser.getSiteUID());
@@ -138,6 +145,10 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setAssetDeptUid(assetDept.getUid());
             this.selected.setAssetDeptName(assetDept.getName());
         }
+        if(this.selected.getStatus() == 1) {
+            this.selected.setProbationStartUserUid(probationConfirmor.getUid());
+            this.selected.setProbationStartUserName(probationConfirmor.getName());
+        }
         this.selected.setLastModifiedBy(loginUser.getName());
         this.selected.setLastModifiedDate(now);
         if (flag) {
@@ -153,6 +164,8 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     public String submit() {
         Date now = DateUtil.now();
         tempSave(false);
+        String sendMsgUserUid = null;
+        Map<String, String> eventParams = MapUtil.newHashMap();
         switch (this.selected.getStatus()) {
             case 0:
                 this.selected.setStatus(1);
@@ -161,12 +174,18 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 this.selected.setCurrentPersonName(detectionUser.getName());
                 this.selected.setDetectionUserUid(detectionUser.getUid());
                 this.selected.setDetectionUserName(detectionUser.getName());
+                sendMsgUserUid = detectionUser.getUid();
+                eventParams.put("currentPerson", detectionUser.getName());
+                eventParams.put("content", "您有新的设备试用工单需要检测");
                 break;
             case 1:
                 this.selected.setStatus(2);
                 this.selected.setCurrentPersonId(probationConfirmor.getUid());
                 this.selected.setCurrentPersonName(probationConfirmor.getName());
                 this.selected.setDetectionTime(now);
+                sendMsgUserUid = probationConfirmor.getUid();
+                eventParams.put("currentPerson", probationConfirmor.getName());
+                eventParams.put("content", "您有新的设备试用工单需要确认试用");
                 break;
             case 2:
                 this.selected.setStatus(3);
@@ -179,6 +198,9 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 this.selected.setProbationEndUserUid(loginUser.getUid());
                 this.selected.setProbationEndUserName(loginUser.getName());
                 this.selected.setProbationEndTime(now);
+                sendMsgUserUid = this.selected.getDetectionUserUid();
+                eventParams.put("currentPerson", this.selected.getDetectionUserName());
+                eventParams.put("content", "您有新的设备试用工单需要确认撤离");
                 break;
             case 4:
                 this.selected.setStatus(5);
@@ -187,6 +209,9 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 this.selected.setEvacuationUserUid(loginUser.getUid());
                 this.selected.setEvacuationUserName(loginUser.getName());
                 this.selected.setEvacuationEndTime(now);
+                sendMsgUserUid = this.selected.getApplicantUserUid();
+                eventParams.put("currentPerson", this.selected.getApplicantUserName());
+                eventParams.put("content", "您有新的设备试用工单需要关单");
                 break;
             case 5:
                 this.selected.setStatus(6);
@@ -202,24 +227,46 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             attachments.forEach(att -> att.setBoUuid(this.selected.getId()));
             blobService.saveBlobObject(attachments);
         }
+        if (ObjectUtil.isNotEmpty(sendMsgUserUid)) {
+            sendMessage(sendMsgUserUid, eventParams);
+        }
         WebUtil.addSuccessMessage(WebUtil.getMessage("Submit") + WebUtil.getMessage("Success"));
         return "externalAssetList?faces-redirect=true";
     }
 
+    private void sendMessage(String sendMsgUserUid, Map<String, String> eventParams) {
+        eventParams.put("status", WebUtil.getFieldValueMessage("probationStatus", this.selected.getStatus().toString()));
+        eventParams.put("orderNum", this.selected.getOrderNum());
+        eventParams.put("assetName", this.selected.getName() + "," + this.selected.getFunctionType() + "," + this.selected.getAssetDeptName());
+        String linkUrl = microServiceUtil.getWebContextUrl() + "/wx/trial-asset?id=" + this.selected.getId();
+        wxMessageService.sendWxMsgToMq(eventParams, linkUrl, MSGEvent.ASSET_PROBATION_PROCESS, ListUtil.newArrayList(sendMsgUserUid), null);
+    }
+
     public String updateUser(Integer status) {
+        String sendMsgUserUid = null;
+        Map<String, String> eventParams = MapUtil.newHashMap();
         if (status == 1) {
             tempSave(false);
             this.selected.setDetectionUserUid(detectionUser.getUid());
             this.selected.setDetectionUserName(detectionUser.getName());
             this.selected.setCurrentPersonId(detectionUser.getUid());
             this.selected.setCurrentPersonName(detectionUser.getName());
+            sendMsgUserUid = detectionUser.getUid();
+            eventParams.put("currentPerson", detectionUser.getName());
+            eventParams.put("content", "您有新的设备试用工单需要检测");
         } else {
             this.selected.setProbationStartUserUid(probationConfirmor.getUid());
             this.selected.setProbationEndUserName(probationConfirmor.getName());
             this.selected.setCurrentPersonId(probationConfirmor.getUid());
             this.selected.setCurrentPersonName(probationConfirmor.getName());
+            sendMsgUserUid = probationConfirmor.getUid();
+            eventParams.put("currentPerson", probationConfirmor.getName());
+            eventParams.put("content", "您有新的设备试用工单需要确认试用");
         }
         dao.save(this.selected);
+        if (ObjectUtil.isNotEmpty(sendMsgUserUid)) {
+            sendMessage(sendMsgUserUid, eventParams);
+        }
         return "externalAssetList?faces-redirect=true";
     }
 
