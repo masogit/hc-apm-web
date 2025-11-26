@@ -1,5 +1,6 @@
 package com.ge.apm.view;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.AssetProbationRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetProbation;
@@ -272,6 +273,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         eventParams.put("orderNum", this.selected.getOrderNum());
         eventParams.put("assetName", this.selected.getName() + "," + this.selected.getFunctionType() + "," + this.selected.getAssetDeptName());
         String linkUrl = microServiceUtil.getWebContextUrl() + "/wx/trial-asset?id=" + this.selected.getId();
+        logger.info("sendMessage : " + JSON.toJSONString(eventParams));
         wxMessageService.sendWxMsgToMq(eventParams, linkUrl, MSGEvent.ASSET_PROBATION_PROCESS, ListUtil.newArrayList(sendMsgUserUid), null);
     }
 
@@ -342,10 +344,12 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             RequestContext.getCurrentInstance().addCallbackParam("threeInformation", true);
             valid = false;
         }
-        if (this.selected.getStatus() == 3 && ObjectUtil.isEmpty(this.selected.getDetectionSituation())) {
-            WebUtil.addErrorMessage("检测情况不能为空！");
-            RequestContext.getCurrentInstance().addCallbackParam("detectionSituationRead", true);
-            valid = false;
+        if (ObjectUtil.isNotEmpty(this.selected.getStatus())) {
+            if (this.selected.getStatus() == 3 && ObjectUtil.isEmpty(this.selected.getDetectionSituation())) {
+                WebUtil.addErrorMessage("检测情况不能为空！");
+                RequestContext.getCurrentInstance().addCallbackParam("detectionSituationRead", true);
+                valid = false;
+            }
         }
         if (valid) {
             RequestContext.getCurrentInstance().addCallbackParam("submitDetection", true);
