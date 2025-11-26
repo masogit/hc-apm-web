@@ -109,7 +109,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedId");
             this.selected = dao.findById(selectedId);
             deptContactList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
-            detectionUserList = Optional.ofNullable(this.selected.getSiteUid()).map(siteUid -> uaaService.getUsersByDeptUidAndRole(siteUid, "AssetStaff")).orElse(ListUtil.empty());
+            detectionUserList = Optional.ofNullable(this.loginUser.getSiteUID()).map(siteUid -> uaaService.getUsersBySiteUidAndRole(siteUid, "AssetStaff")).orElse(ListUtil.empty());
             probationConfirmorList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
             this.assetDept = Optional.ofNullable(this.selected.getAssetDeptUid()).map(orgInfoRepository::getByUid).orElse(new OrgInfo());
             this.deptContact = Optional.ofNullable(this.selected.getDeptContactUid()).map(uaaService::getUserByUid).orElse(new UserAccount());
@@ -463,7 +463,6 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     }
 
     public void onAssetDeptChange(String idx) {
-        detectionUserList = uaaService.getUsersByDeptUidAndRole(this.assetDept.getUid(), "AssetStaff");
         deptContactList = uaaService.getUsersByDeptUidAndRole(this.assetDept.getUid(), "ClinicalStaff");
     }
 
