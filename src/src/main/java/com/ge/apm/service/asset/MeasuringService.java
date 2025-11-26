@@ -491,7 +491,7 @@ public class MeasuringService {
             Map<String, Object> params = new HashMap<>();
             if("AI".equalsIgnoreCase(identifyPatterns)){
                 params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
-                JSONObject  jsonObject = templateService.getJsonObject( GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,newFile);
+                JSONObject  jsonObject = templateService.getJsonObject( GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,newFile,url->url.replace("{type}","/"+ApplicationType.FORM_OCR_WORKFLOWS.name()));
                 String bizStatusCode = jsonObject.getString("bizStatusCode");
                 if("ok".equalsIgnoreCase(bizStatusCode)){
                     JSONObject data = jsonObject.getJSONObject("data");
