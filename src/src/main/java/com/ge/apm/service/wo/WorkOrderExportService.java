@@ -291,7 +291,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("warrantyDate"), formatDate2(workOrderExportPojo.getWarrantyDate()));
             workOrderMap.put(WebUtil.getMessage("factoryWarrantyDate"), formatDate2(workOrderExportPojo.getFactoryWarrantyDate()));
             workOrderMap.put(WebUtil.getMessage("CloseTime_xlsx"), formatDate(workOrderExportPojo.getCloseTime()));
-            workOrderMap.put(WebUtil.getMessage("feedbackRating"), workOrderExportPojo.getFeedbackRating());
+            workOrderMap.put(WebUtil.getMessage("feedbackRating"), workOrderExportPojo.getFeedbackRating()!=null&& workOrderExportPojo.getFeedbackRating()!=0?workOrderExportPojo.getFeedbackRating():null);
             workOrderMap.put("feedbackComment", workOrderExportPojo.getFeedbackComment());
             Integer currentStepId = workOrderExportPojo.getCurrentStepId();
             if (UserContextService.hasCurrentTenantName("")) {
