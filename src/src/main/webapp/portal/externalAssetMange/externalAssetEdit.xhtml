@@ -311,7 +311,7 @@
             </div>
             <ui:include src="/portal/preview/view.xhtml" />
             <!--提交对话框 -->
-            <p:dialog id="submitDialog" widgetVar="submitDialog" modal="true" width="400" resizable="true" draggable="true" header="#{msg.Submit.concat(msg.probationApplication)}">
+            <p:dialog id="submitDialog" widgetVar="submitDialog" modal="true" width="400" height="200" resizable="true" draggable="true" header="#{msg.Submit.concat(msg.probationApplication)}">
                 <h:panelGroup>
                     <h:form id="submitForm" class="submitFormCls">
                         <h:panelGroup>
@@ -321,7 +321,7 @@
                                             completeMethod="#{assetProbationEditController.autoCompleteEngineer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
                             </p:autoComplete>
                         </h:panelGroup>
-                        <br/><br/>
+                        <br/><br/><br/>
                         <h:panelGroup>
                             <p:commandButton validateClient="true" update=":growl" action="#{assetProbationEditController.submit()}" value="#{msg.Confirm}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'submitDialog');"/>
                             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('submitDialog').hide()"/>
