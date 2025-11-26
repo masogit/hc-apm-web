@@ -1,6 +1,8 @@
 package com.ge.apm.service.common;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.TenantOptionConfigRepository;
@@ -10,12 +12,17 @@ import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.TenantOptionConfig;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.sharedasset.SharedAssetService;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +34,7 @@ import java.util.Optional;
  */
 @Component
 public class ConfigCacheService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigCacheService.class);
 
     @Autowired
     private WorkflowConfigRepository configDao;
@@ -107,5 +115,31 @@ public class ConfigCacheService {
     @CacheEvict(cacheNames = "springCache", allEntries = true)
     public void cleanCacheNames(){
         remoteService.asynRemoteCall(GatewayURL.CLEAN_CACHE_NAMES, HttpMethod.POST,new HashMap<>(),(url)->url);
+    }
+
+    @PostConstruct
+    public void initTenantInfo(){
+        List<TenantInfo> tenantInfos = tenantDao.find();
+        boolean b = tenantInfos.stream().anyMatch(item -> item.getFeatureList().contains(ApmFeature.MOBILE_REPAIR.name()));
+        if(b) return;
+        LOGGER.info("同步 tenant feature list start");
+        for (TenantInfo tenantInfo : tenantInfos) {
+            String featureList = tenantInfo.getFeatureList();
+            if(StringUtils.isEmpty(featureList)) continue;
+            //["LOG_AUDIT","ASSET_ACCOUNT_DASHBOARD","ASSET_RISK_EVALUATE","ASSET_INVENTORY","ASSET_INFO","PERFORMANCE","KNOWLEDGE","COMPANY_FILES","TRAINING","CONFIG","REPAIR","MAINTAIN_TEMPLATE","ASSET_BATCH_IMPORT","REPAIR_TEMPLATE","ASSET_PARENTS_INFO","MULTILEVEL_APPROVE","MAINTAIN","ASSET_SCRAP","PLATFORM_CONFIG","MAINTAIN_ELECTRICDATAIMPORT","ASSET_LOCATION"]
+            JSONArray featureArray = JSONArray.parseArray(featureList);
+            featureArray.add(ApmFeature.MOBILE_REPAIR.name());
+            featureArray.add(ApmFeature.MOBILE_REPAIR_MANAGEMENT.name());
+            featureArray.add(ApmFeature.MOBILE_MAINTENANCE_MANAGEMENT.name());
+            featureArray.add(ApmFeature.MOBILE_MAINTENANCE_SPARE_PARTS_APPROVAL.name());
+            featureArray.add(ApmFeature.MOBILE_REPAIR_MY_WORK_ORDERS.name());
+            featureArray.add(ApmFeature.MOBILE_MAINTENANCE_MY_WORK_ORDERS.name());
+            featureArray.add(ApmFeature.MOBILE_DEPARTMENTAL_REPAIR_REPORT.name());
+            String jsonString = featureArray.toJSONString();
+            tenantInfo.setFeatureList(jsonString);
+            LOGGER.info("同步 tenant feature list tenant:{},json:{}",tenantInfo.getName(),jsonString);
+        }
+        LOGGER.info("同步 tenant feature list end size:{}",tenantInfos.size());
+        tenantDao.save(tenantInfos);
     }
 }
