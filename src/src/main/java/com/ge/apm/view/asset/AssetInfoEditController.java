@@ -1,8 +1,10 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.approval.WxMessageService;
+import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
@@ -60,6 +62,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -126,6 +130,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
 
     private SysRoleRepository sysRoleRepository;
+
+    private MasterDataService masterDataService;
 
     @Getter @Setter
     private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
@@ -373,6 +379,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         nurseSiteMaintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
         nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
         nurseSiteMaintainRepository = WebUtil.getBean(NurseSiteMaintainRepository.class);
+        masterDataService = WebUtil.getBean(MasterDataService.class);
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -420,6 +427,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             isStatusAssetHistory = true;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(dao.findByUid(selectedId));
+            if(selected.getAssetClassification32()!=null){
+                selectItemDto=new SelectItemDto(selected.getAssetClassification32(),null);
+            }
             String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
             terminate = Boolean.parseBoolean(terminateStr);
             prepareEdit();
@@ -2612,5 +2622,64 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    private SelectItemDto selectItemDto;
 
+    public  List<SelectItemDto>  autoAssetClassification32() {
+
+        ArrayList<SelectItemDto> selectItemDtos = new ArrayList<>();
+        AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setBrand(selected.getMakerShortName());
+        assetClassificationModel.setPattern(selected.getFunctionType());
+        assetClassificationModel.setSourceName(selected.getName());
+        assetClassificationModel.setFactory(selected.getManufacture());
+        Map<String, Object> resMapByAsset = masterDataService.getResMapByAsset(assetClassificationModel);
+        if(resMapByAsset!=null){
+            String cat1 = (String) resMapByAsset.get("category");
+            String cat2 = (String) resMapByAsset.get("category2");
+            String cat3 = (String) resMapByAsset.get("category3");
+            if (StringUtils.isNotBlank(cat1)) {
+                selectItemDtos.add(new SelectItemDto(cat1,toRoundedDouble(resMapByAsset.get("Prob")).toString()));
+            }
+            if (StringUtils.isNotBlank(cat2)) {
+                selectItemDtos.add(new SelectItemDto(cat2,toRoundedDouble(resMapByAsset.get("Prob2")).toString()));
+            }
+            if (StringUtils.isNotBlank(cat3)) {
+                selectItemDtos.add(new SelectItemDto(cat3,toRoundedDouble(resMapByAsset.get("Prob3")).toString()));
+            }
+        }
+        return selectItemDtos;
+
+    }
+    private Double toRoundedDouble(Object value) {
+        if (value == null) {
+            return 0.0;
+        }
+        try {
+            double d;
+            if (value instanceof Number) {
+                d = ((Number) value).doubleValue();
+            } else {
+                d = Double.parseDouble(value.toString());
+            }
+            return new BigDecimal(d)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+        } catch (NumberFormatException e) {
+            return 0.0; // 或记录日志后返回默认值
+        }
+    }
+
+    public void assetClassification32Change() {
+        if(selectItemDto!=null){
+            selected.setAssetClassification32(selectItemDto.getLabel());
+        }
+    }
+
+    public SelectItemDto getSelectItemDto() {
+        return selectItemDto;
+    }
+
+    public void setSelectItemDto(SelectItemDto selectItemDto) {
+        this.selectItemDto = selectItemDto;
+    }
 }

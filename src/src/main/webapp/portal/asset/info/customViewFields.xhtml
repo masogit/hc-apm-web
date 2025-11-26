@@ -180,6 +180,13 @@
             <p:inputText id="makerShortName" value="#{assetInfoDetailController.selected.makerShortName}"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetClassification32')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetClassification32}</label>
+            <p:inputText id="assetClassification32" value="#{assetInfoDetailController.selected.assetClassification32}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'vendor')}">
         <h:panelGroup >
             <label class="label">#{msg.vendor}</label>
