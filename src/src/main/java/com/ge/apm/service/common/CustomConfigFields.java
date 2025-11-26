@@ -145,6 +145,7 @@ public enum CustomConfigFields {
     spare09(fieldName, "spare09" ,Text),  //备用字段09
     spare10(fieldName, "spare10" ,Text),  //备用字段10
     exceptionReason(fieldName, "exceptionReason" ,Text),  //备用字段10
+    assetClassification32(fieldName, "assetClassification32" ,Text),  //设备32分类
 
 
     ;
