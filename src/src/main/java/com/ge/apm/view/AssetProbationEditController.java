@@ -11,6 +11,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
@@ -22,6 +23,7 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
@@ -41,6 +43,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     private OrgInfoRepository orgInfoRepository;
     private WxMessageService wxMessageService;
     private MicroServiceUtil microServiceUtil;
+    private PreViewerBean preViewerBean;
 
     @Getter @Setter
     private UserAccount loginUser;
@@ -81,6 +84,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         wxMessageService = WebUtil.getBean(WxMessageService.class);
         microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
+        preViewerBean = WebUtil.getBean(PreViewerBean.class);
         loginUser = UserContextService.getCurrentUserAccount();
 
         assetDeptList = uaaService.getClinicalDeptListBySiteUID(loginUser.getSiteUID());
@@ -104,7 +108,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedId");
             this.selected = dao.findById(selectedId);
             deptContactList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
-            detectionUserList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "AssetStaff")).orElse(ListUtil.empty());
+            detectionUserList = Optional.ofNullable(this.selected.getSiteUid()).map(siteUid -> uaaService.getUsersByDeptUidAndRole(siteUid, "AssetStaff")).orElse(ListUtil.empty());
             probationConfirmorList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
             this.assetDept = Optional.ofNullable(this.selected.getAssetDeptUid()).map(orgInfoRepository::getByUid).orElse(new OrgInfo());
             this.deptContact = Optional.ofNullable(this.selected.getDeptContactUid()).map(uaaService::getUserByUid).orElse(new UserAccount());
@@ -138,14 +142,22 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setCreatedDate(now);
         }
         if (this.selected.getStatus() == 0 || action == -11) {
-            this.selected.setDeptContactUid(deptContact.getUid());
-            this.selected.setDeptContactName(deptContact.getName());
-            this.selected.setSpecification(String.join(",", specificationList));
-            this.selected.setInformation(String.join(",", informationList));
-            this.selected.setAssetDeptUid(assetDept.getUid());
-            this.selected.setAssetDeptName(assetDept.getName());
+            if (ObjectUtil.isNotEmpty(deptContact)) {
+                this.selected.setDeptContactUid(deptContact.getUid());
+                this.selected.setDeptContactName(deptContact.getName());
+            }
+            if (ObjectUtil.isNotEmpty(specificationList)) {
+                this.selected.setSpecification(String.join(",", specificationList));
+            }
+            if (ObjectUtil.isNotEmpty(informationList)) {
+                this.selected.setInformation(String.join(",", informationList));
+            }
+            if (ObjectUtil.isNotEmpty(assetDept)) {
+                this.selected.setAssetDeptUid(assetDept.getUid());
+                this.selected.setAssetDeptName(assetDept.getName());
+            }
         }
-        if(this.selected.getStatus() == 1) {
+        if(this.selected.getStatus() == 1 && flag && ObjectUtil.isNotEmpty(probationConfirmor)) {
             this.selected.setProbationStartUserUid(probationConfirmor.getUid());
             this.selected.setProbationStartUserName(probationConfirmor.getName());
         }
@@ -166,6 +178,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         tempSave(false);
         String sendMsgUserUid = null;
         Map<String, String> eventParams = MapUtil.newHashMap();
+        boolean valid = true;
         switch (this.selected.getStatus()) {
             case 0:
                 this.selected.setStatus(1);
@@ -179,9 +192,24 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 eventParams.put("content", "您有新的设备试用工单需要检测");
                 break;
             case 1:
+                if (ObjectUtil.isEmpty(this.selected.getDetectionSituation())) {
+                    WebUtil.addErrorMessage("检测情况不能为空！");
+                    RequestContext.getCurrentInstance().addCallbackParam("detectionSituation", true);
+                    valid = false;
+                }
+                if (ObjectUtil.isEmpty(this.probationConfirmor)) {
+                    WebUtil.addErrorMessage("试用确认人不能为空！");
+                    RequestContext.getCurrentInstance().addCallbackParam("probationUser", true);
+                    valid = false;
+                }
+                if (!valid) {
+                    break;
+                }
                 this.selected.setStatus(2);
                 this.selected.setCurrentPersonId(probationConfirmor.getUid());
                 this.selected.setCurrentPersonName(probationConfirmor.getName());
+                this.selected.setProbationStartUserUid(probationConfirmor.getUid());
+                this.selected.setProbationStartUserName(probationConfirmor.getName());
                 this.selected.setDetectionTime(now);
                 sendMsgUserUid = probationConfirmor.getUid();
                 eventParams.put("currentPerson", probationConfirmor.getName());
@@ -222,6 +250,11 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             default:
                 break;
         }
+        boolean submitOrder = submitOrder();
+        RequestContext.getCurrentInstance().addCallbackParam("submitDetection", false);
+        if (!valid || !submitOrder) {
+            return "";
+        }
         dao.save(this.selected);
         if (ObjectUtil.isNotEmpty(attachments) && "Create".equals(super.crudActionName)) {
             attachments.forEach(att -> att.setBoUuid(this.selected.getId()));
@@ -242,26 +275,108 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         wxMessageService.sendWxMsgToMq(eventParams, linkUrl, MSGEvent.ASSET_PROBATION_PROCESS, ListUtil.newArrayList(sendMsgUserUid), null);
     }
 
+    public boolean submitOrder() {
+        boolean valid = true;
+        if (ObjectUtil.isEmpty(this.selected.getName())) {
+            WebUtil.addErrorMessage("设备名称不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("equipmentName", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getFunctionType())) {
+            WebUtil.addErrorMessage("规格型号不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("functionType", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.assetDept)) {
+            WebUtil.addErrorMessage("使用科室不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("assetDept", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.deptContact)) {
+            WebUtil.addErrorMessage("使用科室联系人不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("deptContact", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getDeptContactTel())) {
+            WebUtil.addErrorMessage("科室联系电话不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("deptContactTel", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getCompany())) {
+            WebUtil.addErrorMessage("公司名称不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("company", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getCompanyContactName())) {
+            WebUtil.addErrorMessage("公司联系人不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("companyContactName", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getCompanyContactTel())) {
+            WebUtil.addErrorMessage("公司联系电话不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("companyContactTel", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getApprovalCompletedDate())) {
+            WebUtil.addErrorMessage("审批完成日期不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("approvalCompletedDate", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getPlanStartDate())) {
+            WebUtil.addErrorMessage("计划开始时间不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("planStartDate", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.selected.getPlanEndDate())) {
+            WebUtil.addErrorMessage("计划结束时间不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("planEndDate", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.specificationList)) {
+            WebUtil.addErrorMessage("说明书不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("specification", true);
+            valid = false;
+        }
+        if (ObjectUtil.isEmpty(this.informationList)) {
+            WebUtil.addErrorMessage("三证资料不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("threeInformation", true);
+            valid = false;
+        }
+        if (this.selected.getStatus() == 3 && ObjectUtil.isEmpty(this.selected.getDetectionSituation())) {
+            WebUtil.addErrorMessage("检测情况不能为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("detectionSituationRead", true);
+            valid = false;
+        }
+        if (valid) {
+            RequestContext.getCurrentInstance().addCallbackParam("submitDetection", true);
+        }
+        return valid;
+    }
+
     public String updateUser(Integer status) {
         String sendMsgUserUid = null;
         Map<String, String> eventParams = MapUtil.newHashMap();
         if (status == 1) {
             tempSave(false);
+            if (ObjectUtil.isNotEmpty(this.selected.getDetectionUserUid()) && !this.selected.getDetectionUserUid().equals(detectionUser.getUid())) {
+                sendMsgUserUid = detectionUser.getUid();
+                eventParams.put("currentPerson", detectionUser.getName());
+                eventParams.put("content", "您有新的设备试用工单需要检测");
+            }
             this.selected.setDetectionUserUid(detectionUser.getUid());
             this.selected.setDetectionUserName(detectionUser.getName());
             this.selected.setCurrentPersonId(detectionUser.getUid());
             this.selected.setCurrentPersonName(detectionUser.getName());
-            sendMsgUserUid = detectionUser.getUid();
-            eventParams.put("currentPerson", detectionUser.getName());
-            eventParams.put("content", "您有新的设备试用工单需要检测");
         } else {
+            if (ObjectUtil.isNotEmpty(this.selected.getProbationStartUserUid()) && !this.selected.getProbationStartUserUid().equals(probationConfirmor.getUid())) {
+                sendMsgUserUid = probationConfirmor.getUid();
+                eventParams.put("currentPerson", probationConfirmor.getName());
+                eventParams.put("content", "您有新的设备试用工单需要确认试用");
+            }
             this.selected.setProbationStartUserUid(probationConfirmor.getUid());
             this.selected.setProbationEndUserName(probationConfirmor.getName());
             this.selected.setCurrentPersonId(probationConfirmor.getUid());
             this.selected.setCurrentPersonName(probationConfirmor.getName());
-            sendMsgUserUid = probationConfirmor.getUid();
-            eventParams.put("currentPerson", probationConfirmor.getName());
-            eventParams.put("content", "您有新的设备试用工单需要确认试用");
         }
         dao.save(this.selected);
         if (ObjectUtil.isNotEmpty(sendMsgUserUid)) {
@@ -400,7 +515,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             attachments.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_SUB_TYPE_ASSET_PROBATION);
             blobObject.setBoSubType(type);
-            blobObject.setBoUuid(selected.getId());
+            blobObject.setBoUuid(this.selected.getId());
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -437,5 +552,25 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             return false;
         }
         return this.selected.getStatus() >= 3;
+    }
+
+    public void preViewed(String objectId){
+        preViewerBean.onServerEvent("",objectId);
+    }
+
+    public Date getPlanMaxDate() {
+        Date planStartDate = this.selected.getPlanStartDate();
+        if (ObjectUtil.isNotEmpty(planStartDate)) {
+            return DateUtil.offsetMonth(planStartDate, 3);
+        }
+        return null;
+    }
+
+    public Date getPlanMinDate() {
+        Date planEndDate = this.selected.getPlanEndDate();
+        if (ObjectUtil.isNotEmpty(planEndDate)) {
+            return DateUtil.offsetMonth(planEndDate, -3);
+        }
+        return null;
     }
 }
