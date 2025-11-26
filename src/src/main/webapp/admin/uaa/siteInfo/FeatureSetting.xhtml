@@ -319,6 +319,37 @@
                                 <p:outputLabel>报告模版管理</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['MOBILE_REPAIR']}"
+                                        itemLabel="移动端.我的报修">
+                                    <p:ajax update="repair"
+                                            listener="#{featureSettingController.featureChange('MOBILE_REPAIR')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>移动端.我的报修</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['MOBILE_REPAIR_MANAGEMENT']}"
+                                        itemLabel="移动端.报修管理">
+                                    <p:ajax update="repair"
+                                            listener="#{featureSettingController.featureChange('MOBILE_REPAIR_MANAGEMENT')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>移动端.报修管理</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['MOBILE_REPAIR_MY_WORK_ORDERS']}"
+                                        itemLabel="移动端.我的维修工单">
+                                    <p:ajax update="repair"
+                                            listener="#{featureSettingController.featureChange('MOBILE_REPAIR_MY_WORK_ORDERS')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>移动端.我的维修工单</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
                         </p:fieldset>
 
@@ -349,6 +380,37 @@
                                             listener="#{featureSettingController.featureChange('MAINTAIN_TEMPLATE')}"/>
                                 </p:selectBooleanCheckbox>
                                 <p:outputLabel>报表模版管理</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['MOBILE_MAINTENANCE_MANAGEMENT']}"
+                                        itemLabel="移动端.保养管理">
+                                    <p:ajax update="maintain"
+                                            listener="#{featureSettingController.featureChange('MOBILE_MAINTENANCE_MANAGEMENT')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>移动端.保养管理</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['MOBILE_MAINTENANCE_SPARE_PARTS_APPROVAL']}"
+                                        itemLabel="移动端.保养备件审核">
+                                    <p:ajax update="maintain"
+                                            listener="#{featureSettingController.featureChange('MOBILE_MAINTENANCE_SPARE_PARTS_APPROVAL')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>移动端.保养备件审核</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+
+
+                                <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['MOBILE_MAINTENANCE_MY_WORK_ORDERS']}"
+                                        itemLabel="移动端.我的保养工单">
+                                    <p:ajax update="maintain"
+                                            listener="#{featureSettingController.featureChange('MOBILE_MAINTENANCE_MY_WORK_ORDERS')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>移动端.我的保养工单</p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                             </p:panelGrid>
@@ -823,6 +885,19 @@
                                                 listener="#{featureSettingController.featureChange('ASSET_CLASSIFICATION_MANAGEMENT')}"/>
                                     </p:selectBooleanCheckbox>
                                     <p:outputLabel>设备分类管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset id="mobileDepartmentalDepairReport" legend="科室报修">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MOBILE_DEPARTMENTAL_REPAIR_REPORT']}"
+                                            itemLabel="移动端.科室报修">
+                                        <p:ajax update="assetClassificationManagement"
+                                                listener="#{featureSettingController.featureChange('MOBILE_DEPARTMENTAL_REPAIR_REPORT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>移动端.科室报修</p:outputLabel>
                                     <p:outputLabel></p:outputLabel>
                                     <p:outputLabel></p:outputLabel>
                                 </p:panelGrid>
