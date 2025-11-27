@@ -205,6 +205,14 @@
                                             <p:inputText value="#{assetArrivedListEditController.selected.repairerTel}" />
                                         </h:panelGroup>
                                     </c:if>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.assetClassification32}</label>
+                                        <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetArrivedListEditController.selectItemDto}" scrollHeight="300"
+                                                        forceSelection="true"  completeMethod="#{assetArrivedListEditController.autoAssetClassification32()}"
+                                                        var="t" itemLabel="#{t.label}  #{t.value}" itemValue="#{t}" converter="stringIdentityConverter"  >
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.assetClassification32Change()}" />
+                                        </p:autoComplete>
+                                    </h:panelGroup>
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status ne 1}">
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":growl"/>

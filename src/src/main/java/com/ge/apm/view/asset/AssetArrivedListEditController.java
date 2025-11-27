@@ -3,9 +3,11 @@ package com.ge.apm.view.asset;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.wo.ServiceRequestApiService;
@@ -13,6 +15,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
@@ -34,6 +37,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -126,7 +131,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private  QrCodeLibRepository qrCodeLibRepository;
     private ConfigItemValueRepository configItemValueRepository;
-
+    private MasterDataService masterDataService;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListRepository.class);
@@ -160,7 +165,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         qrCodeLibRepository = WebUtil.getBean(QrCodeLibRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
-
+        masterDataService = WebUtil.getBean(MasterDataService.class);
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 String copyFrom = (String) UrlEncryptController.getValueFromMap(encodeStr, "copyFrom");
@@ -192,6 +197,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             String listId = (String) UrlEncryptController.getValueFromMap(encodeStr, "listId");
             this.selected = dao.findById(listId);
+            if(selected.getAssetClassification32()!=null){
+                selectItemDto=new SelectItemDto(selected.getAssetClassification32(),null);
+            }
             arrivalItemList = itemDao.findByArrivalListId(selected.getId());
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             deptInfoList = uaaService.getClinicalDeptListBySiteUID(selected.getSiteUID());
@@ -1425,5 +1433,69 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         return Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("enableArrivalListRequired", currentUser.getSiteUID())).
                 map(ConfigItemValue::getValue).map(Boolean::parseBoolean).orElse(false);
     }
+    private SelectItemDto selectItemDto;
 
+
+    public  List<SelectItemDto>  autoAssetClassification32() {
+
+        ArrayList<SelectItemDto> selectItemDtos = new ArrayList<>();
+        AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setBrand(selected.getMakerShortName());
+        assetClassificationModel.setPattern(selected.getFunctionType());
+        assetClassificationModel.setSourceName(selected.getName());
+        assetClassificationModel.setFactory(selected.getManufacture());
+        Map<String, Object> resMapByAsset = masterDataService.getResMapByAsset(assetClassificationModel);
+        if(resMapByAsset!=null){
+            String cat1 = (String) resMapByAsset.get("category");
+            String cat2 = (String) resMapByAsset.get("category2");
+            String cat3 = (String) resMapByAsset.get("category3");
+            if (org.apache.commons.lang.StringUtils.isNotBlank(cat1)) {
+                selectItemDtos.add(new SelectItemDto(cat1,toRoundedDouble(resMapByAsset.get("Prob")).toString()));
+            }
+            if (org.apache.commons.lang.StringUtils.isNotBlank(cat2)) {
+                selectItemDtos.add(new SelectItemDto(cat2,toRoundedDouble(resMapByAsset.get("Prob2")).toString()));
+            }
+            if (org.apache.commons.lang.StringUtils.isNotBlank(cat3)) {
+                selectItemDtos.add(new SelectItemDto(cat3,toRoundedDouble(resMapByAsset.get("Prob3")).toString()));
+            }
+        }
+        List<String> allDisplayNameList = AssetClassification32Enum.getAllDisplayNameList();
+        for (String s : allDisplayNameList) {
+            selectItemDtos.add(new SelectItemDto(s,null));
+
+        }
+        return selectItemDtos;
+
+    }
+    private Double toRoundedDouble(Object value) {
+        if (value == null) {
+            return 0.0;
+        }
+        try {
+            double d;
+            if (value instanceof Number) {
+                d = ((Number) value).doubleValue();
+            } else {
+                d = Double.parseDouble(value.toString());
+            }
+            return new BigDecimal(d)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+    public void assetClassification32Change() {
+        if(selectItemDto!=null){
+            selected.setAssetClassification32(selectItemDto.getLabel());
+        }
+    }
+    public SelectItemDto getSelectItemDto() {
+        return selectItemDto;
+    }
+
+    public void setSelectItemDto(SelectItemDto selectItemDto) {
+        this.selectItemDto = selectItemDto;
+    }
 }

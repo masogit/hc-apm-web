@@ -252,6 +252,8 @@ public class ArrivalList implements Serializable {
     @Column(name = "purchase_date")
     private Date purchaseDate;
 
+    @Column(name = "asset_classification32")
+    private String assetClassification32;
     public Date getPurchaseDate() {
         return purchaseDate;
     }
@@ -695,5 +697,13 @@ public class ArrivalList implements Serializable {
 
     public void setEnableGenerateQrcode(Boolean enableGenerateQrcode) {
         this.enableGenerateQrcode = enableGenerateQrcode;
+    }
+
+    public String getAssetClassification32() {
+        return assetClassification32;
+    }
+
+    public void setAssetClassification32(String assetClassification32) {
+        this.assetClassification32 = assetClassification32;
     }
 }
