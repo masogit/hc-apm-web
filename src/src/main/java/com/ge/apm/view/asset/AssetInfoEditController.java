@@ -10,6 +10,7 @@ import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
@@ -2647,6 +2648,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selectItemDtos.add(new SelectItemDto(cat3,toRoundedDouble(resMapByAsset.get("Prob3")).toString()));
             }
         }
+        List<String> allDisplayNameList = AssetClassification32Enum.getAllDisplayNameList();
+        for (String s : allDisplayNameList) {
+            selectItemDtos.add(new SelectItemDto(s,null));
+
+        }
         return selectItemDtos;
 
     }
@@ -2665,7 +2671,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                     .setScale(2, RoundingMode.HALF_UP)
                     .doubleValue();
         } catch (NumberFormatException e) {
-            return 0.0; // 或记录日志后返回默认值
+            return 0.0;
         }
     }
 

@@ -394,7 +394,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetClassification32')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetClassification32}</label>
-            <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetInfoEditController.selectItemDto}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('assetClassification32')}"
+            <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetInfoEditController.selectItemDto}" scrollHeight="300"     readonly="#{!assetInfoEditController.needEdit('assetClassification32')}"
                             forceSelection="true"  completeMethod="#{assetInfoEditController.autoAssetClassification32()}"
                             var="t" itemLabel="#{t.label}  #{t.value}" itemValue="#{t}" converter="stringIdentityConverter"  >
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.assetClassification32Change()}" />

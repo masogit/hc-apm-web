@@ -8,6 +8,7 @@ import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.asset.AssetInfoListController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import javax.faces.bean.ViewScoped;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @ManagedBean
@@ -90,6 +92,10 @@ public class ModelTrainingController extends GenericCRUDUUIDController<AssetClas
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
 
+    }
+    public List<String> getAssetClassification32All(){
+
+        return AssetClassification32Enum.getAllDisplayNameList();
     }
 
     public void addCategoryModel() {
