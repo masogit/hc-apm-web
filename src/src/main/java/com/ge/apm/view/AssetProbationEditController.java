@@ -415,21 +415,21 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         if (this.selected.getStatus() >= 3) {
             Map<String, Object> step = MapUtil.newHashMap();
             step.put("stepName", "试用中");
-            step.put("ownerName", this.selected.getProbationEndUserName());
+            step.put("ownerName", this.selected.getProbationStartUserName());
             step.put("startTime", DateUtil.formatDateTime(this.selected.getProbationEndTime()));
             stepList.add(step);
         }
         if (this.selected.getStatus() >= 4) {
             Map<String, Object> step = MapUtil.newHashMap();
             step.put("stepName", "待撤离");
-            step.put("ownerName", this.selected.getEvacuationUserName());
+            step.put("ownerName", this.selected.getDetectionUserName());
             step.put("startTime", DateUtil.formatDateTime(this.selected.getEvacuationEndTime()));
             stepList.add(step);
         }
         if (this.selected.getStatus() >= 5) {
             Map<String, Object> step = MapUtil.newHashMap();
             step.put("stepName", "待关单");
-            step.put("ownerName", this.selected.getCloseUserName());
+            step.put("ownerName", this.selected.getApplicantUserName());
             step.put("startTime", DateUtil.formatDateTime(this.selected.getCloseTime()));
             stepList.add(step);
         }
