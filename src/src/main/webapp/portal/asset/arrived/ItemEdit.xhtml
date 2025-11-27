@@ -824,12 +824,12 @@
 <!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
 <!--                            </p:menuitem>-->
                         </p:menuButton>
-                        <p:commandButton validateClient="true"  action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"  update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
+                        <p:commandButton validateClient="true"  action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}"  update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
                              <p:confirm header="确认安装" message="您确定要完成安装吗?" icon="ui-icon-warning"/>
                         </p:commandButton>
-<!--                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstallBatch}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">-->
-<!--                            <p:confirm header="确认批量安装" message="您确定要批量完成安装吗?" icon="ui-icon-warning"/>-->
-<!--                        </p:commandButton>-->
+                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstallBatch}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
+                            <p:confirm header="确认批量安装" message="您确定要批量完成安装吗?" icon="ui-icon-warning"/>
+                        </p:commandButton>
                         <p:commandButton immediate="true" style="margin-left: 4px;margin-right: 5px" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
                         </p:commandButton>
