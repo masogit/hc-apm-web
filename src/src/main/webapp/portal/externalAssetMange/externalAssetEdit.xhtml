@@ -136,9 +136,10 @@
                                     <f:facet name="header">#{msg.attachmentUrl}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
                                     </p:commandLink>
+                                    <span/><span/>
                                     <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="informationList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditBase}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
@@ -213,14 +214,15 @@
                                         <f:facet name="header">#{msg.addPic}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
                                         <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                         <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                            <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
+                                            <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
                                         </p:commandLink>
+                                        <span/><span/>
                                         <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="detectionList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditDetection()}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                         </p:commandButton>
                                     </p:dataList>
-                                    <p:fileUpload id="detection" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                    <p:fileUpload id="detection" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
                                                   multiple="true"  sizeLimit="500000000"  update="detectionList" rendered="#{assetProbationEditController.canEditDetection()}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
@@ -311,7 +313,7 @@
             </div>
             <ui:include src="/portal/preview/view.xhtml" />
             <!--提交对话框 -->
-            <p:dialog id="submitDialog" widgetVar="submitDialog" modal="true" width="400" resizable="true" draggable="true" header="#{msg.Submit.concat(msg.probationApplication)}">
+            <p:dialog id="submitDialog" widgetVar="submitDialog" modal="true" width="400" height="200" resizable="true" draggable="true" header="#{msg.Submit.concat(msg.probationApplication)}">
                 <h:panelGroup>
                     <h:form id="submitForm" class="submitFormCls">
                         <h:panelGroup>
@@ -321,7 +323,7 @@
                                             completeMethod="#{assetProbationEditController.autoCompleteEngineer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
                             </p:autoComplete>
                         </h:panelGroup>
-                        <br/><br/>
+                        <br/><br/><br/>
                         <h:panelGroup>
                             <p:commandButton validateClient="true" update=":growl" action="#{assetProbationEditController.submit()}" value="#{msg.Confirm}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'submitDialog');"/>
                             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('submitDialog').hide()"/>

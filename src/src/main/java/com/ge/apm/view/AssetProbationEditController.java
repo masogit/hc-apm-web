@@ -109,7 +109,6 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedId");
             this.selected = dao.findById(selectedId);
             deptContactList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
-            detectionUserList = Optional.ofNullable(this.loginUser.getSiteUID()).map(siteUid -> uaaService.getUsersBySiteUidAndRole(siteUid, "AssetStaff")).orElse(ListUtil.empty());
             probationConfirmorList = Optional.ofNullable(this.selected.getAssetDeptUid()).map(assetDeptUid -> uaaService.getUsersByDeptUidAndRole(assetDeptUid, "ClinicalStaff")).orElse(ListUtil.empty());
             this.assetDept = Optional.ofNullable(this.selected.getAssetDeptUid()).map(orgInfoRepository::getByUid).orElse(new OrgInfo());
             this.deptContact = Optional.ofNullable(this.selected.getDeptContactUid()).map(uaaService::getUserByUid).orElse(new UserAccount());
@@ -118,6 +117,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.specificationList = Optional.ofNullable(this.selected.getSpecification()).map(specification -> Arrays.asList(specification.split(","))).orElse(ListUtil.empty());
             this.informationList = Optional.ofNullable(this.selected.getInformation()).map(information -> Arrays.asList(information.split(","))).orElse(ListUtil.empty());
         }
+        detectionUserList = Optional.ofNullable(this.loginUser.getSiteUID()).map(siteUid -> uaaService.getUsersBySiteUidAndRole(siteUid, "AssetStaff")).orElse(ListUtil.empty());
         canEditBase = canEditBase();
     }
 
@@ -415,21 +415,21 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         if (this.selected.getStatus() >= 3) {
             Map<String, Object> step = MapUtil.newHashMap();
             step.put("stepName", "试用中");
-            step.put("ownerName", this.selected.getProbationEndUserName());
+            step.put("ownerName", this.selected.getProbationStartUserName());
             step.put("startTime", DateUtil.formatDateTime(this.selected.getProbationEndTime()));
             stepList.add(step);
         }
         if (this.selected.getStatus() >= 4) {
             Map<String, Object> step = MapUtil.newHashMap();
             step.put("stepName", "待撤离");
-            step.put("ownerName", this.selected.getEvacuationUserName());
+            step.put("ownerName", this.selected.getDetectionUserName());
             step.put("startTime", DateUtil.formatDateTime(this.selected.getEvacuationEndTime()));
             stepList.add(step);
         }
         if (this.selected.getStatus() >= 5) {
             Map<String, Object> step = MapUtil.newHashMap();
             step.put("stepName", "待关单");
-            step.put("ownerName", this.selected.getCloseUserName());
+            step.put("ownerName", this.selected.getApplicantUserName());
             step.put("startTime", DateUtil.formatDateTime(this.selected.getCloseTime()));
             stepList.add(step);
         }
