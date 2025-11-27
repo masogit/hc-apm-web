@@ -81,6 +81,9 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="#{msg.currentPersonName}" sortBy="#{item.currentPersonName}" filterBy="#{item.currentPersonName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.currentPersonName}"/>
+                        </p:column>
                         <p:column headerText="#{msg.probationStatus}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{assetProbationController.queryIndex eq -1}">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" rendered="#{assetProbationController.queryIndex == -1}">
