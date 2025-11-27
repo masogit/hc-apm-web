@@ -37,8 +37,17 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">设备32分类<span style="color:red">*</span></label>
-                            <p:inputText required="true"  value="#{modelTrainingController.selected.category}" />
+                            <label class="label">#{msg.assetClassification32}<span style="color:red">*</span></label>
+
+                            <p:selectOneMenu required="true"
+                                    value="#{modelTrainingController.selected.category}"
+                                    id="classificationSelect">
+                                <f:selectItem itemLabel="请选择"/>
+                                <f:selectItems value="#{modelTrainingController.assetClassification32All}"
+                                               var="cat"
+                                               itemLabel="#{cat}"
+                                               itemValue="#{cat}" />
+                            </p:selectOneMenu>
                         </h:panelGroup>
  
                     </p:panelGrid>

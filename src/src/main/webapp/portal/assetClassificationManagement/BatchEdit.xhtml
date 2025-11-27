@@ -194,14 +194,14 @@
                                 <p:column headerText="#{msg.qrCode}" >
                                     <h:outputText value="#{item.qrCode}"/>
                                 </p:column>
-                                <p:column headerText="设备32分类" >
+                                <p:column  headerText="#{msg.assetClassification32}" >
 <!--                                    <p:inputText value="#{item.assetClassification32}"/>-->
                                     <p:selectOneMenu
                                             value="#{item.assetClassification32}"
                                             id="classificationSelect">
 <!--                                            style="width: 100%">-->
                                         <f:selectItem itemLabel="请选择" noSelectionOption="true" />
-                                        <f:selectItems value="#{item.availableCategories}"
+                                        <f:selectItems value="#{batchEditAssetClassificationController.assetClassification32All}"
                                                        var="cat"
                                                        itemLabel="#{cat}"
                                                        itemValue="#{cat}" />

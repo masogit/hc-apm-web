@@ -11,6 +11,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
 import lombok.Data;
@@ -428,6 +429,10 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
 
     }
 
+    public List<String> getAssetClassification32All(){
+
+        return AssetClassification32Enum.getAllDisplayNameList();
+    }
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
