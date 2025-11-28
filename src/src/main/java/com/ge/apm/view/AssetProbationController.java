@@ -4,7 +4,6 @@ import com.ge.apm.dao.AssetProbationRepository;
 import com.ge.apm.domain.AssetProbation;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -17,7 +16,6 @@ import lombok.Setter;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -84,21 +82,21 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, statusFilter.value.toString(), "1*"));
             }
         }
-        List<String> roleNames = loginUser.getRoleNames();
-        if (roleNames.contains("ProbationStaff")) {
+        Set<String> functionList = UserContextService.getCurrentUserFunction();
+        if (functionList.contains("EXTERNAL_ASSET_MANAGE_APPLICATION")) {
             Set<String> orgUidSet = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toSet());
             searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidSet, "1*2+"));
-        } else if (roleNames.contains("AssetStaff")) {
+        } else if (functionList.contains("EXTERNAL_ASSET_MANAGE_DETECTION")) {
             searchFilters.add(new SearchFilter("detectionUserUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*"));
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.GTE, 1, "1*"));
-        } else if (roleNames.contains("ClinicalStaff")) {
+        } else if (functionList.contains("EXTERNAL_ASSET_MANAGE_PROBATION")) {
             searchFilters.add(new SearchFilter("probationStartUserUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*"));
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.GTE, 2, "1*"));
         } else {
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, -1, "1*"));
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, "000", "1*"));
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
@@ -144,30 +142,31 @@ public class AssetProbationController extends GenericCRUDUUIDController<AssetPro
             return false;
         }
         List<String> roleNames = loginUser.getRoleNames();
+        Set<String> functionList = UserContextService.getCurrentUserFunction();
         switch (queryIndex) {
             case 0:
             case 5:
-                if (roleNames.contains("ProbationStaff")) {
+                if (functionList.contains("EXTERNAL_ASSET_MANAGE_APPLICATION")) {
                     return true;
                 }
                 break;
             case 1:
-                if (roleNames.contains("AssetStaff") || roleNames.contains("ProbationStaff")) {
+                if (functionList.contains("EXTERNAL_ASSET_MANAGE_DETECTION") || functionList.contains("EXTERNAL_ASSET_MANAGE_APPLICATION")) {
                     return true;
                 }
                 break;
             case 2:
-                if (roleNames.contains("ClinicalStaff") || roleNames.contains("ProbationStaff") || roleNames.contains("AssetStaff")) {
+                if (functionList.contains("EXTERNAL_ASSET_MANAGE_PROBATION") || functionList.contains("EXTERNAL_ASSET_MANAGE_DETECTION") || functionList.contains("EXTERNAL_ASSET_MANAGE_APPLICATION")) {
                     return true;
                 }
                 break;
             case 3:
-                if (roleNames.contains("ClinicalStaff")) {
+                if (functionList.contains("EXTERNAL_ASSET_MANAGE_PROBATION")) {
                     return true;
                 }
                 break;
             case 4:
-                if (roleNames.contains("AssetStaff")) {
+                if (functionList.contains("EXTERNAL_ASSET_MANAGE_DETECTION")) {
                     return true;
                 }
                 break;
