@@ -533,7 +533,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         if ("View".equals(actionName)) {
             return false;
         }
-        return loginUser.getUid().equals(this.selected.getApplicantUserUid()) && this.selected.getStatus() <= 1;
+        return loginUser.getUid().equals(this.selected.getApplicantUserUid()) && (this.action == -11 || this.selected.getStatus() == 0);
     }
 
     public boolean canEditDetection() {
