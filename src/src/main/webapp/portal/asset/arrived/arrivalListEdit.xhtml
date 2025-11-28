@@ -53,7 +53,9 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetName}*</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"/>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}">
+                                            <p:ajax/>
+                                        </p:inputText>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetGroup}*</label>
@@ -69,7 +71,9 @@
                                         </h:panelGroup>
                                         <h:panelGroup>
                                             <label class="label">#{msg.arrivalListFunctionType}</label>
-                                            <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                            <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" >
+                                                <p:ajax/>
+                                            </p:inputText>
                                         </h:panelGroup>
                                         <h:panelGroup>
                                             <label class="label">#{msg.manufacture}</label>
@@ -83,7 +87,9 @@
                                     </c:if>
                                     <h:panelGroup>
                                         <label class="label">#{msg.brandManufacturerShortName}</label>
-                                        <p:inputText  value="#{assetArrivedListEditController.selected.makerShortName}"  readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        <p:inputText  value="#{assetArrivedListEditController.selected.makerShortName}"  readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" >
+                                            <p:ajax/>
+                                        </p:inputText>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.quantity}*</label>

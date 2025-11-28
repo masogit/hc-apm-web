@@ -2627,52 +2627,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public  List<SelectItemDto>  autoAssetClassification32() {
 
-        ArrayList<SelectItemDto> selectItemDtos = new ArrayList<>();
+
         AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
         assetClassificationModel.setBrand(selected.getMakerShortName());
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getName());
         assetClassificationModel.setFactory(selected.getManufacture());
-        Map<String, Object> resMapByAsset = masterDataService.getResMapByAsset(assetClassificationModel);
-        if(resMapByAsset!=null){
-            String cat1 = (String) resMapByAsset.get("category");
-            String cat2 = (String) resMapByAsset.get("category2");
-            String cat3 = (String) resMapByAsset.get("category3");
-            if (StringUtils.isNotBlank(cat1)) {
-                selectItemDtos.add(new SelectItemDto(cat1,toRoundedDouble(resMapByAsset.get("Prob")).toString()));
-            }
-            if (StringUtils.isNotBlank(cat2)) {
-                selectItemDtos.add(new SelectItemDto(cat2,toRoundedDouble(resMapByAsset.get("Prob2")).toString()));
-            }
-            if (StringUtils.isNotBlank(cat3)) {
-                selectItemDtos.add(new SelectItemDto(cat3,toRoundedDouble(resMapByAsset.get("Prob3")).toString()));
-            }
-        }
-        List<String> allDisplayNameList = AssetClassification32Enum.getAllDisplayNameList();
-        for (String s : allDisplayNameList) {
-            selectItemDtos.add(new SelectItemDto(s,null));
 
-        }
-        return selectItemDtos;
+        return  masterDataService.autoAssetClassification32(assetClassificationModel);
 
-    }
-    private Double toRoundedDouble(Object value) {
-        if (value == null) {
-            return 0.0;
-        }
-        try {
-            double d;
-            if (value instanceof Number) {
-                d = ((Number) value).doubleValue();
-            } else {
-                d = Double.parseDouble(value.toString());
-            }
-            return new BigDecimal(d)
-                    .setScale(2, RoundingMode.HALF_UP)
-                    .doubleValue();
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
     }
 
     public void assetClassification32Change() {
