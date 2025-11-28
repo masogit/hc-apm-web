@@ -31,14 +31,14 @@
                                     </p:dataGrid>
                                 </p:fieldset>
                                 <p:fileUpload id="fileUpload" fileUploadListener="#{measuringCertificateDetailController.uploadDataFile}"
-                                              disabled="#{not empty measuringCertificateDetailController.getOCRTemplates() and not empty measuringCertificateDetailController.streamedContents}"
+                                              disabled="#{not empty measuringCertificateDetailController.streamedContents}"
                                                mode="advanced"
                                               dragDropSupport="false" style="width:100%" process="@this"
                                               multiple="false"
                                               update="measureCoWorkerDlgForm" auto="true" fileLimit="1"
                                               invalidFileMessage="请上传pdf类型计量报告!"
-                                              accept="#{empty measuringCertificateDetailController.getOCRTemplates()?'':'image/*,application/pdf'}"
-                                              allowTypes="#{measuringCertificateDetailController.getAllowTypes()}" label="#{empty measuringCertificateDetailController.getOCRTemplates()?msg.Add:'添加并OCR识别'}"
+                                              accept="image/*,application/pdf"
+                                              allowTypes="#{measuringCertificateDetailController.getAllowTypes()}" label="添加并OCR识别"
                                 />
                             </h:panelGroup>
                         </p:panelGrid>
