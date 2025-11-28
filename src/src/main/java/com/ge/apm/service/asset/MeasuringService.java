@@ -44,6 +44,8 @@ import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
@@ -454,10 +456,9 @@ public class MeasuringService {
         }
         return resultList;
     }
-    public List<MeasuringCertificateDetail> handleZipOCR(UploadedFile file,UserAccount account) throws IOException {
+    public List<MeasuringCertificateDetail> handleZipOCR(UploadedFile file,UserAccount account,String identifyPatterns) throws IOException {
         List<MeasuringCertificateDetail> resultList = Lists.newArrayList();
         progress = 0;
-        String identifyPatterns = configItemService.getConfigItemByKeyToString("identifyPatterns",account);
         // 获取压缩文件中的每个子文件
         try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
             ZipEntry entry;

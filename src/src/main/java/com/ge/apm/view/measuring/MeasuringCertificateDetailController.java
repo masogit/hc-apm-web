@@ -104,6 +104,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                e.printStackTrace();
             }
         }
+        getOCRTemplates();
     }
 
     public void uploadDataFile(FileUploadEvent event) {
@@ -111,12 +112,12 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         String fileName = file.getFileName();
         try {
             logger.info("uploadDataFile");
-            List<OCRTemplate> ocrTemplates = getOCRTemplates();
-            if(CollectionUtils.isEmpty(ocrTemplates)){
-                storageFile(file);
-                WebUtil.addSuccessMessage("上传成功");
-                return;
-            }
+//            List<OCRTemplate> ocrTemplates = getOCRTemplates();
+//            if(CollectionUtils.isEmpty(ocrTemplates)){
+//                storageFile(file);
+//                WebUtil.addSuccessMessage("上传成功");
+//                return;
+//            }
             Map<String, Object> params = new HashMap<>();
             if("AI".equalsIgnoreCase(identifyPatterns)){
                 JSONObject jsonObject = templateService.upload(file, GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,url->url.replace("{type}","/"+ApplicationType.FORM_OCR_WORKFLOWS.name()));
@@ -131,6 +132,12 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                     setObject(content);
                 }
             }else if(fileName.toLowerCase().endsWith("pdf")){
+                List<OCRTemplate> ocrTemplates = getOCRTemplates();
+                if(CollectionUtils.isEmpty(ocrTemplates)){
+                    storageFile(file);
+                    WebUtil.addSuccessMessage("文件上传成功,缺少本地配置无法OCR识别");
+                    return;
+                }
                 params.put("type", BusinessType.MEASURE.name());
                JSONObject jsonObject = templateService.upload(file, GatewayURL.OCR_DOCUMENT,params);
                JSONArray data = jsonObject.getJSONArray("data");
