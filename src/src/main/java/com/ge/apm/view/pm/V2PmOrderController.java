@@ -88,6 +88,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -3022,14 +3023,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.totalManHours = null;
     }
 
+    private V2_WorkOrderCoworker coWorkerDetailOld;
     public void prepareEditCoWorkerDetail(String itemId) {
         if ("new".equals(itemId)) {
             coWorkerDetail = new V2_WorkOrderCoworker();
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             coWorkerDetail.setWoId(selectedPmOrder.getId());
+            coWorkerDetailOld=null;
         } else {
             if (coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {
                 coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+                coWorkerDetailOld=new V2_WorkOrderCoworker();
+                try {
+                    BeanUtils.copyProperties(coWorkerDetailOld,coWorkerDetail);
+                } catch (Exception e) {
+                   logger.error("编辑责任人工时出现异常 e:",e);
+                }
             }
         }
     }
@@ -3174,7 +3183,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 if("000".equals(detail.getId())){
                     continue;
                 }
-                if(coWorkerDetail.getCowokerUserId().equals(detail.getCowokerUserId())){
+                if(coWorkerDetail.getCowokerUserId().equals(detail.getCowokerUserId()) &&  !coWorkerDetail.getId().equals(detail.getId()) ){
                     // 开始时间结束时间不能相等
                     if(coWorkerDetail.getStartTime().getTime() == detail.getStartTime().getTime()
                             || coWorkerDetail.getEndTime().getTime() == detail.getEndTime().getTime()){
@@ -3232,6 +3241,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.updateAccessPrice(itemDetail);
     }
     public void cancelWorkdetail() {
+        if(coWorkerDetailOld!=null){
+            if(CollectionUtils.isNotEmpty(coWorkerList)){
+                coWorkerList.remove(coWorkerDetail);
+                coWorkerList.add(coWorkerDetailOld);
+            }
+        }
         itemDetail = null;
         coWorkerDetail = null;
         selectedPmOrderManHoursDetail = null;
