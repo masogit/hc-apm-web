@@ -7,6 +7,7 @@ import com.ge.apm.domain.AssetClassificationModel;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.uaa.UaaService;
@@ -291,23 +292,13 @@ public class DetailsController extends GenericCRUDController<AssetInfo> implemen
             assetClassificationModel.setPattern(asset.getFunctionType());
             assetClassificationModel.setSourceName(asset.getName());
             assetClassificationModel.setFactory(asset.getManufacture());
-            Map<String, Object> resMapByAsset = masterDataService.getResMapByAsset(assetClassificationModel);
-            if(resMapByAsset!=null){
-//                selected.setCategory1(StringUtils.isNotBlank((String)resMapByAsset.get("category"))? (String) resMapByAsset.get("category") :null);
-//                selected.setCategory2(StringUtils.isNotBlank((String)resMapByAsset.get("category2"))? (String) resMapByAsset.get("category2") :null);
-//                selected.setCategory3(StringUtils.isNotBlank((String)resMapByAsset.get("category3"))? (String) resMapByAsset.get("category3") :null);
-                List<String> objects = new ArrayList<>();
-                if(StringUtils.isNotBlank((String)resMapByAsset.get("category"))){
-                    objects.add((String)resMapByAsset.get("category"));
-                }
-                if(StringUtils.isNotBlank((String)resMapByAsset.get("category2"))){
-                    objects.add((String)resMapByAsset.get("category2"));
-                }
-                if(StringUtils.isNotBlank((String)resMapByAsset.get("category3"))){
-                    objects.add((String)resMapByAsset.get("category3"));
-                }
-                selected.setAvailableCategories(objects);
+            List<SelectItemDto> selectItemDtos = masterDataService.autoAssetClassification32(assetClassificationModel);
+            if(!CollectionUtils.isEmpty(selectItemDtos)){
+                List<String> collect = selectItemDtos.stream().map(SelectItemDto::getLabel).collect(Collectors.toList());
+                asset.setAvailableCategories(collect);
             }
+
+
         }
 
     }
