@@ -189,7 +189,7 @@
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.selected.status ge 2 and assetProbationEditController.action ne -22}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
-                                    <p:inputText id="detectionSituationRead" value="#{assetProbationEditController.selected.detectionSituation}" readonly="true"/>
+                                    <p:inputTextarea id="detectionSituationRead" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" readonly="true" style="width: 100%"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.detectionPeople}<span style="color:red">*</span></label>
@@ -205,7 +205,7 @@
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.canEditDetection()}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
-                                    <p:inputText id="detectionSituation" value="#{assetProbationEditController.selected.detectionSituation}" style="width: 100%"/>
+                                    <p:inputTextarea id="detectionSituation" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" style="width: 100%"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -235,7 +235,8 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
-                        <p:fieldset legend="#{msg.confirmDetail}" rendered="#{assetProbationEditController.selected.status ge 3}">
+                        <p:fieldset legend="#{msg.confirmDetail}" rendered="false">
+<!--                        <p:fieldset legend="#{msg.confirmDetail}" rendered="#{assetProbationEditController.selected.status ge 3}">-->
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">#{msg.probationConfirmTime}</label>
@@ -264,11 +265,11 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.evacuationAssetSituation}<span style="color:red">*</span></label>
-                                    <p:inputText value="#{assetProbationEditController.selected.evacuationAssetSituation}" required="true" readonly="#{assetProbationEditController.selected.status ge 4}"/>
+                                    <p:inputTextarea value="#{assetProbationEditController.selected.evacuationAssetSituation}" rows="1" required="true" style="width: 100%" readonly="#{assetProbationEditController.selected.status ge 4}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.Remark}<span style="color:red">*</span></label>
-                                    <p:inputText value="#{assetProbationEditController.selected.evacuationRemark}" required="true" readonly="#{assetProbationEditController.selected.status ge 4}"/>
+                                    <p:inputTextarea value="#{assetProbationEditController.selected.evacuationRemark}" rows="1" required="true" style="width: 100%" readonly="#{assetProbationEditController.selected.status ge 4}"/>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{assetProbationEditController.selected.status ge 4}">
                                     <label class="label">#{msg.probationEndUserUid}</label>
