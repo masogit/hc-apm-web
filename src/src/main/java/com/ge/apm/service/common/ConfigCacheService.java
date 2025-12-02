@@ -1,16 +1,9 @@
 package com.ge.apm.service.common;
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.TenantOptionConfigRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.TenantOptionConfig;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import org.slf4j.Logger;
@@ -20,13 +13,13 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import webapp.framework.dao.SearchFilter;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -50,6 +43,9 @@ public class ConfigCacheService {
 
     @Autowired
     private SharedAssetService remoteService;
+
+    @Autowired
+    private AdminFeatureActiveRepository adminFeatureActiveRepository;
 
     @Cacheable(cacheNames = "springCache", key = "'OrgInfo_Uid.'+#uid")
     public OrgInfo findOrgByUid(String uid){
@@ -119,13 +115,13 @@ public class ConfigCacheService {
 
     @PostConstruct
     public void initTenantInfo(){
-        List<TenantInfo> tenantInfos = tenantDao.find();
-        boolean b = tenantInfos.stream().anyMatch(item -> item.getFeatureList().contains(ApmFeature.MOBILE_REPAIR.name()));
-        if(b) return;
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        List<TenantInfo> tenantInfos = tenantDao.findBySearchFilter(searchFilterList);
         LOGGER.info("同步 tenant feature list start");
         for (TenantInfo tenantInfo : tenantInfos) {
             String featureList = tenantInfo.getFeatureList();
             if(StringUtils.isEmpty(featureList)) continue;
+            if (featureList.contains(ApmFeature.MOBILE_REPAIR.name())) continue;
             //["LOG_AUDIT","ASSET_ACCOUNT_DASHBOARD","ASSET_RISK_EVALUATE","ASSET_INVENTORY","ASSET_INFO","PERFORMANCE","KNOWLEDGE","COMPANY_FILES","TRAINING","CONFIG","REPAIR","MAINTAIN_TEMPLATE","ASSET_BATCH_IMPORT","REPAIR_TEMPLATE","ASSET_PARENTS_INFO","MULTILEVEL_APPROVE","MAINTAIN","ASSET_SCRAP","PLATFORM_CONFIG","MAINTAIN_ELECTRICDATAIMPORT","ASSET_LOCATION"]
             JSONArray featureArray = JSONArray.parseArray(featureList);
             featureArray.add(ApmFeature.MOBILE_REPAIR.name());
@@ -141,5 +137,37 @@ public class ConfigCacheService {
         }
         LOGGER.info("同步 tenant feature list end size:{}",tenantInfos.size());
         tenantDao.save(tenantInfos);
+    }
+
+    private void initialActiveFeature(){
+        LOGGER.info("同步 tenant feature active start");
+        String featureKey = ApmFeature.HISPERFORMANCE.name();
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        searchFilterList.add(new SearchFilter("featureKey", SearchFilter.Operator.EQ,featureKey));
+        List<AdminFeatureActive> adminFeatureActives = adminFeatureActiveRepository.findBySearchFilter(searchFilterList);
+        if(!CollectionUtils.isEmpty(adminFeatureActives)) return;
+        searchFilterList.clear();
+        searchFilterList.add(new SearchFilter("featureList", SearchFilter.Operator.LIKE,featureKey));
+        List<TenantInfo> tenantInfos = tenantDao.findBySearchFilter(searchFilterList);
+        if(CollectionUtils.isEmpty(tenantInfos)) return;
+        for (TenantInfo tenantInfo : tenantInfos) {
+            createAdminFeatureActive(tenantInfo,featureKey);
+        }
+        LOGGER.info("同步 tenant feature active end");
+    }
+    private void createAdminFeatureActive(TenantInfo tenantInfo,String featureKey){
+        List<OrgInfo> orgInfos = orgDao.findByTenantUIDAndOrgType(tenantInfo.getUid(),2);
+        List<AdminFeatureActive> adminFeatureActives = orgInfos.stream().map(item -> {
+            AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+            adminFeatureActive.setFeatureKey(featureKey);
+            adminFeatureActive.setActiveRole("SuperAdmin");
+            adminFeatureActive.setTenantUID(item.getTenantUID());
+            adminFeatureActive.setHospitalUID(item.getHospitalUID());
+            adminFeatureActive.setCreateDate(new Date());
+            adminFeatureActive.setActiveDate(new Date());
+            LOGGER.info("同步 tenant feature active end orgName:{}", item.getName());
+            return adminFeatureActive;
+        }).collect(Collectors.toList());
+        adminFeatureActiveRepository.save(adminFeatureActives);
     }
 }
