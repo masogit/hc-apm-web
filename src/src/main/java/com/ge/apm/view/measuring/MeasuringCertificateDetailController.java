@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.dao.OCRTemplateRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.OCRTemplateService;
 import com.ge.apm.service.asset.MeasuringService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.MicroServiceUtil;
@@ -78,7 +78,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     private List<StreamedContent> streamedContents = new ArrayList<>();
 
-    private ConfigItemValueRepository configItemValueRepository;
+    private ConfigItemService configItemService;
 
     private String identifyPatterns;
 
@@ -92,9 +92,8 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         measuringService = WebUtil.getBean(MeasuringService.class);
         ocrTemplateRepository = WebUtil.getBean(OCRTemplateRepository.class);
         systemEventAuditUtil = WebUtil.getBean(SystemEventAuditAopAspect.class);
-        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
-        ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("identifyPatterns", currentUser.getSiteUID());
-        identifyPatterns = Optional.ofNullable(displayModeCasePriorityValue).map(ConfigItemValue::getValue).orElse("local");
+        configItemService = WebUtil.getBean(ConfigItemService.class);
+        identifyPatterns = configItemService.getConfigItemByKeyToString("identifyPatterns", currentUser);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         if("Create".equals(actionName)){
