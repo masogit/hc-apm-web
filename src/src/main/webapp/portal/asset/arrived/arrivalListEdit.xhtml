@@ -211,7 +211,7 @@
                                             <p:inputText value="#{assetArrivedListEditController.selected.repairerTel}" />
                                         </h:panelGroup>
                                     </c:if>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_') and  userContextService.canRender('ASSET_CLASSIFICATION_MANAGEMENT')  }">
                                         <label class="label">#{msg.assetClassification32}</label>
                                         <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetArrivedListEditController.selectItemDto}" scrollHeight="300"
                                                         forceSelection="true"  completeMethod="#{assetArrivedListEditController.autoAssetClassification32()}"
