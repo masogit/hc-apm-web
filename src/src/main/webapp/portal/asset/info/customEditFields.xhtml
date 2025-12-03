@@ -391,7 +391,7 @@
         </h:panelGroup>
     </c:if>
 
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetClassification32') and  userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_') and  userContextService.canRender('ASSET_CLASSIFICATION_MANAGEMENT')   }   " >
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetClassification32') and  userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_') and  userContextService.canRender('ASSET_CLASSIFICATION_MANAGEMENT')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetClassification32}</label>
             <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetInfoEditController.selectItemDto}" scrollHeight="300"     readonly="#{!assetInfoEditController.needEdit('assetClassification32')}"
