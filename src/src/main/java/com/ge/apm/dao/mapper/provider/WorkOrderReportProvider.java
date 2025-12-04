@@ -181,6 +181,7 @@ public class WorkOrderReportProvider {
                 "(select string_agg(concat('开始时间:',woh.start_time,'结束时间:', woh.end_time, '工时:', cast(woh.hours as decimal(10,2)),'备注:', woh.remark, ';'),'') from v2_work_order_man_hours_detail woh where woh.wo_id=wo.id GROUP BY woh.wo_id) as workHourDetail, " +
                 "wo.entry_type as entryType, " +
                 " wo.coworker_entry_type as coworkerEntryType, "+
+                " wo.travel_time as travelTime, "+
                 " case when wo.coworker_entry_type = 0 THEN (SELECT string_agg(concat('协作者:',woc.cowoker_user_name,CAST(woc.man_hours AS DECIMAL(10,2)),'备注:',woc.remark,';'),'') FROM V2_Work_Order_Coworker woc WHERE woc.wo_id=wo.ID GROUP BY woc.wo_id) " +
                 " when wo.coworker_entry_type = 1 THEN (SELECT string_agg(concat('协作者:',woc.cowoker_user_name,'开始时间:', woc.start_time, '结束时间:', woc.end_time,CAST(woc.man_hours AS DECIMAL(10,2)),'备注:',woc.remark,';'),'') FROM V2_Work_Order_Coworker woc WHERE woc.wo_id=wo.ID GROUP BY woc.wo_id) end as coworkerEntryDetail, " +
                 "wo.work_order_type as workOrderType, " +

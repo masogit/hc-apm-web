@@ -91,6 +91,12 @@
                                 <label class="label">#{msg.originalPmNum}</label>
                                 <p:outputLabel value="#{v2PmOrderController.selected.originalPmNum}"></p:outputLabel>
                             </h:panelGroup>
+
+                            <h:panelGroup rendered="#{!userContextService.isEnableBtnByKey('pmOrderShowTravelTime')}">
+                                <label class="label">#{msg.travelTime}</label>
+                                <p:outputLabel id="travel_time"  value="#{v2PmOrderController.selected.travelTime}" />
+                            </h:panelGroup>
+
                         </p:panelGrid>
                     </div>
                     <div class="ui-g-2">

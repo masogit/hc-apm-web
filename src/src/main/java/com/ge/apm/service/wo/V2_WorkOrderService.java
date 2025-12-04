@@ -485,6 +485,7 @@ public class V2_WorkOrderService {
             formData.setComName(externalTempUser.getComName());
             formData.setTel(externalTempUser.getTel());
         }
+        formData.setTravelTime(selectedWorkOrder.getTravelTime());
         normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
@@ -552,6 +553,7 @@ public class V2_WorkOrderService {
             formData.setComName(externalTempUser.getComName());
             formData.setTel(externalTempUser.getTel());
         }
+        formData.setTravelTime(selectedWorkOrder.getTravelTime());
         normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {

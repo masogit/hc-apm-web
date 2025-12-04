@@ -98,6 +98,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ORDERTYPE.getChinese(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
             map.put(ExportFields.ORDERCOMMENTS.getChinese(), this.getComments());
             map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
+            map.put(ExportFields.TRAVELTIME.getChinese(), this.getTravelTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getChinese(), this.getActualCompletionTime());
             }
@@ -129,6 +130,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ORDERTYPE.getEnglish(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
             map.put(ExportFields.ORDERCOMMENTS.getEnglish(), this.getComments());
             map.put(ExportFields.PLANTIME.getEnglish(), this.getPlanTime());
+            map.put(ExportFields.TRAVELTIME.getEnglish(), this.getTravelTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getEnglish(), this.getActualCompletionTime());
             }
@@ -263,5 +265,11 @@ public class PmExportFormatter<T> {
         return orderType;
 
     }*/
+
+
+    public Integer getTravelTime() {
+        return v2_pmOrder.getTravelTime();
+    }
+
 
 }

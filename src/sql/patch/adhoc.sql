@@ -1,0 +1,3 @@
+-- YHAAO-26359 维修和保养时增加路途工时字段
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '是否显示路途工时', 'workOrderShowTravelTime', '是否显示路途工时', 'f','t',3 where not exists(select * from config_item where key = 'workOrderShowTravelTime');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '是否显示路途工时', 'workOrderShowTravelTime', '是否显示路途工时', 'f','t',3 where not exists(select * from config_item where key = 'workOrderShowTravelTime');
