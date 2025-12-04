@@ -3068,14 +3068,15 @@ public class AssetInfo implements ChineseName, Serializable {
                 warrantyAlertStatus = "warrantyExpired";
             else if (dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
-        } else if (factoryWarrantyDate != null) {
+        }
+        /*if (factoryWarrantyDate != null) {
             // then check factory Warranty Date
             DateTime dt = TimeUtil.toJodaDate(factoryWarrantyDate);
             if (dt.isBeforeNow())
                 warrantyAlertStatus = "warrantyExpired";
             else if (dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
-        }
+        }*/
     }
 
     public String getMeasuringOwnerName() {

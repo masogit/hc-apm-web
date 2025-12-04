@@ -53,16 +53,24 @@
                 <h:form id="searchForm">
                     <h:panelGrid id="filterType" columns="4" style="float: right">
                         <h:panelGroup style="float: right"  rendered="#{assetInfoListController.showWarrantyAlert}">
-                            <span >#{msg.Legend}：</span>
-                            <span class="warrantyExpireSoon">#{msg.MorWExpireSoon}</span>
-                            <span></span>
-                            <span class="warrantyExpired">#{msg.MorWExpired}</span>
+<!--                            <span >#{msg.Legend}：</span>-->
+<!--                            <span class="warrantyExpireSoon">#{msg.MorWExpireSoon}</span>-->
+<!--                            <span></span>-->
+<!--                            <span class="warrantyExpired">#{msg.MorWExpired}</span>-->
+                            <p:selectCheckboxMenu value="#{assetInfoListController.warrantyStatus}" updateLabel="true" label="#{msg.SelectOneMessage}维保或质保" style="width: 250px" panelStyle="width: 250px">
+                                <f:selectItem itemLabel="维保临期" itemValue="1"/>
+                                <f:selectItem itemLabel="维保逾期" itemValue="2"/>
+                                <f:selectItem itemLabel="质保临期" itemValue="3"/>
+                                <f:selectItem itemLabel="质保逾期" itemValue="4"/>
+                                <p:ajax event="toggleSelect" update="AssetInfoListForm"/>
+                                <p:ajax process="@this" update="AssetInfoListForm"/>
+                            </p:selectCheckboxMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="#{msg.All}" />
-                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="#{msg.ParentDevice}"/>
-                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="#{msg.ChildDevice}"/>
-                        </h:panelGroup>
+<!--                        <h:panelGroup>-->
+<!--                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="#{msg.All}" />-->
+<!--                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="#{msg.ParentDevice}"/>-->
+<!--                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="#{msg.ChildDevice}"/>-->
+<!--                        </h:panelGroup>-->
                     </h:panelGrid>
 
                     <h:panelGrid id="searchPanel" columns="3">
