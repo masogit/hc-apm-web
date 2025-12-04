@@ -342,6 +342,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="work_order_type")
     private String workOrderType;
 
+    @Column(name="travel_time")
+    private Integer travelTime;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
@@ -1122,5 +1125,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setExternalTempUser(ExternalTempUser externalTempUser) {
         this.externalTempUser = externalTempUser;
+    }
+
+    public Integer getTravelTime() {
+        return travelTime;
+    }
+
+    public void setTravelTime(Integer travelTime) {
+        this.travelTime = travelTime;
     }
 }

@@ -474,7 +474,9 @@ public class MaintenanceTemplate {
         COWORKER2("coworker2", Widget.TEXT),
         COWORKER2_TIME("coworker2_time", Widget.TEXT),
         RESULT("result", Widget.TEXT),
-        COMMENTS("comments", Widget.TEXT);
+        COMMENTS("comments", Widget.TEXT),
+        TRAVELTIME("travel_time", Widget.TEXT),
+        ;
 
         private final String key;
         private final Widget widget;

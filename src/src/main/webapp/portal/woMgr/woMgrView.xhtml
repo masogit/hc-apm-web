@@ -301,6 +301,10 @@
                                             <p:outputLabel value="#{fieldMsg.fieldValue('countyAreaOrderType',woItem.orderType)}" rendered="#{not empty woItem.orderType}"/>
                                         </h:panelGroup>
                                     </c:if>
+                                    <h:panelGroup rendered="#{!userContextService.isEnableBtnByKey('workOrderShowTravelTime')}">
+                                        <label class="label">#{msg.travelTime}</label>
+                                        <p:outputLabel id="travel_time"  value="#{woItem.travelTime}" />
+                                    </h:panelGroup>
                                 </p:panelGrid>
                             </div>
                             <div class="ui-g-2">

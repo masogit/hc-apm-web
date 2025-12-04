@@ -22,7 +22,9 @@ public enum ExportFields {
     PLANTIME("计划完成时间", "Planned Completion Time"),
     ACTUALCOMPLETIONTIME("实际完成时间", "Actual Completion Time"),
 
-    SITENAME("所属院区","Site Name");
+    SITENAME("所属院区","Site Name"),
+    TRAVELTIME("路途工时","Travel Time"),
+    ;
 
     private final String english;
 

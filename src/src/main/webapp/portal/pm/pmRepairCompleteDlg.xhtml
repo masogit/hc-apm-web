@@ -208,6 +208,13 @@
                             </p:dataTable>
                         </h:panelGroup>
 
+                        <h:panelGroup rendered="#{!userContextService.isEnableBtnByKey('pmOrderShowTravelTime')}">
+                            <label class="label">#{msg.travelTime}</label>
+                            <p:inputNumber id="travel_time" maxValue="999" value="#{v2PmOrderController.selectedPmOrder.travelTime}" >
+                                <p:ajax />
+                            </p:inputNumber>
+                        </h:panelGroup>
+
                     </p:panelGrid>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>

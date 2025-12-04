@@ -293,6 +293,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("CloseTime_xlsx"), formatDate(workOrderExportPojo.getCloseTime()));
             workOrderMap.put(WebUtil.getMessage("feedbackRating"), workOrderExportPojo.getFeedbackRating()!=null&& workOrderExportPojo.getFeedbackRating()!=0?workOrderExportPojo.getFeedbackRating():null);
             workOrderMap.put("feedbackComment", workOrderExportPojo.getFeedbackComment());
+            workOrderMap.put(WebUtil.getMessage("travelTime"), workOrderExportPojo.getTravelTime());
             Integer currentStepId = workOrderExportPojo.getCurrentStepId();
             if (UserContextService.hasCurrentTenantName("")) {
                 if (currentStepId == null) {

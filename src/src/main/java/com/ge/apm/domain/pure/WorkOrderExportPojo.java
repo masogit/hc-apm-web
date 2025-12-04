@@ -219,6 +219,8 @@ public class WorkOrderExportPojo {
 
     private String mainSub;
 
+    private Integer  travelTime;
+
     public String getCoworkerEntryDetail() {
         return coworkerEntryDetail;
     }
@@ -1027,5 +1029,13 @@ public class WorkOrderExportPojo {
 
     public void setCloseTime(Date closeTime) {
         this.closeTime = closeTime;
+    }
+
+    public Integer getTravelTime() {
+        return travelTime;
+    }
+
+    public void setTravelTime(Integer travelTime) {
+        this.travelTime = travelTime;
     }
 }
