@@ -115,28 +115,7 @@ public class ConfigCacheService {
 
     @PostConstruct
     public void initTenantInfo(){
-        List<SearchFilter> searchFilterList = new ArrayList<>();
-        List<TenantInfo> tenantInfos = tenantDao.findBySearchFilter(searchFilterList);
-        LOGGER.info("同步 tenant feature list start");
-        for (TenantInfo tenantInfo : tenantInfos) {
-            String featureList = tenantInfo.getFeatureList();
-            if(StringUtils.isEmpty(featureList)) continue;
-            if (featureList.contains(ApmFeature.MOBILE_REPAIR.name())) continue;
-            //["LOG_AUDIT","ASSET_ACCOUNT_DASHBOARD","ASSET_RISK_EVALUATE","ASSET_INVENTORY","ASSET_INFO","PERFORMANCE","KNOWLEDGE","COMPANY_FILES","TRAINING","CONFIG","REPAIR","MAINTAIN_TEMPLATE","ASSET_BATCH_IMPORT","REPAIR_TEMPLATE","ASSET_PARENTS_INFO","MULTILEVEL_APPROVE","MAINTAIN","ASSET_SCRAP","PLATFORM_CONFIG","MAINTAIN_ELECTRICDATAIMPORT","ASSET_LOCATION"]
-            JSONArray featureArray = JSONArray.parseArray(featureList);
-            featureArray.add(ApmFeature.MOBILE_REPAIR.name());
-            featureArray.add(ApmFeature.MOBILE_REPAIR_MANAGEMENT.name());
-            featureArray.add(ApmFeature.MOBILE_MAINTENANCE_MANAGEMENT.name());
-            featureArray.add(ApmFeature.MOBILE_MAINTENANCE_SPARE_PARTS_APPROVAL.name());
-            featureArray.add(ApmFeature.MOBILE_REPAIR_MY_WORK_ORDERS.name());
-            featureArray.add(ApmFeature.MOBILE_MAINTENANCE_MY_WORK_ORDERS.name());
-            featureArray.add(ApmFeature.MOBILE_DEPARTMENTAL_REPAIR_REPORT.name());
-            String jsonString = featureArray.toJSONString();
-            tenantInfo.setFeatureList(jsonString);
-            LOGGER.info("同步 tenant feature list tenant:{},json:{}",tenantInfo.getName(),jsonString);
-        }
-        LOGGER.info("同步 tenant feature list end size:{}",tenantInfos.size());
-        tenantDao.save(tenantInfos);
+        initialActiveFeature();
     }
 
     private void initialActiveFeature(){

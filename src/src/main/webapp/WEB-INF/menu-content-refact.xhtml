@@ -145,7 +145,7 @@
                    </c:when>
                    <c:when test="#{item eq 'HISPERFORMANCE'}">
                        <!-- his绩效分析 -->
-                       <p:submenu  label="#{msg.hisPerform}" icon="fa fa-line-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_')}">
+                       <p:submenu  label="#{msg.hisPerform}" icon="fa fa-line-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_')and userContextService.canRender('HISPERFORMANCE')}">
                            <p:menuitem fragment="his011"  id="his011" value="综合效益科室汇总"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipmentDeptAssetDetail.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_DEPARTMENT')}"/>
                            <p:menuitem fragment="his009" id="his009" value="设备综合效益分析"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_EQUIPMENT')}"/>
                            <p:menuitem fragment="his010" id="his010" value="数据录入"  outcome="/portal/his/dataEntry/dataEntry.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DATA_ENTRY')}"/>
