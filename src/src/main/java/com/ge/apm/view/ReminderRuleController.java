@@ -305,6 +305,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
                 break;
             case "AdjustmentCenterReturn":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ADJUSTMENT_CENTER_RETURN_MSG, WechatParam.class));
+                break;
             case "ProbationExpiration":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_PROBATION_EXPIRATION_MSG, WechatParam.class));
                 break;
@@ -382,7 +383,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     }
 
     public List<UserAccount> getUserList() {
-        return userAccountMapper.getBySiteUid(selected.getSiteUid());
+        List<UserAccount> userAccounts = userAccountMapper.getBySiteParent(selected.getSiteUid());
+        userAccounts.addAll(userAccountMapper.getBySiteUid(selected.getSiteUid()));
+        return userAccounts;
     }
 
     public List<SysRole> getRoles() {
