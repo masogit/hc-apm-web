@@ -564,6 +564,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setQrCode(null);
         selected.setId(null);
         selected.setUid(null);
+        selected.setAssetDeptId(null);
+        selected.setAssetDeptUID(null);
+        selected.setAssetDeptOrg(null);
+        selected.setAssetDeptName(null);
+        selected.setCleaned(true);
+        selected.setSharedAssetTypeUid(null);
+        selected.setSharedAssetReqDetail(null);
+        selected.setSharedAssetReqDetailList(null);
+        selected.setSharedAssetSwapIndex(null);
+        selected.setSharedAssetSwapIndexId(null);
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
