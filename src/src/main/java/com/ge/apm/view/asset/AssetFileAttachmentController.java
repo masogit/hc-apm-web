@@ -1,8 +1,12 @@
 package com.ge.apm.view.asset;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.mapper.V2_BlobObjectMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.AssetTagService;
@@ -11,9 +15,11 @@ import com.ge.apm.service.asset.VlinkParserService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +34,9 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StreamUtils;
 import webapp.framework.web.WebUtil;
@@ -48,6 +56,7 @@ import java.util.stream.Collectors;
 public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_BlobObject> implements Serializable, ServerEventInterface {
 
     BlobObjectRepository dao;
+    V2_BlobObjectMapper blobObjectMapper;
     OrgInfoRepository orgInfoDao;
     TenantInfoRepository tenantInfoDao;
 
@@ -107,6 +116,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     @Override
     protected void init() {
         dao = WebUtil.getBean(BlobObjectRepository.class);
+        blobObjectMapper = WebUtil.getBean(V2_BlobObjectMapper.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         microService = WebUtil.getBean(MicroServiceUtil.class);
         assetService = WebUtil.getBean(AssetInfoService.class);
@@ -138,11 +148,49 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     @Override
     protected Page<V2_BlobObject> loadData(PageRequest pageRequest) {
-
+        Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
         if (searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        String boSubType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("boSubType")).map(item -> (String) item.value).findAny().orElse(""));
+        Wrapper<V2_BlobObject> wrapper = new EntityWrapper<>();
+        if (hasFilterOnField("boSubType")) {
+            wrapper.eq("o.bo_sub_type", searchFilters.stream().filter(item -> item.fieldName.equals("boSubType")).map(item -> (String) item.value).findAny().orElse(""));
+        }
+        if (hasFilterOnField("objectName")) {
+            wrapper.like("o.object_name", searchFilters.stream().filter(item -> item.fieldName.equals("objectName")).map(item -> (String) item.value).findAny().orElse(""));
+        }
+        if (hasFilterOnField("assetName")) {
+            wrapper.like("a.name", searchFilters.stream().filter(item -> item.fieldName.equals("assetName")).map(item -> (String) item.value).findAny().orElse(""));
+        }
+        if (hasFilterOnField("serialNum")) {
+            wrapper.like("a.serial_num", searchFilters.stream().filter(item -> item.fieldName.equals("serialNum")).map(item -> (String) item.value).findAny().orElse(""));
+        }
+        if (hasFilterOnField("qrCode")) {
+            wrapper.like("a.qr_code", searchFilters.stream().filter(item -> item.fieldName.equals("qrCode")).map(item -> (String) item.value).findAny().orElse(""));
+        }
+        if (hasFilterOnField("functionType")) {
+            wrapper.like("a.function_type", searchFilters.stream().filter(item -> item.fieldName.equals("functionType")).map(item -> (String) item.value).findAny().orElse(""));
+        }
+        if(UserContextService.hasCurrentTenantName("")){
+            wrapper.ne("o.bo_sub_type", "1");
+        }
+        wrapper.andNew().in("a.site_uid", orgUidList).or().in("a.clinical_dept_uid", orgUidList).or().in("a.hospital_uid", orgUidList).or().in("a.institution_uid", orgUidList).or().in("a.tenant_uid", orgUidList);
+        List<String> assetFiled = ListUtil.newArrayList("serial_num", "qr_code", "function_type");
+        Sort sort = pageRequest.getSort();
+        for (Sort.Order order : sort) {
+            Sort.Direction direction = order.getDirection();
+            String property = ZipUtil.camelToUnderline(order.getProperty());
+            String column;
+            if ("asset_name".equals(property)) {
+                column = "a.name";
+            } else {
+                column = (assetFiled.contains(property) ? "a." : "o.") + property;
+            }
+            wrapper.orderBy(column, "ASC".equals(direction.name()));
+        }
+        currentPageBlobObject = blobObjectMapper.selectAssetBlob(pagination, wrapper);
+        return new PageImpl<>(currentPageBlobObject, pageRequest, pagination.getTotal());
+        /*String boSubType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("boSubType")).map(item -> (String) item.value).findAny().orElse(""));
         boSubType = boSubType.length() > 2  ? boSubType.replace("%","") : boSubType;
         String boName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("objectName")).map(item -> (String) item.value).findAny().orElse(""));
         String assetName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.name")).map(item -> (String) item.value).findAny().orElse(""));
@@ -159,7 +207,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
 
         currentPageBlobObject = blobObjectPage.getContent();
-        return blobObjectPage;
+        return blobObjectPage;*/
     }
 
     @Override

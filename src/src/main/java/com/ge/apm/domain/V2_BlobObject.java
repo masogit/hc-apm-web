@@ -201,11 +201,20 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "second_directory")
     private String secondDirectory;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(insertable = false, updatable = false, name = "bo_uuid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @Where(clause = "bo_type = 'AssetInfo'")
-    @JsonBackReference
-    private AssetInfo assetInfo;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(insertable = false, updatable = false, name = "bo_uuid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+//    @Where(clause = "bo_type = 'AssetInfo'")
+//    @JsonBackReference
+//    private AssetInfo assetInfo;
+
+    @Transient
+    private String assetName;
+    @Transient
+    private String serialNum;
+    @Transient
+    private String qrCode;
+    @Transient
+    private String functionType;
 
     @Column(name = "compress_object_id")
     private String compressObjectId;
@@ -313,12 +322,44 @@ public class V2_BlobObject implements Serializable {
         this.boSubType = boSubType;
     }
 
-    public AssetInfo getAssetInfo() {
-        return assetInfo;
+//    public AssetInfo getAssetInfo() {
+//        return assetInfo;
+//    }
+//
+//    public void setAssetInfo(AssetInfo assetInfo) {
+//        this.assetInfo = assetInfo;
+//    }
+
+    public String getAssetName() {
+        return assetName;
     }
 
-    public void setAssetInfo(AssetInfo assetInfo) {
-        this.assetInfo = assetInfo;
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getSerialNum() {
+        return serialNum;
+    }
+
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
+
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
     }
 
     public String getCreatedBy() {

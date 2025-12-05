@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.V2_BlobObjectMapper">
+
+    <resultMap type="com.ge.apm.domain.V2_BlobObject" id="blobBean" autoMapping="true">
+        <result column="id" property="id"/>
+        <result column="bo_sub_type" property="boSubType"/>
+        <result column="object_name" property="objectName"/>
+        <result column="ext_link" property="extLink"/>
+        <result column="object_storage_id" property="objectStorageId"/>
+        <result column="assetName" property="assetName"/>
+        <result column="serial_num" property="serialNum"/>
+        <result column="qr_code" property="qrCode"/>
+        <result column="function_type" property="functionType"/>
+    </resultMap>
+
+    <select id="selectAssetBlob" resultMap="blobBean">
+        SELECT o.id, o.bo_sub_type, o.object_name, o.ext_link, o.object_storage_id, a.name as assetName, a.serial_num, a.qr_code, a.function_type
+        FROM v2_blob_object o join asset_info a on o.bo_uuid = a.uid and o.bo_type = 'AssetInfo'
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+</mapper>

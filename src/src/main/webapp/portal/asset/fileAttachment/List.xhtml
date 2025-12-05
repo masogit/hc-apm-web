@@ -41,17 +41,17 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.name}"/>
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serialNum}"/>
                         </p:column>
-                        <p:column headerText="#{msg.qrCode}" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        <p:column headerText="#{msg.qrCode}" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
                         </p:column>
-                        <p:column headerText="设备型号" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.functionType}"/>
+                        <p:column headerText="设备型号" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
                         </p:column>
                         <p:column rendered="#{!userContextService.hasCurrentTenantName('')}" headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="EQ">
                             <h:outputText value="#{assetFileAttachmentController.getAttachmentType(item.boSubType)}"/>
