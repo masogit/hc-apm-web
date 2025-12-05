@@ -32,6 +32,8 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -251,24 +253,36 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         currentPageAssets.forEach(item -> selectedMap.put(item.getUid(), !isSelectedAll));
     }
 
+    @Getter @Setter
+    private List<AssetInfo> bathRepairAsset;
+
     public void setSelectedAssetsUuids() {
         flag=true;
-        List<String> selectedAssetUuids = selectedMap.keySet().stream().filter(assetUid -> Boolean.TRUE.equals(selectedMap.get(assetUid))).collect(Collectors.toList());
-        currentPageAssets = selectedAssetUuids.isEmpty() && currentPageAssets==null ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(selectedAssetUuids);
-        if (currentPageAssets.isEmpty()) {
+        List<String> selectedBoUuids = selectedMap.keySet().stream().filter(assetUid -> Boolean.TRUE.equals(selectedMap.get(assetUid))).collect(Collectors.toList());
+        List<String> assetUidList = currentPageAssets.stream().filter(asset -> selectedBoUuids.contains(asset.getBoUuid())).map(AssetInfo::getUid).collect(Collectors.toList());
+        bathRepairAsset = selectedBoUuids.isEmpty() && currentPageAssets==null ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(assetUidList);
+        if (bathRepairAsset.isEmpty()) {
             WebUtil.addErrorMessage("请选择设备,暂不支持报修");
             flag = false;
             return;
         }
-        for (AssetInfo assetInfo: currentPageAssets) {
-            List<MeasuringCertificateDetail>  certificateDetails = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(assetInfo.getUid());
-            if (ObjectUtil.isEmpty(certificateDetails) || 2 == certificateDetails.get(0).getStatus()) {
+        for (String selectedBoUuid : selectedBoUuids) {
+            MeasuringCertificateDetail certificateDetail = measuringCertificateDetailDao.findById(selectedBoUuid);
+            if (ObjectUtil.isEmpty(certificateDetail) || 2 != certificateDetail.getStatus()) {
                 WebUtil.addErrorMessage("有设备检定结论,不符合要求,暂不支持报修");
                 flag = false;
                 return;
             }
         }
-        WorkOrderMgrController.assetInfos = currentPageAssets;
+        WorkOrderMgrController.assetInfos = bathRepairAsset;
+    }
+
+    public boolean judgeMeasurementRepair(){
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
+        if (woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair()) {
+            return true;
+        }
+        return false;
     }
 
     public List<MeasuringCertificateDetail> getMeasuringResult(){

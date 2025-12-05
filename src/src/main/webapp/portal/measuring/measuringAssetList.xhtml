@@ -23,7 +23,7 @@
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                     <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                     <p:column width="36"  id="checkBoxColumn" exportable="false">
-                        <p:selectBooleanCheckbox value="#{measureAssetListController.selectedMap[item.uid]}"  class="selectCheckBox">
+                        <p:selectBooleanCheckbox value="#{measureAssetListController.selectedMap[item.boUuid]}"  class="selectCheckBox">
                             <p:ajax  process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
                         <f:facet name="header"  >
@@ -119,7 +119,7 @@
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" action="#{measuringCertificateDetailController.createAction()}" title="#{msg.Create}" />
-                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUuids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修"/>
+                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUuids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
                         <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm" disabled="#{empty measureAssetListController.selected}" >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
@@ -137,7 +137,7 @@
             <p:dialog id="BatchRepairDlg" widgetVar="BatchRepairDialog" modal="true" resizable="true" draggable="true" width="1050"
                       height="600" header="批量报修设备">
                 <h:form id="BatchRepairForm">
-                    <p:dataTable id="nodeInfoList" value="#{measureAssetListController.currentPageAssets}" var="item"
+                    <p:dataTable id="nodeInfoList" value="#{measureAssetListController.bathRepairAsset}" var="item"
                                      lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
                                      emptyMessage="#{msg.noRecordFound}">
 
