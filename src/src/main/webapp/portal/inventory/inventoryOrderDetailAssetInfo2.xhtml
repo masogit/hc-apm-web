@@ -66,7 +66,7 @@
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		<p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" >
+		<p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.assetInfo.lastModifiedBy}" filterMatchMode="LIKE" >
             <h:outputText value="#{inventoryOrderDetailAssetInfoController2.getUserName(item.lastModifiedBy)}"/>
 		</p:column>
 		<p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">

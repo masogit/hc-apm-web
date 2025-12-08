@@ -83,7 +83,7 @@
 			</f:facet>
 			<h:outputText value="#{item.isSolved?msg.True2Yes:msg.False2No}" />
 		</p:column>
-		<p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+		<p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.assetInfo.lastModifiedBy}" filterMatchMode="LIKE">
 			<h:outputText value="#{inventoryOrderDetailAssetInfoAllController.getUserName(item.lastModifiedBy)}"/>
 		</p:column>
 		<p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
@@ -143,9 +143,9 @@
 				</p:selectOneRadio>
 			</h:panelGroup>
 		</p:panelGrid>
-		<p:commandButton validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoIssueController.save}" value="#{msg.Save}" update="@(.datalist) :growl,
+		<p:commandButton validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoIssueController.save}" value="#{msg.Save}" update="@(.datalist4) :growl,
 		inventoryOrderDetailAssetInfoTab:OrderIssueEditDlg,
-		inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoIssueListForm"
+		inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoIssueListForm" oncomplete="handleSubmit(args, 'OrderIssueEditDlg');"
 						 icon="ui-icon-check" />
 		<p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('OrderIssueEditDlg').hide()"/>
 	</h:form>
