@@ -144,13 +144,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
         Wrapper<AssetInfo> wrapper = convert();
         Sort sort = pageRequest.getSort();
+        boolean orderByCheckDate = false;
         for (Sort.Order order : sort) {
             Sort.Direction direction = order.getDirection();
             String property = ZipUtil.camelToUnderline(order.getProperty());
             String prefix = "check_date".equals(property) ? "mcd." : "ai.";
             wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
         }
-        wrapper.orderBy("mcd.check_date", false);
+        wrapper.orderBy("mcd.id");
         currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
     }
