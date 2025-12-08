@@ -28,7 +28,7 @@
                         </p:selectBooleanCheckbox>
                         <f:facet name="header"  >
                             <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                <p:ajax listener="#{measureAssetListController.onSelectAllOfPage()}" update="@(.selectCheckBox) measuringTab:measuringAssetListForm:datalist_measuringAsset " oncomplete="updateSelectAllCheckBox();"/>
+                                <p:ajax listener="#{measureAssetListController.onSelectAllOfPage()}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
