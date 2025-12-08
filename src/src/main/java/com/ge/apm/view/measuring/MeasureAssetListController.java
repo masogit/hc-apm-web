@@ -249,8 +249,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll = currentPageAssets.stream().noneMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
-        currentPageAssets.forEach(item -> selectedMap.put(item.getUid(), !isSelectedAll));
+        boolean isSelectedAll = currentPageAssets.stream().noneMatch(item -> !selectedMap.containsKey(item.getBoUuid()) || !selectedMap.get(item.getBoUuid()));
+        currentPageAssets.forEach(item -> selectedMap.put(item.getBoUuid(), !isSelectedAll));
     }
 
     @Getter @Setter
