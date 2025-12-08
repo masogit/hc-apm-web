@@ -156,11 +156,11 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         }
         String value = null;
         for (SearchFilter searchFilter :searchFilters) {
-            if ("lastModifiedBy".equals(searchFilter.fieldName)) {
+            if ("assetInfo.lastModifiedBy".equals(searchFilter.fieldName)) {
                 value = (String)searchFilter.value;
             }
         }
-        if(searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"))){
+        if(searchFilters.removeIf(e -> e.fieldName.equals("assetInfo.lastModifiedBy"))){
             List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(user.getTenantUID(), value);
             List<String> loginNamList = new ArrayList<>();
             if(!userAccountList.isEmpty()){
