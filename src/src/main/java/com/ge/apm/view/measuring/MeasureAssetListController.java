@@ -144,7 +144,6 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
         Wrapper<AssetInfo> wrapper = convert();
         Sort sort = pageRequest.getSort();
-        boolean orderByCheckDate = false;
         for (Sort.Order order : sort) {
             Sort.Direction direction = order.getDirection();
             String property = ZipUtil.camelToUnderline(order.getProperty());
