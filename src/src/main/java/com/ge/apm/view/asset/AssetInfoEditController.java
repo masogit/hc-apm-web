@@ -1,35 +1,36 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.domain.dto.SelectItemDto;
-import com.ge.apm.domain.pure.CustomConfigAssetField;
-import com.ge.apm.service.approval.WxMessageService;
-import com.ge.apm.service.remote.MasterDataService;
-import com.ge.apm.service.wo.V2_WorkOrderService;
-import com.ge.apm.service.wo.WorkflowService;
-import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
-import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
-import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
-import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.SelectItemDto;
+import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.*;
+import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -49,8 +50,14 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import sun.misc.BASE64Decoder;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -60,14 +67,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -137,11 +143,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter @Setter
     private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
 
+    @Getter @Setter
+    private EquipmentNameplate equipmentNameplate;
+
+    private RestTemplate restTemplate;
+
+    private MicroServiceUtil microServiceUtil;
+
     public List<BuildManagement> getManagementList() {
         return managementList;
     }
 
-
+    private FileDownloadService fileDownloadService;
     public List<String> managementListString(String query) {
         if(CollectionUtils.isNotEmpty(managementList)){
             List<String> list = managementList.stream().map(BuildManagement::getName).filter(item->item.contains(query)).collect(Collectors.toList());
@@ -381,6 +394,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
         nurseSiteMaintainRepository = WebUtil.getBean(NurseSiteMaintainRepository.class);
         masterDataService = WebUtil.getBean(MasterDataService.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        restTemplate = WebUtil.getBean(RestTemplate.class);
+        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -2660,5 +2676,75 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectItemDto(SelectItemDto selectItemDto) {
         this.selectItemDto = selectItemDto;
+    }
+
+
+    public void  plateRecognition(String objectId){
+        try {
+            String token = UserContextService.getAccessToken();
+            String gatewayURL = microServiceUtil.getGatewayURL(GatewayURL.PLATE_RECOGNITION);
+            gatewayURL = gatewayURL.replace("{objectId}", objectId);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", token);
+            HttpEntity<Map> requestEntity = new HttpEntity<Map>(headers);
+            ResponseEntity<JSONObject> response = restTemplate.exchange(gatewayURL, HttpMethod.GET, requestEntity, JSONObject.class);
+            if(response.getStatusCode().is2xxSuccessful()){
+                JSONObject body = response.getBody();
+                JSONObject data = body.getJSONObject("data");
+                equipmentNameplate = data.toJavaObject(EquipmentNameplate.class);
+            }
+        } catch (RestClientException e) {
+            equipmentNameplate = new EquipmentNameplate();
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void applyResult(){
+        String deviceName = equipmentNameplate.getDevice_name();
+        if(StringUtils.isNotEmpty(deviceName)){
+            this.selected.setName(deviceName);
+        }
+
+        String financingNum = equipmentNameplate.getPattern();
+        if(StringUtils.isNotEmpty(financingNum)){
+            this.selected.setFinancingNum(financingNum);
+        }
+
+        String serialNum = equipmentNameplate.getSerial_num();
+        if(StringUtils.isNotEmpty(serialNum)){
+            this.selected.setSerialNum(serialNum);
+        }
+
+        String manufactory = equipmentNameplate.getManufactory();
+        if(StringUtils.isNotEmpty(manufactory)){
+            this.selected.setManufacture(manufactory);
+        }
+
+        String registryNum = equipmentNameplate.getRegistry_num();
+        if(StringUtils.isNotEmpty(registryNum)){
+            this.selected.setRegistrationNo(registryNum);
+        }
+
+        String usingYear = equipmentNameplate.getUsing_year();
+        if(StringUtils.isNotEmpty(usingYear)){
+            try {
+                Pattern pattern = Pattern.compile("(?:\\d+\\.?\\d*|\\.\\d+)");
+                Matcher matcher = pattern.matcher(usingYear);
+                StringBuffer buffer = new StringBuffer();
+                while (matcher.find()){
+                    buffer.append(matcher.group());
+                }
+                this.selected.setLifecycleInYear(Double.valueOf(buffer.toString()));
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Date factoryDate = equipmentNameplate.getFactory_date();
+        if(factoryDate != null){
+            this.selected.setManufactDate(factoryDate);
+        }
+        equipmentNameplate = null;
+
     }
 }

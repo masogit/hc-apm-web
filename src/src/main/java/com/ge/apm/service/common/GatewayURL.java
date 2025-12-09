@@ -237,6 +237,7 @@ public enum GatewayURL {
 
     // site to site auto ack
     SITE_TO_SITE_AUTO_ACK("/hcapmworkflowservice/api/apm/siteToSiteAllocation/autoAck"),
+    PLATE_RECOGNITION("/hcapmassetservice/api/apm/asset/assetinfos/plateRecognition/{objectId}"),
     ;
     private final String url;
 
