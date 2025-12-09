@@ -1,0 +1,349 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript">
+        </script>
+        <style>
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.assetImportantIntegrityAnalysis}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="4" style="width: 40%">
+                        <h:panelGroup>
+                            <label class="label">#{msg.AllHospitals}</label>
+                            <p:selectOneMenu value="#{assetImportantController.selectSite}">
+                                <p:ajax update=":assetImportantForm :searchForm:clinicalDeptName :searchForm:assetOwnerName :assetImportantRateForm" listener="#{assetImportantController.siteChangeEvent()}"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetImportantController.siteList}" var="item"
+                                               itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.clinicalDeptName}</label>
+                            <p:selectOneMenu id = "clinicalDeptName" value="#{assetImportantController.filterClinicalDeptOrg}" >
+                                <p:ajax update=":assetImportantForm :assetImportantRateForm" listener="#{assetImportantController.changeDeptListener}"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetImportantController.clinicalDeptList}" var="item"
+                                               itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetImportantIsNullSearch}</label>
+                            <p:selectOneMenu value="#{assetImportantController.importantIsNull}" >
+                                <p:ajax update=":assetImportantForm" listener="#{assetImportantController.changeListener}"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetImportantController.customConfig.getAssetsImportantFields()}" var="item"
+                                               itemLabel="#{assetImportantController.findI18nByKey(item)}" itemValue="#{item}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetOwnerName}</label>
+                            <p:selectOneMenu id = "assetOwnerName" value="#{assetImportantController.selectAssetOwner}" >
+                                <p:ajax update=":assetImportantForm" listener="#{assetImportantController.changeListener}"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetImportantController.assetOwnerList}" var="item"
+                                               itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
+                <h:form id="assetImportantRateForm">
+                    <p:dataTable id="importantFieldRateTable" value="#{assetImportantController.singleRow}"
+                        var="dummy"
+                        widgetVar="varImportantFieldRateTable"
+                        paginator="false">
+                        <p:columns value="#{assetImportantController.fieldFillRateList}" var="r">
+                            <f:facet name="header">
+                                <h:outputText value="#{assetImportantController.findI18nByKey(r.key)}"/>
+                            </f:facet>
+                            <h:panelGroup layout="block" style="text-align:center">
+                                <!-- 填写率 -->
+                                <h:outputText value="#{r.value.fillRate}">
+                                    <f:convertNumber type="percent" maxFractionDigits="2"/>
+                                </h:outputText>
+                            </h:panelGroup>
+                        </p:columns>
+                    </p:dataTable>
+                </h:form>
+                <h:form id="assetImportantForm">
+                    <p:dataTable id="datalist" value="#{assetImportantController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" scrollable="false"
+                                 selection="#{assetImportantController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{assetImportantController.onFilter}"
+                                oncomplete="updateSelectAllCheckBox();" update="searchForm"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:column id="checkBoxColumn" width="49" exportable="false">
+                            <p:selectBooleanCheckbox value="#{assetImportantController.selectedMap[item.id]}"
+                                                     class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated) :assetImportantForm:datalist "
+                                        listener="#{assetImportantController.onSelectOfPage}"
+                                        oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{assetImportantController.onSelectAllOfPage}"
+                                            update=" :assetImportantForm:datalist "
+                                            oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="操 作" exportable="false" width="49">
+                            <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
+                                <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                            </p:link>
+                        </p:column>
+                        <!-- 资产名称 -->
+                        <p:column headerText="#{msg.assetName}" width="100" filterBy="#{item.assetName}">
+                            <h:outputText value="#{empty item.name ? item.assetName : item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetOwnerName}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('assetOwnerName')}">
+                            <h:outputText value="#{item.assetOwnerName}" />
+                        </p:column>
+                        <!-- 设备编号 -->
+                        <p:column headerText="#{msg.departNum}" width="125"
+                                  rendered="#{currentCustomConfigController.showImportantField('departNum')}">
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <!-- 所属部门 -->
+                        <p:column headerText="#{msg.clinicalDeptName}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('clinicalDeptName')}">
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                        <!-- 使用部门 -->
+                        <p:column headerText="#{msg.assetDeptName}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('assetDeptName')}">
+                            <h:outputText value="#{item.assetDeptName}"/>
+                        </p:column>
+                        <!-- 使用人 -->
+                        <p:column headerText="#{msg.clinicalOwnerName}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('clinicalOwnerName')}">
+                            <h:outputText value="#{item.clinicalOwnerName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.manufacture}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('manufacture')}">
+                            <h:outputText value="#{item.manufacture}" />
+                        </p:column>
+                        <p:column headerText="#{msg.makerShortName}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('makerShortName')}">
+                            <h:outputText value="#{item.makerShortName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.registrationNo}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('registrationNo')}">
+                            <h:outputText value="#{item.registrationNo}" />
+                        </p:column>
+                        <p:column headerText="#{msg.vendor}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('vendor')}">
+                            <h:outputText value="#{item.vendor}" />
+                        </p:column>
+                        <p:column headerText="#{msg.functionGroup}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('functionGroup')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType', item.functionGroup)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.assetCode68}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('assetCode68')}">
+                            <h:outputText value="#{fieldMsg.fieldValue(item.functionGroup, item.assetCode68)}" />
+                        </p:column>
+                        <!-- 设备型号 -->
+                        <p:column headerText="#{msg.functionType}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('functionType')}">
+                            <h:outputText value="#{item.functionType}" />
+                        </p:column>
+                        <p:column headerText="#{msg.serialNum}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('serialNum')}">
+                            <h:outputText value="#{item.serialNum}" />
+                        </p:column>
+                        <!-- 采购原值 -->
+                        <p:column headerText="#{msg.purchasePrice}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('purchasePrice')}">
+                            <h:outputText value="#{item.purchasePrice}" />
+                        </p:column>
+                        <p:column headerText="#{msg.lifecycle}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('lifecycle')}">
+                            <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.manufactDate}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('manufactDate')}">
+                            <h:outputText value="#{item.manufactDate}" />
+                        </p:column>
+                        <!-- 启用日期 -->
+                        <p:column headerText="#{msg.installDate}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('installDate')}">
+                            <h:outputText value="#{item.installDate}" />
+                        </p:column>
+                        <p:column headerText="#{msg.factoryWarrantyDate}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('factoryWarrantyDate')}">
+                            <h:outputText value="#{item.factoryWarrantyDate}" />
+                        </p:column>
+                        <!-- 安装位置 -->
+                        <p:column headerText="#{msg.locationName}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('locationName')}">
+                            <h:outputText value="#{item.locationName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.assetUsage}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('assetUsage')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.capitalSource}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('capitalSource')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.measureGrade}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('measureGrade')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.riskGrade}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('riskGrade')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.emergencyEquipment}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('emergencyEquipment')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.importEquipment}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('importEquipment')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.systemNum4}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('systemNum4')}">
+                            <h:outputText value="#{item.systemNum4}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.medicalApparatusClassification}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('medicalApparatusClassification')}">
+                            <h:outputText value="#{item.medicalApparatusClassification}" />
+                        </p:column>
+                        <!-- 资产状态 -->
+                        <p:column headerText="#{msg.deviceStatus}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('deviceStatus')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('deviceStatus', item.deviceStatus)}" />
+                        </p:column>
+                        <!-- 当前状态 -->
+                        <p:column headerText="#{msg.status}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('status')}">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetStatus', item.status)}" />
+                        </p:column>
+                        <!-- 在用? -->
+                        <p:column headerText="#{msg.isValid}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('isValid')}">
+                            <h:outputText value="#{item.isValid?'是':'否'}" />
+                        </p:column>
+                        <!-- 资产处置结果-->
+                        <p:column headerText="#{msg.assetDisposalResults}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('assetDisposalResults')}">
+                            <h:outputText value="#{item.assetDisposalResults}" />
+                        </p:column>
+                        <!-- 采购日期 -->
+                        <p:column headerText="#{msg.purchaseDate}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('purchaseDate')}">
+                            <h:outputText value="#{item.purchaseDate}" />
+                        </p:column>
+                        <!-- 二维码 -->
+                        <p:column headerText="#{msg.qrCode}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('qrCode')}">
+                            <h:outputText value="#{item.qrCode}" />
+                        </p:column>
+                        <p:column headerText="#{msg.spare06}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('spare06')}">
+                            <h:outputText value="#{item.spare06}" />
+                        </p:column>
+                        <p:column headerText="#{msg.spare07}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('spare07')}">
+                            <h:outputText value="#{item.spare07}" />
+                        </p:column>
+                        <p:column headerText="#{msg.spare08}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('spare08')}">
+                            <h:outputText value="#{item.spare08}" />
+                        </p:column>
+                        <p:column headerText="#{msg.spare09}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('spare09')}">
+                            <h:outputText value="#{item.spare09}" />
+                        </p:column>
+                        <p:column headerText="#{msg.spare10}" width="130"
+                                  rendered="#{currentCustomConfigController.showImportantField('spare10')}">
+                            <h:outputText value="#{item.spare10}" />
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.BatchModify}" update="batchEditBeforeForm" actionListener="#{assetImportantController.batchEditUsageDateBefore()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" oncomplete="PF('batchEditBeforeDialog').show()"/>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:remoteCommand name="rc"
+                                     update=":assetImportantForm:datalist datalist:editButton"
+                                     immediate="true"/>
+                </h:form>
+            </div>
+        </div>
+        <p:dialog  id="batchEditBeforeDialog" widgetVar="batchEditBeforeDialog"  modal="true" resizable="true" draggable="true" width="30%" height="200px" header="#{msg.batchEditAssets}">
+            <h:form id="batchEditBeforeForm" class="bcls">
+                <p:panelGrid id ="batchEditUsage" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <h1 class="m-0">#{msg.batchEditAffectedDevices} <span style="color: red">#{assetImportantController.batchModifyCount}</span> #{msg.devices}</h1>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{assetImportantController.navigateTo()}" value="#{msg.ok}" onclick="" icon="ui-icon-check"  />
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('batchEditBeforeDialog').hide()"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <script>
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+
+
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#assetImportantForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>
