@@ -17,6 +17,7 @@ import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -599,6 +600,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     public void exportExcel() throws IOException {
 
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        insertCrossSiteColumns(exportFields);
+
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
@@ -610,6 +613,14 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        List<String> assetSheetHeads = template.getAssetSheetHead();
+        if(CollectionUtils.isNotEmpty(assetSheetHeads)){
+            List<String> finalExportFields = exportFields;
+            exportFields= assetSheetHeads.stream().filter(finalExportFields::contains).collect(Collectors.toList());
+            if(!exportFields.contains("UUID")){
+                exportFields.add("UUID");
+            }
+        }
         template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -617,6 +628,17 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
 
+    private void insertCrossSiteColumns(List<String> exportFields) {
+        String hospitalColumn = WebUtil.getMessage("hospitalId");
+        int siteIndex = exportFields.indexOf(hospitalColumn);
+        if (siteIndex == -1){
+            return;
+        }
+        // 增加医院列
+        exportFields.add(siteIndex, WebUtil.getMessage("Hospital"));
+        // 增加集团列
+        exportFields.add(exportFields.size(), WebUtil.getMessage("Institution"));
+    }
     public boolean isChecked() {
         return selectedMap.containsValue(true);
     }

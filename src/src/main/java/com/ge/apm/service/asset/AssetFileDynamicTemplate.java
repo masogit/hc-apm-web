@@ -535,7 +535,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         for (AssetInfo assetInfo : assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites, this, assetDao, orgDao, supplierDao, userDao, authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap1(MapUtil.newHashMap(),flag, assetMap, parentAssets, supliers, encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -681,6 +681,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             logger.info("export clinical dept list");
             writeClinicalDeptList(clinicalDeptList);
         }
+        writeI18nMessage(spare01List);
         Map encodedToAssetTypeGroupPath = new HashMap<>();;
         Map listSysAuthGroupNamePathInHierarchyMap = new HashMap<>();;
         List<Object> assetTypeGroupPaths = assetTypeGroupRepository.flatternHierarchy();
