@@ -61,6 +61,15 @@
                                 <p:outputLabel></p:outputLabel>
                                 <p:outputLabel></p:outputLabel>
                                 <p:selectBooleanCheckbox
+                                        value="#{featureSettingController.tenantFeatureMap['ASSET_INFO_IMPORTANT_FIELD']}"
+                                        itemLabel="台账重要字段完整性分析">
+                                    <p:ajax update="assetGroup"
+                                            listener="#{featureSettingController.featureChange('ASSET_INFO_IMPORTANT_FIELD')}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel>台账重要字段完整性分析菜单</p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                                <p:selectBooleanCheckbox
                                         value="#{featureSettingController.tenantFeatureMap['ASSET_BATCH_MODIFY']}"
                                         itemLabel="资产转科管理">
                                     <p:ajax update="assetGroup"

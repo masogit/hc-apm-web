@@ -4347,5 +4347,20 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void setDisplayModeCasePriority(String displayModeCasePriority) {
         this.displayModeCasePriority = displayModeCasePriority;
     }
+
+    public String setDataLinkUrl(String name, String assetUid){
+        if(StringUtils.isEmpty(assetUid)) return "";
+        String encodeUrlQueryString = "actionName=View&selectedid="
+                + assetUid
+                + "&asset_name=" + name
+                + "&terminate=" + this.terminate;
+        encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+        // 使用 JSF 获取 contextPath
+        String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+        // 返回绝对路径
+        String url = contextPath + "/portal/asset/info/AssetDetail.xhtml?str=" + encodeUrlQueryString;
+        System.out.println(url);
+        return url;
+    }
 }
 
