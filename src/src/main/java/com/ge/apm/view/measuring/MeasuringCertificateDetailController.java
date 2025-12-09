@@ -17,6 +17,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.llm.ApplicationType;
+import com.ge.healthcare.cn.common.llm.Result;
 import com.ge.healthcare.cn.common.llm.WorkflowResponse;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -124,7 +125,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 if("ok".equalsIgnoreCase(bizStatusCode)){
                     JSONObject data = jsonObject.getJSONObject("data");
                     WorkflowResponse workflowResponse = data.toJavaObject(WorkflowResponse.class);
-                    WorkflowResponse.Result result = workflowResponse.getData();
+                    Result result = workflowResponse.getData();
                     JSONObject outputs = result.getOutputs();
                     JSONObject output = outputs.getJSONObject("output");
                     JSONObject content = output.getJSONObject("content");
