@@ -649,11 +649,11 @@ public class PmReportService {
                     try {
                         V2_PmOrder v2PmOrder = pmOrderService.findById(id);
                         List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
-                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
-                            byBoUuid = byBoUuid.stream()
-                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
-                                    .collect(Collectors.toList());
-                        }
+//                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
+//                            byBoUuid = byBoUuid.stream()
+//                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
+//                                    .collect(Collectors.toList());
+//                        }
                         for (V2_BlobObject v2BlobObject : byBoUuid) {
                             String vname = v2BlobObject.getObjectName();
                             zout.putNextEntry(new ZipEntry(vname));
