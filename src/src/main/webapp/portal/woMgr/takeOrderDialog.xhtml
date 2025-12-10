@@ -17,11 +17,11 @@
                     </h:panelGroup>
                  <br/>
                 <h:panelGroup>
-                        <label class="label">#{msg.repairType}</label>
-                        <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.repairType}" required="true" requiredMessage="#{msg.repairType} #{msg.ValidationRequire}" rendered="#{!userContextService.isCountyArea()}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('repairType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
+                    <label class="label">#{msg.repairType}</label>
+                    <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.repairType}" required="true" requiredMessage="#{msg.repairType} #{msg.ValidationRequire}" rendered="#{!userContextService.isCountyArea()}">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('repairType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
                     <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.repairType}" required="true" requiredMessage="#{msg.repairType} #{msg.ValidationRequire}" rendered="#{userContextService.isCountyArea()}">
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('repairTypeCountyArea')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
