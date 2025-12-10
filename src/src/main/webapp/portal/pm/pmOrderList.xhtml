@@ -246,7 +246,7 @@
                         <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_DISPATCH')}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">
+                        <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{v2PmOrderController.isBatchTakePm() or !userContextService.isEnableBtnByKey('disableBatchAcceptOrder')}"  oncomplete="PF('takeOrderDialog').show()">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-arrow-forward" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchReassign}"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
