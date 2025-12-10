@@ -153,10 +153,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
     }
 
     public String findI18nByKey(String key) {
-        if (StringUtils.hasText(key)) {
-            return Optional.ofNullable(I18dao.findValueZHByKey(key)).orElse(key);
-        }
-        return null;
+        return WebUtil.getMessage(key);
     }
 
     public String getSelectSite() {
