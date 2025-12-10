@@ -114,7 +114,7 @@
                             </p:link>
                         </p:column>
                         <!-- 资产名称 -->
-                        <p:column headerText="#{msg.assetName}" width="100" filterBy="#{item.assetName}">
+                        <p:column headerText="#{msg.assetName}" width="100" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{empty item.name ? item.assetName : item.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.assetOwnerName}" width="130"
@@ -141,7 +141,7 @@
                                   rendered="#{currentCustomConfigController.showImportantField('clinicalOwnerName')}">
                             <h:outputText value="#{item.clinicalOwnerName}" />
                         </p:column>
-                        <p:column headerText="#{msg.manufacture}" width="130"
+                        <p:column headerText="#{msg.manufacture}" width="130" filterBy="#{item.manufacture}" filterMatchMode="LIKE"
                                   rendered="#{currentCustomConfigController.showImportantField('manufacture')}">
                             <h:outputText value="#{item.manufacture}" />
                         </p:column>
