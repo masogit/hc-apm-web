@@ -33,8 +33,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.ge.apm.domain.V2_BlobObject.BO_TYPE_TRAIN_DETAIL;
-import static com.ge.apm.domain.V2_BlobObject.BO_TYPE_TRAIN_RESULT;
+import static com.ge.apm.domain.V2_BlobObject.*;
 
 @Service
 public class TrainManageService extends MicroServiceInvoker {
@@ -218,7 +217,7 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     @Transactional
-    public List<TrainDetail> saveDetail(TrainDetail trainDetail,String detailActionName, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, List<V2_BlobObject> resultBlobObjectList){
+    public List<TrainDetail> saveDetail(TrainDetail trainDetail,String detailActionName, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, List<V2_BlobObject> resultBlobObjectList, List<TrainDetailSign> trainDetailSignList){
         if("Create".equals(detailActionName)){
             trainDetail.setCreatedDate(new Date());
         }else{
@@ -236,6 +235,16 @@ public class TrainManageService extends MicroServiceInvoker {
             if(StrUtil.isEmpty(blobObject.getBoUuid())){
                 blobObject.setBoUuid(trainDetail.getId());
                 blobObjectRepository.save(blobObject);
+            }
+        }
+        //签到信息
+       if(CollectionUtils.isNotEmpty(trainDetailSignList)){
+            for (TrainDetailSign trainDetailSign : trainDetailSignList){
+                // 检查 TrainDetailSign 对象的 id 是否为空
+                if(StrUtil.isEmpty(trainDetailSign.getId())){
+                    trainDetailSign.setDetailId(trainDetail.getId());
+                    initAndSaveTrainDetailSign(trainDetailSign);
+                }
             }
         }
 
@@ -333,19 +342,20 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     public List<V2_BlobObject> queryResultBlobByDetailId(String detailId){
-        return blobObjectRepository.fetchBlobObjectByUuidAndType(detailId, BO_TYPE_TRAIN_RESULT);
+        return blobObjectRepository.fetchBlobObjectByUuidAndType(detailId, BO_TYPE_TRAIN_SIGN_FILE);
     }
 
     public void removeBlob(V2_BlobObject v2BlobObject){
         blobFileService.deleteBlobFile(v2BlobObject);
     }
 
-    public V2_BlobObject handleFileUpload(FileUploadEvent event, String boType){
+    public V2_BlobObject handleFileUpload(FileUploadEvent event, String boType, String subBoType){
         V2_BlobObject v2_blobObject = blobFileService.uploadFile(event);
         if (null != v2_blobObject) {
             v2_blobObject.setBoType(boType);
             //v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_TRAIN_DETAIL);
             v2_blobObject.setBoSubType(boType);
+            v2_blobObject.setBoSubType(subBoType);
             v2_blobObject.setBoUuid(null);
             WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -381,18 +391,19 @@ public class TrainManageService extends MicroServiceInvoker {
         if(existSign != null){
             return;
         }
-        if(StrUtil.isEmpty(trainDetailSign.getId())){
-            Object index = trainDetailSignRepository.queryMaxOrderByDetailId(trainDetailSign.getDetailId());
-            if(index != null){
-                int i = Integer.parseInt(index.toString());
-                i++;
-                trainDetailSign.setSignOrder(i);
-            }else{
-                trainDetailSign.setSignOrder(1);
-            }
-        }
+       initAndSaveTrainDetailSign(trainDetailSign);
+    }
+
+    /**
+     * 初始化并保存培训详情签到信息
+     * @param trainDetailSign 需要初始化和保存的培训详情签到对象
+     */
+    private void initAndSaveTrainDetailSign(TrainDetailSign trainDetailSign) {
+
+        // 保存 TrainDetailSign 对象到数据库
         trainDetailSignRepository.save(trainDetailSign);
     }
+
 
     public void deleteSign(TrainDetailSign trainDetailSign){
         trainDetailSignRepository.delete(trainDetailSign);
