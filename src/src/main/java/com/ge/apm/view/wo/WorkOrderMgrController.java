@@ -309,6 +309,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     boolean showLocationNameFlag;
     @Getter @Setter
     boolean enableSignNeedScanQrCode;
+    @Getter
+    private boolean workOrderShowTravelTime=false;
     @Getter @Setter
     private OrgInfo currentUserOrgInfo;
     @Getter @Setter
@@ -393,6 +395,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
                 viewIng = true;
                 onSelectWorkOrder();
+                String workOrderShowTravelTimeStr = configItemValueRepository.findByKeyAndSiteForUseParent(selected.getAssetInfo().getSiteUID(),selected.getAssetInfo().getHospitalUID(), selected.getAssetInfo().getInstitutionUID(), selected.getAssetInfo().getTenantUID(), "workOrderShowTravelTime");
+                workOrderShowTravelTime = StrUtil.isNotEmpty(workOrderShowTravelTimeStr) && "true".equals(workOrderShowTravelTimeStr);
             } else {
                 if (!Strings.isNullOrEmpty(queryAssetUID_href)) {
                     queryAssetUid = queryAssetUID_href;
@@ -1618,6 +1622,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
         workHoursConfig();
+        String workOrderShowTravelTimeStr = configItemValueRepository.findByKeyAndSiteForUseParent(selectedWorkOrder.getAssetInfo().getSiteUID(),selectedWorkOrder.getAssetInfo().getHospitalUID(), selectedWorkOrder.getAssetInfo().getInstitutionUID(), selectedWorkOrder.getAssetInfo().getTenantUID(), "workOrderShowTravelTime");
+        workOrderShowTravelTime = StrUtil.isNotEmpty(workOrderShowTravelTimeStr) && "true".equals(workOrderShowTravelTimeStr);
     }
 
     private void workHoursConfig() {

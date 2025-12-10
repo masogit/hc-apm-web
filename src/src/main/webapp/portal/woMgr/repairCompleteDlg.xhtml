@@ -362,7 +362,7 @@
                                 </p:column>
                             </p:dataTable>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!userContextService.isEnableBtnByKey('workOrderShowTravelTime')}">
+                        <h:panelGroup rendered="#{workOrderMgrController.workOrderShowTravelTime}">
                             <label class="label">#{msg.travelTime}</label>
                             <p:inputNumber id="travel_time" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.travelTime}" >
                                 <p:ajax />
