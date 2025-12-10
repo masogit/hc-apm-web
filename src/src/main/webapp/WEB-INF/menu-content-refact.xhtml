@@ -44,7 +44,8 @@
                            <p:menuitem fragment="um090" id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_HISTORY_VIEW')}"/>
                            <p:menuitem fragment="um092" id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_VIEW')}"/>
                            <p:menuitem fragment="um094" id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EVALUATION_VIEW')}"/>
-                           <p:menuitem fragment="um095" id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_IMPORTANT_FIELD_VIEW')}"/>
+                           <p:menuitem fragment="um095" id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_MVS_DATA_IMPORT')}"/>
+                           <p:menuitem fragment="um530" id="um096" value="台账重要字段完整性分析" outcome="/portal/asset/info/AssetImportant.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_IMPORTANT_FIELD_VIEW')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'SPECIAL_ASSET'}">
@@ -281,7 +282,6 @@
                            <p:menuitem fragment="um528" id="um528" value="系统模板配置" outcome="/portal/config/sysTemplate/systemTemplate.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_SYSTEM_TEMPLATE')}"/>
                            <p:menuitem fragment="um529" id="um529" value="大屏版本管理" outcome="/portal/config/largeScreen/managementList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_NATIONAL_EXAMINATION_MANAGEMENT')}"/>
                            <p:menuitem fragment="um530" id="um530" value="OCR模板管理" outcome="/portal/ocr/templateList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MEASUREOCR_IDENTIFICATION') and userContextService.canRender('MEASUREOCR')}"/>
-                           <p:menuitem fragment="um530" id="um531" value="台账重要字段完整性分析" outcome="/portal/asset/info/AssetImportant.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_IMPORTANT_FIELD')}"/>
                        </p:submenu>
                    </c:when>
                    <!-- 效期管理 -->
