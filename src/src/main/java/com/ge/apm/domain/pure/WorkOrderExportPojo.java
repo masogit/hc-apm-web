@@ -219,7 +219,7 @@ public class WorkOrderExportPojo {
 
     private String mainSub;
 
-    private Integer  travelTime;
+    private Double  travelTime;
 
     public String getCoworkerEntryDetail() {
         return coworkerEntryDetail;
@@ -1031,11 +1031,11 @@ public class WorkOrderExportPojo {
         this.closeTime = closeTime;
     }
 
-    public Integer getTravelTime() {
+    public Double getTravelTime() {
         return travelTime;
     }
 
-    public void setTravelTime(Integer travelTime) {
+    public void setTravelTime(Double travelTime) {
         this.travelTime = travelTime;
     }
 }

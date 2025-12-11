@@ -267,7 +267,7 @@ public class PmExportFormatter<T> {
     }*/
 
 
-    public Integer getTravelTime() {
+    public Double getTravelTime() {
         return v2_pmOrder.getTravelTime();
     }
 

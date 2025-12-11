@@ -343,7 +343,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private String workOrderType;
 
     @Column(name="travel_time")
-    private Integer travelTime;
+    private Double travelTime;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -1127,11 +1127,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
         this.externalTempUser = externalTempUser;
     }
 
-    public Integer getTravelTime() {
+    public Double getTravelTime() {
         return travelTime;
     }
 
-    public void setTravelTime(Integer travelTime) {
+    public void setTravelTime(Double travelTime) {
         this.travelTime = travelTime;
     }
 }
