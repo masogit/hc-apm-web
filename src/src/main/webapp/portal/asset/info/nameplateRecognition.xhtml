@@ -16,7 +16,7 @@
                                  sortMode="single" sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rows="5" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="5">
                         <p:column headerText="#{msg.name}" >
                             <h:outputText value="#{item.objectName}"/>
@@ -92,7 +92,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.lifecycle}</label>
-                            <p:inputText id="serialNum6Old" value="#{assetInfoEditController.selected.lifecycle}" readonly="true"></p:inputText>
+                            <p:inputText id="serialNum6Old" value="#{assetInfoEditController.selected.lifecycleInYear}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.manufactDate}</label>
