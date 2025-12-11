@@ -101,8 +101,8 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
-                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trianInSiteEditController.saveData}"   icon="ui-icon-check" rendered="#{trianInSiteEditController.canEdit}"/>
-                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" action="#{trianInSiteEditController.backList}" />
+                        <p:commandButton validateClient="true" value="#{msg.save}" action="#{trianInSiteEditController.saveData}"   icon="ui-icon-check" rendered="#{trianInSiteEditController.canEdit}"/>
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Return}" icon="ui-icon-cancel" action="#{trianInSiteEditController.backList}" />
                     </h:form>
                 </p:fieldset>
             </div>
@@ -115,7 +115,7 @@
                                          lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.createdDate}"
                                          paginatorTemplate="{Toolbar}" rows="200" emptyMessage="#{msg.noRecordFound}" >
 
-                                <p:ajax event="rowSelect" update="editDetailButton deleteDetailButton qrCodeButton"/>
+                                <p:ajax event="rowSelect" update="qrCodeButton :detailEditForm" listener="#{trianInSiteEditController.prepareItemEdit}"/>
                                 <p:column headerText="培训课程子名称" width="150">
                                     <h:outputText value="#{item.name}"/>
                                 </p:column>
@@ -157,13 +157,13 @@
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">
-                                    <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareItemCreate}" update=":growl :detailEditForm"  rendered="#{trianInSiteEditController.canEdit}"/>
-                                    <p:commandButton immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{trianInSiteEditController.prepareItemEdit}" update=":growl :detailEditForm"  disabled="#{empty trianInSiteEditController.selectedTrainDetail}" rendered="#{trianInSiteEditController.canEdit}"/>
+                                    <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareItemCreate}" update=":growl :detailEditForm" />
+                                   <!-- <p:commandButton immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{trianInSiteEditController.prepareItemEdit}" update=":growl :detailEditForm"  disabled="#{empty trianInSiteEditController.selectedTrainDetail}" rendered="#{trianInSiteEditController.canEdit}"/>
                                     <p:commandButton immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteItem}" update=":growl :editDataListForm:detailDatalist editForm:trainQty" disabled="#{empty trianInSiteEditController.selectedTrainDetail}" rendered="#{trianInSiteEditController.canEdit}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{trianInSiteEditController.getDeleteConformation()}" icon="ui-icon-alert"/>
-                                    </p:commandButton>
+                                    </p:commandButton>-->
 
-                                    <p:commandButton id="qrCodeButton" immediate="false" process="@this"  icon="ui-icon-remove-red-eye" title="签到二维码" actionListener="#{trianInSiteEditController.generateQrCode()}" update=":qrCodeDlg" oncomplete="PF('qrCodeDlg').show()"  disabled="#{empty trianInSiteEditController.selectedTrainDetail or trianInSiteEditController.selectedTrainDetail.status ne 'Planned'}" rendered="#{trianInSiteEditController.canEdit}"/>
+                                    <p:commandButton id="qrCodeButton" immediate="false" process="@this"  icon="ui-icon-remove-red-eye" title="签到二维码" actionListener="#{trianInSiteEditController.generateQrCode()}" update=":qrCodeDlg" oncomplete="PF('qrCodeDlg').show()"  disabled="#{empty trianInSiteEditController.selectedTrainDetail}" />
 
                                 </f:facet>
                             </p:dataTable>

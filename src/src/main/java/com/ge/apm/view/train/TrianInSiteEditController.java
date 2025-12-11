@@ -152,6 +152,9 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         }else{
             canEdit = true;
         }
+        if (selected.getStatus().equals(TrainDetail.Status.Completed.name())) {
+            canEdit = false;
+        }
     }
 
     public void roleChange(){
@@ -206,6 +209,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         //selectedTrainDetail.setDataStatus(TrainDetail.DataStatus.Create.name());
         blobObjectList = new ArrayList<>();
         resultBlobObjectList = new ArrayList<>();
+        trainDetailSignList = new ArrayList<>();
         //selectedTrainDetail.setCreatedDate(new Date());
     }
     /**
@@ -482,7 +486,10 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         if(selectedTrainDetail == null){
             return "";
         }
-        return selectedTrainDetail.getInternalInstructors().concat(" ").concat(selectedTrainDetail.getExternalInstructors()).concat(" ").concat(selectedTrainDetail.getExternalInstructorsCompany());
+        String internalInstructors = StrUtil.isEmpty(selectedTrainDetail.getInternalInstructors()) ? "" : selectedTrainDetail.getInternalInstructors();
+        String externalInstructors = StrUtil.isEmpty(selectedTrainDetail.getExternalInstructors()) ? "" : selectedTrainDetail.getExternalInstructors();
+        String externalInstructorsCompany = StrUtil.isEmpty(selectedTrainDetail.getExternalInstructorsCompany()) ? "" : selectedTrainDetail.getExternalInstructorsCompany();
+        return internalInstructors.concat(" ").concat(externalInstructors).concat(" ").concat(externalInstructorsCompany);
     }
 
     @Override
