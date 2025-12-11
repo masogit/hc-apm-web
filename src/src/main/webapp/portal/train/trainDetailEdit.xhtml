@@ -144,10 +144,13 @@
                   </h:panelGroup>
               </p:fieldset>
               <br/>
-              <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trianInSiteEditController.saveDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-check" rendered="#{empty trianInSiteEditController.selectedTrainDetail.status or trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
+              <p:commandButton validateClient="true" value="#{msg.Save}" action="#{trianInSiteEditController.saveDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-check" rendered="#{empty trianInSiteEditController.selectedTrainDetail.status or trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
               <p:commandButton validateClient="true" value="完成" action="#{trianInSiteEditController.completeDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-repeat" rendered="#{not empty trianInSiteEditController.selectedTrainDetail.id and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}" />
+              <p:commandButton validateClient="true" value="#{msg.Delete}" action="#{trianInSiteEditController.deleteItem()}" icon="ui-icon-cancel"  update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" rendered="#{not empty trianInSiteEditController.selectedTrainDetail.id and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
+                  <p:confirm header="#{msg.DeleteConformation}" message="#{trianInSiteEditController.getDeleteConformation()}" icon="ui-icon-alert"/>
+              </p:commandButton>
 <!--              <p:commandButton validateClient="true" value="#{msg.Cancel}" icon="ui-icon-cancel" oncomplete="PF('cancelDlg').show();" update=":cancelForm  :editDataListForm:detailDatalist" rendered="#{not empty trianInSiteEditController.selectedTrainDetail.id and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>-->
-              <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back" action="#{trianInSiteEditController.backDetail}"  update=" :editDataListForm:detailDatalist :detailEditForm"/>
+<!--              <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back" action="#{trianInSiteEditController.backDetail}"  update=" :editDataListForm:detailDatalist :detailEditForm"/>-->
           </p:fieldset>
 
       </h:form>
