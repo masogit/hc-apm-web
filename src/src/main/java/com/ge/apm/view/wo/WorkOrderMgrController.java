@@ -311,6 +311,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     boolean enableSignNeedScanQrCode;
     @Getter
     private boolean workOrderShowTravelTime=false;
+    private boolean autoDispatchAllowClaimByAssignee = false;
     @Getter @Setter
     private OrgInfo currentUserOrgInfo;
     @Getter @Setter
@@ -384,6 +385,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             enableMaintenanceDate = Optional.ofNullable(enableMaintenanceDateValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
             ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("displayModeCasePriority", loginUser.getSiteUID());
             displayModeCasePriority = Optional.ofNullable(displayModeCasePriorityValue).map(ConfigItemValue::getValue).orElse("key");
+
+            ConfigItemValue autoDispatchAllowClaimByAssigneeValue = configItemValueRepository.findFirstByKeyAndSiteUid("autoDispatchAllowClaimByAssignee", loginUser.getSiteUID());
+            autoDispatchAllowClaimByAssignee = Optional.ofNullable(autoDispatchAllowClaimByAssigneeValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
             selectedBatchMap = new HashMap<>();
             currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
             enableAuditGroupConfiguration();
@@ -830,6 +834,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 //当前责任人是自己且已经派工的单子
 //                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+9*"));
 //                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
+
+
+                if(autoDispatchAllowClaimByAssignee){
+                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*3+8*"));
+                }
                 List<Integer> tagGroupAssets = getTagGroupAssets();
                 if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
