@@ -61,7 +61,7 @@ public class PmOrderActionForm {
     private String signature;
 
     Integer coworkerEntryType;
-    Integer travelTime;
+    Double travelTime;
     public Integer getCoworkerEntryType() {
         return coworkerEntryType;
     }
@@ -303,11 +303,11 @@ public class PmOrderActionForm {
         this.entryType = entryType;
     }
 
-    public Integer getTravelTime() {
+    public Double getTravelTime() {
         return travelTime;
     }
 
-    public void setTravelTime(Integer travelTime) {
+    public void setTravelTime(Double travelTime) {
         this.travelTime = travelTime;
     }
 }

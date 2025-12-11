@@ -210,7 +210,7 @@
 
                         <h:panelGroup rendered="#{!userContextService.isEnableBtnByKey('pmOrderShowTravelTime')}">
                             <label class="label">#{msg.travelTime}</label>
-                            <p:inputNumber id="travel_time" maxValue="999" value="#{v2PmOrderController.selectedPmOrder.travelTime}" >
+                            <p:inputNumber id="travel_time"  minValue="0" maxValue="999"  decimalPlaces="2" value="#{v2PmOrderController.selectedPmOrder.travelTime}" >
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>

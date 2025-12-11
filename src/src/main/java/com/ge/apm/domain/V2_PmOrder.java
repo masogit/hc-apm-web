@@ -311,7 +311,7 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
 
     @Column(name="travel_time")
-    private Integer travelTime;
+    private Double travelTime;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "pm_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
@@ -920,11 +920,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
         this.pmOrderManHoursDetails = pmOrderManHoursDetails;
     }
 
-    public Integer getTravelTime() {
+    public Double getTravelTime() {
         return travelTime;
     }
 
-    public void setTravelTime(Integer travelTime) {
+    public void setTravelTime(Double travelTime) {
         this.travelTime = travelTime;
     }
 }
