@@ -16,6 +16,7 @@ import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -95,6 +96,9 @@ public class PmReportService {
 
     @Autowired
     private V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
+
+    @Autowired
+    private ConfigCacheService cacheService;
 
     /**
      * Render Dynamic Table content.
@@ -564,7 +568,8 @@ public class PmReportService {
                 if (selected) {
                     try {
                         V2_PmOrder pmOrder = pmOrderService.findById(id);
-                        String name = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
+                        OrgInfo orgByUid = cacheService.findOrgByUid(pmOrder.getSiteUID());
+                        String name = "保养-"+orgByUid.getName()+"-"+pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
                         byte[] bytes = generate(pmOrder, activeTemplateBytes);
                         if("pdf".equalsIgnoreCase(pmOrderExportType)){
                             bytes = getPDF(bytes);
