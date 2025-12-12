@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -36,6 +37,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
     private AssetInfoRepository dao = null;
     private UaaService uaaService;
     private UserContextService userContextService;
+    private UserAccountRepository userAccountRepository;
     private CustomConfigService customConfigService;
     private I18nMessageRepository I18dao;
     private OrgInfoRepository orgDao;
@@ -77,6 +79,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         customConfigService = WebUtil.getBean(CustomConfigService.class);
         I18dao = WebUtil.getBean(I18nMessageRepository.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         this.selectedMap = new HashMap();
         loadSList();
@@ -146,7 +149,6 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
     public void siteChangeEvent() {
         this.searchFilters.clear();
         loadClinicalDeptList();
-        loadAssetOwnerList();
         loadFieldFillRate();
         filterClinicalDeptOrg = null;
         filterAssetStatus = null;
@@ -220,11 +222,8 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
     }
 
     private void loadAssetOwnerList() {
-        if (StringUtils.hasText(selectSite)) {
-            OrgInfo orgInfo = orgDao.getOrgInfoByUid(selectSite);
-            assetOwnerList = uaaService.getUsersWithAssetHeadOrStaffRole(orgInfo.getHospitalId());
-        } else {
-            assetOwnerList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(assetOwnerList)) {
+            assetOwnerList = userAccountRepository.getUsersWithAssetStaffRoleBySiteId(user.getSiteId());
         }
     }
 
