@@ -223,7 +223,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
 
     private void loadAssetOwnerList() {
         if (CollectionUtils.isEmpty(assetOwnerList)) {
-            assetOwnerList = userAccountRepository.getUsersWithAssetStaffRoleBySiteId(user.getSiteId());
+            assetOwnerList = userAccountRepository.findByTenantUIDAndStaffRole(user.getTenantUID());
         }
     }
 
