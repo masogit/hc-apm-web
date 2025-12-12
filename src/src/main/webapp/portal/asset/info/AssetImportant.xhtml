@@ -53,7 +53,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerName}</label>
-                                <p:selectOneMenu id = "assetOwnerName" value="#{assetImportantController.selectAssetOwner}" >
+                                <p:selectOneMenu id = "assetOwnerName" filter="true" filterMatchMode="contains" filterNormalize="true" value="#{assetImportantController.selectAssetOwner}" >
                                     <p:ajax update=":assetImportantForm" listener="#{assetImportantController.changeListener}"></p:ajax>
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{assetImportantController.assetOwnerList}" var="item"
