@@ -497,6 +497,14 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                         params.put("planTimeLTE", searchFilter.value);
                     }
                     break;
+                case "endTime":
+                    if (searchFilter.operator.toString().equals("GTE")){
+                        params.put("endTimeGTE", searchFilter.value);
+                    }
+                    if (searchFilter.operator.toString().equals("LTE")){
+                        params.put("endTimeLTE", searchFilter.value);
+                    }
+                    break;
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
                 default:
