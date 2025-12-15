@@ -138,6 +138,12 @@
         <if test="planTimeLTE != null">
           and t.plan_time &lt;= #{planTimeLTE}
         </if>
+        <if test="endTimeGTE != null">
+            and t.end_time &gt;= #{endTimeGTE}
+        </if>
+        <if test="endTimeLTE != null">
+            and t.end_time &lt;= #{endTimeLTE}
+        </if>
         <if test="queryAssetUid != null">
             and a.uid = #{queryAssetUid}
         </if>
