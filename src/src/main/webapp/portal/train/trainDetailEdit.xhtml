@@ -9,7 +9,7 @@
 
 <ui:composition>
       <h:form id="detailEditForm" >
-          <p:fieldset legend="子课程详情" rendered="#{not empty trianInSiteEditController.selectedTrainDetail}">
+          <p:fieldset legend="#{trianInSiteEditController.detailActionName eq 'Create' ? '新增' : '编辑'} 子课程详情" rendered="#{not empty trianInSiteEditController.selectedTrainDetail}">
               <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                   <h:panelGroup>
                       <label class="label">培训课程子名称*</label>
@@ -74,7 +74,7 @@
                                currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowsPerPageTemplate="25,50,100">
 
                       <p:ajax event="rowSelect" update="deleteSignlButton"/>
-                      <p:column headerText="序号" style="width: 50px;">
+                      <p:column headerText="序号" >
                           <h:outputText value="#{item.signOrder}"/>
                       </p:column>
                       <!-- <p:column headerText="所属科室">
@@ -92,8 +92,8 @@
                           </h:outputText>
                       </p:column>
                       <f:facet name="{Toolbar}">
-                          <p:commandButton immediate="false" process="@this" id="createSignButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareSignCreate}" update=":growl :signDlg" oncomplete="PF('signDlg').show()"  rendered="#{trianInSiteEditController.canEdit and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
-                          <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteSign}" update=":growl :detailEditForm:signDatalist " disabled="#{empty trianInSiteEditController.selectedTrainDetailSign}" rendered="#{trianInSiteEditController.canEdit and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
+                          <p:commandButton immediate="false" process="@this" id="createSignButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareSignCreate}" update=":growl :signDlg" oncomplete="PF('signDlg').show()"  rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
+                          <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteSign}" update=":growl :detailEditForm:signDatalist " disabled="#{empty trianInSiteEditController.selectedTrainDetailSign}" rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
                               <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                           </p:commandButton>
                           <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
@@ -145,7 +145,7 @@
               </p:fieldset>
               <br/>
               <p:commandButton validateClient="true" value="#{msg.Save}" action="#{trianInSiteEditController.saveDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-check" rendered="#{empty trianInSiteEditController.selectedTrainDetail.status or trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
-              <p:commandButton validateClient="true" value="完成" action="#{trianInSiteEditController.completeDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-repeat" rendered="#{not empty trianInSiteEditController.selectedTrainDetail.id and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}" />
+              <p:commandButton validateClient="true" value="完成" action="#{trianInSiteEditController.completeDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-repeat" rendered="#{empty trianInSiteEditController.selectedTrainDetail.status or trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}" />
               <p:commandButton validateClient="true" value="#{msg.Delete}" action="#{trianInSiteEditController.deleteItem()}" icon="ui-icon-cancel"  update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" rendered="#{not empty trianInSiteEditController.selectedTrainDetail.id and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
                   <p:confirm header="#{msg.DeleteConformation}" message="#{trianInSiteEditController.getDeleteConformation()}" icon="ui-icon-alert"/>
               </p:commandButton>

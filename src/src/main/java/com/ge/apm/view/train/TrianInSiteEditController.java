@@ -177,7 +177,13 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         }
         trainManageService.save(selected, loginUser, selectedOrgUid, selectedRoleId);
         WebUtil.addSuccessMessage("保存成功！");
-        String url = UrlEncryptController.encodeUrlParam("trainEdit?faces-redirect=true&actionName=Edit".concat("&selectedid=").concat(selected.getId()));
+
+        String url = "";
+        if(actionName.equals("Edit")){
+            url = UrlEncryptController.encodeUrlParam("trainEdit?faces-redirect=true&actionName=Edit".concat("&selectedid=").concat(selected.getId()));
+        }else{
+            url = "trainMain?faces-redirect=true";
+        }
         System.out.println(url);
         return url;
     }
@@ -186,6 +192,13 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
      * 返回训练主页面的导航路径
      */
     public String backList(){
+        if (actionName.equals("Edit")) {
+            TrainInfo old = dao.findById(selected.getId());
+            if(!selected.equals(old)){
+                WebUtil.addErrorMessage("修改信息未保存，请先点击【保存】后返回！");
+                return "";
+            }
+        }
         return "trainMain?faces-redirect=true";
     }
 
@@ -206,10 +219,12 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         selectedTrainDetail = new TrainDetail();
         selectedTrainDetail.setTrainId(selected.getId());
         selectedTrainDetail.setStatus(TrainDetail.Status.Planned.name());
+        selectedTrainDetail.setCompleteRecorder(loginUser.getName());
         //selectedTrainDetail.setDataStatus(TrainDetail.DataStatus.Create.name());
         blobObjectList = new ArrayList<>();
         resultBlobObjectList = new ArrayList<>();
         trainDetailSignList = new ArrayList<>();
+        signTotal = null;
         //selectedTrainDetail.setCreatedDate(new Date());
     }
     /**
@@ -383,7 +398,8 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
             WebUtil.addErrorMessage("实际培训完成日期不能为空！");
             return;
         }
-        trainManageService.completeDetail(selectedTrainDetail, blobObjectList, selected,loginUser, resultBlobObjectList);
+        trainDetailList = trainManageService.completeDetail(selectedTrainDetail,detailActionName, blobObjectList, selected,loginUser, resultBlobObjectList, trainDetailSignList);
+
         selectedTrainDetail = null;
         trainDetailSignList = new ArrayList<>();
     }
@@ -401,6 +417,8 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
      * 子课程保存操作
      */
     public void saveDetail(){
+
+
         // 调用服务层保存培训详情信息
         trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, resultBlobObjectList, trainDetailSignList);
         // 重置选中的培训详情对象和培训详情标识列表

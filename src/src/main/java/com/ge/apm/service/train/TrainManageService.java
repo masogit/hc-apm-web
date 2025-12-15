@@ -257,7 +257,12 @@ public class TrainManageService extends MicroServiceInvoker {
         return trainDetailList;
     }
 
-    public void completeDetail(TrainDetail trainDetail, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, UserAccount userAccount, List<V2_BlobObject> resultBlobObjectList){
+    public List<TrainDetail> completeDetail(TrainDetail trainDetail,String detailActionName, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, UserAccount userAccount, List<V2_BlobObject> resultBlobObjectList, List<TrainDetailSign> trainDetailSignList){
+        if("Create".equals(detailActionName)){
+            trainDetail.setCreatedDate(new Date());
+        }else{
+            trainDetail.setLastModifiedDate(new Date());
+        }
         trainDetail.setStatus(TrainDetail.Status.Completed.name());
         trainDetail.setLastModifiedDate(new Date());
         trainDetailRepository.save(trainDetail);
@@ -273,6 +278,16 @@ public class TrainManageService extends MicroServiceInvoker {
                 blobObjectRepository.save(blobObjects);
             }
         }
+        //签到信息
+        if(CollectionUtils.isNotEmpty(trainDetailSignList)){
+            for (TrainDetailSign trainDetailSign : trainDetailSignList){
+                // 检查 TrainDetailSign 对象的 id 是否为空
+                if(StrUtil.isEmpty(trainDetailSign.getId())){
+                    trainDetailSign.setDetailId(trainDetail.getId());
+                    initAndSaveTrainDetailSign(trainDetailSign);
+                }
+            }
+        }
         List<TrainDetail> trainDetailList = trainDetailRepository.findByTrainId(trainDetail.getTrainId());
         boolean allComplete = true;
         for(TrainDetail td : trainDetailList){
@@ -286,6 +301,7 @@ public class TrainManageService extends MicroServiceInvoker {
             trainInfo.setLastModifiedBy(userAccount.getName());
             trainInfoRepository.save(trainInfo);
         }
+        return trainDetailList;
     }
 
     @Transactional
