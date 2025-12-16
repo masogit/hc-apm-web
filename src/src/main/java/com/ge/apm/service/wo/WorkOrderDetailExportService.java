@@ -125,6 +125,7 @@ public class WorkOrderDetailExportService {
             workOrderDetailMap.put(WebUtil.getMessage("InvoiceNumber_xlsx"), workOrderDetailPojo.getInvoiceNum());
             workOrderDetailMap.put(WebUtil.getMessage("InvoiceTime_xlsx"), formatDate(workOrderDetailPojo.getInvoiceTime()));
             workOrderDetailMap.put(WebUtil.getMessage("approveUserId"), workOrderDetailPojo.getApproverName());
+            workOrderDetailMap.put(WebUtil.getMessage("SerialNumber_xlsx"), workOrderDetailPojo.getSerialNum());
             workOrderDetailMap.put(WebUtil.getMessage("ContractNumber_xlsx"), workOrderDetailPojo.getContractNum());
             workOrderDetailMap.put(WebUtil.getMessage("Remark"), workOrderDetailPojo.getComment());
             workOrderDetailMap.put(WebUtil.getMessage("PartType"), workOrderDetailPojo.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetailPojo.getPartsType()) : "");
