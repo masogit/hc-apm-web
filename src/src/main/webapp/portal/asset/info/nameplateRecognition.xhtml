@@ -102,7 +102,7 @@
                             <label class="label">#{msg.manufactDate}</label>
                             <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}" id="serialNum7Old" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" />
                         </h:panelGroup>
-                        <p:commandButton id = "saveButton" value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" oncomplete="PF('nameplateRecognitionDlg').hide();" validateClient="true" update="tab:AssetInfoEditForm" style="float:left" />
+                        <p:commandButton id = "saveButton" value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" oncomplete="PF('nameplateRecognitionDlg').hide();" validateClient="true" update="tab:AssetInfoEditForm @(.manufacturerChange)" style="float:left" />
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
 
                     </p:panelGrid>

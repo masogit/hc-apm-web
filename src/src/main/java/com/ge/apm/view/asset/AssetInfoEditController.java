@@ -2692,11 +2692,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 JSONObject body = response.getBody();
                 JSONObject data = body.getJSONObject("data");
                 equipmentNameplate = data.toJavaObject(EquipmentNameplate.class);
+                WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition")+"完成");
             }
         } catch (RestClientException e) {
+            // 识别失败，请重新上传图片之类的
             equipmentNameplate = new EquipmentNameplate();
             e.printStackTrace();
-            throw new RuntimeException(e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition")+"识别失败，请重新上传图片");
         }
     }
 
@@ -2718,7 +2720,24 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         String manufactory = equipmentNameplate.getManufactory();
         if(StringUtils.isNotEmpty(manufactory)){
-            this.selected.setManufacture(manufactory);
+            List<Supplier> suppliers = autoCompleteManufacture("");
+            Optional<Supplier> first = suppliers.stream().filter(item -> manufactory.equalsIgnoreCase(item.getName())).findFirst();
+            Supplier supplier = null;
+            if(first.isPresent()){
+                supplier = first.get();
+            }else{
+                newSupplier = new Supplier();
+                newSupplier.setName(manufactory);
+                newSupplier.setManufacturerT(Boolean.TRUE);
+                createTpye = "manufacturer";
+                saveNewSupplier();
+                supplier =  newSupplier;
+                WebUtil.addSuccessMessage("制造商创建成功");
+            }
+            selectedObjectMap.put("manufacturer",supplier);
+            this.selected.setManufacture(supplier.getName());
+            this.selected.setManufactureId(supplier.getUid());
+            createTpye= null;
         }
 
         String registryNum = equipmentNameplate.getRegistry_num();
