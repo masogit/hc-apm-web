@@ -448,6 +448,11 @@ public class UaaService {
         userDao.activeSingleUser(userId);
     }
 
+    public List<UserAccount> findByNameLike(String name) {
+        UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
+        return userDao.findByNameContains(name);
+    }
+
     public void deactiveTemporaryUser(Integer userId){
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
         userDao.deactiveTemporaryUser(userId);

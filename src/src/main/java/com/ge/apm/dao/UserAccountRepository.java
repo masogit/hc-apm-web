@@ -327,4 +327,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
             "and zt.start_date <= now() and zt.end_date >= now() " +
             "and zt.course_id = ?1", nativeQuery = true)
     List<UserAccount> findByZkbCourseId(String courseId);
+
+    List<UserAccount> findByNameContains(String name);
 }

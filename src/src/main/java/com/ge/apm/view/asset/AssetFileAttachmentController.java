@@ -20,6 +20,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +40,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StreamUtils;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -171,6 +173,29 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         if (hasFilterOnField("functionType")) {
             wrapper.like("a.function_type", searchFilters.stream().filter(item -> item.fieldName.equals("functionType")).map(item -> (String) item.value).findAny().orElse(""));
         }
+        if (hasFilterOnField("createdBy")) {
+            String createdBy = searchFilters.stream().filter(item -> item.fieldName.equals("createdBy")).map(item -> (String) item.value).findAny().orElse("");
+            List<UserAccount> list = uaaService.findByNameLike(createdBy);
+            if (list != null && list.size() > 0) {
+                wrapper.in("o.created_by", list.stream().map(item -> item.getUid()).collect(Collectors.toList()));
+            }else {
+                wrapper.eq("1", "0"); // 1!=1 的条件，确保查询不到任何结果
+            }
+        }
+        if (hasFilterOnField("createdDate")) {
+            // 查找大于等于操作符的开始日期条件
+            searchFilters.stream()
+                    .filter(item -> item.fieldName.equals("createdDate") && item.operator == SearchFilter.Operator.GTE)
+                    .findFirst()
+                    .ifPresent(filter -> wrapper.ge("o.created_date", (Date) filter.value));
+
+            // 查找小于等于操作符的结束日期条件
+            searchFilters.stream()
+                    .filter(item -> item.fieldName.equals("createdDate") && item.operator == SearchFilter.Operator.LTE)
+                    .findFirst()
+                    .ifPresent(filter -> wrapper.le("o.created_date", (Date) filter.value));
+        }
+
         if(UserContextService.hasCurrentTenantName("")){
             wrapper.ne("o.bo_sub_type", "1");
         }
@@ -250,6 +275,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                 object.setBoUuid(a.getUid());
                 object.setObjectName(vlinkTitle);
                 object.setExtLink(parsedLink);
+                object.setCreatedBy(currentUser.getUid());
+                object.setCreatedDate(new Date());
                 dao.save(object);
             }
             cancel();
@@ -283,6 +310,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                     object.setObjectStorageId(blobObject.getObjectStorageId());
                     object.setObjectSize(blobObject.getObjectSize());
                     object.setObjectType(blobObject.getObjectType());
+                    object.setCreatedBy(blobObject.getCreatedBy());
+                    object.setCreatedDate(blobObject.getCreatedDate());
                     dao.save(object);
                 }
             }
@@ -636,6 +665,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                     tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
                     tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
                     tempBlobObject.setObjectType(batchBlobObject.getObjectType());
+                    tempBlobObject.setCreatedBy(batchBlobObject.getCreatedBy());
+                    tempBlobObject.setCreatedDate(batchBlobObject.getCreatedDate());
                     batchSaveObject.add(tempBlobObject);
                 }
             }
@@ -721,6 +752,16 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
     }
 
+    public String getUserName(String uid){
+        if (StrUtil.isEmpty(uid)) {
+            return "";
+        }
+        UserAccount userAccount = uaaService.getUserByUid(uid);
+        if(userAccount != null){
+            return userAccount.getName();
+        }
+        return uid;
+    }
     public boolean isCreatAction() {
         return "Create".equals(crudActionName);
     }
