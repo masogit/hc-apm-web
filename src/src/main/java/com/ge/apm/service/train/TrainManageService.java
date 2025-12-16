@@ -241,7 +241,8 @@ public class TrainManageService extends MicroServiceInvoker {
        if(CollectionUtils.isNotEmpty(trainDetailSignList)){
             for (TrainDetailSign trainDetailSign : trainDetailSignList){
                 // 检查 TrainDetailSign 对象的 id 是否为空
-                if(StrUtil.isEmpty(trainDetailSign.getId())){
+                if(StrUtil.isEmpty(trainDetailSign.getDetailId())){
+                    trainDetailSign.setId(null);
                     trainDetailSign.setDetailId(trainDetail.getId());
                     initAndSaveTrainDetailSign(trainDetailSign);
                 }
@@ -282,7 +283,8 @@ public class TrainManageService extends MicroServiceInvoker {
         if(CollectionUtils.isNotEmpty(trainDetailSignList)){
             for (TrainDetailSign trainDetailSign : trainDetailSignList){
                 // 检查 TrainDetailSign 对象的 id 是否为空
-                if(StrUtil.isEmpty(trainDetailSign.getId())){
+                if(StrUtil.isEmpty(trainDetailSign.getDetailId())){
+                    trainDetailSign.setId(null);
                     trainDetailSign.setDetailId(trainDetail.getId());
                     initAndSaveTrainDetailSign(trainDetailSign);
                 }
