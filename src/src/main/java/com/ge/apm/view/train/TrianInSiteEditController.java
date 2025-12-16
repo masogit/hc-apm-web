@@ -346,7 +346,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         loadClinicalDeptList();
         selectedTrainDetailSign = new TrainDetailSign();
         selectedTrainDetailSign.setSignDate(new Date());
-        selectedTrainDetailSign.setDetailId(selectedTrainDetail.getId());
+        //selectedTrainDetailSign.setDetailId(selectedTrainDetail.getId());
         orgInfoList = trainManageService.queryOrgToSign(selected.getTrainingDeptUid());
     }
 
@@ -363,6 +363,9 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     public void saveSign(){
         selectedTrainDetailSign.setSignDate(new Date());
         selectedTrainDetailSign.setSignOrder(trainDetailSignList.size() + 1);
+        if(StrUtil.isEmpty(selectedTrainDetailSign.getId())){
+            selectedTrainDetailSign.setId(UUID.randomUUID().toString());
+        }
         trainDetailSignList.add(selectedTrainDetailSign);
         signTotal = trainDetailSignList.size();
         selectedTrainDetail.setActualSignTotal(trainDetailSignList.size());
@@ -417,8 +420,6 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
      * 子课程保存操作
      */
     public void saveDetail(){
-
-
         // 调用服务层保存培训详情信息
         trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, resultBlobObjectList, trainDetailSignList);
         // 重置选中的培训详情对象和培训详情标识列表

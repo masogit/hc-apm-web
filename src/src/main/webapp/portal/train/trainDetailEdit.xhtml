@@ -68,7 +68,7 @@
                   </p:panelGrid>
                   <p:dataTable id="signDatalist" value="#{trianInSiteEditController.trainDetailSignList}" var="item"
                                widgetVar="signDatalist" selectionMode="single" selection="#{trianInSiteEditController.selectedTrainDetailSign}"
-                               lazy="false" paginator="true" rowKey="#{item.signOrder}" sortMode="single"  sortBy="#{item.signOrder}"
+                               lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single"  sortBy="#{item.signOrder}"
                                rows="25" emptyMessage="#{msg.noRecordFound}"
                                paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowsPerPageTemplate="25,50,100">
@@ -92,11 +92,11 @@
                           </h:outputText>
                       </p:column>
                       <f:facet name="{Toolbar}">
-                          <p:commandButton immediate="false" process="@this" id="createSignButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareSignCreate}" update=":growl :signDlg" oncomplete="PF('signDlg').show()"  rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
-                          <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteSign}" update=":growl :detailEditForm:signDatalist " disabled="#{empty trianInSiteEditController.selectedTrainDetailSign}" rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
+                          <p:commandButton immediate="false" process="@this" id="createSignButton"  validateClient="false" value="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareSignCreate}" update=":growl :signDlg" oncomplete="PF('signDlg').show()"  rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
+                          <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" value="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteSign}" update=":growl :detailEditForm:signDatalist " disabled="#{empty trianInSiteEditController.selectedTrainDetailSign}" rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
                               <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                           </p:commandButton>
-                          <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                          <p:commandButton value="#{msg.exportToXLS}"  class="btn btn-sm btn-gray" ajax="false">
                               <p:dataExporter type="xls" target="signDatalist" fileName="Train_Info_Sign_Export"/>
                           </p:commandButton>
                       </f:facet>
