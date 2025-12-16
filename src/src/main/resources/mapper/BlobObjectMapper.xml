@@ -12,10 +12,12 @@
         <result column="serial_num" property="serialNum"/>
         <result column="qr_code" property="qrCode"/>
         <result column="function_type" property="functionType"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_date" property="createdDate"/>
     </resultMap>
 
     <select id="selectAssetBlob" resultMap="blobBean">
-        SELECT o.id, o.bo_sub_type, o.object_name, o.ext_link, o.object_storage_id, a.name as assetName, a.serial_num, a.qr_code, a.function_type
+        SELECT o.id, o.bo_sub_type, o.object_name, o.ext_link, o.object_storage_id, a.name as assetName, a.serial_num, a.qr_code, a.function_type,o.created_by, o.created_date
         FROM v2_blob_object o join asset_info a on o.bo_uuid = a.uid and o.bo_type = 'AssetInfo'
         <where>${ew.sqlSegment}</where>
     </select>
