@@ -15,6 +15,8 @@ public class WorkOrderDetailPojo {
     private String assetDepartNum;
     //资产编号
     private String assetFinancingNum;
+    //制造商序列号
+    private String serialNum;
     //设备名称
     private String assetName;
     //供货单位名称
@@ -176,5 +178,13 @@ public class WorkOrderDetailPojo {
 
     public void setApproved(Boolean approved) {
         this.approved = approved;
+    }
+
+    public String getSerialNum() {
+        return serialNum;
+    }
+
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
     }
 }
