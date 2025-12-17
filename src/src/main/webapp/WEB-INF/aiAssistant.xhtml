@@ -9,7 +9,7 @@
 <ui:composition>
     <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
 
-        <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+        <div id="aiButton" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
             <button
                     style="background-color: #000000; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-radius: 50%; width: 56px; height: 56px; padding: 0;"
                     title="点击获取帮助"
@@ -21,7 +21,7 @@
         </div>
 
         <!-- 对话框中的 iframe：使用预加载好的实例 -->
-        <p:dialog  id="globalHelpDialog" widgetVar="globalHelpDialog"
+        <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
                   position="right top" header="AI助手" modal="false"
                   resizable="true" draggable="true" closable="true"
                   width="400" style="z-index: 10000;"
@@ -44,7 +44,7 @@
             (function() {
                 var preloadFrame = document.createElement('iframe');
                 preloadFrame.id = 'aiAssistantPreload';
-                preloadFrame.src = '/wx/acctChatbot';
+                preloadFrame.src = 'http://localhost:9001/wx/acctChatbot';
                 preloadFrame.style.cssText = 'position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0;';
                 preloadFrame.onload = function() {
                     console.log('AI 助手预加载完成');
@@ -52,6 +52,27 @@
                 document.body.appendChild(preloadFrame);
                 movePreloadedIframe();
             })();
+            // 全局 loading 控制函数
+            function showGlobalLoading() {
+                document.getElementById('aiButton').style.display = 'flex';
+            }
+
+            function hideGlobalLoading() {
+                document.getElementById('aiButton').style.display = 'none';
+            }
+            // 监听来自 iframe 的消息
+            window.addEventListener('message', function(event) {
+                // 安全建议：限制 origin（替换 '*' 为实际域名）
+                // if (event.origin !== 'https://your-iframe-domain.com') return;
+                const data = event.data;
+                if (data.type === 'iframeLoadingStatus') {
+                    if (data.payload === 'show') {
+                        hideGlobalLoading();
+                    } else if (data.payload === 'hide') {
+                        showGlobalLoading();
+                    }
+                }
+            });
         </h:outputScript>
 
     </c:if>
