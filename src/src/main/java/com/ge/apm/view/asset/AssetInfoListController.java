@@ -1,10 +1,11 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.mapper.ContractInfoMapper;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
-import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.apm.service.utils.*;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -18,9 +19,6 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ApmConstant;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -36,6 +34,7 @@ import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -142,7 +141,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     @Getter @Setter
     private Boolean isOrderByForParentAndChildren = false;
     @Getter @Setter
-    private List<String> warrantyStatus;
+    private List<String> warrantyStatus= new ArrayList<>();
 
     //显示子设备，主设备，或者全部类型的设备
     @Getter
@@ -1643,6 +1642,46 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
         return orgInfo.getName();
+    }
+
+
+    private TreeNode[] selectedWarrantyNodes; // 用于 tree 绑定
+    public TreeNode getBuildTreeWarranty() {
+        TreeNode root = new DefaultTreeNode("Root", null);
+        root.setExpanded(true);
+
+        // 添加4个叶子节点，对应原来的 selectItem
+        new DefaultTreeNode("status", new SelectItemDto("维保临期", "1"), root);
+        new DefaultTreeNode("status", new SelectItemDto("维保逾期", "2"), root);
+        new DefaultTreeNode("status", new SelectItemDto("质保临期", "3"), root);
+        new DefaultTreeNode("status", new SelectItemDto("质保逾期", "4"), root);
+
+        return root;
+    }
+    public void onWarrantySelect(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        if (node.getData() instanceof SelectItemDto) {
+            String value = ((SelectItemDto) node.getData()).getValue();
+            if (!warrantyStatus.contains(value)) {
+                warrantyStatus.add(value);
+            }
+        }
+    }
+
+    public void onWarrantyUnselect(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        if (node.getData() instanceof SelectItemDto) {
+            String value = ((SelectItemDto) node.getData()).getValue();
+            warrantyStatus.remove(value);
+        }
+    }
+
+    public TreeNode[] getSelectedWarrantyNodes() {
+        return selectedWarrantyNodes;
+    }
+
+    public void setSelectedWarrantyNodes(TreeNode[] selectedWarrantyNodes) {
+        this.selectedWarrantyNodes = selectedWarrantyNodes;
     }
 
     public String getFilterAssetTypeGroup() {
