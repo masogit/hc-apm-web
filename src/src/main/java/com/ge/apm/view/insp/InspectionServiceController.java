@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.TabChangeEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -194,6 +195,16 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     }
 
     public List<InventoryOrderDetail> getInventoryOrderDetailList(Integer assetId){
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, assetId));
+        // 添加时间查询条件
+        if (ObjectUtil.isNotEmpty(startTime)) {
+            filters.add(new SearchFilter("planStartTime", SearchFilter.Operator.GTE, startTime));
+        }
+        if (ObjectUtil.isNotEmpty(endTime)) {
+            filters.add(new SearchFilter("planEndTime", SearchFilter.Operator.LTE, endTime));
+        }
+
         List<InventoryOrderDetail> inventoryOrderDetails = infoRepositoryDao.findProjectionByAssetId(assetId);
         if(inventoryOrderDetails != null && inventoryOrderDetails.size()>0){
             for(InventoryOrderDetail inventoryOrderDetail:inventoryOrderDetails){
@@ -282,7 +293,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         detailInventoryOrderDetailList = getInventoryOrderDetailList(assetInfo.getId());
         detailAdverseEventList = getAdverseEventList();
         detailApprovalEventList = getApprovalEventList();
-        detailAssetChangeHistoryList = getAssetChangeList();
+        //detailAssetChangeHistoryList = getAssetChangeList();
     }
 
     private String setStatus(Integer status){
