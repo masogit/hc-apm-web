@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+<ui:composition>
+    <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
+
+        <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+            <button
+                    style="background-color: #000000; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-radius: 50%; width: 56px; height: 56px; padding: 0;"
+                    title="点击获取帮助"
+                    onclick="PF('globalHelpDialog').show(); return false;">
+                <svg viewBox="64 64 896 896" width="28" height="28" fill="currentColor" aria-hidden="true">
+                    <path d="M300 328a60 60 0 10120 0 60 60 0 10-120 0zM852 64H172c-17.7 0-32 14.3-32 32v660c0 17.7 14.3 32 32 32h680c17.7 0 32-14.3 32-32V96c0-17.7-14.3-32-32-32zm-32 660H204V128h616v596zM604 328a60 60 0 10120 0 60 60 0 10-120 0zm250.2 556H169.8c-16.5 0-29.8 14.3-29.8 32v36c0 4.4 3.3 8 7.4 8h729.1c4.1 0 7.4-3.6 7.4-8v-36c.1-17.7-13.2-32-29.7-32zM664 508H360c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h304c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 对话框中的 iframe：使用预加载好的实例 -->
+        <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
+                  position="right top" header="AI助手" modal="false"
+                  resizable="true" draggable="true" closable="true"
+                  width="400" style="z-index: 10000;"
+                  >
+            <!-- 初始为空，onShow 时填入预加载的 iframe -->
+            <div id="aiAssistantContainer" style="height:800px;"></div>
+        </p:dialog>
+        <h:outputScript>
+            function movePreloadedIframe() {
+                var container = document.getElementById('aiAssistantContainer');
+                if (container.children.length === 0) {
+                    var preloaded = document.getElementById('aiAssistantPreload');
+                    if (preloaded) {
+                        // 设置正确尺寸并移入容器
+                        preloaded.style.cssText = 'width:100%; height:100%; border:none;';
+                        container.appendChild(preloaded);
+                    }
+                }
+            }
+            (function() {
+                var preloadFrame = document.createElement('iframe');
+                preloadFrame.id = 'aiAssistantPreload';
+                preloadFrame.src = 'http://localhost:9001/wx/acctChatbot';
+                preloadFrame.style.cssText = 'position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0;';
+                preloadFrame.onload = function() {
+                    console.log('AI 助手预加载完成');
+                };
+                document.body.appendChild(preloadFrame);
+                movePreloadedIframe();
+            })();
+        </h:outputScript>
+
+    </c:if>
+</ui:composition>
+</html>
