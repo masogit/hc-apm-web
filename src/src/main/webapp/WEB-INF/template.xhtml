@@ -64,17 +64,6 @@
         <div class="layout-main">
             <ui:insert name="elements"/>
             <ui:insert name="content"/>
-            <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
-                <div style="position: fixed;bottom: 20px;right: 20px;z-index: 9999;">
-                    <p:commandButton
-                            value="帮助"
-                            icon="pi pi-question-circle"
-                            styleClass="ui-button-raised ui-button-warning"
-                            onclick="PF('globalHelpDialog').show(); return false;"
-                            style="box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-radius: 50%; width: 56px; height: 56px; padding: 0;"
-                            title="点击获取帮助" />
-                </div>
-            </c:if>
         </div>
         <div class="layout-profile" style="font-size: 14px; text-align: right;">
             <div class="profile-name">
@@ -95,9 +84,6 @@
 
     <p:dialog widgetVar="statusDialog"  modal="false" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">
         <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
-    </p:dialog>
-    <p:dialog widgetVar="globalHelpDialog" position="right bottom" positionType="absolute"  header="帮助中心" modal="false" resizable="true" draggable="true" closable="true" width="1000" style="z-index: 10000;">
-        <iframe id="aiAssistant" height="915px" width="100%" src="/wx/acctChatbot"/>
     </p:dialog>
     <p:ajaxStatus onstart="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide()"/>
 
