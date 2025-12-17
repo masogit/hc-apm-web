@@ -4,6 +4,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template-react.xhtml">
 
     <ui:define name="post-script">
@@ -23,7 +24,19 @@
             }
             init();
         </script>
-
-
+        <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
+            <div style="position: fixed;bottom: 20px;right: 20px;z-index: 9999;">
+                <p:commandButton
+                        value="帮助"
+                        icon="pi pi-question-circle"
+                        styleClass="ui-button-raised ui-button-warning"
+                        onclick="PF('globalHelpDialog').show(); return false;"
+                        style="box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-radius: 50%; width: 56px; height: 56px; padding: 0;"
+                        title="点击获取帮助" />
+            </div>
+        </c:if>
+        <p:dialog widgetVar="globalHelpDialog" position="right bottom"  header="帮助中心" modal="false" resizable="true" draggable="true" closable="true" width="400" style="z-index: 10000;">
+            <iframe id="aiAssistant" height="915px" width="100%" src="/wx/acctChatbot"/>
+        </p:dialog>
     </ui:define>
 </ui:composition>
