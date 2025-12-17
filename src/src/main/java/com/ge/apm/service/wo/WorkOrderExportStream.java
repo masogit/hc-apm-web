@@ -99,7 +99,7 @@ public class WorkOrderExportStream extends InputStream {
         String deviceName = (String) map.get(WebUtil.getMessage("EquipmentName_xlsx"));
         deviceName = StringUtils.replace(deviceName, "\\", "-");
         deviceName = StringUtils.replace(deviceName, "/", "-");
-        return "维修-"+siteName + index + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
+        return "维修-"+siteName  + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
     }
 
     public void exportReport(int index) {
