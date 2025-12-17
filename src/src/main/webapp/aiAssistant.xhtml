@@ -21,7 +21,7 @@
         </div>
 
         <!-- 对话框中的 iframe：使用预加载好的实例 -->
-        <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
+        <p:dialog  id="globalHelpDialog" widgetVar="globalHelpDialog"
                   position="right top" header="AI助手" modal="false"
                   resizable="true" draggable="true" closable="true"
                   width="400" style="z-index: 10000;"
@@ -44,7 +44,7 @@
             (function() {
                 var preloadFrame = document.createElement('iframe');
                 preloadFrame.id = 'aiAssistantPreload';
-                preloadFrame.src = 'http://localhost:9001/wx/acctChatbot';
+                preloadFrame.src = '/wx/acctChatbot';
                 preloadFrame.style.cssText = 'position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0;';
                 preloadFrame.onload = function() {
                     console.log('AI 助手预加载完成');
