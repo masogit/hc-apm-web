@@ -11,7 +11,7 @@
 
         <div id="aiButton" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
             <button
-                    style="background-color: #FFFFFF; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);border-radius: 30%;  width: 90px; height: 90px; padding: 0;"
+                    style="background-color: #FFFFFF; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);border-radius: 100%;  width: 50px; height: 50px; padding:10px;"
                     title="点击获取帮助"
                     onclick="PF('globalHelpDialog').show(); return false;">
 <!--                <svg viewBox="64 64 896 896" width="28" height="28" fill="currentColor" aria-hidden="true">-->
@@ -48,11 +48,11 @@
         </div>
         <!-- 对话框中的 iframe：使用预加载好的实例 position="right top"-->
         <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
-                  position="center" positionType="fixed" header="AI助手" modal="false"
+                  position="right top" positionType="fixed" header="AI助手" modal="false"
                   resizable="false" draggable="true" closable="true" fitViewport="true"
                   width="400" style="z-index: 10000;"  maximizable="true"
         >
-            <div style="height: 680px;width: 100%;overflow: hidden">
+            <div style="height: 700px;width: 100%;overflow: hidden">
                 <!-- 初始为空，onShow 时填入预加载的 iframe -->
                 <div id="aiAssistantContainer" style="width: 100%; height: 100%;min-height: 600px"></div>
             </div>
