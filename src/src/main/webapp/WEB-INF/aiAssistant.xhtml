@@ -9,7 +9,7 @@
 <ui:composition>
     <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
 
-        <div id="aiButton" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+        <div id="aiButton" style="position: fixed; bottom: 150px; right: 0px; z-index: 9999;">
             <button
                     style="background-color: #FFFFFF; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);border-radius: 100%;  width: 50px; height: 50px; padding:10px;"
                     title="点击获取帮助"
@@ -48,7 +48,7 @@
         </div>
         <!-- 对话框中的 iframe：使用预加载好的实例 position="right top"-->
         <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
-                  position="right top" positionType="fixed" header="AI助手" modal="false"
+                  position="right top" positionType="fixed" header="APM助手" modal="false"
                   resizable="false" draggable="true" closable="true" fitViewport="true"
                   width="500" style="z-index: 10000;"  maximizable="true"
         >
