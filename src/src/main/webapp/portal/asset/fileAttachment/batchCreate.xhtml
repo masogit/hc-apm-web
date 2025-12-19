@@ -188,6 +188,23 @@
                                 </div>
                             </div>
                         </p:panel>
+
+
+                        <c:forEach items="#{assetFileAttachmentController.getAttachmentCategories()}" var="item">
+                            <p:panel  styleClass="ui-panelgrid-blank" style=" border: 0">
+                                <p:dataList id="ObjectUpload_#{item.boType}" value="#{assetFileAttachmentController.getBatchBlobObjectListByType(item.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{item.label}</f:facet>
+                                    <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
+                                    <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload5" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="#{item.boType}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadWorkFlowConfig}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                              sizeLimit="500000000" update="ObjectUpload_#{item.boType}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
+                            </p:panel>
+                        </c:forEach>
+
                     </p:panelGrid>
                 </h:panelGroup>
             </p:fieldset>
