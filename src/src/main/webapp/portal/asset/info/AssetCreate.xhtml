@@ -234,7 +234,7 @@
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
-                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       multiple="true"  sizeLimit="500000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                     <h:panelGroup >
