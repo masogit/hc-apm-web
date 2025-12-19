@@ -1,5 +1,7 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
@@ -547,8 +549,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         handleFileUploadBatch(event,"vlink");
     }
 
-
-
     public void removeAttachmentBatch(String objectId) {
         Iterator<V2_BlobObject> iterator = batchBlobObjectList.iterator();
         while (iterator.hasNext()){
@@ -624,6 +624,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         repeatBlobObjectSet = new HashSet<>();
         repeatAssets = new HashSet<>();
         assetInfoList = new ArrayList<>();
+        getWorkflowList();
     }
     public List<AssetInfo> getAssetInfos() {
         return assetInfoList;
@@ -692,6 +693,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                 tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
                 tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
                 tempBlobObject.setObjectType(batchBlobObject.getObjectType());
+                tempBlobObject.setCreatedDate(new Date());
+                tempBlobObject.setCreatedBy(currentUser.getUid());
                 batchSaveObject.add(tempBlobObject);
             }
         }
@@ -764,6 +767,24 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     }
     public boolean isCreatAction() {
         return "Create".equals(crudActionName);
+    }
+
+    @Getter@Setter
+    List<WorkflowConfig.AttachmentCategory> attachmentCategories = new ArrayList<>();
+    public void getWorkflowList() {
+        WorkflowConfig workflowConfig = configService.findConfigBySite(currentUser.getSiteUID());
+        if(workflowConfig != null){
+            String categories = workflowConfig.getCustomizedAssetAttachmentCategory();
+            if (null != categories) {
+                attachmentCategories = JSON.parseObject(categories, new TypeReference<List<WorkflowConfig.AttachmentCategory>>() {
+                });
+            }
+        }
+
+    }
+
+    public void handleFileUploadWorkFlowConfig(FileUploadEvent event) {
+        handleFileUploadBatch(event,event.getComponent().getId());
     }
 
 
