@@ -997,19 +997,28 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void handleFileUpload(FileUploadEvent event) {
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            String type = event.getComponent().getId();
-            type = type.substring(type.indexOf("type") + 4);
-            attachements.add(blobObject);
-            blobObject.setBoId(selected.getId());
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-            blobObject.setBoSubType(type);
-            blobObject.setBoUuid(selected.getUid());
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
+        try {
+            String fileName = event.getFile().getFileName();
+            logger.info("AssetInfoEditController handleFileUpload fileName start:" + fileName);
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            logger.info("AssetInfoEditController handleFileUpload fileName end:" + fileName);
+            if (null != blobObject) {
+                String type = event.getComponent().getId();
+                type = type.substring(type.indexOf("type") + 4);
+                attachements.add(blobObject);
+                blobObject.setBoId(selected.getId());
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+                blobObject.setBoSubType(type);
+                blobObject.setBoUuid(selected.getUid());
+                blobService.saveBlobObject(blobObject);
+                WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("AssetInfoEditController handleFileUpload error fileName:" + event.getFile().getFileName()+"error:"+e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

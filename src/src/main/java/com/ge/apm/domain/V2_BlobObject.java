@@ -203,11 +203,11 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "second_directory")
     private String secondDirectory;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(insertable = false, updatable = false, name = "bo_uuid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @Where(clause = "bo_type = 'AssetInfo'")
-    @JsonBackReference
-    private AssetInfo assetInfo;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(insertable = false, updatable = false, name = "bo_uuid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+//    @Where(clause = "bo_type = 'AssetInfo'")
+//    @JsonBackReference
+//    private AssetInfo assetInfo;
 
     @Transient
     private String assetName;
@@ -324,13 +324,13 @@ public class V2_BlobObject implements Serializable {
         this.boSubType = boSubType;
     }
 
-    public AssetInfo getAssetInfo() {
-        return assetInfo;
-    }
-
-    public void setAssetInfo(AssetInfo assetInfo) {
-        this.assetInfo = assetInfo;
-    }
+//    public AssetInfo getAssetInfo() {
+//        return assetInfo;
+//    }
+//
+//    public void setAssetInfo(AssetInfo assetInfo) {
+//        this.assetInfo = assetInfo;
+//    }
 
     public String getAssetName() {
         return assetName;
