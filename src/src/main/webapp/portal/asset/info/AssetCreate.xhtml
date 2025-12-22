@@ -117,17 +117,6 @@
                 <p:tabView id="tab">
                     <p:tab title="#{assetInfoEditController.CRUDActionName}">
                         <h:form id="AssetInfoEditForm">
-                            <h:panelGroup >
-                                <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>
-                                </p:dataList>
-                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="true"  sizeLimit="500000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
-                            </h:panelGroup>
                             <c:if test="#{assetInfoEditController.isCreateAction() or assetInfoEditController.CRUDActionName.equals('')}">
                                 <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
                                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -237,17 +226,17 @@
                             <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" rendered="#{!assetInfoEditController.isStatus()}">
                                 <p:commandButton  process="@this"  type="submit" update="nameplateRecognitionForm" value="铭牌识别" onclick="PF('nameplateRecognitionDlg').show()" icon="ui-icon ui-icon-wifi-tethering" title="铭牌识别" style="background-color:#5180ce;margin-left: 20px" />
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-<!--                                    <h:panelGroup >-->
-<!--                                        <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-<!--                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>-->
-<!--                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
-<!--                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">-->
-<!--                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
-<!--                                            </p:commandButton>-->
-<!--                                        </p:dataList>-->
-<!--                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"-->
-<!--                                                      multiple="true"  sizeLimit="500000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>-->
-<!--                                    </h:panelGroup>-->
+                                    <h:panelGroup >
+                                        <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
                                     <h:panelGroup >
                                         <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
