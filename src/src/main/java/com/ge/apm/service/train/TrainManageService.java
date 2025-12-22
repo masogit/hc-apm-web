@@ -243,6 +243,7 @@ public class TrainManageService extends MicroServiceInvoker {
                 // 检查 TrainDetailSign 对象的 id 是否为空
                 if(StrUtil.isEmpty(trainDetailSign.getDetailId())){
                     trainDetailSign.setId(null);
+                    trainDetailSign.setSignOrder(null);
                     trainDetailSign.setDetailId(trainDetail.getId());
                     initAndSaveTrainDetailSign(trainDetailSign);
                 }
