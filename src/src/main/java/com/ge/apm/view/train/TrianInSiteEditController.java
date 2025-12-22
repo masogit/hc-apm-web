@@ -243,7 +243,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
             signTotal = trainDetailSignList.size();
             for(int i = 0; i < trainDetailSignList.size(); i++){
                 TrainDetailSign trainDetailSign = trainDetailSignList.get(i);
-                trainDetailSign.setSignOrder(i);
+                trainDetailSign.setSignOrder(i+1);
             }
         }
     }

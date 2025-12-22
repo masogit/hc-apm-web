@@ -97,7 +97,8 @@
                             <p:link href="#{item.extLink}" target="_blank" rendered="#{'vlink' eq item.boSubType}">打开</p:link>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetFileAttachmentController.prepareCreate}" update=":AssetFileAttachmentEditForm" />
+                            <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetFileAttachmentController.prepareCreate}" update=":AssetFileAttachmentEditForm" />-->
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{assetFileAttachmentController.cancelData()}" update=":FileEditDlg" oncomplete="PF('FileEditDialog').show()"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量删除" actionListener="#{assetFileAttachmentController.deleteBatch}" update=":AssetFileAttachmentListForm :growl" disabled="#{not assetFileAttachmentController.isChecked()}">
                                 <p:confirm header="批量删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-warning"/>
                             </p:commandButton>
