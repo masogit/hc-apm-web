@@ -366,7 +366,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
      */
     public void saveSign(){
         selectedTrainDetailSign.setSignDate(new Date());
-        //selectedTrainDetailSign.setSignOrder(trainDetailSignList.size() + 1);
+        selectedTrainDetailSign.setSignOrder(trainDetailSignList.size() + 1);
         if(StrUtil.isEmpty(selectedTrainDetailSign.getId())){
             selectedTrainDetailSign.setId(UUID.randomUUID().toString());
         }
