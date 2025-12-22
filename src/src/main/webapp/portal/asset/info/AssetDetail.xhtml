@@ -345,17 +345,17 @@
                                 <p:dataTable var="item" value="#{inspectionServiceController.detailInventoryOrderDetailList}" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.PlannedStartTime}" >
                                         <h:outputText value="#{item.planStartTime}" >
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="#{msg.plannedEndTime}" >
                                         <h:outputText value="#{item.planEndTime}" >
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="#{msg.InvnetoryTime}" >
                                         <h:outputText value="#{item.inventoryDate}" >
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="#{msg.InventoryChecker}" >

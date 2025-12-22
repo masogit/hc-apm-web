@@ -218,7 +218,7 @@
         <h:form id="importDataForm">
             <p:tabView>
                 <p:tab title="之前已上传的重复文件">
-                    <p:dataTable  value="#{assetFileAttachmentController.assetInfos}" var="item" >
+                    <p:dataTable  value="#{assetFileAttachmentController.assetInfos}" var="item" emptyMessage="无记录">
 
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
                             <h:outputText value="#{item.name}"/>

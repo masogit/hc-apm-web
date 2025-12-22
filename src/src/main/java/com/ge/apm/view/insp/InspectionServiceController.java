@@ -53,6 +53,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     MultiLevelApprovalMapper approvalMapper =  WebUtil.getBean(MultiLevelApprovalMapper.class);
     AssetHistoryService assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
     ConfigService configService = WebUtil.getBean(ConfigService.class);
+    InventoryOrderMapper inventoryOrderMapper = WebUtil.getBean(InventoryOrderMapper.class);
 
     @Getter @Setter
     List<AssetInfo> detailMeasureAssetList;
@@ -80,6 +81,8 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     private Boolean needTwoSubStatus=false;
     @Getter @Setter
     private String stepFilter;
+    @Getter @Setter
+    private String isSolvedFilter;
     @Getter @Setter
     private Date startTime;
     @Getter @Setter
@@ -195,7 +198,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     }
 
     public List<InventoryOrderDetail> getInventoryOrderDetailList(Integer assetId){
-        List<SearchFilter> filters = new ArrayList<>();
+        /*List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, assetId));
         // 添加时间查询条件
         if (ObjectUtil.isNotEmpty(startTime)) {
@@ -203,9 +206,21 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         }
         if (ObjectUtil.isNotEmpty(endTime)) {
             filters.add(new SearchFilter("planEndTime", SearchFilter.Operator.LTE, endTime));
+        }*/
+        //inventoryIssueRepository
+        Pagination pagination = new Pagination(0, 1000);
+        Wrapper wrapper = getWrapper("d.asset_id", null, null, ListUtil.newArrayList(this.assetInfo.getId()), "last_modified_date");
+        if (ObjectUtil.isNotEmpty(startTime)) {
+            wrapper.ge("d.plan_start_time", startTime);
+        }
+        if (ObjectUtil.isNotEmpty(endTime)) {
+            wrapper.le("d.plan_end_time", endTime);
+        }
+        if(isSolvedFilter != null){
+            wrapper.eq("d.is_solved", isSolvedFilter);
         }
 
-        List<InventoryOrderDetail> inventoryOrderDetails = infoRepositoryDao.findProjectionByAssetId(assetId);
+        List<InventoryOrderDetail> inventoryOrderDetails =inventoryOrderMapper.selectInventoryDetailByCondition(pagination, wrapper);
         if(inventoryOrderDetails != null && inventoryOrderDetails.size()>0){
             for(InventoryOrderDetail inventoryOrderDetail:inventoryOrderDetails){
                 if(inventoryOrderDetail.getStatus() == 0){
@@ -224,6 +239,14 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
                         }
                     }
                 }
+                InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(assetId, inventoryOrderId);
+                if(inventoryIssue != null){
+                    inventoryOrderDetail.setComment(inventoryIssue.getComment());
+                    inventoryOrderDetail.setInventoryCheckListItems(inventoryIssue.getInventoryCheckListItems());
+                    inventoryOrderDetail.setIsSolved(inventoryIssue.getIsSolved() ? "是" : "否");
+                    inventoryOrderDetail.setStatus(3);
+                }
+
             }
         }
         return inventoryOrderDetails;
