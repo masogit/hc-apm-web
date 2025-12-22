@@ -86,7 +86,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		if (null == orderId){
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
-            listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
+			listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
 		}
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		loadClinicalDeptList();
