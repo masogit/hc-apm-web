@@ -18,7 +18,7 @@
         /*所有图标都可以在这个地址找,谨此留给后人: https://fontawesome.com/v4/icons */
     </style>
     <div class="menu-content" tabindex="0">
-<!--        <ui:include src="aiAssistant.xhtml" />-->
+        <ui:include src="aiAssistant.xhtml" />
         <pu:menu id="me" widgetVar="me">
 
             <p:menuitem style=" font-size: 30" id="um9001" value="ChangeToEnglish" rendered="#{(localeService.language eq 'zh') and (userContextService.getTenantInfo().isSupportMultiLanguage)}" icon="fa fa-language fa-fw" url="#{request.requestURI}?locale=en"/>
