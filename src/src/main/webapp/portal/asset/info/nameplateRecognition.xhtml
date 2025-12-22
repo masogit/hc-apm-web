@@ -40,35 +40,35 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
                             <label class="label">#{msg.name}</label>
-                            <p:inputText id="serialNum" value="#{assetInfoEditController.equipmentNameplate.device_name}" ></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.equipmentNameplate.device_name}" ></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.name}</label>
-                            <p:inputText id="serialNumOdl" value="#{assetInfoEditController.selected.name}" readonly="true"></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.selected.name}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.financingNum}</label>
-                            <p:inputText id="serialNum1" value="#{assetInfoEditController.equipmentNameplate.pattern}" ></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.equipmentNameplate.pattern}" ></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.financingNum}</label>
-                            <p:inputText id="serialNum1Old" value="#{assetInfoEditController.selected.financingNum}" readonly="true"></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.selected.financingNum}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.serialNum}</label>
-                            <p:inputText id="serialNum2" value="#{assetInfoEditController.equipmentNameplate.serial_num}" ></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.equipmentNameplate.serial_num}" ></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.serialNum}</label>
-                            <p:inputText id="serialNum2Old" value="#{assetInfoEditController.selected.serialNum}" readonly="true"></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.selected.serialNum}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.manufacture}</label>
-                            <p:inputText id="serialNum3" value="#{assetInfoEditController.equipmentNameplate.manufactory}" ></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.equipmentNameplate.manufactory}" ></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.manufacture}</label>
-                            <p:inputText id="serialNum3Old" value="#{assetInfoEditController.selected.manufacture}" readonly="true"></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.selected.manufacture}" readonly="true"></p:inputText>
                         </h:panelGroup>
         <!--                <h:panelGroup>-->
         <!--                    <label class="label">#{msg.power}</label>-->
@@ -80,29 +80,29 @@
         <!--                </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.registrationNo}</label>
-                            <p:inputText id="serialNum5" value="#{assetInfoEditController.equipmentNameplate.registry_num}" ></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.equipmentNameplate.registry_num}" ></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.registrationNo}</label>
-                            <p:inputText id="serialNum5Old" value="#{assetInfoEditController.selected.registrationNo}" readonly="true"></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.selected.registrationNo}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.lifecycle}</label>
-                            <p:inputText id="serialNum6" value="#{assetInfoEditController.equipmentNameplate.using_year}" ></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.equipmentNameplate.using_year}" ></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.lifecycle}</label>
-                            <p:inputText id="serialNum6Old" value="#{assetInfoEditController.selected.lifecycleInYear}" readonly="true"></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.selected.lifecycleInYear}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.manufactDate}</label>
-                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="serialNum7" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.equipmentNameplate.factory_date}" />
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.equipmentNameplate.factory_date}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.manufactDate}</label>
-                            <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}" id="serialNum7Old" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" />
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" />
                         </h:panelGroup>
-                        <p:commandButton id = "saveButton" value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" oncomplete="PF('nameplateRecognitionDlg').hide();" validateClient="true" update="tab:AssetInfoEditForm @(.manufacturerChange)" style="float:left" />
+                        <p:commandButton  value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" oncomplete="PF('nameplateRecognitionDlg').hide();" validateClient="true" update="tab:AssetInfoEditForm @(.manufacturerChange)" style="float:left" />
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
 
                     </p:panelGrid>
