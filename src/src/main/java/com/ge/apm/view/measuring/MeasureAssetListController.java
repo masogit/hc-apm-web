@@ -211,22 +211,20 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         wrapper.andNew().in(ObjectUtil.isNotEmpty(clinicalUidList), "ai.clinical_dept_uid", clinicalUidList);
         if(this.hasFilterOnField("verificationConclusion")){
             Integer verificationConclusion = Integer.valueOf(searchFilters.stream().filter(sf -> "verificationConclusion".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("verificationConclusion", SearchFilter.Operator.EQ, 0)).value.toString());
-            searchFilters.removeIf(e -> "verificationConclusion".equals(e.fieldName));
+//            searchFilters.removeIf(e -> "verificationConclusion".equals(e.fieldName));
             wrapper.eq("mcd.status", verificationConclusion);
         }
         if(this.hasFilterOnField("measuringItemCategory")){
             Integer measuringItemCategory = Integer.valueOf(searchFilters.stream().filter(sf -> "measuringItemCategory".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, 0)).value.toString());
-            searchFilters.removeIf(e -> "measuringItemCategory".equals(e.fieldName));
-            wrapper.eq("ai.measuring_item_category", measuringItemCategory);
+            this.updateSearchFilter(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, measuringItemCategory, "1*"));
         }
         if(this.hasFilterOnField("assetGroup")){
             Integer assetGroup = Integer.valueOf(searchFilters.stream().filter(sf -> "assetGroup".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, 0)).value.toString());
-            searchFilters.removeIf(e -> "assetGroup".equals(e.fieldName));
-            wrapper.eq("ai.asset_group", assetGroup);
+            this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, assetGroup, "1*"));
         }
         if(this.hasFilterOnField("checkDate")){
             List<SearchFilter> checkDateFilters = searchFilters.stream().filter(sf -> "checkDate".equals(sf.fieldName)).collect(Collectors.toList());
-            searchFilters.removeIf(e -> "checkDate".equals(e.fieldName));
+//            searchFilters.removeIf(e -> "checkDate".equals(e.fieldName));
             WrapperSearchFilterUtils.convert(checkDateFilters, wrapper, "mcd");
         }
         if(this.hasFilterOnField("nextMeteringDate")){
@@ -235,16 +233,17 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             for (SearchFilter nextMeteringDateFilter : nextMeteringDateFilters) {
                 validDateToFilters.add(new SearchFilter("validDateTo", nextMeteringDateFilter.operator, nextMeteringDateFilter.value));
             }
-            searchFilters.removeIf(e -> "nextMeteringDate".equals(e.fieldName));
+//            searchFilters.removeIf(e -> "nextMeteringDate".equals(e.fieldName));
             WrapperSearchFilterUtils.convert(validDateToFilters, wrapper, "mcd");
         }
         if(this.hasFilterOnField("meteringNO")){
             String meteringNO = searchFilters.stream().filter(sf -> "meteringNO".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("meteringNO", SearchFilter.Operator.EQ, 0)).value.toString();
-            searchFilters.removeIf(e -> "meteringNO".equals(e.fieldName));
+//            searchFilters.removeIf(e -> "meteringNO".equals(e.fieldName));
             wrapper.like("mcd.certificate_no", meteringNO);
         }
-
-        WrapperSearchFilterUtils.convert(searchFilters, wrapper, "ai");
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO");
+        List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
+        WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
     }
 
