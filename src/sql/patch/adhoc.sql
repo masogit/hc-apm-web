@@ -12,3 +12,15 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 
 -- asset_lifecycle_event 删除外键  asset_info  id
 ALTER TABLE asset_lifecycle_event DROP CONSTRAINT IF EXISTS fk_avxmtljopeqkojo8r88kjdhvn;
+
+
+--培训签到人
+UPDATE train_detail
+SET actual_sign_total = tds.sign_count
+    FROM (
+    SELECT detail_id, COUNT(*) as sign_count
+    FROM train_detail_sign
+    GROUP BY detail_id
+) tds
+WHERE train_detail.id = tds.detail_id
+  AND train_detail.actual_sign_total IS NULL;
