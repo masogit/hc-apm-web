@@ -159,8 +159,10 @@
                      <p:commandButton  icon="ui-icon-arrow-1-s" actionListener="#{v2PmOrderMvsController.doExportMaintenanceReport()}" class=" btn-sm btn-gray btn-export-maintenance-report" title="#{msg.ExportMaintenanceWorkorder}" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false">
                         <p:fileDownload value="#{v2PmOrderMvsController.maintenanceReport}" />
                     </p:commandButton>-->
-                    <p:commandButton icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class=" btn-export-maintenance-report" title="批量下载附件工单" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false"/>
-                     <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
+                    <ui:fragment rendered="true">
+                        <p:commandButton  icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="btn-export-maintenance-report" title="批量下载附件工单" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false"/>
+                    </ui:fragment>
+                    <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
                                      message="#{v2PmOrderMvsController.messageTip}"
                                      header="确认下载"
                                      severity="warn" class="downloadConfirm">
