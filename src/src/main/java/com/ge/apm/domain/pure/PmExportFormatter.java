@@ -3,6 +3,7 @@ package com.ge.apm.domain.pure;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.pm.V2PmOrderController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -43,16 +44,17 @@ public class PmExportFormatter<T> {
         this.creator = v2_pmOrder.getCreatorName();
     }
     I18nMessageRepository I18dao = null;
+    I18nMessageService i18nMessageService;
 
     public PmExportFormatter(V2_PmOrder v2_pmOrder) {
         this.v2_pmOrder = v2_pmOrder;
         I18dao = WebUtil.getBean(I18nMessageRepository.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         i18PmtypeList =I18dao.getByMsgType("pmType");
         i18OrderTypeList  =I18dao.getByMsgType("intExtType");
         i18nRuleLevel  =I18dao.getByMsgType("ruleLevelFour");
-        i18nAssetGroup  =I18dao.getByMsgType("assetGroup");
-
+        i18nAssetGroup  = i18nMessageService.getByMsgType("assetGroup");
         v2PmOrderController = WebUtil.getBean(V2PmOrderController.class);
         pmOrderRule = v2PmOrderController.getRulePm(v2_pmOrder);
     }
