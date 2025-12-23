@@ -439,6 +439,13 @@ public class TrainManageService extends MicroServiceInvoker {
                 }
             }
         }
+
+        if(CollectionUtils.isNotEmpty(trainDetailSignList)){
+            for(int i = 0; i < trainDetailSignList.size(); i++){
+                TrainDetailSign trainDetailSign = trainDetailSignList.get(i);
+                trainDetailSign.setSignOrder(i+1);
+            }
+        }
         return trainDetailSignList;
     }
 

@@ -241,10 +241,6 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
                 selectedTrainDetail.setCompleteRecorder(loginUser.getName());
             }
             signTotal = trainDetailSignList.size();
-            for(int i = 0; i < trainDetailSignList.size(); i++){
-                TrainDetailSign trainDetailSign = trainDetailSignList.get(i);
-                trainDetailSign.setSignOrder(i+1);
-            }
         }
     }
 
@@ -358,8 +354,19 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
      * 删除签到信息
      */
     public void deleteSign(){
-        trainManageService.deleteSign(selectedTrainDetailSign);
-        trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetailSign.getDetailId());
+        if(StrUtil.isNotEmpty(selectedTrainDetailSign.getDetailId())){
+            trainManageService.deleteSign(selectedTrainDetailSign);
+        }
+        trainDetailSignList.remove(selectedTrainDetailSign);
+        if(CollectionUtils.isNotEmpty(trainDetailSignList)){
+            for(int i = 0; i < trainDetailSignList.size(); i++){
+                TrainDetailSign trainDetailSign = trainDetailSignList.get(i);
+                trainDetailSign.setSignOrder(i+1);
+            }
+        }
+        //trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetailSign.getDetailId());
+        signTotal = trainDetailSignList.size();
+        selectedTrainDetail.setActualSignTotal(trainDetailSignList.size());
     }
     /**
      * 保存签到信息

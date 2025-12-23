@@ -342,7 +342,10 @@
                                 <f:facet name="actions">
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/inventory/inventoryOrderDetailAssetInfoMainAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                 </f:facet>
-                                <p:dataTable var="item" value="#{inspectionServiceController.detailInventoryOrderDetailList}" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataTable var="item" value="#{inspectionServiceController.detailInventoryOrderDetailList}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="bottom" rows="5" widgetVar="varworkOrderListgl"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                     <p:column headerText="#{msg.PlannedStartTime}" >
                                         <h:outputText value="#{item.planStartTime}" >
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
