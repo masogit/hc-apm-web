@@ -149,30 +149,31 @@
                     <ui:fragment rendered="true">
                         <p:commandButton  icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="btn-export-maintenance-report" title="批量下载附件工单" rendered="#{workOrderMgrMvsController.queryIndex==8}" disabled="#{not workOrderMgrMvsController.isTargetSelected()}" ajax="false"/>
                      </ui:fragment>
-                    <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
-                                     message="#{workOrderMgrMvsController.messageTip}"
-                                     header="确认下载"
-                                     severity="warn" class="downloadConfirm"
-                                      >
-                        <p:commandButton value="确定" ajax="false"
-                                         actionListener="#{workOrderMgrMvsController.doExportWorkOrderReport()}"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton" icon="ui-icon-check"
-                                          >
-                            <p:fileDownload value="#{workOrderMgrMvsController.maintenanceReport}" oncomplete="PF('downloadConfirm').hide()" />
-                        </p:commandButton>
 
-                        <!-- 取消按钮 -->
-                        <p:commandButton value="取消" type="button"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton" icon="ui-icon-close"
-                                           />
-                    </p:confirmDialog>
                 </f:facet>
 
             </p:dataTable>
         </h:form>
         <!-- 确认对话框 -->
         <ui:include src="woMvsMgrView.xhtml"/>
-
+        <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
+                         message="#{workOrderMgrMvsController.messageTip}"
+                         header="确认下载"
+                         severity="warn" class="downloadConfirm">
+            <h:form>
+                <p:commandButton value="确定" ajax="false"
+                                 actionListener="#{workOrderMgrMvsController.doExportWorkOrderReport()}"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton"
+                                 icon="ui-icon-check">
+                    <p:fileDownload value="#{workOrderMgrMvsController.maintenanceReport}"
+                                    oncomplete="PF('downloadConfirm').hide()"/>
+                </p:commandButton>
+                <p:commandButton value="取消" type="button"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton"
+                                 icon="ui-icon-close"
+                />
+            </h:form>
+        </p:confirmDialog>
     </div>
 
     <script>
