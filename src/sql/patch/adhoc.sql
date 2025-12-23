@@ -9,3 +9,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 -- YHAAO-26046 云版贴码,转到本地版
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, '', 'apm本地版,但在云版盘点并贴码,二维码解析转发到对应本地版', 'cloudQrCodeToLocalApm', '云版二维码转发到本地版', 'f','t',1 where not exists(select * from config_item where key = 'cloudQrCodeToLocalApm');
+
+-- asset_lifecycle_event 删除外键  asset_info  id
+ALTER TABLE asset_lifecycle_event DROP CONSTRAINT IF EXISTS fk_avxmtljopeqkojo8r88kjdhvn;
