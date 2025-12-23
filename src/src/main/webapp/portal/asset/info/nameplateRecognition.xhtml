@@ -9,10 +9,10 @@
     <p:dialog class="coworkerDlg" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.nameplateRecognition}">
 
             <h:form id="nameplateRecognitionForm">
-                <p:fieldset legend="#{msg.nameplateRecognition}" style="margin-bottom:20px">
+                <p:fieldset legend="#{msg.nameplateRecognition}" style="margin-bottom:20px;height: 300px;overflow-y: auto">
                     <p:dataTable id="datalist" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="item" widgetVar="varDataList"  resizeMode="expand"
                                  scrollable="true" scrollWidth="98%"
-                                 lazy="true" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  sortMode="single" sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
@@ -21,16 +21,16 @@
                         <p:column headerText="#{msg.name}" >
                             <h:outputText value="#{item.objectName}"/>
                         </p:column>
-<!--                        <p:column headerText="图片" exportable="false">-->
-<!--                            <p:graphicImage value="#{fileDownloadService.getFile(item.objectStorageId)}" height="80" width="100" stream="false" >-->
-<!--                            </p:graphicImage>-->
-<!--                        </p:column>-->
+                        <p:column headerText="图片" exportable="false">
+                            <p:graphicImage value="#{fileDownloadService.getFile(item.objectStorageId)}" height="80" width="100" stream="false" >
+                            </p:graphicImage>
+                        </p:column>
                         <p:column headerText="操作">
         <!--                    <p:commandButton process="@this" icon="ui-icon ui-icon-file-download" style="zoom:0.8;" title="#{msg.Download}"-->
         <!--                                     rendered="#{not empty item}"-->
         <!--                    />-->
-                            <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" style="zoom:0.8;" title="识别"
-                                             update="nameplateRecognitionForm" rendered="#{not empty item}" actionListener="#{assetInfoEditController.plateRecognition(item.objectStorageId)}"/>
+                            <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8;" title="识别"
+                                           onclick="disableAction()"  update="nameplateRecognitionForm" rendered="#{not empty item}" actionListener="#{assetInfoEditController.plateRecognition(item.objectStorageId)}"/>
                         </p:column>
                     </p:dataTable>
 
@@ -102,8 +102,8 @@
                             <label class="label">#{msg.manufactDate}</label>
                             <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" />
                         </h:panelGroup>
-                        <p:commandButton  value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" oncomplete="PF('nameplateRecognitionDlg').hide();" validateClient="true" update="tab:AssetInfoEditForm @(.manufacturerChange)" style="float:left" />
-                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
+                        <p:commandButton class="my-button" value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" oncomplete="PF('nameplateRecognitionDlg').hide();" validateClient="true" update="tab:AssetInfoEditForm @(.manufacturerChange)" style="float:left" />
+                        <p:commandButton class="my-button"  value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
 
                     </p:panelGrid>
                 </p:fieldset>
@@ -111,7 +111,18 @@
 
             </h:form>
     </p:dialog>
-
+    <h:outputScript>
+        function disableAction(){
+            // 选中所有目标元素
+            const buttons = document.querySelectorAll('.my-button');
+            // 遍历并禁用
+            buttons.forEach(button => {
+                button.classList.add('is-disabled'); // 添加视觉禁用类
+                button.disabled = true;              // 真正禁用功能
+                button.style.backgroundColor='#cccccc'
+            });
+        }
+    </h:outputScript>
 
 </ui:composition>
         <!--</html>-->
