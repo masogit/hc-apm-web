@@ -17,4 +17,5 @@ public class WorkOrderEventRecordDto {
     private String currentPersonName;
     private Date approvalDate;
     private Integer detailCount;
+    private Integer assetId;
 }

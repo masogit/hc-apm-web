@@ -519,9 +519,9 @@ public class AssetInfoDetailController {
         return orders.get(0).getId();
     }
 
-    public String getQueryTabValue(V2_PmOrder item) {
+    public String getQueryTabValue(Integer assetId) {
         boolean isYiMaiYangGuangTenant = userContextService.isYiMaiYangGuangTenant();
-        boolean selectedIdMatches = selected.getId().equals(item.getAssetId());
+        boolean selectedIdMatches = selected.getId().equals(assetId);
         if (!isYiMaiYangGuangTenant || selectedIdMatches) {
             return "0";
         } else {
