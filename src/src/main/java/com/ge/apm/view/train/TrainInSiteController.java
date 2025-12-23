@@ -95,7 +95,8 @@ public class TrainInSiteController extends GenericCRUDUUIDController<TrainInfo> 
             WebUtil.addErrorMessage("该主课程下仍包含子课程，必须先删除所有子课程后才能删除主课程。请先移除子课程，再尝试删除。");
             return;
         }
-        super.delete();
+        dao.delete(selected);
+        WebUtil.addSuccessMessage("删除成功");
     }
 
     @Override

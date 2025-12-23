@@ -93,7 +93,7 @@
                       </p:column>
                       <f:facet name="{Toolbar}">
                           <p:commandButton immediate="false" process="@this" id="createSignButton"  validateClient="false" value="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareSignCreate}" update=":growl :signDlg" oncomplete="PF('signDlg').show()"  rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
-                          <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" value="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteSign}" update=":growl :detailEditForm:signDatalist " disabled="#{empty trianInSiteEditController.selectedTrainDetailSign}" rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
+                          <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" value="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteSign}" update=":growl :detailEditForm:signDatalist :detailEditForm:actualSignTotal :detailEditForm:signTotal" disabled="#{empty trianInSiteEditController.selectedTrainDetailSign}" rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
                               <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                           </p:commandButton>
                           <p:commandButton value="#{msg.exportToXLS}"  class="btn btn-sm btn-gray" ajax="false">
