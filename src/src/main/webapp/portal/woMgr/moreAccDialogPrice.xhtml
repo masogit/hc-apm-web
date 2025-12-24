@@ -14,7 +14,7 @@
                         <c:when test="#{!workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
                             <h:panelGroup>
                                 <label class="label">#{msg.PartName}*</label>
-                                <p:inputText value="#{workOrderMgrController.itemDetail.parts}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                                <p:inputText value="#{workOrderMgrController.itemDetail.parts}" required="true"   requiredMessage="#{msg.PartName} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                         </c:when>
                         <c:otherwise>
@@ -27,6 +27,7 @@
                                                 completeMethod="#{workOrderMgrController.autosparePartName}"
                                                 var="item" itemLabel="#{item.name}"
                                                 itemValue="#{item}"
+                                                required="true"  requiredMessage="#{msg.PartName} #{msg.ValidationRequire}"
                                                 converter="simplePartsItemConverter">
                                     <p:ajax event="itemSelect"
                                             listener="#{workOrderMgrController.onSparePartsValueChange}"
@@ -36,7 +37,7 @@
                             </h:panelGroup>
                             <h:panelGroup  rendered="#{workOrderMgrController.statusFlag==3}">
                                 <label class="label">#{msg.PartName}*</label>
-                                <p:inputText id="partsOther" value="#{workOrderMgrController.itemDetail.parts}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                                <p:inputText id="partsOther" value="#{workOrderMgrController.itemDetail.parts}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{workOrderMgrController.statusFlag==2}">
                                 <label class="label">#{msg.PartName}*</label>
@@ -46,6 +47,7 @@
                                                 completeMethod="#{workOrderMgrController.initSparePartsMaster}"
                                                 var="item" itemLabel="#{item.name}"
                                                 itemValue="#{item}"
+                                                required="true"  requiredMessage="#{msg.PartName} #{msg.ValidationRequire}"
                                                 converter="simplePartsItemConverter">
                                     <p:ajax event="itemSelect"
                                             listener="#{workOrderMgrController.onSparePartsMasterValueChange}"
