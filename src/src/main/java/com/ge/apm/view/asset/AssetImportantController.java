@@ -102,7 +102,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         if (StringUtils.hasText(importantIsNull)) {
             if (importantIsNull.equals("assetDeptName")) {
-                importantIsNull = "assetDeptId";
+                importantIsNull = "assetDeptUID";
             }
             if (importantIsNull.equals("clinicalDeptName")) {
                 importantIsNull = "clinicalDeptUID";
