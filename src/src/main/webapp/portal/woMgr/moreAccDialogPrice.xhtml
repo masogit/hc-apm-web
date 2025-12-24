@@ -77,8 +77,8 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.PartType}</label>
-                        <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}">
+                        <label class="label">#{msg.PartType}*</label>
+                        <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}" required="true" requiredMessage="#{msg.PartType} #{msg.ValidationRequire}"  >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             <p:ajax event="itemSelect"  update="moreAccDialogFormX" listener="#{workOrderMgrController.changeStatus()}"/>
