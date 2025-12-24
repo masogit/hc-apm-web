@@ -70,7 +70,7 @@ public class AssetInfoRepositoryImpl implements AssetInfoRepositoryCustom {
         Expression<Long> totalExpr = cb.count(root);
         // 字段非自然列变更
         if (fieldName.equals("assetDeptName")) {
-            fieldName = "assetDeptId";
+            fieldName = "assetDeptUID";
         }
         // 3. 填写数：根据字段是否“有值”
         Path<?> fieldPath = root.get(fieldName);
