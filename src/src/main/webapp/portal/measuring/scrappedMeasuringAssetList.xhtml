@@ -99,6 +99,9 @@
                     <p:column headerText="检测单位" filterBy="#{item.lastCheckCompany}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.lastCheckCompany}"/>
                     </p:column>
+                    <p:column headerText="检测人" filterBy="#{item.checkPerson}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.checkPerson}"/>
+                    </p:column>
                     <p:column headerText="计量日期" sortBy="#{item.checkDate}" filterBy="#{item.checkDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterCheckDate" widgetVar="varFilterCheckDate" />
