@@ -25,7 +25,7 @@ public interface HisAdministrativeOfficesMatchRepository extends GenericReposito
 
     @Transactional
     @Modifying
-    @Query(value="delete from his_equipment_sfxm_match o where o.id = ?1 ",nativeQuery = true)
+    @Query(value="delete from his_administrative_offices_match o where o.id = ?1 ",nativeQuery = true)
     public void deleteById(String id);
 
 
