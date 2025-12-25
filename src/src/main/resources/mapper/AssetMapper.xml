@@ -23,6 +23,7 @@
         <result column="last_metering_date" property="lastMeteringDate"/>
         <result column="next_metering_date" property="nextMeteringDate"/>
         <result column="check_date" property="checkDate"/>
+        <result column="check_person" property="checkPerson"/>
         <result column="bo_uuid" property="boUuid"/>
         <result column="tenant_uid" property="tenantUID"/>
         <result column="institution_uid" property="institutionUID"/>
@@ -54,6 +55,7 @@
         ai.last_metering_date,
         mcd.valid_date_to next_metering_date,
         mcd.check_date,
+        mcd.check_person,
         mcd.id as bo_uuid
         FROM asset_info ai
         INNER JOIN measuring_certificate_detail mcd ON mcd.asset_uid = ai.uid

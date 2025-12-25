@@ -878,6 +878,10 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Transient
     @TableField(exist = false)
+    private String checkPerson;
+
+    @Transient
+    @TableField(exist = false)
     private String boUuid;
 
     @Transient
@@ -3267,6 +3271,14 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setCheckDate(Date checkDate) {
         this.checkDate = checkDate;
+    }
+
+    public String getCheckPerson() {
+        return checkPerson;
+    }
+
+    public void setCheckPerson(String checkPerson) {
+        this.checkPerson = checkPerson;
     }
 
     public String getBoUuid() {
