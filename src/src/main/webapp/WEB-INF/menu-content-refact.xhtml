@@ -85,7 +85,7 @@
                            <p:menuitem fragment="um01023" id="um01023" value="备件报表" outcome="/portal/parts/PartsReport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PARTS_REPORT_EDIT')}"/>
                        </p:submenu>
                    </c:when>
-                   <c:when test="#{item eq 'ADVERSE_MANAGE'}">
+                   <c:when test="#{item eq 'ASSET_ADVERSE_EVENT'}">
                        <p:submenu id="um019" label="不良事件管理" icon="fa fa-briefcase fa-fw" rendered="#{userContextService.accessContainsFunctionMenu2('ADVERSE')}" >
                            <p:menuitem fragment="um098" id="um098" value="不良事件上报" outcome="/portal/adverseEventManagement/adverseEventList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ADVERSE_EVENT_EDIT') and userContextService.canRender('ASSET_ADVERSE_EVENT')}"/>
                            <p:menuitem fragment="um099" id="um099" value="不良事件审核" outcome="/portal/adverseEventManagement/adverseEventApproveList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ADVERSE_EVENT_APPROVE_EDIT') and userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE') and userContextService.canRender('ASSET_ADVERSE_EVENT')}"/>
@@ -293,7 +293,7 @@
                        </p:submenu>
                    </c:when>
                    <!-- BI报表分析 -->
-                   <c:when test="#{item eq 'BI_REPORT_MANAGE'}">
+                   <c:when test="#{item eq 'BI_REPORT'}">
                        <!-- 此处二级菜单新增的时候以BI_开头以适应规则 -->
                        <p:submenu id="biReportManage" label="BI报表分析" icon="fa fa-tags fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW') or userContextService.accessContainsFunctionMenu('BI_')}">
                            <!-- 设备数据概览 -->
