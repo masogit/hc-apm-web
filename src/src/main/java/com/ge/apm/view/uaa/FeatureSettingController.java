@@ -364,7 +364,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             // 2. 新增的 feature 追加到末尾
             for (int i = 0; i < featureArray.size(); i++) {
                 String feature = featureArray.getString(i);
-                if (result.contains(feature)) {
+                if (!result.contains(feature)) {
                     result.add(feature);
                 }
             }
@@ -379,7 +379,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         }
     }
 
-    public void saveMenuOrder(){
+    public void saveMenuOrder() {
         try {
             List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
             orderedItems.addAll(featureList.stream()
