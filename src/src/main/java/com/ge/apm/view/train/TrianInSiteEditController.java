@@ -350,12 +350,14 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         orgInfoList = trainManageService.queryOrgToSign(selected.getTrainingDeptUid());
     }
 
+    List<TrainDetailSign> deleteSignList = new ArrayList<>();
     /**
      * 删除签到信息
      */
     public void deleteSign(){
         if(StrUtil.isNotEmpty(selectedTrainDetailSign.getDetailId())){
-            trainManageService.deleteSign(selectedTrainDetailSign);
+            //trainManageService.deleteSign(selectedTrainDetailSign);
+            deleteSignList.add(selectedTrainDetailSign);
         }
         trainDetailSignList.remove(selectedTrainDetailSign);
         if(CollectionUtils.isNotEmpty(trainDetailSignList)){
@@ -432,7 +434,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
      */
     public void saveDetail(){
         // 调用服务层保存培训详情信息
-        trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, resultBlobObjectList, trainDetailSignList);
+        trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, resultBlobObjectList, trainDetailSignList, deleteSignList);
         // 重置选中的培训详情对象和培训详情标识列表
         selectedTrainDetail = null;
         trainDetailSignList = new ArrayList<>();

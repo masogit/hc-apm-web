@@ -24,6 +24,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.TabChangeEvent;
@@ -209,17 +210,17 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         }*/
         //inventoryIssueRepository
         Pagination pagination = new Pagination(0, 1000);
-        Wrapper wrapper = getWrapper("d.asset_id", null, null, ListUtil.newArrayList(this.assetInfo.getId()), "last_modified_date");
+        Wrapper wrapper = getWrapper("d.asset_id", null, null, ListUtil.newArrayList(this.assetInfo.getId()), null);
         if (ObjectUtil.isNotEmpty(startTime)) {
-            wrapper.ge("d.plan_start_time", startTime);
+            wrapper.ge("io.plan_start_time", startTime);
         }
         if (ObjectUtil.isNotEmpty(endTime)) {
-            wrapper.le("d.plan_end_time", endTime);
+            wrapper.le("io.plan_end_time", endTime);
         }
         if(isSolvedFilter != null){
-            wrapper.eq("d.is_solved", isSolvedFilter);
+            wrapper.eq("ii.is_solved", isSolvedFilter);
         }
-
+        wrapper.orderBy("d.last_modified_date", false);
         List<InventoryOrderDetail> inventoryOrderDetails =inventoryOrderMapper.selectInventoryDetailByCondition(pagination, wrapper);
         if(inventoryOrderDetails != null && inventoryOrderDetails.size()>0){
             for(InventoryOrderDetail inventoryOrderDetail:inventoryOrderDetails){
@@ -272,12 +273,15 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         if (ObjectUtil.isNotEmpty(assetIds)) {
             wrapper.in(queryField, assetIds);
         }
-        if (ObjectUtil.isNotEmpty(startTime)) {
-            wrapper.ge(dateField, startTime);
+        if(StrUtil.isNotEmpty(dateField)){
+            if (ObjectUtil.isNotEmpty(startTime)) {
+                wrapper.ge(dateField, startTime);
+            }
+            if (ObjectUtil.isNotEmpty(endTime)) {
+                wrapper.le(dateField, endTime);
+            }
         }
-        if (ObjectUtil.isNotEmpty(endTime)) {
-            wrapper.le(dateField, endTime);
-        }
+
         wrapper.orderBy(dateField, false);
         return wrapper;
     }
