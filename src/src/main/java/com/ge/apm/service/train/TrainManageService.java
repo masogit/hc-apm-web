@@ -217,7 +217,7 @@ public class TrainManageService extends MicroServiceInvoker {
     }
 
     @Transactional
-    public List<TrainDetail> saveDetail(TrainDetail trainDetail,String detailActionName, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, List<V2_BlobObject> resultBlobObjectList, List<TrainDetailSign> trainDetailSignList){
+    public List<TrainDetail> saveDetail(TrainDetail trainDetail,String detailActionName, List<V2_BlobObject> blobObjects, TrainInfo trainInfo, List<V2_BlobObject> resultBlobObjectList, List<TrainDetailSign> trainDetailSignList, List<TrainDetailSign> deleteSignList){
         if("Create".equals(detailActionName)){
             trainDetail.setCreatedDate(new Date());
         }else{
@@ -249,7 +249,11 @@ public class TrainManageService extends MicroServiceInvoker {
                 }
             }
         }
-
+        if(CollectionUtils.isNotEmpty(deleteSignList)){
+            for(TrainDetailSign trainDetailSign : deleteSignList){
+                trainDetailSignRepository.delete(trainDetailSign);
+            }
+        }
         List<TrainDetail> trainDetailList = trainDetailRepository.findByTrainId(trainDetail.getTrainId());
         if("Create".equals(detailActionName)){
             trainInfo.setStatus(TrainDetail.Status.Planned.name());//已计划

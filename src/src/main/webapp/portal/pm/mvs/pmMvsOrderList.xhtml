@@ -162,23 +162,30 @@
                     <ui:fragment rendered="true">
                         <p:commandButton  icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="btn-export-maintenance-report" title="批量下载附件工单" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false"/>
                     </ui:fragment>
-                    <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
-                                     message="#{v2PmOrderMvsController.messageTip}"
-                                     header="确认下载"
-                                     severity="warn" class="downloadConfirm">
-                        <p:commandButton value="确定" ajax="false"
-                                         actionListener="#{v2PmOrderMvsController.doExportWorkOrderReport()}"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton" icon="ui-icon-check">
-                            <p:fileDownload value="#{v2PmOrderMvsController.maintenanceWorkReport}" oncomplete="PF('downloadConfirm').hide()" />
-                        </p:commandButton>
-                        <!-- 取消按钮 -->
-                        <p:commandButton value="取消" type="button"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton" icon="ui-icon-close"
-                        />
-                    </p:confirmDialog>
+
                 </f:facet>
             </p:dataTable>
         </h:form>
+
+        <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
+                         message="#{v2PmOrderMvsController.messageTip}"
+                         header="确认下载"
+                         severity="warn" class="downloadConfirm" width="700px">
+            <h:form>
+                <p:commandButton value="确定" ajax="false"
+                                 actionListener="#{v2PmOrderMvsController.doExportWorkOrderReport()}"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton"
+                                 icon="ui-icon-check">
+                    <p:fileDownload value="#{v2PmOrderMvsController.maintenanceWorkReport}"
+                                    oncomplete="PF('downloadConfirm').hide()"/>
+                </p:commandButton>
+                <p:commandButton value="取消" type="button"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton"
+                                 icon="ui-icon-close"
+                />
+            </h:form>
+        </p:confirmDialog>
+
         <p:overlayPanel id="idMvsPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="pmTab:pmMvsListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>

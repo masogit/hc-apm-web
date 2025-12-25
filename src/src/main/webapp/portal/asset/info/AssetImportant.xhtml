@@ -137,7 +137,7 @@
                         <!-- 使用部门 -->
                         <p:column headerText="#{msg.assetDeptName}" width="130"
                                   rendered="#{currentCustomConfigController.showImportantField('assetDeptName')}">
-                            <h:outputText value="#{item.assetDeptName}"/>
+                            <h:outputText value="#{assetImportantController.findDeptName(item.assetDeptUID)}"/>
                         </p:column>
                         <!-- 使用人 -->
                         <p:column headerText="#{msg.clinicalOwnerName}" width="130"

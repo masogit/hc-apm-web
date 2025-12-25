@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.analysis.FieldFillRateDTO;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -41,6 +42,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
     private CustomConfigService customConfigService;
     private I18nMessageRepository I18dao;
     private OrgInfoRepository orgDao;
+    private ConfigCacheService configCacheService;
     @Getter
     private CustomConfigObject customConfig;
     //选定的院区
@@ -80,6 +82,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
         customConfigService = WebUtil.getBean(CustomConfigService.class);
         I18dao = WebUtil.getBean(I18nMessageRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         customConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         this.selectedMap = new HashMap();
         loadSList();
@@ -99,7 +102,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         if (StringUtils.hasText(importantIsNull)) {
             if (importantIsNull.equals("assetDeptName")) {
-                importantIsNull = "assetDeptId";
+                importantIsNull = "assetDeptUID";
             }
             if (importantIsNull.equals("clinicalDeptName")) {
                 importantIsNull = "clinicalDeptUID";
@@ -144,6 +147,13 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
     @Override
     protected GenericRepository<AssetInfo> getDAO() {
         return dao;
+    }
+
+    public String findDeptName(String deptUid) {
+        if (StringUtils.hasText(deptUid)) {
+            return Optional.ofNullable(configCacheService.findOrgByUid(deptUid)).orElse(new OrgInfo()).getName();
+        }
+        return null;
     }
 
     public void siteChangeEvent() {
