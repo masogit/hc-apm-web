@@ -897,7 +897,7 @@
                                         <p:ajax event="blur" listener="#{featureSettingController.changeActiveListener}" update="datalist"/>
                                     </p:inputText>
                                 </h:panelGroup>
-                                <p:dataTable id="datalist" value="#{featureSettingController.filterAdminFeatureActives}" rendered="#{featureSettingController.tabIndex == 1}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                <p:dataTable id="datalist" value="#{featureSettingController.filterAdminFeatureActives}" rendered="#{featureSettingController.tabIndex == 2}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
                                              scrollable="false"
                                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                              sortMode="single"
@@ -958,9 +958,9 @@
                         </p:tab>
                     </p:tabView>
                     <br/>
-                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 0}" actionListener="#{featureSettingController.saveFeatures}"
+                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 0 or featureSettingController.tabIndex == 1}" actionListener="#{featureSettingController.saveFeatures}"
                                      value="#{msg.Save}" update=":SiteInfoEditVersionForm " icon="ui-icon-check"/>
-                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 2}" actionListener="#{featureSettingController.saveMenuOrder}"
+                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 3}" actionListener="#{featureSettingController.saveMenuOrder}"
                                      value="#{msg.Save}" update=":SiteInfoEditVersionForm " icon="ui-icon-check"/>
                 </h:form>
                 <p:dialog modal="true" id="Links" widgetVar="Links" header="激活链接" appendTo="@(body)">
