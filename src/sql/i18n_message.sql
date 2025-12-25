@@ -5088,17 +5088,16 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- 添加提醒消息推送菜单
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ReminderConfiguration', '消息提醒配置', 'Message reminder configuration', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'reminderRule', '提醒规则类型', 'asset expire reminder', NULL, '-1');
--- INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'Default', '默认到期提醒', 'default expire reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'AssetLifecycle', '资产到期提醒', 'asset expire reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'AssetWarrantyDate', '设备维保截止日期到期提醒', 'Equipment maintenance deadline expiration reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'ProbationExpiration', '设备试用到期提醒', 'Asset Probation expiration reminder', NULL, '-1');
--- INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'Measuring', '计量到期提醒', 'measuring expire reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'ContractOverdue', '合同到期提醒', 'contract expire reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'ContractAck', '合同验收提醒', 'contract acceptance reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'UnattendedApproval', '无人值守审批提醒', 'unattended expire reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'NurseSiteMaintainItem', '日常检查工单提醒', 'NurseSiteMaintainItem expire reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'UnattendedOverdue', '无人值守借用超期提醒', 'unattended overdue reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'SupplierReview', '供应商注册审核提醒', 'supplier registration review reminder', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'InventoryUnfinished', '盘点工单未完成提醒', 'Inventory unfinished', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'AdjustmentCenterReturn', '调剂中心归还提醒', 'adjustment center return reminder', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'reminderType', '提醒类型', 'reminder type', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderType', 'wechat', '微信', 'wechat', NULL, '-1');
