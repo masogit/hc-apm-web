@@ -131,7 +131,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     }
 
     public void changeTab(TabChangeEvent event) {
-        if (tabIndex == 2) {
+        if (tabIndex == 3) {
             List<String> featureList = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class);
             List<ApmFeatureDefaultOrder> apmFeatureDefaultOrderList =  Arrays.stream(ApmFeatureDefaultOrder.values()).collect(Collectors.toList());
             List<String> defaultOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(Enum::name).collect(Collectors.toList());
