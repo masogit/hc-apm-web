@@ -27,6 +27,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -692,5 +693,13 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
 		}
 		return user.getName() + "-" + org.getName();
+	}
+
+	public boolean newVersionTenant() {
+		if (ObjectUtils.isEmpty(selected)) {
+			return true;
+		} else {
+			return (selected.getType() != 0 && selected.getType() != 2);
+		}
 	}
 }
