@@ -9,6 +9,27 @@
 
 <ui:composition>
     <div class="ui-g-12 card">
+        <h:form id="searchForm" class="searchForm">
+            <h:panelGroup>
+                <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg" for="pmTab:pmOrderListForm:datalist:btnOrg" hideEffect="fade" dynamic="false" modal="false" >
+                    <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="pmTab:searchForm:treeNodeNameFilter @this" update="pmTab:searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="pmTab:searchForm:treeNodeNameFilter @this" update="pmTab" value="确定"/>
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{v2PmOrderController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"     dynamic="false"  cache="false"   propagateSelectionUp="#{orgTreeController.propagateSelectionUp}"    >
+                            <p:ajax process="@this" event="select" listener="#{v2PmOrderController.onSelectSiteTreeNode}"/>
+                            <p:ajax process="@this" event="unselect" listener="#{v2PmOrderController.onUnSelectSiteTreeNode}"/>
+                            <p:ajax process="@this" event="expand"/>
+                            <p:ajax process="@this" event="collapse"/>
+                            <p:treeNode type="org">
+                                <h:outputText value="#{node.name}"/>
+                            </p:treeNode>
+                            <p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
+                    </p:scrollPanel>
+                </p:overlayPanel>
+            </h:panelGroup>
+        </h:form>
         <h:form id="pmOrderListForm">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                 <c:choose>
@@ -59,15 +80,11 @@
                             <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
-
                 </p:column>
 
                 <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.siteUidFilter}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{v2PmOrderController.LoadSiteNameList()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
-                        </p:selectOneMenu>
+                        <p:autoComplete id="btnOrg" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     </f:facet>
                     <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
                 </p:column>

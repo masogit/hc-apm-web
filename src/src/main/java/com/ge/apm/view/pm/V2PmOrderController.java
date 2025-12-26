@@ -65,6 +65,7 @@ import org.primefaces.event.*;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -307,6 +308,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Getter @Setter
     private boolean repaFlag = false;
+
+    @Getter @Setter
+    private TreeNode[] selectedAccessOrgNodes;
 
     private WorkflowService workflowService;
 
@@ -1986,7 +1990,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<SearchFilter> filterArrayList = new ArrayList<>();
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
-
         if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
@@ -2033,8 +2036,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterArrayList.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
-//            searchFilters = new ArrayList();
-            setSearchFilter();
             pmIdList = new ArrayList<>();
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
@@ -2645,6 +2646,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         filterArrayList.clear();
+        if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+            List<String> selectedSiteList = ListUtil.newArrayList();
+            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+                selectedSiteList.add(orgInfo.getUid());
+            }
+            filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+        }
         updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
@@ -2812,14 +2824,31 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
-        this.filterArrayList.clear();
-        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            selectSite = (OrgInfo) event.getTreeNode().getData();
-        } else {
-            selectSite = null;
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+
+    public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
+        this.searchFilters.clear();
+        loadClinicalDeptList();
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
         }
-        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-            selectSite = null;
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
         }
     }
 
