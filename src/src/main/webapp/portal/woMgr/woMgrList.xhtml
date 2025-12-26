@@ -67,8 +67,12 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500" >
-
-                <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectOrder(null)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" update=" woTab:ServiceRequestCreateForm manHoursManageButton "/>
+                <c:if test="#{workOrderMgrController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectOrder(null)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" update=" woTab:ServiceRequestCreateForm manHoursManageButton "/>
+                </c:if>
+                <c:if test="#{workOrderMgrController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectOrder(null)}"  update=" woTab:woMgrDetailForm manHoursManageButton "/>
+                </c:if>
                 <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist   " oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 

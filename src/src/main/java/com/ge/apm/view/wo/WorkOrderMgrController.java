@@ -335,6 +335,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
 
     private String displayModeCasePriority;
+
+    @Setter@Getter
+    private String pageType ;
+
     @Override
     protected void init() {
         try {
@@ -445,6 +449,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 ix2.stream().forEach(
                         item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
                 loadClinicalDeptList();
+                getPageTypeFromConfig();
             }
         } catch (Exception e) {
             LOGGER.error("init occur exception", e);
@@ -459,6 +464,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
+    }
+
+    public void getPageTypeFromConfig() {
+        String  key= "WorkOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
     }
 
     public void onSelectAllOfPage() {
@@ -2168,7 +2182,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newServiceRequest.setRequestorId(loginUser.getId());
         newServiceRequest.setFromDeptId(loginUser.getOrgInfoId());
         newServiceRequest.setRequestorName(loginUser.getName());
-        newServiceRequest.setRequestorPhone(loginUser.getTelephone());
+        String requestorPhone = loginUser.getTelephone();
+        if(StrUtil.isNotEmpty(loginUser.getLandlineNumber())){
+            requestorPhone = (StrUtil.isNotEmpty(requestorPhone) ? requestorPhone.concat("，") : "").concat(loginUser.getLandlineNumber());
+        }
+        newServiceRequest.setRequestorPhone(requestorPhone);
         newServiceRequest.setRequestTime(new Date());
         if(repairReportSendPlace != null){
             newServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());

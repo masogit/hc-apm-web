@@ -305,7 +305,7 @@
                                         <label class="label">#{msg.travelTime}</label>
                                         <p:outputLabel id="travel_time"  value="#{woItem.travelTime}" />
                                     </h:panelGroup>
-                                    <h:panelGroup >
+                                    <h:panelGroup rendered="#{woItem.currentStepId != 1 and woItem.currentStepId != 2}">
                                         <label class="label">#{msg.repairType}</label>
                                         <p:outputLabel value="#{fieldMsg.fieldValue('repairType',woItem.repairType)}" />
                                     </h:panelGroup>
