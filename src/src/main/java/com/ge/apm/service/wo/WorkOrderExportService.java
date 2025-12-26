@@ -193,19 +193,23 @@ public class WorkOrderExportService {
         if (StringUtils.isNotEmpty(v2WorkOrderReportDto.getSrNum())) {
             searchFilters.add(new SearchFilter("srNum", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSrNum()));
         }
-        List<Integer> assetIds = getVisableMvAssetIds(v2WorkOrderReportDto.getSelectedOrg(), v2WorkOrderReportDto.getClinicalDept());
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
-        if (!assetIds.isEmpty()) {
-            List<Integer> orderAssetIds = workOrderList.stream().map(WorkOrderExportPojo::getAssetId).collect(Collectors.toList());
-            List<Integer> mvsAssetIds = assetIds.stream().filter(assetId -> !orderAssetIds.contains(assetId)).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, mvsAssetIds));
-            workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
-        }
+        searchFilters.add(new SearchFilter("userUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+        List<WorkOrderExportPojo> mvsWorkOrderList = worDao.mvsWorkOrderExport(searchFilters);
+        workOrderList.addAll(mvsWorkOrderList);
+//        List<Integer> assetIds = getVisableMvAssetIds(v2WorkOrderReportDto.getSelectedOrg(), v2WorkOrderReportDto.getClinicalDept());
+//        if (!assetIds.isEmpty()) {
+//            List<Integer> orderAssetIds = workOrderList.stream().map(WorkOrderExportPojo::getAssetId).collect(Collectors.toList());
+//            List<Integer> mvsAssetIds = assetIds.stream().filter(assetId -> !orderAssetIds.contains(assetId)).collect(Collectors.toList());
+//            searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, mvsAssetIds));
+//            workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
+//        }
         List<I18nMessage> spare01 = i18nMessageService.getByMsgType("spare01");
         List<I18nMessage> spare02 = i18nMessageService.getByMsgType("spare02");
         List<I18nMessage> spare03 = i18nMessageService.getByMsgType("spare03");
         List<I18nMessage> spare04 = i18nMessageService.getByMsgType("spare04");
         List<I18nMessage> spare05 = i18nMessageService.getByMsgType("spare05");
+        List<Integer> assetIds = mvsWorkOrderList.stream().map(WorkOrderExportPojo::getAssetId).collect(Collectors.toList());
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             workOrderExportPojo.setMVSWorkOrder(assetIds.contains(workOrderExportPojo.getAssetId()));
             boolean isReturn = true;
