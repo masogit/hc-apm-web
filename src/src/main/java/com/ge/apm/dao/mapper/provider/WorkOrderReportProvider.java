@@ -193,15 +193,86 @@ public class WorkOrderReportProvider {
                 "LEFT JOIN user_account ua ON ua.id = sr.requestor_id " +
                 "LEFT JOIN asset_fault_type aft ON aft.id=wo.case_type " +
                 "LEFT JOIN org_info oi ON ai.clinical_dept_uid = oi.uid " +
-                "WHERE 1=1 "
+                "WHERE ai.is_valid AND NOT ai.is_deleted"
         );
 
         String filter = buildFilter(searchFilterList);
         sb.append(filter);
         sb.append(" order by wo.created_date desc ");
-
         return sb.toString();
+    }
 
+    public String mvsWorkOrderExport(Map<String, Object> param) {
+
+        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("select wo.id as id,wo.sr_id as srId,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.uid as assetUid," +
+                "ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
+                "wo.status as status, ai.id as assetId ,ai.risk_grade as riskGrade, " +
+                "wo.sub_status as subStatus, " +
+                "ai.registration_no as registrationNo, "+
+                "ai.warranty_date as warrantyDate, "+
+                "ai.factory_warranty_date as factoryWarrantyDate, "+
+                "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
+                "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +
+                "oi.short_name as assetClinicalDeptName, " +
+                "ai.asset_group as assetGroup, " +
+                "ai.function_group as assetFunctionGroup, " +
+                "ai.asset_code68 as assetCode68, " +
+                "ai.function_type as assetFunctionType,wo.current_person_name as currentPersonName, " +
+                "wo.current_step_id as currentStepId, " +
+                "sr.requestor_name as requestorName,sr.request_time as requestTime,sr.request_reason as requestReason, " +
+                "wo.send_step_owner_name as sendStepOwnerName, " +
+                "wo.send_step_start_time as sendStepStartTime, " +
+                "wo.int_ext_type as intExtType, " +
+                "wo.repair_result as repairResult, " +
+                "wo.repair_type as repairType, " +
+                "wo.accept_step_owner_name as acceptStepOwnerName, " +
+                "wo.accept_step_start_time as acceptStepStartTime, " +
+                "wo.work_step_end_time as workStepEndTime, " +
+                "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
+                "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(wod.closed_price, ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
+                "(select sum(wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = true or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
+                "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
+                "wo.evaluate_step_owner_name as evaluateStepOwnerName, " +
+                "wo.evaluate_step_end_time as evaluateStepEndTime," +
+                "wo.close_step_owner_name as closeStepOwnerName, " +
+                "wo.close_step_end_time as closeStepEndTime, " +
+                "(select string_agg(woc.cowoker_user_name,',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworker, " +
+                "(select string_agg(to_char(woc.man_hours,'9999990.99'),',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworkManHour, " +
+                "sr.nearest_sr_days as nearestWorkDay,sr.confirmed_down_time as confirmedDownTime,sr.confirmed_up_time as confirmedUpTime,wo.feedback_rating as feedbackRating, wo.feedback_comment as feedbackComment,wo.close_time as closeTime, " +
+                "(case when sr.requestor_phone is not null then sr.requestor_phone else ua.telephone end) as telephone," +
+                "aft.fault_name as caseTypeName, " +
+                "ai.status as assetStatus, " +
+                "wo.external_quotation as externalQuotation," +
+                "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes ," +
+                "wo.sieble_number as siebleNumber,wo.call_center_number as callCenterNumber, " +
+                "(select string_agg(concat('开始时间:',woh.start_time,'结束时间:', woh.end_time, '工时:', cast(woh.hours as decimal(10,2)),'备注:', woh.remark, ';'),'') from v2_work_order_man_hours_detail woh where woh.wo_id=wo.id GROUP BY woh.wo_id) as workHourDetail, " +
+                "wo.entry_type as entryType, " +
+                " wo.coworker_entry_type as coworkerEntryType, "+
+                " wo.travel_time as travelTime, "+
+                " case when wo.coworker_entry_type = 0 THEN (SELECT string_agg(concat('协作者:',woc.cowoker_user_name,CAST(woc.man_hours AS DECIMAL(10,2)),'备注:',woc.remark,';'),'') FROM V2_Work_Order_Coworker woc WHERE woc.wo_id=wo.ID GROUP BY woc.wo_id) " +
+                " when wo.coworker_entry_type = 1 THEN (SELECT string_agg(concat('协作者:',woc.cowoker_user_name,'开始时间:', woc.start_time, '结束时间:', woc.end_time,CAST(woc.man_hours AS DECIMAL(10,2)),'备注:',woc.remark,';'),'') FROM V2_Work_Order_Coworker woc WHERE woc.wo_id=wo.ID GROUP BY woc.wo_id) end as coworkerEntryDetail, " +
+                "wo.work_order_type as workOrderType, " +
+                "wo.main_sub as mainSub, " +
+                "ai.spare01,ai.spare02,ai.spare03,ai.spare04,ai.spare05,ai.spare06,ai.spare07,ai.spare08,ai.spare09,ai.spare10 " +
+                "from v2_work_order wo " +
+                "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
+                "INNER JOIN mvs_ib_mapping m1 ON wo.asset_uid = m1.mvs_ib_uid OR wo.asset_uid = m1.e_home_ib_uid " +
+                "INNER JOIN asset_info ai ON ai.id = wo.asset_id " +
+                "INNER JOIN user_org uo ON uo.org_uid IN (ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.clinical_dept_uid) " +
+                "LEFT JOIN user_account ua ON ua.id = sr.requestor_id " +
+                "LEFT JOIN asset_fault_type aft ON aft.id=wo.case_type " +
+                "LEFT JOIN org_info oi ON ai.clinical_dept_uid = oi.uid " +
+                "WHERE AND ai.is_valid AND NOT ai.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL) "
+        );
+
+        String filter = buildFilter(searchFilterList);
+        sb.append(filter);
+        sb.append(" order by wo.created_date desc ");
+        return sb.toString();
     }
 
     public String workOrderExportForMVS(Map<String, Object> param) {
@@ -351,6 +422,9 @@ public class WorkOrderReportProvider {
                     } else if (op.equals(SearchFilter.Operator.LT)) {
                         sb.append(" and sr.request_time<'").append(value).append("' ");
                     }
+                    break;
+                case "userUid":
+                    sb.append(" and uo.user_uid = '").append(value).append("'");
                     break;
                 default:
                     break;
