@@ -31,6 +31,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
@@ -305,6 +306,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<V2_PmOrder> bySearchFilterInternal = null;
     @Getter @Setter
     private List<OrgInfo> orgList;
+    @Setter@Getter
+    private String pageType ;
 
     @Getter @Setter
     private boolean repaFlag = false;
@@ -1786,57 +1789,68 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         //如果是院长等管理层登录进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
-        if (!Strings.isNullOrEmpty(enCodeParameters)) {
-            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
-            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
-            orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
-            if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
-                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
-            }
-        }
-        if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
-            if (Strings.isNullOrEmpty(query)) {
-                queryIndex = 8;
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
-            }
-        }else {
-            if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.hasCurrentTenantName("")){
-                    queryIndex = 10;
-                }else{
-                    queryIndex = -1;
+        if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
+            selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+            onSelectPmOrder();
+        }else{
+            if (!Strings.isNullOrEmpty(enCodeParameters)) {
+                requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+                queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+                orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
+                if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
+                    query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
                 }
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
             }
-        }
-        for (ExportFields exs: ExportFields.values()
-        ) {
-            if(userContextService.isLocale()){
-                pmFieldsExport.add(exs.getChinese());
-            }else{
-                pmFieldsExport.add(exs.getEnglish());
+            if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
+                if (Strings.isNullOrEmpty(query)) {
+                    queryIndex = 8;
+                } else {
+                    queryIndex = Integer.valueOf(query);
+                    searchList(queryIndex);
+                }
+            }else {
+                if (Strings.isNullOrEmpty(query)) {
+                    if(userContextService.hasCurrentTenantName("")){
+                        queryIndex = 10;
+                    }else{
+                        queryIndex = -1;
+                    }
+                } else {
+                    queryIndex = Integer.valueOf(query);
+                    searchList(queryIndex);
+                }
             }
+            for (ExportFields exs: ExportFields.values()) {
+                if(userContextService.isLocale()){
+                    pmFieldsExport.add(exs.getChinese());
+                }else{
+                    pmFieldsExport.add(exs.getEnglish());
+                }
+            }
+            this.filterBySite = false;
+            this.filterByHospital = false;
+            hmCheck = new HashMap<String, UnstructuredData>();
+            isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
+            isInsulate = isInsulate == null ? false : isInsulate;
+            WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
+            if(wfc !=null)
+                isBatchOp=wfc.getPmIsSupportBatchFinish();
+            loadClinicalDeptList();
+            loadRuleList();
+            String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+            showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
+            getPageTypeFromConfig();
         }
-
-
-        this.filterBySite = false;
-        this.filterByHospital = false;
-        hmCheck = new HashMap<String, UnstructuredData>();
-        isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
-        isInsulate = isInsulate == null ? false : isInsulate;
-        WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
-        if(wfc !=null)
-            isBatchOp=wfc.getPmIsSupportBatchFinish();
-        loadClinicalDeptList();
-        loadRuleList();
-        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
-        showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
     }
 
+    public void getPageTypeFromConfig() {
+        String  key= "PmOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
+    }
 
 
     public void loadRuleList(){
@@ -2315,6 +2329,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         loadHmCheck(selected);
         // 获取temp user信息
         initExternalTempUser();
+    }
+
+    public void onSelectOrderRedirect() throws IOException {
+        String url = "actionName=View&selectedid="
+                + selected.getId()
+                + "&queryIndex=" + queryIndex
+                ;
+        url = "pmOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {

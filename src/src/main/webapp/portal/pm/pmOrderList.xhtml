@@ -67,8 +67,12 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-
-                <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                <c:if test="#{v2PmOrderController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectOrderRedirect()}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{v2PmOrderController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                </c:if>
                 <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36" visible="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31 or v2PmOrderController.queryIndex == 7 or v2PmOrderController.queryIndex == -1}" exportable="false">
@@ -739,5 +743,15 @@
 
     <!-- </ui:define>-->
 
+    <script>
+        var newWin;
+        function prepareOrderViewWindow() {
+            newWin = window.open('about:blank', '_blank');
+            newWin.document.body.innerHTML = '加载中...';
+        }
+        function openOrderViewWindow(xhr, status, args) {
+            newWin.location.href = args.url;
+        }
+    </script>
 </ui:composition>
 </html>

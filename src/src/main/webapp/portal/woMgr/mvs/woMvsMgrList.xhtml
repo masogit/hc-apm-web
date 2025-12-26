@@ -22,7 +22,14 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500" >
-                <p:ajax event="rowSelect" listener="#{workOrderMgrMvsController.onSelectWorkOrder}" update = "woTab:woMvsMgrDetailForm" />
+
+                <c:if test="#{workOrderMgrMvsController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderMgrMvsController.onSelectOrderRedirect}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{workOrderMgrMvsController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderMgrMvsController.onSelectWorkOrder}" update = "woTab:woMvsMgrDetailForm" />
+                </c:if>
+
                 <p:ajax event="filter" listener="#{workOrderMgrMvsController.onFilterWo}" update="datalist"/>
                 <p:column width="36" visible="#{workOrderMgrMvsController.queryIndex==8}" exportable="false">
                     <p:selectBooleanCheckbox  value="#{workOrderMgrMvsController.selectedMap[item.id]}"  class="selectCheckBox">
