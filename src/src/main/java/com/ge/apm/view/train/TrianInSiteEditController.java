@@ -524,6 +524,9 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         return internalInstructors.concat(" ").concat(externalInstructors).concat(" ").concat(externalInstructorsCompany);
     }
 
+    public String getExportFileName(){
+        return selected.getCourseName().concat("_").concat(selectedTrainDetail.getName()).concat("_").concat(DateUtil.format(new Date(), "yyyyMMddHHmmss"));
+    }
     @Override
     protected GenericRepositoryUUID<TrainInfo> getDAO() {
         return dao;
