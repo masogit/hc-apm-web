@@ -97,7 +97,7 @@
                               <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                           </p:commandButton>
                           <p:commandButton value="#{msg.exportToXLS}"  class="btn btn-sm btn-gray" ajax="false">
-                              <p:dataExporter type="xls" target="signDatalist" fileName="Train_Info_Sign_Export"/>
+                              <p:dataExporter type="xls" target="signDatalist" fileName="#{trianInSiteEditController.getExportFileName()} "/>
                           </p:commandButton>
                       </f:facet>
                   </p:dataTable>
