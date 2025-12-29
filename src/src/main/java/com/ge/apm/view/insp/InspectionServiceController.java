@@ -320,7 +320,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         detailInventoryOrderDetailList = getInventoryOrderDetailList(assetInfo.getId());
         detailAdverseEventList = getAdverseEventList();
         detailApprovalEventList = getApprovalEventList();
-        //detailAssetChangeHistoryList = getAssetChangeList();
+        detailAssetChangeHistoryList = getAssetChangeList();
     }
 
     private String setStatus(Integer status){
