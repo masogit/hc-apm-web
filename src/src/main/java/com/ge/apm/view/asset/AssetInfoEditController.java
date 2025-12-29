@@ -2719,7 +2719,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         String financingNum = equipmentNameplate.getPattern();
         if(StringUtils.isNotEmpty(financingNum)){
-            this.selected.setFinancingNum(financingNum);
+            this.selected.setFunctionType(financingNum);
         }
 
         String serialNum = equipmentNameplate.getSerial_num();

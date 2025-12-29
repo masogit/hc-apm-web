@@ -7,7 +7,7 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:apm="http://www.ge.com/tags/apm">
     <p:dialog class="coworkerDlg" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.nameplateRecognition}">
-
+        <p:ajax event="close"  update="previewedDlg" oncomplete="PF('previewedDlg').hide()" />
             <h:form id="nameplateRecognitionForm">
                 <p:fieldset legend="#{msg.nameplateRecognition}" style="margin-bottom:20px;height: 300px;overflow-y: auto">
                     <p:dataTable id="datalist" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="item" widgetVar="varDataList"  resizeMode="expand"
@@ -31,6 +31,8 @@
         <!--                    />-->
                             <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8;" title="识别"
                                            onclick="disableAction()"  update="nameplateRecognitionForm" rendered="#{not empty item}" actionListener="#{assetInfoEditController.plateRecognition(item.objectStorageId)}"/>
+                            <p:commandButton process="@this" disabled="#{!preViewerBean.isPreview(item)}" icon="ui-icon ui-icon-search" class="my-button" style="zoom:0.8;" title="预览"
+                                              update="previewedDlg" oncomplete="PF('previewedDlg').show();bringToFront('previewedDlg')" rendered="#{not empty item}" actionListener="#{preViewerBean.onServerEvent(assetInfoEditController,item.objectStorageId)}"/>
                         </p:column>
                     </p:dataTable>
 
@@ -47,11 +49,11 @@
                             <p:inputText  value="#{assetInfoEditController.selected.name}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.financingNum}</label>
+                            <label class="label">#{msg.pattern}</label>
                             <p:inputText  value="#{assetInfoEditController.equipmentNameplate.pattern}" ></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">当前#{msg.financingNum}</label>
+                            <label class="label">当前#{msg.pattern}</label>
                             <p:inputText  value="#{assetInfoEditController.selected.financingNum}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -110,6 +112,7 @@
 
 
             </h:form>
+        <ui:include src="/portal/preview/view.xhtml" />
     </p:dialog>
     <h:outputScript>
         function disableAction(){
@@ -121,6 +124,18 @@
                 button.disabled = true;              // 真正禁用功能
                 button.style.backgroundColor='#cccccc'
             });
+        }
+        function bringToFront(widgetVar) {
+            var dialog = PF(widgetVar).jq;
+            // 获取当前最大 z-index
+            var maxZ = Math.max.apply(null,
+                    $.map($('body > .ui-dialog'), function(e) {
+                        return parseInt($(e).css('z-index')) || 0;
+                    })
+            );
+            dialog.css('z-index', maxZ + 1);
+            // 同时提升遮罩层（modal overlay）
+            $('.ui-widget-overlay').last().css('z-index', 1000);
         }
     </h:outputScript>
 
