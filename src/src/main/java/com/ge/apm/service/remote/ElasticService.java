@@ -41,7 +41,7 @@ public class ElasticService extends MicroServiceInvoker {
         map.put("pageSize",pageSize);
         map.put("sortField","created_date");
         map.put("sortValue","DESC");
-        map.put("esIndex","asset_history");
+        map.put("esIndex","asset_history_v2");
 
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
