@@ -31,7 +31,7 @@
         <!--                    />-->
                             <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8;" title="识别"
                                            onclick="disableAction()"  update="nameplateRecognitionForm" rendered="#{not empty item}" actionListener="#{assetInfoEditController.plateRecognition(item.objectStorageId)}"/>
-                            <p:commandButton process="@this" disabled="#{!preViewerBean.isPreview(item)}" icon="ui-icon ui-icon-search" class="my-button" style="zoom:0.8;" title="预览"
+                            <p:commandButton process="@this"  icon="ui-icon ui-icon-search" class="my-button" style="zoom:0.8;" title="预览"
                                               update="previewedDlg" oncomplete="PF('previewedDlg').show();bringToFront('previewedDlg')" rendered="#{not empty item}" actionListener="#{preViewerBean.onServerEvent(assetInfoEditController,item.objectStorageId)}"/>
                         </p:column>
                     </p:dataTable>
@@ -54,7 +54,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">当前#{msg.pattern}</label>
-                            <p:inputText  value="#{assetInfoEditController.selected.financingNum}" readonly="true"></p:inputText>
+                            <p:inputText  value="#{assetInfoEditController.selected.functionType}" readonly="true"></p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.serialNum}</label>
