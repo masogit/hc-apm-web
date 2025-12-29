@@ -107,7 +107,7 @@ public class AssetHistoryService {
             searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LTE, endTime));
         }
         List<String> assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
-        searchFilters.add(new SearchFilter("json_data", SearchFilter.Operator.CONTAINS, assetsImportantFieldsAll));
+        searchFilters.add(new SearchFilter("has_columns", SearchFilter.Operator.IN, assetsImportantFieldsAll));
         Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), pageNum, pageSize);
         List<AssetHistory> resultList = assetHistoryPage.getContent();
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());

@@ -101,11 +101,10 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
             searchFilters.add(new SearchFilter("site_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
         List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
-        this.updateSearchFilter(new SearchFilter("jsonData", SearchFilter.Operator.CONTAINS, assetsImportantFields));
+        this.updateSearchFilter(new SearchFilter("has_columns", SearchFilter.Operator.CONTAINS, assetsImportantFields));
         if(!StringUtils.isEmpty(oneSearchStr)) {
-            searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.LIKE, oneSearchStr));
+            this.updateSearchFilter(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr));
         }
-
         pageRequest = addDefaultSort(pageRequest);
         Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), pageRequest.getPageNumber(), pageRequest.getPageSize());
         if(assetHistoryPage==null || assetHistoryPage.getContent()==null){
