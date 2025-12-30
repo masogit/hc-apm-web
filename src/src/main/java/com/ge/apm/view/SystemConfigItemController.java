@@ -8,6 +8,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.pm.PmOrderPreCreateService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -71,6 +72,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     private UserCommonService userCommonService;
     private UserAccountRepository userAccountRepository;
+
+    private PmOrderPreCreateService pmOrderPreCreateService;
+
     private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
     private List<OrgInfo> deptList;
 
@@ -92,6 +96,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         user = UserContextService.getCurrentUserAccount();
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        pmOrderPreCreateService = WebUtil.getBean(PmOrderPreCreateService.class);
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
         loadClinicalDept();
         loadAssetStaff();
@@ -605,6 +610,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         for (String siteUID : collect) {
             sharedAssetService.asynRemoteCall(GatewayURL.SITE_TO_SITE_AUTO_ACK, HttpMethod.GET,new HashMap<>(),(url)->url+"?siteUID="+siteUID);
         }
+    }
+
+    public void pmOrderCreateByCycleDlg(ConfigItem configItem) {
+        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
+        saveConfig(configItem);
     }
 
     public List<String> getMultiSelectedList(String key) {
