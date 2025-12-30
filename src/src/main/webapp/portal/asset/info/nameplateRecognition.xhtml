@@ -6,7 +6,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:apm="http://www.ge.com/tags/apm">
-    <p:dialog class="coworkerDlg" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.nameplateRecognition}">
+    <p:dialog class="coworkerDlg" style="overflow-y: auto" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.nameplateRecognition}">
         <p:ajax event="close"  update="previewedDlg" oncomplete="PF('previewedDlg').hide()" />
             <h:form id="nameplateRecognitionForm">
                 <p:fieldset legend="#{msg.nameplateRecognition}" style="margin-bottom:20px;height: 300px;overflow-y: auto">
