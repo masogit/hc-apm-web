@@ -14,4 +14,15 @@ public interface PmOrderPreCreateRepository extends GenericRepositoryUUID<PmOrde
     @Query(value = "delete from pm_order_pre_create where asset_uid = ?1",nativeQuery = true)
     @Transactional
     public void deleteByAssetUid(String assetUid);
+
+
+    @Modifying
+    @Query(value = "delete from pm_order_pre_create where asset_uid  in (select uid from asset_info where site_uid=?1)",nativeQuery = true)
+    @Transactional
+    public void  deleteBySiteUid(String siteUid);
+
+    @Modifying
+    @Query(value = "delete from pm_order_pre_create where asset_uid  in (select asset_uid from rel_rule_asset where rule_uid=?1 or rule_uid2=?1 or rule_uid1=?1 or rule_uid4=?1)",nativeQuery = true)
+    @Transactional
+    public void  deleteByPmOrderRuleId(String ruleUid);
 }

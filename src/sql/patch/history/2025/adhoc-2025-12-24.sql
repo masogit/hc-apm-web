@@ -24,3 +24,6 @@ SET actual_sign_total = tds.sign_count
 ) tds
 WHERE train_detail.id = tds.detail_id
   AND train_detail.actual_sign_total IS NULL;
+
+
+ALTER TABLE asset_history ALTER COLUMN asset_json TYPE text;

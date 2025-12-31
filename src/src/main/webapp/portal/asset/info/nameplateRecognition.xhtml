@@ -6,7 +6,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:apm="http://www.ge.com/tags/apm">
-    <p:dialog class="coworkerDlg" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.nameplateRecognition}">
+    <p:dialog class="coworkerDlg" style="overflow-y: auto" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.nameplateRecognition}">
         <p:ajax event="close"  update="previewedDlg" oncomplete="PF('previewedDlg').hide()" />
             <h:form id="nameplateRecognitionForm">
                 <p:fieldset legend="#{msg.nameplateRecognition}" style="margin-bottom:20px;height: 300px;overflow-y: auto">
@@ -30,9 +30,9 @@
         <!--                                     rendered="#{not empty item}"-->
         <!--                    />-->
                             <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8;" title="识别"
-                                           onclick="disableAction()"  update="nameplateRecognitionForm" rendered="#{not empty item}" actionListener="#{assetInfoEditController.plateRecognition(item.objectStorageId)}"/>
+                                           onclick="disableAction(true,'#cccccc')"  update="nameplateRecognitionForm" rendered="#{not empty item}" actionListener="#{assetInfoEditController.plateRecognition(item.objectStorageId)}"/>
                             <p:commandButton process="@this"  icon="ui-icon ui-icon-search" class="my-button" style="zoom:0.8;" title="预览"
-                                              update="previewedDlg" oncomplete="PF('previewedDlg').show();bringToFront('previewedDlg')" rendered="#{not empty item}" actionListener="#{preViewerBean.onServerEvent(assetInfoEditController,item.objectStorageId)}"/>
+                                             onclick="disableAction(true,'#cccccc')" update="previewedDlg" oncomplete="PF('previewedDlg').show();bringToFront('previewedDlg');disableAction(false,'#3e464c')" rendered="#{not empty item}" actionListener="#{preViewerBean.onServerEvent(assetInfoEditController,item.objectStorageId)}"/>
                         </p:column>
                     </p:dataTable>
 
@@ -115,14 +115,15 @@
         <ui:include src="/portal/preview/view.xhtml" />
     </p:dialog>
     <h:outputScript>
-        function disableAction(){
+        function disableAction(disabledFlag,color){
             // 选中所有目标元素
             const buttons = document.querySelectorAll('.my-button');
             // 遍历并禁用
             buttons.forEach(button => {
                 button.classList.add('is-disabled'); // 添加视觉禁用类
-                button.disabled = true;              // 真正禁用功能
-                button.style.backgroundColor='#cccccc'
+                button.disabled = disabledFlag;              // 真正禁用功能
+                //button.style.backgroundColor='#cccccc'
+                button.style.backgroundColor=color
             });
         }
         function bringToFront(widgetVar) {
