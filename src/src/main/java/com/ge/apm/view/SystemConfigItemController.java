@@ -95,7 +95,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private List<String> datePatternSelect = ListUtil.newArrayList("yyyy/MM/dd", "yyyy/MM/dd HH", "yyyy/MM/dd HH:mm", "yyyy/MM/dd HH:mm:ss");
 
     @Getter@Setter
-    private List<ConfigItem> configItemList2;
+    private ConfigItem selectedConfigItem;
+    @Getter@Setter
+    private String itemValue = "WorkOrderListColumn_0";
     @Override
     protected void init() {
         dao = WebUtil.getBean(ConfigItemRepository.class);
@@ -131,6 +133,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(15,"培训管理");
         categoryMap.put(16,"MVS院级工单");
         categoryMap.put(17,"IB报表链接");
+        categoryMap.put(18,"列表字段配置");
 
 
     }
@@ -181,7 +184,6 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             }
         }
         configItemList = page.getContent();
-        configItemList2 = configItemList.stream().filter(item -> item.getCategory().equals(18)).collect(Collectors.toList());
         for (ConfigItem configItem : configItemList) {
             if ("assetScrap".equals(configItem.getKey()) || "showAssetScrapNo".equals(configItem.getKey()) ) {
                 configItemMap.put(configItem.getKey(),configItem);
@@ -259,6 +261,15 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             requestContext.addCallbackParam("url", "configItemList.xhtml");
         }
     }
+
+    public List<ConfigItem> getWorkOrderListType(){
+        return configItemList.stream().filter(item -> item.getKey().contains("WorkOrderListColumn")).collect(Collectors.toList());
+    }
+
+    public void selectedConfigItemChange(){
+        System.out.println(itemValue);
+    }
+
 
     @Override
     public void prepareEdit() {
