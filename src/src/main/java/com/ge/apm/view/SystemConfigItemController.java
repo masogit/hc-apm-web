@@ -9,10 +9,12 @@ import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.PmOrderPreCreateService;
+import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
@@ -26,6 +28,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
@@ -37,6 +40,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -75,6 +79,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     private PmOrderPreCreateService pmOrderPreCreateService;
 
+    private PmOrderRequestApiService srApi;
+
+    private V2_PmOrderRepository v2PmOrderRepository;
+
     private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
     private List<OrgInfo> deptList;
 
@@ -97,6 +105,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         pmOrderPreCreateService = WebUtil.getBean(PmOrderPreCreateService.class);
+        v2PmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
+        srApi = WebUtil.getBean(PmOrderRequestApiService.class);
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
         loadClinicalDept();
         loadAssetStaff();
@@ -332,6 +342,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         saveScrap(configItemF);
         saveScrap(configItemS);
         WebUtil.addErrorMessage("保存成功！");
+    }
+
+    public void saveConfigMmOrderCreateByCycle() {
+        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
+        saveConfig(this.selected);
+        invokeBatchPmOrderCancel(user.getSiteUID());
+
     }
 
     public void saveScrap(ConfigItem configItemF){
@@ -615,6 +632,32 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     public void pmOrderCreateByCycleDlg(ConfigItem configItem) {
         pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
         saveConfig(configItem);
+        invokeBatchPmOrderCancel(user.getSiteUID());
+    }
+
+
+    public void invokeBatchPmOrderCancel(String siteUid){
+        String token = UserContextService.getAccessToken();
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        List<V2_PmOrder> batchPmOrderList =v2PmOrderRepository.findBySiteUidAndPmTypeAndIsFinished(siteUid,1,false);
+        if(CollectionUtils.isEmpty(batchPmOrderList)){
+            return;
+        }
+        batchPmOrderList.forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setPmOrderId(item.getId());
+            if(item.getPmType()==1){
+                formData.setQualityChecking("2");
+            }
+            formData.setStepId(item.getCurrentStepId());
+            formDataList.add(formData);
+            formData.setDesc("配置项修改批量取消周期工单");
+        });
+        String res = srApi.invokeBatchPmOrderCancel(token,formDataList,"cancel");
+        if (res==null || !res.equalsIgnoreCase("ok")) {
+            WebUtil.addErrorMessage("取消周期性保养工单失败");
+        }
+
     }
 
     public List<String> getMultiSelectedList(String key) {
