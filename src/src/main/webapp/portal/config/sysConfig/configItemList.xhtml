@@ -153,18 +153,21 @@
                         <p:tab title="IB报表链接" id="id17">
                             <ui:include src="configItemIbReport.xhtml"/>
                         </p:tab>
+                        <p:tab title="维修列表字段" id="id18">
+                          <ui:include src="configItemRepairListColumn.xhtml"/>
+                        </p:tab>
 
-<!--                        <c:forEach items="#{systemConfigItemController.getCategoryEntrySet()}" var="entryItem">-->
-<!--                            <p:tab title="#{entryItem.getValue()}" id="#{'id'.concat(entryItem.getKey())}">-->
-<!--                                <ui:include src="configItemCategory.xhtml"/>-->
-<!--                            </p:tab>-->
-<!--                        </c:forEach>-->
+                        <!--                        <c:forEach items="#{systemConfigItemController.getCategoryEntrySet()}" var="entryItem">-->
+                        <!--                            <p:tab title="#{entryItem.getValue()}" id="#{'id'.concat(entryItem.getKey())}">-->
+                        <!--                                <ui:include src="configItemCategory.xhtml"/>-->
+                        <!--                            </p:tab>-->
+                        <!--                        </c:forEach>-->
                     </p:tabView>
 
-<!--                    <h:panelGroup id="actionButtonGroup">-->
-<!--                        <p:commandButton value="#{msg.Onekey}#{msg.Save}" icon="ui-icon-check" action="#{systemConfigItemController.saveConfigMap()}" validateClient="true" update="configItemForm" rendered="#{not empty systemConfigItemController.configItemList}" style="float:left"/>-->
-<!--                        <p:commandButton value="#{msg.Onekey}#{msg.Delete}" icon="ui-icon-check" action="#{systemConfigItemController.deleteConfigMap()}" validateClient="true" update="configItemForm" rendered="#{not empty systemConfigItemController.configItemList}" style="float:left"/>-->
-<!--                    </h:panelGroup>-->
+                    <!--                    <h:panelGroup id="actionButtonGroup">-->
+                    <!--                        <p:commandButton value="#{msg.Onekey}#{msg.Save}" icon="ui-icon-check" action="#{systemConfigItemController.saveConfigMap()}" validateClient="true" update="configItemForm" rendered="#{not empty systemConfigItemController.configItemList}" style="float:left"/>-->
+                    <!--                        <p:commandButton value="#{msg.Onekey}#{msg.Delete}" icon="ui-icon-check" action="#{systemConfigItemController.deleteConfigMap()}" validateClient="true" update="configItemForm" rendered="#{not empty systemConfigItemController.configItemList}" style="float:left"/>-->
+                    <!--                    </h:panelGroup>-->
 
                 </h:form>
             </div>

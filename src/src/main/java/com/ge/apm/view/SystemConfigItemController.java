@@ -82,6 +82,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private static final String VALUE ="value";
     private List<String> datePatternSelect = ListUtil.newArrayList("yyyy/MM/dd", "yyyy/MM/dd HH", "yyyy/MM/dd HH:mm", "yyyy/MM/dd HH:mm:ss");
 
+    @Getter@Setter
+    private List<ConfigItem> configItemList2;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ConfigItemRepository.class);
@@ -158,9 +160,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 if (9 == configItem.getValueType()) {
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getShowValue(), FieldColumnDto.class));
                 }
+                if(10 == configItem.getValueType()){
+                    configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
+                }
             }
         }
         configItemList = page.getContent();
+        configItemList2 = configItemList.stream().filter(item -> item.getCategory().equals(18)).collect(Collectors.toList());
         for (ConfigItem configItem : configItemList) {
             if ("assetScrap".equals(configItem.getKey()) || "showAssetScrapNo".equals(configItem.getKey()) ) {
                 configItemMap.put(configItem.getKey(),configItem);
@@ -229,10 +235,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                         selectedObjectMap.put("AssetHead", userAccountRepository.getByUid(AssetHead));
                     }
                 }
-
+            }else if(category.equals("18")){
+                configItemList = configItemList.stream().filter(t -> t.getCategory().equals(18)).collect(Collectors.toList());
             }
             this.searchFilters = null;
-        } else {
+        }  else {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", "configItemList.xhtml");
         }
@@ -417,7 +424,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
             } else if (9 == this.selected.getValueType()) {
                 configItemValue.setValue(JSON.toJSONString(this.selected.getFieldColumnDto()));
-            } else{
+            } else if(10 == this.selected.getValueType()) {
+                configItemValue.setValue(JSON.toJSONString(this.selected.getFieldColumnDtoList()));
+            }else{
                 configItemValue.setValue(this.selected.getShowValue());
             }
             configItemValueRepository.save(configItemValue);
@@ -592,6 +601,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(orgInfo.getSiteUID(), orgInfo.getHospitalUID(), orgInfo.getInstitutionUID(), orgInfo.getTenantUID(), key);
         return JSON.parseObject(value, FieldColumnDto.class);
     }
+
 
     public void siteToSiteAutoAck(ConfigItem item){
         ConfigItemValue configItemValue = item.getConfigItemValue();
