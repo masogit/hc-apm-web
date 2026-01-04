@@ -49,8 +49,8 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public InputStream downloadRepeatedReadFile(String fileId) {
-        HttpHeaders headers = new HttpHeaders();
-        String gatewayURL = getGatewayURL(GatewayURL.DOWNLOAD_FILE);
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+        String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
         ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
         HttpHeaders responseHeader = response.getHeaders();
         byte[] result = response.getBody();
@@ -60,7 +60,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public List<FileInfoResult> getFiles(Collection<String> fileIds) {
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
         String gatewayURL = getGatewayURL(GatewayURL.GET_FILES);
         HttpEntity<Collection<String>> httpEntity = new HttpEntity<>(fileIds, headers);
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, httpEntity, LinkedHashMap.class);
@@ -192,7 +192,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public Boolean deleteFileObject(String token, String objectId) {
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
         headers.add("Authorization", token);
@@ -210,7 +210,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public Map<String, Object> uploadSingleFile(String token, File file) {
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
         MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
         headers.setContentType(type);
         headers.add("Authorization", token);
@@ -257,7 +257,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
 
 
     public Map<String, Object> uploadSingleFileByUrl(String token, String url, String fileName) {
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
         headers.add("Authorization", token);
@@ -478,7 +478,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public Map<String, Object> uploadSingleCompressFile(String token, File file) {
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
         MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
         headers.setContentType(type);
         headers.add("Authorization", token);
