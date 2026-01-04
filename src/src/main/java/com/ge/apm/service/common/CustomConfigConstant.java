@@ -185,11 +185,11 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsMobilepageFilterFields() {
-        return Arrays.asList("siteUID", "assetGroup", "status");
+        return Arrays.asList("siteUID", "assetGroup", "status", "spare10");
     }
 
     public static List<String> defaultAssetsMobilepageFilterFields() {
-        return Arrays.asList("siteUID", "assetGroup", "status", "isChecked","assetTypeGroup");
+        return Arrays.asList("siteUID", "assetGroup", "status", "isChecked","assetTypeGroup", "spare10");
     }
 
     /**
