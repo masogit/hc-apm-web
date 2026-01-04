@@ -266,7 +266,7 @@ public class WorkOrderReportProvider {
                 "LEFT JOIN user_account ua ON ua.id = sr.requestor_id " +
                 "LEFT JOIN asset_fault_type aft ON aft.id=wo.case_type " +
                 "LEFT JOIN org_info oi ON ai.clinical_dept_uid = oi.uid " +
-                "WHERE AND ai.is_valid AND NOT ai.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL) "
+                "WHERE ai.is_valid AND NOT ai.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL) "
         );
 
         String filter = buildFilter(searchFilterList);
