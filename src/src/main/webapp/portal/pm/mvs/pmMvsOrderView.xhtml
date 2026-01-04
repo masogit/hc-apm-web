@@ -124,7 +124,7 @@
                         <p:panel style="text-align:center"
                                  rendered="#{woAttachItemE.boType == 'IMG'}">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:ajax  event="click" update="pmTab:previewedDlgEhome" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(v2PmOrderMvsController,woAttachItemE.objectStorageId)}"/>
+                                <p:ajax  event="click" update="#{v2PmOrderMvsController.pageType eq 'current' ? 'pmTab:previewedDlgEhome' : ':previewedDlgEhome'}" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(v2PmOrderMvsController,woAttachItemE.objectStorageId)}"/>
                                 <p:graphicImage value="#{fileDownloadService.getFile(woAttachItemE.objectStorageId)}"
                                                 height="80" width="100" stream="false"/>
                                 <p:commandLink validateClient="false" immediate="true" process="@this"
