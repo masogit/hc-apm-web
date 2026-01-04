@@ -279,7 +279,7 @@
                 <p:dataGrid id="partPictureList" var="fileitem" value="#{v2PmOrderController.getPartPictures(v2PmOrderController.selected.id)}" columns="5" layout="grid" >
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
-                            <p:ajax  event="click" update="pmTab:previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                            <p:ajax  event="click" update="#{v2PmOrderController.pageType eq 'current' ? 'pmTab:previewedDlg' : ':previewedDlg'}" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
                             <img src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
                         </h:panelGrid>
                         <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
