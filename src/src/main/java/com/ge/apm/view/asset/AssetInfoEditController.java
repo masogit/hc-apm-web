@@ -2745,7 +2745,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
             selectedObjectMap.put("manufacturer",supplier);
             this.selected.setManufacture(supplier.getName());
-            this.selected.setManufactureId(supplier.getUid());
+            this.selected.setManufactureId(supplier.getId().toString());
             createTpye= null;
         }
 
