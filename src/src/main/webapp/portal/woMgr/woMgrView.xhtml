@@ -123,7 +123,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
-                    <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
+                    <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}" emptyMessage="#{msg.noRecordFound}">
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
@@ -135,7 +135,7 @@
                     </p:dataGrid>
                 </p:fieldset>
                 <p:fieldset legend="#{msg.repairImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
-                    <p:dataGrid id="woPicItem" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
+                    <p:dataGrid id="woPicItem" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}" emptyMessage="#{msg.noRecordFound}">
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
@@ -146,7 +146,7 @@
                         </p:panel>
                     </p:dataGrid>
                 </p:fieldset>
-                <p:dataGrid var="fileitem" value="#{workOrderMgrController.attachList}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.attachList}">
+                <p:dataGrid var="fileitem" value="#{workOrderMgrController.attachList}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.attachList}" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">#{msg.repairAttachment}</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
@@ -157,7 +157,7 @@
                     </p:panel>
                 </p:dataGrid>
                 <p:fieldset rendered="#{not empty workOrderMgrController.audioList}">
-                <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}">
+                <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">#{msg.requestVoice}</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%">
@@ -175,7 +175,7 @@
 <!--                        </h:panelGroup>-->
 <!--                    </p:dataGrid>-->
             </p:fieldset>
-                <p:dataGrid var="audioItem" value="#{workOrderMgrController.videoList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.videoList}">
+                <p:dataGrid var="audioItem" value="#{workOrderMgrController.videoList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.videoList}" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">#{msg.repairVideo}</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="6" style="width: 100%">
@@ -572,7 +572,7 @@
                                 </h:panelGroup>
                             </c:otherwise>
                         </c:choose>
-                        <p:dataGrid id="partPictureList" var="fileitem" value="#{workOrderMgrController.getPartPictures(woItem.id)}" columns="5" layout="grid">
+                        <p:dataGrid id="partPictureList" var="fileitem" value="#{workOrderMgrController.getPartPictures(woItem.id)}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.attachmentUpload}</f:facet>
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >

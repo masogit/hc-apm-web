@@ -126,7 +126,7 @@
 
 
                 <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
-                    <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
+                    <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}" emptyMessage="#{msg.noRecordFound}">
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
@@ -137,7 +137,7 @@
                         </p:panel>
                     </p:dataGrid>
                 </p:fieldset>
-                <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="7" layout="grid">
+                <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="7" layout="grid" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">
                         #{msg.addPic}<p:outputLabel value="(#{msg.maxUpload5Pics})" style="color: red"></p:outputLabel>
                     </f:facet>
@@ -155,7 +155,7 @@
                               invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{workOrderMgrController.getPicListByBoType('WorkOrder').size() ge 5}"/>
 
 
-                <p:dataGrid id="attachList" var="fileitem" value="#{workOrderMgrController.attachList}" columns="7" layout="grid">
+                <p:dataGrid id="attachList" var="fileitem" value="#{workOrderMgrController.attachList}" columns="7" layout="grid" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">#{msg.AddDocument}<p:outputLabel value="(#{msg.maxUpload5Docs})" style="color: red"></p:outputLabel></f:facet>
                     <h:panelGrid columns="1" style="width:100%" >
                         #{fileitem.objectName}
