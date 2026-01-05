@@ -363,7 +363,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     }
 
     public void saveConfigMmOrderCreateByCycle() {
-        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
+//        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
         saveConfig(this.selected);
         invokeBatchPmOrderCancel(user.getSiteUID());
 
