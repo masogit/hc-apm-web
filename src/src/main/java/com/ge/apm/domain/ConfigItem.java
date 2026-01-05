@@ -96,4 +96,7 @@ public class ConfigItem implements Serializable {
 
     @Transient
     private FieldColumnDto fieldColumnDto;
+
+    @Transient
+    private List<FieldColumnDto> fieldColumnDtoList;
 }

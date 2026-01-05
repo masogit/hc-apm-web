@@ -228,10 +228,10 @@ public class V2_BlobObject implements Serializable {
     private String approveStatus;
 
     @Transient
-    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
+    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg","jfif");
 
     @Transient
-    private List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg");
+    private List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg","jfif");
 
     @Transient
     private String boSubTypeValue;

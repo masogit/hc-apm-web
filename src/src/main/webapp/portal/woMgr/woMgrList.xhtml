@@ -10,7 +10,7 @@
     <div class="ui-g-12 card">
         <h:form id="searchForm" class="searchForm">
             <h:panelGroup>
-                <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="#{workOrderMgrController.siteFor}" hideEffect="fade" dynamic="false" modal="false" >
+               <!-- <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="woTab:woMgrListForm:datalist:btnOrg2" hideEffect="fade" dynamic="false" modal="false" >
                     <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab:searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab" value="确定"/>
@@ -26,7 +26,7 @@
                             <p:treeNode type="hidden" rendered="false"/>
                         </p:tree>
                     </p:scrollPanel>
-                </p:overlayPanel>
+                </p:overlayPanel>-->
             </h:panelGroup>
         </h:form>
         <h:form id="woMgrListForm" rendered="#{!workOrderMgrController.viewIng}">
@@ -102,151 +102,190 @@
                         </c:otherwise>
                     </c:choose>
                 </p:column>
+                <c:forEach items="#{workOrderMgrController.getFieldColumnList()}" var="fieldItem">
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetName'}">
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'manufacturerSerialNumber'}">
+                        <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'departNum'}">
+                        <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.departNum}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'functionType'}">
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.functionType}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'systemId'}">
+                        <c:if test="#{userContextService.isCountyArea()}">
+                            <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.assetInfo.systemId}"/>
+                            </p:column>
+                        </c:if>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'siebleNumber'}">
+                        <c:if test="#{userContextService.isCountyArea()}">
+                            <p:column headerText="#{msg.siebleNumber}" sortBy="#{item.siebleNumber}" filterBy="#{item.siebleNumber}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.siebleNumber}"/>
+                            </p:column>
+                        </c:if>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'hospitalId'}">
+                        <c:if test="#{userContextService.isCountyArea()}">
+                            <p:column headerText="#{msg.hospitalId}" sortBy="#{item.serviceRequest.hospitalName}" filterBy="#{item.serviceRequest.hospitalName}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.serviceRequest.hospitalName}"/>
+                            </p:column>
+                        </c:if>
+                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{!workOrderMgrController.isYiMaiYangGuangTenant}" visible="#{workOrderMgrController.hospitalShow}">
+                            <f:facet name="filter" >
+                                <p:autoComplete id="btnOrg1" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            </f:facet>
+                            <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{workOrderMgrController.isYiMaiYangGuangTenant}">
+                            <f:facet name="filter" >
+                                <p:autoComplete id="btnOrg2" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            </f:facet>
+                            <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'clinicalDeptName'}">
+                        <!--所属科室-->
+                        <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{userContextService.hasCurrentTenantName('')}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'locationName'}">
+                        <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{workOrderMgrController.showLocationNameFlag}">
+                            <h:outputText value="#{item.assetInfo.locationName}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'srNum'}">
+                        <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serviceRequest.srNum}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'requestorName'}">
+                        <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.serviceRequest.requestorName}" filterMatchMode="LIKE" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                            <h:outputText value="#{item.serviceRequest.requestorName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.serviceRequest.requestorName}" filterMatchMode="LIKE" rendered="#{userContextService.hasCurrentTenantName('')}">
+                            <h:outputText value="#{item.serviceRequest.requestorName}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'requireName'}">
+                        <p:column headerText="#{msg.requireName}"  filterBy="#{item.id}" filterMatchMode="IN" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                            <h:outputText value="#{item.repairName}"/>
+                        </p:column>
+                        <!-- 云南阜外 全部、已完成维修人 -->
+                        <p:column headerText="#{msg.Assignee}" filterBy="#{item.id}" filterMatchMode="LIKE"  rendered="#{(workOrderMgrController.queryIndex==8 or workOrderMgrController.queryIndex==11) and userContextService.hasCurrentTenantName('')}">
+                            <!--维修人是从WorkOrderStep表中获取【维修中】步骤数据owner_name，维修中状态==4-->
+                            <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,4)}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'requestTime'}">
+                        <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="LIKE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{workOrderMgrController.applyTimeFormatTime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.serviceRequest.requestTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'currentStep'}">
 
-                <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.name}"/>
-                </p:column>
-                <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
-                </p:column>
-                <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.departNum}"/>
-                </p:column>
-                <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.functionType}"/>
-                </p:column>
-                <c:if test="#{userContextService.isCountyArea()}">
-                    <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetInfo.systemId}"/>
-                    </p:column>
-                    <p:column headerText="#{msg.siebleNumber}" sortBy="#{item.siebleNumber}" filterBy="#{item.siebleNumber}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.siebleNumber}"/>
-                    </p:column>
-                    <p:column headerText="#{msg.hospitalId}" sortBy="#{item.serviceRequest.hospitalName}" filterBy="#{item.serviceRequest.hospitalName}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.serviceRequest.hospitalName}"/>
-                    </p:column>
-                </c:if>
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{!workOrderMgrController.isYiMaiYangGuangTenant}" visible="#{workOrderMgrController.hospitalShow}">
-                    <f:facet name="filter" >
-                        <p:autoComplete id="btnOrg1" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    </f:facet>
-                    <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
-                </p:column>
+                        <!--当前处理步骤 for 待办-->
+                        <p:column rendered="#{workOrderMgrController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.currentStepName}" style="display: none"/>
+                            <p:graphicImage  width="165" height="38" url="#{workOrderMgrController.getStepImg(item)}"/>
+                        </p:column>
+                        <!--当前处理步骤 for 全部-->
+                        <p:column rendered="#{workOrderMgrController.queryIndex eq 11 and !userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{workOrderMgrController.isYiMaiYangGuangTenant}">
-                    <f:facet name="filter" >
-                        <p:autoComplete id="btnOrg2" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    </f:facet>
-                    <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
-                </p:column>
-                <!--所属科室-->
-                <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
-                </p:column>
-                <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{userContextService.hasCurrentTenantName('')}">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
-                </p:column>
-                <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{workOrderMgrController.showLocationNameFlag}">
-                    <h:outputText value="#{item.assetInfo.locationName}"/>
-                </p:column>
-                <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.serviceRequest.srNum}"/>
-                </p:column>
-                <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.serviceRequest.requestorName}" filterMatchMode="LIKE" rendered="#{!userContextService.hasCurrentTenantName('')}">
-                    <h:outputText value="#{item.serviceRequest.requestorName}"/>
-                </p:column>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,9,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6,9')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.currentStepName}" style="display: none"/>
+                            <p:graphicImage  width="165" height="38" url="#{workOrderMgrController.getStepImg(item)}"/>
+                        </p:column>
+                        <!--当前处理步骤 for 全部 云阜-->
+                        <p:column rendered="#{workOrderMgrController.queryIndex eq 11 and userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ" >
 
-                <p:column headerText="#{msg.requireName}"  filterBy="#{item.id}" filterMatchMode="IN" rendered="#{!userContextService.hasCurrentTenantName('')}">
-                    <h:outputText value="#{item.repairName}"/>
-                </p:column>
-                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="LIKE">
-                    <f:facet name="filter">
-                        <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{workOrderMgrController.applyTimeFormatTime}"/>
-                    </f:facet>
-                    <h:outputText value="#{item.serviceRequest.requestTime}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                    </h:outputText>
-                </p:column>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 9)}" itemValue="#{fieldMsg.fieldValue('woSteps', 9)}" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.currentStepName}" style="display: none"/>
+                            <h:outputText  value="#{workOrderMgrController.getStepName(item)}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'intExtType'}">
+                        <p:column width="90" headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}" sortBy="#{item.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType').subList(0,2)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'requestReason'}">
+                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                            <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}" title="#{item.serviceRequest.requestReason}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'mainSub'}">
+                        <p:column width="90" headerText="主子工单" rendered="#{!userContextService.isEnableBtnByKey('displayMainSubWorkOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                    <f:selectItem itemLabel="主工单" itemValue="main" />
+                                    <f:selectItem itemLabel="子工单" itemValue="sub" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
+                        </p:column>
+                    </c:if>
+                </c:forEach>
 
-                <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.serviceRequest.requestorName}" filterMatchMode="LIKE" rendered="#{userContextService.hasCurrentTenantName('')}">
-                    <h:outputText value="#{item.serviceRequest.requestorName}"/>
-                </p:column>
-                <!-- 云南阜外 全部、已完成维修人 -->
-                <p:column headerText="#{msg.Assignee}" filterBy="#{item.id}" filterMatchMode="LIKE"  rendered="#{(workOrderMgrController.queryIndex==8 or workOrderMgrController.queryIndex==11) and userContextService.hasCurrentTenantName('')}">
-                    <!--维修人是从WorkOrderStep表中获取【维修中】步骤数据owner_name，维修中状态==4-->
-                    <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,4)}"/>
-                </p:column>
-                <!--当前处理步骤 for 待办-->
-                <p:column rendered="#{workOrderMgrController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{item.currentStepName}" style="display: none"/>
-                    <p:graphicImage  width="165" height="38" url="#{workOrderMgrController.getStepImg(item)}"/>
-                </p:column>
-                <!--当前处理步骤 for 全部-->
-                <p:column rendered="#{workOrderMgrController.queryIndex eq 11 and !userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{workOrderMgrController.needTwoSubStatus?workOrderMgrController.getWoSteps('2,3,4,5,6,9,10,11'):workOrderMgrController.getWoSteps('2,3,4,5,6,9')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{item.currentStepName}" style="display: none"/>
-                    <p:graphicImage  width="165" height="38" url="#{workOrderMgrController.getStepImg(item)}"/>
-                </p:column>
-                <!--当前处理步骤 for 全部 云阜-->
-                <p:column rendered="#{workOrderMgrController.queryIndex eq 11 and userContextService.hasCurrentTenantName('')}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ" >
-
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0 || workOrderMgrController.queryIndex eq 11}">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
-                            <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
-                            <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 9)}" itemValue="#{fieldMsg.fieldValue('woSteps', 9)}" />
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{item.currentStepName}" style="display: none"/>
-                    <h:outputText  value="#{workOrderMgrController.getStepName(item)}"/>
-                </p:column>
-                <p:column width="90" headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}" sortBy="#{item.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="EQ">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType').subList(0,2)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
-                </p:column>
-
-                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
-                    <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}" title="#{item.serviceRequest.requestReason}"/>
-                </p:column>
-                <p:column width="90" headerText="主子工单" rendered="#{!userContextService.isEnableBtnByKey('displayMainSubWorkOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()">
-                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
-                            <f:selectItem itemLabel="主工单" itemValue="main" />
-                            <f:selectItem itemLabel="子工单" itemValue="sub" />
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
-                </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CANCEL')}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
