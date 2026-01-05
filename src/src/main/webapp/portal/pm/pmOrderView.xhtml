@@ -106,7 +106,7 @@
                         </div>
                     </div>
                 </div>
-                <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
                             <p:ajax  event="click" update="#{v2PmOrderController.pageType eq 'current' ? 'pmTab:previewedDlg' : ':previewedDlg'}" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
@@ -276,7 +276,7 @@
                     </p:dataTable>
                 </h:panelGroup>
 
-                <p:dataGrid id="partPictureList" var="fileitem" value="#{v2PmOrderController.getPartPictures(v2PmOrderController.selected.id)}" columns="5" layout="grid" >
+                <p:dataGrid id="partPictureList" var="fileitem" value="#{v2PmOrderController.getPartPictures(v2PmOrderController.selected.id)}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}" >
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
                             <p:ajax  event="click" update="#{v2PmOrderController.pageType eq 'current' ? 'pmTab:previewedDlg' : ':previewedDlg'}" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>

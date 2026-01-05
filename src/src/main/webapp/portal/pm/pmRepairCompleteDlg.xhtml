@@ -216,7 +216,7 @@
                         </h:panelGroup>
 
                     </p:panelGrid>
-                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
@@ -261,7 +261,7 @@
                 </p:fieldset>
 
                 <p:fieldset legend="#{msg.MaintenancePhotos}" >
-                    <p:dataGrid id="pictureBeforeList" var="fileitem" value="#{v2PmOrderController.picBeforeList}" columns="5" layout="grid">
+                    <p:dataGrid id="pictureBeforeList" var="fileitem" value="#{v2PmOrderController.picBeforeList}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.BeforeMaintenancePhotos}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
@@ -273,7 +273,7 @@
                         </p:panel>
                     </p:dataGrid>
                     <p:fileUpload id="beforePic" disabled="#{v2PmOrderController.disableUploadButton('before')}" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureBeforeList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-                    <p:dataGrid id="pictureAfterList" var="fileitem" value="#{v2PmOrderController.picAfterList}" columns="5" layout="grid">
+                    <p:dataGrid id="pictureAfterList" var="fileitem" value="#{v2PmOrderController.picAfterList}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.AfterMaintenancePhotos}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
