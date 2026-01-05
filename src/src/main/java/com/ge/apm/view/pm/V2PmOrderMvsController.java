@@ -586,7 +586,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                 + selected.getId()
                 + "&queryIndex=" + queryIndex
                 ;
-        url = "pmMvsOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        url = "mvs/pmMvsOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);

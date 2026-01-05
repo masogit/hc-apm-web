@@ -108,7 +108,8 @@ public class PreViewerBean implements ServerEventInterface {
             if(blobObject.getObjectType().contains("image") ||
                blobObject.getObjectName().toLowerCase().contains(".jpg") ||
                blobObject.getObjectName().toLowerCase().contains(".png") ||
-               blobObject.getObjectName().toLowerCase().contains(".jpeg")
+               blobObject.getObjectName().toLowerCase().contains(".jpeg")||
+               blobObject.getObjectName().toLowerCase().contains(".jfif")
             ){
                 type = 0;
             }else if(blobObject.getObjectType().contains("pdf") ||
@@ -129,7 +130,8 @@ public class PreViewerBean implements ServerEventInterface {
             if(streamedContent.getContentType().contains("image") ||
                     streamedContent.getName().toLowerCase().contains(".jpg") ||
                     streamedContent.getName().toLowerCase().contains(".png") ||
-                    streamedContent.getName().toLowerCase().contains(".jpeg")
+                    streamedContent.getName().toLowerCase().contains(".jpeg")||
+                    streamedContent.getName().toLowerCase().contains(".jfif")
             ){
                 type = 2;
             }else if(streamedContent.getContentType().contains("pdf") ||

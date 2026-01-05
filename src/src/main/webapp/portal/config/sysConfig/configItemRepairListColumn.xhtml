@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:composition>
+        <p:fieldset legend="维修工作台">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup>
+                    <p:selectOneMenu value="#{systemConfigItemController.itemValue}" style="width: 50%;">
+                        <p:ajax update="dataTableGroup"  listener="#{systemConfigItemController.selectedConfigItemChange()}"/>
+                        <f:selectItems value="#{systemConfigItemController.getWorkOrderListType()}" var="item" itemLabel="#{item.name}" itemValue="#{item.key}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup></h:panelGroup>
+                <h:panelGroup id="dataTableGroup">
+                    <label class="label">#{systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).name.concat('(').concat(systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).key).concat(')')}</label>
+                   <p:dataTable id="WorkOrderListColumn" var='item' value="#{systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).fieldColumnDtoList}" draggableRows="true">
+                        <p:growl id="msgss" />
+                        <p:ajax event="rowReorder" update="WorkOrderListColumn"/>
+                        <p:column headerText="#{msg.DisplayedField}" >
+                            <h:outputText value="#{item.label}"  />
+                        </p:column>
+                        <p:column headerText="是否固定列" >
+                            <h:outputText value="#{item.required ? '是' : '否'}"  />
+                        </p:column>
+                        <p:column headerText="#{msg.Operation}">
+                            <h:panelGroup rendered="#{!item.required}">
+                                <p:selectBooleanCheckbox value="#{item.rendered}"  >
+                                    <p:ajax />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.Operation}</label>
+                    <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue))}" update="configItemForm" />
+                    <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue))}" update="configItemForm" style="padding:10px"
+                                   disabled="#{systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).configItemValue == null}"/>
+                </h:panelGroup>
+
+            </p:panelGrid>
+        </p:fieldset>
+
+    </ui:composition>
+
+</html>

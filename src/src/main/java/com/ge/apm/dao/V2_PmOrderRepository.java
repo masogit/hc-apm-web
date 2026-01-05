@@ -179,4 +179,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 
 	@Query(nativeQuery = true,value = "select * from v2_pm_order where asset_uid in (?1) and is_finished =?2")
 	List<V2_PmOrder> findByAssetUidInAndIsFinished(List<String> assetUid, boolean status);
+
+	@Query(nativeQuery = true,value = "select * from v2_pm_order where site_uid =?1 and pm_type=?2  and is_finished =?3")
+    List<V2_PmOrder> findBySiteUidAndPmTypeAndIsFinished(String siteUid, int pmType, boolean status);
 }

@@ -466,6 +466,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         this.mvsAssetInfo = mvsAssetInfo;
     }
 
+    public List<FieldColumnDto> getFieldColumnList() {
+        String query = WebUtil.getRequestParameter("query");
+        query = StrUtil.isEmpty(query) ? "0": query;
+        String key = "WorkOrderListColumn_".concat(query);
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+        List<FieldColumnDto> list =  JSON.parseArray(value, FieldColumnDto.class);
+        return list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
+    }
+
     public void getPageTypeFromConfig() {
         String  key= "WorkOrderDetailViewType";
         pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
