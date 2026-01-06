@@ -24,4 +24,8 @@ public interface ZkbEngineerRepository extends GenericRepositoryUUID<ZkbEngineer
     List<ZkbEngineer> findByTenantUID(String tenantUid);
 
     List<ZkbEngineer> findByPhone(String phone);
+
+    ZkbEngineer findByIdentityNumber(String identityNumber);
+
+    ZkbEngineer findByNameAndPhoneAndEmail(String name, String phone, String email);
 }
