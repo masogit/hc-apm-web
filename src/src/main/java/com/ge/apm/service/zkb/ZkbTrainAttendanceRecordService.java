@@ -267,6 +267,10 @@ public class ZkbTrainAttendanceRecordService {
                         if (zkbTrainPublishInfo != null) {
                             record.setPublishId(zkbTrainPublishInfo.getId());
                         }
+                        ZkbEngineer existingByCard = zkbEngineerRepository.findByIdentityNumber(idCardNo);
+                        if (existingByCard != null) {
+                            record.setEngineerId(existingByCard.getId());
+                        }
                         // 保存成功记录
                         dao.save(record);
                         // 更新工程师SSO
