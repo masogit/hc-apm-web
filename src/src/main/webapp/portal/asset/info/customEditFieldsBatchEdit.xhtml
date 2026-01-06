@@ -18,7 +18,7 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'name')}" >
         <h:panelGroup>
             <label class="label">#{msg.name}</label>
-            <p:autoComplete id="name" value="#{assetInfoBulkEditController.selected.name}" completeMethod="#{assetInfoBulkEditController.completeAssetName}"/>
+            <p:autoComplete id="name" value="#{assetInfoBulkEditController.selected.name}" readonly="#{!assetInfoBulkEditController.needEdit('name')}" completeMethod="#{assetInfoBulkEditController.completeAssetName}"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'aliasName')}" >
