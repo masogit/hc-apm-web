@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -98,6 +99,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private ConfigItem selectedConfigItem;
     @Getter@Setter
     private String itemValue = "WorkOrderListColumn_0";
+    Map<String, Boolean> fieldRenderedMap = new HashMap<>();
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ConfigItemRepository.class);
@@ -254,6 +257,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
             }else if(category.equals("18")){
                 configItemList = configItemList.stream().filter(t -> t.getCategory().equals(18)).collect(Collectors.toList());
+                selectedConfigItemChange();
             }
             this.searchFilters = null;
         }  else {
@@ -268,6 +272,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public void selectedConfigItemChange(){
         System.out.println(itemValue);
+        List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
+        fieldRenderedMap = list.stream().collect(Collectors.toMap(FieldColumnDto::getField, FieldColumnDto::getRendered));
     }
 
 
@@ -343,6 +349,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 if (9 == configItem.getValueType()) {
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getDefaultValue(), FieldColumnDto.class));
                 }
+                if (10 == configItem.getValueType()){
+                    configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
+                    fieldRenderedMap = configItem.getFieldColumnDtoList().stream().collect(Collectors.toMap(FieldColumnDto::getField, FieldColumnDto::getRendered));
+                }
             }
             WebUtil.addErrorMessage("删除成功！");
         }
@@ -363,7 +373,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     }
 
     public void saveConfigMmOrderCreateByCycle() {
-        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
+//        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
         saveConfig(this.selected);
         invokeBatchPmOrderCancel(user.getSiteUID());
 
@@ -679,6 +689,25 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             WebUtil.addErrorMessage("取消周期性保养工单失败");
         }
 
+    }
+
+    public void onItemRowReorder(ReorderEvent event){
+        logger.info(event.toString());
+        List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
+        for (FieldColumnDto dto : list){
+            dto.setRendered(fieldRenderedMap.get(dto.getField()));
+        }
+    }
+
+    public void columnSelectedChange(String field){
+        logger.info(field);
+        List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
+        for (FieldColumnDto dto : list){
+            if(field.equals(dto.getField())){
+                logger.info(dto.getRendered());
+                fieldRenderedMap.put(dto.getField(),dto.getRendered());
+            }
+        }
     }
 
     public List<String> getMultiSelectedList(String key) {

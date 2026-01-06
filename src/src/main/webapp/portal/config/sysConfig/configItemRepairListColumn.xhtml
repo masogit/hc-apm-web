@@ -20,7 +20,7 @@
                     <label class="label">#{systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).name.concat('(').concat(systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).key).concat(')')}</label>
                    <p:dataTable id="WorkOrderListColumn" var='item' value="#{systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).fieldColumnDtoList}" draggableRows="true">
                         <p:growl id="msgss" />
-                        <p:ajax event="rowReorder" update="WorkOrderListColumn"/>
+                        <p:ajax event="rowReorder" update="WorkOrderListColumn" listener="#{systemConfigItemController.onItemRowReorder}"/>
                         <p:column headerText="#{msg.DisplayedField}" >
                             <h:outputText value="#{item.label}"  />
                         </p:column>
@@ -30,9 +30,10 @@
                         <p:column headerText="#{msg.Operation}">
                             <h:panelGroup rendered="#{!item.required}">
                                 <p:selectBooleanCheckbox value="#{item.rendered}"  >
-                                    <p:ajax />
+                                    <p:ajax event="change" listener="#{systemConfigItemController.columnSelectedChange(item.field)}"/>
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup>
+
                         </p:column>
                     </p:dataTable>
                 </h:panelGroup>

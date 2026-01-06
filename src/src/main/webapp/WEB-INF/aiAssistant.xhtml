@@ -75,7 +75,7 @@
             (function() {
                     var preloadFrame = document.createElement('iframe');
                     preloadFrame.id = 'aiAssistantPreload';
-                    preloadFrame.src = '/wx/acctChatbot?cache=true';
+                    preloadFrame.src = '/wx/acctChatbot?cache=true&amp;view=webpage';
                     preloadFrame.style.cssText = 'position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0;';
                     preloadFrame.onload = function() {
                         console.log('AI 助手预加载完成');
