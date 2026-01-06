@@ -62,6 +62,10 @@
 			<h:outputText value="#{item.warnMessage}" />
 		</p:column>
 		<f:facet name="{Toolbar}">
+
+			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+				<p:dataExporter type="xls" target="datalist" fileName="电气安全数据导入"   />
+			</p:commandButton>
 			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ELECTRIC_IMPORT')}"
 				actionListener="#{measureElectricSafetyController.delete}" update=":measureElectricSafetyTab:measureElectricSafetyListForm:datalist"
 				disabled="#{empty measureElectricSafetyController.selected.id}">

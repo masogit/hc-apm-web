@@ -300,11 +300,17 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             case "SupplierReview":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.SUPPLIER_REVIEW_MSG, WechatParam.class));
                 break;
+            case "InventoryUnfinished":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.INVENTORY_UNFINISHED_MSG, WechatParam.class));
+                break;
             case "UnattendedApproval":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.UNATTENDED_APPROVAL_MSG, WechatParam.class));
                 break;
             case "AdjustmentCenterReturn":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ADJUSTMENT_CENTER_RETURN_MSG, WechatParam.class));
+                break;
+            case "ProbationExpiration":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_PROBATION_EXPIRATION_MSG, WechatParam.class));
                 break;
             default:
                 break;
@@ -380,7 +386,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     }
 
     public List<UserAccount> getUserList() {
-        return userAccountMapper.getBySiteUid(selected.getSiteUid());
+        List<UserAccount> userAccounts = userAccountMapper.getBySiteParent(selected.getSiteUid());
+        userAccounts.addAll(userAccountMapper.getBySiteUid(selected.getSiteUid()));
+        return userAccounts;
     }
 
     public List<SysRole> getRoles() {

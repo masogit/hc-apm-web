@@ -10,7 +10,7 @@ import webapp.framework.dao.GenericRepository;
 
 import java.util.*;
 
-public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
+public interface AssetInfoRepository extends GenericRepository<AssetInfo>, AssetInfoRepositoryCustom {
 
     @Query("select o from AssetInfo o where o.hospitalId = ?1 and o.isValid = true")
     public List<AssetInfo> getByHospitalId(int hospitalId);

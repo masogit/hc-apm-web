@@ -223,6 +223,9 @@ public class V2_ServiceRequest implements Serializable {
     @Column(name="external_work_order")//是否是外部工单
     private String externalWorkOrder;
 
+    @Column(name = "voice_to_text", columnDefinition = "text")
+    private String voiceToText;
+
     public String getExternalWorkOrder() {
         return externalWorkOrder;
     }
@@ -621,6 +624,13 @@ public class V2_ServiceRequest implements Serializable {
 
     public void setSrRepairSource(String srRepairSource) {
         this.srRepairSource = srRepairSource;
+    }
+    public String getVoiceToText() {
+        return voiceToText;
+    }
+
+    public void setVoiceToText(String voiceToText) {
+        this.voiceToText = voiceToText;
     }
 
     @Override

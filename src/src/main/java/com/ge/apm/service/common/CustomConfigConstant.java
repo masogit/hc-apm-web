@@ -185,11 +185,11 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsMobilepageFilterFields() {
-        return Arrays.asList("siteUID", "assetGroup", "status");
+        return Arrays.asList("siteUID", "assetGroup", "status", "spare10");
     }
 
     public static List<String> defaultAssetsMobilepageFilterFields() {
-        return Arrays.asList("siteUID", "assetGroup", "status", "isChecked","assetTypeGroup");
+        return Arrays.asList("siteUID", "assetGroup", "status", "isChecked","assetTypeGroup", "spare10");
     }
 
     /**
@@ -201,10 +201,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsImportantFieldsAll() {
-        return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid","assetDisposalResults",
-                "spare06", "spare07", "spare08", "spare09", "spare10"
-        );
+        return Arrays.asList("name","assetOwnerName","departNum","clinicalDeptName","assetDeptName","clinicalOwnerName","manufacture","makerShortName","registrationNo","vendor","functionGroup","assetCode68","functionType","serialNum","purchasePrice","lifecycle","manufactDate","installDate","factoryWarrantyDate","locationName","assetUsage","capitalSource","measureGrade","riskGrade","emergencyEquipment","importEquipment","systemNum4","medicalApparatusClassification","deviceStatus","status","isValid","assetDisposalResults","purchaseDate","qrCode","spare06","spare07","spare08","spare09","spare10","financingNum","locationNotes");
     }
 
     public static List<String> getTemplateEnableList() {

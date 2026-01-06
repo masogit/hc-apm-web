@@ -16,6 +16,7 @@ import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -40,6 +41,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import webapp.framework.web.WebUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -94,6 +96,9 @@ public class PmReportService {
 
     @Autowired
     private V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
+
+    @Autowired
+    private ConfigCacheService cacheService;
 
     /**
      * Render Dynamic Table content.
@@ -235,6 +240,7 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Device.MAKER.toString(), pmOrder.getAssetInfo().getMakerShortName());
         content.put(MaintenanceTemplate.Device.INSTALL_DATE.toString(), pmOrder.getAssetInfo().getInstallDate() != null ? DEFAULT_DAY.print(pmOrder.getAssetInfo().getInstallDate().getTime()) : "");
         content.put(MaintenanceTemplate.Device.LOCATION_NAME.toString(), pmOrder.getAssetInfo().getLocationName());
+        content.put(MaintenanceTemplate.Device.GROUP.toString(), WebUtil.getFieldValueMessage("assetGroup",  pmOrder.getAssetInfo().getAssetGroup()!=null?  pmOrder.getAssetInfo().getAssetGroup().toString():""));
         String periodUnit = pmOrder.getPeriodUnit();
         String period = pmOrder.getPeriod() == null ?"":pmOrder.getPeriod().toString();
         periodUnit =(StringUtils.isEmpty(periodUnit)?"":"y".equalsIgnoreCase(periodUnit)?"年":"m".equalsIgnoreCase(periodUnit)?"月":"w".equalsIgnoreCase(periodUnit)?"周":"d".equalsIgnoreCase(periodUnit)?"日":"");
@@ -258,6 +264,7 @@ public class PmReportService {
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
         content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qualityChecking", pmOrder.getQualityChecking()));
         content.put(MaintenanceTemplate.Maintenance.COMMENTS.toString(), pmOrder.getComments());
+        content.put(MaintenanceTemplate.Maintenance.TRAVELTIME.toString(), pmOrder.getTravelTime());
         // Coworker List
         if (coWorkerList != null) {
             int count = 0;
@@ -476,6 +483,21 @@ public class PmReportService {
             }
         }
         content.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(), coworkerHoursInfoTable);
+        List<Map<String, Object>> manHoursDetail = new ArrayList<>();
+        if(pmOrder.getEntryType() == 1){
+            List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails = pmOrder.getPmOrderManHoursDetails();
+            if(CollectionUtils.isNotEmpty(pmOrderManHoursDetails)){
+                for (V2_PmOrderManHoursDetail item : pmOrderManHoursDetails) {
+                    Map<String, Object> manHoursInfoMap = new HashMap<>();
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.START_TIME.toString(), item.getStartTime());
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.END_TIME.toString(), item.getEndTime());
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.MAN_HOURS.toString(), item.getHours());
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.REMARK.toString(), item.getRemark());
+                    manHoursDetail.add(manHoursInfoMap);
+                }
+            }
+        }
+        content.put(MaintenanceTemplate.Component.MAN_HOURS_DETAIL.toString(), manHoursDetail);
 
         // Check List
         List<Map<String, Object>> checkListTable = new ArrayList<>();
@@ -561,7 +583,8 @@ public class PmReportService {
                 if (selected) {
                     try {
                         V2_PmOrder pmOrder = pmOrderService.findById(id);
-                        String name = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
+                        OrgInfo orgByUid = cacheService.findOrgByUid(pmOrder.getSiteUID());
+                        String name = "保养-"+orgByUid.getName()+"-"+pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
                         byte[] bytes = generate(pmOrder, activeTemplateBytes);
                         if("pdf".equalsIgnoreCase(pmOrderExportType)){
                             bytes = getPDF(bytes);
@@ -646,11 +669,11 @@ public class PmReportService {
                     try {
                         V2_PmOrder v2PmOrder = pmOrderService.findById(id);
                         List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
-                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
-                            byBoUuid = byBoUuid.stream()
-                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
-                                    .collect(Collectors.toList());
-                        }
+//                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
+//                            byBoUuid = byBoUuid.stream()
+//                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
+//                                    .collect(Collectors.toList());
+//                        }
                         for (V2_BlobObject v2BlobObject : byBoUuid) {
                             String vname = v2BlobObject.getObjectName();
                             zout.putNextEntry(new ZipEntry(vname));
@@ -740,6 +763,7 @@ public class PmReportService {
         bindings.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(), new CoworkerHoursRenderPolicy());
+        bindings.put(MaintenanceTemplate.Component.MAN_HOURS_DETAIL.toString(), new ManHoursRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1));

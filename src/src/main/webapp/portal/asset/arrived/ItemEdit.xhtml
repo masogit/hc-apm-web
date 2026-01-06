@@ -238,7 +238,7 @@
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['parentAssetId']}">
                                 <h:panelGroup id="parentAssetList" class="parentAssetList">
                                     <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired? '*':''}</span></label>
-                                    <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired}" 
+                                    <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['parentAssetId'].arrivalRequired}"
                                                     requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.name}#{t.name eq null ? '' : '/'}#{t.qrCode}" itemValue="#{t}" converter="assetInfoConverter">
                                         <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
                                     </p:autoComplete>
@@ -480,6 +480,17 @@
                                     <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired? '*':''}</span></label>
                                     <apm:selectAssetTypeGroup readonly="true" required="#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired}"
                                                               updateAfterClinicalDeptChange="clinicalDeptNameChange" update="#{userContextService.enableAssetGroupAssetTypeGroupAssociation()?'@parent:assetGroup':''} ItemEditDlgForm"/>
+                                </h:panelGroup>
+                            </c:if>
+
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetClassification32'] and userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_') and  userContextService.canRender('ASSET_CLASSIFICATION_MANAGEMENT') }">
+                                <h:panelGroup >
+                                <label class="label">#{msg.assetClassification32}</label>
+                                <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetInstallationController.selectItemDto}" scrollHeight="300"
+                                                forceSelection="true"  completeMethod="#{assetInstallationController.autoAssetClassification32()}"
+                                                var="t" itemLabel="#{t.label}  #{t.value}" itemValue="#{t}" converter="stringIdentityConverter"  >
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.assetClassification32Change()}" />
+                                </p:autoComplete>
                                 </h:panelGroup>
                             </c:if>
                         </p:panelGrid>
@@ -813,7 +824,7 @@
 <!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
 <!--                            </p:menuitem>-->
                         </p:menuButton>
-                        <p:commandButton validateClient="true"  action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
+                        <p:commandButton validateClient="true"  action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}"  update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
                              <p:confirm header="确认安装" message="您确定要完成安装吗?" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstallBatch}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">

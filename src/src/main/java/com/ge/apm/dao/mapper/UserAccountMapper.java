@@ -103,6 +103,13 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
             "tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid})")
     public List<UserAccount> getBySiteUid(String siteUid);
 
+    @Select("with recursive cte_org as ( " +
+            "SELECT oi.uid, oi.name, oi.parent_uid from org_info oi where oi.uid = #{siteUid} " +
+            "union all " +
+            "SELECT oi.uid, oi.name, oi.parent_uid from org_info oi join cte_org cte on oi.uid = cte.parent_uid) " +
+            "select id, name, login_name, org_uid from user_account where is_deleted is not true and is_disable is not true and org_uid in (SELECT uid FROM cte_org) and org_uid != #{siteUid}")
+    public List<UserAccount> getBySiteParent(String siteUid);
+
     @Select({
             "<script>" +
                     "select login_name loginName, name from  user_account where login_name in " +

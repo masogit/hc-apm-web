@@ -56,7 +56,7 @@
             }
 
             .message-left .message-content {
-                background: linear-gradient(135deg, #f5eded 0%, #d9d2d2 100%);
+                background: linear-gradient(135deg, #efede9 0%, #ededed 100%);
             }
 
             /* 用户信息样式 */
@@ -92,8 +92,8 @@
                 margin-left: 0;
                 margin-right: 16px;
                 color: #1a1919;
-                white-space: pre-wrap; /* 保留空格和换行 */
-                word-break: break-word; /* 自动换行以防文字太长 */
+                /*white-space: pre-wrap; !* 保留空格和换行 *!*/
+                /*word-break: break-word; !* 自动换行以防文字太长 *!*/
             }
 
             /* 输入指示器样式 */
@@ -187,64 +187,44 @@
                 background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
                 border-radius: 10px;
             }
-            .dropdown-transition {
-                transition: all 0.3s ease-in-out;
-            }
-            .dropdown-shadow {
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            }
-            .option-hover:hover {
-                background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-                transform: translateX(4px);
-            }
-            .message-markdown {
-                line-height: 1.6;
-                white-space: normal;       /* Markdown 交给渲染控制 */
+
+            /* Markdown 容器走正常流式布局 */
+            .message-text.message-markdown {
+                white-space: normal !important;
+                text-align: left;
+                line-height: 1.7;
+                font-size: 0.85rem;
             }
 
-            .message-markdown blockquote {
-                border-left: 4px solid #e0e0e0;
-                margin: 8px 0;
-                padding: 6px 12px;
-                color: #555;
-            }
-
+            /* 表格更清晰：加深边框、表头底色、单元格间距 */
             .message-markdown table {
+                width: 100%;
                 border-collapse: collapse;
+                table-layout: fixed;       /* 防止列宽跳动，三列更匀称 */
+                background: #fff;
+                border: 1px solid #d0d7de;
+                border-radius: 8px;        /* 需要圆角可保留；不需要可去掉 */
+                overflow: hidden;
+                font-size: 0.7rem;
+                font-family: "Microsoft YaHei", "微软雅黑", "PingFang SC", "Hiragino Sans GB", sans-serif;
             }
-            .message-markdown table th,
-            .message-markdown table td {
-                border: 1px solid #e0e0e0;
-                padding: 6px 10px;
-            }
-            .message-markdown {
-                line-height: 1.5;
-                white-space: normal;
-            }
-
-            .message-markdown p {
-                margin: 0.3em 0;  /* 段落更紧凑 */
-            }
-
-            .message-markdown ul,
-            .message-markdown ol {
-                margin: 0.3em 0 0.3em 1.2em;
-            }
-
-            .message-markdown pre {
-                margin: 0.4em 0;
-                padding: 10px;
-                border-radius: 6px;
+            .message-markdown thead th {
                 background: #f6f8fa;
+                font-weight: 700;
             }
+            .message-markdown th,
+            .message-markdown td {
+                border: 1px solid #d0d7de;
+                padding: 5px 7px;
+                vertical-align: top;
+                word-break: break-word;
+            }
+            .message-markdown td br { line-height: 1.0; }
 
-            .message-markdown code {
-                background: #f6f8fa;
-                padding: 2px 4px;
-                border-radius: 3px;
-                font-family: Menlo, Consolas, monospace;
-                font-size: 0.95em;
-            }
+            /* 段首段尾不多留白 */
+            .message-markdown > :first-child { margin-top: 0; }
+            .message-markdown > :last-child  { margin-bottom: 0; }
+
         </style>
         <div class="ui-g-12 card cardTitle bg-white shadow-lg">
             <div class="p-4" style="margin-top: -22px;">
@@ -254,6 +234,7 @@
                 </h1>
             </div>
             <input type="hidden" id="userName" value="#{userContextService.userName}" />
+            <input type="hidden" id="conversationId" value="" />
             <div class="chat-container bg-white rounded-lg shadow-xl mt-4">
                 <div id="logDisplayForm">
                     <div id="messagesList" class="w-full">
@@ -295,15 +276,6 @@
                                 <i class="fa fa-trash mr-2"></i>
                                 清空记录
                             </button>
-<!--                            <button-->
-
-<!--                                    id="simulateButton"-->
-<!--                                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center"-->
-<!--                                    onclick="simulateChat()"-->
-<!--                            >-->
-<!--                                <i class="fa fa-magic mr-2"></i>-->
-<!--                                模拟对话-->
-<!--                            </button>-->
                         </div>
                     </form>
                 </div>

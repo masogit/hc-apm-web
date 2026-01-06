@@ -78,6 +78,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("device_number", WebUtil.getMessage("EquipmentID_xlsx"));
         COPY_KEY_MAPPING.put("device_location", WebUtil.getMessage("CurrentLocation_xlsx"));
         COPY_KEY_MAPPING.put("device_registration_no", WebUtil.getMessage("registrationNo"));
+        COPY_KEY_MAPPING.put("device_group", WebUtil.getMessage("EquipmentClassification_xlsx"));
         //质保
         COPY_KEY_MAPPING.put("device_factory_warranty_date", WebUtil.getMessage("warrantyDate"));
         //维保
@@ -109,6 +110,9 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("fix_reason", WebUtil.getMessage("ReasonDescription_xlsx"));
         COPY_KEY_MAPPING.put("fix_solution", WebUtil.getMessage("patActions"));
         COPY_KEY_MAPPING.put("fix_validation", WebUtil.getMessage("TestbeforeDelivery_xlsx"));
+        COPY_KEY_MAPPING.put("feedback_rating", WebUtil.getMessage("feedbackRating"));
+        COPY_KEY_MAPPING.put("feedback_comment", "feedbackComment");
+        COPY_KEY_MAPPING.put("close_time", WebUtil.getMessage("CloseTime_xlsx"));
 
         /*COPY_KEY_MAPPING.put("fix_co1", "协作者1");
         COPY_KEY_MAPPING.put("fix_co2", "协作者2");
@@ -134,7 +138,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("spare09", "spare09");
         COPY_KEY_MAPPING.put("spare10", "spare10");
         COPY_KEY_MAPPING.put("related_order_number","related_order_number");
-
+        COPY_KEY_MAPPING.put("travel_time", WebUtil.getMessage("travelTime"));
     }
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {

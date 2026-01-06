@@ -41,6 +41,22 @@ public class V2_ServiceRequestNoAsset implements Serializable {
     @Column(name = "dept_name")
     private String deptName;
 
+    @Size(max = 64)
+    @Column(name = "financing_num")
+    private String financingNum;//资产编号
+
+    @Column(name = "function_type")
+    private String functionType;//设备型号
+
+    @Size(max = 64)
+    @Column(name = "serial_num")
+    private String serialNum;//制造商序列号
+
+    //品牌/制造商简称
+    @Size(max = 64)
+    @Column(name = "make_short_name")
+    private String makerShortName;
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "requestor_id")

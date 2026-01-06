@@ -271,7 +271,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
     public void getQueryAssetsList() {
         List<AssetInfo> sourceAssets;
-        if(selectedOrg != null){
+        if(selectedOrg != null && filterDeptOrg!=null){
             sourceAssets = hisAssetGroupService.getAssetListByDept(selectedOrg, filterDeptOrg, selected.getIsSubEquipment(),assetGroup,purchasePrice);
             sourceAssets = new ArrayList<>(sourceAssets);
             sourceAssets.removeAll(availableAssets.getTarget());

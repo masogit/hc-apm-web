@@ -86,7 +86,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		if (null == orderId){
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
-            listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
+			listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
 		}
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		loadClinicalDeptList();
@@ -114,13 +114,13 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		}
        	boolean hasLastModifiedBy = false; String lastModifiedByFilter = null;
        	for (SearchFilter searchFilter :searchFilters) {
-       		if ("lastModifiedBy".equals(searchFilter.fieldName)) {
+       		if ("assetInfo.lastModifiedBy".equals(searchFilter.fieldName)) {
        			hasLastModifiedBy = true;
 				lastModifiedByFilter = (String)searchFilter.value;
        		}
 		}
        	if(hasLastModifiedBy) {
-			searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
+			searchFilters.removeIf(e -> e.fieldName.equals("assetInfo.lastModifiedBy"));
 			List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(currentUser.getTenantUID(), lastModifiedByFilter);
 			List<String> loginNamList = new ArrayList<>();
 			if(!userAccountList.isEmpty()){

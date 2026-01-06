@@ -878,6 +878,10 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Transient
     @TableField(exist = false)
+    private String checkPerson;
+
+    @Transient
+    @TableField(exist = false)
     private String boUuid;
 
     @Transient
@@ -930,9 +934,6 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Temporal(TemporalType.DATE)
     private Date lastMeasuringDate;
-    @Size(max = 256)
-    @Column(name = "bar_code")
-    private String barCode;
 
     // 入库单号
     @Column(name = "receipt_number")
@@ -1082,6 +1083,31 @@ public class AssetInfo implements ChineseName, Serializable {
     private boolean isSpecialAsset; //是否特种设备
     @Column(name = "asset_scrap_id")
     private String assetScrapId; //设备报废id
+
+    @Column(name = "asset_classification32")
+    private String assetClassification32;
+
+    @Transient
+    @TableField(exist = false)
+    private List<String> availableCategories;
+
+    @Transient
+    @TableField(exist = false)
+    private String category1;
+    @Transient
+    @TableField(exist = false)
+    private String category2;
+    @Transient
+    @TableField(exist = false)
+    private String category3;
+
+    @Transient
+    @TableField(exist = false)
+    private String categoryRadio;
+
+    @Transient
+    @TableField(exist = false)
+    private boolean editing = false;
     @Transient
     @TableField(exist = false)
     private BigDecimal scaleAssessment;
@@ -1153,14 +1179,6 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setLastMeasuringDate(Date lastMeasuringDate) {
         this.lastMeasuringDate = lastMeasuringDate;
-    }
-
-    public String getBarCode() {
-        return barCode;
-    }
-
-    public void setBarCode(String barCode) {
-        this.barCode = barCode;
     }
 
     public String getReceiptNumber() {
@@ -3054,14 +3072,15 @@ public class AssetInfo implements ChineseName, Serializable {
                 warrantyAlertStatus = "warrantyExpired";
             else if (dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
-        } else if (factoryWarrantyDate != null) {
+        }
+        /*if (factoryWarrantyDate != null) {
             // then check factory Warranty Date
             DateTime dt = TimeUtil.toJodaDate(factoryWarrantyDate);
             if (dt.isBeforeNow())
                 warrantyAlertStatus = "warrantyExpired";
             else if (dt.minusDays(warrantyAlertDays).isBeforeNow())
                 warrantyAlertStatus = "warrantyExpireSoon";
-        }
+        }*/
     }
 
     public String getMeasuringOwnerName() {
@@ -3254,6 +3273,14 @@ public class AssetInfo implements ChineseName, Serializable {
         this.checkDate = checkDate;
     }
 
+    public String getCheckPerson() {
+        return checkPerson;
+    }
+
+    public void setCheckPerson(String checkPerson) {
+        this.checkPerson = checkPerson;
+    }
+
     public String getBoUuid() {
         return boUuid;
     }
@@ -3386,5 +3413,58 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setCreateType(String createType) {
         this.createType = createType;
+    }
+
+    public String getAssetClassification32() {
+        return assetClassification32;
+    }
+
+    public void setAssetClassification32(String assetClassification32) {
+        this.assetClassification32 = assetClassification32;
+    }
+
+    public String getCategory1() {
+        return category1;
+    }
+
+    public void setCategory1(String category1) {
+        this.category1 = category1;
+    }
+
+    public String getCategory2() {
+        return category2;
+    }
+
+    public void setCategory2(String category2) {
+        this.category2 = category2;
+    }
+
+    public String getCategory3() {
+        return category3;
+    }
+
+    public void setCategory3(String category3) {
+        this.category3 = category3;
+    }
+
+
+
+    public List<String> getAvailableCategories() {
+        return availableCategories;
+    }
+
+    public void setAvailableCategories(List<String> availableCategories) {
+        this.availableCategories = availableCategories;
+    }
+
+    public boolean isEditing() { return editing; }
+    public void setEditing(boolean editing) { this.editing = editing; }
+
+    public String getCategoryRadio() {
+        return categoryRadio;
+    }
+
+    public void setCategoryRadio(String categoryRadio) {
+        this.categoryRadio = categoryRadio;
     }
 }

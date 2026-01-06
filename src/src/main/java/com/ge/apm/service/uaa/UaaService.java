@@ -448,6 +448,11 @@ public class UaaService {
         userDao.activeSingleUser(userId);
     }
 
+    public List<UserAccount> findByNameLike(String name) {
+        UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
+        return userDao.findByNameContains(name);
+    }
+
     public void deactiveTemporaryUser(Integer userId){
         UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
         userDao.deactiveTemporaryUser(userId);
@@ -940,6 +945,16 @@ public class UaaService {
     public List<UserAccount> getUsersByDeptUid(String deptUid){
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         return userAccountDao.getByOrgInfoUID(deptUid);
+    }
+
+    public List<UserAccount> getUsersByDeptUidAndRole(String deptUid, String roleName){
+        UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        return userAccountDao.getUsersByDeptUidAndRole(deptUid, roleName);
+    }
+
+    public List<UserAccount> getUsersBySiteUidAndRole(String siteUid, String roleName){
+        UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        return userAccountDao.getUsersBySiteUidAndRole(siteUid, roleName);
     }
 
     //用户可以显示的医院列表

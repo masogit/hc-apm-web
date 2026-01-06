@@ -53,7 +53,9 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetName}*</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"/>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}">
+                                            <p:ajax/>
+                                        </p:inputText>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetGroup}*</label>
@@ -69,7 +71,9 @@
                                         </h:panelGroup>
                                         <h:panelGroup>
                                             <label class="label">#{msg.arrivalListFunctionType}</label>
-                                            <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                            <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" >
+                                                <p:ajax/>
+                                            </p:inputText>
                                         </h:panelGroup>
                                         <h:panelGroup>
                                             <label class="label">#{msg.manufacture}</label>
@@ -83,7 +87,9 @@
                                     </c:if>
                                     <h:panelGroup>
                                         <label class="label">#{msg.brandManufacturerShortName}</label>
-                                        <p:inputText  value="#{assetArrivedListEditController.selected.makerShortName}"  readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
+                                        <p:inputText  value="#{assetArrivedListEditController.selected.makerShortName}"  readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" >
+                                            <p:ajax/>
+                                        </p:inputText>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.quantity}*</label>
@@ -205,6 +211,14 @@
                                             <p:inputText value="#{assetArrivedListEditController.selected.repairerTel}" />
                                         </h:panelGroup>
                                     </c:if>
+                                    <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_') and  userContextService.canRender('ASSET_CLASSIFICATION_MANAGEMENT')  }">
+                                        <label class="label">#{msg.assetClassification32}</label>
+                                        <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetArrivedListEditController.selectItemDto}" scrollHeight="300"
+                                                        forceSelection="true"  completeMethod="#{assetArrivedListEditController.autoAssetClassification32()}"
+                                                        var="t" itemLabel="#{t.label}  #{t.value}" itemValue="#{t}" converter="stringIdentityConverter"  >
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.assetClassification32Change()}" />
+                                        </p:autoComplete>
+                                    </h:panelGroup>
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status ne 1}">
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":growl"/>

@@ -31,6 +31,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
@@ -65,6 +66,7 @@ import org.primefaces.event.*;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -88,6 +90,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -303,9 +306,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<V2_PmOrder> bySearchFilterInternal = null;
     @Getter @Setter
     private List<OrgInfo> orgList;
+    @Setter@Getter
+    private String pageType ;
 
     @Getter @Setter
     private boolean repaFlag = false;
+
+    @Getter @Setter
+    private TreeNode[] selectedAccessOrgNodes;
 
     private WorkflowService workflowService;
 
@@ -447,11 +455,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private List<V2_PmOrder> getExportList() {
         List<V2_PmOrder> pmList=null;
+        pick(null);
         if(pmIdList.size()!=0 && queryIndex!=10 ) {
             pmList = dao.getBatchPmOrderList(pmIdList);
         }else{
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            pmList = dao.getPmOrderListAll(orgUidList);
+//            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+//            pmList = dao.getPmOrderListAll(orgUidList);
+
+
+            Sort.Order orders = new Sort.Order(Sort.Direction.DESC, "planTime");
+            Sort sort = new Sort(orders);
+            PageRequest    pageRequest = new PageRequest(0,30000,sort);
+            Page<V2_PmOrder> v2PmOrders = loadData(pageRequest);
+            pmList= v2PmOrders.getContent();
         }
         return pmList;
     }
@@ -1773,57 +1789,68 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         //如果是院长等管理层登录进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
-        if (!Strings.isNullOrEmpty(enCodeParameters)) {
-            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
-            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
-            orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
-            if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
-                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
-            }
-        }
-        if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
-            if (Strings.isNullOrEmpty(query)) {
-                queryIndex = 8;
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
-            }
-        }else {
-            if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.hasCurrentTenantName("")){
-                    queryIndex = 10;
-                }else{
-                    queryIndex = -1;
+        if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
+            selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+            onSelectPmOrder();
+        }else{
+            if (!Strings.isNullOrEmpty(enCodeParameters)) {
+                requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+                queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+                orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
+                if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
+                    query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
                 }
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
             }
-        }
-        for (ExportFields exs: ExportFields.values()
-        ) {
-            if(userContextService.isLocale()){
-                pmFieldsExport.add(exs.getChinese());
-            }else{
-                pmFieldsExport.add(exs.getEnglish());
+            if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
+                if (Strings.isNullOrEmpty(query)) {
+                    queryIndex = 8;
+                } else {
+                    queryIndex = Integer.valueOf(query);
+                    searchList(queryIndex);
+                }
+            }else {
+                if (Strings.isNullOrEmpty(query)) {
+                    if(userContextService.hasCurrentTenantName("")){
+                        queryIndex = 10;
+                    }else{
+                        queryIndex = -1;
+                    }
+                } else {
+                    queryIndex = Integer.valueOf(query);
+                    searchList(queryIndex);
+                }
             }
+            for (ExportFields exs: ExportFields.values()) {
+                if(userContextService.isLocale()){
+                    pmFieldsExport.add(exs.getChinese());
+                }else{
+                    pmFieldsExport.add(exs.getEnglish());
+                }
+            }
+            this.filterBySite = false;
+            this.filterByHospital = false;
+            hmCheck = new HashMap<String, UnstructuredData>();
+            isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
+            isInsulate = isInsulate == null ? false : isInsulate;
+            WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
+            if(wfc !=null)
+                isBatchOp=wfc.getPmIsSupportBatchFinish();
+            loadClinicalDeptList();
+            loadRuleList();
+            String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+            showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
+            getPageTypeFromConfig();
         }
-
-
-        this.filterBySite = false;
-        this.filterByHospital = false;
-        hmCheck = new HashMap<String, UnstructuredData>();
-        isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
-        isInsulate = isInsulate == null ? false : isInsulate;
-        WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
-        if(wfc !=null)
-            isBatchOp=wfc.getPmIsSupportBatchFinish();
-        loadClinicalDeptList();
-        loadRuleList();
-        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
-        showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
     }
 
+    public void getPageTypeFromConfig() {
+        String  key= "PmOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
+    }
 
 
     public void loadRuleList(){
@@ -1977,7 +2004,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<SearchFilter> filterArrayList = new ArrayList<>();
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
-
         if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
@@ -2024,8 +2050,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterArrayList.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
-//            searchFilters = new ArrayList();
-            setSearchFilter();
             pmIdList = new ArrayList<>();
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
@@ -2307,6 +2331,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         initExternalTempUser();
     }
 
+    public void onSelectOrderRedirect() throws IOException {
+        String url = "actionName=View&selectedid="
+                + selected.getId()
+                + "&queryIndex=" + queryIndex
+                ;
+        url = "pmOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return pmOrderService.getWorkOrderDetails(woId);
     }
@@ -2524,27 +2559,49 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         accessoryList = getWorkOrderDetail(woid);
         coWorkerList = getWorkOrderCoworker(woid);
         loadHmCheck(selectedPmOrder);
-        if(selectedPmOrder.getEntryType() == null){
+
+        Integer oldEntryType=selectedPmOrder.getEntryType();
+        Integer oldCoworkerEntryType = selectedPmOrder.getCoworkerEntryType();
+//        if(selectedPmOrder.getEntryType() == null){
             String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectedPmOrder.getSiteUID(), selectedPmOrder.getHospitalUID(), selectedPmOrder.getInstitutionUID(), selectedPmOrder.getTenantUID(), "pmEntryTypeSet");
             if(StrUtil.isNotEmpty(value)){
                 FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
                 if(fieldColumnDto.getEntryType() != null){
-                    selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
-                    if(fieldColumnDto.getEntryType() == 0){
-                        selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                    if(selectedPmOrder.getEntryType() == null){
+                        selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
+                        if(fieldColumnDto.getEntryType()==0 || fieldColumnDto.getEntryType()==2){
+                            selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                        }
+                    }else{
+                        if(fieldColumnDto.getEntryType()==2 || fieldColumnDto.getEntryType()==3){
+                            selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
+                        }
+                        if((oldEntryType==1 || oldEntryType==3) &&  fieldColumnDto.getEntryType() ==2){
+                            selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                        }
+                        if((oldEntryType==0 || oldEntryType==2) && fieldColumnDto.getEntryType() ==3){
+                            selectedPmOrder.setManHours(null);
+                        }
+                    }
+
+                    if(selectedPmOrder.getCoworkerEntryType() == null){
+                        selectedPmOrder.setCoworkerEntryType(fieldColumnDto.getEntryType());
+                    }else{
+                        if(fieldColumnDto.getEntryType()==2 || fieldColumnDto.getEntryType()==3){
+                            selectedPmOrder.setCoworkerEntryType(fieldColumnDto.getEntryType());
+                        }
+
+                        if((oldCoworkerEntryType==0 &&  fieldColumnDto.getEntryType() ==3  ) ||  (oldCoworkerEntryType==1 &&  fieldColumnDto.getEntryType() ==2  )){
+                            coWorkerList=new ArrayList<>();
+                        }
                     }
                 }
             }
-            if(selectedPmOrder.getEntryType() == null){
-                selectedPmOrder.setEntryType(0);
-            }
-            if(selectedPmOrder.getCoworkerEntryType() == null){
-                selectedPmOrder.setCoworkerEntryType(0);
-            }
+
 //            if(selectedPmOrder.getManHours() == null){
 //                selectedPmOrder.setManHours(0.1);
 //            }
-        }
+//        }
 
 //        if (pmCheckItemList != null){
 //        pmCheckItemList.stream().filter(item-> !hmCheck.containsKey(item.getUid()))
@@ -2560,7 +2617,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //        }
 //        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
         // 验收人
-        currentPersonIdBatch = selectedPmOrder.getAcceptPerson();
+        if (Boolean.TRUE.equals(selectedPmOrder.getSimplify())) {
+            currentPersonIdBatch = loginUser.getUid();
+        } else {
+            currentPersonIdBatch = selectedPmOrder.getAcceptPerson();
+        }
         if (ObjectUtil.isNotEmpty(pmCheckItemList)) {
             for (UnstructuredData data : pmCheckItemList) {
                 hmCheck.put(data.getKey(), data);
@@ -2610,6 +2671,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         filterArrayList.clear();
+        if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+            List<String> selectedSiteList = ListUtil.newArrayList();
+            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+                selectedSiteList.add(orgInfo.getUid());
+            }
+            filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+        }
         updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
@@ -2777,14 +2849,31 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
-        this.filterArrayList.clear();
-        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            selectSite = (OrgInfo) event.getTreeNode().getData();
-        } else {
-            selectSite = null;
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+
+    public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
+        this.searchFilters.clear();
+        loadClinicalDeptList();
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
         }
-        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-            selectSite = null;
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
         }
     }
 
@@ -2988,14 +3077,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.totalManHours = null;
     }
 
+    private V2_WorkOrderCoworker coWorkerDetailOld;
     public void prepareEditCoWorkerDetail(String itemId) {
         if ("new".equals(itemId)) {
             coWorkerDetail = new V2_WorkOrderCoworker();
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             coWorkerDetail.setWoId(selectedPmOrder.getId());
+            coWorkerDetailOld=null;
         } else {
             if (coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {
                 coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+                coWorkerDetailOld=new V2_WorkOrderCoworker();
+                try {
+                    BeanUtils.copyProperties(coWorkerDetailOld,coWorkerDetail);
+                } catch (Exception e) {
+                   logger.error("编辑责任人工时出现异常 e:",e);
+                }
             }
         }
     }
@@ -3133,7 +3230,41 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private V2_WorkOrderCoworkerRepository coWorkerDao;
 
     public void addCoWokerItem() {
-        if(selectedPmOrder.getCoworkerEntryType() == 1){
+        if(selectedPmOrder.getCoworkerEntryType() == 1 ||  selectedPmOrder.getCoworkerEntryType() == 3){
+            // 重复性校验
+            boolean check = false;
+            for (V2_WorkOrderCoworker detail : coWorkerList) {
+                if("000".equals(detail.getId())){
+                    continue;
+                }
+                if(coWorkerDetail.getCowokerUserId().equals(detail.getCowokerUserId()) &&  !coWorkerDetail.getId().equals(detail.getId()) ){
+                    // 开始时间结束时间不能相等
+                    if(coWorkerDetail.getStartTime().getTime() == detail.getStartTime().getTime()
+                            || coWorkerDetail.getEndTime().getTime() == detail.getEndTime().getTime()){
+                        check = true;
+                        break;
+                    }
+                    // 当前开始时间小于结束时间 && 大于开始时间
+                    if(coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()
+                            && coWorkerDetail.getStartTime().getTime() > detail.getStartTime().getTime()){
+                        check = true;
+                        break;
+                    }
+                    // 当前结束时间大于开始时间 && 小于结束时间
+                    if(coWorkerDetail.getEndTime().getTime() > detail.getStartTime().getTime()
+                            && coWorkerDetail.getStartTime().getTime() < detail.getEndTime().getTime()){
+                        check = true;
+                        break;
+                    }
+                }
+
+            }
+            if(check){
+                WebUtil.addErrorMessage("工时段重复，请重新填写");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+
             String strHours = "0";
             long milliSeconds = coWorkerDetail.getEndTime().getTime() - coWorkerDetail.getStartTime().getTime();
             if (milliSeconds > 0) {
@@ -3164,6 +3295,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.updateAccessPrice(itemDetail);
     }
     public void cancelWorkdetail() {
+        if(coWorkerDetailOld!=null){
+            if(CollectionUtils.isNotEmpty(coWorkerList)){
+                coWorkerList.remove(coWorkerDetail);
+                coWorkerList.add(coWorkerDetailOld);
+            }
+        }
         itemDetail = null;
         coWorkerDetail = null;
         selectedPmOrderManHoursDetail = null;
@@ -4072,6 +4209,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public Date getMaxDate(){
         if(selectedPmOrderManHoursDetail.getStartTime() != null){
             Date date = DateUtil.offset(selectedPmOrderManHoursDetail.getStartTime(), DateField.HOUR, 24);
+            return date;
+        }
+        return TimeUtil.now();
+    }
+
+    public Date getCoWorkMaxDate(){
+        if(coWorkerDetail.getStartTime() != null){
+            Date date = DateUtil.offset(coWorkerDetail.getStartTime(), DateField.HOUR, 24);
             return date;
         }
         return TimeUtil.now();

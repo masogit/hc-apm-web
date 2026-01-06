@@ -113,21 +113,17 @@ public class ZkbTrainAttendanceRecord {
     @Column(name = "online_score")
     private String onlineScore;
 
-    // Lab + 笔试成绩（如 "40+48"）
-    @Column(name = "lab_written_score")
-    private String labWrittenScore;
+    // Lab成绩
+    @Column(name = "lab_score")
+    private Double labScore;
 
-    // Final 成绩（数值型）
+    // 笔试成绩
+    @Column(name = "written_score")
+    private Double writtenScore;
+
+    // 总分
     @Column(name = "final_score")
     private Double finalScore;
-
-    // 学位/评级（如：良好、优秀等）
-    @Column(name = "degree")
-    private String degree;
-
-    // 是否通过（"通过" / "未通过"）
-    @Column(name = "is_passed")
-    private String isPassed;
 
     @Column(name = "created_by")
     private String createdBy;

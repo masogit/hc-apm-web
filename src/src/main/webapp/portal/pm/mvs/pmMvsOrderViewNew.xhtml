@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="MVS工单详情"/>
+            </div>
+        </div>
+        <ui:include src="pmMvsOrderView.xhtml"/>
+        <ui:include src="/portal/preview/view.xhtml"/>
+        <p:dialog id="previewedDlgEhome" width="1000" height="800"  widgetVar="previewedDlg" modal="true" howEffect="fade"  maximizable="true" appendTo="@this">
+            <c:choose>
+                <c:when test="#{preViewerBean.type eq 0}">
+                    <p:graphicImage value="#{fileDownloadService.getFile(preViewerBean.getObjectId())}" stream="false"   width="100%" height="780px" />
+                </c:when>
+                <c:when test="#{preViewerBean.type eq 1}">
+                    <embed src="#{preViewerBean.pdfUrl}" type="application/pdf"  width="100%" height="780px" />
+                </c:when>
+                <c:otherwise>
+                    <h:outputText value="预览失败！" />
+                </c:otherwise>
+            </c:choose>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

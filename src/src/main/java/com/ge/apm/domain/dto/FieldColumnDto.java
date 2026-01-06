@@ -18,4 +18,5 @@ public class FieldColumnDto {
     private String type;
     private Integer entryType;
     private Double hours;
+    private String field;
 }

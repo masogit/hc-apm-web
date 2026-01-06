@@ -1,0 +1,410 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{assetProbationEditController.CRUDActionName} #{msg.probationApplication}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="externalAssetEditForm">
+                    <p:fieldset legend="#{msg.probationApplication.substring(0, 2).concat(msg.BasicInfo)}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.EquipmentName}<span style="color:red">*</span></label>
+                                <p:inputText id="equipmentName" value="#{assetProbationEditController.selected.name}" readonly="#{!assetProbationEditController.canEditBase}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.pattern}<span style="color:red">*</span></label>
+                                <p:inputText id="functionType" value="#{assetProbationEditController.selected.functionType}" readonly="#{!assetProbationEditController.canEditBase}"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.AssetDepartment}<span style="color:red">*</span></label>
+                                <p:autoComplete id="assetDept" dropdown="true" value="#{assetProbationEditController.assetDept}" scrollHeight="300" forceSelection="true" requiredMessage="#{msg.assetDeptName} #{msg.ValidationRequire}"
+                                                completeMethod="#{assetProbationEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter">
+                                    <p:ajax event="itemSelect" listener="#{assetProbationEditController.onAssetDeptChange('assetDept')}" update="deptContact"/>
+                                    <p:ajax listener="#{assetProbationEditController.onAssetDeptChange('assetDept')}"/>
+                                </p:autoComplete>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.AssetDepartment}<span style="color:red">*</span></label>
+                                <p:inputText value="#{assetProbationEditController.selected.assetDeptName}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.AssetDepartment.concat(msg.contactPerson)}<span style="color:red">*</span></label>
+                                <p:autoComplete id="deptContact" dropdown="true" value="#{assetProbationEditController.deptContact}" scrollHeight="300" forceSelection="true" requiredMessage="#{msg.probationConfirmor} #{msg.ValidationRequire}"
+                                                completeMethod="#{assetProbationEditController.autoCompleteDeptContact}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                                </p:autoComplete>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.AssetDepartment.concat(msg.contactPerson)}<span style="color:red">*</span></label>
+                                <p:inputText value="#{assetProbationEditController.selected.deptContactName}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.department.concat(msg.contactPhone)}<span style="color:red">*</span></label>
+                                <p:inputText id="deptContactTel" value="#{assetProbationEditController.selected.deptContactTel}" readonly="#{!assetProbationEditController.canEditBase}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.company.concat(msg.name)}<span style="color:red">*</span></label>
+                                <p:inputText id="company" value="#{assetProbationEditController.selected.company}" readonly="#{!assetProbationEditController.canEditBase}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.company.concat(msg.contactPerson)}<span style="color:red">*</span></label>
+                                <p:inputText id="companyContactName" value="#{assetProbationEditController.selected.companyContactName}" readonly="#{!assetProbationEditController.canEditBase}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.company.concat(msg.contactPhone)}<span style="color:red">*</span></label>
+                                <p:inputText id="companyContactTel" value="#{assetProbationEditController.selected.companyContactTel}" readonly="#{!assetProbationEditController.canEditBase}"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.approvalCompletedDate}<span style="color:red">*</span></label>
+                                <p:calendar id="approvalCompletedDate" timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetProbationEditController.selected.approvalCompletedDate}"
+                                            showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.PlannedStartTime}<span style="color:red">*</span></label>
+                                <p:calendar id="planStartDate" timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetProbationEditController.selected.planStartDate}" mindate="#{assetProbationEditController.getPlanMinDate()}" maxdate="#{assetProbationEditController.selected.planEndDate}"
+                                            showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" process="@this" update="planEndDate"/>
+                                    <p:ajax process="@this" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.plannedEndTime}<span style="color:red">*</span></label>
+                                <p:calendar id="planEndDate" timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetProbationEditController.selected.planEndDate}" maxdate="#{assetProbationEditController.getPlanMaxDate()}" mindate="#{assetProbationEditController.selected.planStartDate}"
+                                            showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" process="@this" update="planStartDate"/>
+                                    <p:ajax process="@this" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.approvalCompletedDate}<span style="color:red">*</span></label>
+                                <p:inputText value="#{assetProbationEditController.selected.approvalCompletedDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.PlannedStartTime}<span style="color:red">*</span></label>
+                                <p:inputText value="#{assetProbationEditController.selected.planStartDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!assetProbationEditController.canEditBase}">
+                                <label class="label">#{msg.plannedEndTime}<span style="color:red">*</span></label>
+                                <p:inputText value="#{assetProbationEditController.selected.planEndDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </p:inputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="#{msg.equipmentMaterialInformation}">
+                        <div style="display: flex; gap: 1rem;">
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.Device.concat(msg.certificate)}<span style="color:red">*</span></label>
+                                    <h:panelGrid>
+                                        <p:selectBooleanCheckbox value="#{assetProbationEditController.selected.hasCertificate}" disabled="#{!assetProbationEditController.canEditBase}"/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.specification}<span style="color:red">*</span></label>
+                                    <h:panelGrid>
+                                        <p:selectManyCheckbox id="specification" value="#{assetProbationEditController.specificationList}" disabled="#{!assetProbationEditController.canEditBase}">
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('specification')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectManyCheckbox>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.threeInformation}<span style="color:red">*</span></label>
+                                    <h:panelGrid>
+                                        <p:selectManyCheckbox id="threeInformation" value="#{assetProbationEditController.informationList}" disabled="#{!assetProbationEditController.canEditBase}">
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('threeInformation')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectManyCheckbox>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <p:dataList id="informationList" value="#{assetProbationEditController.getAttachList('information')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{msg.attachmentUrl}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
+                                    <span/><span/>
+                                    <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="informationList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditBase}">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="information" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                              multiple="true"  sizeLimit="500000000"  update="informationList" rendered="#{assetProbationEditController.canEditBase}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="#{msg.WorkorderInformation}" rendered="#{assetProbationEditController.selected.status ge 0}">
+                        <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbPartOrder_srNum}</label>
+                                <p:inputText value="#{assetProbationEditController.selected.orderNum}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.Applicant}</label>
+                                <p:inputText value="#{assetProbationEditController.selected.applicantUserName}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.ApplyTime}</label>
+                                <p:inputText value="#{assetProbationEditController.selected.applicationTime}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.probationStatus}</label>
+                                <p:inputText value="#{fieldMsg.doGetFieldValue('probationStatus', assetProbationEditController.selected.status)}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.currentPersonName}</label>
+                                <p:inputText value="#{assetProbationEditController.selected.currentPersonName}" readonly="true"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:dataTable value="#{assetProbationEditController.getStepList()}" var="stepItem" rendered="#{assetProbationEditController.getStepList().size() gt 0}">
+                            <p:column headerText="#{msg.stepName}">
+                                <h:outputText value="#{stepItem.stepName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.ownerName}">
+                                <h:outputText value="#{stepItem.ownerName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.startTime}">
+                                <h:outputText value="#{stepItem.startTime}"/>
+                            </p:column>
+                        </p:dataTable>
+                        <p:fieldset legend="#{msg.tempEngineerDetection}" rendered="#{assetProbationEditController.viewDetection()}">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.selected.status ge 2 and assetProbationEditController.action ne -22}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
+                                    <p:inputTextarea id="detectionSituationRead" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" readonly="true" style="width: 80%"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.detectionPeople}<span style="color:red">*</span></label>
+                                    <p:inputText value="#{assetProbationEditController.selected.detectionUserName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.detectionTime}<span style="color:red">*</span></label>
+                                    <p:inputText value="#{assetProbationEditController.selected.detectionTime}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.canEditDetection()}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
+                                    <p:inputTextarea id="detectionSituation" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" style="width: 100%"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <p:dataList id="detectionList" value="#{assetProbationEditController.getAttachList('detection')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                        <f:facet name="header">#{msg.addPic}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
+                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                        <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                            <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                        </p:commandLink>
+                                        <span/><span/>
+                                        <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="detectionList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditDetection()}">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                        </p:commandButton>
+                                    </p:dataList>
+                                    <p:fileUpload id="detection" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                                  multiple="true"  sizeLimit="500000000"  update="detectionList" rendered="#{assetProbationEditController.canEditDetection()}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.canEditDetection()}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.probationConfirmor}<span style="color:red">*</span></label>
+                                    <p:autoComplete id="probationUser" dropdown="true" value="#{assetProbationEditController.probationConfirmor}" scrollHeight="300" forceSelection="true" requiredMessage="#{msg.probationConfirmor} #{msg.ValidationRequire}"
+                                                    completeMethod="#{assetProbationEditController.autoCompleteConfirmor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="#{msg.confirmDetail}" rendered="false">
+<!--                        <p:fieldset legend="#{msg.confirmDetail}" rendered="#{assetProbationEditController.selected.status ge 3}">-->
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.probationConfirmTime}</label>
+                                    <p:inputText value="#{assetProbationEditController.selected.probationStartTime}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.probationConfirmor}</label>
+                                    <p:inputText value="#{assetProbationEditController.selected.probationStartUserName}" readonly="true"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="#{msg.evacuationDetail}" rendered="#{assetProbationEditController.viewEvacuation()}">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup rendered="#{assetProbationEditController.selected.status eq 3}">
+                                    <label class="label">#{msg.evacuationInitiationTime}<span style="color:red">*</span></label>
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetProbationEditController.selected.evacuationInitiationTime}" required="true"
+                                                showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{assetProbationEditController.selected.status ge 4}">
+                                    <label class="label">#{msg.evacuationInitiationTime}</label>
+                                    <p:inputText value="#{assetProbationEditController.selected.evacuationInitiationTime}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.evacuationAssetSituation}<span style="color:red">*</span></label>
+                                    <p:inputTextarea value="#{assetProbationEditController.selected.evacuationAssetSituation}" rows="1" required="true" style="width: 100%" readonly="#{assetProbationEditController.selected.status ge 4}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.Remark}<span style="color:red">*</span></label>
+                                    <p:inputTextarea value="#{assetProbationEditController.selected.evacuationRemark}" rows="1" required="true" style="width: 100%" readonly="#{assetProbationEditController.selected.status ge 4}"/>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{assetProbationEditController.selected.status ge 4}">
+                                    <label class="label">#{msg.probationEndUserUid}</label>
+                                    <p:inputText value="#{assetProbationEditController.selected.probationEndUserName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{assetProbationEditController.selected.status ge 4}">
+                                    <label class="label">#{msg.probationEndTime}</label>
+                                    <p:inputText value="#{assetProbationEditController.selected.probationEndTime}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:fieldset>
+                    </p:fieldset>
+                    <p:fieldset legend="#{msg.Update.concat(msg.detectionPeople)}" rendered="#{assetProbationEditController.action eq -11}">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.selectOneMessage.concat(msg.Engineer)}<span style="color:red">*</span></label>
+                                <p:autoComplete dropdown="true" value="#{assetProbationEditController.detectionUser}" scrollHeight="300" forceSelection="true" required="true" requiredMessage="#{msg.Engineer} #{msg.ValidationRequire}"
+                                                completeMethod="#{assetProbationEditController.autoCompleteEngineer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                                </p:autoComplete>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <h:panelGroup rendered="#{assetProbationEditController.actionName eq null}">
+                        <p:commandButton id="tempSaveButton" validateClient="true" action="#{assetProbationEditController.tempSave(true)}" value="#{msg.tempSave}" update="externalAssetEditForm tempSaveButton :growl" icon="ui-icon-check" rendered="#{!(assetProbationEditController.selected.status ge 2) and assetProbationEditController.action ge -1 and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>
+                        <p:commandButton validateClient="true" value="#{msg.Submit}" actionListener="#{assetProbationEditController.submitOrder()}" update=":growl" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);" rendered="#{!(assetProbationEditController.selected.status ge 1) and assetProbationEditController.action ge -1 and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>
+<!--                        <p:commandButton validateClient="true" value="#{msg.Submit}" actionListener="#{assetProbationEditController.submitOrder()}" update=":growl" icon="ui-icon-check" oncomplete="PF('submitDialog').show()" rendered="#{!(assetProbationEditController.selected.status ge 1) and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>-->
+                        <p:commandButton validateClient="true" value="#{msg.Submit}" action="#{assetProbationEditController.submit()}" oncomplete="handleValidFields(xhr, status, args);" update=":growl" icon="ui-icon-check" rendered="#{assetProbationEditController.selected.status eq 1 and assetProbationEditController.action ge -1 and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>
+                        <p:commandButton validateClient="true" value="#{msg.save}" action="#{assetProbationEditController.updateUser(1)}" update=":growl" icon="ui-icon-check" rendered="#{assetProbationEditController.action eq -11}"/>
+                        <p:commandButton validateClient="true" value="#{msg.save}" action="#{assetProbationEditController.updateUser(2)}" update=":growl" icon="ui-icon-check" rendered="#{assetProbationEditController.action eq -22}"/>
+                        <p:commandButton validateClient="true" value="#{msg.Confirm.concat(msg.probationApplication.substring(0, 2))}" oncomplete="handleValidFields(xhr, status, args);" action="#{assetProbationEditController.submit()}" update=":growl" icon="ui-icon-check" rendered="#{assetProbationEditController.selected.status eq 2 and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>
+                        <p:commandButton validateClient="true" value="#{fieldMsg.doGetFieldValue('probationStatus', 4).substring(1)}" action="#{assetProbationEditController.submit()}" update=":growl" icon="ui-icon-check" rendered="#{assetProbationEditController.selected.status eq 3 and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>
+                        <p:commandButton validateClient="true" value="#{msg.Confirm.concat(fieldMsg.doGetFieldValue('probationStatus', 4).substring(1))}" action="#{assetProbationEditController.submit()}" update=":growl" icon="ui-icon-check" rendered="#{assetProbationEditController.selected.status eq 4 and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>
+                        <p:commandButton validateClient="true" value="#{fieldMsg.doGetFieldValue('probationStatus', 5).substring(1)}" action="#{assetProbationEditController.submit()}" update=":growl" icon="ui-icon-check" rendered="#{assetProbationEditController.selected.status eq 5 and assetProbationEditController.selected.currentPersonId eq assetProbationEditController.loginUser.uid}"/>
+                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{'externalAssetList?faces-redirect=true&amp;query='.concat(assetProbationEditController.selected.status)}" immediate="true" />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{assetProbationEditController.actionName eq 'View'}">
+                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{'externalAssetList?faces-redirect=true&amp;query='.concat(assetProbationEditController.action)}" immediate="true" />
+                    </h:panelGroup>
+                </h:form>
+            </div>
+            <ui:include src="/portal/preview/view.xhtml" />
+            <!--提交对话框 -->
+            <p:dialog id="submitDialog" widgetVar="submitDialog" modal="true" width="400" height="200" resizable="true" draggable="true" header="#{msg.Submit.concat(msg.probationApplication)}">
+                <h:panelGroup>
+                    <h:form id="submitForm" class="submitFormCls">
+                        <h:panelGroup>
+                            <br/>
+                            <label class="label">#{msg.selectOneMessage.concat(msg.Engineer)}<span style="color:red">*</span></label>
+                            <p:autoComplete id="detectionUser" dropdown="true" value="#{assetProbationEditController.detectionUser}" scrollHeight="300" forceSelection="true" required="true" requiredMessage="#{msg.Engineer} #{msg.ValidationRequire}"
+                                            completeMethod="#{assetProbationEditController.autoCompleteEngineer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                            </p:autoComplete>
+                        </h:panelGroup>
+                        <br/><br/><br/>
+                        <h:panelGroup>
+                            <p:commandButton validateClient="true" update=":growl" action="#{assetProbationEditController.submit()}" value="#{msg.Confirm}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'submitDialog');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('submitDialog').hide()"/>
+                        </h:panelGroup>
+                    </h:form>
+                </h:panelGroup>
+            </p:dialog >
+        </div>
+        <script type="text/javascript">
+            function handleValidFields(xhr, status, args) {
+                var valid = true;
+                if (args.equipmentName) {
+                    $('#externalAssetEditForm\\:equipmentName').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.planStartDate) {
+                    $('#externalAssetEditForm\\:functionType').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.assetDept) {
+                    $('#externalAssetEditForm\\:assetDept_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.deptContact) {
+                    $('#externalAssetEditForm\\:deptContact_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.deptContactTel) {
+                    $('#externalAssetEditForm\\:deptContactTel').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.company) {
+                    $('#externalAssetEditForm\\:company').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.companyContactName) {
+                    $('#externalAssetEditForm\\:companyContactName').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.companyContactTel) {
+                    $('#externalAssetEditForm\\:companyContactTel').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.approvalCompletedDate) {
+                    $('#externalAssetEditForm\\:approvalCompletedDate_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.planStartDate) {
+                    $('#externalAssetEditForm\\:planStartDate_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.planEndDate) {
+                    $('#externalAssetEditForm\\:planEndDate_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.specification) {
+                    $('#externalAssetEditForm\\:specification').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.threeInformation) {
+                    $('#externalAssetEditForm\\:threeInformation').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.detectionSituation) {
+                    $('#externalAssetEditForm\\:detectionSituation').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.probationUser) {
+                    $('#externalAssetEditForm\\:probationUser_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.detectionSituationRead) {
+                    $('#externalAssetEditForm\\:detectionSituationRead').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (valid &amp; args.submitDetection) {
+                    PF('submitDialog').show()
+                }
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>

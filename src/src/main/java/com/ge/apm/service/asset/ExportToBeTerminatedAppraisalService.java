@@ -1,7 +1,5 @@
 package com.ge.apm.service.asset;
 
-import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
 import com.deepoove.poi.policy.RenderPolicy;
@@ -26,10 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import webapp.framework.context.LocaleHolder;
 import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,8 +41,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static com.ge.apm.service.asset.ExportTerminatedAppraisalService.ASSET_DETAIL.approvaAauditSignature;
-import static com.ge.apm.service.asset.ExportTerminatedAppraisalService.ASSET_DETAIL.lifecycle;
 import static com.ge.apm.service.asset.ExportToBeTerminatedAppraisalService.ASSET_DETAIL.*;
 
 @Component
@@ -351,7 +345,12 @@ public class ExportToBeTerminatedAppraisalService {
                         if (StringUtils.isBlank(i)) {
                             addCell(row, "");
                         } else {
-                            addCell(row, extractValue(part, ASSET_DETAIL.valueOf(i)));
+                            try {
+                                addCell(row, extractValue(part, ASSET_DETAIL.valueOf(i)));
+                            }catch (Exception e){
+                                addCell(row, i);
+                            }
+
                         }
                     });
                 }

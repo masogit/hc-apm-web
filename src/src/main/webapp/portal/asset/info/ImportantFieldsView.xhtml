@@ -132,6 +132,82 @@
     </p:column>
 
 
+    <p:column headerText="#{msg.riskGrade}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('riskGrade')}">
+        <h:outputText value="#{item.riskGrade}" />
+    </p:column>
+    <p:column headerText="#{msg.emergencyEquipment}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('emergencyEquipment')}">
+        <h:outputText value="#{item.emergencyEquipment}" />
+    </p:column>
+    <p:column headerText="#{msg.importEquipment}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('importEquipment')}">
+        <h:outputText value="#{item.importEquipment}" />
+    </p:column>
+    <p:column headerText="#{msg.capitalSource}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('capitalSource')}">
+        <h:outputText value="#{item.capitalSource}" />
+    </p:column>
+    <p:column headerText="#{msg.assetUsage}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('assetUsage')}">
+        <h:outputText value="#{item.assetUsage}" />
+    </p:column>
+    <p:column headerText="#{msg.measureGrade}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('measureGrade')}">
+        <h:outputText value="#{item.measureGrade}" />
+    </p:column>
+    <p:column headerText="#{msg.vendor}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('vendor')}">
+        <h:outputText value="#{item.vendor}" />
+    </p:column>
+    <p:column headerText="#{msg.registrationNo}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('registrationNo')}">
+        <h:outputText value="#{item.registrationNo}" />
+    </p:column>
+    <p:column headerText="#{msg.manufacture}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('manufacture')}">
+        <h:outputText value="#{item.manufacture}" />
+    </p:column>
+    <p:column headerText="#{msg.makerShortName}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('makerShortName')}">
+        <h:outputText value="#{item.makerShortName}" />
+    </p:column>
+    <p:column headerText="#{msg.assetOwnerName}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('assetOwnerName')}">
+        <h:outputText value="#{item.assetOwnerName}" />
+    </p:column>
+    <p:column headerText="#{msg.manufactDate}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('manufactDate')}">
+        <h:outputText value="#{item.manufactDate}" />
+    </p:column>
+    <p:column headerText="#{msg.factoryWarrantyDate}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('factoryWarrantyDate')}">
+        <h:outputText value="#{item.factoryWarrantyDate}" />
+    </p:column>
+    <p:column headerText="#{msg.lifecycle}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('lifecycle')}">
+        <h:outputText value="#{item.lifecycle}" />
+    </p:column>
+    <p:column headerText="#{msg.medicalApparatusClassification}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('medicalApparatusClassification')}">
+        <h:outputText value="#{item.medicalApparatusClassification}" />
+    </p:column>
+    <p:column headerText="#{msg.systemNum4}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('systemNum4')}">
+        <h:outputText value="#{item.systemNum4}" />
+    </p:column>
+    <p:column headerText="#{msg.functionGroup}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('functionGroup')}">
+        <h:outputText value="#{item.functionGroup}" />
+    </p:column>
+    <p:column headerText="#{msg.assetCode68}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('assetCode68')}">
+        <h:outputText value="#{item.assetCode68}" />
+    </p:column>
+    <p:column headerText="#{msg.serialNum}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('serialNum')}">
+        <h:outputText value="#{item.serialNum}" />
+    </p:column>
     <!-- 修改时间 -->
     <p:column headerText="#{msg.modifiedTime}" width="160" filterBy="#{item.createdDate}" filterMatchMode="GTE">
         <f:facet name="filter">

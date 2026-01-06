@@ -61,6 +61,10 @@
                             <p:inputText id="telephone" label="#{msg.telephone}" value="#{userAccountController.selected.telephone}" />
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">#{msg.landlineNumber}</label>
+                            <p:inputText id="landlineNumber" label="#{msg.landlineNumber}" value="#{userAccountController.selected.landlineNumber}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">#{msg.Region}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.region}" >
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->

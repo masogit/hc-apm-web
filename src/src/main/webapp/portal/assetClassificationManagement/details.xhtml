@@ -1,0 +1,186 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .ui-selectbooleanbutton {
+                background: #3e464c !important;
+                color: #fff !important;
+                border: none !important;
+            }
+
+            body.layout-compact .ui-chkbox {
+                width: 18px !important;
+            }
+
+            .vertical-radio-aligned .ui-radiobutton {
+                display: inline-block;
+                vertical-align: top;
+                margin-right: 8px;
+            }
+
+            .vertical-radio-aligned label {
+                display: block;
+                margin-bottom: 6px;
+                line-height: 1.4;
+            }
+
+            .vertical-radio-aligned .ui-radiobutton-box {
+                vertical-align: middle;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="设备分类详情"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="AssetDetailListForm">
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{empty detailsController.selectSite? msg.AllHospitals:detailsController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg"  appendTo="btnOrg"  for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0;" mode="native">
+                                    <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{detailsController.onSelectSiteTreeNode}" update="AssetDetailListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <p:dataTable id="datalist" value="#{detailsController.lazyModel}" var="item"
+                                 widgetVar="varDataList" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false"
+                                 selection="#{detailsController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+
+                                 rowKey="#{item.id}" sortMode="single"  sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="rowIndex"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{detailsController.onFilter}" />
+                        <p:column headerText="#{msg.Operation}" style="width:120px">
+                            <p:outputPanel id="actionPanel">
+                                <h:panelGroup rendered="#{item.editing}">
+                                    <p:commandButton
+                                            icon="fa fa-check-circle-o"
+                                            title="#{msg.Save}"
+                                            styleClass="p-button-success p-button-sm"
+                                            action="#{detailsController.saveDetail(item)}"
+                                            process="@this,classificationSelect"
+                                            update="classificationPanel, actionPanel" />
+
+                                    <p:commandButton
+                                            icon="fa fa-times"
+                                            title="#{msg.Cancel}"
+                                            styleClass="p-button-secondary p-button-sm ml-2"
+                                            action="#{detailsController.cancel(item)}"
+                                            process="@this"
+                                            update="classificationPanel, actionPanel" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{!item.editing}">
+                                    <p:commandLink
+                                            title="#{msg.Edit}"
+                                            style="display: inline-block; vertical-align: middle;"
+                                            action="#{detailsController.edit(item)}"
+                                    process="@this"
+                                    update="classificationPanel, actionPanel" >
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;" />
+                                </p:commandLink>
+                            </h:panelGroup>
+                        </p:outputPanel>
+                    </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{detailsController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{detailsController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{detailsController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetDetailListForm:datalist" />
+                                    <p:ajax process="@this" listener="#{detailsController.onClinicalDeptNameFilterChange}" update=":AssetDetailListForm:datalist" />
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptOrg.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{detailsController.filterAssetDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{detailsController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{detailsController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetDetailListForm:datalist" />
+                                    <p:ajax process="@this" listener="#{detailsController.onAssetDeptNameFilterChange}" update=":AssetDetailListForm:datalist" />
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.assetDeptOrg.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.makerShortName}" sortBy="#{item.makerShortName}" filterBy="#{item.makerShortName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.makerShortName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
+                                  sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}"
+                                  filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.registrationNo}" sortBy="#{item.registrationNo}" filterBy="#{item.registrationNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.registrationNo}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.assetClassification32}" >
+                            <p:outputPanel id="classificationPanel">
+                                <p:selectOneMenu id="classificationSelect"
+                                                 value="#{item.assetClassification32}"
+                                                 rendered="#{item.editing}"
+                                                 style="width:100%">
+                                    <f:selectItem itemLabel="请选择" noSelectionOption="true" />
+<!--                                    <f:selectItem itemLabel="#{item.category1}" itemValue="#{item.category1}" rendered="#{not empty item.category1}"/>-->
+<!--                                    <f:selectItem itemLabel="#{item.category2}" itemValue="#{item.category2}" rendered="#{not empty item.category2}"/>-->
+<!--                                    <f:selectItem itemLabel="#{item.category3}" itemValue="#{item.category3}" rendered="#{not empty item.category3}"/>-->
+                                    <f:selectItems value="#{item.availableCategories}"
+                                                   var="cat"
+                                                   itemLabel="#{cat}"
+                                                   itemValue="#{cat}" />
+                                </p:selectOneMenu>
+                                <h:outputText value="#{item.assetClassification32}" rendered="#{not item.editing}" />
+                            </p:outputPanel>
+                        </p:column>
+                        <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}"
+                                  filterBy="#{item.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.BatchModify}" action="BatchEdit?faces-redirect=true"  />
+
+
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+
+            </div>
+        </div>
+
+        <script>
+
+        </script>
+    </ui:define>
+</ui:composition>

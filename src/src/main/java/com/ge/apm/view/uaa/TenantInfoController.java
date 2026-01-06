@@ -13,6 +13,7 @@ import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFeatureGroup;
 import com.ge.healthcare.cn.common.cons.ApmFeatureVersion;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -27,6 +28,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -303,8 +305,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
 				return;
 			}
-			Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
-			selected.setFeatureList(JSON.toJSONString(features.get().getFeatureList()));
+			List<ApmFeature> featureList = new ArrayList<>();
+			if (selected.getType() == 0 || selected.getType() == 2) {
+				//普通租户 or 临时租户 基础版本默认
+				featureList.addAll(ApmFeatureGroup.basicVersion.getFeatureList());
+			} else {
+				featureList.addAll(Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst().get().getFeatureList());
+			}
+			selected.setFeatureList(JSON.toJSONString(featureList));
 			selected.setEnablesNewMenu(true);
 			selected.setEnablesMenuOrder(false);
 		}
@@ -692,5 +700,13 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
 		}
 		return user.getName() + "-" + org.getName();
+	}
+
+	public boolean newVersionTenant() {
+		if (ObjectUtils.isEmpty(selected)) {
+			return true;
+		} else {
+			return (selected.getType() != 0 && selected.getType() != 2);
+		}
 	}
 }

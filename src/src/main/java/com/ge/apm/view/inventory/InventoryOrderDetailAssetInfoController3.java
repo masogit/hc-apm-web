@@ -193,13 +193,13 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 	}
 
 	public void delete(InventoryOrderDetail inventoryOrderDetail) {
-		dao.delete(inventoryOrderDetail);
+		dao.deleteById(ListUtil.newArrayList(inventoryOrderDetail.getId()));
 		WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
 	}
 
 	public void bathDelete() {
 		if (ObjectUtil.isNotEmpty(selectedItems)) {
-			dao.delete(selectedItems);
+			dao.deleteById(selectedItems.stream().map(InventoryOrderDetail::getId).collect(Collectors.toList()));
 		}
 		WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
 	}

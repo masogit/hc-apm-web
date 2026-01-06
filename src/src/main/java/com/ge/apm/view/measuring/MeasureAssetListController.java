@@ -32,6 +32,8 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -148,7 +150,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             String prefix = "check_date".equals(property) ? "mcd." : "ai.";
             wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
         }
-        wrapper.orderBy("mcd.check_date", false);
+        wrapper.orderBy("mcd.id");
         currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
     }
@@ -209,22 +211,18 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         wrapper.andNew().in(ObjectUtil.isNotEmpty(clinicalUidList), "ai.clinical_dept_uid", clinicalUidList);
         if(this.hasFilterOnField("verificationConclusion")){
             Integer verificationConclusion = Integer.valueOf(searchFilters.stream().filter(sf -> "verificationConclusion".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("verificationConclusion", SearchFilter.Operator.EQ, 0)).value.toString());
-            searchFilters.removeIf(e -> "verificationConclusion".equals(e.fieldName));
             wrapper.eq("mcd.status", verificationConclusion);
         }
         if(this.hasFilterOnField("measuringItemCategory")){
             Integer measuringItemCategory = Integer.valueOf(searchFilters.stream().filter(sf -> "measuringItemCategory".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, 0)).value.toString());
-            searchFilters.removeIf(e -> "measuringItemCategory".equals(e.fieldName));
-            wrapper.eq("ai.measuring_item_category", measuringItemCategory);
+            this.updateSearchFilter(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, measuringItemCategory, "1*"));
         }
         if(this.hasFilterOnField("assetGroup")){
             Integer assetGroup = Integer.valueOf(searchFilters.stream().filter(sf -> "assetGroup".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, 0)).value.toString());
-            searchFilters.removeIf(e -> "assetGroup".equals(e.fieldName));
-            wrapper.eq("ai.asset_group", assetGroup);
+            this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, assetGroup, "1*"));
         }
         if(this.hasFilterOnField("checkDate")){
             List<SearchFilter> checkDateFilters = searchFilters.stream().filter(sf -> "checkDate".equals(sf.fieldName)).collect(Collectors.toList());
-            searchFilters.removeIf(e -> "checkDate".equals(e.fieldName));
             WrapperSearchFilterUtils.convert(checkDateFilters, wrapper, "mcd");
         }
         if(this.hasFilterOnField("nextMeteringDate")){
@@ -233,42 +231,57 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             for (SearchFilter nextMeteringDateFilter : nextMeteringDateFilters) {
                 validDateToFilters.add(new SearchFilter("validDateTo", nextMeteringDateFilter.operator, nextMeteringDateFilter.value));
             }
-            searchFilters.removeIf(e -> "nextMeteringDate".equals(e.fieldName));
             WrapperSearchFilterUtils.convert(validDateToFilters, wrapper, "mcd");
         }
         if(this.hasFilterOnField("meteringNO")){
             String meteringNO = searchFilters.stream().filter(sf -> "meteringNO".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("meteringNO", SearchFilter.Operator.EQ, 0)).value.toString();
-            searchFilters.removeIf(e -> "meteringNO".equals(e.fieldName));
             wrapper.like("mcd.certificate_no", meteringNO);
         }
-
-        WrapperSearchFilterUtils.convert(searchFilters, wrapper, "ai");
+        if(this.hasFilterOnField("checkPerson")){
+            String checkPerson = searchFilters.stream().filter(sf -> "checkPerson".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("checkPerson", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.like("mcd.check_person", checkPerson);
+        }
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson");
+        List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
+        WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
     }
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll = currentPageAssets.stream().noneMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
-        currentPageAssets.forEach(item -> selectedMap.put(item.getUid(), !isSelectedAll));
+        boolean isSelectedAll = currentPageAssets.stream().noneMatch(item -> !selectedMap.containsKey(item.getBoUuid()) || !selectedMap.get(item.getBoUuid()));
+        currentPageAssets.forEach(item -> selectedMap.put(item.getBoUuid(), !isSelectedAll));
     }
+
+    @Getter @Setter
+    private List<AssetInfo> bathRepairAsset;
 
     public void setSelectedAssetsUuids() {
         flag=true;
-        List<String> selectedAssetUuids = selectedMap.keySet().stream().filter(assetUid -> Boolean.TRUE.equals(selectedMap.get(assetUid))).collect(Collectors.toList());
-        currentPageAssets = selectedAssetUuids.isEmpty() && currentPageAssets==null ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(selectedAssetUuids);
-        if (currentPageAssets.isEmpty()) {
+        List<String> selectedBoUuids = selectedMap.keySet().stream().filter(assetUid -> Boolean.TRUE.equals(selectedMap.get(assetUid))).collect(Collectors.toList());
+        List<String> assetUidList = currentPageAssets.stream().filter(asset -> selectedBoUuids.contains(asset.getBoUuid())).map(AssetInfo::getUid).collect(Collectors.toList());
+        bathRepairAsset = selectedBoUuids.isEmpty() && currentPageAssets==null ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(assetUidList);
+        if (bathRepairAsset.isEmpty()) {
             WebUtil.addErrorMessage("请选择设备,暂不支持报修");
             flag = false;
             return;
         }
-        for (AssetInfo assetInfo: currentPageAssets) {
-            List<MeasuringCertificateDetail>  certificateDetails = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(assetInfo.getUid());
-            if (ObjectUtil.isEmpty(certificateDetails) || 2 == certificateDetails.get(0).getStatus()) {
+        for (String selectedBoUuid : selectedBoUuids) {
+            MeasuringCertificateDetail certificateDetail = measuringCertificateDetailDao.findById(selectedBoUuid);
+            if (ObjectUtil.isEmpty(certificateDetail) || 2 != certificateDetail.getStatus()) {
                 WebUtil.addErrorMessage("有设备检定结论,不符合要求,暂不支持报修");
                 flag = false;
                 return;
             }
         }
-        WorkOrderMgrController.assetInfos = currentPageAssets;
+        WorkOrderMgrController.assetInfos = bathRepairAsset;
+    }
+
+    public boolean judgeMeasurementRepair(){
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
+        if (woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair()) {
+            return true;
+        }
+        return false;
     }
 
     public List<MeasuringCertificateDetail> getMeasuringResult(){

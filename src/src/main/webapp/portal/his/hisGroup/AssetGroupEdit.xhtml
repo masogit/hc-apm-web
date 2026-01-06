@@ -42,12 +42,17 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
-                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{hisAssetGroupEditController.filterDeptOrg}"
-                                        scrollHeight="300"  forceSelection="true" completeMethod="#{hisAssetGroupEditController.autoCompleteDept}" disabled="#{hisAssetGroupEditController.editMode and hisAssetGroupEditController.selected.hisAssetGroup.type eq 'Income'}"
-                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange" >
-                            <p:ajax event="itemSelect" listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos"  oncomplete="buttonComplete(xhr, status, args)"/>
-                            <p:ajax listener="#{hisAssetGroupEditController.onClinicalDeptChange()}" update="HisAssetsPickList selectAssetInfos" oncomplete="buttonComplete(xhr, status, args)" />
-                        </p:autoComplete>
+                        <p:selectOneMenu id="clinicalDeptName" class="SiteUIDChange"
+                                         value="#{hisAssetGroupEditController.filterDeptOrg}"
+                                         converter="orgInfoConverter" panelStyle="width:180px" style="width: 180px"
+                                         filter="true" filterMatchMode="contains" filterNormalize="true"
+                                         disabled="#{hisAssetGroupEditController.editMode and hisAssetGroupEditController.selected.hisAssetGroup.type eq 'Income'}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{hisAssetGroupEditController.autoCompleteDept('')}" var="item"
+                                           itemLabel="#{item.name}" itemValue="#{item}"/>
+                            <p:ajax process="@this" listener="#{hisAssetGroupEditController.onClinicalDeptChange()}"
+                                    update="HisAssetsPickList selectAssetInfos"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
 
                     <h:panelGroup>

@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.pm.PmOrderPreCreateService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -87,7 +88,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private List<PmOrderRule> currentPageAssets;
 
     private SystemTemplateService systemTemplateService;
-
+    private PmOrderPreCreateService pmOrderPreCreateService;
+    private Integer periodOld;//保养周期
+    private String periodUnitOld;//保养周期单位
     @Override
     protected void init() {
         filterBySite = false;
@@ -111,6 +114,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         supplierService = WebUtil.getBean(SupplierService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        pmOrderPreCreateService = WebUtil.getBean(PmOrderPreCreateService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
@@ -409,6 +413,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             pmOrderRuleCheckListRepository.save(checkItemLists);
         }
         checkItemLists.clear();
+        if(!Objects.equals(selected.getPeriod(), periodOld) || !selected.getPeriodUnit().equals(periodUnitOld)){
+            pmOrderPreCreateService.deleteByPmOrderRuleId(selected.getUid());
+        }
         WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
     }
 
@@ -641,6 +648,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         super.prepareEdit();
         selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         initCheckItemLists();
+        if(selected!=null){
+            periodOld=selected.getPeriod();
+            periodUnitOld=selected.getPeriodUnit();
+        }
     }
 
     public void prepareEditItemDetail(String itemId) {

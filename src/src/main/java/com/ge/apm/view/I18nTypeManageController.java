@@ -79,7 +79,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
 
     @Override
-    protected Page<I18nTypeManage> doLoadData(PageRequest pageRequest) {
+    protected Page<I18nTypeManage> loadData(PageRequest pageRequest) {
         if(!supperAdmin){
             initParameter();
         }
@@ -92,7 +92,6 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         } else {
             result= new PageImpl(list,pageRequest,totalRowCount);
         }
-        searchFilters.clear();
         return result;
     }
     private void initParameter(){
@@ -140,13 +139,13 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             }
         }
 
-        if(CollectionUtils.isEmpty(selected.getDefaultMsgList()) && CollectionUtils.isEmpty(selected.getI18nMessageList())){
-            searchFilters.clear();
-            searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
-            i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
-            selected.setDefaultMsgList(i18nMessageList);
-            selected.setI18nMessageList(copy(i18nMessageList));
-        }
+//        if(CollectionUtils.isEmpty(selected.getDefaultMsgList()) && CollectionUtils.isEmpty(selected.getI18nMessageList())){
+//            searchFilters.clear();
+//            searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
+//            i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
+//            selected.setDefaultMsgList(i18nMessageList);
+//            selected.setI18nMessageList(copy(i18nMessageList));
+//        }
         alone = CollectionUtils.isEmpty(defaultMsgList);
         selected.setAlone(alone);
         LOGGER.info("msgType:{},siteId:{},default:{},alone:{}",msgType,siteId,defaultValue,alone);

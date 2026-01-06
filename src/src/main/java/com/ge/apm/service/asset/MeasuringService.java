@@ -11,10 +11,14 @@ import com.ge.apm.dao.mapper.MeasuringCertificateDetailMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.OCRTemplateService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import com.ge.healthcare.cn.common.llm.ApplicationType;
+import com.ge.healthcare.cn.common.llm.Result;
+import com.ge.healthcare.cn.common.llm.WorkflowResponse;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -41,6 +45,8 @@ import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
@@ -115,6 +121,8 @@ public class MeasuringService {
 
     @Value("#{systemEnvironment['FILE_SCAN_FOLDER'] ?: urlProperties.FileScanFolder}")
     private String FILE_SCAN_FOLDER;
+    @Autowired
+    private ConfigItemService configItemService;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -449,14 +457,14 @@ public class MeasuringService {
         }
         return resultList;
     }
-    public List<MeasuringCertificateDetail> handleZipOCR(UploadedFile file,UserAccount account) throws IOException {
+    public List<MeasuringCertificateDetail> handleZipOCR(UploadedFile file,UserAccount account,String identifyPatterns) throws IOException {
         List<MeasuringCertificateDetail> resultList = Lists.newArrayList();
         progress = 0;
         // 获取压缩文件中的每个子文件
         try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
-                MeasuringCertificateDetail detailList = handleOcr(zipInputStream, entry);
+                MeasuringCertificateDetail detailList = handleOcr(zipInputStream, entry,identifyPatterns);
                 resultList.add(detailList);
                 progress ++;
             }
@@ -468,7 +476,7 @@ public class MeasuringService {
         resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         return resultList;
     }
-    public MeasuringCertificateDetail handleOcr(ZipInputStream zis,ZipEntry entry){
+    public MeasuringCertificateDetail handleOcr(ZipInputStream zis,ZipEntry entry,String identifyPatterns){
         File newFile = null;
         try {
             byte[] buffer = new byte[1024];
@@ -482,14 +490,45 @@ public class MeasuringService {
                     fos.write(buffer, 0, len);
                 }
             }
-
             Map<String, Object> params = new HashMap<>();
-            params.put("type", BusinessType.MEASURE.name());
-            JSONObject jsonObject = templateService.getJsonObject(GatewayURL.OCR_DOCUMENT, params, newFile);
-            JSONArray data = jsonObject.getJSONArray("data");
-            if(data != null && data.size() > 0){
-               return handleOcrResult(data, newFile);
+            if("AI".equalsIgnoreCase(identifyPatterns)){
+                params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
+                JSONObject  jsonObject = templateService.getJsonObject( GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,newFile,url->url.replace("{type}","/"+ApplicationType.FORM_OCR_WORKFLOWS.name()));
+                String bizStatusCode = jsonObject.getString("bizStatusCode");
+                if("ok".equalsIgnoreCase(bizStatusCode)){
+                    JSONObject data = jsonObject.getJSONObject("data");
+                    WorkflowResponse workflowResponse = data.toJavaObject(WorkflowResponse.class);
+                    Result result = workflowResponse.getData();
+                    JSONObject outputs = result.getOutputs();
+                    JSONObject output = outputs.getJSONObject("output");
+                    JSONObject content = output.getJSONObject("content");
+                    JSONObject json = new JSONObject();
+                    json.put("certificateNo",content.getString("cetification_id"));
+                    json.put("assetManufacturer",content.getString("manufactory"));
+                    json.put("checkPerson",content.getString("checked_by"));
+                    json.put("assetModel",content.getString("pattern"));
+                    json.put("assetSN",content.getString("serial_num"));
+                    json.put("assetName",content.getString("device_name"));
+                    json.put("checkCompany",content.getString("check_company"));
+                    json.put("department",content.getString("applicant"));
+                    json.put("status",content.getString("conclusion"));
+                    json.put("validDateTo",content.getString("valid_util"));
+                    json.put("checkDate",content.getString("verify_date"));
+                    return handleOcrResult(json, newFile);
+                }else{
+                    LOGGER.info("AI 识别 失败：{}",newFile.getName());
+                }
+            }else{
+                params.put("type", BusinessType.MEASURE.name());
+                JSONObject jsonObject = null;
+                jsonObject = templateService.getJsonObject(GatewayURL.OCR_DOCUMENT, params, newFile);
+                JSONArray data = jsonObject.getJSONArray("data");
+                if(data != null && data.size() > 0){
+                    return handleOcrResult(data.getJSONObject(0), newFile);
+                }
             }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
@@ -500,9 +539,9 @@ public class MeasuringService {
         return null;
     }
 
-    private MeasuringCertificateDetail handleOcrResult(JSONArray data, File newFile) throws IOException {
+    private MeasuringCertificateDetail handleOcrResult(JSONObject data, File newFile) throws IOException {
         MeasuringCertificateDetail result = null;
-        JSONObject object= data.getJSONObject(0);
+        JSONObject object= data;
         try {
             result = new MeasuringCertificateDetail();
             String assetSN = object.getString("assetSN");

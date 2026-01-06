@@ -133,11 +133,47 @@ public class TrainInfo implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ZkbIntegralOrder)) {
+        if (!(object instanceof TrainInfo)) {
             return false;
         }
         TrainInfo other = (TrainInfo) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        if ((this.courseNo == null && other.courseNo != null) || (this.courseNo != null && !this.courseNo.equals(other.courseNo))) {
+            return false;
+        }
+        if ((this.trainType == null && other.trainType != null) || (this.trainType != null && !this.trainType.equals(other.trainType))) {
+            return false;
+        }
+        if ((this.courseName == null && other.courseName != null) || (this.courseName != null && !this.courseName.equals(other.courseName))) {
+            return false;
+        }
+        if ((this.trainMode == null && other.trainMode != null) || (this.trainMode != null && !this.trainMode.equals(other.trainMode))) {
+            return false;
+        }
+        if ((this.courseContent == null && other.courseContent != null) || (this.courseContent != null && !this.courseContent.equals(other.courseContent))) {
+            return false;
+        }
+        if ((this.courseObjective == null && other.courseObjective != null) || (this.courseObjective != null && !this.courseObjective.equals(other.courseObjective))) {
+            return false;
+        }
+        if ((this.trainingDeptUid == null && other.trainingDeptUid != null) || (this.trainingDeptUid != null && !this.trainingDeptUid.equals(other.trainingDeptUid))) {
+            return false;
+        }
+        if ((this.trainingRoleUid == null && other.trainingRoleUid != null) || (this.trainingRoleUid != null && !this.trainingRoleUid.equals(other.trainingRoleUid))) {
+            return false;
+        }
+        if ((this.trainingPeopleCount == null && other.trainingPeopleCount != null) || (this.trainingPeopleCount != null && !this.trainingPeopleCount.equals(other.trainingPeopleCount))) {
+            return false;
+        }
+        if ((this.contractNo == null && other.contractNo != null) || (this.contractNo != null && !this.contractNo.equals(other.contractNo))) {
+            return false;
+        }
+        if ((this.assetGroup == null && other.assetGroup != null) || (this.assetGroup != null && !this.assetGroup.equals(other.assetGroup))) {
+            return false;
+        }
+        if ((this.contractContent == null && other.contractContent != null) || (this.contractContent != null && !this.contractContent.equals(other.contractContent))) {
             return false;
         }
         return true;

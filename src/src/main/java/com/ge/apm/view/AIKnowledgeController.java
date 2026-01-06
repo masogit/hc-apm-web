@@ -4,6 +4,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.difyHttp.DifyStreamService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.difyChat.DiFyChatRequest;
+import com.ge.apm.web.difyChat.DiFyChatResponse;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
@@ -45,8 +46,8 @@ public class AIKnowledgeController implements Serializable {
         askEnd = false;
         if (newLogMessage != null && !newLogMessage.trim().isEmpty()) {
             try {
-                String result = difyStreamService.processDifyStream(new DiFyChatRequest());
-                addLogEntry(logLevel, result, newLogMessage);
+                DiFyChatResponse result = difyStreamService.processDifyStream(new DiFyChatRequest());
+                addLogEntry(logLevel, result.getResult(), newLogMessage);
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null,
                         new javax.faces.application.FacesMessage(

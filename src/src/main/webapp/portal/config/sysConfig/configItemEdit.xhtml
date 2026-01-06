@@ -4,7 +4,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 
     <ui:composition>
         <p:dialog id="configItemEditDlg" widgetVar="configItemEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ConfigItemManage}" max-height="600" width="520">
@@ -115,10 +115,12 @@
                     <h:panelGroup rendered="#{systemConfigItemController.selected.valueType eq 9 and systemConfigItemController.selected.key eq 'pmEntryTypeSet' }">
                         <h:panelGroup>
                             <label class="label">保养工时设置</label>
-                            <p:selectOneRadio value="#{systemConfigItemController.selected.fieldColumnDto.entryType}" style="width: 30%;">
+                            <p:selectOneRadio value="#{systemConfigItemController.selected.fieldColumnDto.entryType}"  layout="pageDirection" >
                                 <p:ajax update="manHoursGroup"/>
                                 <f:selectItem itemLabel="工时段" itemValue="1"/>
                                 <f:selectItem itemLabel="总工时" itemValue="0"/>
+                                <f:selectItem itemLabel="仅工时段" itemValue="3"/>
+                                <f:selectItem itemLabel="仅总工时" itemValue="2"/>
                             </p:selectOneRadio>
                         </h:panelGroup>
 
@@ -156,10 +158,18 @@
                     </h:panelGroup>
                  </p:panelGrid>
                 <br/>
-                <p:commandButton rendered="#{systemConfigItemController.selected.key eq 'assetScrap' or systemConfigItemController.selected.key eq 'showAssetScrapNo'}"  validateClient="true" value="#{msg.Save}" actionListener="#{systemConfigItemController.saveConfigScrap(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'))}"
-                                 update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
-                <p:commandButton rendered="#{systemConfigItemController.selected.key ne 'assetScrap' and systemConfigItemController.selected.key ne 'showAssetScrapNo'}" validateClient="true" value="#{msg.Save}" actionListener="#{systemConfigItemController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
-                <p:commandButton id="save" validateClient="true" value="#{msg.Save}并处理历史未完成工单" rendered="#{systemConfigItemController.selected.key eq 'enableSimpleDepartmentSecondment' and systemConfigItemController.selected.showValue eq 'true' and systemConfigItemController.selected.valueType ne '10' }" actionListener="#{systemConfigItemController.saveConfigAndUpdateData}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
+                <c:if test="#{systemConfigItemController.selected.key eq 'pmOrderCreateByCycle'}">
+                    <p:commandButton  validateClient="true" value="#{msg.Save}并取消所有周期性工单"   update=":growl @(.datalist)" icon="ui-icon-check"  actionListener="#{systemConfigItemController.saveConfigMmOrderCreateByCycle}" oncomplete="handleSubmit(args, 'configItemEditDialog');"/>
+
+                </c:if>
+
+                <c:if test="#{systemConfigItemController.selected.key ne 'pmOrderCreateByCycle'}">
+                    <p:commandButton rendered="#{systemConfigItemController.selected.key eq 'assetScrap' or systemConfigItemController.selected.key eq 'showAssetScrapNo'}"  validateClient="true" value="#{msg.Save}" actionListener="#{systemConfigItemController.saveConfigScrap(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'))}"
+                                     update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
+                    <p:commandButton rendered="#{systemConfigItemController.selected.key ne 'assetScrap' and systemConfigItemController.selected.key ne 'showAssetScrapNo'}" validateClient="true" value="#{msg.Save}" actionListener="#{systemConfigItemController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
+                    <p:commandButton id="save" validateClient="true" value="#{msg.Save}并处理历史未完成工单" rendered="#{systemConfigItemController.selected.key eq 'enableSimpleDepartmentSecondment' and systemConfigItemController.selected.showValue eq 'true' and systemConfigItemController.selected.valueType ne '10' }" actionListener="#{systemConfigItemController.saveConfigAndUpdateData}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
+                </c:if>
+
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('configItemEditDialog').hide()"/>
             </h:form>
         </p:dialog>

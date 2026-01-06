@@ -592,7 +592,7 @@ class WorkOrderActionForm {
     String tel;
 
     String comName;
-
+    Double travelTime;
     public Integer getCoworkerEntryType() {
         return coworkerEntryType;
     }
@@ -895,6 +895,14 @@ class WorkOrderActionForm {
 
     public void setComName(String comName) {
         this.comName = comName;
+    }
+
+    public Double getTravelTime() {
+        return travelTime;
+    }
+
+    public void setTravelTime(Double travelTime) {
+        this.travelTime = travelTime;
     }
 }
 

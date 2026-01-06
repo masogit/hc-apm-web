@@ -32,6 +32,7 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Component
 public class OCRTemplateService extends MicroServiceInvoker {
@@ -188,12 +189,16 @@ public class OCRTemplateService extends MicroServiceInvoker {
         }
         return result[0];
     }
-
     public JSONObject upload(UploadedFile uploadedFile,GatewayURL gatewayURL,Map<String,Object> param){
+
+        return upload(uploadedFile,gatewayURL,param,null);
+    }
+
+    public JSONObject upload(UploadedFile uploadedFile,GatewayURL gatewayURL,Map<String,Object> param,Function<String,String> function){
         File file = null;
         try {
             file = getFile(uploadedFile);
-            return getJsonObject(gatewayURL, param, file);
+            return getJsonObject(gatewayURL, param, file,function);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -203,11 +208,14 @@ public class OCRTemplateService extends MicroServiceInvoker {
             }
         }
     }
-
     public JSONObject getJsonObject(GatewayURL gatewayURL, Map<String, Object> param, File file) {
+
+        return getJsonObject(gatewayURL,param,file,null);
+    }
+    public JSONObject getJsonObject(GatewayURL gatewayURL, Map<String, Object> param, File file, Function<String,String> function) {
         String token = UserContextService.getAccessToken();
         HttpHeaders headers = new HttpHeaders();
-        MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
+        MediaType type = MediaType.parseMediaType("multipart/form-data;charset=UTF-8");
         headers.setContentType(type);
         headers.add("Authorization", token);
         String name = file.getName();
@@ -218,6 +226,9 @@ public class OCRTemplateService extends MicroServiceInvoker {
         body.setAll(param);
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(body, headers);
         String url = getGatewayURL(gatewayURL);
+        if(function != null){
+            url = function.apply(url);
+        }
         return getRemoteRequest(url, HttpMethod.POST, requestEntity, JSONObject.class);
     }
 

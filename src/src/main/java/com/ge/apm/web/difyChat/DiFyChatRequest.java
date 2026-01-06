@@ -8,6 +8,16 @@ public class DiFyChatRequest {
 
     private String selectStorage;
 
+    private String conversationId;
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
+    }
+
     public String getParamStr() {
         return paramStr;
     }

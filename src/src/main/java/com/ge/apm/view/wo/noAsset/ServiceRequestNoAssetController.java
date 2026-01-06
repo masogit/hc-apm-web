@@ -18,6 +18,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.cons.RepairSourceEnum;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
@@ -141,6 +142,8 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Getter  @Setter
     private TreeNode orgTreeSearch;
 
+    private List<V2_ServiceRequestNoAsset>  selectedItems;
+
 
     @Override
     protected void init() {
@@ -209,6 +212,19 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Override
     public void setSearchFilter() {
 
+        Boolean srId=null;
+        for (SearchFilter searchFilter : searchFilters) {
+            if ("srId".equals(searchFilter.fieldName)) {
+                srId = (Boolean) searchFilter.value;
+                break;
+            }
+        }
+        searchFilters.removeIf(e -> e.fieldName.equals("srId"));
+        if(Boolean.TRUE.equals(srId)){
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IsNotNull, null, "1*"));
+        }else  if(Boolean.FALSE.equals(srId)){
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IsNull,  "1*"));
+        }
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("deptUid", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
@@ -246,8 +262,13 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         }else if (queryIndex == 2) { //待派工
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
-//            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
+            List<UserRole> userRoleList = loginUser.getUserRoleList();
+            boolean assetHead = userRoleList.stream().anyMatch(ite -> ite.getRole().getName().equals(ApmSystemRole.AssetHead.name()));
+            if(assetHead){
+                searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
+            }else{
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
+            }
         }else if (queryIndex == 3) { //待接单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
@@ -834,5 +855,13 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
     @Override
     protected GenericRepositoryUUID<V2_ServiceRequestNoAsset> getDAO() {
         return dao;
+    }
+
+    public List<V2_ServiceRequestNoAsset> getSelectedItems() {
+        return selectedItems;
+    }
+
+    public void setSelectedItems(List<V2_ServiceRequestNoAsset> selectedItems) {
+        this.selectedItems = selectedItems;
     }
 }

@@ -180,20 +180,22 @@ class APMChatApp {
     // 模拟助手回复
     simulateAssistantResponse(userMessage) {
         this.showTypingIndicator();
-        // const select = document.getElementById('knowledgeBaseSelect');
-        // const selectedText = select.options[select.selectedIndex].text;
-        // console.log(selectedText);
         const userName = document.getElementById('userName').value;
+        let conversationId = document.getElementById('conversationId').value;
         axios.post( this.origin+`/geapm/web/apmChat/chat`,{
             paramStr: userMessage,
-            userName: userName
-           // selectStorage: selectedText
+            userName: userName,
+            conversationId: conversationId || null
         }).then(res => {
             if (res) {
+                if (res.data?.conversationId) {
+                    conversationId = res.data.conversationId;
+                    document.getElementById('conversationId').value = conversationId;
+                }
                 this.hideTypingIndicator();
                 this.addMessage({
                     type: 'assistant',
-                    message: res.data,
+                    message: res.data.result,
                     timestamp: new Date()
                 });
             }
@@ -299,10 +301,6 @@ class APMChatApp {
         return p;
     }
 }
-// 初始化应用
-document.addEventListener('DOMContentLoaded', () => {
-    new APMChatApp();
-});
 
 // 全局函数供HTML调用
 function sendMessage() {
@@ -336,11 +334,111 @@ async function typeInto(el, text, speed = 15, abortFlag) {
     }
 }
 
+// 规范化空白
+function normalizeForDisplay(text = '') {
+    return text
+        .replace(/\r\n/g, '\n')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/^\n+/, '')
+        .replace(/\n+$/, '');
+}
+
+// 把 API 的“中文编号 + 小黑点”等排版字符 => 标准 Markdown
+function apiTextToMarkdown(src = '') {
+    // 统一换行与首尾空白
+    let text = src.replace(/\r\n/g, '\n').replace(/^\n+/, '').replace(/\n+$/, '');
+
+    const lines = text.split('\n');
+    const out = [];
+    let inTable = false;
+
+    // 小工具：是否是“表格行”（以 | 开头并至少有两个 |）
+    const isTableLine = (line) => /^\s*\|.*\|\s*$/.test(line) && (line.match(/\|/g) || []).length >= 2;
+
+    // 有序列表状态（非表格区域使用）
+    let inOl = false;
+    let seenFirstOl = false;
+
+    for (const raw of lines) {
+        const line = raw;           // 不 trim，表格保留原样；非表格时再按需 trim
+        const trimmed = raw.trim();
+
+        // 进入/离开“表格块”
+        if (isTableLine(line)) {
+            if (!inTable) {
+                // 进入表格前关闭有序列表块
+                if (inOl) { inOl = false; seenFirstOl = false; }
+                // 表格前补一个空行，避免和上一个段落粘连
+                if (out.length && out[out.length - 1] !== '') out.push('');
+            }
+            inTable = true;
+            out.push(line);           // 表格行原样保留（包括单元格里的 <br>）
+            continue;
+        } else if (inTable) {
+            // 离开表格块
+            inTable = false;
+            // 表格后如果下一行不是空行，补一个空行
+            if (out.length && out[out.length - 1] !== '') out.push('');
+            // 继续按非表格逻辑处理当前行（fall through）
+        }
+
+        // —— 下面是“非表格区域”的预处理 ——
+
+        // 空行：关闭有序列表
+        if (trimmed === '') {
+            if (inOl) { inOl = false; seenFirstOl = false; }
+            out.push('');
+            continue;
+        }
+
+        // “一、/二、”这类做成小标题
+        let m = trimmed.match(/^([一二三四五六七八九十百零两]+)[、.]\s*(.+)$/);
+        if (m) {
+            if (inOl) { inOl = false; seenFirstOl = false; out.push(''); }
+            out.push(`### ${m[1]}、${m[2]}`);
+            continue;
+        }
+
+        // 1. / 1) / （1）/ 1、 => 有序列表项
+        m = trimmed.match(/^\(?\s*(\d+)\s*\)?[.)、]\s*(.+)$/);
+        if (m) {
+            if (!inOl) {
+                if (out.length && out[out.length - 1] !== '') out.push('');
+                inOl = true; seenFirstOl = true;
+            }
+            out.push(`${m[1]}. ${m[2]}`);
+            continue;
+        }
+
+        // 子弹点 • · ▪ ◦
+        m = trimmed.match(/^[•·▪◦]\s*(.+)$/);
+        if (m) {
+            if (inOl && seenFirstOl) out.push(`   - ${m[1]}`); else out.push(`- ${m[1]}`);
+            continue;
+        }
+
+        // 普通文本：列表续行还是普通段落
+        if (inOl) out.push('   ' + trimmed); else out.push(trimmed);
+    }
+
+    // 压缩多余空行
+    return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+
 function renderMarkdownInto(el, mdText) {
-    const rawHtml = marked.parse(mdText ?? '');
+    const normalized = apiTextToMarkdown(mdText);   // ⬅️ 先转 Markdown
+    const rawHtml = marked.parse(normalized);
     const safeHtml = DOMPurify.sanitize(rawHtml, {
-        ADD_ATTR: ['target', 'rel', 'class', 'id'],
-        ADD_TAGS: ['span']
+        ALLOWED_TAGS: [
+            'a','b','i','em','strong','s','u','p','sub',
+            'p','br','hr','blockquote',
+            'ul','ol','li',
+            'pre','code',
+            'h1','h2','h3','h4','h5','h6',
+            'table','thead','tbody','tfoot','tr','th','td'
+        ],
+        ALLOWED_ATTR: ['href','title','target','rel','class','id','lang']
     });
     el.innerHTML = safeHtml;
 }
@@ -350,27 +448,23 @@ async function typeMarkdown(el, fullText, speed = 12, abortFlag, onTick) {
     let buf = '';
     let lastRender = 0;
 
-    const shouldRender = (now) => (now - lastRender) > 50; // 每 ~50ms 重渲染一次
+    const shouldRender = (now) => (now - lastRender) > 50;
 
     for (let i = 0; i < fullText.length; i++) {
         if (abortFlag?.aborted) return;
-
         buf += fullText[i];
 
-        // 轻微“聪明停顿”：遇到标点/换行时更容易渲染一次
         const ch = fullText[i];
         const now = performance.now();
-        const isPunct = (ch === '\n' || ch === '，' || ch === '。' || ch === ',' || ch === '.' || ch === '!' || ch === '?' || ch === '；' || ch === ';' );
+        const punct = '\n，。,.!?；;';
 
-        if (isPunct || shouldRender(now) || i === fullText.length - 1) {
+        if (punct.includes(ch) || shouldRender(now) || i === fullText.length - 1) {
             renderMarkdownInto(el, buf);
-
-            // 仅在```成对闭合后再跑高亮，减少抖动
+            // 代码块成对闭合后再高亮，避免抖动
             const fencedCount = (buf.match(/```/g) || []).length;
             if (fencedCount % 2 === 0) {
-                document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+                el.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
             }
-
             lastRender = now;
             onTick && onTick();
         }
@@ -378,3 +472,9 @@ async function typeMarkdown(el, fullText, speed = 12, abortFlag, onTick) {
         await new Promise(r => setTimeout(r, speed));
     }
 }
+
+// 初始化应用
+document.addEventListener('DOMContentLoaded', () => {
+    window.chatApp = new APMChatApp();
+});
+

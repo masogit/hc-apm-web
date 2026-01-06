@@ -123,7 +123,21 @@
                         </p:inputTextarea>
                     </h:panelGroup>
                 </p:panelGrid>
-                <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="7" layout="grid">
+
+
+                <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
+                    <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}" emptyMessage="#{msg.noRecordFound}">
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:ajax disabled="#{!preViewerBean.isPreview(fileitem)}" event="click" update="previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(workOrderMgrController,fileitem.objectStorageId)}"/>
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                                </p:graphicImage>
+                            </h:panelGrid>
+                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                        </p:panel>
+                    </p:dataGrid>
+                </p:fieldset>
+                <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="7" layout="grid" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">
                         #{msg.addPic}<p:outputLabel value="(#{msg.maxUpload5Pics})" style="color: red"></p:outputLabel>
                     </f:facet>
@@ -141,7 +155,7 @@
                               invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{workOrderMgrController.getPicListByBoType('WorkOrder').size() ge 5}"/>
 
 
-                <p:dataGrid id="attachList" var="fileitem" value="#{workOrderMgrController.attachList}" columns="7" layout="grid">
+                <p:dataGrid id="attachList" var="fileitem" value="#{workOrderMgrController.attachList}" columns="7" layout="grid" emptyMessage="#{msg.noRecordFound}">
                     <f:facet name="header">#{msg.AddDocument}<p:outputLabel value="(#{msg.maxUpload5Docs})" style="color: red"></p:outputLabel></f:facet>
                     <h:panelGrid columns="1" style="width:100%" >
                         #{fileitem.objectName}
@@ -158,17 +172,26 @@
                             <label class="label">#{msg.manHoursEntryType}*</label>
                             <p:selectOneRadio id="entryType" required="true" disabled="false" value="#{workOrderMgrController.selectedWorkOrder.entryType}"  requiredMessage="#{msg.manHoursEntryType} #{msg.ValidationRequire}">
                                 <p:ajax event="change" process="@this" update=":growl woTab:repairCompleteDialogForm:entryType woTab:repairCompleteDialogForm:workHourDetail woTab:repairCompleteDialogForm:coworkerList woTab:repairCompleteDialogForm:entryTypeFlag"  listener="#{workOrderMgrController.updateEntryType(workOrderMgrController.selectedWorkOrder.entryType)}" />
-                                <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
-                                <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                <c:if test="#{workOrderMgrController.selectedWorkOrder.entryType==1 || workOrderMgrController.selectedWorkOrder.entryType==0}">
+                                    <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
+                                    <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                </c:if>
+
+                                <c:if test="#{workOrderMgrController.selectedWorkOrder.entryType==3}">
+                                    <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="3"/>
+                                </c:if>
+                                <c:if test="#{workOrderMgrController.selectedWorkOrder.entryType==2}">
+                                    <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="2"/>
+                                </c:if>
                             </p:selectOneRadio>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==0 || workOrderMgrController.selectedWorkOrder.entryType==null}">
+                        <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==0 || workOrderMgrController.selectedWorkOrder.entryType==2  || workOrderMgrController.selectedWorkOrder.entryType==null}">
                             <label class="label">#{workOrderMgrController.getManHourShow()}</label>
                             <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==1}">
+                        <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==1 || workOrderMgrController.selectedWorkOrder.entryType==3}">
                             <label class="label">#{workOrderMgrController.getManHourShow()}</label>
                             <p:inputNumber id="manHours_input2" readonly="true" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
@@ -189,7 +212,7 @@
                     </p:panelGrid>
 
                     <p:panelGrid id="workHourDetail" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup  rendered="#{workOrderMgrController.selectedWorkOrder.entryType==1}">
+                        <h:panelGroup  rendered="#{workOrderMgrController.selectedWorkOrder.entryType==1 || workOrderMgrController.selectedWorkOrder.entryType==3 }">
                             <label class="label">#{msg.addManHoursSection}</label>
                             <p:dataTable id="workHourDetailList" class="workHourDetailList" value="#{workOrderMgrController.workHoursList}" var="item" widgetVar="workHourDetailList"
                                          lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
@@ -296,8 +319,17 @@
                             <label class="label">#{msg.coworkerManHoursEntryType}</label>
                             <p:selectOneRadio id="coworkerEntryType" required="true" value="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType}"  requiredMessage="#{msg.coworkerManHoursEntryType} #{msg.ValidationRequire}">
                                 <p:ajax event="change" process="@this" update=":growl woTab:repairCompleteDialogForm:coworkerEntryType woTab:repairCompleteDialogForm:coworkerList"  listener="#{workOrderMgrController.updateCoworkerEntryType(workOrderMgrController.selectedWorkOrder.coworkerEntryType)}" />
-                                <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
-                                <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                <c:if test="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1 || workOrderMgrController.selectedWorkOrder.coworkerEntryType==0}">
+                                    <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
+                                    <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                </c:if>
+
+                                <c:if test="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==3}">
+                                    <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="3"/>
+                                </c:if>
+                                <c:if test="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==2}">
+                                    <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="2"/>
+                                </c:if>
                             </p:selectOneRadio>
                         </h:panelGroup>
 
@@ -308,12 +340,12 @@
                                 <p:column headerText="#{msg.coworker}">
                                     <h:outputText value="#{item.cowokerUserName}"/>
                                 </p:column>
-                                <p:column headerText="#{msg.startTime}" rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                                <p:column headerText="#{msg.startTime}" rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1 || workOrderMgrController.selectedWorkOrder.coworkerEntryType==3}">
                                     <h:outputText value="#{item.startTime}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="#{msg.endTime}" rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                                <p:column headerText="#{msg.endTime}" rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1 || workOrderMgrController.selectedWorkOrder.coworkerEntryType==3}">
                                     <h:outputText value="#{item.endTime}">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm" />
                                     </h:outputText>
@@ -329,6 +361,12 @@
                                     </p:commandButton>
                                 </p:column>
                             </p:dataTable>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{workOrderMgrController.workOrderShowTravelTime}">
+                            <label class="label">#{msg.travelTime}</label>
+                            <p:inputNumber minValue="0" maxValue="999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.travelTime}" >
+                                <p:ajax />
+                            </p:inputNumber>
                         </h:panelGroup>
                             <h:panelGroup id="addContractor" styleClass="#{workOrderMgrController.showEnableEngineersWriteRepairOutside()?'':'display-none'}">
                                 <label class="label">#{msg.addContractor}*</label>

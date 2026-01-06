@@ -109,6 +109,11 @@ public class WorkOrderExportPojo {
     private String coworkManHour;
     //最终评价
     private Integer feedbackRating;
+
+    private String feedbackComment;
+
+
+    private Date closeTime;
     //故障类型
     private Integer caseType;
     //故障类型名称
@@ -213,6 +218,8 @@ public class WorkOrderExportPojo {
     private String spare10;
 
     private String mainSub;
+
+    private Double  travelTime;
 
     public String getCoworkerEntryDetail() {
         return coworkerEntryDetail;
@@ -1006,5 +1013,29 @@ public class WorkOrderExportPojo {
 
     public void setMainSub(String mainSub) {
         this.mainSub = mainSub;
+    }
+
+    public String getFeedbackComment() {
+        return feedbackComment;
+    }
+
+    public void setFeedbackComment(String feedbackComment) {
+        this.feedbackComment = feedbackComment;
+    }
+
+    public Date getCloseTime() {
+        return closeTime;
+    }
+
+    public void setCloseTime(Date closeTime) {
+        this.closeTime = closeTime;
+    }
+
+    public Double getTravelTime() {
+        return travelTime;
+    }
+
+    public void setTravelTime(Double travelTime) {
+        this.travelTime = travelTime;
     }
 }

@@ -16,27 +16,14 @@
 		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="#{msg.clinicalDeptName}" rendered="#{userContextService.hasCurrentTenantName('')}">
-			<f:facet name="header">
-				<h:outputText value="#{msg.clinicalDeptName}"/><br/>
-				<p:autoComplete dropdown="true" value="#{inventoryOrderDetailAssetInfoController2.filterClinicalDeptOrg}" appendTo="@(Body)"
-								scrollHeight="300"  forceSelection="true" completeMethod="#{inventoryOrderDetailAssetInfoController2.autoCompleteDeptName}" size="5">
-					<p:ajax event="itemSelect" listener="#{inventoryOrderDetailAssetInfoController2.onClinicalDeptNameFilterChange}" process="@this" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2"/>
-					<p:ajax process="@this" listener="#{inventoryOrderDetailAssetInfoController2.onClinicalDeptNameFilterChange}" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2"/>
-				</p:autoComplete>
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;" filter="true" filterMatchMode="contains">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{inventoryOrderDetailAssetInfoController2.listClinicalDeptName}" />
+				</p:selectOneMenu>
 			</f:facet>
-			<h:outputText value="#{item.clinicalDeptName}" />
-		</p:column>
-		<p:column headerText="#{msg.clinicalDeptName}" rendered="#{!userContextService.hasCurrentTenantName('')}">
-			<f:facet name="header">
-				<h:outputText value="#{msg.clinicalDeptName}"/><br/>
-				<p:autoComplete dropdown="true" value="#{inventoryOrderDetailAssetInfoController2.filterClinicalDeptOrg}" appendTo="@(Body)"
-								scrollHeight="300"  forceSelection="true" completeMethod="#{inventoryOrderDetailAssetInfoController2.autoCompleteDeptName}" size="5">
-					<p:ajax event="itemSelect" listener="#{inventoryOrderDetailAssetInfoController2.onClinicalDeptNameFilterChange}" process="@this" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2"/>
-					<p:ajax process="@this" listener="#{inventoryOrderDetailAssetInfoController2.onClinicalDeptNameFilterChange}" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2"/>
-				</p:autoComplete>
-			</f:facet>
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+			<h:outputText value="#{userContextService.hasCurrentTenantName('') ? item.clinicalDeptName : item.assetInfo.clinicalDeptName}" />
 		</p:column>
 		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.qrCode}">
 			<h:outputText value="#{item.assetInfo.qrCode}" />
@@ -66,7 +53,7 @@
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		<p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" >
+		<p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.assetInfo.lastModifiedBy}" filterMatchMode="LIKE" >
             <h:outputText value="#{inventoryOrderDetailAssetInfoController2.getUserName(item.lastModifiedBy)}"/>
 		</p:column>
 		<p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">

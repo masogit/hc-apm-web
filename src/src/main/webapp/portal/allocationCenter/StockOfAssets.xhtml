@@ -146,7 +146,7 @@
                         <p:column headerText="备注"  >
                             <h:outputText value="#{asset.sharedAssetReqDetail.remark}" title="#{asset.sharedAssetReqDetail.remark}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Actions}" width="16%">
+                        <p:column headerText="#{msg.Actions}" width="16%" exportable="false">
                             <p:commandButton value="借出"
                                              rendered="#{asset.canBorrow}"
                                              update="forceLeaseAssetDialog"
@@ -173,6 +173,9 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}"/>
                             <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="StockOfAssets_export"/>
+                            </p:commandButton>
                         </f:facet>
 
                     </p:dataTable>

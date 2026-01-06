@@ -41,17 +41,17 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.name}"/>
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serialNum}"/>
                         </p:column>
-                        <p:column headerText="#{msg.qrCode}" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        <p:column headerText="#{msg.qrCode}" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
                         </p:column>
-                        <p:column headerText="设备型号" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.functionType}"/>
+                        <p:column headerText="设备型号" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
                         </p:column>
                         <p:column rendered="#{!userContextService.hasCurrentTenantName('')}" headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="EQ">
                             <h:outputText value="#{assetFileAttachmentController.getAttachmentType(item.boSubType)}"/>
@@ -81,12 +81,24 @@
                         <p:column headerText="#{msg.name}" sortBy="#{item.objectName}" filterBy="#{item.objectName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.objectName}"/>
                         </p:column>
+                        <p:column headerText="上传人" sortBy="#{item.createdBy}" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
+                            <h:outputText value="#{assetFileAttachmentController.getUserName(item.createdBy)}"/>
+                        </p:column>
+                        <p:column headerText="上传日期" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" />
+                            </f:facet>
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="#{msg.download}" exportable="false">
                             <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
                             <p:link href="#{item.extLink}" target="_blank" rendered="#{'vlink' eq item.boSubType}">打开</p:link>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetFileAttachmentController.prepareCreate}" update=":AssetFileAttachmentEditForm" />
+                            <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetFileAttachmentController.prepareCreate}" update=":AssetFileAttachmentEditForm" />-->
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{assetFileAttachmentController.cancelData()}" update=":FileEditDlg" oncomplete="PF('FileEditDialog').show()"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量删除" actionListener="#{assetFileAttachmentController.deleteBatch}" update=":AssetFileAttachmentListForm :growl" disabled="#{not assetFileAttachmentController.isChecked()}">
                                 <p:confirm header="批量删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -103,7 +115,18 @@
             </div>
         </div>
         <ui:include src="selectAssetDialog.xhtml"/>
-
+        <p:overlayPanel  widgetVar="panelFilterCreatedDate" for=":AssetFileAttachmentListForm:datalist:filterCreatedDate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel for="cal1" />
+                <p:calendar id="cal1" widgetVar="varCreatedDateFrom" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                <p:outputLabel for="cal2"/>
+                <p:calendar id="cal2" widgetVar="varCreatedDateTo" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+            </h:panelGrid>
+            <p:commandButton onclick="PF('panelFilterCreatedDate').hide();setDateFilter('varDataList', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+        </p:overlayPanel>
         <script>
             //<![CDATA[
             function start() {

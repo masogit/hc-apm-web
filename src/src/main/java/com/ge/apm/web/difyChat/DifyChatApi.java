@@ -18,10 +18,10 @@ public class DifyChatApi {
 
   @RequestMapping(value = "chat", method = RequestMethod.POST)
   @ResponseBody
-  public ResponseEntity<String> handleRequest(@RequestBody DiFyChatRequest request) {
+  public ResponseEntity<DiFyChatResponse> handleRequest(@RequestBody DiFyChatRequest request) {
     if (request.getParamStr() != null && !request.getParamStr().trim().isEmpty()) {
       try {
-        String result = difyStreamService.processDifyStream(request);
+        DiFyChatResponse result = difyStreamService.processDifyStream(request);
         return ResponseEntity.ok(result);
       } catch (Exception e) {
         e.printStackTrace();
@@ -34,7 +34,7 @@ public class DifyChatApi {
                 ));
       }
     }
-    return (ResponseEntity<String>) ResponseEntity.badRequest();
+    return (ResponseEntity<DiFyChatResponse>) ResponseEntity.badRequest();
   }
 
 }

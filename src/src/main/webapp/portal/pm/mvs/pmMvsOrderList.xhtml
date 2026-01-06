@@ -10,10 +10,10 @@
     <div class="ui-g-12 card">
         <h:form id="pmMvsListForm">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderMvsController.updateQueryIndex(10)}" disabled="#{v2PmOrderMvsController.queryIndex==10}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"/>
-                <p:commandButton value="#{msg.Planned}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderMvsController.updateQueryIndex(0)}" disabled="#{v2PmOrderMvsController.queryIndex==0}"  rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}"  />
-                <p:commandButton value="#{msg.Finished}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderMvsController.updateQueryIndex(7)}" disabled="#{v2PmOrderMvsController.queryIndex==7}"  rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"  />
-                <p:commandButton value="#{msg.Canceled}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderMvsController.updateQueryIndex(20)}" disabled="#{v2PmOrderMvsController.queryIndex==20}"  rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"  />
+                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm pmTab:idMvsPanelFilterPlannedCompletionTime pmTab:idMvsPanelFilterActualCompletionTime" action="#{v2PmOrderMvsController.updateQueryIndex(10)}" disabled="#{v2PmOrderMvsController.queryIndex==10}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"/>
+                <p:commandButton value="#{msg.Planned}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm pmTab:idMvsPanelFilterPlannedCompletionTime pmTab:idMvsPanelFilterActualCompletionTime" action="#{v2PmOrderMvsController.updateQueryIndex(0)}" disabled="#{v2PmOrderMvsController.queryIndex==0}"  rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}"  />
+                <p:commandButton value="#{msg.Finished}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm pmTab:idMvsPanelFilterPlannedCompletionTime pmTab:idMvsPanelFilterActualCompletionTime" action="#{v2PmOrderMvsController.updateQueryIndex(7)}" disabled="#{v2PmOrderMvsController.queryIndex==7}"  rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"  />
+                <p:commandButton value="#{msg.Canceled}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm pmTab:idMvsPanelFilterPlannedCompletionTime pmTab:idMvsPanelFilterActualCompletionTime" action="#{v2PmOrderMvsController.updateQueryIndex(20)}" disabled="#{v2PmOrderMvsController.queryIndex==20}"  rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"  />
             </h:panelGrid>
             <p:dataTable id="datalist" value="#{v2PmOrderMvsController.lazyModel}" var="item" widgetVar="varDataListgl"
                          selectionMode="single" selection="#{v2PmOrderMvsController.selected}"
@@ -23,7 +23,14 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-                <p:ajax event="rowSelect" listener="#{v2PmOrderMvsController.onSelectPmOrder()}" update="pmTab:pmMvsOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+
+                <c:if test="#{v2PmOrderMvsController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderMvsController.onSelectOrderRedirect()}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{v2PmOrderMvsController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderMvsController.onSelectPmOrder()}" update="pmTab:pmMvsOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                </c:if>
+
                 <p:ajax event="filter" listener="#{v2PmOrderMvsController.onFilter}" update="datalist pmTab:pmOrderDetailForm  @(.pmOrderDetailFormCls)" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36" visible="#{v2PmOrderMvsController.queryIndex==2 or v2PmOrderMvsController.queryIndex==3 or v2PmOrderMvsController.queryIndex==0 or v2PmOrderMvsController.queryIndex==6 or v2PmOrderMvsController.queryIndex == 31 or v2PmOrderMvsController.queryIndex == 7 or v2PmOrderMvsController.queryIndex == -1}" exportable="false">
@@ -134,7 +141,7 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{msg.ActualCompletionTime}"  rendered="#{v2PmOrderMvsController.queryIndex==7 or userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.ActualCompletionTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2PmOrderMvsController.queryIndex==7 or userContextService.hasCurrentTenantName('')}">
                     <f:facet name="filter">
                         <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2PmOrderMvsController.actualCompletionTimeFormat}"/>
                     </f:facet>
@@ -153,30 +160,59 @@
                     <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
                 </p:column>
                 <f:facet name="{Toolbar}" >
-                    <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderMvsController.exportExcel}" disabled="#{v2PmOrderMvsController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                    <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderMvsController.exportExcel1}" disabled="#{v2PmOrderMvsController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
                         <p:fileDownload value="#{v2PmOrderMvsController.excelFile}"/>
                     </p:commandButton><!--
                      <p:commandButton  icon="ui-icon-arrow-1-s" actionListener="#{v2PmOrderMvsController.doExportMaintenanceReport()}" class=" btn-sm btn-gray btn-export-maintenance-report" title="#{msg.ExportMaintenanceWorkorder}" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false">
                         <p:fileDownload value="#{v2PmOrderMvsController.maintenanceReport}" />
                     </p:commandButton>-->
-                    <p:commandButton icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class=" btn-export-maintenance-report" title="批量下载附件工单" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false"/>
-                     <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
-                                     message="#{v2PmOrderMvsController.messageTip}"
-                                     header="确认下载"
-                                     severity="warn" class="downloadConfirm">
-                        <p:commandButton value="确定" ajax="false"
-                                         actionListener="#{v2PmOrderMvsController.doExportWorkOrderReport()}"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton" icon="ui-icon-check">
-                            <p:fileDownload value="#{v2PmOrderMvsController.maintenanceWorkReport}" oncomplete="PF('downloadConfirm').hide()" />
-                        </p:commandButton>
-                        <!-- 取消按钮 -->
-                        <p:commandButton value="取消" type="button"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton" icon="ui-icon-close"
-                        />
-                    </p:confirmDialog>
+                    <ui:fragment rendered="true">
+                        <p:commandButton  icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="btn-export-maintenance-report" title="批量下载附件工单" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false"/>
+                    </ui:fragment>
+
                 </f:facet>
             </p:dataTable>
         </h:form>
+
+        <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
+                         message="#{v2PmOrderMvsController.messageTip}"
+                         header="确认下载"
+                         severity="warn" class="downloadConfirm" width="700px">
+            <h:form>
+                <p:commandButton value="确定" ajax="false"
+                                 actionListener="#{v2PmOrderMvsController.doExportWorkOrderReport()}"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton"
+                                 icon="ui-icon-check">
+                    <p:fileDownload value="#{v2PmOrderMvsController.maintenanceWorkReport}"
+                                    oncomplete="PF('downloadConfirm').hide()"/>
+                </p:commandButton>
+                <p:commandButton value="取消" type="button"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton"
+                                 icon="ui-icon-close"
+                />
+            </h:form>
+        </p:confirmDialog>
+
+        <p:overlayPanel id="idMvsPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="pmTab:pmMvsListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataListgl', 'varFilterPlannedCompletionTime', 'varPlannedCompletionTimeFrom', 'varPlannedCompletionTimeTo'); PF('panelFilterPlannedCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterPlannedCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+        <p:overlayPanel id="idMvsPanelFilterActualCompletionTime" widgetVar="panelFilterActualCompletionTime" for="pmTab:pmMvsListForm:datalist:filterActualCompletionTime" dismissable="false" >
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varActualCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varActualCompletionTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataListgl', 'varFilterActualCompletionTime', 'varActualCompletionTimeFrom', 'varActualCompletionTimeTo'); PF('panelFilterActualCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterActualCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
         <p:dialog id="previewedDlgEhome" width="1000" height="800"  widgetVar="previewedDlg" modal="true" howEffect="fade"  maximizable="true" appendTo="@this">
             <c:choose>
                 <c:when test="#{preViewerBean.type eq 0}">
@@ -192,16 +228,5 @@
         </p:dialog>
         <ui:include src="pmMvsOrderView.xhtml"/>
     </div>
-    <p:overlayPanel id="idMvsPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="pmTab:pmMvsListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
-        <h:panelGrid columns="2">
-            <p:outputLabel value="#{msg.From}"/>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            <p:outputLabel value="#{msg.To}"/>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-        </h:panelGrid>
-        <p:commandButton onclick="setDateFilter('varDataListgl', 'varFilterPlannedCompletionTime', 'varPlannedCompletionTimeFrom', 'varPlannedCompletionTimeTo'); PF('panelFilterPlannedCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-        <p:commandButton onclick="PF('panelFilterPlannedCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-    </p:overlayPanel>
-
 </ui:composition>
 </html>
