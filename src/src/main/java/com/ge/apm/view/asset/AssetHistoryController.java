@@ -53,6 +53,8 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
     private CustomConfigObject customConfigObject;
     private ElasticService elasticService;
 
+    private UserAccount userAccount;
+
     @Getter
     @Setter
     private String oneSearchStr;
@@ -69,6 +71,8 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         uuaService = WebUtil.getBean(UaaService.class);
         customConfigService = WebUtil.getBean(CustomConfigService.class);
         elasticService=WebUtil.getBean(ElasticService.class);
+        userAccount = UserContextService.getCurrentUserAccount();
+        loadConfigForSite(userAccount.getSiteUID());
     }
 
 
@@ -86,33 +90,29 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
         List<String> orgUidList = uuaService.getOrgListByUser(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        this.updateSearchFilter(new SearchFilter("tenant_uid", SearchFilter.Operator.EQ, userAccount.getTenantUID(), "1*"));
 
-        searchFilters.add(new SearchFilter("tenant_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("institution_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospital_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("site_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        loadConfigForSite(userAccount.getSiteUID());
-//        CustomConfigObject  customConfig = customConfigService.getCurrentCustomConfig(userAccount.getSiteUID());
-        List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
-//        logger.info("assetsImportantFields siteuid:{}, size:{},assetsImportantFields:{}",userAccount.getSiteUID(),assetsImportantFields.size(),assetsImportantFields.toString());
-        searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.CONTAINS, assetsImportantFields));
-        if(!StringUtils.isEmpty(oneSearchStr)) {
-            searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.LIKE, oneSearchStr));
+        if (!this.hasFilterOnField("site_uid")) {
+            searchFilters.add(new SearchFilter("tenant_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("institution_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospital_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("site_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
-
-        //convert to json data page
+        List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
+        this.updateSearchFilter(new SearchFilter("has_columns", SearchFilter.Operator.CONTAINS, assetsImportantFields));
+        if(!StringUtils.isEmpty(oneSearchStr)) {
+            this.updateSearchFilter(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr));
+        }
         pageRequest = addDefaultSort(pageRequest);
         Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), pageRequest.getPageNumber(), pageRequest.getPageSize());
-//        Page<AssetHistory> assetHistoryPage = assetHistoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
         if(assetHistoryPage==null || assetHistoryPage.getContent()==null){
             Page<JSONObject> objects = new PageImpl<>(new ArrayList<>(), pageRequest, 0);
             return objects;
         }
         List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(assetHistoryPage.getContent());
         Page<JSONObject> jsonPage = new PageImpl<>(dataLists, pageRequest, assetHistoryPage.getTotalElements());
-        searchFilters = new ArrayList<SearchFilter>();
         return jsonPage;
     }
 

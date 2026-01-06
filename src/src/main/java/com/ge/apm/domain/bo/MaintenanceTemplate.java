@@ -163,6 +163,7 @@ public class MaintenanceTemplate {
             this.content.put(Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), Component.ACCEPTANCE_SIGNATURE_TITLE.value());
             this.content.put(Component.MAINTENANCE_WORKFLOW.toString(), Component.MAINTENANCE_WORKFLOW.value());
             this.content.put(Component.COWORKER_HOURS_TABLE.toString(), Component.COWORKER_HOURS_TABLE.value());
+            this.content.put(Component.MAN_HOURS_DETAIL.toString(), Component.MAN_HOURS_DETAIL.value());
             this.content.put(Component.AUDIT_RECORDS.toString(), Component.AUDIT_RECORDS.value());
             this.content.put(Component.CHECK_LIST.toString(), Component.CHECK_LIST.value());
         }
@@ -297,6 +298,24 @@ public class MaintenanceTemplate {
         }
     }
 
+    public enum ManHours {
+        START_TIME("start_time"),
+        END_TIME("end_time"),
+        MAN_HOURS("man_hours"),
+        REMARK("remark");
+
+        private final String key;
+
+        ManHours(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
     /**
      * Component in Maintenance Report.
      */
@@ -397,6 +416,7 @@ public class MaintenanceTemplate {
         ACCEPTANCE_SIGNATURE_TITLE("acceptance_signature_title", Widget.TEXT),
         MAINTENANCE_WORKFLOW("maintenance_workflow", Widget.TABLE),
         COWORKER_HOURS_TABLE("coworker_hours_table", Widget.TABLE),
+        MAN_HOURS_DETAIL("man_hours_detail", Widget.TABLE),
         AUDIT_RECORDS("audit_records", Widget.TABLE),
         CHECK_LIST("check_list", Widget.TABLE),
         SAFETY_REPORT("safety_report", Widget.DYNAMIC),
@@ -436,6 +456,7 @@ public class MaintenanceTemplate {
         INSTALL_DATE("installDate", Widget.TEXT),
         LOCATION_NAME("locationName", Widget.TEXT),
         PERIOD("period", Widget.TEXT),
+        GROUP("group", Widget.TEXT),
         ;
 
         private final String key;
@@ -473,7 +494,9 @@ public class MaintenanceTemplate {
         COWORKER2("coworker2", Widget.TEXT),
         COWORKER2_TIME("coworker2_time", Widget.TEXT),
         RESULT("result", Widget.TEXT),
-        COMMENTS("comments", Widget.TEXT);
+        COMMENTS("comments", Widget.TEXT),
+        TRAVELTIME("travel_time", Widget.TEXT),
+        ;
 
         private final String key;
         private final Widget widget;

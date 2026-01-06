@@ -9,6 +9,27 @@
 
 <ui:composition>
     <div class="ui-g-12 card">
+        <h:form id="searchForm" class="searchForm">
+            <h:panelGroup>
+                <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg" for="pmTab:pmOrderListForm:datalist:btnOrg" hideEffect="fade" dynamic="false" modal="false" >
+                    <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="pmTab:searchForm:treeNodeNameFilter @this" update="pmTab:searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="pmTab:searchForm:treeNodeNameFilter @this" update="pmTab" value="确定"/>
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{v2PmOrderController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"     dynamic="false"  cache="false"   propagateSelectionUp="#{orgTreeController.propagateSelectionUp}"    >
+                            <p:ajax process="@this" event="select" listener="#{v2PmOrderController.onSelectSiteTreeNode}"/>
+                            <p:ajax process="@this" event="unselect" listener="#{v2PmOrderController.onUnSelectSiteTreeNode}"/>
+                            <p:ajax process="@this" event="expand"/>
+                            <p:ajax process="@this" event="collapse"/>
+                            <p:treeNode type="org">
+                                <h:outputText value="#{node.name}"/>
+                            </p:treeNode>
+                            <p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
+                    </p:scrollPanel>
+                </p:overlayPanel>
+            </h:panelGroup>
+        </h:form>
         <h:form id="pmOrderListForm">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                 <c:choose>
@@ -46,8 +67,12 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-
-                <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                <c:if test="#{v2PmOrderController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectOrderRedirect()}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{v2PmOrderController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                </c:if>
                 <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36" visible="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31 or v2PmOrderController.queryIndex == 7 or v2PmOrderController.queryIndex == -1}" exportable="false">
@@ -59,15 +84,11 @@
                             <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
-
                 </p:column>
 
                 <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.siteUidFilter}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{v2PmOrderController.LoadSiteNameList()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
-                        </p:selectOneMenu>
+                        <p:autoComplete id="btnOrg" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     </f:facet>
                     <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
                 </p:column>
@@ -246,7 +267,7 @@
                         <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_DISPATCH')}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">
+                        <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{v2PmOrderController.isBatchTakePm() or !userContextService.isEnableBtnByKey('disableBatchAcceptOrder')}"  oncomplete="PF('takeOrderDialog').show()">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-arrow-forward" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchReassign}"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
@@ -258,7 +279,7 @@
                         <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchCancel}"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{ (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==-1) and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_CANCEL')}" disabled="#{v2PmOrderController.batchCancelShow() or not v2PmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-art-track" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="#{userContextService.hasCurrentTenantName('')?msg.BatchTake:msg.BatchGrap}"  rendered="#{v2PmOrderController.queryIndex==31  and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{not v2PmOrderController.isBatchRob()}" oncomplete="PF('robOrderDialog').show()">
+                        <p:commandButton  icon="ui-icon-art-track" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="#{userContextService.hasCurrentTenantName('')?msg.BatchTake:msg.BatchGrap}"  rendered="#{v2PmOrderController.queryIndex==31  and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{ !v2PmOrderController.isBatchRob() or !userContextService.isEnableBtnByKey('disableBatchAcceptOrder')}" oncomplete="PF('robOrderDialog').show()">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2PmOrderController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchClose}"  rendered="#{v2PmOrderController.queryIndex==6}" update="@(.closePmDialogClassBatch)" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('closePmDialogBatch').show()">
@@ -722,5 +743,15 @@
 
     <!-- </ui:define>-->
 
+    <script>
+        var newWin;
+        function prepareOrderViewWindow() {
+            newWin = window.open('about:blank', '_blank');
+            newWin.document.body.innerHTML = '加载中...';
+        }
+        function openOrderViewWindow(xhr, status, args) {
+            newWin.location.href = args.url;
+        }
+    </script>
 </ui:composition>
 </html>

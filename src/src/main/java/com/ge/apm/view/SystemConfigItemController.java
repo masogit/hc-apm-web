@@ -8,10 +8,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.pm.PmOrderPreCreateService;
+import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
@@ -24,7 +27,9 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
@@ -36,6 +41,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -71,6 +77,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     private UserCommonService userCommonService;
     private UserAccountRepository userAccountRepository;
+
+    private PmOrderPreCreateService pmOrderPreCreateService;
+
+    private PmOrderRequestApiService srApi;
+
+    private V2_PmOrderRepository v2PmOrderRepository;
+
     private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
     private List<OrgInfo> deptList;
 
@@ -82,6 +95,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private static final String VALUE ="value";
     private List<String> datePatternSelect = ListUtil.newArrayList("yyyy/MM/dd", "yyyy/MM/dd HH", "yyyy/MM/dd HH:mm", "yyyy/MM/dd HH:mm:ss");
 
+    @Getter@Setter
+    private ConfigItem selectedConfigItem;
+    @Getter@Setter
+    private String itemValue = "WorkOrderListColumn_0";
+    Map<String, Boolean> fieldRenderedMap = new HashMap<>();
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ConfigItemRepository.class);
@@ -92,6 +111,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         user = UserContextService.getCurrentUserAccount();
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        pmOrderPreCreateService = WebUtil.getBean(PmOrderPreCreateService.class);
+        v2PmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
+        srApi = WebUtil.getBean(PmOrderRequestApiService.class);
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
         loadClinicalDept();
         loadAssetStaff();
@@ -114,6 +136,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(15,"培训管理");
         categoryMap.put(16,"MVS院级工单");
         categoryMap.put(17,"IB报表链接");
+        categoryMap.put(18,"列表字段配置");
 
 
     }
@@ -157,6 +180,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
                 if (9 == configItem.getValueType()) {
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getShowValue(), FieldColumnDto.class));
+                }
+                if(10 == configItem.getValueType()){
+                    configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
                 }
             }
         }
@@ -229,14 +255,27 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                         selectedObjectMap.put("AssetHead", userAccountRepository.getByUid(AssetHead));
                     }
                 }
-
+            }else if(category.equals("18")){
+                configItemList = configItemList.stream().filter(t -> t.getCategory().equals(18)).collect(Collectors.toList());
+                selectedConfigItemChange();
             }
             this.searchFilters = null;
-        } else {
+        }  else {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", "configItemList.xhtml");
         }
     }
+
+    public List<ConfigItem> getWorkOrderListType(){
+        return configItemList.stream().filter(item -> item.getKey().contains("WorkOrderListColumn")).collect(Collectors.toList());
+    }
+
+    public void selectedConfigItemChange(){
+        System.out.println(itemValue);
+        List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
+        fieldRenderedMap = list.stream().collect(Collectors.toMap(FieldColumnDto::getField, FieldColumnDto::getRendered));
+    }
+
 
     @Override
     public void prepareEdit() {
@@ -310,6 +349,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 if (9 == configItem.getValueType()) {
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getDefaultValue(), FieldColumnDto.class));
                 }
+                if (10 == configItem.getValueType()){
+                    configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
+                    fieldRenderedMap = configItem.getFieldColumnDtoList().stream().collect(Collectors.toMap(FieldColumnDto::getField, FieldColumnDto::getRendered));
+                }
             }
             WebUtil.addErrorMessage("删除成功！");
         }
@@ -327,6 +370,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         saveScrap(configItemF);
         saveScrap(configItemS);
         WebUtil.addErrorMessage("保存成功！");
+    }
+
+    public void saveConfigMmOrderCreateByCycle() {
+//        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
+        saveConfig(this.selected);
+        invokeBatchPmOrderCancel(user.getSiteUID());
+
     }
 
     public void saveScrap(ConfigItem configItemF){
@@ -417,7 +467,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
             } else if (9 == this.selected.getValueType()) {
                 configItemValue.setValue(JSON.toJSONString(this.selected.getFieldColumnDto()));
-            } else{
+            } else if(10 == this.selected.getValueType()) {
+                configItemValue.setValue(JSON.toJSONString(this.selected.getFieldColumnDtoList()));
+            }else{
                 configItemValue.setValue(this.selected.getShowValue());
             }
             configItemValueRepository.save(configItemValue);
@@ -593,6 +645,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         return JSON.parseObject(value, FieldColumnDto.class);
     }
 
+
     public void siteToSiteAutoAck(ConfigItem item){
         ConfigItemValue configItemValue = item.getConfigItemValue();
         String key = item.getKey();
@@ -604,6 +657,56 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         List<String> collect = hospitalChildrenByUids.stream().filter(org -> Integer.valueOf(3).equals(org.getOrgType())).map(OrgInfo::getUid).collect(Collectors.toList());
         for (String siteUID : collect) {
             sharedAssetService.asynRemoteCall(GatewayURL.SITE_TO_SITE_AUTO_ACK, HttpMethod.GET,new HashMap<>(),(url)->url+"?siteUID="+siteUID);
+        }
+    }
+
+    public void pmOrderCreateByCycleDlg(ConfigItem configItem) {
+        pmOrderPreCreateService.deleteBySiteUid(user.getSiteUID());
+        saveConfig(configItem);
+        invokeBatchPmOrderCancel(user.getSiteUID());
+    }
+
+
+    public void invokeBatchPmOrderCancel(String siteUid){
+        String token = UserContextService.getAccessToken();
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        List<V2_PmOrder> batchPmOrderList =v2PmOrderRepository.findBySiteUidAndPmTypeAndIsFinished(siteUid,1,false);
+        if(CollectionUtils.isEmpty(batchPmOrderList)){
+            return;
+        }
+        batchPmOrderList.forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setPmOrderId(item.getId());
+            if(item.getPmType()==1){
+                formData.setQualityChecking("2");
+            }
+            formData.setStepId(item.getCurrentStepId());
+            formDataList.add(formData);
+            formData.setDesc("配置项修改批量取消周期工单");
+        });
+        String res = srApi.invokeBatchPmOrderCancel(token,formDataList,"cancel");
+        if (res==null || !res.equalsIgnoreCase("ok")) {
+            WebUtil.addErrorMessage("取消周期性保养工单失败");
+        }
+
+    }
+
+    public void onItemRowReorder(ReorderEvent event){
+        logger.info(event.toString());
+        List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
+        for (FieldColumnDto dto : list){
+            dto.setRendered(fieldRenderedMap.get(dto.getField()));
+        }
+    }
+
+    public void columnSelectedChange(String field){
+        logger.info(field);
+        List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
+        for (FieldColumnDto dto : list){
+            if(field.equals(dto.getField())){
+                logger.info(dto.getRendered());
+                fieldRenderedMap.put(dto.getField(),dto.getRendered());
+            }
         }
     }
 

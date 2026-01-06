@@ -220,6 +220,18 @@ public class OrgTreeController {
         }
     }
 
+    public TreeNode getSiteOrgTree(List<OrgInfo> siteList) {
+        if (null == siteOrgTree) {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            if (uaaService.isIbSiteAdmin(currentUserAccount)) {
+                return null;
+            }
+            siteOrgTree = buildTree(siteList);
+            expandedByOrgType(siteOrgTree, 2);
+        }
+        return siteOrgTree;
+    }
+
     public TreeNode getSiteOrgTree() {
         if (null == siteOrgTree) {
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();

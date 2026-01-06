@@ -1,10 +1,16 @@
 package com.ge.apm.view.measuring;
 
+import com.ge.apm.dao.ConfigItemValueRepository;
+import com.ge.apm.dao.OCRTemplateRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.MeasuringService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.springframework.util.CollectionUtils;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -29,11 +35,17 @@ public class MeasureFromZipController {
     private UploadedFile file;
     private List<MeasuringCertificateDetail> resultList;
     private UserAuth customRoleAuth;
+
+    private OCRTemplateRepository ocrTemplateRepository;
+
+    private ConfigItemService configItemService;
     private int progress;
     @PostConstruct
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
         measuringService = WebUtil.getBean(MeasuringService.class);
+        ocrTemplateRepository = WebUtil.getBean(OCRTemplateRepository.class);
+        configItemService = WebUtil.getBean(ConfigItemService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.MEASURE_INFO);
         measuringService.setProgress(0);
@@ -47,9 +59,27 @@ public class MeasureFromZipController {
     }
     public void handleZipFileUploadOCR(FileUploadEvent event) throws IOException {
         resultList = new ArrayList<>();
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
-        resultList = measuringService.handleZipOCR(event.getFile(), currentUser);
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        String identifyPatterns = configItemService.getConfigItemByKeyToString("identifyPatterns",currentUser);
+        if("local".equals(identifyPatterns)){
+            List<OCRTemplate> ocrTemplates = getOCRTemplates();
+            if(CollectionUtils.isEmpty(ocrTemplates)){
+                FacesMessage message = new FacesMessage("上传完成"+event.getFile().getFileName() + " 处理失败,本地配置缺少无法OCR识别！");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                return ;
+            }
+        }
+        resultList = measuringService.handleZipOCR(event.getFile(), currentUser,identifyPatterns);
+        if(!CollectionUtils.isEmpty(resultList)){
+            FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    public List<OCRTemplate> getOCRTemplates() {
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,currentUser.getTenantUID()));
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, BusinessType.MEASURE.name()));
+        return ocrTemplateRepository.findBySearchFilter(searchFilters);
+
     }
 
     public UploadedFile getFile() {

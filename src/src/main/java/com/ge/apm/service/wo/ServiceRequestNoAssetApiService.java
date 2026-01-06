@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class ServiceRequestNoAssetApiService  extends MicroServiceInvoker {
         formData.setRequestorPhone(newServiceRequest.getRequestorPhone());
         formData.setAssetStatus(newServiceRequest.getAssetStatus());
         formData.setRepairSource(RepairSourceEnum.ServiceRequestNoAsset.name());
+        formData.setFinancingNum(newServiceRequest.getFinancingNum());
         if (null != newServiceRequest.getConfirmedDownTime()) {
             formData.setConfirmedDownTime(TimeUtils.getStrDate(newServiceRequest.getConfirmedDownTime(), "yyyy-MM-dd HH:mm:ss"));
         }
@@ -101,6 +103,7 @@ class ServiceRequestNoAssetForm {
 
     String deptUid;
     String deptName;
+    String financingNum;
     String requestReason;
     List<V2_BlobObject> attachments;
     String comment;
@@ -125,4 +128,17 @@ class ServiceRequestNoAssetActionForm{
     String cancelReason;
     Integer repairType;
     String assetUid;
+
+
+    private String financingNum;//资产编号
+
+
+    private String functionType;//设备型号
+
+
+
+    private String serialNum;//制造商序列号
+
+
+    private String makerShortName;
 }

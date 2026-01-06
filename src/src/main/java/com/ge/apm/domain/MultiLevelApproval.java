@@ -113,6 +113,13 @@ public class MultiLevelApproval implements Serializable {
      */
     @Column(name = "application_uid")
     private String applicationUid;
+
+
+    /**
+     * 多级审批申请人uid
+     */
+    @Column(name = "application_name")
+    private String applicationName;
     /**
      * 多级审批申请科室
      */

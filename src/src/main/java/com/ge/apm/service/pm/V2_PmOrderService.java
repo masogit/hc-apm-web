@@ -685,7 +685,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setComments(selectedPmOrder.getComments());//工作备注
         formData.setEntryType(selectedPmOrder.getEntryType());
         formData.setCoworkerEntryType(selectedPmOrder.getCoworkerEntryType());
-        if(selectedPmOrder.getEntryType() == 1){
+        formData.setTravelTime(selectedPmOrder.getTravelTime());
+        normalizeEntryType(formData);
+        if(formData.getEntryType() == 1){
             pmHoursList = pmHoursList.stream()
                     .filter(item -> !"000".equals(item.getId()))
                     .collect(Collectors.toList());
@@ -775,7 +777,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setComments(selectedPmOrder.getComments());
         formData.setEntryType(selectedPmOrder.getEntryType());
         formData.setCoworkerEntryType(selectedPmOrder.getCoworkerEntryType());
-        if(selectedPmOrder.getEntryType() == 1){
+        formData.setTravelTime(selectedPmOrder.getTravelTime());
+        normalizeEntryType(formData);
+        if(formData.getEntryType() == 1){
             pmHoursList = pmHoursList.stream()
                     .filter(item -> !"000".equals(item.getId()))
                     .collect(Collectors.toList());
@@ -786,6 +790,21 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
         }else{
             WebUtil.addSuccessMessage(WebUtil.getMessage("TemporaryStorageSuccess"));
+        }
+    }
+
+    private void normalizeEntryType(PmOrderActionForm formData) {
+        if (formData.getCoworkerEntryType() != null) {
+            int type = formData.getCoworkerEntryType();
+            if (type == 2 || type == 3) {
+                formData.setCoworkerEntryType(type - 2);
+            }
+        }
+        if (formData.getEntryType() != null) {
+            int type = formData.getEntryType();
+            if (type == 2 || type == 3) {
+                formData.setEntryType(type - 2);
+            }
         }
     }
     public List<V2_ServiceRequest> getServiceRequestByAssetId(Integer id) {

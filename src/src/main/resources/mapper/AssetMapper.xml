@@ -23,6 +23,7 @@
         <result column="last_metering_date" property="lastMeteringDate"/>
         <result column="next_metering_date" property="nextMeteringDate"/>
         <result column="check_date" property="checkDate"/>
+        <result column="check_person" property="checkPerson"/>
         <result column="bo_uuid" property="boUuid"/>
         <result column="tenant_uid" property="tenantUID"/>
         <result column="institution_uid" property="institutionUID"/>
@@ -30,6 +31,9 @@
         <result column="site_uid" property="siteUID"/>
         <result column="asset_dept_uid" property="assetDeptUID"/>
         <result column="clinical_dept_uid" property="clinicalDeptUID"/>
+        <result column="make_short_name" property="makerShortName"/>
+        <result column="manufacture" property="manufacture"/>
+        <result column="asset_classification32" property="assetClassification32"/>
     </resultMap>
 
     <select id="selectMeasureResult" resultMap="assetBean">
@@ -51,6 +55,7 @@
         ai.last_metering_date,
         mcd.valid_date_to next_metering_date,
         mcd.check_date,
+        mcd.check_person,
         mcd.id as bo_uuid
         FROM asset_info ai
         INNER JOIN measuring_certificate_detail mcd ON mcd.asset_uid = ai.uid
@@ -97,6 +102,13 @@
 
     <select id="toBeTerminatedListCount" resultType="long">
         select  count(*) from asset_info ai
+        LEFT JOIN (
+            SELECT
+            *, row_number()over(partition by asset_uid order by create_time desc)
+            FROM
+            asset_lifecycle
+            WHERE current_status = 4 AND tenant_uid = #{tenantUid}
+            ) al ON ai.uid = al.asset_uid AND al.row_number = 1
         LEFT JOIN (
             SELECT
                 id, asset_id, row_number()over(partition by asset_id order by created_date desc)
@@ -234,12 +246,11 @@
                 AND ai.financing_num like concat('%',#{financingNum},'%')
             </if>
             <if test="departNum != null">
-                AND ai.depart_num = #{departNum}
+                AND ai.depart_num  like concat('%',#{departNum},'%')
             </if>
             <if test="makerShortName != null">
                 AND ai.make_short_name like concat('%',#{makerShortName},'%')
             </if>
-
 
             <if test="vendor != null">
                 AND ai.vendor like concat('%',#{vendor},'%')
@@ -262,7 +273,58 @@
                 AND ai.qr_code  like concat('%',#{qrCode},'%')
             </if>
             <if test="warrantyDate != null">
-                AND ai.warranty_date  ge #{warrantyDate}
+                AND ai.warranty_date  >= #{warrantyDate}
+            </if>
+            <if test="warrantyDate1 != null">
+                AND ai.warranty_date  <![CDATA[ <= ]]> #{warrantyDate1}
+            </if>
+            <if test="createdDate != null">
+                AND ai.created_date  >= #{createdDate}
+            </if>
+            <if test="createdDate1 != null">
+                AND ai.created_date  <![CDATA[ <= ]]> #{createdDate1}
+            </if>
+            <if test="manufactDate != null">
+                AND ai.manufact_date  >= #{manufactDate}
+            </if>
+            <if test="manufactDate1 != null">
+                AND ai.manufact_date  <![CDATA[ <= ]]> #{manufactDate1}
+            </if>
+            <if test="purchaseDate != null">
+                AND ai.purchase_date  >= #{purchaseDate}
+            </if>
+            <if test="purchaseDate1 != null">
+                AND ai.purchase_date  <![CDATA[ <= ]]> #{purchaseDate1}
+            </if>
+            <if test="acceptDate != null">
+                AND ai.accept_date  >= #{acceptDate}
+            </if>
+            <if test="acceptDate1 != null">
+                AND ai.accept_date  <![CDATA[ <= ]]> #{acceptDate1}
+            </if>
+            <if test="arriveDate != null">
+                AND ai.arrive_date  >= #{arriveDate}
+            </if>
+            <if test="arriveDate1 != null">
+                AND ai.arrive_date  <![CDATA[ <= ]]> #{arriveDate1}
+            </if>
+            <if test="installDate != null">
+                AND ai.install_date  >= #{installDate}
+            </if>
+            <if test="installDate1 != null">
+                AND ai.install_date  <![CDATA[ <= ]]> #{installDate1}
+            </if>
+            <if test="terminateDate != null">
+                AND ai.terminate_date  >= #{terminateDate}
+            </if>
+            <if test="terminateDate1 != null">
+                AND ai.terminate_date  <![CDATA[ <= ]]> #{terminateDate1}
+            </if>
+            <if test="factoryWarrantyDate != null">
+                AND ai.factory_warranty_date  >= #{factoryWarrantyDate}
+            </if>
+            <if test="factoryWarrantyDate1 != null">
+                AND ai.factory_warranty_date  <![CDATA[ <= ]]> #{factoryWarrantyDate1}
             </if>
             <if test="workOrderId != null and workOrderId == 'true'">
                 AND wo.id is not null
@@ -285,7 +347,162 @@
                     #{item}
                 </foreach>
             </if>
-
+            <if test="nationalStandardCode != null">
+                AND ai.national_standard_code like concat('%',#{nationalStandardCode},'%')
+            </if>
+            <if test="serialNum != null">
+                AND ai.serial_num like concat('%',#{serialNum},'%')
+            </if>
+            <if test="manufacture != null">
+                AND ai.manufacture like concat('%',#{manufacture},'%')
+            </if>
+            <if test="subjectProject != null">
+                AND ai.subject_project like concat('%',#{subjectProject},'%')
+            </if>
+            <if test="aliasName != null">
+                AND ai.alias_name like concat('%',#{aliasName},'%')
+            </if>
+            <if test="assetOwnerName != null">
+                AND ai.asset_owner_name like concat('%',#{assetOwnerName},'%')
+            </if>
+            <if test="assetOwnerTel != null">
+                AND ai.asset_owner_tel like concat('%',#{assetOwnerTel},'%')
+            </if>
+            <if test="assetOwnerName2 != null">
+                AND ai.asset_owner_name2 like concat('%',#{assetOwnerName2},'%')
+            </if>
+            <if test="assetOwnerTel2 != null">
+                AND ai.asset_owner_tel2 like concat('%',#{assetOwnerTel2},'%')
+            </if>
+            <if test="assetOwnerName3 != null">
+                AND ai.asset_owner_name3 like concat('%',#{assetOwnerName3},'%')
+            </if>
+            <if test="assetOwnerTel3 != null">
+                AND ai.asset_owner_tel3 like concat('%',#{assetOwnerTel3},'%')
+            </if>
+            <if test="clinicalOwnerName != null">
+                AND ai.clinical_owner_name like concat('%',#{clinicalOwnerName},'%')
+            </if>
+            <if test="clinicalOwnerTel != null">
+                AND ai.clinical_owner_tel like concat('%',#{clinicalOwnerTel},'%')
+            </if>
+            <if test="assetUsage != null">
+                AND ai.asset_usage =  CAST( #{assetUsage} AS integer)
+            </if>
+            <if test="assetValueCategory != null">
+                AND ai.asset_value_category =   #{assetValueCategory}
+            </if>
+            <if test="capitalSource != null">
+                AND ai.capital_source =  CAST( #{capitalSource} AS integer)
+            </if>
+            <if test="capitalSource2 != null">
+                AND ai.capital_source2 = CAST( #{capitalSource2} AS integer)
+            </if>
+            <if test="measureGrade != null">
+                AND ai.measure_grade = CAST( #{measureGrade} AS integer)
+            </if>
+            <if test="riskGrade != null">
+                AND ai.risk_grade = CAST( #{riskGrade} AS integer)
+            </if>
+            <if test="modalityId != null">
+                AND ai.modality_id  like concat('%',#{modalityId},'%')
+            </if>
+            <if test="deviceStatus != null">
+                AND ai.device_status  = CAST( #{deviceStatus} AS integer)
+            </if>
+            <if test="registrationNo != null">
+                AND ai.registration_no  like concat('%',#{registrationNo},'%')
+            </if>
+            <if test="emergencyEquipment != null">
+                AND ai.emergency_equipment  = CAST(#{emergencyEquipment} AS integer)
+            </if>
+            <if test="importEquipment != null">
+                AND ai.import_equipment  =CAST( #{importEquipment} AS integer)
+            </if>
+            <if test="systemId != null">
+                AND ai.system_id  like concat('%',#{systemId},'%')
+            </if>
+            <if test="measuringItemCategory != null">
+                AND ai.measuring_item_category  = CAST( #{measuringItemCategory} AS integer)
+            </if>
+            <if test="accountingCategory != null">
+                AND ai.accounting_category  = CAST( #{accountingCategory} AS integer)
+            </if>
+            <if test="functionGroup != null">
+                AND ai.function_group  = CAST( #{functionGroup} AS integer)
+            </if>
+            <if test="assetCode68 != null">
+                AND ai.asset_code68  = CAST(#{assetCode68} AS integer)
+            </if>
+            <if test="functionGrade != null">
+                AND ai.function_grade  =CAST( #{functionGrade} AS integer)
+            </if>
+            <if test="proprietaryClass != null">
+                AND ai.proprietary_class  = #{proprietaryClass}
+            </if>
+            <if test="maitanance != null">
+                AND ai.maitanance  = #{maitanance}
+            </if>
+            <if test="maitananceTel != null">
+                AND ai.maitanance_tel  = #{maitananceTel}
+            </if>
+            <if test="barcode != null">
+                AND ai.barcode   like concat('%',#{barcode},'%')
+            </if>
+            <if test="locationCode != null">
+                AND ai.location_code  like concat('%',#{locationCode},'%')
+            </if>
+            <if test="locationName != null">
+                AND ai.location_name  like concat('%',#{locationName},'%')
+            </if>
+            <if test="purchasePrice != null">
+                AND ai.purchase_price  = CAST(#{purchasePrice}  AS numeric)
+            </if>
+            <if test="salvageValue != null">
+                AND ai.salvage_value  =  CAST(#{salvageValue}  AS numeric)
+            </if>
+            <if test="lifecycle != null">
+                AND ai.lifecycle  = CAST( #{lifecycle} AS integer)
+            </if>
+            <if test="warrantyMonth != null">
+                AND ai.warranty_month  = CAST( #{warrantyMonth} AS integer)
+            </if>
+            <if test="depreciationMethod != null">
+                AND ai.depreciation_method  = CAST( #{depreciationMethod} AS integer)
+            </if>
+            <if test="assetGroupSecondary != null">
+                AND ai.asset_group_secondary  = #{assetGroupSecondary}
+            </if>
+            <if test="deviceName != null">
+                AND ai.devic_name  = #{deviceName}
+            </if>
+            <if test="repairForm != null">
+                AND ai.repair_form  = CAST( #{repairForm} AS integer)
+            </if>
+            <if test="comments != null">
+                AND ai.comments   like concat('%',#{comments},'%')
+            </if>
+            <if test="isPm != null">
+                AND ai.is_pm  = #{isPm}
+            </if>
+            <if test="isChecked != null">
+                AND ai.is_checked  = #{isChecked}
+            </if>
+            <if test="pmOwnerName != null">
+                AND ai.pm_owner_name  like concat('%',#{pmOwnerName},'%')
+            </if>
+            <if test="pmOwnerTel != null">
+                AND ai.pm_owner_tel  = #{pmOwnerTel}
+            </if>
+            <if test="terminationCause != null">
+                AND ai.termination_cause  = #{terminationCause}
+            </if>
+            <if test="usageStatus != null">
+                AND ai.usage_status  = CAST( #{usageStatus} AS integer)
+            </if>
+            <if test="terminateOperation != null">
+                AND al.modify_by  like concat('%',#{terminateOperation},'%')
+            </if>
             <if test="selectSite != null">
                 AND (
                 ai.institution_uid IN  #{selectSite}
@@ -297,6 +514,52 @@
         </where>
     </sql>
 
+    <select id="queryAssetInfo" resultMap="assetBean">
+
+
+        select
+
+        ai.id,
+        ai.uid,
+        ai.name,
+        ai.serial_num,
+        ai.financing_num,
+        ai.qr_code,
+        ai.function_type,
+        ai.asset_group,
+        ai.clinical_dept_name,
+        ai.measure_grade,
+        ai.measuring_item_category,
+        ai.make_short_name ,
+        ai.manufacture,
+        ai.asset_classification32
+
+
+
+            from asset_info       ai
+        <where>
+            ai.tenant_uid = #{tenantUid}
+            and ai.site_uid=#{siteUid}
+            <if test="clinicalDeptUid != null">
+                AND ai.clinical_dept_uid =#{clinicalDeptUid}
+            </if>
+            <if test="name != null">
+                AND ai.name like concat('%',#{name},'%')
+            </if>
+
+            <if test="functionType != null">
+                AND ai.function_type like concat('%',#{functionType},'%')
+            </if>
+
+            <if test="makerShortName != null">
+                AND ai.make_short_name like concat('%',#{makerShortName},'%')
+            </if>
+            <if test="manufacture != null">
+                AND ai.manufacture like concat('%',#{manufacture},'%')
+            </if>
+        </where>
+
+    </select>
 
 
 </mapper>

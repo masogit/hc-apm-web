@@ -6,6 +6,8 @@
 package com.ge.apm.view.asset;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,14 +20,17 @@ import javax.faces.event.ValueChangeEvent;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
+import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -169,12 +174,14 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     private SystemTemplateService systemTemplateService;
     private MicroServiceUtil msService;
-
+    private MasterDataService masterDataService;
 
     @Getter @Setter
     private Map<String, Boolean> arrivalRequireField = new HashMap<>();
 
-
+    @Getter
+    @Setter
+    private SelectItemDto selectItemDto;
     @Override
     protected GenericRepositoryUUID<ArrivalList> getDAO() {
         return arrivalListDao;
@@ -222,6 +229,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         msService = WebUtil.getBean(MicroServiceUtil.class);
+        masterDataService = WebUtil.getBean(MasterDataService.class);
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
             AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(assetTypeGroup, arrivalListItem.getTenantUid());
@@ -271,6 +279,9 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
         getParentAssetList();
         selectedObjectMap.put("selectedOrg", orgInfoRepository.findByUid(arrivalList.getSiteUID()));
+        if(arrivalListItem.getAssetClassification32()!=null){
+            selectItemDto=new SelectItemDto(arrivalListItem.getAssetClassification32(),null);
+        }
     }
 
     public void requiredInput(String encoded, CustomConfigAssetField customConfigAssetField) {
@@ -1344,5 +1355,21 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     public List<SystemTemplate> getArrivalAcceptanceReportList() {
         return systemTemplateService.findByKeyAndSiteForUseParent(SystemTemplateEnum.ARRIVAL_ACCEPTANCE_REPORT.getCode(),loginUser);
+    }
+    public void assetClassification32Change() {
+        if(selectItemDto!=null){
+            arrivalListItem.setAssetClassification32(selectItemDto.getLabel());
+        }
+    }
+    public  List<SelectItemDto>  autoAssetClassification32() {
+
+        AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setBrand(arrivalListItem.getBrand());
+        assetClassificationModel.setPattern(arrivalListItem.getFunctionType());
+        assetClassificationModel.setSourceName(arrivalListItem.getAliasName());
+        assetClassificationModel.setFactory(null);
+
+        return    masterDataService.autoAssetClassification32(assetClassificationModel);
+
     }
 }

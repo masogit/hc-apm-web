@@ -3,6 +3,7 @@ package com.ge.apm.domain.pure;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.pm.V2PmOrderController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -29,6 +30,7 @@ public class PmExportFormatter<T> {
     private List<I18nMessage> i18PmtypeList=null;
     private List<I18nMessage> i18OrderTypeList=null;
     private List<I18nMessage> i18nRuleLevel=null;
+    private List<I18nMessage> i18nAssetGroup=null;
     private V2_PmOrder v2_pmOrder;
     private String type = null;
 
@@ -42,15 +44,17 @@ public class PmExportFormatter<T> {
         this.creator = v2_pmOrder.getCreatorName();
     }
     I18nMessageRepository I18dao = null;
+    I18nMessageService i18nMessageService;
 
     public PmExportFormatter(V2_PmOrder v2_pmOrder) {
         this.v2_pmOrder = v2_pmOrder;
         I18dao = WebUtil.getBean(I18nMessageRepository.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         i18PmtypeList =I18dao.getByMsgType("pmType");
         i18OrderTypeList  =I18dao.getByMsgType("intExtType");
         i18nRuleLevel  =I18dao.getByMsgType("ruleLevelFour");
-
+        i18nAssetGroup  = i18nMessageService.getByMsgType("assetGroup");
         v2PmOrderController = WebUtil.getBean(V2PmOrderController.class);
         pmOrderRule = v2PmOrderController.getRulePm(v2_pmOrder);
     }
@@ -75,6 +79,8 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
+            map.put(ExportFields.FUNCTIONTYPE.getChinese(), this.getFunctionType());
+            map.put(ExportFields.ASSETGROUP.getChinese(),this.getFromI18(i18nAssetGroup,v2_pmOrder.getAssetInfo().getAssetGroup()));
 //            if("1".equals(this.getRuleLevel())){
 //                map.put(ExportFields.RUNLEVEL.getChinese(), "巡检");
 //            }else if("4".equals(this.getRuleLevel())){
@@ -94,6 +100,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ORDERTYPE.getChinese(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
             map.put(ExportFields.ORDERCOMMENTS.getChinese(), this.getComments());
             map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
+            map.put(ExportFields.TRAVELTIME.getChinese(), this.getTravelTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getChinese(), this.getActualCompletionTime());
             }
@@ -104,6 +111,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ASSETNAME.getEnglish(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getEnglish(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getEnglish(), this.getAssetNumber());
+            map.put(ExportFields.FUNCTIONTYPE.getEnglish(), this.getFunctionType());
             if("1".equals(this.getRuleLevel())){
                 map.put(ExportFields.RUNLEVEL.getEnglish(), "巡检");
             }else if("4".equals(this.getRuleLevel())){
@@ -111,6 +119,8 @@ public class PmExportFormatter<T> {
             }else {
                 map.put(ExportFields.RUNLEVEL.getEnglish(), this.getRuleLevel());
             }
+            map.put(ExportFields.ASSETGROUP.getEnglish(),this.getFromI18(i18nAssetGroup,v2_pmOrder.getAssetInfo().getAssetGroup()));
+
             map.put(ExportFields.PMTYPE.getEnglish(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getEnglish(), this.getClincialName());
             map.put(ExportFields.PMRULE.getEnglish(), this.getRuleName());
@@ -122,6 +132,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ORDERTYPE.getEnglish(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
             map.put(ExportFields.ORDERCOMMENTS.getEnglish(), this.getComments());
             map.put(ExportFields.PLANTIME.getEnglish(), this.getPlanTime());
+            map.put(ExportFields.TRAVELTIME.getEnglish(), this.getTravelTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getEnglish(), this.getActualCompletionTime());
             }
@@ -212,7 +223,9 @@ public class PmExportFormatter<T> {
     public String getAssetNumber() {
         return v2_pmOrder.getAssetInfo().getDepartNum();
     }
-
+    public String getFunctionType() {
+        return v2_pmOrder.getAssetInfo().getFunctionType();
+    }
     public void setAssetNumber(String assetNumber) {
         this.assetNumber = assetNumber;
     }
@@ -254,5 +267,11 @@ public class PmExportFormatter<T> {
         return orderType;
 
     }*/
+
+
+    public Double getTravelTime() {
+        return v2_pmOrder.getTravelTime();
+    }
+
 
 }

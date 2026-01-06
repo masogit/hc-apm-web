@@ -1,25 +1,25 @@
 package com.ge.apm.service.common;
 
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.TenantOptionConfigRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.TenantOptionConfig;
-import com.ge.apm.domain.WorkflowConfig;
+import com.alibaba.fastjson.JSONArray;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedasset.SharedAssetService;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import webapp.framework.dao.SearchFilter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -27,6 +27,7 @@ import java.util.Optional;
  */
 @Component
 public class ConfigCacheService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigCacheService.class);
 
     @Autowired
     private WorkflowConfigRepository configDao;
@@ -42,6 +43,9 @@ public class ConfigCacheService {
 
     @Autowired
     private SharedAssetService remoteService;
+
+    @Autowired
+    private AdminFeatureActiveRepository adminFeatureActiveRepository;
 
     @Cacheable(cacheNames = "springCache", key = "'OrgInfo_Uid.'+#uid")
     public OrgInfo findOrgByUid(String uid){
@@ -107,5 +111,42 @@ public class ConfigCacheService {
     @CacheEvict(cacheNames = "springCache", allEntries = true)
     public void cleanCacheNames(){
         remoteService.asynRemoteCall(GatewayURL.CLEAN_CACHE_NAMES, HttpMethod.POST,new HashMap<>(),(url)->url);
+    }
+
+    @PostConstruct
+    public void initTenantInfo(){
+        initialActiveFeature();
+    }
+
+    private void initialActiveFeature(){
+        LOGGER.info("同步 tenant feature active start");
+        String featureKey = ApmFeature.HISPERFORMANCE.name();
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        searchFilterList.add(new SearchFilter("featureKey", SearchFilter.Operator.EQ,featureKey));
+        List<AdminFeatureActive> adminFeatureActives = adminFeatureActiveRepository.findBySearchFilter(searchFilterList);
+        if(!CollectionUtils.isEmpty(adminFeatureActives)) return;
+        searchFilterList.clear();
+        searchFilterList.add(new SearchFilter("featureList", SearchFilter.Operator.LIKE,featureKey));
+        List<TenantInfo> tenantInfos = tenantDao.findBySearchFilter(searchFilterList);
+        if(CollectionUtils.isEmpty(tenantInfos)) return;
+        for (TenantInfo tenantInfo : tenantInfos) {
+            createAdminFeatureActive(tenantInfo,featureKey);
+        }
+        LOGGER.info("同步 tenant feature active end");
+    }
+    private void createAdminFeatureActive(TenantInfo tenantInfo,String featureKey){
+        List<OrgInfo> orgInfos = orgDao.findByTenantUIDAndOrgType(tenantInfo.getUid(),2);
+        List<AdminFeatureActive> adminFeatureActives = orgInfos.stream().map(item -> {
+            AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+            adminFeatureActive.setFeatureKey(featureKey);
+            adminFeatureActive.setActiveRole("SuperAdmin");
+            adminFeatureActive.setTenantUID(item.getTenantUID());
+            adminFeatureActive.setHospitalUID(item.getHospitalUID());
+            adminFeatureActive.setCreateDate(new Date());
+            adminFeatureActive.setActiveDate(new Date());
+            LOGGER.info("同步 tenant feature active end orgName:{}", item.getName());
+            return adminFeatureActive;
+        }).collect(Collectors.toList());
+        adminFeatureActiveRepository.save(adminFeatureActives);
     }
 }

@@ -14,14 +14,12 @@
         <p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}">
             <h:outputText value="#{item.qrCode}" />
         </p:column>
-        <p:column headerText="#{msg.clinicalDeptName}">
-            <f:facet name="header">
-                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                <p:autoComplete dropdown="true" value="#{inventoryOrderDetailAssetInfoController2.filterClinicalDeptOrg}" appendTo="@(Body)"
-                                scrollHeight="300"  forceSelection="true" completeMethod="#{inventoryOrderDetailAssetInfoController2.autoCompleteDeptName}" size="5">
-                    <p:ajax event="itemSelect" listener="#{inventoryOrderDetailAssetInfoController2.onClinicalDeptNameFilterChange}" process="@this" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"/>
-                    <p:ajax process="@this" listener="#{inventoryOrderDetailAssetInfoController2.onClinicalDeptNameFilterChange}" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"/>
-                </p:autoComplete>
+        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;" filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{inventoryOrderDetailAssetInfoController3.listClinicalDeptName}" />
+                </p:selectOneMenu>
             </f:facet>
             <h:outputText value="#{item.orgName}" />
         </p:column>
@@ -56,7 +54,7 @@
             </p:commandButton>
         </p:column>
 		<f:facet name="{Toolbar}">
-            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.BatchDelete}" process="@this" update=":growl :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"
+            <p:commandButton id="bathDeleteButton" icon="ui-icon-delete" class="btnEdit" title="#{msg.BatchDelete}" update=":growl :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3"
                              rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_NO_LEDGER_DELETE')}" disabled="#{not empty inventoryOrderDetailAssetInfoController3.inventoryOrder and inventoryOrderDetailAssetInfoController3.inventoryOrder.isFinished}" validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoController3.bathDelete()}">
                 <p:confirm header="#{msg.DeleteConfirmation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
             </p:commandButton>

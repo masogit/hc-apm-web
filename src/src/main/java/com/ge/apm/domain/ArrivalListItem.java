@@ -472,6 +472,9 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "out_stock_business_date")
     private Date outStockBusinessDate;
 
+    @Column(name = "asset_classification32")
+    private String assetClassification32;
+
     public String getInStockNo() {
         return inStockNo;
     }
@@ -1280,5 +1283,13 @@ public class ArrivalListItem implements Serializable {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public String getAssetClassification32() {
+        return assetClassification32;
+    }
+
+    public void setAssetClassification32(String assetClassification32) {
+        this.assetClassification32 = assetClassification32;
     }
 }

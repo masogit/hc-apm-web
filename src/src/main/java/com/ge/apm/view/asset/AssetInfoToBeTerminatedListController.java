@@ -17,6 +17,7 @@ import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -34,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -43,6 +45,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,6 +153,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         return dao;
     }
 
+    private List<Field> fieldList = new ArrayList<>();
+
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+
     @Override
     protected void init() {
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
@@ -180,6 +189,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         this.selectedObject = new HashMap<>();
         loadCustomConfig();
         loadClinicalDeptList();
+        fieldList = Arrays.stream(AssetInfo.class.getDeclaredFields()).collect(Collectors.toList());
 
     }
 
@@ -227,7 +237,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         if(lastPageSort==null){
             sql="order by al.create_time desc nulls last";
         }else{
-            switch (lastPageSort.iterator().next().getProperty()) {
+            String property = lastPageSort.iterator().next().getProperty();
+            switch (property) {
                 case "namePyCode":
                     sql="order by ai.name_py_code ";
                     break;
@@ -253,7 +264,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                     sql="order by ai.vendor ";
                     break;
                 case "subjectProject":
-                    sql="ai.subject_project ";
+                    sql=" order by ai.subject_project ";
                     break;
                 case "warrantyDate":
                     sql="order by ai.warranty_date ";
@@ -291,9 +302,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 case "proprietaryClass":
                     sql="order by ai.proprietary_class ";
                     break;
-
-
                 default:
+                    sql="order by "+ StringUtil.camelToSnakeOptimized(property)+" ";
                     break;
 
             }
@@ -590,6 +600,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     public void exportExcel() throws IOException {
 
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        insertCrossSiteColumns(exportFields);
+
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
@@ -601,6 +613,14 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        List<String> assetSheetHeads = template.getAssetSheetHead();
+        if(CollectionUtils.isNotEmpty(assetSheetHeads)){
+            List<String> finalExportFields = exportFields;
+            exportFields= assetSheetHeads.stream().filter(finalExportFields::contains).collect(Collectors.toList());
+            if(!exportFields.contains("UUID")){
+                exportFields.add("UUID");
+            }
+        }
         template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -608,6 +628,17 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
 
+    private void insertCrossSiteColumns(List<String> exportFields) {
+        String hospitalColumn = WebUtil.getMessage("hospitalId");
+        int siteIndex = exportFields.indexOf(hospitalColumn);
+        if (siteIndex == -1){
+            return;
+        }
+        // 增加医院列
+        exportFields.add(siteIndex, WebUtil.getMessage("Hospital"));
+        // 增加集团列
+        exportFields.add(exportFields.size(), WebUtil.getMessage("Institution"));
+    }
     public boolean isChecked() {
         return selectedMap.containsValue(true);
     }
@@ -1078,17 +1109,49 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 case "terminationCause":
                     param.put("terminationCause", searchFilter.value);
                     break;
-                case "warrantyDate":
-                    param.put("warrantyDate", searchFilter.value);
-                    break;
                 case "workOrderId":
                     param.put("workOrderId", searchFilter.value);
                     break;
-
-
-
-                default:
+                case "terminateOperation":
+                    param.put("terminateOperation", searchFilter.value);
                     break;
+                default:
+                Optional<Field> firstField = fieldList.stream().filter(item -> item.getName().equalsIgnoreCase(fieldName)).findFirst();
+                if(firstField.isPresent()){
+                    Field field = firstField.get();
+                    String name = field.getName();
+                    Class<?> type = field.getType();
+                    if(name.equals("warrantyDate")){
+                        String[] split = filterWarrantyDate.split("~");
+                        try {
+                            if(ObjectUtil.isNotEmpty(split[0])){
+                                param.put(name, format.parse(split[0]));
+                                param.put(name+"1", format.parse(split[1]));
+                            }else{
+                                param.put(name, format.parse(split[1]));
+                            }
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }else if (type == Date.class){
+                        String filterDate =(String) selectedObject.get(name);
+                        String[] split = filterDate.split("~");
+                        try {
+                            if(ObjectUtil.isNotEmpty(split[0])){
+                                param.put(name, format.parse(split[0]));
+                                param.put(name+"1", format.parse(split[1]));
+                            }else{
+                                param.put(name, format.parse(split[1]));
+                            }
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }else{
+                        param.put(name,  searchFilter.value);
+                    }
+
+                }
+                break;
             }
         }
 

@@ -166,10 +166,12 @@
                 <p:fieldset>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmEntryTypeSet').fieldColumnDto.entryType}" style="width: 75%;" >
+                            <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmEntryTypeSet').fieldColumnDto.entryType}"  layout="pageDirection" styleClass="vertical-radio-aligned">
                                 <p:ajax update="manHoursGroup"/>
                                 <f:selectItem itemLabel="#{msg.addManHoursSection}" itemValue="1"/>
                                 <f:selectItem itemLabel="#{msg.enterTotalManHours}" itemValue="0"/>
+                                <f:selectItem itemLabel="#{msg.totalHoursWorkedOnly}" itemValue="2"/>
+                                <f:selectItem itemLabel="#{msg.duringWorkingHoursOnly}" itemValue="3"/>
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup id="manHoursGroup" >
@@ -202,7 +204,79 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('defaultMaintainPerson'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('defaultMaintainPerson').configItemValue == null}"/>
             </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').name.concat('(').concat(systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('pmOrderShowTravelTime'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('pmOrderShowTravelTime'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').configItemValue == null}"/>
+            </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('disableBatchAcceptOrder').name.concat('(').concat(systemConfigItemController.configItemMap.get('disableBatchAcceptOrder').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('disableBatchAcceptOrder').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('disableBatchAcceptOrder'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('disableBatchAcceptOrder'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('disableBatchAcceptOrder').configItemValue == null}"/>
+            </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('PmOrderDetailViewType').name.concat('(').concat(systemConfigItemController.configItemMap.get('PmOrderDetailViewType').key).concat(')')}</label>
+                <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('PmOrderDetailViewType').showValue}" style="width: 50%;">
+                    <f:selectItems value="#{systemConfigItemController.configItemMap.get('PmOrderDetailViewType').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('PmOrderDetailViewType'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('PmOrderDetailViewType'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('PmOrderDetailViewType').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('pmOrderCreateByCycle').name.concat('(').concat(systemConfigItemController.configItemMap.get('pmOrderCreateByCycle').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmOrderCreateByCycle').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}"  oncomplete="PF('pmOrderCreateByCycleDlg').show()"  update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}"  oncomplete="PF('pmOrderCreateByCycleDlg').show()"  actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('pmOrderCreateByCycle'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('pmOrderCreateByCycle').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
+        <p:dialog id="pmOrderCreateByCycleDlg" widgetVar="pmOrderCreateByCycleDlg" modal="true" resizable="true" draggable="true" width="30%" height="200px" header="#{msg.BatchConfigMaintenanceRule}">
+            <h:form id="pmOrderCreateByCycleForm" class="bcls">
+
+
+                <p:panelGrid  columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    取消所有周期性工单
+                </p:panelGrid>
+                <h:panelGroup>
+                    <p:commandButton  actionListener="#{systemConfigItemController.pmOrderCreateByCycleDlg(systemConfigItemController.configItemMap.get('pmOrderCreateByCycle'))}" value="#{msg.Save}" icon="ui-icon-check" update=":configItemForm"/>
+                    <p:commandButton  value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('pmOrderCreateByCycleDlg').hide()" update=":configItemForm"  />
+                </h:panelGroup>
+                <br/>
+            </h:form>
+        </p:dialog>
     </ui:composition>
 
 </html>

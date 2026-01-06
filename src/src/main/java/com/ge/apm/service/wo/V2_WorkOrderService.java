@@ -11,6 +11,7 @@ import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
@@ -458,7 +459,7 @@ public class V2_WorkOrderService {
         //【最新进展】
         formData.setComment(selectedWorkOrder.getComment());
 
-        if(selectedWorkOrder.getEntryType() == 1){
+        if(selectedWorkOrder.getEntryType() == 1 || selectedWorkOrder.getEntryType() == 3 ){
             formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
         }
         if (null != confirmedUpTime) {
@@ -484,12 +485,27 @@ public class V2_WorkOrderService {
             formData.setComName(externalTempUser.getComName());
             formData.setTel(externalTempUser.getTel());
         }
+        formData.setTravelTime(selectedWorkOrder.getTravelTime());
+        normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "保存"));
         }
     }
-
+    private void normalizeEntryType(WorkOrderActionForm formData) {
+        if (formData.getCoworkerEntryType() != null) {
+            int type = formData.getCoworkerEntryType();
+            if (type == 2 || type == 3) {
+                formData.setCoworkerEntryType(type - 2);
+            }
+        }
+        if (formData.getEntryType() != null) {
+            int type = formData.getEntryType();
+            if (type == 2 || type == 3) {
+                formData.setEntryType(type - 2);
+            }
+        }
+    }
 
 
     public void repairWorkOrder(V2_WorkOrder selectedWorkOrder,String assignId, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, String comments, List<V2_BlobObject> attachments) {
@@ -526,7 +542,7 @@ public class V2_WorkOrderService {
         formData.setEntryType(selectedWorkOrder.getEntryType());
         formData.setCoworkerEntryType(selectedWorkOrder.getCoworkerEntryType());
         formData.setWorkOrderType(selectedWorkOrder.getWorkOrderType());
-        if(selectedWorkOrder.getEntryType() == 1){
+        if(selectedWorkOrder.getEntryType() == 1 || selectedWorkOrder.getEntryType() == 3){
             formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
         }
         //【最新进展】
@@ -537,6 +553,8 @@ public class V2_WorkOrderService {
             formData.setComName(externalTempUser.getComName());
             formData.setTel(externalTempUser.getTel());
         }
+        formData.setTravelTime(selectedWorkOrder.getTravelTime());
+        normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "完成"));
@@ -750,11 +768,11 @@ public class V2_WorkOrderService {
                     try {
                         V2_WorkOrder workOrder = woDao.findById(id);
                         List<V2_BlobObject> byBoUuid = blobDao.findByBoUuid(workOrder.getServiceRequest().getId());
-                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
-                            byBoUuid = byBoUuid.stream()
-                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
-                                    .collect(Collectors.toList());
-                        }
+//                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
+//                            byBoUuid = byBoUuid.stream()
+//                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
+//                                    .collect(Collectors.toList());
+//                        }
                         for (V2_BlobObject v2BlobObject : byBoUuid) {
                             String vname = v2BlobObject.getObjectName();
                             zout.putNextEntry(new ZipEntry(vname));

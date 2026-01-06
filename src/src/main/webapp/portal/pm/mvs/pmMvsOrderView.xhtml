@@ -94,7 +94,7 @@
                             </div>
                         </div>
                     </div>
-                    <p:dataGrid id="pictureMvsList" var="fileitem" value="#{v2PmOrderMvsController.picList}" columns="5" layout="grid" rendered="#{ empty v2PmOrderMvsController.attachListEhome}">
+                    <p:dataGrid id="pictureMvsList" var="fileitem" value="#{v2PmOrderMvsController.picList}" columns="5" layout="grid" rendered="#{ empty v2PmOrderMvsController.attachListEhome}"  emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
@@ -108,7 +108,7 @@
                     </p:dataGrid>
                     <!--E 家图片附件显示-->
                     <!--e家图片附件显示-->
-                    <p:dataGrid var="woAttachItemE" value="#{v2PmOrderMvsController.attachListEhome}" columns="4" layout="grid" rendered="#{not empty v2PmOrderMvsController.attachListEhome}">
+                    <p:dataGrid var="woAttachItemE" value="#{v2PmOrderMvsController.attachListEhome}" columns="4" layout="grid" rendered="#{not empty v2PmOrderMvsController.attachListEhome}" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <!-- 非 IMG 类型的面板 -->
                         <p:panel style="text-align:center"
@@ -124,7 +124,7 @@
                         <p:panel style="text-align:center"
                                  rendered="#{woAttachItemE.boType == 'IMG'}">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:ajax  event="click" update="pmTab:previewedDlgEhome" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(v2PmOrderMvsController,woAttachItemE.objectStorageId)}"/>
+                                <p:ajax  event="click" update="#{v2PmOrderMvsController.pageType eq 'current' ? 'pmTab:previewedDlgEhome' : ':previewedDlgEhome'}" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(v2PmOrderMvsController,woAttachItemE.objectStorageId)}"/>
                                 <p:graphicImage value="#{fileDownloadService.getFile(woAttachItemE.objectStorageId)}"
                                                 height="80" width="100" stream="false"/>
                                 <p:commandLink validateClient="false" immediate="true" process="@this"
@@ -224,7 +224,7 @@
                     </h:panelGroup>
 
 
-                    <p:dataGrid id="partMvsPictureList" var="fileitem" value="#{v2PmOrderMvsController.getPartPictures(v2PmOrderMvsController.selected.id)}" columns="5" layout="grid">
+                    <p:dataGrid id="partMvsPictureList" var="fileitem" value="#{v2PmOrderMvsController.getPartPictures(v2PmOrderMvsController.selected.id)}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >

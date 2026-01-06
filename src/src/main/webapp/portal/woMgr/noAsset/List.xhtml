@@ -11,7 +11,7 @@
 						<p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet" disabled="#{serviceRequestNoAssetController.queryIndex==0}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" action="List.xhtml?faces-redirect=true&amp;query=0" />
 						<p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet createSrNoAssetDialog" actionListener="#{serviceRequestNoAssetController.createServiceRequest()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CREATE')}" oncomplete="PF('createSrNoAssetDialog').show()"/>
 						<p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=1" disabled="#{serviceRequestNoAssetController.queryIndex==1}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" onclick="onButtonChange()"  />
-						<p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=2"  disabled="#{serviceRequestNoAssetController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}"/>
+						<p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=2"  disabled="#{serviceRequestNoAssetController.queryIndex==2}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_NO_ASSET_ORDER_MOBILE_DISPATCH')}"/>
 						<p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet" action="List.xhtml?faces-redirect=true&amp;query=3"  disabled="#{serviceRequestNoAssetController.queryIndex==3}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
 						<p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=4"  disabled="#{serviceRequestNoAssetController.queryIndex==4}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
 						<p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet " action="List.xhtml?faces-redirect=true&amp;query=5"  disabled="#{serviceRequestNoAssetController.queryIndex==5}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
@@ -53,6 +53,10 @@
 						<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetName}"/>
 						</p:column>
+
+						<p:column headerText="#{msg.financingNum}" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.financingNum}"/>
+						</p:column>
 						<p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
 							<f:facet name="filter" >
 								<p:selectOneMenu onchange="PF('varDataList').filter()" value="#{serviceRequestNoAssetController.siteUidFilter}">
@@ -92,11 +96,38 @@
 						<p:column headerText="#{msg.requestReason}" sortBy="#{item.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
 							<h:outputText value="#{serviceRequestNoAssetController.getRequestReasonInShort(item.requestReason)}" title="#{item.requestReason}"/>
 						</p:column>
-						<p:column  headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+
+						<p:column rendered="#{serviceRequestNoAssetController.queryIndex eq 11 }" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepId}" filterMatchMode="EQ">
+
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" >
+									<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+									<f:selectItem itemLabel="待派工" itemValue="2" />
+									<f:selectItem itemLabel="待接单" itemValue="3" />
+									<f:selectItem itemLabel="待关单" itemValue="4" />
+									<f:selectItem itemLabel="已关单" itemValue="5" />
+									<f:selectItem itemLabel="已取消" itemValue="9" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText  value="#{serviceRequestNoAssetController.getStepName(item)}"/>
+
+						</p:column>
+						<p:column rendered="#{serviceRequestNoAssetController.queryIndex ne 11 }"  headerText="#{msg.currentStep}" width="186">
 							<h:outputText  value="#{serviceRequestNoAssetController.getStepName(item)}"/>
 						</p:column>
-						<p:column  headerText="是否已转成有台账报修" >
+						<p:column  headerText="是否已转成有台账报修" filterBy="#{item.srId}" filterMatchMode="EQ">
 							<h:outputText value="#{serviceRequestNoAssetController.getTurnWoFlag(item)}"/>
+
+							<f:facet name="filter">
+								<f:facet name="filter">
+									<p:selectOneMenu onchange="PF('varDataList').filter()">
+										<f:converter converterId="javax.faces.Boolean" />
+										<f:selectItem itemLabel="#{msg.All}" itemValue="" />
+										<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+										<f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+									</p:selectOneMenu>
+								</f:facet>
+							</f:facet>
 						</p:column>
 						<!-- 已报修 -->
 						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{serviceRequestNoAssetController.queryIndex==1 }">
@@ -117,10 +148,15 @@
 						<!-- 待关单 -->
 						<p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE') and serviceRequestNoAssetController.queryIndex==4}">
 							<p:commandButton value="关  单" style="width: 70px;" actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" />
-							<p:commandButton value="转台账" actionListener="#{serviceRequestNoAssetController.prepareTurnWorkOrder(item.id)}" update=":AssetSelectDlg :assetSearchForm" oncomplete="PF('AssetSelectDlg').show()"/>
-							<p:commandButton  value="#{msg.Cancel}"  actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
+							<p:commandButton value="转台账" style="width: 70px;"  actionListener="#{serviceRequestNoAssetController.prepareTurnWorkOrder(item.id)}" update=":AssetSelectDlg :assetSearchForm" oncomplete="PF('AssetSelectDlg').show()"/>
+							<p:commandButton  value="#{msg.Cancel}" style="width: 70px;"   actionListener="#{serviceRequestNoAssetController.prepareAct(item.id)}" update=":cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
 
 						</p:column>
+						<f:facet name="{Toolbar}">
+							<p:commandButton rendered="#{serviceRequestNoAssetController.queryIndex==11}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+								<p:dataExporter type="xls" target="datalist" fileName="无台账记录"  />
+							</p:commandButton>
+						</f:facet>
 					</p:dataTable>
 				</h:form>
 
@@ -245,10 +281,37 @@
 				</h:panelGroup>
 			</h:form>
 		</p:dialog>
-		<p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="300" appendTo="@(body)" header="#{msg.closeWo}" height="180">
+		<p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="600" appendTo="@(body)" header="#{msg.closeWo}" height="580">
 			<h:form id="toCloseDialogForm" >
+
+				<p:fieldset  >
+
 				<h:panelGroup id="display3" rendered="#{not empty serviceRequestNoAssetController.selectedSr}">
-					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+					<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label class="label">#{msg.financingNum}</label>
+							<p:inputText id="financingNum" value="#{serviceRequestNoAssetController.selectedSr.financingNum}"/>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<label class="label">#{msg.functionType}</label>
+							<p:inputText id="functionType" value="#{serviceRequestNoAssetController.selectedSr.functionType}">
+								<p:ajax />
+							</p:inputText>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<label class="label">#{msg.serialNum}</label>
+							<p:inputText id="serialNum" value="#{serviceRequestNoAssetController.selectedSr.serialNum}">
+
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup>
+							<label class="label">#{msg.makerShortName}</label>
+							<p:inputText id="makerShortName" value="#{serviceRequestNoAssetController.selectedSr.makerShortName}">
+								<p:ajax />
+							</p:inputText>
+						</h:panelGroup>
 						<h:panelGroup>
 							<label class="label">#{msg.Remark}</label>
 							<p:inputTextarea  value="#{serviceRequestNoAssetController.comments}" rows="4"  cols="30"  queryDelay="750" minQueryLength="4" maxlength="100"/>
@@ -259,6 +322,7 @@
 					<p:commandButton validateClient="true" actionListener="#{serviceRequestNoAssetController.closeSrNoAsset()}" value="#{msg.closeWo}" update=":toCloseDialogForm :growl :listForm:datalist " icon="ui-icon-check" oncomplete="handleSubmit(args, 'toCloseDialog');"/>
 					<p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{serviceRequestNoAssetController.cancel()}" icon="ui-icon-cancel" onclick="PF('toCloseDialog').hide()"/>
 				</h:panelGroup>
+				</p:fieldset>
 			</h:form>
 		</p:dialog>
 		<ui:include src="srCreate.xhtml" />

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+<ui:composition>
+    <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
+
+        <div id="aiButton" style="position: fixed; bottom: 90px; right: 0px; z-index: 9999;font-size: 20px">
+            <button
+                    style="background-color: white; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);border-radius: 100%;  width: 45px; height: 45px; padding:6px;"
+                    title="点击获取帮助"
+                    onclick="PF('globalHelpDialog').show(); return false;">
+<!--                <svg viewBox="64 64 896 896" width="28" height="28" fill="currentColor" aria-hidden="true">-->
+<!--                    <path d="M300 328a60 60 0 10120 0 60 60 0 10-120 0zM852 64H172c-17.7 0-32 14.3-32 32v660c0 17.7 14.3 32 32 32h680c17.7 0 32-14.3 32-32V96c0-17.7-14.3-32-32-32zm-32 660H204V128h616v596zM604 328a60 60 0 10120 0 60 60 0 10-120 0zm250.2 556H169.8c-16.5 0-29.8 14.3-29.8 32v36c0 4.4 3.3 8 7.4 8h729.1c4.1 0 7.4-3.6 7.4-8v-36c.1-17.7-13.2-32-29.7-32zM664 508H360c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h304c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/>-->
+<!--                </svg>-->
+                <svg version="1.1" id="图层_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     viewBox="0 0 141.7 141.7" style="enable-background:new 0 0 141.7 141.7;" xml:space="preserve">
+                    <style type="text/css">
+                        .st0{opacity:0.2;fill:#5180ce;enable-background:new    ;}
+                        .st1{fill:none;stroke:#5180ce;stroke-width:5;stroke-miterlimit:10;}
+                        .st2{fill:#5180ce;;}
+                    </style>
+                    <g>
+                        <circle class="st0" cx="88.1" cy="85.9" r="38.6"/>
+                        <circle class="st0" cx="48.1" cy="47.3" r="29.4"/>
+                    </g>
+                    <path class="st1" d="M122.1,19.6H19.6c-6.8,0-12.3,5.5-12.3,12.3V105c0,6.8,5.5,12.3,12.3,12.3h13.2c2.4,0,4.4,2.1,4.2,4.5l0,0l-0.9,12.5c0,0,0,0.1,0.1,0l12.2-14.5c1.3-1.6,3.3-2.5,5.4-2.5H122c6.8,0,12.3-5.5,12.3-12.3V31.8C134.2,25.1,128.8,19.6,122.1,19.6z"/>
+                    <g>
+                        <g>
+                            <path class="st2" d="M26.6,103.7L26.6,103.7c-1.9,0-3.4-1.5-3.4-3.4V37.1c0-1.9,1.5-3.4,3.4-3.4l0,0c1.9,0,3.4,1.5,3.4,3.4v63.2C30.1,102.1,28.5,103.7,26.6,103.7z"/>
+                            <path class="st2" d="M65.2,103.7L65.2,103.7c-1.9,0-3.4-1.5-3.4-3.4V37.1c0-1.9,1.5-3.4,3.4-3.4l0,0c1.9,0,3.4,1.5,3.4,3.4v63.2C68.6,102.1,67.1,103.7,65.2,103.7z"/>
+                            <path class="st2" d="M68.6,37.1L68.6,37.1c0-1.9-1.5-3.4-3.4-3.4H26.6c-1.9,0-3.4,1.5-3.4,3.4l0,0c0,1.9,1.5,3.4,3.4,3.4h38.5C67.1,40.4,68.6,38.9,68.6,37.1z"/>
+                            <path class="st2" d="M68.6,75.3L68.6,75.3c0-1.9-1.5-3.4-3.4-3.4H26.6c-1.9,0-3.4,1.5-3.4,3.4l0,0c0,1.9,1.5,3.4,3.4,3.4h38.5C67.1,78.7,68.6,77.2,68.6,75.3z"/>
+                        </g>
+                        <g>
+                            <path class="st2" d="M102.7,103.4L102.7,103.4c-1.9,0-3.4-1.5-3.4-3.4V36.8c0-1.9,1.5-3.4,3.4-3.4l0,0c1.9,0,3.4,1.5,3.4,3.4V100C106,101.9,104.5,103.4,102.7,103.4z"/>
+                            <path class="st2" d="M118.4,36.8L118.4,36.8c0-1.9-1.5-3.4-3.4-3.4H90.2c-1.9,0-3.4,1.5-3.4,3.4l0,0c0,1.9,1.5,3.4,3.4,3.4H115C116.9,40.2,118.4,38.6,118.4,36.8z"/>
+                            <path class="st2" d="M118.4,100.8L118.4,100.8c0-1.9-1.5-3.4-3.4-3.4H90.2c-1.9,0-3.4,1.5-3.4,3.4l0,0c0,1.9,1.5,3.4,3.4,3.4H115C116.9,104.1,118.4,102.6,118.4,100.8z"/>
+                        </g>
+                    </g>
+                </svg>
+            </button>
+
+        </div>
+        <!-- 对话框中的 iframe：使用预加载好的实例 position="right top"-->
+        <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
+                  position="right top" positionType="fixed" header="APM助手" modal="false"
+                  resizable="false" draggable="true" closable="true" fitViewport="true"
+                  width="500" style="z-index: 10000;"  maximizable="true"
+        >
+            <div style="height: 700px;width: 100%;overflow: hidden">
+                <!-- 初始为空，onShow 时填入预加载的 iframe -->
+                <div id="aiAssistantContainer" style="width: 100%; height: 100%;min-height: 600px"></div>
+            </div>
+
+
+        </p:dialog>
+
+        <h:outputScript>
+            function movePreloadedIframe() {
+                var container = document.getElementById('aiAssistantContainer');
+                if (container.children.length === 0) {
+                    var preloaded = document.getElementById('aiAssistantPreload');
+                    if (preloaded) {
+                        // 设置正确尺寸并移入容器
+                        preloaded.style.cssText = 'width:100%; height:100%; border:none;';
+                        container.appendChild(preloaded);
+                    }
+                }
+            }
+            (function() {
+                    var preloadFrame = document.createElement('iframe');
+                    preloadFrame.id = 'aiAssistantPreload';
+                    preloadFrame.src = '/wx/acctChatbot?cache=true&amp;view=webpage';
+                    preloadFrame.style.cssText = 'position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0;';
+                    preloadFrame.onload = function() {
+                        console.log('AI 助手预加载完成');
+                    };
+                    document.body.appendChild(preloadFrame);
+                    movePreloadedIframe();
+            })();
+            // 全局 loading 控制函数
+            function showGlobalLoading() {
+                document.getElementById('aiButton').style.display = 'flex';
+            }
+
+            function hideGlobalLoading() {
+                document.getElementById('aiButton').style.display = 'none';
+            }
+            // 监听来自 iframe 的消息
+            window.addEventListener('message', function(event) {
+                // 安全建议：限制 origin（替换 '*' 为实际域名）
+                // if (event.origin !== 'https://your-iframe-domain.com') return;
+                const data = event.data;
+                if (data.type === 'iframeLoadingStatus') {
+                    if (data.payload === 'show') {
+                        hideGlobalLoading();
+                    } else if (data.payload === 'hide') {
+                        showGlobalLoading();
+                    }
+                }
+            });
+        </h:outputScript>
+
+    </c:if>
+</ui:composition>
+</html>

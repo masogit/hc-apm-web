@@ -103,6 +103,10 @@ public class TrainDetail implements Serializable {
     @Column(name = "vedio_url")
     private String vedioUrl;
 
+    //最终签到人数
+    @Column(name = "actual_sign_total")
+    private Integer actualSignTotal;
+
     @Override
     public int hashCode() {
         int hash = 0;

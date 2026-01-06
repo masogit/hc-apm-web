@@ -12,7 +12,7 @@
                 <h:panelGroup>
                     <p:panelGrid style="width: 550px; overflow: auto;" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.noticeType eq msg.noticeTypeRole}">
-                            <label class="label">#{msg.noticeSetting}<span style="color:red">*</span></label>
+                            <label class="label">#{msg.noticeSetting}</label>
                             <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.noticeUser}" filter="true" filterMatchMode="contains" updateLabel="true"
                                                   label="#{msg.SelectOneMessage}#{fieldMsg.fieldValue('noticeType', 'noticeTypeRole')}" dynamic="true" panelStyle="width: 300px" style="width:50%" scrollHeight="250">
                                 <f:selectItems value="#{reminderRuleController.roles}" var="roleItem" itemLabel="#{roleItem.roleDesc}" itemValue="#{roleItem.id}"/>
@@ -25,7 +25,7 @@
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.noticeType eq msg.noticeTypeUser}">
-                            <label class="label">#{msg.noticeSetting}<span style="color:red">*</span></label>
+                            <label class="label">#{msg.noticeSetting}</label>
                             <p:selectCheckboxMenu value="#{reminderRuleController.selected.ruleParam.noticeUser}" filter="true" filterMatchMode="contains" updateLabel="true"
                                                   label="#{msg.SelectOneMessage}#{fieldMsg.fieldValue('noticeType', 'noticeTypeUser')}" dynamic="true" panelStyle="width: 300px" style="width:50%" scrollHeight="250">
                                 <f:selectItems value="#{reminderRuleController.getUserList()}" var="userItem" itemLabel="#{userItem.name}" itemValue="#{userItem.id}"/>

@@ -425,7 +425,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
         List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-
+        insertCrossSiteColumns(exportFields);
         logger.info("load asset list to export");
         List<AssetInfo> assetList = getExportList();
 
@@ -438,7 +438,17 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
-
+    private void insertCrossSiteColumns(List<String> exportFields) {
+        String hospitalColumn = WebUtil.getMessage("hospitalId");
+        int siteIndex = exportFields.indexOf(hospitalColumn);
+        if (siteIndex == -1){
+            return;
+        }
+        // 增加医院列
+        exportFields.add(siteIndex, WebUtil.getMessage("Hospital"));
+        // 增加集团列
+        exportFields.add(exportFields.size(), WebUtil.getMessage("Institution"));
+    }
     public boolean isChecked() {
         return selectedMap.containsValue(true);
     }

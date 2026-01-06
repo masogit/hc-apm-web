@@ -124,6 +124,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_AUDIT_TEMPLATE = "auditTemplate";
     public static final String BO_TYPE_PART_PIC = "sparePart";
     public static final String BO_TYPE_BUDGET_PURCHASE_TEMPLATE = "budgetPurchaseTemplate";
+    public static final String BO_SUB_TYPE_ASSET_PROBATION = "AssetProbation";
     /**
      * 工程师信息
      */
@@ -132,7 +133,9 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_QRCODE_BACKGROUND = "qrCodeBackground";
 
     public static final String BO_TYPE_TRAIN_DETAIL = "TrainDetail";
-    public static final String BO_TYPE_TRAIN_RESULT = "TrainDetailResult";
+    public static final String BO_TYPE_TRAIN_SIGN_FILE = "TrainDetailSign";
+    public static final String BO_TYPE_TRAIN_SIGN_RESULT = "TrainDetailSignResult";
+    public static final String BO_TYPE_TRAIN_SIGN_PHOTO = "TrainDetailSignPhoto";
 
     public static final String BO_TYPE_MC_SUBSCRIBE = "MC_SUBSCRIBE";
     public static final String BO_TYPE_MC_SUBSCRIBE_APPLY = "MC_SUBSCRIBE_APPLY";
@@ -200,11 +203,20 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "second_directory")
     private String secondDirectory;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(insertable = false, updatable = false, name = "bo_uuid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @Where(clause = "bo_type = 'AssetInfo'")
-    @JsonBackReference
-    private AssetInfo assetInfo;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(insertable = false, updatable = false, name = "bo_uuid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+//    @Where(clause = "bo_type = 'AssetInfo'")
+//    @JsonBackReference
+//    private AssetInfo assetInfo;
+
+    @Transient
+    private String assetName;
+    @Transient
+    private String serialNum;
+    @Transient
+    private String qrCode;
+    @Transient
+    private String functionType;
 
     @Column(name = "compress_object_id")
     private String compressObjectId;
@@ -216,10 +228,10 @@ public class V2_BlobObject implements Serializable {
     private String approveStatus;
 
     @Transient
-    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
+    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg","jfif");
 
     @Transient
-    private List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg");
+    private List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg","jfif");
 
     @Transient
     private String boSubTypeValue;
@@ -312,12 +324,44 @@ public class V2_BlobObject implements Serializable {
         this.boSubType = boSubType;
     }
 
-    public AssetInfo getAssetInfo() {
-        return assetInfo;
+//    public AssetInfo getAssetInfo() {
+//        return assetInfo;
+//    }
+//
+//    public void setAssetInfo(AssetInfo assetInfo) {
+//        this.assetInfo = assetInfo;
+//    }
+
+    public String getAssetName() {
+        return assetName;
     }
 
-    public void setAssetInfo(AssetInfo assetInfo) {
-        this.assetInfo = assetInfo;
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getSerialNum() {
+        return serialNum;
+    }
+
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
+
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
     }
 
     public String getCreatedBy() {

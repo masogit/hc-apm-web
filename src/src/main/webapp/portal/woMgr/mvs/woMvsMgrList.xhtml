@@ -22,7 +22,14 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500" >
-                <p:ajax event="rowSelect" listener="#{workOrderMgrMvsController.onSelectWorkOrder}" update = "woTab:woMvsMgrDetailForm" />
+
+                <c:if test="#{workOrderMgrMvsController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderMgrMvsController.onSelectOrderRedirect}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{workOrderMgrMvsController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderMgrMvsController.onSelectWorkOrder}" update = "woTab:woMvsMgrDetailForm" />
+                </c:if>
+
                 <p:ajax event="filter" listener="#{workOrderMgrMvsController.onFilterWo}" update="datalist"/>
                 <p:column width="36" visible="#{workOrderMgrMvsController.queryIndex==8}" exportable="false">
                     <p:selectBooleanCheckbox  value="#{workOrderMgrMvsController.selectedMap[item.id]}"  class="selectCheckBox">
@@ -41,7 +48,7 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
+                    <h:outputText value="#{workOrderMgrMvsController.displayModeCasePriority.equals('key')?item.serviceRequest.casePriority:fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                 </p:column>
                 <p:column headerText="#{msg.assetName}" filterBy="#{item.mvsIbMapping.assetInfo.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.name}"/>
@@ -149,30 +156,31 @@
                     <ui:fragment rendered="true">
                         <p:commandButton  icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="btn-export-maintenance-report" title="批量下载附件工单" rendered="#{workOrderMgrMvsController.queryIndex==8}" disabled="#{not workOrderMgrMvsController.isTargetSelected()}" ajax="false"/>
                      </ui:fragment>
-                    <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
-                                     message="#{workOrderMgrMvsController.messageTip}"
-                                     header="确认下载"
-                                     severity="warn" class="downloadConfirm"
-                                      >
-                        <p:commandButton value="确定" ajax="false"
-                                         actionListener="#{workOrderMgrMvsController.doExportWorkOrderReport()}"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton" icon="ui-icon-check"
-                                          >
-                            <p:fileDownload value="#{workOrderMgrMvsController.maintenanceReport}" oncomplete="PF('downloadConfirm').hide()" />
-                        </p:commandButton>
 
-                        <!-- 取消按钮 -->
-                        <p:commandButton value="取消" type="button"
-                                         onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton" icon="ui-icon-close"
-                                           />
-                    </p:confirmDialog>
                 </f:facet>
 
             </p:dataTable>
         </h:form>
         <!-- 确认对话框 -->
         <ui:include src="woMvsMgrView.xhtml"/>
-
+        <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
+                         message="#{workOrderMgrMvsController.messageTip}"
+                         header="确认下载"
+                         severity="warn" class="downloadConfirm" width="700px">
+            <h:form>
+                <p:commandButton value="确定" ajax="false"
+                                 actionListener="#{workOrderMgrMvsController.doExportWorkOrderReport()}"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton"
+                                 icon="ui-icon-check">
+                    <p:fileDownload value="#{workOrderMgrMvsController.maintenanceReport}"
+                                    oncomplete="PF('downloadConfirm').hide()"/>
+                </p:commandButton>
+                <p:commandButton value="取消" type="button"
+                                 onclick="PF('downloadConfirm').hide()" styleClass="ui-confirmdialog-no uiButton"
+                                 icon="ui-icon-close"
+                />
+            </h:form>
+        </p:confirmDialog>
     </div>
 
     <script>

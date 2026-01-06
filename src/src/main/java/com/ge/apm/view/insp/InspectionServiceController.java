@@ -24,10 +24,12 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.TabChangeEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -52,6 +54,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     MultiLevelApprovalMapper approvalMapper =  WebUtil.getBean(MultiLevelApprovalMapper.class);
     AssetHistoryService assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
     ConfigService configService = WebUtil.getBean(ConfigService.class);
+    InventoryOrderMapper inventoryOrderMapper = WebUtil.getBean(InventoryOrderMapper.class);
 
     @Getter @Setter
     List<AssetInfo> detailMeasureAssetList;
@@ -79,6 +82,8 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     private Boolean needTwoSubStatus=false;
     @Getter @Setter
     private String stepFilter;
+    @Getter @Setter
+    private String isSolvedFilter;
     @Getter @Setter
     private Date startTime;
     @Getter @Setter
@@ -194,7 +199,29 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
     }
 
     public List<InventoryOrderDetail> getInventoryOrderDetailList(Integer assetId){
-        List<InventoryOrderDetail> inventoryOrderDetails = infoRepositoryDao.findProjectionByAssetId(assetId);
+        /*List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, assetId));
+        // 添加时间查询条件
+        if (ObjectUtil.isNotEmpty(startTime)) {
+            filters.add(new SearchFilter("planStartTime", SearchFilter.Operator.GTE, startTime));
+        }
+        if (ObjectUtil.isNotEmpty(endTime)) {
+            filters.add(new SearchFilter("planEndTime", SearchFilter.Operator.LTE, endTime));
+        }*/
+        //inventoryIssueRepository
+        Pagination pagination = new Pagination(0, 1000);
+        Wrapper wrapper = getWrapper("d.asset_id", null, null, ListUtil.newArrayList(this.assetInfo.getId()), null);
+        if (ObjectUtil.isNotEmpty(startTime)) {
+            wrapper.ge("io.plan_start_time", startTime);
+        }
+        if (ObjectUtil.isNotEmpty(endTime)) {
+            wrapper.le("io.plan_end_time", endTime);
+        }
+        if(isSolvedFilter != null){
+            wrapper.eq("ii.is_solved", isSolvedFilter);
+        }
+        wrapper.orderBy("d.last_modified_date", false);
+        List<InventoryOrderDetail> inventoryOrderDetails =inventoryOrderMapper.selectInventoryDetailByCondition(pagination, wrapper);
         if(inventoryOrderDetails != null && inventoryOrderDetails.size()>0){
             for(InventoryOrderDetail inventoryOrderDetail:inventoryOrderDetails){
                 if(inventoryOrderDetail.getStatus() == 0){
@@ -213,6 +240,14 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
                         }
                     }
                 }
+                InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(assetId, inventoryOrderId);
+                if(inventoryIssue != null){
+                    inventoryOrderDetail.setComment(inventoryIssue.getComment());
+                    inventoryOrderDetail.setInventoryCheckListItems(inventoryIssue.getInventoryCheckListItems());
+                    inventoryOrderDetail.setIsSolved(inventoryIssue.getIsSolved() ? "是" : "否");
+                    inventoryOrderDetail.setStatus(3);
+                }
+
             }
         }
         return inventoryOrderDetails;
@@ -238,12 +273,15 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         if (ObjectUtil.isNotEmpty(assetIds)) {
             wrapper.in(queryField, assetIds);
         }
-        if (ObjectUtil.isNotEmpty(startTime)) {
-            wrapper.ge(dateField, startTime);
+        if(StrUtil.isNotEmpty(dateField)){
+            if (ObjectUtil.isNotEmpty(startTime)) {
+                wrapper.ge(dateField, startTime);
+            }
+            if (ObjectUtil.isNotEmpty(endTime)) {
+                wrapper.le(dateField, endTime);
+            }
         }
-        if (ObjectUtil.isNotEmpty(endTime)) {
-            wrapper.le(dateField, endTime);
-        }
+
         wrapper.orderBy(dateField, false);
         return wrapper;
     }

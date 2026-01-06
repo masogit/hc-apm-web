@@ -8,123 +8,155 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
-   <p:dialog id="detailEditDialog" widgetVar="detailEditDialog" modal="true"  resizable="false" draggable="true" width="60%" height="650" appendTo="@(body)"  header="子课程" >
-      <h:form id="detailEditForm">
-         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-            <h:panelGroup>
-               <label class="label">培训课程子名称*</label>
-               <p:inputText value="#{trainInSiteController.selectedTrainDetail.name}" required="true" requiredMessage="培训课程子名称 不能为空！" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}"/>
-            </h:panelGroup>
-            <h:panelGroup>
-               <label class="label">计划培训日期*</label>
-               <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{trainInSiteController.selectedTrainDetail.planTrainDate}" required="true" requiredMessage="计划培训日期 #{msg.ValidationRequire}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}"/>
-            </h:panelGroup>
-            <h:panelGroup>
-               <label class="label">计划培训开始时间*</label>
-               <p:calendar timeZone="GMT+8" pattern="HH:mm" timeOnly="true" value="#{trainInSiteController.selectedTrainDetail.startTime}" required="true" requiredMessage="计划培训开始时间 #{msg.ValidationRequire}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}"/>
-            </h:panelGroup>
-            <h:panelGroup>
-               <label class="label">计划培训结束时间*</label>
-               <p:calendar timeZone="GMT+8" pattern="HH:mm" timeOnly="true" value="#{trainInSiteController.selectedTrainDetail.endTime}" required="true" requiredMessage="计划培训结束时间 #{msg.ValidationRequire}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}"/>
-            </h:panelGroup>
-            <h:panelGroup>
-               <label class="label">内部授课人</label>
-               <p:inputText value="#{trainInSiteController.selectedTrainDetail.internalInstructors}" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}" />
-            </h:panelGroup>
-            <h:panelGroup>
-               <label class="label">外部授课人</label>
-               <p:inputText value="#{trainInSiteController.selectedTrainDetail.externalInstructors}" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}" />
-            </h:panelGroup>
-            <h:panelGroup>
-               <label class="label">外部授课公司</label>
-               <p:inputText value="#{trainInSiteController.selectedTrainDetail.externalInstructorsCompany}" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}" />
-            </h:panelGroup>
-            <h:panelGroup>
-               <label class="label">培训地点*</label>
-               <p:inputText value="#{trainInSiteController.selectedTrainDetail.trainLocation}" required="true" requiredMessage="培训地点不能为空！" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}"/>
-            </h:panelGroup>
-         </p:panelGrid>
-         <h:panelGroup >
-            <p:dataList id="uploadList" value="#{trainInSiteController.blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
-               <f:facet name="header">附件</f:facet>
-               <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-               <p:commandButton actionListener="#{trainInSiteController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}">
-                  <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-               </p:commandButton>
-            </p:dataList>
-            <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF)$/" fileUploadListener="#{trainInSiteController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                          multiple="true"  sizeLimit="31000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}"/>
-         </h:panelGroup>
-         <!--<p:fieldset legend="签到信息" rendered="#{not empty trainInSiteController.selectedTrainDetail.id}">-->
-         <p:fieldset legend="签到信息" rendered="#{not empty trainInSiteController.selectedTrainDetail.id}">
-            <p:dataTable id="signDatalist" value="#{trainInSiteController.trainDetailSignList}" var="item"
-                         widgetVar="signDatalist" selectionMode="single" selection="#{trainInSiteController.selectedTrainDetailSign}"
-                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.signDate}"
-                         paginatorTemplate="{Toolbar}" rows="200" emptyMessage="#{msg.noRecordFound}" >
+      <h:form id="detailEditForm" >
+          <p:fieldset legend="#{trianInSiteEditController.detailActionName eq 'Create' ? '新增' : '编辑'} 子课程详情" rendered="#{not empty trianInSiteEditController.selectedTrainDetail}">
+              <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                  <h:panelGroup>
+                      <label class="label">培训课程子名称*</label>
+                      <p:inputText value="#{trianInSiteEditController.selectedTrainDetail.name}" required="true" requiredMessage="培训课程子名称 不能为空！" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}"/>
+                  </h:panelGroup>
+                  <h:panelGroup>
+                      <label class="label">计划培训日期*</label>
+                      <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{trianInSiteEditController.selectedTrainDetail.planTrainDate}" required="true" requiredMessage="计划培训日期 #{msg.ValidationRequire}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}"/>
+                  </h:panelGroup>
+                  <h:panelGroup>
+                      <label class="label">计划培训开始时间*</label>
+                      <p:calendar timeZone="GMT+8" pattern="HH:mm" placeholder="请输入培训时间" timeOnly="true" value="#{trianInSiteEditController.selectedTrainDetail.startTime}" required="true" requiredMessage="计划培训开始时间 #{msg.ValidationRequire}" showOn="false" Input="true" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}"/>
+                  </h:panelGroup>
+                  <h:panelGroup>
+                      <label class="label">计划培训结束时间*</label>
+                      <p:calendar timeZone="GMT+8" pattern="HH:mm" placeholder="请输入培训时间" timeOnly="true" value="#{trianInSiteEditController.selectedTrainDetail.endTime}" required="true" requiredMessage="计划培训结束时间 #{msg.ValidationRequire}" showOn="false" Input="true" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}"/>
+                  </h:panelGroup>
+                  <h:panelGroup>
+                      <label class="label">内部授课人</label>
+                      <p:inputText value="#{trianInSiteEditController.selectedTrainDetail.internalInstructors}" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                      <label class="label">外部授课人</label>
+                      <p:inputText value="#{trianInSiteEditController.selectedTrainDetail.externalInstructors}" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                      <label class="label">外部授课公司</label>
+                      <p:inputText value="#{trianInSiteEditController.selectedTrainDetail.externalInstructorsCompany}" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                      <label class="label">培训地点*</label>
+                      <p:inputText value="#{trianInSiteEditController.selectedTrainDetail.trainLocation}" required="true" requiredMessage="培训地点不能为空！" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}"/>
+                  </h:panelGroup>
+              </p:panelGrid>
+              <h:panelGroup >
+                  <p:dataList id="uploadList" value="#{trianInSiteEditController.blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
+                      <f:facet name="header">附件</f:facet>
+                      <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                      <p:commandButton actionListener="#{trianInSiteEditController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{trianInSiteEditController.selectedTrainDetail.status == 'Planned'}">
+                          <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                      </p:commandButton>
+                  </p:dataList>
+                  <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF)$/" fileUploadListener="#{trianInSiteEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                multiple="true"  sizeLimit="31000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}" rendered="#{trianInSiteEditController.selectedTrainDetail.status == 'Planned'}"/>
+              </h:panelGroup>
+              <p:fieldset legend="签到信息" >
+                  <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                      <h:panelGroup>
+                          <label class="label">扫码签到人数</label>
+                          <p:inputText id="signTotal" value="#{trianInSiteEditController.signTotal}" disabled="true" />
+                      </h:panelGroup>
+                      <h:panelGroup>
+                          <label class="label">最终签到人数</label>
+                          <p:spinner id="actualSignTotal" value="#{trianInSiteEditController.selectedTrainDetail.actualSignTotal}" min="0" max="10000000" ><p:ajax /></p:spinner>
+                      </h:panelGroup>
+                  </p:panelGrid>
+                  <p:dataTable id="signDatalist" value="#{trianInSiteEditController.trainDetailSignList}" var="item"
+                               widgetVar="signDatalist" selectionMode="single" selection="#{trianInSiteEditController.selectedTrainDetailSign}"
+                               lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single"  sortBy="#{item.signOrder}"
+                               rows="25" emptyMessage="#{msg.noRecordFound}"
+                               paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                               currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowsPerPageTemplate="25,50,100">
 
-               <p:ajax event="rowSelect" update="deleteSignlButton"/>
-             <!--  <p:column headerText="" style="width: 30px;">
-                  <h:outputText value="#{item.signOrder}"/>
-               </p:column>
-               <p:column headerText="所属科室">
-                  <h:outputText value="#{item.signDeptName}"/>
-               </p:column>-->
-               <p:column headerText="所属科室">
-                  <h:outputText value="#{item.signDeptName}"/>
-               </p:column>
-               <p:column headerText="签到人">
-                  <h:outputText value="#{item.signerName}"/>
-               </p:column>
-               <p:column headerText="签到时间">
-                  <h:outputText value="#{item.signDate}">
-                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
-                  </h:outputText>
-               </p:column>
-               <f:facet name="{Toolbar}">
-                  <p:commandButton immediate="false" process="@this" id="createSignButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{trainInSiteController.prepareSignCreate}" update=":growl trainTab:signDlg" oncomplete="PF('signDlg').show()"  rendered="#{trainInSiteController.canEdit and trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
-                  <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.deleteSign}" update=":growl trainTab:detailEditForm:signDatalist " disabled="#{empty trainInSiteController.selectedTrainDetailSign}" rendered="#{trainInSiteController.canEdit and trainInSiteController.selectedTrainDetail.status eq 'Planned'}">
-                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                  </p:commandButton>
-               </f:facet>
-            </p:dataTable>
-         </p:fieldset>
-         <p:fieldset legend="完成信息" rendered="#{not empty trainInSiteController.trainDetailSignList}">
-            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-               <h:panelGroup>
-                  <label class="label">实际培训完成日期*</label>
-                  <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{trainInSiteController.selectedTrainDetail.actualTrainDate}" required="true" requiredMessage="计划培训日期 #{msg.ValidationRequire}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" />
-               </h:panelGroup>
-               <h:panelGroup>
-                  <label class="label">记录者*</label>
-                  <p:inputText value="#{trainInSiteController.selectedTrainDetail.completeRecorder}" disabled="true"/>
-               </h:panelGroup>
-               <h:panelGroup>
-                  <label class="label">视频链接</label>
-                  <p:inputText value="#{trainInSiteController.selectedTrainDetail.vedioUrl}" />
-               </h:panelGroup>
-            </p:panelGrid>
-            <h:panelGroup >
-               <p:dataList id="uploadCompleteList" value="#{trainInSiteController.resultBlobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
-                  <f:facet name="header">附件</f:facet>
-                  <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                  <p:commandButton actionListener="#{trainInSiteController.removeResultFile(fileitem)}" update="uploadCompleteList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}">
-                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                  </p:commandButton>
-                  <p:commandButton actionListener="#{trainInSiteController.prepareEditFile(fileitem)}" update="trainTab:modifyFileDlg" oncomplete="PF('modifyFileDlg').show()" icon="ui-icon-pencil" title="修改文件名称" class="popupIconButton" process="@this" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}">
+                      <p:ajax event="rowSelect" update="deleteSignlButton"/>
+                      <p:column headerText="序号" >
+                          <h:outputText value="#{item.signOrder}"/>
+                      </p:column>
+                      <!-- <p:column headerText="所属科室">
+                          <h:outputText value="#{item.signDeptName}"/>
+                       </p:column>-->
+                      <p:column headerText="所属科室">
+                          <h:outputText value="#{item.signDeptName}"/>
+                      </p:column>
+                      <p:column headerText="签到人">
+                          <h:outputText value="#{item.signerName}"/>
+                      </p:column>
+                      <p:column headerText="签到时间">
+                          <h:outputText value="#{item.signDate}">
+                              <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                          </h:outputText>
+                      </p:column>
+                      <f:facet name="{Toolbar}">
+                          <p:commandButton immediate="false" process="@this" id="createSignButton"  validateClient="false" value="#{msg.Create}" actionListener="#{trianInSiteEditController.prepareSignCreate}" update=":growl :signDlg" oncomplete="PF('signDlg').show()"  rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
+                          <p:commandButton immediate="false" process="@this"  id="deleteSignlButton" value="#{msg.Delete}" actionListener="#{trianInSiteEditController.deleteSign}" update=":growl :detailEditForm:signDatalist :detailEditForm:actualSignTotal :detailEditForm:signTotal" disabled="#{empty trianInSiteEditController.selectedTrainDetailSign}" rendered="#{ trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
+                              <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                          </p:commandButton>
+                          <p:commandButton value="#{msg.exportToXLS}"  class="btn btn-sm btn-gray" ajax="false">
+                              <p:dataExporter type="xls" target="signDatalist" fileName="#{trianInSiteEditController.getExportFileName()} "/>
+                          </p:commandButton>
+                      </f:facet>
+                  </p:dataTable>
+              </p:fieldset>
+              <p:fieldset legend="完成信息" >
+                  <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                      <h:panelGroup>
+                          <label class="label">实际培训完成日期*</label>
+                          <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{trianInSiteEditController.selectedTrainDetail.actualTrainDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                      </h:panelGroup>
+                      <h:panelGroup>
+                          <label class="label">记录者*</label>
+                          <p:inputText value="#{trianInSiteEditController.selectedTrainDetail.completeRecorder}" disabled="true"/>
+                      </h:panelGroup>
+                      <h:panelGroup>
+                          <label class="label">视频链接</label>
+                          <p:inputText value="#{trianInSiteEditController.selectedTrainDetail.vedioUrl}" />
+                      </h:panelGroup>
+                  </p:panelGrid>
+                  <h:panelGroup >
+                      <p:dataList id="photoList" value="#{trianInSiteEditController.getResultBlobList('TrainDetailSignPhoto')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
+                          <f:facet name="header">培训照片</f:facet>
+                          <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false" >
+                          </p:graphicImage>
+                          <p:commandButton actionListener="#{trianInSiteEditController.removeFile(fileitem)}" update="photoList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{trianInSiteEditController.selectedTrainDetail.status == 'Planned'}">
+                              <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                          </p:commandButton>
+                      </p:dataList>
+                      <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{trianInSiteEditController.handlePhotoFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                    multiple="true"  sizeLimit="31000000"  update="photoList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}" rendered="#{trianInSiteEditController.selectedTrainDetail.status == 'Planned'}"/>
 
-                  </p:commandButton>
-               </p:dataList>
-               <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|mp4|avi|pptx|zip|ZIP|PPTX|AVI|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF|MP4)$/" fileUploadListener="#{trainInSiteController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                             multiple="true"  sizeLimit="110000000"  update="uploadCompleteList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{trainInSiteController.selectedTrainDetail.status == 'Planned'}"/>
-            </h:panelGroup>
-         </p:fieldset>
-         <br/>
-         <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trainInSiteController.saveDetail}" oncomplete="PF('detailEditDialog').hide()" update=":growl trainTab:editForm:detailDatalist trainTab:editForm:trainQty" icon="ui-icon-check" rendered="#{empty trainInSiteController.selectedTrainDetail.status or trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
-         <p:commandButton validateClient="true" value="完成" action="#{trainInSiteController.completeDetail}" oncomplete="PF('detailEditDialog').hide()" update=":growl trainTab:editForm:detailDatalist trainTab:editForm:trainQty" icon="ui-icon-check" rendered="#{not empty trainInSiteController.selectedTrainDetail.id and trainInSiteController.selectedTrainDetail.status eq 'Planned'}" />
-         <p:commandButton validateClient="true" value="#{msg.Cancel}" icon="ui-icon-cancel" oncomplete="PF('cancelDlg').show();" update="trainTab:cancelForm  trainTab:editForm:detailDatalist" rendered="#{not empty trainInSiteController.selectedTrainDetail.id and trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
-         <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back" action="#{trainInSiteController.backDetail}" oncomplete="PF('detailEditDialog').hide()"  update=" trainTab:editForm:detailDatalist"/>
+                      <p:dataList id="uploadCompleteList" value="#{trianInSiteEditController.getResultBlobList('TrainDetailSignResult')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
+                          <f:facet name="header">附件</f:facet>
+                          <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                          <p:commandButton actionListener="#{trianInSiteEditController.removeResultFile(fileitem)}" update="uploadCompleteList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{trianInSiteEditController.selectedTrainDetail.status == 'Planned'}">
+                              <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                          </p:commandButton>
+                          <p:commandButton actionListener="#{trianInSiteEditController.prepareEditFile(fileitem)}" update=":modifyFileDlg" oncomplete="PF('modifyFileDlg').show()" icon="ui-icon-pencil" title="修改文件名称" class="popupIconButton" process="@this" rendered="#{trianInSiteEditController.selectedTrainDetail.status == 'Planned'}">
+
+                          </p:commandButton>
+                      </p:dataList>
+                      <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|xls|xlsx|doc|docx|pdf|mp4|avi|pptx|zip|ZIP|PPTX|AVI|JPEG|JPG|PNG|XLS|XLSX|DOC|DOCX|PDF|MP4)$/" fileUploadListener="#{trianInSiteEditController.handleResultFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                    multiple="true"  sizeLimit="110000000"  update="uploadCompleteList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{trianInSiteEditController.selectedTrainDetail.status == 'Planned'}"/>
+                  </h:panelGroup>
+              </p:fieldset>
+              <br/>
+              <p:commandButton validateClient="true" value="#{msg.Save}" action="#{trianInSiteEditController.saveDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-check" rendered="#{empty trianInSiteEditController.selectedTrainDetail.status or trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
+              <p:commandButton validateClient="true" value="完成" action="#{trianInSiteEditController.completeDetail}" update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" icon="ui-icon-repeat" rendered="#{empty trianInSiteEditController.selectedTrainDetail.status or trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}" />
+              <p:commandButton validateClient="true" value="#{msg.Delete}" action="#{trianInSiteEditController.deleteItem()}" icon="ui-icon-cancel"  update=":growl :editDataListForm:detailDatalist editForm:trainQty :detailEditForm" rendered="#{not empty trianInSiteEditController.selectedTrainDetail.id and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}">
+                  <p:confirm header="#{msg.DeleteConformation}" message="#{trianInSiteEditController.getDeleteConformation()}" icon="ui-icon-alert"/>
+              </p:commandButton>
+<!--              <p:commandButton validateClient="true" value="#{msg.Cancel}" icon="ui-icon-cancel" oncomplete="PF('cancelDlg').show();" update=":cancelForm  :editDataListForm:detailDatalist" rendered="#{not empty trianInSiteEditController.selectedTrainDetail.id and trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>-->
+<!--              <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back" action="#{trianInSiteEditController.backDetail}"  update=" :editDataListForm:detailDatalist :detailEditForm"/>-->
+          </p:fieldset>
+
       </h:form>
-   </p:dialog>
+
+
+
    <p:dialog id="modifyFileDlg" widgetVar="modifyFileDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="附件名称修改" width="600" height="200">
       <h:form id="modifyFileForm">
          <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -132,31 +164,29 @@
                <label class="label">附件名称*</label>
             </h:panelGroup>
             <h:panelGroup>
-               <p:inputText value="#{trainInSiteController.fileName}" required="true" requiredMessage="附件名称不能为空"/>
+               <p:inputText value="#{trianInSiteEditController.fileName}" required="true" requiredMessage="附件名称不能为空"/>
             </h:panelGroup>
             <h:panelGroup>
-               <p:inputText value="#{trainInSiteController.fileType}" disabled="true"/>
+               <p:inputText value="#{trianInSiteEditController.fileType}" disabled="true"/>
             </h:panelGroup>
          </p:panelGrid>
-         <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trainInSiteController.saveModifyFileName}" oncomplete="PF('modifyFileDlg').hide()" update=":growl trainTab:detailEditForm:uploadCompleteList " icon="ui-icon-check" rendered="#{empty trainInSiteController.selectedTrainDetail.status or trainInSiteController.selectedTrainDetail.status eq 'Planned'}"/>
+         <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{trianInSiteEditController.saveModifyFileName}" oncomplete="PF('modifyFileDlg').hide()" update=":growl :detailEditForm:uploadCompleteList " icon="ui-icon-check" rendered="#{empty trianInSiteEditController.selectedTrainDetail.status or trianInSiteEditController.selectedTrainDetail.status eq 'Planned'}"/>
          <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-arrow-back"  oncomplete="PF('modifyFileDlg').hide()"  update=" "/>
-
-
       </h:form>
    </p:dialog>
 
+    <!-- 取消原因 -->
    <p:dialog id="cancelDlg" widgetVar="cancelDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="取消原因" height="300">
-
       <h:form id="cancelForm">
          <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
             <h:panelGroup>
                <label class="label">原因</label>
-               <p:inputTextarea rows="10" cols="50" value="#{trainInSiteController.selectedTrainDetail.cancelReason}" required="true" requiredMessage="原因不能为空">
+               <p:inputTextarea rows="10" cols="50" value="#{trianInSiteEditController.selectedTrainDetail.cancelReason}" required="true" requiredMessage="原因不能为空">
                </p:inputTextarea>
             </h:panelGroup>
          </p:panelGrid>
          <br/>
-         <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{trainInSiteController.cancelDetail()}" oncomplete="PF('cancelDlg').hide();PF('detailEditDialog').hide();" update=":growl trainTab:editForm:detailDatalist" icon="ui-icon-check" />
+         <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{trianInSiteEditController.cancelDetail()}" oncomplete="PF('cancelDlg').hide();PF('detailEditDialog').hide();" update=":growl :editDataListForm:detailDatalist" icon="ui-icon-check" />
          <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('cancelDlg').hide()"/>
       </h:form>
    </p:dialog>
@@ -166,19 +196,19 @@
          <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
             <h:panelGroup>
                <label class="label">科室</label>
-               <p:selectOneMenu value="#{trainInSiteController.selectedTrainDetailSign.signDeptUid}" required="true" requiredMessage="培训科室不能为空！"  >
-                  <p:ajax listener="#{trainInSiteController.signDeptUidValueChage()}"/>
+               <p:selectOneMenu value="#{trianInSiteEditController.selectedTrainDetailSign.signDeptUid}" required="true" requiredMessage="培训科室不能为空！"  >
+                  <p:ajax listener="#{trianInSiteEditController.signDeptUidValueChage()}"/>
                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                  <f:selectItems value="#{trainInSiteController.orgInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                  <f:selectItems value="#{trianInSiteEditController.orgInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                </p:selectOneMenu>
             </h:panelGroup>
             <h:panelGroup>
                <label class="label">签到人</label>
-               <p:inputText value="#{trainInSiteController.selectedTrainDetailSign.signerName}" required="true" requiredMessage="签到人 不能为空！" disabled="#{trainInSiteController.selectedTrainDetail.status != 'Planned'}"/>
-               <!--<p:autoComplete value="#{trainInSiteController.filterSigner}" converter="userAccountConverter" dropdown="true"
+               <p:inputText value="#{trianInSiteEditController.selectedTrainDetailSign.signerName}" required="true" requiredMessage="签到人 不能为空！" disabled="#{trianInSiteEditController.selectedTrainDetail.status != 'Planned'}"/>
+               <!--<p:autoComplete value="#{trianInSiteEditController.filterSigner}" converter="userAccountConverter" dropdown="true"
                                forceSelection="true" var="t" required="true" requiredMessage="签到人 #{msg.ValidationRequire}"
-                               itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{trainInSiteController.completeClinicalOwnerList}" class="SiteUIDChange clinicalDeptNameChange">
-                  <p:ajax event="itemSelect" listener="#{trainInSiteController.onSignerFilterChange}" process="@this"   />
+                               itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{trianInSiteEditController.completeClinicalOwnerList}" class="SiteUIDChange clinicalDeptNameChange">
+                  <p:ajax event="itemSelect" listener="#{trianInSiteEditController.onSignerFilterChange}" process="@this"   />
 
                   <p:column>
                      <h:outputText value="#{t.name}"/>
@@ -190,10 +220,10 @@
             </h:panelGroup>
             <h:panelGroup rendered="false">
                <label class="label">签到时间</label>
-               <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd hh:mm:ss" value="#{trainInSiteController.selectedTrainDetailSign.signDate}" required="true" requiredMessage="计划培训日期 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+               <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd hh:mm:ss" value="#{trianInSiteEditController.selectedTrainDetailSign.signDate}" required="true" requiredMessage="计划培训日期 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
          </p:panelGrid>
-         <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{trainInSiteController.saveSign()}" oncomplete="PF('signDlg').hide();" update=":growl trainTab:detailEditForm:signDatalist" icon="ui-icon-check" />
+         <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{trianInSiteEditController.saveSign()}" oncomplete="PF('signDlg').hide();" update=":growl :detailEditForm:signDatalist :detailEditForm:actualSignTotal :detailEditForm:signTotal" icon="ui-icon-check" />
          <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('signDlg').hide()"/>
       </h:form>
    </p:dialog>

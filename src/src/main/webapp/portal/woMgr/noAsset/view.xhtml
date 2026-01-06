@@ -74,6 +74,25 @@
                         <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                      </p:outputLabel>
                   </h:panelGroup>
+
+                  <h:panelGroup>
+                     <label class="label">#{msg.financingNum}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.financingNum}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.functionType}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.functionType}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                     <label class="label">#{msg.serialNum}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.serialNum}" />
+                  </h:panelGroup>
+
+                  <h:panelGroup>
+                     <label class="label">#{msg.makerShortName}</label>
+                     <h:outputText value="#{serviceRequestNoAssetController.selected.makerShortName}" />
+                  </h:panelGroup>
+
                   <h:panelGroup >
                      <label class="label">#{msg.comment}</label>
                      <h:outputText value="#{serviceRequestNoAssetController.selected.comment}"/>
@@ -94,22 +113,25 @@
                      </p:outputLabel>
                   </h:panelGroup>
                </p:panelGrid>
-               <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.audioList}" columns="2" layout="grid" rendered="#{not empty serviceRequestNoAssetController.audioList}">
-                  <f:facet name="header">#{msg.requestVoice}</f:facet>
-                  <p:panel  style="text-align:center">
-                     <h:panelGrid columns="1" style="width:100%">
-                        <audio controls="controls">
-                           <source src="#{fileDownloadService.getFileUrl(audioItem.objectStorageId)}" />
-                        </audio>
-                     </h:panelGrid>
-                  </p:panel>
-                  <h:panelGroup >
-                     <label class="label">语音转文字</label>
-                     <h:outputText value="#{serviceRequestNoAssetController.selected.voiceToText}"/>
-                  </h:panelGroup>
-               </p:dataGrid>
-
-
+               <p:fieldset rendered="#{not empty serviceRequestNoAssetController.audioList}">
+                  <p:dataGrid var="audioItem" value="#{serviceRequestNoAssetController.audioList}" columns="2" layout="grid" rendered="#{not empty serviceRequestNoAssetController.audioList}">
+                     <f:facet name="header">#{msg.requestVoice}</f:facet>
+                     <p:panel style="text-align:center">
+                        <h:panelGrid columns="1" style="width:100%">
+                           <audio controls="controls">
+                              <source src="#{fileDownloadService.getFileUrl(audioItem.objectStorageId)}" />
+                           </audio>
+                        </h:panelGrid>
+                     </p:panel>
+                  </p:dataGrid>
+<!--                  <p:dataGrid var="voiceToText" value="#{serviceRequestNoAssetController.selected.voiceToText}" rendered="#{not empty serviceRequestNoAssetController.audioList and not empty serviceRequestNoAssetController.selected.voiceToText}">-->
+<!--                     <f:facet name="header">语音转文字</f:facet>-->
+<!--                     <h:panelGroup>-->
+<!--                        <h:outputText value="#{serviceRequestNoAssetController.selected.voiceToText}"-->
+<!--                                      style="display: block; margin-top: 4px; white-space: pre-wrap;" />-->
+<!--                     </h:panelGroup>-->
+<!--                  </p:dataGrid>-->
+               </p:fieldset>
                <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
                   <p:dataGrid id="requestImage" var="fileitem" value="#{serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}" columns="5" layout="grid" rendered="#{not empty serviceRequestNoAssetController.getPicListByBoType('ServiceRequestNoAsset')}">
                      <p:panel  style="text-align:center">

@@ -13,6 +13,7 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -132,6 +133,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private List<OrgInfo> orgListMVS;
     @Getter @Setter
     List<V2_PmOrder> bySearchFilterMVS = null;
+    @Setter@Getter
+    private String pageType ;
 
     private MvsPmOrderMapper mvsPmOrderMapper;
 
@@ -187,6 +190,30 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
     }
 
+    public void exportExcel1() throws IOException{
+        PmFileExportTemplate template = new PmFileExportTemplate();
+        List<V2_PmOrder> pmOrderList= getPmListByselectedId();
+        if(pmOrderList ==null && queryIndex!=10){
+            WebUtil.addErrorMessage(WebUtil.getMessage("SelectExportFiles"));
+            RequestContext.getCurrentInstance().addCallbackParam("", true);
+            return;
+        }
+        template.writePm(pmOrderList,queryIndex);
+        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
+    }
+
+    private List<V2_PmOrder> getExportList() {
+        List<V2_PmOrder> pmList=null;
+        if(pmIdList.size()!=0 && queryIndex!=10 ) {
+            pmList = dao.getBatchPmOrderList(pmIdList);
+        }else{
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            pmList = dao.getPmOrderListAll(orgUidList);
+        }
+        return pmList;
+    }
+
+
     public String checkValue(Object obj){
         if(obj != null){
             return obj.toString();
@@ -197,15 +224,22 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     List<String> pmIdList = new ArrayList<String>();
     private  List<V2_PmOrder> getPmListByselectedId(){
-        Map<String, Object> params = new HashMap<>();
+//        Map<String, Object> params = new HashMap<>();
         if(pmIdList.size()==0) {
             return null;
         }
-        params.put("userUid", loginUser.getUid());
-        params.put("tenantUid", loginUser.getTenantUID());
+//        params.put("userUid", loginUser.getUid());
+//        params.put("tenantUid", loginUser.getTenantUID());
+
+        Map<String, Object> params = initializeParams();
         if(queryIndex!=10){
             params.put("pmIdList", pmIdList.toArray());
         }
+        // 处理搜索过滤器
+        processSearchFilters(params);
+        // 根据查询索引设置参数
+        setParamsByQueryIndex(params);
+
         List<V2_PmOrder> pmList = mvsPmOrderMapper.loadData(params);
         return pmList;
     }
@@ -300,31 +334,47 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         //如果是院长等管理层登录进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
-        if (!Strings.isNullOrEmpty(enCodeParameters)) {
-            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
-            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
-            orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
-            if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
-                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+        if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
+            selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+            onSelectPmOrder();
+        }else{
+            if (!Strings.isNullOrEmpty(enCodeParameters)) {
+                requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+                queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+                orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
+                if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
+                    query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+                }
             }
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = -1;
+            } else {
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
+            for (ExportFields exs: ExportFields.values()){
+                pmFieldsExport.add(exs.getChinese());
+            }
+            queryIndex = Strings.isNullOrEmpty(query) ? 10  : Integer.valueOf(query);
+            this.filterBySite = false;
+            this.filterByHospital = false;
+            hmCheck = new HashMap<String, UnstructuredData>();
+            isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
+            isInsulate = isInsulate == null ? false : isInsulate;
+            loadClinicalDeptList();
+            getPageTypeFromConfig();
         }
-        if (Strings.isNullOrEmpty(query)) {
-            queryIndex = -1;
-        } else {
-            queryIndex = Integer.valueOf(query);
-            searchList(queryIndex);
-        }
-        for (ExportFields exs: ExportFields.values()){
-            pmFieldsExport.add(exs.getChinese());
-        }
-        queryIndex = Strings.isNullOrEmpty(query) ? 10  : Integer.valueOf(query);
-        this.filterBySite = false;
-        this.filterByHospital = false;
-        hmCheck = new HashMap<String, UnstructuredData>();
-        isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
-        isInsulate = isInsulate == null ? false : isInsulate;
-        loadClinicalDeptList();
     }
+
+    public void getPageTypeFromConfig() {
+        String  key= "PmOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
+    }
+
 
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
@@ -466,6 +516,14 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                         params.put("planTimeLTE", searchFilter.value);
                     }
                     break;
+                case "endTime":
+                    if (searchFilter.operator.toString().equals("GTE")){
+                        params.put("endTimeGTE", searchFilter.value);
+                    }
+                    if (searchFilter.operator.toString().equals("LTE")){
+                        params.put("endTimeLTE", searchFilter.value);
+                    }
+                    break;
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
                 default:
@@ -521,6 +579,17 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     public StreamedContent getExcelFile() {
         return excelFile;
+    }
+
+    public void onSelectOrderRedirect() throws IOException {
+        String url = "actionName=View&selectedid="
+                + selected.getId()
+                + "&queryIndex=" + queryIndex
+                ;
+        url = "mvs/pmMvsOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void onSelectPmOrder() {

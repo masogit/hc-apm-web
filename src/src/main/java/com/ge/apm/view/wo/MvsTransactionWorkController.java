@@ -47,7 +47,8 @@ import java.util.stream.Collectors;
 public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHomeTransactionWorkOrder> implements Serializable, ServerEventInterface {
     protected static final Logger LOGGER = LoggerFactory.getLogger(MvsTransactionWorkController.class);
     private static final ObjectMapper objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+            .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     OrgInfoRepository orgInfoRepository;
 
     private AssetFaultTypeService assetFaultTypeService;

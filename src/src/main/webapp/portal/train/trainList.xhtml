@@ -17,7 +17,7 @@
                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 
-                <p:ajax event="rowSelect" update="editButton" />
+                <p:ajax event="rowSelect" update="editButton deleteButton" />
                 <p:ajax event="filter" listener="#{trainInSiteController.onFilter}" />
                 <p:column headerText="课程号" sortBy="#{item.courseNo}" filterMatchMode="GTE">
                     <h:outputText value="#{item.courseNo}" />
@@ -72,8 +72,11 @@
                     <h:outputText value="#{fieldMsg.fieldValue('trainStatus', item.status)}"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
-                    <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" actionListener="#{trainInSiteController.prepareCreate}" update="trainTab:trainInsiteListForm trainTab:createDialog" oncomplete="PF('createDialog').show()"/>
-                    <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" actionListener="#{trainInSiteController.prepareEdit}"  update="trainTab:createDialog" disabled="#{empty trainInSiteController.selected}" oncomplete="PF('createDialog').show()"/>
+                    <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('trainEdit.xhtml?actionName=Create')}" actionListener="#{trainInSiteController.prepareCreate}" />
+                    <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{trainInSiteController.editForward()}" disabled="#{empty trainInSiteController.selected}" />
+                    <p:commandButton id="deleteButton" immediate="false" process="@this"   icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{trainInSiteController.delete}" update=":growl trainTab:trainInsiteListForm:datalist" disabled="#{empty trainInSiteController.selected}">
+                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                    </p:commandButton>
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                         <p:dataExporter type="xls" target="datalist" fileName="Train_info_Export"/>
                     </p:commandButton>
@@ -108,7 +111,7 @@
             <p:commandButton onclick="PF('panelFilterActualTrainDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
         </p:overlayPanel>-->
     </div>
-    <ui:include src="trainEdit.xhtml"></ui:include>
+   <!-- <ui:include src="trainEdit.xhtml"></ui:include>-->
 </ui:composition>
 
 </html>

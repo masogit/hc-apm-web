@@ -342,6 +342,7 @@ public class MaintenanceContractApplyPurchaseService {
                 approval.get().setWorkflowConfigApproveUid(approvalConfig.getId());
                 approval.get().setInitiateApproverUid(account.getUid());
                 approval.get().setApplicationUid(account.getUid());
+                approval.get().setApplicationName(account.getName());
                 approval.get().setCreatedDate(new Date());
                 approval.get().setCreatedBy(account.getLoginName());
                 setApplicationDepartment(account,approval.get());

@@ -342,12 +342,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="work_order_type")
     private String workOrderType;
 
+    @Column(name="travel_time")
+    private Double travelTime;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
     @Fetch(FetchMode.SUBSELECT)
     private List<V2_WorkOrderManHoursDetail> workHoursList;
-
     @Transient
     private String partApproveSignature;
 
@@ -1099,7 +1101,6 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setWorkOrderType(String workOrderType) {
         this.workOrderType = workOrderType;
     }
-
     @Transient
     private String businessDigest;
     @Override
@@ -1124,5 +1125,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setExternalTempUser(ExternalTempUser externalTempUser) {
         this.externalTempUser = externalTempUser;
+    }
+
+    public Double getTravelTime() {
+        return travelTime;
+    }
+
+    public void setTravelTime(Double travelTime) {
+        this.travelTime = travelTime;
     }
 }

@@ -22,7 +22,6 @@ import lombok.Setter;
 import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -40,74 +39,65 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     private static final Logger log = LoggerFactory.getLogger(FeatureSettingController.class);
-
     TenantInfoRepository dao;
-
     private ConfigCacheService configCacheService;
     private AdminFeatureActiveRepository featureActiveRepository;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
-
     @Getter
     @Setter
     private TenantInfo tenantInfo;
-
     @Getter
     @Setter
     private String edition;
-
     @Getter
     @Setter
     private String cpmURL;
-
     @Getter
     @Setter
     private Map<String, Boolean> tenantFeatureMap = new HashMap<>();
-
     @Getter
     @Setter
     private JSONObject featureSettings;
-
     @Getter
     @Setter
     private String selectedFeature;
-
     @Getter
     @Setter
     private List<OrgInfo> hospitalList;
-
     @Getter
     @Setter
     private List<String> selectHospitalUidList;
-
     @Getter
     @Setter
     private Map<String, Boolean> selectHospitalMap = new HashMap<>();
-
+    @Getter
+    @Setter
+    private Map<String, List<String>> moduleFeatureMap = new LinkedHashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Boolean> tenantModuleMap = new LinkedHashMap<>();
+    @Getter
+    @Setter
+    private List<ModuleItem> moduleItems = new ArrayList<>();
     @Getter
     @Setter
     private OrgInfo selectHospital;
-
     @Getter
     @Setter
     private List<AdminFeatureActive> adminFeatureActives;
-
     @Getter
     @Setter
     private List<AdminFeatureActive> filterAdminFeatureActives = new ArrayList<>();
-
     @Getter
     @Setter
     private Integer tabIndex = 0;
-
     @Getter
     @Setter
     private String link;
-
     @Getter
     @Setter
     private String hospitalStr;
-
     @Getter
     @Setter
     private List<String> orderedItems = new ArrayList<>();
@@ -120,22 +110,19 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userService = WebUtil.getBean(UserCommonService.class);
-
         String tenantUid = "";
         String encodeStr = WebUtil.getRequestParameter("str");
         if (encodeStr != null) {
             tenantUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "tenantUid");
         }
         tenantInfo = dao.findByUid(tenantUid);
-
         JSONObject tenantConfig = JSONObject.parseObject(tenantInfo.getTenantConfig());
-
         edition = tenantConfig.getString("edition");
         cpmURL = tenantConfig.getString("cpmURL");
         selectedFeature = "ALL";
         hospitalList = orgDao.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
         buildActiveMap(tenantInfo.getFeatureList());
-
+        initModuleSetting();
     }
 
     @Override
@@ -144,22 +131,14 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     }
 
     public void changeTab(TabChangeEvent event) {
-        if (tabIndex == 2) {
+        if (tabIndex == 3) {
             List<String> featureList = JSONArray.parseArray(getTenantInfo().getFeatureList()).toJavaList(String.class);
             List<ApmFeatureDefaultOrder> apmFeatureDefaultOrderList =  Arrays.stream(ApmFeatureDefaultOrder.values()).collect(Collectors.toList());
             List<String> defaultOrder = Arrays.stream(ApmFeatureDefaultOrder.values()).map(Enum::name).collect(Collectors.toList());
             if (tenantInfo.getEnablesMenuOrder()) {
                 HashMap<String, String> defaultOrderMap = MenuAnalysis.defaultOrderToMap();
                 orderedItems = featureList.stream().filter(t -> defaultOrderMap.containsKey(t)).map(t -> defaultOrderMap.get(t)).distinct().collect(Collectors.toList());
-                /*orderedItems = featureList.stream()
-                        .filter(defaultOrder::contains)  // 移除不在 defaultOrder 中的字符串
-                        .collect(Collectors.toList());*/
-
             } else {
-                /*orderedItems = featureList.stream()
-                        .sorted(Comparator.comparingInt(defaultOrder::indexOf))  // 根据 defaultOrder 的顺序排序
-                        .filter(defaultOrder::contains)  // 移除不在 defaultOrder 中的字符串
-                        .collect(Collectors.toList());*/
                 orderedItems =  apmFeatureDefaultOrderList.stream()
                         .filter(t -> MenuAnalysis.existOrderByFeature(t, featureList))
                         .map(ApmFeatureDefaultOrder::name).collect(Collectors.toList());
@@ -172,6 +151,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     public void changeListener() {
         Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(edition)).collect(Collectors.toSet()).stream().findFirst();
         buildActiveMap(JSON.toJSONString(features.get().getFeatureList()));
+        refreshModuleChecked();
     }
 
     public void changeActiveListener() {
@@ -201,6 +181,94 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                 .collect(Collectors.toMap(ApmFeature::name, i-> featureList.contains(i.name())));
         if (StringUtils.hasText(selectedFeature) && !selectedFeature.equals("ALL")) {
             changeActiveListener();
+        }
+        // 若模块映射已初始化，则同步模块勾选状态
+        if (moduleFeatureMap != null && !moduleFeatureMap.isEmpty()) {
+            refreshModuleChecked();
+        }
+    }
+
+    private void initModuleSetting() {
+        moduleFeatureMap = new LinkedHashMap<>();
+        tenantModuleMap = new LinkedHashMap<>();
+        moduleItems = new ArrayList<>();
+        for (ApmFeatureGroup g : ApmFeatureGroup.values()) {
+            List<String> featureKeys = g.getFeatureList().stream().map(Enum::name).collect(Collectors.toList());
+            moduleFeatureMap.put(g.name(), featureKeys);
+            if (g.getVersionName().equals(ApmFeatureGroup.basicVersion.getVersionName())) {
+                moduleItems.add(new ModuleItem(g.name(), g.getVersionName(), true));
+            } else {
+                moduleItems.add(new ModuleItem(g.name(), g.getVersionName(), false));
+            }
+        }
+        refreshModuleChecked();
+    }
+
+    public void moduleChange(String moduleKey) {
+        if (Strings.isNullOrEmpty(moduleKey)) {
+            return;
+        }
+        Boolean checked = tenantModuleMap.get(moduleKey);
+        List<String> featureKeys = moduleFeatureMap.getOrDefault(moduleKey, Collections.emptyList());
+
+        if (Boolean.TRUE.equals(checked)) {
+            featureKeys.forEach(k -> tenantFeatureMap.put(k, true));
+        } else {
+            for (String featureKey : featureKeys) {
+                if (isFeatureUsedByOtherCheckedModules(featureKey, moduleKey)) {
+                    continue;
+                }
+                tenantFeatureMap.put(featureKey, false);
+            }
+        }
+        refreshModuleChecked();
+    }
+
+    private boolean isFeatureUsedByOtherCheckedModules(String featureKey, String excludedModuleKey) {
+        if (Strings.isNullOrEmpty(featureKey)) {
+            return false;
+        }
+        for (Map.Entry<String, Boolean> e : tenantModuleMap.entrySet()) {
+            String moduleKey = e.getKey();
+            Boolean moduleChecked = e.getValue();
+            if (!Boolean.TRUE.equals(moduleChecked)) {
+                continue;
+            }
+            if (Objects.equals(moduleKey, excludedModuleKey)) {
+                continue;
+            }
+            List<String> keys = moduleFeatureMap.getOrDefault(moduleKey, Collections.emptyList());
+            if (keys.contains(featureKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void refreshModuleChecked() {
+        if (tenantModuleMap == null) {
+            tenantModuleMap = new LinkedHashMap<>();
+        }
+        if (moduleFeatureMap == null) {
+            moduleFeatureMap = new LinkedHashMap<>();
+        }
+        moduleFeatureMap.forEach((moduleKey, features) -> {
+            boolean anySelected = features.stream().anyMatch(f -> Boolean.TRUE.equals(tenantFeatureMap.get(f)));
+            tenantModuleMap.put(moduleKey, anySelected);
+        });
+    }
+
+    @Getter
+    @Setter
+    public static class ModuleItem {
+        private String key;
+        private String name;
+        private boolean disabled;
+
+        public ModuleItem(String key, String name, boolean disabled) {
+            this.key = key;
+            this.name = name;
+            this.disabled = disabled;
         }
     }
 
@@ -257,6 +325,8 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                 }
                 break;
         }
+
+        refreshModuleChecked();
     }
 
     public void addHospital(AdminFeatureActive adminFeatureActive) {
@@ -281,7 +351,24 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                     featureArray.add(k);
                 }
             });
-            tenantInfo.setFeatureList(featureArray.toJSONString());
+            // 为了不影响原来的feature排序 将新保存的和后面的进行比对添加和移除
+            JSONArray oldFeatureArray = JSONArray.parseArray(tenantInfo.getFeatureList());
+            List<String> result = new ArrayList<>();
+            // 1. 先保留旧 feature 中仍然存在的（顺序不变）
+            for (int i = 0; i < oldFeatureArray.size(); i++) {
+                String feature = oldFeatureArray.getString(i);
+                if (featureArray.contains(feature)) {
+                    result.add(feature);
+                }
+            }
+            // 2. 新增的 feature 追加到末尾
+            for (int i = 0; i < featureArray.size(); i++) {
+                String feature = featureArray.getString(i);
+                if (!result.contains(feature)) {
+                    result.add(feature);
+                }
+            }
+            tenantInfo.setFeatureList(JSON.toJSONString(result));
             tenantInfo.setLastModifiedDate(new Date());
             tenantInfo.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             dao.save(tenantInfo);
@@ -292,7 +379,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         }
     }
 
-    public void saveMenuOrder(){
+    public void saveMenuOrder() {
         try {
             List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
             orderedItems.addAll(featureList.stream()

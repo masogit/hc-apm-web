@@ -18,16 +18,18 @@
                             <f:selectItems value="#{workOrderMgrController.getWorkerList()}" var="item1" itemLabel="#{item1.name}" itemValue="#{item1.id}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1 || workOrderMgrController.selectedWorkOrder.coworkerEntryType==3}">
                         <label class="label">开始时间*</label>
-                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.coWorkerDetail.startTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.coWorkerDetail.startTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}" >
+                            <p:ajax update="endDate2"/>
+                        </p:calendar>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1}">
+                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==1 || workOrderMgrController.selectedWorkOrder.coworkerEntryType==3}">
                         <label class="label">结束时间*</label>
-                        <p:calendar  timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.coWorkerDetail.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="结束时间#{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="GMT+8" id="endDate2" maxdate="#{workOrderMgrController.getCoWorkMaxDate()}" pattern="yyyy-MM-dd HH:mm"  value="#{workOrderMgrController.coWorkerDetail.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="结束时间#{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
 
-                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==0}">
+                    <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.coworkerEntryType==0 || workOrderMgrController.selectedWorkOrder.coworkerEntryType==2}">
                         <label class="label">#{msg.manhourPrice}*</label>
                         <p:inputNumber decimalPlaces="2" maxValue="999" id="manHours" value="#{workOrderMgrController.coWorkerDetail.manHours}" required="true" requiredMessage="#{msg.manhourPrice} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
