@@ -4,6 +4,8 @@ import com.ge.apm.domain.Progress;
 import com.ge.apm.service.wo.doctemplate.WorkOrderDocxRenderService;
 import com.ge.healthcare.cn.common.pdf.PDFConversion;
 import com.ge.healthcare.cn.common.pdf.PDFConversionUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +44,13 @@ public class WorkOrderExportStream extends InputStream {
 
     private String exportType = "WORD";
 
+    private Map<String, Integer> fileNameMap;
+
+    private Map<String, String> orderNameMap;
+
     public WorkOrderExportStream(List<Map<String, Object>> workOrderData, byte[] templateBytes, WorkOrderDocxRenderService renderService, Progress progress) {
+        fileNameMap = MapUtil.newHashMap();
+        orderNameMap = MapUtil.newHashMap();
         this.workOrderData = workOrderData;
         this.templateBytes = templateBytes;
         bout = new ByteArrayOutputStream();
@@ -99,7 +107,23 @@ public class WorkOrderExportStream extends InputStream {
         String deviceName = (String) map.get(WebUtil.getMessage("EquipmentName_xlsx"));
         deviceName = StringUtils.replace(deviceName, "\\", "-");
         deviceName = StringUtils.replace(deviceName, "/", "-");
-        return "维修-"+siteName  + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
+        String srNumXlsx = WebUtil.getMessage("srNum_xlsx");
+        String name = "维修-"+siteName + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx"));
+        String fileName = name + ".docx";
+        String orderName = orderNameMap.get((String) map.get("woId"));
+        if (ObjectUtil.isNotEmpty(orderName)) {
+            return orderName;
+        } else {
+            orderNameMap.put((String) map.get("woId"), fileName);
+        }
+        Integer i = fileNameMap.get((String) map.get(srNumXlsx));
+        if (ObjectUtil.isNotEmpty(i)) {
+            fileName = name + "(" + ++i + ")" + ".docx";
+            fileNameMap.put((String) map.get(srNumXlsx), i);
+        } else {
+            fileNameMap.put((String) map.get(srNumXlsx), 0);
+        }
+        return fileName;
     }
 
     public void exportReport(int index) {

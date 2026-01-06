@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="工程师导入"/><!--#{msg.ZKBCourseMgt}-->
+            </div>
+            <div class="ui-g-12 card"><br/><br/>
+                <h:form enctype="multipart/form-data">
+                    <p:fieldset legend="批量导入 工程师" id="uploaderContainer">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <p:fileUpload fileUploadListener="#{zkbEngineerController.handleExcelUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+                                          invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M"
+                                          update=":dataListForm" sizeLimit="5242880"
+                                          allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+                            <p:growl id="messages" showDetail="true" />
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <p>
+                                1. <a href="APM_ZKB_Engineer_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+                            </p>
+                            <p>2. 文件中填入要导入的数据，其中 [租户]、[姓名]、[电话]、[邮箱]、[身份证号] 必填</p>
+                            <p>3. 上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:fieldset>
+                </h:form>
+                <h:panelGroup>
+                    <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="List.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+                </h:panelGroup>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="dataListForm">
+                    <p:fieldset legend="错误的数据">
+                        <p:dataTable id="datalist" rendered="#{not empty zkbEngineerController.importFailedDataList}"
+                                     value="#{zkbEngineerController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both"
+                                     paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+                            <p:column headerText="EXCEL行数">
+                                <h:outputText value="#{item.excelIdex}" />
+                            </p:column>
+                            <p:column headerText="姓名">
+                                <h:outputText value="#{item.name}" />
+                            </p:column>
+                            <p:column headerText="电话">
+                                <h:outputText value="#{item.phone}" />
+                            </p:column>
+                            <p:column headerText="邮箱">
+                                <h:outputText value="#{item.email}" />
+                            </p:column>
+                            <p:column headerText="身份证号">
+                                <h:outputText value="#{item.identityNumber}" />
+                            </p:column>
+                            <p:column headerText="错误原因">
+                                <h:outputText value="#{item.errorMsg}" />
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="datalist" fileName="SmallAssetPerformanceFailed_export" />
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:fieldset>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
