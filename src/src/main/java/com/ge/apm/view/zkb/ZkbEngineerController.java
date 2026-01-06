@@ -7,11 +7,14 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbEngineerExportService;
 import com.ge.apm.service.zkb.ZkbEngineerService;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -24,10 +27,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -53,21 +53,12 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
 
     private List<ZkbEngineerTrackRecord> zkbEngineerTrackRecordList;
 
-
-    /**
-     * 培训记录
-     */
-    private List<ZkbContractCourseSchedule> zkbEngineerTrainRecordList;
     private ZkbEngineerTrackRecord zkbEngineerTrackRecordSelected;
-
-    private ZkbContractCourseSchedule zkbContractCourseSchedule;
-
 
     /**
      * 获取附件处理service
      */
     private BlobFileService blobService;
-
 
     /**
      * 附件信息
@@ -79,7 +70,18 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
      */
     private List<V2_BlobObject> removev2_blobObjectList = new ArrayList<>();
 
-    private static final String ssoStartWith="ZKB";
+    private static final String ssoStartWith = "ZKB";
+
+    @Getter
+    @Setter
+    private UploadedFile file;
+    @Getter
+    @Setter
+    private List<ZkbEngineer> importFailedDataList;
+
+    @Getter
+    @Setter
+    private List<ZkbTrainAttendanceRecord> zkbTrainAttendanceRecords;
 
     @Override
     protected void init() {
@@ -138,23 +140,27 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
         this.selected.setLastModifiedDate(new Date());
 
         zkbEngineerTrackRecordList = zkbEngineerService.getZkbEngineerTrackRecordList(this.selected.getId());
-        zkbEngineerTrainRecordList = zkbEngineerService.getZkbEngineerTrainRecordList(this.selected.getId());
+        zkbTrainAttendanceRecords = zkbEngineerService.getZkbTrainAttendanceRecordList(this.selected.getId());
+
         this.initBlobObjectList(this.selected.getId());
     }
 
     @Override
     public void save() {
-        if(selected.hashCode()==0)
-        {
-           List<ZkbEngineer> zkbEngineerList = this.dao.findBySso(selected.getSso());
-           if(CollectionUtils.isNotEmpty(zkbEngineerList))
-           {
-               this.zkbEngineerService.fullSso(this.selected,ssoStartWith);
-           }
+        if (selected.hashCode() == 0) {
+            List<ZkbEngineer> zkbEngineerList = this.dao.findBySso(selected.getSso());
+            if (CollectionUtils.isNotEmpty(zkbEngineerList)) {
+                this.zkbEngineerService.fullSso(this.selected, ssoStartWith);
+            }
         }
-        super.save();
-        this.zkbEngineerService.saveUploadFile(this.v2_blobObjectList,this.selected.getId());
-        this.zkbEngineerService.removeFile(this.removev2_blobObjectList);
+        ZkbEngineer existedEngineer = this.dao.findByIdentityNumber(this.selected.getIdentityNumber());
+        if (existedEngineer != null && !Objects.equals(existedEngineer.getId(), this.selected.getId())) {
+            WebUtil.addErrorMessage("保存失败！当前身份证号已存在！");
+        } else {
+            super.save();
+            this.zkbEngineerService.saveUploadFile(this.v2_blobObjectList, this.selected.getId());
+            this.zkbEngineerService.removeFile(this.removev2_blobObjectList);
+        }
         this.cancel();
     }
 
@@ -220,8 +226,7 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
      */
     public void removeFile(V2_BlobObject v2_blobObject) {
         this.v2_blobObjectList = this.v2_blobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
-        if(StringUtils.isNotBlank(v2_blobObject.getId()))
-        {
+        if (StringUtils.isNotBlank(v2_blobObject.getId())) {
             this.removev2_blobObjectList.add(v2_blobObject);
         }
 
@@ -229,14 +234,14 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
 
     /**
      * 初始化附件列表
+     *
      * @param id 流程主键
      */
-    public void initBlobObjectList(String id)
-    {
-        this.v2_blobObjectList=this.blobService.findBlobObjectsByBoUid(id);
+    public void initBlobObjectList(String id) {
+        this.v2_blobObjectList = this.blobService.findBlobObjectsByBoUid(id);
     }
 
-    public void tenantInfoSelect(){
+    public void tenantInfoSelect() {
         this.cancel();
     }
 
@@ -244,7 +249,7 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
         this.selected = null;
     }
 
-    public TenantInfo getTenantInfo(String tenantInfoUID){
+    public TenantInfo getTenantInfo(String tenantInfoUID) {
         return zkbEngineerService.getTenantInfo(tenantInfoUID);
     }
 
@@ -304,19 +309,16 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
         this.v2_blobObjectList = v2_blobObjectList;
     }
 
-    public List<ZkbContractCourseSchedule> getZkbEngineerTrainRecordList() {
-        return zkbEngineerTrainRecordList;
+
+    public void handleExcelUpload(FileUploadEvent event) {
+        this.file = event.getFile();
+        importFailedDataList = zkbEngineerService.handleExcel(file, currentUser);
+        if (CollectionUtils.isEmpty(importFailedDataList)) {
+            WebUtil.addSuccessMessage("导入完成！");
+        } else {
+            WebUtil.addErrorMessage("导入失败！请修改错误数据");
+        }
     }
 
-    public void setZkbEngineerTrainRecordList(List<ZkbContractCourseSchedule> zkbEngineerTrainRecordList) {
-        this.zkbEngineerTrainRecordList = zkbEngineerTrainRecordList;
-    }
 
-    public ZkbContractCourseSchedule getZkbContractCourseSchedule() {
-        return zkbContractCourseSchedule;
-    }
-
-    public void setZkbContractCourseSchedule(ZkbContractCourseSchedule zkbContractCourseSchedule) {
-        this.zkbContractCourseSchedule = zkbContractCourseSchedule;
-    }
 }

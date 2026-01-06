@@ -145,6 +145,10 @@ public class ZkbTrainAttendanceRecord {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
+    @Column(name = "engineer_id")
+    private String engineerId;
+
+
     @Transient
     private Integer excelIdex;
 
