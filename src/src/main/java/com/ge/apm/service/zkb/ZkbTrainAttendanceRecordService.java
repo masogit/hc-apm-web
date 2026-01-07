@@ -267,9 +267,11 @@ public class ZkbTrainAttendanceRecordService {
                         if (zkbTrainPublishInfo != null) {
                             record.setPublishId(zkbTrainPublishInfo.getId());
                         }
-                        ZkbEngineer existingByCard = zkbEngineerRepository.findByIdentityNumber(idCardNo);
-                        if (existingByCard != null) {
-                            record.setEngineerId(existingByCard.getId());
+
+                        //设置engineerId
+                        List<ZkbEngineer> engineerList = zkbEngineerRepository.findByPhone(record.getPhone());
+                        if (CollectionUtils.isNotEmpty(engineerList)) {
+                            record.setEngineerId(engineerList.get(0).getId());
                         }
                         // 保存成功记录
                         dao.save(record);
@@ -323,6 +325,13 @@ public class ZkbTrainAttendanceRecordService {
         if (zkbTrainPublishInfo != null) {
             selected.setPublishId(zkbTrainPublishInfo.getId());
         }
+
+        //设置engineerId
+        List<ZkbEngineer> engineerList = zkbEngineerRepository.findByPhone(selected.getPhone());
+        if (CollectionUtils.isNotEmpty(engineerList)) {
+            selected.setEngineerId(engineerList.get(0).getId());
+        }
+
         selected.setLastModifiedDate(new Date());
         selected.setLastModifiedBy(currentUser.getLoginName());
 
