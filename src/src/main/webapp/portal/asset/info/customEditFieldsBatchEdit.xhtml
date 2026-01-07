@@ -615,7 +615,7 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'status')}" >
         <h:panelGroup >
             <label class="label">#{msg.status}</label>
-            <p:selectOneRadio id="status" value="#{assetInfoBulkEditController.selected.status}" >
+            <p:selectOneRadio id="status" value="#{assetInfoBulkEditController.selected.status}" disabled="#{!assetInfoBulkEditController.needEdit('status')}">
                 <f:selectItems value="#{assetInfoBulkEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneRadio>
         </h:panelGroup>
@@ -626,7 +626,6 @@
             <p:selectOneRadio id="deviceStatus" value="#{assetInfoBulkEditController.selected.deviceStatus}"
                               disabled="#{!assetInfoBulkEditController.needEdit('deviceStatus')}" >
                 <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
