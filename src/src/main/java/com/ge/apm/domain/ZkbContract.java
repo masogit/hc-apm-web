@@ -1,4 +1,4 @@
-  package com.ge.apm.domain;
+package com.ge.apm.domain;
 
 import com.ge.apm.service.utils.ChineseName;
 import org.hibernate.annotations.GenericGenerator;
@@ -25,7 +25,7 @@ public class ZkbContract implements ChineseName, Serializable {
     }
 
     public enum ContractRegion {
-        North,South,East,West
+        E1, E2, E3, N3, W1, W2, N1, N2, S1, S2
     }
 
     public enum ContractType {
