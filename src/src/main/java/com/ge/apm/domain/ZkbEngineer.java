@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.util.Date;
 /**
  * @author 212605082 on 2019/12/17.
  */
+@Data
 @Entity
 @Table(name = "zkb_engineer")
 public class ZkbEngineer implements Serializable {
@@ -70,6 +72,15 @@ public class ZkbEngineer implements Serializable {
 
     @Column(name = "identity_number")
     private String identityNumber;
+
+    @Transient
+    private Integer excelIdex;
+    @Transient
+    private String errorMsg = "";
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg += errorMsg;
+    }
 
     public String getId() {
         return id;
@@ -206,6 +217,7 @@ public class ZkbEngineer implements Serializable {
     public void setIdentityNumber(String identityNumber) {
         this.identityNumber = identityNumber;
     }
+
 
     @Override
     public int hashCode() {

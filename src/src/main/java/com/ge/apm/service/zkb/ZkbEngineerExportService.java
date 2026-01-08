@@ -44,11 +44,12 @@ public class ZkbEngineerExportService {
             zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_name"), zkbEngineer.getName());
             zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_phone"), zkbEngineer.getPhone());
             zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_email"), zkbEngineer.getEmail());
-            zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_status"), zkbEngineer.getStatus());
-            zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_age"), zkbEngineer.getAge() != null ? String.valueOf(zkbEngineer.getAge()) : "");
+            zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_identityNumber"), zkbEngineer.getIdentityNumber());
+//            zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_age"), zkbEngineer.getAge() != null ? String.valueOf(zkbEngineer.getAge()) : "");
             zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_educationalBackground"), zkbEngineer.getEducationalBackground());
             zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_graduateSchool"), zkbEngineer.getGraduateSchool());
             zkbEngineerDataMap.put(WebUtil.getMessage("zkbEngineer_specialty"), zkbEngineer.getSpecialty());
+            zkbEngineerDataMap.put("SSO", zkbEngineer.getSso());
 
             zkbEngineerDataList.add(zkbEngineerDataMap);
 
