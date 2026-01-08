@@ -8,6 +8,7 @@ import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.healthcare.cn.common.cons.ApmEsIndex;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class ElasticService extends MicroServiceInvoker {
         map.put("pageSize",pageSize);
         map.put("sortField","created_date");
         map.put("sortValue","DESC");
-        map.put("esIndex","asset_history_v2");
+        map.put("esIndex", ApmEsIndex.ASSET_HISTORY.getValue());
 
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
