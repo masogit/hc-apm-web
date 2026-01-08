@@ -58,9 +58,13 @@
                             <h:outputText value="#{item.status}"/>
                         </p:column>-->
 
-                        <p:column headerText="#{msg.zkbEngineer_age}" filterBy="#{item.age}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.age}"/>
+                        <p:column headerText="#{msg.zkbEngineer_identityNumber}" filterBy="#{item.identityNumber}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.identityNumber}"/>
                         </p:column>
+
+<!--                        <p:column headerText="#{msg.zkbEngineer_age}" filterBy="#{item.age}" filterMatchMode="LIKE">-->
+<!--                            <h:outputText value="#{item.age}"/>-->
+<!--                        </p:column>-->
 
                         <p:column headerText="#{msg.zkbEngineer_educationalBackground}" filterBy="#{item.educationalBackground}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.educationalBackground}"/>
@@ -82,6 +86,7 @@
                             <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbEngineerController.delete}" update=":zkbEngineerListForm :zkbEngineerEditForm" disabled="#{empty zkbEngineerController.selected.id}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
+                            <p:commandButton id="importButton" ajax="false" title="导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n" rendered="#{userContextService.zkbAdmin}"/>
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbEngineerController.exportAll}" icon="ui-icon-arrowthick-1-s">
                                 <p:fileDownload value="#{zkbEngineerController.exportFile}"/>
                             </p:commandButton>

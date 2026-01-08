@@ -24,13 +24,13 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_phone}</label>
-                        <p:inputText id="phone" value="#{zkbEngineerController.selected.phone}" required="false" requiredMessage="#{msg.zkbEngineer_phone} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbEngineer_phone}*</label>
+                        <p:inputText id="phone" value="#{zkbEngineerController.selected.phone}" required="true" requiredMessage="#{msg.zkbEngineer_phone} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_email}</label>
-                        <p:inputText id="email" value="#{zkbEngineerController.selected.email}" required="false" requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbEngineer_email}*</label>
+                        <p:inputText id="email" value="#{zkbEngineerController.selected.email}" required="true" requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <!--<h:panelGroup>
@@ -43,25 +43,32 @@
                     </h:panelGroup>-->
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_age}*</label>
-                        <p:inputNumber id="age"  decimalPlaces="0" minValue="0" maxValue="999" value="#{zkbEngineerController.selected.age}" required="true" requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}">
-                            <f:convertNumber pattern="0" type="number"/>
-                        </p:inputNumber>
+                        <label class="label">#{msg.zkbEngineer_identityNumber}*</label>
+                        <p:inputText id="identityNumber" value="#{zkbEngineerController.selected.identityNumber}"
+                                       required="true"
+                                       requiredMessage="#{msg.zkbEngineer_identityNumber} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+
+<!--                    <h:panelGroup>-->
+<!--                        <label class="label">#{msg.zkbEngineer_age}*</label>-->
+<!--                        <p:inputNumber id="age"  decimalPlaces="0" minValue="0" maxValue="999" value="#{zkbEngineerController.selected.age}" required="true" requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}">-->
+<!--                            <f:convertNumber pattern="0" type="number"/>-->
+<!--                        </p:inputNumber>-->
+<!--                    </h:panelGroup>-->
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbEngineer_educationalBackground}</label>
+                        <p:inputText id="educationalBackground" value="#{zkbEngineerController.selected.educationalBackground}" required="false" requiredMessage="#{msg.zkbEngineer_educationalBackground} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_educationalBackground}*</label>
-                        <p:inputText id="educationalBackground" value="#{zkbEngineerController.selected.educationalBackground}" required="true" requiredMessage="#{msg.zkbEngineer_educationalBackground} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbEngineer_graduateSchool}</label>
+                        <p:inputText id="graduateSchool" value="#{zkbEngineerController.selected.graduateSchool}" required="false" requiredMessage="#{msg.zkbEngineer_graduateSchool} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_graduateSchool}*</label>
-                        <p:inputText id="graduateSchool" value="#{zkbEngineerController.selected.graduateSchool}" required="true" requiredMessage="#{msg.zkbEngineer_graduateSchool} #{msg.ValidationRequire}" />
-                    </h:panelGroup>
-
-                    <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_specialty}*</label>
-                        <p:inputText id="specialty" value="#{zkbEngineerController.selected.specialty}" required="true" requiredMessage="#{msg.zkbEngineer_specialty} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbEngineer_specialty}</label>
+                        <p:inputText id="specialty" value="#{zkbEngineerController.selected.specialty}" required="false" requiredMessage="#{msg.zkbEngineer_specialty} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -107,29 +114,24 @@
                     </p:dataTable>
                 </p:fieldset>
                 <p:fieldset id="zkbEngineerTrainRecordFieldset" legend="培训记录" rendered="#{zkbEngineerController.actionName eq 'Edit'}">
-                    <p:dataTable id="zkbEngineerTrainRecordDatalist" value="#{zkbEngineerController.zkbEngineerTrainRecordList}" var="zkbEngineerTrainRecordItem"
-                                 widgetVar="zkbEngineerTrainRecordDataList" selectionMode="single" selection="#{zkbEngineerController.zkbContractCourseSchedule}"
-                                 lazy="false" paginator="true" rowKey="#{zkbEngineerTrainRecordItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbEngineerTrainRecordItem.createdDate}"
+                    <p:dataTable id="zkbEngineerTrainRecordDatalist" value="#{zkbEngineerController.zkbTrainAttendanceRecords}" var="record"
+                                 widgetVar="zkbEngineerTrainRecordDataList" selectionMode="single"
+                                 lazy="false" paginator="true" rowKey="#{record.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbEngineerTrainRecordItem.createdDate}"
                                  paginatorTemplate="{Toolbar}" rows="100" emptyMessage="#{msg.noRecordFound}">
-                        <p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
-                            <h:outputText value="#{zkbEngineerTrainRecordItem.cid}"/>
+                        <p:column headerText="课程名称">
+                            <h:outputText value="#{record.courseName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.zkbContractCourseSchedule_cname}">
-                            <h:outputText value="#{zkbEngineerTrainRecordItem.cname}"/>
+                        <p:column headerText="培训开始时间">
+                            <h:outputText value="#{record.trainStartDate}"/>
                         </p:column>
-                        <p:column headerText="#{msg.zkbContractCourseSchedule_modality}">
-                            <h:outputText value="#{zkbEngineerTrainRecordItem.modality}"/>
+                        <p:column headerText="培训结束时间">
+                            <h:outputText value="#{record.trainEndDate}"/>
                         </p:column>
-                        <p:column headerText="#{msg.zkbContractCourseSchedule_batchNo}">
-                            <h:outputText value="#{zkbEngineerTrainRecordItem.batchNo}"/>
+                        <p:column headerText="成绩">
+                            <h:outputText value="#{record.finalScore}"/>
                         </p:column>
-                        <p:column headerText="#{msg.zkbContractCourseSchedule_type}">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',zkbEngineerTrainRecordItem.type)}"/>
-                        </p:column>
-                        <p:column headerText="报名时间">
-                            <h:outputText value="#{zkbEngineerTrainRecordItem.createdDate}">
-                                <f:convertDateTime pattern="yyyy-MM-dd" />
-                            </h:outputText>
+                        <p:column headerText="状态">
+                            <h:outputText value="#{record.status}"/>
                         </p:column>
                     </p:dataTable>
                 </p:fieldset>

@@ -88,8 +88,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private ContractInfoMapper contractInfoMapper;
 
     private QRPreViewerBean qrPreViewerBean;
-    //选定的院区
-//    private OrgInfo selectSite;
 
     //选定科室过滤
     private String filterClinicalDeptOrg;
@@ -320,23 +318,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("lifecycle", SearchFilter.Operator.EQ,newLifecyle));
         }
         selected = null;
-        /*TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(user.getTenantUID());
-            if (tenantOptionConfig.getOrderByCreateTimeByDefault()) {
-                if(pageRequest.getSort() !=null){
-                    Sort sortCreatedDate = new Sort(Sort.Direction.DESC, "createdDate");
-                    pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortCreatedDate));
-                }else {
-                    pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"createdDate"));
-                }
-            }else {
-                if(pageRequest.getSort() !=null){
-                    Sort sortNamePyCode = new Sort(Sort.Direction.ASC, "namePyCode");
-                    pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortNamePyCode));
-                }else {
-                    pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"namePyCode"));
-                }
-            }*/
-//        pageRequest = addRequiredSortById(new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort));
         pageRequest = addSort(pageRequest);
 
         lastPageSort = pageRequest.getSort(); //export excel use
@@ -375,8 +356,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetInfoService.setSupplier(currentPageAssets);
         assetInfoService.setWarrantyStatus(currentPageAssets);
 
-//        Set<String> createdBys = currentPageAssets.stream().map(AssetInfo::getCreatedBy).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
-//        createdByMap = userDao.getByLoginNameIn(createdBys).stream().collect(Collectors.toMap(UserAccount::getLoginName, t -> t));
         Set<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedInAndTenantUid(encodes, user.getTenantUID());
         currentPageAssetTypeGroupMap = currentPageAssetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, ast -> ast));
@@ -510,11 +489,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
         }
 
-//        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
-//            this.removeFilterOnField("oneQrCodeStatus");
-//            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
-//        }
-
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
@@ -610,28 +584,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-        TreeNode treeNode = event.getTreeNode();
         this.searchFilters.clear();
-
-//        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-//            selectSite = (OrgInfo) event.getTreeNode().getData();
-//        } else {
-//            selectSite = null;
-//        }
-//
-//        //如果是mvs role,选择了所有租户选项，则清空所选机构
-//        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-//            selectSite = null;
-//        }
-
         loadClinicalDeptList();
-
-        //table header dropdown needs to clear manually, table filters cleared by clear method above.
         filterClinicalDeptOrg = null;
         filterAssetDeptOrg = null;
         assetDeptOrgUidSet = null;
         clinicalDeptOrgUidSet = null;
-
         assetGroup = null;
         assetGroupSecondary = null;
         filterAssetStatus = null;
@@ -641,33 +599,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
 
     public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
-
-        TreeNode treeNode = event.getTreeNode();
         this.searchFilters.clear();
-
-//        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-//            selectSite = (OrgInfo) event.getTreeNode().getData();
-//        } else {
-//            selectSite = null;
-//        }
-//
-//        //如果是mvs role,选择了所有租户选项，则清空所选机构
-//        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-//            selectSite = null;
-//        }
-
         loadClinicalDeptList();
-
-        //table header dropdown needs to clear manually, table filters cleared by clear method above.
         filterClinicalDeptOrg = null;
         filterAssetDeptOrg = null;
         assetDeptOrgUidSet = null;
         clinicalDeptOrgUidSet = null;
-
         assetGroup = null;
         assetGroupSecondary = null;
         filterAssetStatus = null;
-
 
         TreeNode node = event.getTreeNode();
         setTreeNodes(node, false);
@@ -688,31 +628,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode2(NodeSelectEvent event) {
-        // Compared with the above method "onSelectSiteTreeNode", 
-        // this method does not clear existing filters
-//        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-//            selectSite = (OrgInfo) event.getTreeNode().getData();
-//        } else {
-//            selectSite = null;
-//        }
-//
-//        //如果是mvs role,选择了所有租户选项，则清空所选机构
-//        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-//            selectSite = null;
-//        }
-//
-//        if(selectSite==null) this.removeFilterOnField("siteUID");
-
         loadClinicalDeptList();
     }
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
-//        if (null != selectSite) {
-//            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
-//                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
-//        }
         if (selectedAccessOrgNodes!=null && selectedAccessOrgNodes.length>0){
             Set<OrgInfo> orgInfos = new HashSet<>();
             selectSiteDeptList=new ArrayList<>();
@@ -1087,10 +1008,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
-//        if(exportList.size()>5000){
-//            WebUtil.addErrorMessage("超出下载数量限制5000");
-//            return;
-//        }
         Map<String, String> orgNamesMap = orgDao.findByUids(exportList.stream().map(AssetInfo::getSiteUID).distinct().collect(Collectors.toSet()))
                 .stream().collect(Collectors.toMap(OrgInfo::getUid, OrgInfo::getName));
         QrCodeExportStream exportStream = new QrCodeExportStream(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()), exportQrCodeTemplateId,orgNamesMap);
@@ -1464,10 +1381,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
-
-
-
-
     public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
 
         if (event instanceof SelectEvent) {
@@ -1546,14 +1459,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
         }
     }
-/*    public String selectCreatedBy(String loginName) {
-        UserAccount userAccount = createdByMap.get(loginName);
-        String createdBy = null;
-        if (ObjectUtil.isNotEmpty(userAccount)) {
-            createdBy = userAccount.getName();
-        }
-        return createdBy;
-    }*/
 
     /**
      *
@@ -1691,14 +1596,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setFilterAssetTypeGroup(String filterAssetTypeGroup) {
         this.filterAssetTypeGroup = filterAssetTypeGroup;
     }
-
-//    public OrgInfo getSelectSite() {
-//        return selectSite;
-//    }
-//
-//    public void setSelectSite(OrgInfo selectSite) {
-//        this.selectSite = selectSite;
-//    }
 
     public String getFilterWarrantyDate() {
         return filterWarrantyDate;
