@@ -3,6 +3,7 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.ZkbEngineerTrackRecord;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -10,4 +11,6 @@ import java.util.List;
  */
 public interface ZkbEngineerTrackRecordRepository extends GenericRepositoryUUID<ZkbEngineerTrackRecord> {
     List<ZkbEngineerTrackRecord> findByZkbEngineerId(String zkbEngineerId);
+
+    List<ZkbEngineerTrackRecord> findByZkbEngineerIdAndCompanyNameAndPositionAndHireDate(String id, String companyName, String position, Date hireDate);
 }

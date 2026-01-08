@@ -469,7 +469,7 @@ public class PmReportService {
 
         // coworker hours pmOrder
         List<Map<String, Object>> coworkerHoursInfoTable = new ArrayList<>();
-        if(pmOrder.getCoworkerEntryType() == 1){
+        if(pmOrder.getCoworkerEntryType()!=null &&  pmOrder.getCoworkerEntryType() == 1){
             List<V2_WorkOrderCoworker> v2WorkOrderCoworkers = workOrderCoworkerDao.findByWoIdOrderByCreatedDateDesc(pmOrder.getId());
             for (V2_WorkOrderCoworker item : v2WorkOrderCoworkers) {
                 Map<String, Object> coworkerHoursInfoMap = new HashMap<>();
@@ -484,7 +484,7 @@ public class PmReportService {
         }
         content.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(), coworkerHoursInfoTable);
         List<Map<String, Object>> manHoursDetail = new ArrayList<>();
-        if(pmOrder.getEntryType() == 1){
+        if(pmOrder.getEntryType()!=null &&  pmOrder.getEntryType() == 1){
             List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails = pmOrder.getPmOrderManHoursDetails();
             if(CollectionUtils.isNotEmpty(pmOrderManHoursDetails)){
                 for (V2_PmOrderManHoursDetail item : pmOrderManHoursDetails) {

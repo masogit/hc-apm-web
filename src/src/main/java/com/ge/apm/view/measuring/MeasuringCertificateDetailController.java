@@ -120,11 +120,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 //            }
             Map<String, Object> params = new HashMap<>();
             if("AI".equalsIgnoreCase(identifyPatterns)){
-                JSONObject jsonObject = templateService.upload(file, GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,url->url.replace("{type}","/"+ApplicationType.FORM_OCR_WORKFLOWS.name()));
-                String bizStatusCode = jsonObject.getString("bizStatusCode");
-                if("ok".equalsIgnoreCase(bizStatusCode)){
-                    JSONObject data = jsonObject.getJSONObject("data");
-                    WorkflowResponse workflowResponse = data.toJavaObject(WorkflowResponse.class);
+                params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
+                JSONObject jsonObject = templateService.upload(file, GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,null);
+                if(jsonObject != null){
+                    WorkflowResponse workflowResponse = jsonObject.toJavaObject(WorkflowResponse.class);
                     Result result = workflowResponse.getData();
                     JSONObject outputs = result.getOutputs();
                     JSONObject output = outputs.getJSONObject("output");
@@ -167,7 +166,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             storageFile(file);
             WebUtil.addSuccessMessage("计量报告上传识别成功");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
             WebUtil.addErrorMessage("计量报告上传失败");
         }
     }
