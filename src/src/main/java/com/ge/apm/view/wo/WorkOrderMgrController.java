@@ -450,6 +450,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                         item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
                 loadClinicalDeptList();
                 getPageTypeFromConfig();
+
             }
         } catch (Exception e) {
             LOGGER.error("init occur exception", e);
@@ -460,19 +461,23 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         showLocationNameFlag = StrUtil.isNotEmpty(showLocationNameFlagStr) && "true".equals(showLocationNameFlagStr);
         String enableSignNeedScanQrCodeStr = userContextService.getConfigItemValue("enableSignNeedScanQrCode");
         enableSignNeedScanQrCode = StringUtils.isEmpty(enableSignNeedScanQrCodeStr) || !Boolean.parseBoolean(enableSignNeedScanQrCodeStr);
+        getFieldColumnList();
     }
 
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
     }
 
-    public List<FieldColumnDto> getFieldColumnList() {
+    @Getter@Setter
+    private List<FieldColumnDto> fieldColumnDtoList = new ArrayList<>();
+
+    public void getFieldColumnList() {
         String query = WebUtil.getRequestParameter("query");
         query = StrUtil.isEmpty(query) ? "0": query;
         String key = "WorkOrderListColumn_".concat(query);
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
         List<FieldColumnDto> list =  JSON.parseArray(value, FieldColumnDto.class);
-        return list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
+        fieldColumnDtoList = list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
     }
 
     public void getPageTypeFromConfig() {
