@@ -2692,7 +2692,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         try {
             String token = UserContextService.getAccessToken();
             String gatewayURL = microServiceUtil.getGatewayURL(GatewayURL.PLATE_RECOGNITION);
-            gatewayURL = gatewayURL.replace("{objectId}", objectId);
+            gatewayURL = gatewayURL.replace("{objectId}", objectId).concat("?assetUid=").concat(selected == null?"":selected.getUid()==null?"":selected.getUid());
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", token);
             HttpEntity<Map> requestEntity = new HttpEntity<Map>(headers);
@@ -2703,10 +2703,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 equipmentNameplate = data.toJavaObject(EquipmentNameplate.class);
                 WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition")+"完成");
             }
-        } catch (RestClientException e) {
+        } catch (Exception e) {
             // 识别失败，请重新上传图片之类的
             equipmentNameplate = new EquipmentNameplate();
-            e.printStackTrace();
+            logger.info(e.getLocalizedMessage(),e);
             WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition")+"识别失败，请重新上传图片");
         }
     }
