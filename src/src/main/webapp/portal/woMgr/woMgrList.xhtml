@@ -102,7 +102,7 @@
                         </c:otherwise>
                     </c:choose>
                 </p:column>
-                <c:forEach items="#{workOrderMgrController.getFieldColumnList()}" var="fieldItem">
+                <c:forEach items="#{workOrderMgrController.fieldColumnDtoList}" var="fieldItem">
                     <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetName'}">
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.name}"/>

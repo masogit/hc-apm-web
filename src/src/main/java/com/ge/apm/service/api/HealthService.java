@@ -1,5 +1,7 @@
 package com.ge.apm.service.api;
 
+import com.ge.apm.domain.UserAccount;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.davidmoten.rx.jdbc.ConnectionProvider;
 import com.github.davidmoten.rx.jdbc.Database;
 import org.simpleflatmapper.tuple.Tuple4;
@@ -13,6 +15,7 @@ import rx.Observable;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.Set;
 
 @Service
 public class HealthService {
@@ -211,11 +214,21 @@ public class HealthService {
 
 
 	}*/
-	public Observable<Tuple7<Integer, String, Integer, String, String, Integer,String>> queryForMaintain7NoDept(String tenantUID, String siteUID) {
 
+	private String getSql(UserAccount user, String sql) {
+		String resultSql;
+		if (user.isEnableAssetTypeGroup()) {
+			resultSql = sql + " AND asset_info.asset_type IN ( '" + String.join("','", user.getAssetTypeGroupMap().keySet()) + "' )";
+		} else {
+			resultSql = sql;
+		}
+		return resultSql;
+	}
+
+	public Observable<Tuple7<Integer, String, Integer, String, String, Integer,String>> queryForMaintain7NoDept(UserAccount user, String tenantUID, String siteUID) {
 		if(siteUID != null){
 			return db
-					.select(asset_maintain7)
+					.select(getSql(user, asset_maintain7))
 					.parameter("site_uid", siteUID)
 					.get(rs ->
 							new Tuple7<Integer, String, Integer, String, String, Integer,String>(
@@ -225,7 +238,7 @@ public class HealthService {
 									,rs.getString("id")) );
 		}else{
 			return db
-					.select(asset_maintain7_all)
+					.select(getSql(user, asset_maintain7_all))
 					.parameter("tenant_uid", tenantUID)
 					.get(rs ->
 							new Tuple7<Integer, String, Integer, String, String, Integer,String>(
@@ -314,8 +327,7 @@ public class HealthService {
 			+ " ON inner_1.asset_id = v2_work_order.asset_id "
 			+ " WHERE inner_1.created_date = v2_work_order.created_date ) AS inner_2 "
 			+ " ON asset_info.id = inner_2.asset_id "
-			+ " WHERE asset_info.is_valid = true AND asset_info.status = 2 AND (asset_info.tenant_uid IN (:site_uid) OR asset_info.institution_uid IN (:site_uid) OR asset_info.hospital_uid IN (:site_uid) OR asset_info.site_uid IN (:site_uid)) "
-			+ " ORDER BY to_char, id, int_ext_type ";
+			+ " WHERE asset_info.is_valid = true AND asset_info.status = 2 AND (asset_info.tenant_uid IN (:site_uid) OR asset_info.institution_uid IN (:site_uid) OR asset_info.hospital_uid IN (:site_uid) OR asset_info.site_uid IN (:site_uid)) ";
 
 	/*private static final String asset_outage_all
 			= " SELECT asset_info.id, asset_info.name, to_char(inner_2.created_date, 'YYYY-MM-DD'), inner_2.int_ext_type as case_type, asset_info.clinical_dept_id "
@@ -343,8 +355,7 @@ public class HealthService {
 			+ " ON inner_1.asset_id = v2_work_order.asset_id "
 			+ " WHERE inner_1.created_date = v2_work_order.created_date ) AS inner_2 "
 			+ " ON asset_info.id = inner_2.asset_id "
-			+ " WHERE asset_info.is_valid = true AND asset_info.status = 2 AND asset_info.tenant_uid = :tenant_uid "
-			+ " ORDER BY to_char, id, int_ext_type ";
+			+ " WHERE asset_info.is_valid = true AND asset_info.status = 2 AND asset_info.tenant_uid = :tenant_uid ";
 
 	/*public Observable<Tuple5<Integer, String, String, Integer, Integer>> queryForOutage(Integer site_id, Integer hospital_id) {
 
@@ -368,11 +379,11 @@ public class HealthService {
 					;
 		}
 	}*/
-	public Observable<Tuple5<Integer, String, String, Integer, Integer>> queryForOutage(String tenantUID, String siteUID) {
+	public Observable<Tuple5<Integer, String, String, Integer, Integer>> queryForOutage(UserAccount user, String tenantUID, String siteUID) {
 
 		if(siteUID != null){
 			return db
-					.select(asset_outage)
+					.select(getSql(user, asset_outage) + " ORDER BY to_char, id, int_ext_type ")
 					.parameter("site_uid", siteUID)
 					.get(rs ->
 							new Tuple5<Integer, String, String, Integer, Integer> (
@@ -381,7 +392,7 @@ public class HealthService {
 			//.cache();
 		}else{
 			return db
-					.select(asset_outage_all)
+					.select(getSql(user, asset_outage_all) + " ORDER BY to_char, id, int_ext_type ")
 					.parameter("tenant_uid", tenantUID)
 					.get(rs ->
 							new Tuple5<Integer, String, String, Integer, Integer> (
@@ -446,8 +457,7 @@ public class HealthService {
 	private static final String asset_warranty
 			= " SELECT id, name, to_char(warranty_date, 'YYYY-MM-DD'), clinical_dept_id "
 			+ " FROM asset_info "
-			+ " WHERE is_valid = true AND is_warranty = true AND warranty_date <= (NOW() + interval '2 months') AND (tenant_uid IN (:site_uid) OR institution_uid IN (:site_uid) OR hospital_uid IN (:site_uid) OR site_uid IN (:site_uid)) "
-			+ " ORDER BY warranty_date ";
+			+ " WHERE is_valid = true AND is_warranty = true AND warranty_date <= (NOW() + interval '2 months') AND (tenant_uid IN (:site_uid) OR institution_uid IN (:site_uid) OR hospital_uid IN (:site_uid) OR site_uid IN (:site_uid)) ";
 
 	/*private static final String asset_warranty_all
 			= " SELECT id, name, to_char(warranty_date, 'YYYY-MM-DD'), clinical_dept_id "
@@ -457,8 +467,7 @@ public class HealthService {
 	private static final String asset_warranty_all
 			= " SELECT id, name, to_char(warranty_date, 'YYYY-MM-DD'), clinical_dept_id "
 			+ " FROM asset_info "
-			+ " WHERE is_valid = true AND is_warranty = true AND warranty_date <= (NOW() + interval '2 months') AND tenant_uid = :tenant_uid "
-			+ " ORDER BY warranty_date ";
+			+ " WHERE is_valid = true AND is_warranty = true AND warranty_date <= (NOW() + interval '2 months') AND tenant_uid = :tenant_uid ";
 
 	/*public Observable<Tuple4<Integer, String, String, Integer>> queryForWarranty(Integer site_id, Integer hospital_id) {
 
@@ -482,11 +491,11 @@ public class HealthService {
 					;
 		}
 	}*/
-	public Observable<Tuple4<Integer, String, String, Integer>> queryForWarranty(String tenantUID, String siteUID) {
+	public Observable<Tuple4<Integer, String, String, Integer>> queryForWarranty(UserAccount user, String tenantUID, String siteUID) {
 
 		if(siteUID != null){
 			return db
-					.select(asset_warranty)
+					.select(getSql(user, asset_warranty) + " ORDER BY warranty_date ")
 					.parameter("site_uid", siteUID)
 					.get(rs ->
 							new Tuple4<Integer, String, String, Integer> (
@@ -494,7 +503,7 @@ public class HealthService {
 					;
 		}else{
 			return db
-					.select(asset_warranty_all)
+					.select(getSql(user, asset_warranty_all) + " ORDER BY warranty_date ")
 					.parameter("tenant_uid", tenantUID)
 					.get(rs ->
 							new Tuple4<Integer, String, String, Integer> (
@@ -556,12 +565,11 @@ public class HealthService {
 			+ " WHERE po.tenant_uid=:tenantUID AND po.site_uid=:siteUID AND po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') "
 			+ " ORDER BY plan_time ";*/
 	private static final String asset_pm
-			= " SELECT po.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), ai.clinical_dept_id "
+			= " SELECT po.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), asset_info.clinical_dept_id "
 			+ " FROM v2_pm_order po "
-			+ " LEFT JOIN asset_info ai "
-			+ " ON po.asset_uid = ai.uid "
-			+ " WHERE po.rule_level = 3 and po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') AND (po.tenant_uid IN (:site_uid) OR po.institution_uid IN (:site_uid) OR po.hospital_uid IN (:site_uid) OR po.site_uid IN (:site_uid)) "
-			+ " ORDER BY plan_time ";
+			+ " LEFT JOIN asset_info "
+			+ " ON po.asset_uid = asset_info.uid "
+			+ " WHERE po.rule_level = 3 and po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') AND (po.tenant_uid IN (:site_uid) OR po.institution_uid IN (:site_uid) OR po.hospital_uid IN (:site_uid) OR po.site_uid IN (:site_uid)) ";
 
 	/*private static final String asset_pm_all
 			= " SELECT po.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), ai.clinical_dept_id "
@@ -571,12 +579,11 @@ public class HealthService {
 			+ " WHERE po.tenant_uid=:tenantUID AND po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') "
 			+ " ORDER BY plan_time ";*/
 	private static final String asset_pm_all
-			= " SELECT po.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), ai.clinical_dept_id "
+			= " SELECT po.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), asset_info.clinical_dept_id "
 			+ " FROM v2_pm_order po "
-			+ " LEFT JOIN asset_info ai "
-			+ " ON po.asset_uid = ai.uid "
-			+ " WHERE po.tenant_uid=:tenant_uid AND po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') "
-			+ " ORDER BY plan_time ";
+			+ " LEFT JOIN asset_info "
+			+ " ON po.asset_uid = asset_info.uid "
+			+ " WHERE po.tenant_uid=:tenant_uid AND po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') ";
 
 	/*public Observable<Tuple4<String, String, String, Integer>> queryForPm(String tenantUID, String siteUID) {
 
@@ -601,11 +608,11 @@ public class HealthService {
 					;
 		}
 	}*/
-	public Observable<Tuple4<String, String, String, Integer>> queryForPm(String tenantUID, String siteUID) {
+	public Observable<Tuple4<String, String, String, Integer>> queryForPm(UserAccount user, String tenantUID, String siteUID) {
 
 		if(siteUID != null){
 			return db
-					.select(asset_pm)
+					.select(getSql(user, asset_pm) + " ORDER BY plan_time ")
 					.parameter("site_uid", siteUID)
 					.get(rs ->
 							new Tuple4<String, String, String, Integer> (
@@ -613,7 +620,7 @@ public class HealthService {
 					;
 		}else{
 			return db
-					.select(asset_pm_all)
+					.select(getSql(user, asset_pm_all) + " ORDER BY plan_time ")
 					.parameter("tenant_uid", tenantUID)
 					.get(rs ->
 							new Tuple4<String, String, String, Integer> (
