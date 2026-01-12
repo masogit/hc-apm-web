@@ -50,6 +50,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -2687,6 +2688,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selectItemDto = selectItemDto;
     }
 
+    @Setter@Getter
+    private String selectedFileItemId;
+
+    public void nameplatePhotoPreview(String itemId){
+        selectedFileItemId = itemId;
+    }
 
     public void  plateRecognition(String objectId){
         try {
