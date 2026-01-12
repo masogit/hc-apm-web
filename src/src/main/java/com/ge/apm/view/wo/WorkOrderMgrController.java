@@ -477,7 +477,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         String key = "WorkOrderListColumn_".concat(query);
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
         List<FieldColumnDto> list =  JSON.parseArray(value, FieldColumnDto.class);
-        fieldColumnDtoList = list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(list)){
+            fieldColumnDtoList = list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
+        }
     }
 
     public void getPageTypeFromConfig() {
