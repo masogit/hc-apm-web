@@ -10,7 +10,7 @@
     <div class="ui-g-12 card">
         <h:form id="searchForm" class="searchForm">
             <h:panelGroup>
-               <!-- <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="woTab:woMgrListForm:datalist:btnOrg2" hideEffect="fade" dynamic="false" modal="false" >
+               <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="#{workOrderMgrController.siteFor}" hideEffect="fade" dynamic="false" modal="false" >
                     <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab:searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab" value="确定"/>
@@ -26,7 +26,7 @@
                             <p:treeNode type="hidden" rendered="false"/>
                         </p:tree>
                     </p:scrollPanel>
-                </p:overlayPanel>-->
+                </p:overlayPanel>
             </h:panelGroup>
         </h:form>
         <h:form id="woMgrListForm" rendered="#{!workOrderMgrController.viewIng}">
