@@ -1,8 +1,11 @@
 package com.ge.apm.web;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.AssetFaultTypeRepository;
+import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.mapper.HealthMapper;
+import com.ge.apm.domain.AssetTypeGroup;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.dto.HealthPendingStatistics;
@@ -30,6 +33,7 @@ import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 @RestController
@@ -44,6 +48,10 @@ public class HealthApi {
     private DeviceStatusMonitorService deviceStatusMonitorService;
     @Autowired
     private HealthMapper healthMapper;
+    @Autowired
+    private AssetTypeGroupRepository assetTypeGroupRepository;
+    @Autowired
+    private TenantInfoRepository tenantInfoRepository;
 
     @Autowired
     AssetFaultTypeRepository assetTypeRepository;
@@ -69,6 +77,15 @@ public class HealthApi {
                                                               @Min(0) @RequestParam(value = "start", required = false, defaultValue = "0") Integer start) {
 
         UserAccount user = UserContext.getCurrentLoginUser();
+        TenantInfo tenantInfo = tenantInfoRepository.findByUid(user.getTenantUID());
+        Set<String> apmFeatures = ((List<String>) JSON.parse(tenantInfo.getFeatureList())).stream().collect(Collectors.toSet());
+        if (apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            user.setEnableAssetTypeGroup(true);
+        }
+        List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(user.getUid());
+        Map<String, AssetTypeGroup> assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
+        user.setAssetTypeGroupList(assetTypeGroupList);
+        user.setAssetTypeGroupMap(assetTypeGroupMap);
         String tenantUID = user.getTenantUID();
         String siteUID = user.getSiteUID();
 
@@ -85,13 +102,13 @@ public class HealthApi {
             case 0:
                 return createDeviceStatusSummary(request, user);
             case 1:
-                return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(tenantUID, siteUID), start, limit);
+                return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(user, tenantUID, siteUID), start, limit);
             case 2:
-                return createResponseBody(category, healthService.queryForOutage(tenantUID, siteUID), request, start, limit);
+                return createResponseBody(category, healthService.queryForOutage(user, tenantUID, siteUID), request, start, limit);
             case 3:
-                return createResponseBody(healthService.queryForWarranty(tenantUID, siteUID), category, request, start, limit);
+                return createResponseBody(healthService.queryForWarranty(user, tenantUID, siteUID), category, request, start, limit);
             case 4:
-                return createResponseBody_s(healthService.queryForPm(tenantUID, siteUID), category, request, start, limit);
+                return createResponseBody_s(healthService.queryForPm(user, tenantUID, siteUID), category, request, start, limit);
             case 5:
                 return deviceStatusMonitorService.createResponseEntityForAssetMetering(user, start, limit, category, getDisplay(category), getRef("branch"), getHref(category * 10, request, 1));
             case 6:
@@ -270,7 +287,6 @@ public class HealthApi {
     }
 
     private ResponseEntity<Map<String, Object>> createDeviceStatusSummary(HttpServletRequest request, UserAccount user) {
-        log.info("createDeviceStatusSummary to web");
         Map<String, Object> param = MapUtil.newHashMap("siteUid", user.getSiteUID());
         HealthPendingStatistics healthPendingStatistics;
         if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(user.getAssetTypeGroupList())) {
