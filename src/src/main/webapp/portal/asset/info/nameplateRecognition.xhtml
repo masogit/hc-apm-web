@@ -10,7 +10,7 @@
         <p:ajax event="close"  update="previewedDlg" oncomplete="PF('previewedDlg').hide()" />
             <h:form id="nameplateRecognitionForm">
                 <p:fieldset legend="#{msg.nameplateRecognition}" style="margin-bottom:20px;height: 300px;overflow-y: auto">
-                    <p:dataTable id="datalist" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="item" widgetVar="varDataList"  resizeMode="expand"
+                    <!--<p:dataTable id="datalist" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="item" widgetVar="varDataList"  resizeMode="expand"
                                  scrollable="true" scrollWidth="98%"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  sortMode="single" sortOrder="descending"
@@ -26,16 +26,19 @@
                             </p:graphicImage>
                         </p:column>
                         <p:column headerText="操作">
-        <!--                    <p:commandButton process="@this" icon="ui-icon ui-icon-file-download" style="zoom:0.8;" title="#{msg.Download}"-->
-        <!--                                     rendered="#{not empty item}"-->
-        <!--                    />-->
+        &lt;!&ndash;                    <p:commandButton process="@this" icon="ui-icon ui-icon-file-download" style="zoom:0.8;" title="#{msg.Download}"&ndash;&gt;
+        &lt;!&ndash;                                     rendered="#{not empty item}"&ndash;&gt;
+        &lt;!&ndash;                    />&ndash;&gt;
                             <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8;" title="识别"
                                            onclick="disableAction(true,'#cccccc')"  update="nameplateRecognitionForm" rendered="#{not empty item}" actionListener="#{assetInfoEditController.plateRecognition(item.objectStorageId)}"/>
                             <p:commandButton process="@this"  icon="ui-icon ui-icon-search" class="my-button" style="zoom:0.8;" title="预览"
                                              onclick="disableAction(true,'#cccccc')" update="previewedDlg" oncomplete="PF('previewedDlg').show();bringToFront('previewedDlg');disableAction(false,'#3e464c')" rendered="#{not empty item}" actionListener="#{preViewerBean.onServerEvent(assetInfoEditController,item.objectStorageId)}"/>
                         </p:column>
-                    </p:dataTable>
-
+                    </p:dataTable>-->
+                    <p:graphicImage value="#{fileDownloadService.getFile(assetInfoEditController.selectedFileItemId)}" height="220" width="100%" stream="false" >
+                    </p:graphicImage>
+                    <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8;" value="识别"
+                                     onclick="disableAction(true,'#cccccc')"  update="nameplateRecognitionForm" actionListener="#{assetInfoEditController.plateRecognition(assetInfoEditController.selectedFileItemId)}"/>
                 </p:fieldset>
 
                 <p:fieldset legend="识别结果" style="margin-bottom:20px">
