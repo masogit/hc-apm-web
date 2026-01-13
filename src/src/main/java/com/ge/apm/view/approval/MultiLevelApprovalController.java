@@ -1049,7 +1049,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             String type = event.getFile().getContentType().startsWith("image")?"Image":"File";
-            blobObject.setBoType(V2_BlobObject.AttachmentType.getKeyByValue("多级审批"));
+            blobObject.setBoType("MULTI_LEVEL_APPROVAL");
             blobObject.setBoSubType(type);
             blobObject.setBoUuid(selected.getId());
             blobObject.setTenantUid(selected.getTenantUID());
