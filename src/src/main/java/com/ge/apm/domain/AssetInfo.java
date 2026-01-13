@@ -117,7 +117,7 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "national_standard_code")
     private String nationalStandardCode;//2010国家编码
 
-//    @Size(max = 64)
+    @Size(max = 128)
     @Column(name = "serial_num")
     private String serialNum;//制造商序列号
 
