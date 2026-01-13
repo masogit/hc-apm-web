@@ -30,7 +30,6 @@ public class V2_BlobObject implements Serializable {
         AUDIT_REPORT("AuReport","质控报告"),
         INSPECTION_REPORT ("PIReport","巡检报告"),
         OTHER ("Other","其他"),
-        MULTI_LEVEL_APPROVAL("MultiLevelApproval","多级审批"),
 //        PMBE("PMBE","保养前照片"),
 //        PMAF("PMAF","保养后照片"),
         ;
