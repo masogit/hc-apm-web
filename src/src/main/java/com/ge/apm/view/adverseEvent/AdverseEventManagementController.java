@@ -620,10 +620,12 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         V2_BlobObject blobObject = blobService.uploadFile(tempFile.getInputStream(), tempFile.getFileName());
         AdverseEventsFile file = new AdverseEventsFile();
         file.setCreatedDate(new Date());
-        file.setObjectId(blobObject.getObjectStorageId());
-        file.setObjectName(blobObject.getObjectName());
-        file.setObjectType(blobObject.getObjectType());
-        file.setObjectSize(blobObject.getObjectSize());
+        if(blobObject != null){
+            file.setObjectId(blobObject.getObjectStorageId());
+            file.setObjectName(blobObject.getObjectName());
+            file.setObjectType(blobObject.getObjectType());
+            file.setObjectSize(blobObject.getObjectSize());
+        }
         return file;
     }
 
