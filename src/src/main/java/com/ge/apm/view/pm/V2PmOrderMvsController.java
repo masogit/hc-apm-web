@@ -139,7 +139,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private MvsPmOrderMapper mvsPmOrderMapper;
 
     private ConfigCacheService configCacheService;
-
+    private AssetInfoRepository assetInfoRepository;
 
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
@@ -321,13 +321,14 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         pmOrderService = WebUtil.getBean(V2_PmOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         configService = WebUtil.getBean(ConfigService.class);
         this.selectedMap = new HashMap();
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
-         loginUser = UserContextService.getCurrentUserAccount();
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
         orgListMVS = new ArrayList<>();
@@ -336,6 +337,10 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
             selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+            if(selected.getAssetInfo() ==null){
+                AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                selected.setAssetInfo(assetInfo);
+            }
             onSelectPmOrder();
         }else{
             if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -583,7 +588,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     public void onSelectOrderRedirect() throws IOException {
         String url = "actionName=View&selectedid="
-                + selected.getId()
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
                 + "&queryIndex=" + queryIndex
                 ;
         url = "mvs/pmMvsOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
