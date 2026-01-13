@@ -527,12 +527,22 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private void processFile() {
         if (!CollectionUtils.isEmpty(injuryPerformance)) {
             List<AdverseEventsFile> harmPerformFile = CollectionUtils.isEmpty(selected.getHarmPerformFile())?new ArrayList<>():selected.getHarmPerformFile();
-            injuryPerformance.forEach(v -> harmPerformFile.add(saveTempFile(v)));
+            injuryPerformance.forEach(v -> {
+                AdverseEventsFile adverseEventsFile = saveTempFile(v);
+                if(adverseEventsFile != null){
+                    harmPerformFile.add(adverseEventsFile);
+                }
+            });
             selected.setHarmPerformFile(harmPerformFile);
         }
         if (!CollectionUtils.isEmpty(mechanicalFailure)) {
             List<AdverseEventsFile> deviceFaultPerformFile = CollectionUtils.isEmpty(selected.getDeviceFaultPerformFile())?new ArrayList<>():selected.getDeviceFaultPerformFile();
-            mechanicalFailure.forEach(v -> deviceFaultPerformFile.add(saveTempFile(v)));
+            mechanicalFailure.forEach(v -> {
+                AdverseEventsFile adverseEventsFile = saveTempFile(v);
+                if(adverseEventsFile != null){
+                    deviceFaultPerformFile.add(adverseEventsFile);
+                }
+            });
             selected.setDeviceFaultPerformFile(deviceFaultPerformFile);
         }
     }
@@ -618,6 +628,9 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     public AdverseEventsFile saveTempFile(TempFileUtil tempFile) {
         V2_BlobObject blobObject = blobService.uploadFile(tempFile.getInputStream(), tempFile.getFileName());
+        if(blobObject == null){
+            return null;
+        }
         AdverseEventsFile file = new AdverseEventsFile();
         file.setCreatedDate(new Date());
         if(blobObject != null){
