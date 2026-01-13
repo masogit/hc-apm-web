@@ -603,7 +603,9 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         attachListEhmeFile = new ArrayList<>();
         attachListEhmeImg = new ArrayList<>();
         newServiceRequest = null;
-        currentStatus = selected.getAssetInfo().getStatus();
+        if(selected != null && selected.getAssetInfo() != null){
+            currentStatus = selected.getAssetInfo().getStatus();
+        }
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = woService.getPicListBySrUid(selected.getSrId(), 2, null);
