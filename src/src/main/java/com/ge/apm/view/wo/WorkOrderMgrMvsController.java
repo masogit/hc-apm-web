@@ -147,6 +147,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private CustomConfig customConfig;
      private MultiLevelApprovalService multiLevelApprovalService;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
+    private AssetInfoRepository assetInfoRepository;
      @Getter @Setter
     private String siteUidFilterMVS;
     @Getter @Setter
@@ -258,6 +259,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
+            assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
             uaaService = WebUtil.getBean(UaaService.class);
             assetTypeGroupList = loginUser.getAssetTypeGroupList();
             ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("displayModeCasePriority", loginUser.getSiteUID());
@@ -268,6 +270,10 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
                 queryIndex = Integer.valueOf(UrlEncryptController.getValueFromMap(enCodeParameters, "queryIndex").toString());
                 selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+                if(selected.getAssetInfo() ==null){
+                    AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                    selected.setAssetInfo(assetInfo);
+                }
                 onSelectWorkOrder();
             } else {
                 if (!Strings.isNullOrEmpty(queryAssetUID_href)) {
@@ -588,10 +594,9 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
 
 
     public void onSelectOrderRedirect() throws IOException {
-
         onSelectWorkOrder();
         String url = "actionName=View&selectedid="
-                + selected.getId()
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
                 + "&queryIndex=" + queryIndex
                 ;
         url = "mvs/woMvsMgrViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
