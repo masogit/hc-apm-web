@@ -1438,7 +1438,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             picList.add(blobObject);
-            String keyByValue = V2_BlobObject.AttachmentType.getKeyByValue(fileTypeName);
+            String keyByValue = V2_BlobObject.PmReportAttachmentType.getPmReportKeyByValue(fileTypeName);
 //            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
             blobObject.setBoType(keyByValue);
             String fileType=blobObject.getObjectName().split("\\.")[blobObject.getObjectName().split("\\.").length-1];
@@ -3442,7 +3442,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public List<String> getTypeList(){
 
-        List<String> attachmentTypeList = V2_BlobObject.AttachmentType.getAttachmentTypeList();
+        List<String> attachmentTypeList = V2_BlobObject.PmReportAttachmentType.getPmReportAttachmentTypeList();
         return attachmentTypeList;
     }
 
