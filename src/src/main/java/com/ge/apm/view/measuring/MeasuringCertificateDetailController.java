@@ -134,7 +134,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 List<OCRTemplate> ocrTemplates = getOCRTemplates();
                 if(CollectionUtils.isEmpty(ocrTemplates)){
                     storageFile(file);
-                    WebUtil.addSuccessMessage("文件上传成功,缺少本地配置无法OCR识别");
+                    WebUtil.addSuccessMessage("文件上传成功,缺少本地配置无法OCR识别!");
                     return;
                 }
                 params.put("type", BusinessType.MEASURE.name());
