@@ -169,6 +169,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private CustomConfigObject currentCustomConfig;
     private ExternalTempUserRepository externalTempUserDao;
     private ConfigItemValueRepository configItemValueRepository;
+    private AssetInfoRepository assetInfoRepository;
+
     List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
@@ -1781,6 +1783,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
@@ -1791,6 +1794,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
             selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+            if(selected.getAssetInfo() ==null){
+                AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                selected.setAssetInfo(assetInfo);
+            }
             onSelectPmOrder();
         }else{
             if (!Strings.isNullOrEmpty(enCodeParameters)) {
@@ -2334,7 +2341,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void onSelectOrderRedirect() throws IOException {
         String url = "actionName=View&selectedid="
-                + selected.getId()
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
                 + "&queryIndex=" + queryIndex
                 ;
         url = "pmOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);

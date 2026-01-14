@@ -259,6 +259,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private ExternalTempUserRepository externalTempUserDao;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private OrgTreeController orgTreeController;
+    private AssetInfoRepository assetInfoRepository;
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
@@ -388,6 +389,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             v2WorkOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
             multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
             orgTreeController = WebUtil.getBean(OrgTreeController.class);
+            assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -416,6 +418,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
                 queryIndex = Integer.valueOf(UrlEncryptController.getValueFromMap(enCodeParameters, "queryIndex").toString());
                 selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+                if(selected.getAssetInfo() ==null){
+                    AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                    selected.setAssetInfo(assetInfo);
+                }
                 viewIng = true;
                 onSelectWorkOrder();
                 String workOrderShowTravelTimeStr = configItemValueRepository.findByKeyAndSiteForUseParent(selected.getAssetInfo().getSiteUID(),selected.getAssetInfo().getHospitalUID(), selected.getAssetInfo().getInstitutionUID(), selected.getAssetInfo().getTenantUID(), "workOrderShowTravelTime");
@@ -1281,7 +1287,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         onSelectWorkOrder();
         String url = "actionName=View&selectedid="
-                + selected.getId()
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
                 + "&queryIndex=" + queryIndex
                 ;
         url = "workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
