@@ -2,9 +2,7 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.OwnerConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.OwnerConfig;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.OwnerConfigService;
 import com.ge.apm.service.common.UserCommonService;
@@ -12,13 +10,20 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.uaa.AssetTypeGroupTreeController;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -41,6 +46,8 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     private UserCommonService userCommonService;
     private OwnerConfigService ownerConfigService;
     private OrgInfoRepository orgInfoDao;
+    private AssetTypeGroupTreeController assetTypeGroupTreeController;
+    private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
 
     private List<UserAccount> userAccountList;
 
@@ -65,7 +72,16 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     private OrgInfoTreeService orgInfoTreeService;
     private String filterClinicalDeptOrgName;
     private Set<String> clinicalDeptOrgUidSetFilter;
+    @Getter @Setter
     private List<OrgInfo> filterClinicalDeptList;
+    @Getter @Setter
+    private List<AssetTypeGroup> assetTypeGroupList;
+    @Setter @Getter
+    private Map<String, AssetTypeGroup> assetTypeGroupMap;
+    @Getter @Setter
+    private TreeNode[] selectedAssetTypeNodes;
+    @Getter @Setter
+    private boolean enableAssetTypeGroup;
 
     @Override
     protected void init() {
@@ -78,8 +94,15 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
+        assetTypeGroupTreeController = WebUtil.getBean(AssetTypeGroupTreeController.class);
+        assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
+        assetTypeGroupTreeComponentController.registerController(this);
+
         userAccountList = userCommonService.getWorkerList(null,null);
         currentUser = UserContextService.getCurrentUserAccount();
+        enableAssetTypeGroup = currentUser.isEnableAssetTypeGroup();
+        assetTypeGroupList = currentUser.getAssetTypeGroupList();
+        assetTypeGroupMap = currentUser.getAssetTypeGroupMap();
 
         this.selectedOrg = orgInfoDao.getByUid(currentUser.getSiteUID());
         this.initOrgTree();
@@ -90,12 +113,27 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     }
 
     @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        switch (eventName) {
+            case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
+                AssetTypeGroup assetTypeGroup = (AssetTypeGroup) eventObject;
+                selected.setAssetType(assetTypeGroup.getEncoded());
+                this.resetOwnerConfig();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
     protected OwnerConfigRepository getDAO(){
         return dao;
     }
 
     protected Page<OwnerConfig> loadData(PageRequest pageRequest) {
-
+        if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
         }
@@ -124,11 +162,15 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
             this.updateSearchFilter(new SearchFilter("deptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetFilter)));
         }
 
+        if (currentUser.isEnableAssetTypeGroup()) {
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
+        }
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     //得到所选记录数据信息
     public void onSelectOwnerConfig(){
+        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
         this.ownerOrgInfo = this.selected.getSiteOrgInfo();
         this.deptOrg = this.selected.getDeptOrgInfo();
         this.woOwner = this.selected.getWoOwner();
@@ -218,6 +260,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         ownerConfig.setLastModifiedBy(currentUser.getLoginName());
         ownerConfig.setLastModifiedDate(new Date());
 
+        ownerConfig.setAssetType(selected.getAssetType());
         dao.save(ownerConfig);
 
         this.resetOwnerConfig();

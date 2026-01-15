@@ -55,6 +55,15 @@
                         <h:outputText value="#{item.deptOrgInfo.shortName}"/>
                     </p:column>
 
+                    <p:column headerText="#{msg.assetTypeGroup}" sortBy="#{item.assetType}" filterBy="#{item.assetType}" filterMatchMode="EQ" rendered="#{departmentOwnerSettingController.enableAssetTypeGroup}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_departmentOwner').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{departmentOwnerSettingController.assetTypeGroupList}" var="item" itemLabel="#{item.name}" itemValue="#{item.encoded}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{departmentOwnerSettingController.assetTypeGroupMap.get(item.assetType).displayName}"/>
+                    </p:column>
                     <p:column headerText="#{msg.RepairOwner}" filterBy="#{item.woOwner.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.woOwner.name}"/>
                     </p:column>

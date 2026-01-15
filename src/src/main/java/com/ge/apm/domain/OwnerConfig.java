@@ -103,6 +103,9 @@ public class OwnerConfig implements Serializable {
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 
+    @Column(name = "asset_type")
+    private String assetType;
+
     public String getId() {
         return id;
     }
@@ -285,6 +288,14 @@ public class OwnerConfig implements Serializable {
 
     public void setPmOwner(UserAccount pmOwner) {
         this.pmOwner = pmOwner;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     @Override
