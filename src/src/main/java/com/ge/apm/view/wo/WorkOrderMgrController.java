@@ -802,6 +802,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                                 || StringUtils.equals(item.getTenantUID(), selectSite.getSiteUID()))
                         .collect(Collectors.toList());
             }
+            if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+                List<String> selectedSiteUidList = Arrays.stream(selectedAccessOrgNodes).map(node -> (OrgInfo) node.getData()).map(OrgInfo::getSiteUID).collect(Collectors.toList());
+                clinicalDeptList = clinicalDeptList.stream()
+                        .filter(item -> selectedSiteUidList.contains(item.getSiteUID())
+                                || selectedSiteUidList.contains(item.getHospitalUID())
+                                || selectedSiteUidList.contains(item.getInstitutionUID())
+                                || selectedSiteUidList.contains(item.getTenantUID()))
+                        .collect(Collectors.toList());
+            }
         } catch (Exception e) {
             LOGGER.error("loadClinicalDeptList occur exception", e);
             throw e;
@@ -4499,6 +4508,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
+        loadClinicalDeptList();
         filterClinicalDeptOrg = null;
         filterAssetDeptOrg = null;
         clinicalDeptOrgUidSet = null;
