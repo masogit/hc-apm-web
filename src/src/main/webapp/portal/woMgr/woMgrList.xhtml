@@ -28,25 +28,6 @@
                     </p:scrollPanel>
                 </p:overlayPanel>
             </h:panelGroup>
-            <h:panelGroup>
-                <p:overlayPanel appendTo="searchForm" widgetVar="varPanelAssetType" for="woTab:woMgrListForm:datalist:assetType" hideEffect="fade" dynamic="false" modal="false" >
-                    <p:inputText id="treeNodeAssetTypeNameFilter" value="#{assetTypeGroupTreeController.treeNodeNameFilter}"/>
-                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeAssetTypeNameFilter @this" update="woTab:searchForm:assetTypeTree" actionListener="#{assetTypeGroupTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
-                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeAssetTypeNameFilter @this" update="woTab" value="确定"/>
-                    <p:scrollPanel style="height:300px;border: 0" mode="native">
-                        <p:tree id="assetTypeTree" class="tree" style="width:98%;border:0;" value="#{assetTypeGroupTreeController.assetTypeGroupTreeByUser}" selection="#{workOrderMgrController.selectedAssetTypeNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false">
-                            <p:ajax process="@this" event="select" listener="#{workOrderMgrController.onSelectAssetTypeTreeNode}"/>
-                            <p:ajax process="@this" event="unselect" listener="#{workOrderMgrController.onUnSelectAssetTypeTreeNode}"/>
-                            <p:ajax process="@this" event="expand"/>
-                            <p:ajax process="@this" event="collapse"/>
-                            <p:treeNode type="assetTypeGroup">
-                                <h:outputText value="#{node.name}"/>
-                            </p:treeNode>
-                            <p:treeNode type="hidden" rendered="false"/>
-                        </p:tree>
-                    </p:scrollPanel>
-                </p:overlayPanel>
-            </h:panelGroup>
         </h:form>
         <h:form id="woMgrListForm" rendered="#{!workOrderMgrController.viewIng}">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
@@ -303,9 +284,12 @@
                         </p:column>
                     </c:if>
                     <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetType'}">
-                        <p:column headerText="#{msg.assetTypeGroup}" sortBy="#{item.assetInfo.assetType}"  filterBy="#{item.assetInfo.assetType}" filterMatchMode="LIKE">
-                            <f:facet name="filter" >
-                                <p:autoComplete id="assetType" value="请选择资产分类" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                        <p:column headerText="#{msg.assetTypeGroup}" sortBy="#{item.assetInfo.assetType}" filterBy="#{item.assetInfo.assetType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList_departmentOwner').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{workOrderMgrController.assetTypeGroupList}" var="item" itemLabel="#{item.name}" itemValue="#{item.encoded}"/>
+                                </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{workOrderMgrController.convertAssetTypeGroupEncodedToName(item.assetInfo.assetType)}"/>
                         </p:column>
