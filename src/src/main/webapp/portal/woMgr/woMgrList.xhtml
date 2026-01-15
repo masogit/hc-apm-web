@@ -28,6 +28,25 @@
                     </p:scrollPanel>
                 </p:overlayPanel>
             </h:panelGroup>
+            <h:panelGroup>
+                <p:overlayPanel appendTo="searchForm" widgetVar="varPanelAssetType" for="woTab:woMgrListForm:datalist:assetType" hideEffect="fade" dynamic="false" modal="false" >
+                    <p:inputText id="treeNodeAssetTypeNameFilter" value="#{assetTypeGroupTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeAssetTypeNameFilter @this" update="woTab:searchForm:assetTypeTree" actionListener="#{assetTypeGroupTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeAssetTypeNameFilter @this" update="woTab" value="确定"/>
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                        <p:tree id="assetTypeTree" class="tree" style="width:98%;border:0;" value="#{assetTypeGroupTreeController.assetTypeGroupTreeByUser}" selection="#{workOrderMgrController.selectedAssetTypeNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false">
+                            <p:ajax process="@this" event="select" listener="#{workOrderMgrController.onSelectAssetTypeTreeNode}"/>
+                            <p:ajax process="@this" event="unselect" listener="#{workOrderMgrController.onUnSelectAssetTypeTreeNode}"/>
+                            <p:ajax process="@this" event="expand"/>
+                            <p:ajax process="@this" event="collapse"/>
+                            <p:treeNode type="assetTypeGroup">
+                                <h:outputText value="#{node.name}"/>
+                            </p:treeNode>
+                            <p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
+                    </p:scrollPanel>
+                </p:overlayPanel>
+            </h:panelGroup>
         </h:form>
         <h:form id="woMgrListForm" rendered="#{!workOrderMgrController.viewIng}">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
@@ -283,8 +302,15 @@
                             <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
                         </p:column>
                     </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetType'}">
+                        <p:column headerText="#{msg.assetTypeGroup}" sortBy="#{item.assetInfo.assetType}"  filterBy="#{item.assetInfo.assetType}" filterMatchMode="LIKE">
+                            <f:facet name="filter" >
+                                <p:autoComplete id="assetType" value="请选择资产分类" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            </f:facet>
+                            <h:outputText value="#{workOrderMgrController.convertAssetTypeGroupEncodedToName(item.assetInfo.assetType)}"/>
+                        </p:column>
+                    </c:if>
                 </c:forEach>
-
 
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CANCEL')}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
@@ -307,15 +333,12 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and (userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
                     <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') and workOrderMgrController.enableSignNeedScanQrCode}"/>
-<!--                    <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'? '':'transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>-->
                     <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
                     <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'@(.x0) @(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}">
                         <p:confirm  header="维修提示"  message="#{workOrderMgrController.repairTipMessageMap.get(item.id)}" disabled="#{workOrderMgrController.repairTip(item)}" icon="ui-icon-alert"/>
                     </p:commandButton>
-<!--                    <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'woTab:newWorkorderDlgForm  :growl'}"  oncomplete="PF('newWorkorderDlg').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>-->
                     <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
                     <!--报修后，被接单的工单 医工主任有权限能够取消 -->
-<!--                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>-->
                     <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="handleCancelOrderSubmit(xhr, status, args);"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==10 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_APPROVE')}"><!--审批-->
