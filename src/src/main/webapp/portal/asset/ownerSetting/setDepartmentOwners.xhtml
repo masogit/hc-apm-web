@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:apm="http://www.ge.com/tags/apm">
 
 <ui:composition>
     <div class="ui-g-12 card">
@@ -24,23 +25,27 @@
                             <p:ajax listener="#{departmentOwnerSettingController.loadOwnerConfig()}" update="woOwner_department pmOwner_department" />
                         </p:autoComplete>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{departmentOwnerSettingController.enableAssetTypeGroup}">
+                        <label class="label">#{msg.assetTypeGroup}*</label>
+                        <apm:selectAssetTypeGroup readonly="true" required="true" update="@(.woOwnerSelecter_department) @(.woOwnerSelecter_department2) @(.woOwnerSelecter_department3) @(.pmOwnerSelecter_department)"/>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="woOwner_department">
-                    <h:panelGroup id="woOwnerSelecter_department">
+                    <h:panelGroup id="woOwnerSelecter_department" class="woOwnerSelecter_department">
                         <label class="label">#{msg.SettingOwner}#{msg.assetOwnerName}</label>
                         <p:autoComplete dropdown="true" value="#{departmentOwnerSettingController.woOwner}"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{departmentOwnerSettingController.autoCompleteOwner}"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
                         </p:autoComplete>
                     </h:panelGroup>
-                    <h:panelGroup id="woOwnerSelecter_department2">
+                    <h:panelGroup id="woOwnerSelecter_department2" class="woOwnerSelecter_department2">
                         <label class="label">#{msg.SettingOwner}#{msg.assetOwnerName2}</label>
                         <p:autoComplete dropdown="true" value="#{departmentOwnerSettingController.woOwner2}"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{departmentOwnerSettingController.autoCompleteOwner}"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">
                         </p:autoComplete>
                     </h:panelGroup>
-                    <h:panelGroup id="woOwnerSelecter_department3">
+                    <h:panelGroup id="woOwnerSelecter_department3" class="woOwnerSelecter_department3">
                         <label class="label">#{msg.SettingOwner}#{msg.assetOwnerName3}</label>
                         <p:autoComplete dropdown="true" value="#{departmentOwnerSettingController.woOwner3}"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{departmentOwnerSettingController.autoCompleteOwner}"
@@ -49,7 +54,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="pmOwner_department">
-                    <h:panelGroup id="pmOwnerSelecter_department">
+                    <h:panelGroup id="pmOwnerSelecter_department" class="pmOwnerSelecter_department">
                         <label class="label">#{msg.SetPMOwner}</label>
                         <p:autoComplete dropdown="true" value="#{departmentOwnerSettingController.pmOwner}"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{departmentOwnerSettingController.autoCompleteOwner}"
