@@ -70,7 +70,6 @@ import org.springframework.util.ObjectUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -320,6 +319,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private TreeNode[] selectedAccessOrgNodes;
     @Getter @Setter
+    private TreeNode[] selectedAssetTypeNodes;
+    @Getter @Setter
     private String newMessage;
     @Getter @Setter
     private Map<String, String> repairTipMessageMap = MapUtil.newHashMap();
@@ -337,8 +338,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private String displayModeCasePriority;
 
-    @Setter@Getter
-    private String pageType ;
+    @Setter @Getter
+    private String pageType;
+
+    @Setter @Getter
+    private String filterAssetTypeGroup;
+    @Setter @Getter
+    private List<AssetTypeGroup> assetTypeGroupList;
+    @Setter @Getter
+    private Set<String> assetTypeGroupEncodedSet;
+    @Setter @Getter
+    private Map<String, AssetTypeGroup> currentPageAssetTypeGroupMap;
 
     @Override
     protected void init() {
@@ -1191,6 +1201,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         // 资产分类权限
+        if (ObjectUtil.isNotEmpty(selectedAssetTypeNodes)) {
+            List<String> selectedAssetTypeList = ListUtil.newArrayList();
+            for (TreeNode selectedAssetTypeNode : selectedAssetTypeNodes) {
+                AssetTypeGroup assetTypeGroup =(AssetTypeGroup) selectedAssetTypeNode.getData();
+                selectedAssetTypeList.add(assetTypeGroup.getEncoded());
+            }
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, selectedAssetTypeList, "1*"));
+        }
         if (loginUser.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, loginUser.getAssetTypeGroupMap().keySet(), "1*"));
         }
@@ -4507,6 +4525,40 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         for (TreeNode item : root.getChildren()) {
             setTreeNodes(item, isSelected);
         }
+    }
+
+    public void onSelectAssetTypeTreeNode(NodeSelectEvent event) {
+        this.searchFilters.clear();
+        setAssetTypeTreeNodes(event.getTreeNode(), true);
+    }
+
+
+    public void onUnSelectAssetTypeTreeNode(NodeUnselectEvent event) {
+        this.searchFilters.clear();
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void setAssetTypeTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
+    }
+
+    public String convertAssetTypeGroupEncodedToName(String encoded) {
+        if (null == encoded) {
+            return null;
+        }
+        AssetTypeGroup assetTypeGroup = currentPageAssetTypeGroupMap.get(encoded);
+        if (null == assetTypeGroup) {
+            return null;
+        }
+        return assetTypeGroup.getDisplayName();
     }
 }
 
