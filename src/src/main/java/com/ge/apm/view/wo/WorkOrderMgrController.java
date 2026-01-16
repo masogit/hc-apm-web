@@ -27,6 +27,7 @@ import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.simpleparts.*;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -259,6 +260,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private OrgTreeController orgTreeController;
     private AssetInfoRepository assetInfoRepository;
+    private AssetTypeGroupService assetTypeGroupService;
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
@@ -341,14 +343,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Setter @Getter
     private String pageType;
 
-    @Setter @Getter
-    private String filterAssetTypeGroup;
+    @Getter @Setter
+    private boolean enableAssetTypeGroup;
     @Setter @Getter
     private List<AssetTypeGroup> assetTypeGroupList;
     @Setter @Getter
-    private Set<String> assetTypeGroupEncodedSet;
-    @Setter @Getter
-    private Map<String, AssetTypeGroup> currentPageAssetTypeGroupMap;
+    private Map<String, AssetTypeGroup> assetTypeGroupMap;
 
     @Override
     protected void init() {
@@ -359,6 +359,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
             loginUser = UserContextService.getCurrentUserAccount();
+            enableAssetTypeGroup = loginUser.isEnableAssetTypeGroup();
+            assetTypeGroupList = loginUser.getAssetTypeGroupList();
+            assetTypeGroupMap = loginUser.getAssetTypeGroupMap();
             currentCustomConfig = ccService.getCurrentCustomConfig(
                     loginUser.getSiteUID());
             aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -400,6 +403,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
             orgTreeController = WebUtil.getBean(OrgTreeController.class);
             assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+            assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -1217,6 +1221,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 selectedAssetTypeList.add(assetTypeGroup.getEncoded());
             }
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, selectedAssetTypeList, "1*"));
+        }
+        List<SearchFilter> assetTypeFilters = this.searchFilters.stream().filter(item -> "assetInfo.assetType".equals(item.fieldName)).collect(Collectors.toList());
+        if (ObjectUtil.isNotEmpty(assetTypeFilters)) {
+            SearchFilter searchFilter = assetTypeFilters.get(0);
+            String assetType = (String) searchFilter.value;
+            List<AssetTypeGroup> assetTypeGroupsMatchingByEncoded = this.assetTypeGroupList.stream().filter(item -> item.getEncoded().equals(assetType)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByEncoded, assetTypeGroupList);
+            Set<String> assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            searchFilters.remove(searchFilter);
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
         }
         if (loginUser.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, loginUser.getAssetTypeGroupMap().keySet(), "1*"));
@@ -4558,17 +4572,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         for (TreeNode item : root.getChildren()) {
             setTreeNodes(item, isSelected);
         }
-    }
-
-    public String convertAssetTypeGroupEncodedToName(String encoded) {
-        if (null == encoded) {
-            return null;
-        }
-        AssetTypeGroup assetTypeGroup = currentPageAssetTypeGroupMap.get(encoded);
-        if (null == assetTypeGroup) {
-            return null;
-        }
-        return assetTypeGroup.getDisplayName();
     }
 }
 

@@ -283,15 +283,15 @@
                             <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
                         </p:column>
                     </c:if>
-                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetType'}">
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetType' and workOrderMgrController.enableAssetTypeGroup}">
                         <p:column headerText="#{msg.assetTypeGroup}" sortBy="#{item.assetInfo.assetType}" filterBy="#{item.assetInfo.assetType}" filterMatchMode="EQ">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList_departmentOwner').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" filter="true" filterMatchMode="contains" filterNormalize="true">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{workOrderMgrController.assetTypeGroupList}" var="item" itemLabel="#{item.name}" itemValue="#{item.encoded}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{workOrderMgrController.convertAssetTypeGroupEncodedToName(item.assetInfo.assetType)}"/>
+                            <h:outputText value="#{workOrderMgrController.assetTypeGroupMap.get(item.assetInfo.assetType).displayName}"/>
                         </p:column>
                     </c:if>
                 </c:forEach>
