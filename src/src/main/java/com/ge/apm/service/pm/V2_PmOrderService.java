@@ -455,7 +455,11 @@ public class V2_PmOrderService extends MicroServiceInvoker {
       /*  formData.setAssetStatus(StrPmOrderAction(token,formData,"ackFailed",selectedWorkOrder.getId());*/
         String res = srApi.invokePmOrderAction(token,formData,"ackFailed",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Acknowledge"));
+            if(res == null){
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Acknowledge"));
+            }else {
+                WebUtil.addErrorMessage(res);
+            }
         }else{
             WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
         }
