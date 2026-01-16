@@ -13,6 +13,7 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -132,11 +133,13 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private List<OrgInfo> orgListMVS;
     @Getter @Setter
     List<V2_PmOrder> bySearchFilterMVS = null;
+    @Setter@Getter
+    private String pageType ;
 
     private MvsPmOrderMapper mvsPmOrderMapper;
 
     private ConfigCacheService configCacheService;
-
+    private AssetInfoRepository assetInfoRepository;
 
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
@@ -318,44 +321,65 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         pmOrderService = WebUtil.getBean(V2_PmOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         configService = WebUtil.getBean(ConfigService.class);
         this.selectedMap = new HashMap();
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
-         loginUser = UserContextService.getCurrentUserAccount();
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
         orgListMVS = new ArrayList<>();
         //如果是院长等管理层登录进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
-        if (!Strings.isNullOrEmpty(enCodeParameters)) {
-            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
-            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
-            orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
-            if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
-                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+        if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
+            selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+            if(selected.getAssetInfo() ==null){
+                AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                selected.setAssetInfo(assetInfo);
             }
+            onSelectPmOrder();
+        }else{
+            if (!Strings.isNullOrEmpty(enCodeParameters)) {
+                requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+                queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+                orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
+                if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
+                    query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+                }
+            }
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = -1;
+            } else {
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
+            for (ExportFields exs: ExportFields.values()){
+                pmFieldsExport.add(exs.getChinese());
+            }
+            queryIndex = Strings.isNullOrEmpty(query) ? 10  : Integer.valueOf(query);
+            this.filterBySite = false;
+            this.filterByHospital = false;
+            hmCheck = new HashMap<String, UnstructuredData>();
+            isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
+            isInsulate = isInsulate == null ? false : isInsulate;
+            loadClinicalDeptList();
+            getPageTypeFromConfig();
         }
-        if (Strings.isNullOrEmpty(query)) {
-            queryIndex = -1;
-        } else {
-            queryIndex = Integer.valueOf(query);
-            searchList(queryIndex);
-        }
-        for (ExportFields exs: ExportFields.values()){
-            pmFieldsExport.add(exs.getChinese());
-        }
-        queryIndex = Strings.isNullOrEmpty(query) ? 10  : Integer.valueOf(query);
-        this.filterBySite = false;
-        this.filterByHospital = false;
-        hmCheck = new HashMap<String, UnstructuredData>();
-        isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
-        isInsulate = isInsulate == null ? false : isInsulate;
-        loadClinicalDeptList();
     }
+
+    public void getPageTypeFromConfig() {
+        String  key= "PmOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
+    }
+
 
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
@@ -560,6 +584,17 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     public StreamedContent getExcelFile() {
         return excelFile;
+    }
+
+    public void onSelectOrderRedirect() throws IOException {
+        String url = "actionName=View&selectedid="
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
+                + "&queryIndex=" + queryIndex
+                ;
+        url = "mvs/pmMvsOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void onSelectPmOrder() {

@@ -23,7 +23,14 @@
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                          rows="20" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
-                <p:ajax event="rowSelect" listener="#{v2PmOrderMvsController.onSelectPmOrder()}" update="pmTab:pmMvsOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+
+                <c:if test="#{v2PmOrderMvsController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderMvsController.onSelectOrderRedirect()}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{v2PmOrderMvsController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderMvsController.onSelectPmOrder()}" update="pmTab:pmMvsOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                </c:if>
+
                 <p:ajax event="filter" listener="#{v2PmOrderMvsController.onFilter}" update="datalist pmTab:pmOrderDetailForm  @(.pmOrderDetailFormCls)" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36" visible="#{v2PmOrderMvsController.queryIndex==2 or v2PmOrderMvsController.queryIndex==3 or v2PmOrderMvsController.queryIndex==0 or v2PmOrderMvsController.queryIndex==6 or v2PmOrderMvsController.queryIndex == 31 or v2PmOrderMvsController.queryIndex == 7 or v2PmOrderMvsController.queryIndex == -1}" exportable="false">

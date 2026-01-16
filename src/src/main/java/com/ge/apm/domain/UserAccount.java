@@ -314,8 +314,10 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "app_alias", length = 40)
 	private String appAlias;
 
+    @Column(name = "landline_number")
+    private String landlineNumber;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "org_uid",referencedColumnName = "uid", insertable = false,updatable = false)
 	private OrgInfo org;
 
@@ -1333,4 +1335,12 @@ public class UserAccount implements ChineseName, Serializable {
 	public void setOrg(OrgInfo org) {
 		this.org = org;
 	}
+
+    public String getLandlineNumber() {
+        return landlineNumber;
+    }
+
+    public void setLandlineNumber(String landlineNumber) {
+        this.landlineNumber = landlineNumber;
+    }
 }

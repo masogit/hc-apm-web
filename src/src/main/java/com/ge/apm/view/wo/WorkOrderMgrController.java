@@ -30,6 +30,7 @@ import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -37,6 +38,7 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.uaa.OrgTreeController;
 import com.ge.healthcare.cn.common.cons.RepairSourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateField;
@@ -49,12 +51,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.RowEditEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TabChangeEvent;
+import org.primefaces.event.*;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -257,6 +258,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private MultiLevelApprovalService multiLevelApprovalService;
     private ExternalTempUserRepository externalTempUserDao;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
+    private OrgTreeController orgTreeController;
+    private AssetInfoRepository assetInfoRepository;
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
@@ -315,18 +318,28 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private OrgInfo currentUserOrgInfo;
     @Getter @Setter
+    private TreeNode[] selectedAccessOrgNodes;
+    @Getter @Setter
     private String newMessage;
     @Getter @Setter
     private Map<String, String> repairTipMessageMap = MapUtil.newHashMap();
 
     @Getter @Setter
     private boolean enableEngineersWriteRepairOutside;
+    @Getter @Setter
+    private String siteFor;
+    @Getter @Setter
+    private Boolean isYiMaiYangGuangTenant;
 
     private V2_WorkOrderDetailRepository v2WorkOrderDetailRepository;
 
     private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
 
     private String displayModeCasePriority;
+
+    @Setter@Getter
+    private String pageType ;
+
     @Override
     protected void init() {
         try {
@@ -375,10 +388,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
             v2WorkOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
             multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
+            orgTreeController = WebUtil.getBean(OrgTreeController.class);
+            assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
+            isYiMaiYangGuangTenant = userContextService.isYiMaiYangGuangTenant();
+            if (isYiMaiYangGuangTenant) {
+                siteFor = "woTab:woMgrListForm:datalist:btnOrg2";
+            } else {
+                siteFor = "woTab:woMgrListForm:datalist:btnOrg1";
+            }
             ConfigItemValue enableMaintenanceContractValue = configItemValueRepository.findFirstByKeyAndSiteUid("enableMaintenanceContract", loginUser.getSiteUID());
             enableMaintenanceContract = Optional.ofNullable(enableMaintenanceContractValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
             ConfigItemValue enableMaintenanceDateValue = configItemValueRepository.findFirstByKeyAndSiteUid("enableMaintenanceDate", loginUser.getSiteUID());
@@ -397,6 +418,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
                 queryIndex = Integer.valueOf(UrlEncryptController.getValueFromMap(enCodeParameters, "queryIndex").toString());
                 selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+                if(selected.getAssetInfo() ==null){
+                    AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                    selected.setAssetInfo(assetInfo);
+                }
                 viewIng = true;
                 onSelectWorkOrder();
                 String workOrderShowTravelTimeStr = configItemValueRepository.findByKeyAndSiteForUseParent(selected.getAssetInfo().getSiteUID(),selected.getAssetInfo().getHospitalUID(), selected.getAssetInfo().getInstitutionUID(), selected.getAssetInfo().getTenantUID(), "workOrderShowTravelTime");
@@ -430,6 +455,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 ix2.stream().forEach(
                         item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
                 loadClinicalDeptList();
+                getPageTypeFromConfig();
+
             }
         } catch (Exception e) {
             LOGGER.error("init occur exception", e);
@@ -440,10 +467,34 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         showLocationNameFlag = StrUtil.isNotEmpty(showLocationNameFlagStr) && "true".equals(showLocationNameFlagStr);
         String enableSignNeedScanQrCodeStr = userContextService.getConfigItemValue("enableSignNeedScanQrCode");
         enableSignNeedScanQrCode = StringUtils.isEmpty(enableSignNeedScanQrCodeStr) || !Boolean.parseBoolean(enableSignNeedScanQrCodeStr);
+        getFieldColumnList();
     }
 
     public void setSelected(MvsAssetInfo mvsAssetInfo) {
         this.mvsAssetInfo = mvsAssetInfo;
+    }
+
+    @Getter@Setter
+    private List<FieldColumnDto> fieldColumnDtoList = new ArrayList<>();
+
+    public void getFieldColumnList() {
+        String query = WebUtil.getRequestParameter("query");
+        query = StrUtil.isEmpty(query) ? "0": query;
+        String key = "WorkOrderListColumn_".concat(query);
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+        List<FieldColumnDto> list =  JSON.parseArray(value, FieldColumnDto.class);
+        if(!CollectionUtils.isEmpty(list)){
+            fieldColumnDtoList = list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
+        }
+    }
+
+    public void getPageTypeFromConfig() {
+        String  key= "WorkOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
     }
 
     public void onSelectAllOfPage() {
@@ -1110,6 +1161,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (StringUtils.isNotEmpty(siteUidFilter)) {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
         }
+        if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+            List<String> selectedSiteList = ListUtil.newArrayList();
+            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+                selectedSiteList.add(orgInfo.getUid());
+            }
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+        }
         if (!this.hasFilterOnField("siteUID")) {
             if(enableAuditGroupConfiguration && queryIndex == 10) {
                 String hospitalUID = loginUser.getHospitalUID();
@@ -1225,7 +1287,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         onSelectWorkOrder();
         String url = "actionName=View&selectedid="
-                + selected.getId()
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
                 + "&queryIndex=" + queryIndex
                 ;
         url = "workOrderList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
@@ -2142,7 +2204,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newServiceRequest.setRequestorId(loginUser.getId());
         newServiceRequest.setFromDeptId(loginUser.getOrgInfoId());
         newServiceRequest.setRequestorName(loginUser.getName());
-        newServiceRequest.setRequestorPhone(loginUser.getTelephone());
+        String requestorPhone = loginUser.getTelephone();
+        if(StrUtil.isNotEmpty(loginUser.getLandlineNumber())){
+            requestorPhone = (StrUtil.isNotEmpty(requestorPhone) ? requestorPhone.concat("，") : "").concat(loginUser.getLandlineNumber());
+        }
+        newServiceRequest.setRequestorPhone(requestorPhone);
         newServiceRequest.setRequestTime(new Date());
         if(repairReportSendPlace != null){
             newServiceRequest.setRepairReportSendPlace(repairReportSendPlace.toString());
@@ -4115,16 +4181,48 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void initLoadInternalSiteNameList() {
-        List<OrgInfo> orgInfoList = uaaService.getUserAccessibleSiteList(loginUser.getUid());
-        orgList = orgInfoList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
-        hospitalShow = orgList.size() > 1;
+        orgList = uaaService.getUserAccessibleSiteList(loginUser.getUid());
+        hospitalShow = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList()).size() > 1;
     }
 
     public List<OrgInfo> getLoadInternalSiteNameList() {
         return orgList;
     }
 
+    public TreeNode getSiteOrgTree() {
+        if (isYiMaiYangGuangTenant) {
+            LoadSiteNameList();
+        }
+        return orgTreeController.getSiteOrgTree(orgList);
+    }
 
+    private TreeNode buildTree(List<OrgInfo> orgList) {
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
+    }
+
+    private void expandedByOrgType(TreeNode tree, Integer type) {
+        if (tree.getData() != null) {
+            OrgInfo node = (OrgInfo) tree.getData();
+            if (node.getOrgType() > type) {
+                return;
+            }
+        }
+        tree.setExpanded(true);
+        for (TreeNode child : tree.getChildren()) {
+            expandedByOrgType(child, type);
+        }
+    }
 
     public boolean getHospitalShow() {
         return hospitalShow;
@@ -4379,6 +4477,36 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         String url = contextPath + "/portal/asset/info/AssetDetail.xhtml?str=" + encodeUrlQueryString;
         System.out.println(url);
         return url;
+    }
+
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        this.searchFilters.clear();
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+
+    public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
+        this.searchFilters.clear();
+        loadClinicalDeptList();
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
     }
 }
 

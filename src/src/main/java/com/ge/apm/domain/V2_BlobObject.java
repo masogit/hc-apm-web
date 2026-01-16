@@ -23,37 +23,36 @@ public class V2_BlobObject implements Serializable {
     public enum ZkbOperationType {
         A, C
     }
-    public enum  AttachmentType{
+    public enum  PmReportAttachmentType{
 
         PM_REPORT("PmReport","保养报告"),
         MEASUREMENT_REPORT("MeReport","计量报告"),
         AUDIT_REPORT("AuReport","质控报告"),
         INSPECTION_REPORT ("PIReport","巡检报告"),
         OTHER ("Other","其他"),
-        MULTI_LEVEL_APPROVAL("MultiLevelApproval","多级审批"),
 //        PMBE("PMBE","保养前照片"),
 //        PMAF("PMAF","保养后照片"),
         ;
         private String key;
         private String value;
 
-        AttachmentType(String key, String value) {
+        PmReportAttachmentType(String key, String value) {
             this.key=key;
             this.value=value;
         }
 
 
-        public static List<String> getAttachmentTypeList(){
+        public static List<String> getPmReportAttachmentTypeList(){
             ArrayList<String> attList = new ArrayList<>();
 
-            for (AttachmentType attachmentType : values()) {
+            for (PmReportAttachmentType attachmentType : values()) {
                 attList.add(attachmentType.value);
             }
             return  attList;
 
         }
-        public  static String  getKeyByValue(String value){
-            for (AttachmentType attachmentType : values()) {
+        public  static String  getPmReportKeyByValue(String value){
+            for (PmReportAttachmentType attachmentType : values()) {
                 if(attachmentType.value.equals(value)){
                     return attachmentType.key;
                 }
@@ -228,10 +227,10 @@ public class V2_BlobObject implements Serializable {
     private String approveStatus;
 
     @Transient
-    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg");
+    private List<String> showPreviewTypeList = ListUtil.newArrayList("pdf", "png", "jpg", "jpeg","jfif");
 
     @Transient
-    private List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg");
+    private List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg","jfif");
 
     @Transient
     private String boSubTypeValue;

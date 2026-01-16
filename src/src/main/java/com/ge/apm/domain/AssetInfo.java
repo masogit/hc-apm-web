@@ -117,7 +117,7 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "national_standard_code")
     private String nationalStandardCode;//2010国家编码
 
-    @Size(max = 64)
+    @Size(max = 128)
     @Column(name = "serial_num")
     private String serialNum;//制造商序列号
 
@@ -875,6 +875,10 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     @TableField(exist = false)
     private Date checkDate;
+
+    @Transient
+    @TableField(exist = false)
+    private String checkPerson;
 
     @Transient
     @TableField(exist = false)
@@ -3267,6 +3271,14 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setCheckDate(Date checkDate) {
         this.checkDate = checkDate;
+    }
+
+    public String getCheckPerson() {
+        return checkPerson;
+    }
+
+    public void setCheckPerson(String checkPerson) {
+        this.checkPerson = checkPerson;
     }
 
     public String getBoUuid() {

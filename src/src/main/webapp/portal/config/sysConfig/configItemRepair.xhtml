@@ -329,7 +329,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">无台账报修派工人1</label>
-                            <p:autoComplete id="NoAssetDispatchWorkers1" dropdown="true"
+                            <p:autoComplete  dropdown="true"
                                             value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers1']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
@@ -339,7 +339,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">无台账报修派工人2</label>
-                            <p:autoComplete id="NoAssetDispatchWorkers2" dropdown="true"
+                            <p:autoComplete  dropdown="true"
                                             value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers2']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
@@ -349,7 +349,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医学工程处主任</label>
-                            <p:autoComplete id="AssetHead" dropdown="true"
+                            <p:autoComplete  dropdown="true"
                                             value="#{systemConfigItemController.selectedObjectMap['AssetHead']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteAssetHead}"
@@ -364,7 +364,7 @@
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers'))}" update="configItemForm" style="padding:10px"
-                               disabled="#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers1').configItemValue == null}"/>
+                               disabled="#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').configItemValue == null}"/>
             </h:panelGroup>
 
             <h:panelGroup>
@@ -407,6 +407,19 @@
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('autoDispatchAllowClaimByAssignee'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('autoDispatchAllowClaimByAssignee'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('autoDispatchAllowClaimByAssignee').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').name.concat('(').concat(systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').key).concat(')')}</label>
+                <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').showValue}" style="width: 50%;">
+                    <f:selectItems value="#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('WorkOrderDetailViewType'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('WorkOrderDetailViewType'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').configItemValue == null}"/>
             </h:panelGroup>
 
         </p:panelGrid>

@@ -19,6 +19,7 @@ import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.pm.V2PmOrderController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -32,6 +33,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.StreamedContent;
@@ -51,6 +53,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
@@ -144,6 +147,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private CustomConfig customConfig;
      private MultiLevelApprovalService multiLevelApprovalService;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
+    private AssetInfoRepository assetInfoRepository;
      @Getter @Setter
     private String siteUidFilterMVS;
     @Getter @Setter
@@ -151,6 +155,8 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     @Getter @Setter
     List<V2_WorkOrder> bySearchFilterMVS = null;
     private UserAccount loginUser;
+    @Setter@Getter
+    private String pageType ;
 
     private ConfigItemValueRepository configItemValueRepository;
 
@@ -231,6 +237,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
 
     @Override
     protected void init() {
+        pageType = "0";
         try {
             fileDownloadService = WebUtil.getBean(FileDownloadService.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
@@ -252,6 +259,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
+            assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
             uaaService = WebUtil.getBean(UaaService.class);
             assetTypeGroupList = loginUser.getAssetTypeGroupList();
             ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("displayModeCasePriority", loginUser.getSiteUID());
@@ -262,6 +270,10 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
                 queryIndex = Integer.valueOf(UrlEncryptController.getValueFromMap(enCodeParameters, "queryIndex").toString());
                 selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+                if(selected.getAssetInfo() ==null){
+                    AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                    selected.setAssetInfo(assetInfo);
+                }
                 onSelectWorkOrder();
             } else {
                 if (!Strings.isNullOrEmpty(queryAssetUID_href)) {
@@ -285,13 +297,23 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                         .getFieldValueListByMsgType("woSteps");
                 ix2.stream().forEach(
                         item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
+                getPageTypeFromConfig();
             }
+
         } catch (Exception e) {
             LOGGER.error("init occur exception", e);
             throw e;
         }
     }
 
+    public void getPageTypeFromConfig() {
+        String  key= "WorkOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
+    }
 
 
     public String getStepImg(V2_WorkOrder v2_workOrder){
@@ -570,11 +592,25 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         locationName = null;
     }
 
+
+    public void onSelectOrderRedirect() throws IOException {
+        onSelectWorkOrder();
+        String url = "actionName=View&selectedid="
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
+                + "&queryIndex=" + queryIndex
+                ;
+        url = "mvs/woMvsMgrViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
     public void onSelectWorkOrder() {
         attachListEhmeFile = new ArrayList<>();
         attachListEhmeImg = new ArrayList<>();
         newServiceRequest = null;
-        currentStatus = selected.getAssetInfo().getStatus();
+        if(selected != null && selected.getAssetInfo() != null){
+            currentStatus = selected.getAssetInfo().getStatus();
+        }
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = woService.getPicListBySrUid(selected.getSrId(), 2, null);

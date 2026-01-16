@@ -111,7 +111,7 @@
         FROM v2_work_order t
         left join v2_service_request vs on t.sr_id = VS.ID
         left join mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
-        left join asset_info a ON m1.ib_id = a.id
+        left join asset_info a ON m1.ib_uid = a.uid
         left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
         left join v2_work_order_detail ws ON t.id = ws.wo_id
         WHERE   a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)

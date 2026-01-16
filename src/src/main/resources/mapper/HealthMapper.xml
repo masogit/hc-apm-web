@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.HealthMapper">
+
+    <select id="countAssetsToMeter" resultType="int">
+        select count(*) from asset_info ai
+        where (ai.tenant_uid = #{siteUid} OR ai.institution_uid = #{siteUid} OR ai.hospital_uid = #{siteUid} OR ai.site_uid = #{siteUid})
+        and ai.next_metering_date between now() and date_trunc('month', now() + interval '2 months')
+    </select>
+
+    <select id="countOpenIssues" resultType="int">
+
+    </select>
+
+    <select id="countOutOfWarranty" resultType="int">
+
+    </select>
+
+    <select id="countPmLv2" resultType="int">
+
+    </select>
+
+    <select id="countPmLv3" resultType="int">
+
+    </select>
+
+    <select id="deviceStatusSummary" resultType="com.ge.apm.domain.dto.HealthPendingStatistics">
+        SELECT
+            (
+                SELECT count(*) FROM asset_info WHERE next_metering_date between now() AND date_trunc('month', now() + interval '2 months')
+                AND (tenant_uid = #{siteUid} OR institution_uid = #{siteUid} OR hospital_uid = #{siteUid} OR site_uid = #{siteUid})
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    AND asset_type IN
+                    <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                </if>
+            ) AS countAssetsToMeter,
+            (
+                SELECT count(*) FROM v2_work_order wo
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    LEFT JOIN asset_info ai ON wo.asset_uid = ai.uid
+                </if>
+                WHERE wo.status = 1 AND (wo.tenant_uid = #{siteUid} OR wo.institution_uid = #{siteUid} OR wo.hospital_uid = #{siteUid} OR wo.site_uid = #{siteUid})
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    AND ai.asset_type IN
+                    <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                </if>
+            ) AS countOpenIssues,
+            (
+                SELECT count(*) FROM asset_info WHERE is_valid = true AND is_warranty = true AND warranty_date &lt;= (NOW() + interval '2 months')
+                AND (tenant_uid = #{siteUid} OR institution_uid = #{siteUid}OR hospital_uid = #{siteUid} OR site_uid = #{siteUid})
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    AND asset_type IN
+                    <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                </if>
+            ) AS countOutOfWarranty,
+            (
+                SELECT count(*) FROM v2_pm_order po
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    LEFT JOIN asset_info ai ON po.asset_uid = ai.uid
+                </if>
+                WHERE po.rule_level = 2 and po.is_finished = false AND po.plan_time &lt; (NOW() + interval '1 weeks')
+                AND (po.tenant_uid = #{siteUid} OR po.institution_uid = #{siteUid}OR po.hospital_uid = #{siteUid} OR po.site_uid = #{siteUid})
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    AND ai.asset_type IN
+                    <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                </if>
+            ) AS countPmLv2,
+            (
+                SELECT count(*) FROM v2_pm_order po
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    LEFT JOIN asset_info ai ON po.asset_uid = ai.uid
+                </if>
+                WHERE po.rule_level = 3 AND po.is_finished = false AND po.plan_time &lt; (NOW() + interval '1 weeks')
+                AND (po.tenant_uid = #{siteUid} OR po.institution_uid = #{siteUid}OR po.hospital_uid = #{siteUid} OR po.site_uid = #{siteUid})
+                <if test="assetTypes != null and assetTypes.size > 0">
+                    AND ai.asset_type IN
+                    <foreach item="item" collection="assetTypes" separator="," open="(" close=")" index="">
+                        #{item}
+                    </foreach>
+                </if>
+            ) AS countPmLv3
+    </select>
+
+</mapper>

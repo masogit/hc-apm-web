@@ -191,7 +191,7 @@
                         </p:column>
                         <p:column headerText="#{msg.Actions}" exportable="false" width="60" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT') or userContextService.accessContainsFunctionMenu('ASSET_INFO_SINGLE_EDIT')}" >
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">

@@ -31,6 +31,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
@@ -65,6 +66,7 @@ import org.primefaces.event.*;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -167,6 +169,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private CustomConfigObject currentCustomConfig;
     private ExternalTempUserRepository externalTempUserDao;
     private ConfigItemValueRepository configItemValueRepository;
+    private AssetInfoRepository assetInfoRepository;
+
     List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
@@ -304,9 +308,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<V2_PmOrder> bySearchFilterInternal = null;
     @Getter @Setter
     private List<OrgInfo> orgList;
+    @Setter@Getter
+    private String pageType ;
 
     @Getter @Setter
     private boolean repaFlag = false;
+
+    @Getter @Setter
+    private TreeNode[] selectedAccessOrgNodes;
 
     private WorkflowService workflowService;
 
@@ -1431,7 +1440,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             picList.add(blobObject);
-            String keyByValue = V2_BlobObject.AttachmentType.getKeyByValue(fileTypeName);
+            String keyByValue = V2_BlobObject.PmReportAttachmentType.getPmReportKeyByValue(fileTypeName);
 //            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
             blobObject.setBoType(keyByValue);
             String fileType=blobObject.getObjectName().split("\\.")[blobObject.getObjectName().split("\\.").length-1];
@@ -1774,6 +1783,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
@@ -1782,57 +1792,72 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         //如果是院长等管理层登录进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
-        if (!Strings.isNullOrEmpty(enCodeParameters)) {
-            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
-            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
-            orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
-            if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
-                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+        if ("View".equals((String) UrlEncryptController.getValueFromMap(enCodeParameters, "actionName"))) {
+            selected = dao.findById((String) UrlEncryptController.getValueFromMap(enCodeParameters, "selectedid"));
+            if(selected.getAssetInfo() ==null){
+                AssetInfo assetInfo = assetInfoRepository.findByUid((String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUid"));
+                selected.setAssetInfo(assetInfo);
             }
-        }
-        if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
-            if (Strings.isNullOrEmpty(query)) {
-                queryIndex = 8;
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
-            }
-        }else {
-            if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.hasCurrentTenantName("")){
-                    queryIndex = 10;
-                }else{
-                    queryIndex = -1;
+            onSelectPmOrder();
+        }else{
+            if (!Strings.isNullOrEmpty(enCodeParameters)) {
+                requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+                queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+                orderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "orderId");
+                if (null != UrlEncryptController.getValueFromMap(enCodeParameters, "query")) {
+                    query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
                 }
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
             }
-        }
-        for (ExportFields exs: ExportFields.values()
-        ) {
-            if(userContextService.isLocale()){
-                pmFieldsExport.add(exs.getChinese());
-            }else{
-                pmFieldsExport.add(exs.getEnglish());
+            if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
+                if (Strings.isNullOrEmpty(query)) {
+                    queryIndex = 8;
+                } else {
+                    queryIndex = Integer.valueOf(query);
+                    searchList(queryIndex);
+                }
+            }else {
+                if (Strings.isNullOrEmpty(query)) {
+                    if(userContextService.hasCurrentTenantName("")){
+                        queryIndex = 10;
+                    }else{
+                        queryIndex = -1;
+                    }
+                } else {
+                    queryIndex = Integer.valueOf(query);
+                    searchList(queryIndex);
+                }
             }
+            for (ExportFields exs: ExportFields.values()) {
+                if(userContextService.isLocale()){
+                    pmFieldsExport.add(exs.getChinese());
+                }else{
+                    pmFieldsExport.add(exs.getEnglish());
+                }
+            }
+            this.filterBySite = false;
+            this.filterByHospital = false;
+            hmCheck = new HashMap<String, UnstructuredData>();
+            isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
+            isInsulate = isInsulate == null ? false : isInsulate;
+            WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
+            if(wfc !=null)
+                isBatchOp=wfc.getPmIsSupportBatchFinish();
+            loadClinicalDeptList();
+            loadRuleList();
+            String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
+            showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
+            getPageTypeFromConfig();
         }
-
-
-        this.filterBySite = false;
-        this.filterByHospital = false;
-        hmCheck = new HashMap<String, UnstructuredData>();
-        isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
-        isInsulate = isInsulate == null ? false : isInsulate;
-        WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
-        if(wfc !=null)
-            isBatchOp=wfc.getPmIsSupportBatchFinish();
-        loadClinicalDeptList();
-        loadRuleList();
-        String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
-        showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
     }
 
+    public void getPageTypeFromConfig() {
+        String  key= "PmOrderDetailViewType";
+        pageType = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
+
+        if(StrUtil.isEmpty(pageType)){
+            pageType = "current";
+        }
+    }
 
 
     public void loadRuleList(){
@@ -1986,7 +2011,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<SearchFilter> filterArrayList = new ArrayList<>();
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
-
+        selected = null;
         if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
@@ -2033,8 +2058,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterArrayList.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
-//            searchFilters = new ArrayList();
-            setSearchFilter();
             pmIdList = new ArrayList<>();
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
@@ -2314,6 +2337,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         loadHmCheck(selected);
         // 获取temp user信息
         initExternalTempUser();
+    }
+
+    public void onSelectOrderRedirect() throws IOException {
+        String url = "actionName=View&selectedid="
+                + selected.getId() + "&assetUid=" + selected.getAssetInfo().getUid()
+                + "&queryIndex=" + queryIndex
+                ;
+        url = "pmOrderViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
@@ -2645,6 +2679,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         filterArrayList.clear();
+        if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+            List<String> selectedSiteList = ListUtil.newArrayList();
+            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+                selectedSiteList.add(orgInfo.getUid());
+            }
+            filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+        }
         updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
@@ -2812,14 +2857,31 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
-        this.filterArrayList.clear();
-        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            selectSite = (OrgInfo) event.getTreeNode().getData();
-        } else {
-            selectSite = null;
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+
+    public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
+        this.searchFilters.clear();
+        loadClinicalDeptList();
+        filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
         }
-        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
-            selectSite = null;
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
         }
     }
 
@@ -3387,7 +3449,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public List<String> getTypeList(){
 
-        List<String> attachmentTypeList = V2_BlobObject.AttachmentType.getAttachmentTypeList();
+        List<String> attachmentTypeList = V2_BlobObject.PmReportAttachmentType.getPmReportAttachmentTypeList();
         return attachmentTypeList;
     }
 

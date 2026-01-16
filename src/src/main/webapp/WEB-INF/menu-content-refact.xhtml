@@ -41,7 +41,7 @@
                            <p:menuitem fragment="um084" id="um084" value="#{msg.AssetApproval}" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_AUDIT_APPROVE')}"/>
                            <p:menuitem fragment="um087" id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_BATCH_IMPORT')}"/>
                            <p:menuitem fragment="um088"  id="um088" value="#{msg.inventoryWorkorder}" outcome="/portal/inventory/inventoryOrderDetailAssetInfoMainAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_EDIT')}"/>
-<!--                           <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_TEMPLATE_VIEW')}"/>-->
+<!--                       <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_TEMPLATE_VIEW')}"/>-->
                            <p:menuitem fragment="um090" id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_HISTORY_VIEW')}"/>
                            <p:menuitem fragment="um092" id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_VIEW')}"/>
                            <p:menuitem fragment="um094" id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EVALUATION_VIEW')}"/>
@@ -269,12 +269,12 @@
                            <p:menuitem fragment="um509" id="um509" value="#{msg.auditGroupConfiguration}" outcome="/portal/config/multilevelApproveConfig/auditGroupConfigurationList.xhtml" rendered="#{userContextService.enableAuditGroupConfiguration() and userContextService.accessContainsFunctionMenu('CONFIG_APPROVE_GROUP_EDIT')}"/>
                            <p:menuitem fragment="um504" id="um504" value="#{msg.CustomConfiguration}" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_CUSTOM_FIELD_EDIT')}"/>
                            <p:menuitem fragment="um505" id="um505" value="#{msg.AttributeConfiguration}" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ATTRIBUTE_EDIT')}"/>
-                           <p:menuitem fragment="um506" id="um506" value="#{msg.RepairMessageConfiguration}" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_REPAIR_MESSAGE_EDIT')}"/>
+<!--                           <p:menuitem fragment="um506" id="um506" value="#{msg.RepairMessageConfiguration}" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_REPAIR_MESSAGE_EDIT')}"/>-->
                            <p:menuitem fragment="um502" id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{not userContextService.hasAnyRoleByApmRoles('SuperAdmin') and userContextService.accessContainsFunctionMenu('CONFIG_QRCODE_EDIT')}"/>
 <!--                           <p:menuitem id="um503" value="#{msg.SmallScreenMessageConfiguration}" outcome="/portal/asset/captureData/captureDataMessageList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_SCREEN_MESSAGE_EDIT')}"/>-->
                            <p:menuitem fragment="um507" id="um507" value="#{msg.CustomRole}" outcome="/portal/uaa/customRole/List.xhtml" rendered= "#{userContextService.accessContainsFunctionMenu('CONFIG_CUSTOM_ROLE_EDIT')}"/>
                            <p:menuitem fragment="um508" id="um508" value="#{msg.Accountdash}" url="/account-dashboard/#/" target="_blank" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ACCOUNT_DASHBOARD_EDIT')}"/>
-                           <p:menuitem fragment="um514" id="um514" value="导出记录信息" outcome="/portal/export/tenant/TenantRecord.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_EXPORT_RECORD_EDIT')}"/>
+<!--                           <p:menuitem fragment="um514" id="um514" value="导出记录信息" outcome="/portal/export/tenant/TenantRecord.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_EXPORT_RECORD_EDIT')}"/>-->
                            <p:menuitem fragment="um523" id="um523" value="#{msg.ConfigItemManage}" outcome="/portal/config/sysConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_CONFIG_ITEM_EDIT')}"/>
                            <p:menuitem fragment="um524" id="um524" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/I18nTypeManageList.xhtml" rendered="#{not userContextService.hasAnyRoleByApmRoles('SuperAdmin') and userContextService.accessContainsFunctionMenu('CONFIG_DICTIONARY_EDIT')}"/>
                            <p:menuitem fragment="um525" id="um525" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/reminderRuleList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_REMINDER_EDIT')}"/>
@@ -415,7 +415,6 @@
             <p:menuitem fragment="um53" id="um53" value="#{msg.profile}" icon="fa fa-user-circle fa-fw" outcome="/portal/profile.xhtml"/>
             <!-- 注销 -->
             <p:menuitem id="logout" value="#{msg.Logout}" icon="fa fa-window-close-o fa-fw" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>
-
         </pu:menu>
     </div>
 

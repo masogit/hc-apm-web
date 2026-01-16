@@ -469,7 +469,7 @@ public class PmReportService {
 
         // coworker hours pmOrder
         List<Map<String, Object>> coworkerHoursInfoTable = new ArrayList<>();
-        if(pmOrder.getCoworkerEntryType() == 1){
+        if(pmOrder.getCoworkerEntryType()!=null &&  pmOrder.getCoworkerEntryType() == 1){
             List<V2_WorkOrderCoworker> v2WorkOrderCoworkers = workOrderCoworkerDao.findByWoIdOrderByCreatedDateDesc(pmOrder.getId());
             for (V2_WorkOrderCoworker item : v2WorkOrderCoworkers) {
                 Map<String, Object> coworkerHoursInfoMap = new HashMap<>();
@@ -483,6 +483,21 @@ public class PmReportService {
             }
         }
         content.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(), coworkerHoursInfoTable);
+        List<Map<String, Object>> manHoursDetail = new ArrayList<>();
+        if(pmOrder.getEntryType()!=null &&  pmOrder.getEntryType() == 1){
+            List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails = pmOrder.getPmOrderManHoursDetails();
+            if(CollectionUtils.isNotEmpty(pmOrderManHoursDetails)){
+                for (V2_PmOrderManHoursDetail item : pmOrderManHoursDetails) {
+                    Map<String, Object> manHoursInfoMap = new HashMap<>();
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.START_TIME.toString(), item.getStartTime());
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.END_TIME.toString(), item.getEndTime());
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.MAN_HOURS.toString(), item.getHours());
+                    manHoursInfoMap.put(MaintenanceTemplate.ManHours.REMARK.toString(), item.getRemark());
+                    manHoursDetail.add(manHoursInfoMap);
+                }
+            }
+        }
+        content.put(MaintenanceTemplate.Component.MAN_HOURS_DETAIL.toString(), manHoursDetail);
 
         // Check List
         List<Map<String, Object>> checkListTable = new ArrayList<>();
@@ -748,6 +763,7 @@ public class PmReportService {
         bindings.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(), new AccessoryTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.COWORKER_HOURS_TABLE.toString(), new CoworkerHoursRenderPolicy());
+        bindings.put(MaintenanceTemplate.Component.MAN_HOURS_DETAIL.toString(), new ManHoursRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1));

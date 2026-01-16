@@ -117,8 +117,8 @@
                             </p:link>
                         </p:column>
                         <!-- 资产名称 -->
-                        <p:column headerText="#{msg.assetName}" width="100" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{empty item.name ? item.assetName : item.name}"/>
+                        <p:column headerText="#{msg.assetName}" width="100" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.assetOwnerName}" width="130"
                                   rendered="#{currentCustomConfigController.showImportantField('assetOwnerName')}">

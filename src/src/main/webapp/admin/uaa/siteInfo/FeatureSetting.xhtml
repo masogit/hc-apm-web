@@ -23,14 +23,14 @@
                 <h:form id="SiteInfoEditVersionForm">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <label class="label">版本</label>
-                            <p:selectOneMenu value="#{featureSettingController.edition}" disabled="#{featureSettingController.tabIndex == 1 or featureSettingController.tabIndex == 2}">
+                            <h4 style="font-size: 20!important;">#{msg.TenantInfo}:#{featureSettingController.tenantInfo.name}</h4>
+                            <p:selectOneMenu style="display: none" value="#{featureSettingController.edition}" disabled="#{featureSettingController.tabIndex == 1 or featureSettingController.tabIndex == 2}">
                                 <p:ajax update=":SiteInfoEditVersionForm" listener="#{featureSettingController.changeListener}"></p:ajax>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item"
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="false">
                             <label class="label">设备运营管理链接</label>
                             <p:inputText value="#{featureSettingController.cpmURL}" disabled="#{featureSettingController.tabIndex == 1 or featureSettingController.tabIndex == 2}"></p:inputText>
                         </h:panelGroup>
@@ -38,741 +38,762 @@
 
                     <p:tabView  id="tabView" activeIndex="#{featureSettingController.tabIndex}">
                         <p:ajax event="tabChange" listener="#{featureSettingController.changeTab}" update=":SiteInfoEditVersionForm"/>
+                        <p:tab title="模块设置">
+
+                            <p:fieldset legend="模块" style="margin-top:10px;">
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <ui:repeat var="m" value="#{featureSettingController.moduleItems}">
+                                        <p:selectBooleanCheckbox
+                                                value="#{featureSettingController.tenantModuleMap[m.key]}"
+                                                itemLabel="#{m.name}"
+                                                disabled="#{m.disabled}">
+                                            <p:ajax update=":SiteInfoEditVersionForm" listener="#{featureSettingController.moduleChange(m.key)}"/>
+                                        </p:selectBooleanCheckbox>
+                                        <p:outputLabel value=""/>
+                                    </ui:repeat>
+                                </p:panelGrid>
+
+                                <p:outputPanel style="margin-top:8px; color:#666;">
+                                    <h:outputText value="说明：勾选模块会自动勾选该模块下所有功能；只要模块下任一功能被勾选，则认为该模块在使用中。基础配置默认开启且不可编辑。"/>
+                                </p:outputPanel>
+                            </p:fieldset>
+
+                        </p:tab>
                         <p:tab title="功能设置">
-                        <p:fieldset id="assetGroup" legend="设备档案">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_INFO']}"
-                                        itemLabel="资产管理">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_INFO')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>资产信息菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_PARENTS_INFO']}"
-                                        itemLabel="主子设备信息">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_PARENTS_INFO')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>主子设备信息菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_INFO_IMPORTANT_FIELD']}"
-                                        itemLabel="台账重要字段完整性分析">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_INFO_IMPORTANT_FIELD')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>台账重要字段完整性分析菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_BATCH_MODIFY']}"
-                                        itemLabel="资产转科管理">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_BATCH_MODIFY')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>资产转科管理菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_RISK_EVALUATE']}"
-                                        itemLabel="设备风险评估">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_RISK_EVALUATE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备风险评估菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_LOCATION']}"
-                                        itemLabel="设备定位">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_LOCATION')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备定位菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_SCRAP_TEMPLATE']}"
-                                        itemLabel="报损模板管理">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_SCRAP_TEMPLATE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>报损模板管理菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_APPROVE']}"
-                                        itemLabel="资产审核">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_APPROVE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>资产审核菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_INVENTORY']}"
-                                        itemLabel="盘点工单">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_INVENTORY')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>盘点工单菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_CONTRACT']}"
-                                        itemLabel="合同管理">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_CONTRACT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>合同管理菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_SUPPLIER_APPLICATION']}"
-                                        itemLabel="供应商小程序">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_SUPPLIER_APPLICATION')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>供应商小程序</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_VENDER']}"
-                                        itemLabel="供应商管理">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_VENDER')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>供应商管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_MVS_DATA']}"
-                                        itemLabel="MVS设备信息导入">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_MVS_DATA')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>MVS设备信息导入菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_DEP_CONVERT']}"
-                                        itemLabel="设备转科">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_DEP_CONVERT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备转科菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                            </p:panelGrid>
-                        </p:fieldset>
-
-
-                        <p:fieldset id="approve" legend="审批">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['MULTILEVEL_APPROVE']}"
-                                        itemLabel="多级审批">
-                                    <p:ajax update="approve"
-                                            listener="#{featureSettingController.featureChange('MULTILEVEL_APPROVE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>多级审批菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="install" legend="到货安装">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['INSTALL']}"
-                                        itemLabel="到货安装">
-                                    <p:ajax update="install"
-                                            listener="#{featureSettingController.featureChange('INSTALL')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>到货清单,安装入库菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['INSTALL_CHECK']}"
-                                        itemLabel="核对入库">
-                                    <p:ajax update="install"
-                                            listener="#{featureSettingController.featureChange('INSTALL_CHECK')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>核对入库菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['INSTALL_OUT_STOCK']}"
-                                        itemLabel="资产出入库">
-                                    <p:ajax update="install"
-                                            listener="#{featureSettingController.featureChange('INSTALL_OUT_STOCK')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>资产出入库菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="specialAsset" legend="特种设备管理">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['SPECIAL_ASSET']}"
-                                        itemLabel="特种设备管理">
-                                    <p:ajax update="specialAsset"
-                                            listener="#{featureSettingController.featureChange('SPECIAL_ASSET')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>特种设备管理菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="parts" legend="备件备品">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['PARTS_APPLY']}"
-                                        itemLabel="备件备品">
-                                    <p:ajax update="parts"
-                                            listener="#{featureSettingController.featureChange('PARTS_APPLY')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>备件备品菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['PARTS']}"
-                                        itemLabel="简易备件管理">
-                                    <p:ajax update="parts"
-                                            listener="#{featureSettingController.featureChange('PARTS')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>简易备件管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="repair" legend="维修">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPAIR']}"
-                                        itemLabel="维修">
-                                    <p:ajax update="repair"
-                                            listener="#{featureSettingController.featureChange('REPAIR')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>维修工作台菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPAIR_NO_ASSET']}"
-                                        itemLabel="无台账维修">
-                                    <p:ajax update="repair"
-                                            listener="#{featureSettingController.featureChange('REPAIR_NO_ASSET')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>无台账维修</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPAIR_FAULTS']}"
-                                        itemLabel="常用故障及分类">
-                                    <p:ajax update="repair"
-                                            listener="#{featureSettingController.featureChange('REPAIR_FAULTS')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>常用故障及分类管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPAIR_ARRANGE']}"
-                                        itemLabel="排班管理">
-                                    <p:ajax update="repair"
-                                            listener="#{featureSettingController.featureChange('REPAIR_ARRANGE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>排班管理管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPAIR_APPROVE_PROCESS']}"
-                                        itemLabel="核心组审核进度查看">
-                                    <p:ajax update="repair"
-                                            listener="#{featureSettingController.featureChange('REPAIR_APPROVE_PROCESS')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>核心组审核进度查看</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPAIR_VACATION']}"
-                                        itemLabel="休假管理">
-                                    <p:ajax update="repair"
-                                            listener="#{featureSettingController.featureChange('REPAIR_VACATION')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>休假管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPAIR_TEMPLATE']}"
-                                        itemLabel="报告模版管理">
-                                    <p:ajax update="repair"
-                                            listener="#{featureSettingController.featureChange('REPAIR_TEMPLATE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>报告模版管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="maintain" legend="保养">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['MAINTAIN']}"
-                                        itemLabel="保养">
-                                    <p:ajax update="maintain"
-                                            listener="#{featureSettingController.featureChange('MAINTAIN')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>保养工作台菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['MAINTAIN_ELECTRICDATAIMPORT']}"
-                                        itemLabel="电气安全数据导入">
-                                    <p:ajax update="maintain"
-                                            listener="#{featureSettingController.featureChange('MAINTAIN_ELECTRICDATAIMPORT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>电气安全数据导入</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['MAINTAIN_TEMPLATE']}"
-                                        itemLabel="报表模版管理">
-                                    <p:ajax update="maintain"
-                                            listener="#{featureSettingController.featureChange('MAINTAIN_TEMPLATE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>报表模版管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="measure" legend="计量">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['MEASURE']}"
-                                        itemLabel="计量">
-                                    <p:ajax update="measure"
-                                            listener="#{featureSettingController.featureChange('MEASURE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>计量</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['MEASUREOCR']}"
-                                        itemLabel="计量OCR识别">
-                                    <p:ajax update="measure"
-                                            listener="#{featureSettingController.featureChange('MEASUREOCR')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>计量OCR识别</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="nursesite" legend="日常检查">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['NURSESITE']}"
-                                        itemLabel="日常检查">
-                                    <p:ajax update="nursesite"
-                                            listener="#{featureSettingController.featureChange('NURSESITE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>日常检查</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['NURSESITE_RECORD']}"
-                                        itemLabel="开关机登记">
-                                    <p:ajax update="nursesite"
-                                            listener="#{featureSettingController.featureChange('NURSESITE_RECORD')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>开关机登记</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['NURSESITE_USING']}"
-                                        itemLabel="使用登记">
-                                    <p:ajax update="nursesite"
-                                            listener="#{featureSettingController.featureChange('NURSESITE_USING')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>使用登记</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="knowledge" legend="知识文档">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['KNOWLEDGE']}"
-                                        itemLabel="知识文档">
-                                    <p:ajax update="knowledge"
-                                            listener="#{featureSettingController.featureChange('KNOWLEDGE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>知识文档</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="adjust" legend="集中调剂">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ADJUST_ASSET']}"
-                                        itemLabel="调剂中心">
-                                    <p:ajax update="adjust"
-                                            listener="#{featureSettingController.featureChange('ADJUST_ASSET')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>调剂中心</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ADJUST_ARRANGE']}"
-                                        itemLabel="排班管理">
-                                    <p:ajax update="adjust"
-                                            listener="#{featureSettingController.featureChange('ADJUST_ARRANGE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>排班管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ADJUST_DEPTMENT']}"
-                                        itemLabel="科室借调">
-                                    <p:ajax update="adjust"
-                                            listener="#{featureSettingController.featureChange('ADJUST_DEPTMENT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>科室借调</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ADJUST_UNATTENDED']}"
-                                        itemLabel="无人值守">
-                                    <p:ajax update="adjust"
-                                            listener="#{featureSettingController.featureChange('ADJUST_UNATTENDED')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>无人值守</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="adjust_dept" legend="科室间调剂">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['SECONDMENT_BETWEEN_DEPARTMENTS']}"
-                                        itemLabel="科室间调剂">
-                                    <p:ajax update="adjust_dept"
-                                            listener="#{featureSettingController.featureChange('SECONDMENT_BETWEEN_DEPARTMENTS')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>科室间调剂</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="audit" legend="质控评审">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['AUDIT']}"
-                                        itemLabel="质控评审">
-                                    <p:ajax update="audit"
-                                            listener="#{featureSettingController.featureChange('AUDIT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>质控评审</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="performance" legend="绩效配置">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['PERFORMANCE']}"
-                                        itemLabel="绩效配置">
-                                    <p:ajax update="performance"
-                                            listener="#{featureSettingController.featureChange('PERFORMANCE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>绩效配置</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_PERFORMANCE']}"
-                                        itemLabel="设备绩效记录">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_PERFORMANCE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备绩效记录菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_KEYASSETDATAINPUT']}"
-                                        itemLabel="重点医疗设备报表">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_KEYASSETDATAINPUT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>重点医疗设备报表菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="budget" legend="预算管理">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['BUDGET']}"
-                                        itemLabel="预算管理">
-                                    <p:ajax update="budget"
-                                            listener="#{featureSettingController.featureChange('BUDGET')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>预算管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="hisperformance" legend="综合绩效分析">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['HISPERFORMANCE']}"
-                                        itemLabel="综合绩效分析">
-                                    <p:ajax update="hisperformance"
-                                            listener="#{featureSettingController.featureChange('HISPERFORMANCE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>综合绩效分析</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="reportCenter" legend="定制报表管理">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['REPORT_CENTER']}"
-                                        itemLabel="定制报表管理">
-                                    <p:ajax update="reportCenter"
-                                            listener="#{featureSettingController.featureChange('REPORT_CENTER')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>定制报表管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="assetAccountDashboard" legend="资产管理一览">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_ACCOUNT_DASHBOARD']}"
-                                        itemLabel="资产管理一览">
-                                    <p:ajax update="assetAccountDashboard"
-                                            listener="#{featureSettingController.featureChange('ASSET_ACCOUNT_DASHBOARD')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>资产管理一览</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-                        <p:fieldset id="mvsAsset" legend="MVS设备管理">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['MVS_ASSET']}"
-                                        itemLabel="MVS设备管理">
-                                    <p:ajax update="mvsAsset"
-                                            listener="#{featureSettingController.featureChange('MVS_ASSET')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>MVS设备管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="logAudit" legend="日志审计">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['LOG_AUDIT']}"
-                                        itemLabel="日志审计">
-                                    <p:ajax update="logAudit"
-                                            listener="#{featureSettingController.featureChange('LOG_AUDIT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>日志审计</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="config" legend="系统配置">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['CONFIG_ASSET_TYPE_GROUP']}"
-                                        itemLabel="资产分类">
-                                    <p:ajax update="config"
-                                            listener="#{featureSettingController.featureChange('CONFIG_ASSET_TYPE_GROUP')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>资产分类</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <!--<p:fieldset id="deviceDataReview" legend="设备数据概览">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['DEVICEDATAPREVIEW']}"
-                                        itemLabel="设备数据概览">
-                                    <p:ajax update="deviceDataReview"
-                                            listener="#{featureSettingController.featureChange('DEVICEDATAPREVIEW')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备数据概览</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>-->
-
-                        <p:fieldset id="validityManage" legend="效期管理">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['ASSET_DEVICE_OVERDUE']}"
-                                        itemLabel="效期管理">
-                                    <p:ajax update="assetGroup"
-                                            listener="#{featureSettingController.featureChange('ASSET_DEVICE_OVERDUE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>效期管理菜单</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="biReportAnalysis" legend="BI报表分析">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['DEVICEDATAPREVIEW']}"
-                                        itemLabel="设备数据概览">
-                                    <p:ajax update="biReportAnalysis"
-                                            listener="#{featureSettingController.featureChange('DEVICEDATAPREVIEW')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>设备数据概览</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['BI_REPORT']}"
-                                        itemLabel="BI报表">
-                                    <p:ajax update="biReportAnalysis"
-                                            listener="#{featureSettingController.featureChange('BI_REPORT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>BI报表</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                        <p:fieldset id="qualityDataView" legend="质控管理">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-<!--                                <p:selectBooleanCheckbox-->
-<!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"-->
-<!--                                        itemLabel="质控日历">-->
-<!--                                    <p:ajax update="qualityDataView"-->
-<!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>-->
-<!--                                </p:selectBooleanCheckbox>-->
-<!--                                <p:outputLabel>质控日历</p:outputLabel>-->
-<!--                                <p:outputLabel></p:outputLabel>-->
-<!--                                <p:outputLabel></p:outputLabel>-->
-
-<!--                                <p:selectBooleanCheckbox-->
-<!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_RAD_BOARD']}"-->
-<!--                                        itemLabel="放射科质控大屏">-->
-<!--                                    <p:ajax update="qualityDataView"-->
-<!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_RAD_BOARD')}"/>-->
-<!--                                </p:selectBooleanCheckbox>-->
-<!--                                <p:outputLabel>放射科质控大屏</p:outputLabel>-->
-<!--                                <p:outputLabel></p:outputLabel>-->
-<!--                                <p:outputLabel></p:outputLabel>-->
-
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_MANAGE']}"
-                                        itemLabel="质控管理">
-                                    <p:ajax update="qualityDataView"
-                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_MANAGE')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>质控管理</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-
-                       <!-- <p:fieldset id="qualityControlCalendar" legend="质控日历">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"
-                                        itemLabel="质控日历">
-                                    <p:ajax update="qualityControlCalendar"
-                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>质控日历</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>-->
-
-                        <p:fieldset id="supplierTenant" legend="供应商租户">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['SUPPLIER_TENANT']}"
-                                        itemLabel="供应商租户">
-                                    <p:ajax update="supplierTenant"
-                                            listener="#{featureSettingController.featureChange('SUPPLIER_TENANT')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>供应商租户</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-                        <p:fieldset id="nationalExaminationBigScreen" legend="国考大屏">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <p:selectBooleanCheckbox
-                                        value="#{featureSettingController.tenantFeatureMap['NATIONAL_EXAMINATION_BIG_SCREEN']}"
-                                        itemLabel="国考大屏">
-                                    <p:ajax update="supplierTenant"
-                                            listener="#{featureSettingController.featureChange('NATIONAL_EXAMINATION_BIG_SCREEN')}"/>
-                                </p:selectBooleanCheckbox>
-                                <p:outputLabel>国考大屏</p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                                <p:outputLabel></p:outputLabel>
-                            </p:panelGrid>
-                        </p:fieldset>
-                          <!--  <p:fieldset id="biReport" legend="BI报表">
+                            <p:fieldset id="assetGroup" legend="设备档案">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_INFO']}"
+                                            itemLabel="资产管理">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_INFO')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>资产信息菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_PARENTS_INFO']}"
+                                            itemLabel="主子设备信息">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_PARENTS_INFO')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>主子设备信息菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_INFO_IMPORTANT_FIELD']}"
+                                            itemLabel="台账重要字段完整性分析">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_INFO_IMPORTANT_FIELD')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>台账重要字段完整性分析菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_BATCH_MODIFY']}"
+                                            itemLabel="资产转科管理">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_BATCH_MODIFY')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>资产转科管理菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_RISK_EVALUATE']}"
+                                            itemLabel="设备风险评估">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_RISK_EVALUATE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>设备风险评估菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_LOCATION']}"
+                                            itemLabel="设备定位">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_LOCATION')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>设备定位菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_SCRAP_TEMPLATE']}"
+                                            itemLabel="报损模板管理">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_SCRAP_TEMPLATE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>报损模板管理菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_APPROVE']}"
+                                            itemLabel="资产审核">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_APPROVE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>资产审核菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_INVENTORY']}"
+                                            itemLabel="盘点工单">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_INVENTORY')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>盘点工单菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_CONTRACT']}"
+                                            itemLabel="合同管理">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_CONTRACT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>合同管理菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_SUPPLIER_APPLICATION']}"
+                                            itemLabel="供应商小程序">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_SUPPLIER_APPLICATION')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>供应商小程序</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_VENDER']}"
+                                            itemLabel="供应商管理">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_VENDER')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>供应商管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_MVS_DATA']}"
+                                            itemLabel="MVS设备信息导入">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_MVS_DATA')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>MVS设备信息导入菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_DEP_CONVERT']}"
+                                            itemLabel="设备转科">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_DEP_CONVERT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>设备转科菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+
+
+                            <p:fieldset id="approve" legend="审批">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MULTILEVEL_APPROVE']}"
+                                            itemLabel="多级审批">
+                                        <p:ajax update="approve"
+                                                listener="#{featureSettingController.featureChange('MULTILEVEL_APPROVE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>多级审批菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="install" legend="到货安装">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['INSTALL']}"
+                                            itemLabel="到货安装">
+                                        <p:ajax update="install"
+                                                listener="#{featureSettingController.featureChange('INSTALL')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>到货清单,安装入库菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['INSTALL_CHECK']}"
+                                            itemLabel="核对入库">
+                                        <p:ajax update="install"
+                                                listener="#{featureSettingController.featureChange('INSTALL_CHECK')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>核对入库菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['INSTALL_OUT_STOCK']}"
+                                            itemLabel="资产出入库">
+                                        <p:ajax update="install"
+                                                listener="#{featureSettingController.featureChange('INSTALL_OUT_STOCK')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>资产出入库菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="specialAsset" legend="特种设备管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['SPECIAL_ASSET']}"
+                                            itemLabel="特种设备管理">
+                                        <p:ajax update="specialAsset"
+                                                listener="#{featureSettingController.featureChange('SPECIAL_ASSET')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>特种设备管理菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="parts" legend="备件备品">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['PARTS_APPLY']}"
+                                            itemLabel="备件备品">
+                                        <p:ajax update="parts"
+                                                listener="#{featureSettingController.featureChange('PARTS_APPLY')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>备件备品菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['PARTS']}"
+                                            itemLabel="简易备件管理">
+                                        <p:ajax update="parts"
+                                                listener="#{featureSettingController.featureChange('PARTS')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>简易备件管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="repair" legend="维修">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPAIR']}"
+                                            itemLabel="维修">
+                                        <p:ajax update="repair"
+                                                listener="#{featureSettingController.featureChange('REPAIR')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>维修工作台菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPAIR_NO_ASSET']}"
+                                            itemLabel="无台账维修">
+                                        <p:ajax update="repair"
+                                                listener="#{featureSettingController.featureChange('REPAIR_NO_ASSET')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>无台账维修</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPAIR_FAULTS']}"
+                                            itemLabel="常用故障及分类">
+                                        <p:ajax update="repair"
+                                                listener="#{featureSettingController.featureChange('REPAIR_FAULTS')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>常用故障及分类管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPAIR_ARRANGE']}"
+                                            itemLabel="排班管理">
+                                        <p:ajax update="repair"
+                                                listener="#{featureSettingController.featureChange('REPAIR_ARRANGE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>排班管理管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPAIR_APPROVE_PROCESS']}"
+                                            itemLabel="核心组审核进度查看">
+                                        <p:ajax update="repair"
+                                                listener="#{featureSettingController.featureChange('REPAIR_APPROVE_PROCESS')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>核心组审核进度查看</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPAIR_VACATION']}"
+                                            itemLabel="休假管理">
+                                        <p:ajax update="repair"
+                                                listener="#{featureSettingController.featureChange('REPAIR_VACATION')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>休假管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPAIR_TEMPLATE']}"
+                                            itemLabel="报告模版管理">
+                                        <p:ajax update="repair"
+                                                listener="#{featureSettingController.featureChange('REPAIR_TEMPLATE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>报告模版管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="maintain" legend="保养">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MAINTAIN']}"
+                                            itemLabel="保养">
+                                        <p:ajax update="maintain"
+                                                listener="#{featureSettingController.featureChange('MAINTAIN')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>保养工作台菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MAINTAIN_ELECTRICDATAIMPORT']}"
+                                            itemLabel="电气安全数据导入">
+                                        <p:ajax update="maintain"
+                                                listener="#{featureSettingController.featureChange('MAINTAIN_ELECTRICDATAIMPORT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>电气安全数据导入</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MAINTAIN_TEMPLATE']}"
+                                            itemLabel="报表模版管理">
+                                        <p:ajax update="maintain"
+                                                listener="#{featureSettingController.featureChange('MAINTAIN_TEMPLATE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>报表模版管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="measure" legend="计量">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MEASURE']}"
+                                            itemLabel="计量">
+                                        <p:ajax update="measure"
+                                                listener="#{featureSettingController.featureChange('MEASURE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>计量</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MEASUREOCR']}"
+                                            itemLabel="计量OCR识别">
+                                        <p:ajax update="measure"
+                                                listener="#{featureSettingController.featureChange('MEASUREOCR')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>计量OCR识别</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="nursesite" legend="日常检查">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['NURSESITE']}"
+                                            itemLabel="日常检查">
+                                        <p:ajax update="nursesite"
+                                                listener="#{featureSettingController.featureChange('NURSESITE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>日常检查</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['NURSESITE_RECORD']}"
+                                            itemLabel="开关机登记">
+                                        <p:ajax update="nursesite"
+                                                listener="#{featureSettingController.featureChange('NURSESITE_RECORD')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>开关机登记</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['NURSESITE_USING']}"
+                                            itemLabel="使用登记">
+                                        <p:ajax update="nursesite"
+                                                listener="#{featureSettingController.featureChange('NURSESITE_USING')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>使用登记</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="knowledge" legend="知识文档">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['KNOWLEDGE']}"
+                                            itemLabel="知识文档">
+                                        <p:ajax update="knowledge"
+                                                listener="#{featureSettingController.featureChange('KNOWLEDGE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>知识文档</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="adjust" legend="集中调剂">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ADJUST_ASSET']}"
+                                            itemLabel="调剂中心">
+                                        <p:ajax update="adjust"
+                                                listener="#{featureSettingController.featureChange('ADJUST_ASSET')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>调剂中心</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ADJUST_ARRANGE']}"
+                                            itemLabel="排班管理">
+                                        <p:ajax update="adjust"
+                                                listener="#{featureSettingController.featureChange('ADJUST_ARRANGE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>排班管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ADJUST_DEPTMENT']}"
+                                            itemLabel="科室借调">
+                                        <p:ajax update="adjust"
+                                                listener="#{featureSettingController.featureChange('ADJUST_DEPTMENT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>科室借调</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ADJUST_UNATTENDED']}"
+                                            itemLabel="无人值守">
+                                        <p:ajax update="adjust"
+                                                listener="#{featureSettingController.featureChange('ADJUST_UNATTENDED')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>无人值守</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="adjust_dept" legend="科室间调剂">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['SECONDMENT_BETWEEN_DEPARTMENTS']}"
+                                            itemLabel="科室间调剂">
+                                        <p:ajax update="adjust_dept"
+                                                listener="#{featureSettingController.featureChange('SECONDMENT_BETWEEN_DEPARTMENTS')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>科室间调剂</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="audit" legend="质控评审">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['AUDIT']}"
+                                            itemLabel="质控评审">
+                                        <p:ajax update="audit"
+                                                listener="#{featureSettingController.featureChange('AUDIT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>质控评审</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="performance" legend="绩效配置">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['PERFORMANCE']}"
+                                            itemLabel="绩效配置">
+                                        <p:ajax update="performance"
+                                                listener="#{featureSettingController.featureChange('PERFORMANCE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>绩效配置</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_PERFORMANCE']}"
+                                            itemLabel="设备绩效记录">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_PERFORMANCE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>设备绩效记录菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_KEYASSETDATAINPUT']}"
+                                            itemLabel="重点医疗设备报表">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_KEYASSETDATAINPUT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>重点医疗设备报表菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="budget" legend="预算管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['BUDGET']}"
+                                            itemLabel="预算管理">
+                                        <p:ajax update="budget"
+                                                listener="#{featureSettingController.featureChange('BUDGET')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>预算管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="hisperformance" legend="综合绩效分析">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['HISPERFORMANCE']}"
+                                            itemLabel="综合绩效分析">
+                                        <p:ajax update="hisperformance"
+                                                listener="#{featureSettingController.featureChange('HISPERFORMANCE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>综合绩效分析</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="reportCenter" legend="定制报表管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['REPORT_CENTER']}"
+                                            itemLabel="定制报表管理">
+                                        <p:ajax update="reportCenter"
+                                                listener="#{featureSettingController.featureChange('REPORT_CENTER')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>定制报表管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="assetAccountDashboard" legend="资产管理一览">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_ACCOUNT_DASHBOARD']}"
+                                            itemLabel="资产管理一览">
+                                        <p:ajax update="assetAccountDashboard"
+                                                listener="#{featureSettingController.featureChange('ASSET_ACCOUNT_DASHBOARD')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>资产管理一览</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset id="mvsAsset" legend="MVS设备管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['MVS_ASSET']}"
+                                            itemLabel="MVS设备管理">
+                                        <p:ajax update="mvsAsset"
+                                                listener="#{featureSettingController.featureChange('MVS_ASSET')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>MVS设备管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="logAudit" legend="日志审计">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['LOG_AUDIT']}"
+                                            itemLabel="日志审计">
+                                        <p:ajax update="logAudit"
+                                                listener="#{featureSettingController.featureChange('LOG_AUDIT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>日志审计</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="config" legend="系统配置">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['CONFIG_ASSET_TYPE_GROUP']}"
+                                            itemLabel="资产分类">
+                                        <p:ajax update="config"
+                                                listener="#{featureSettingController.featureChange('CONFIG_ASSET_TYPE_GROUP')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>资产分类</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <!--<p:fieldset id="deviceDataReview" legend="设备数据概览">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['DEVICEDATAPREVIEW']}"
+                                            itemLabel="设备数据概览">
+                                        <p:ajax update="deviceDataReview"
+                                                listener="#{featureSettingController.featureChange('DEVICEDATAPREVIEW')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>设备数据概览</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>-->
+
+                            <p:fieldset id="validityManage" legend="效期管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ASSET_DEVICE_OVERDUE']}"
+                                            itemLabel="效期管理">
+                                        <p:ajax update="assetGroup"
+                                                listener="#{featureSettingController.featureChange('ASSET_DEVICE_OVERDUE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>效期管理菜单</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="biReportAnalysis" legend="BI报表分析">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['DEVICEDATAPREVIEW']}"
+                                            itemLabel="设备数据概览">
+                                        <p:ajax update="biReportAnalysis"
+                                                listener="#{featureSettingController.featureChange('DEVICEDATAPREVIEW')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>设备数据概览</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+
                                     <p:selectBooleanCheckbox
                                             value="#{featureSettingController.tenantFeatureMap['BI_REPORT']}"
                                             itemLabel="BI报表">
-                                        <p:ajax update="supplierTenant"
+                                        <p:ajax update="biReportAnalysis"
                                                 listener="#{featureSettingController.featureChange('BI_REPORT')}"/>
                                     </p:selectBooleanCheckbox>
                                     <p:outputLabel>BI报表</p:outputLabel>
                                     <p:outputLabel></p:outputLabel>
                                     <p:outputLabel></p:outputLabel>
                                 </p:panelGrid>
-                            </p:fieldset>-->
+                            </p:fieldset>
+
+                            <p:fieldset id="qualityDataView" legend="质控管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <!--                                <p:selectBooleanCheckbox-->
+                                    <!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"-->
+                                    <!--                                        itemLabel="质控日历">-->
+                                    <!--                                    <p:ajax update="qualityDataView"-->
+                                    <!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>-->
+                                    <!--                                </p:selectBooleanCheckbox>-->
+                                    <!--                                <p:outputLabel>质控日历</p:outputLabel>-->
+                                    <!--                                <p:outputLabel></p:outputLabel>-->
+                                    <!--                                <p:outputLabel></p:outputLabel>-->
+
+                                    <!--                                <p:selectBooleanCheckbox-->
+                                    <!--                                        value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_RAD_BOARD']}"-->
+                                    <!--                                        itemLabel="放射科质控大屏">-->
+                                    <!--                                    <p:ajax update="qualityDataView"-->
+                                    <!--                                            listener="#{featureSettingController.featureChange('QUALITY_CONTROL_RAD_BOARD')}"/>-->
+                                    <!--                                </p:selectBooleanCheckbox>-->
+                                    <!--                                <p:outputLabel>放射科质控大屏</p:outputLabel>-->
+                                    <!--                                <p:outputLabel></p:outputLabel>-->
+                                    <!--                                <p:outputLabel></p:outputLabel>-->
+
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_MANAGE']}"
+                                            itemLabel="质控管理">
+                                        <p:ajax update="qualityDataView"
+                                                listener="#{featureSettingController.featureChange('QUALITY_CONTROL_MANAGE')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>质控管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <!-- <p:fieldset id="qualityControlCalendar" legend="质控日历">
+                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                     <p:selectBooleanCheckbox
+                                             value="#{featureSettingController.tenantFeatureMap['QUALITY_CONTROL_CALENDAR']}"
+                                             itemLabel="质控日历">
+                                         <p:ajax update="qualityControlCalendar"
+                                                 listener="#{featureSettingController.featureChange('QUALITY_CONTROL_CALENDAR')}"/>
+                                     </p:selectBooleanCheckbox>
+                                     <p:outputLabel>质控日历</p:outputLabel>
+                                     <p:outputLabel></p:outputLabel>
+                                     <p:outputLabel></p:outputLabel>
+                                 </p:panelGrid>
+                             </p:fieldset>-->
+
+                            <p:fieldset id="supplierTenant" legend="供应商租户">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['SUPPLIER_TENANT']}"
+                                            itemLabel="供应商租户">
+                                        <p:ajax update="supplierTenant"
+                                                listener="#{featureSettingController.featureChange('SUPPLIER_TENANT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>供应商租户</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset id="nationalExaminationBigScreen" legend="国考大屏">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['NATIONAL_EXAMINATION_BIG_SCREEN']}"
+                                            itemLabel="国考大屏">
+                                        <p:ajax update="supplierTenant"
+                                                listener="#{featureSettingController.featureChange('NATIONAL_EXAMINATION_BIG_SCREEN')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>国考大屏</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <!--  <p:fieldset id="biReport" legend="BI报表">
+                                  <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                      <p:selectBooleanCheckbox
+                                              value="#{featureSettingController.tenantFeatureMap['BI_REPORT']}"
+                                              itemLabel="BI报表">
+                                          <p:ajax update="supplierTenant"
+                                                  listener="#{featureSettingController.featureChange('BI_REPORT')}"/>
+                                      </p:selectBooleanCheckbox>
+                                      <p:outputLabel>BI报表</p:outputLabel>
+                                      <p:outputLabel></p:outputLabel>
+                                      <p:outputLabel></p:outputLabel>
+                                  </p:panelGrid>
+                              </p:fieldset>-->
                             <p:fieldset id="trainManage" legend="培训管理">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <p:selectBooleanCheckbox
@@ -876,7 +897,7 @@
                                         <p:ajax event="blur" listener="#{featureSettingController.changeActiveListener}" update="datalist"/>
                                     </p:inputText>
                                 </h:panelGroup>
-                                <p:dataTable id="datalist" value="#{featureSettingController.filterAdminFeatureActives}" rendered="#{featureSettingController.tabIndex == 1}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                <p:dataTable id="datalist" value="#{featureSettingController.filterAdminFeatureActives}" rendered="#{featureSettingController.tabIndex == 2}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
                                              scrollable="false"
                                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                              sortMode="single"
@@ -937,9 +958,9 @@
                         </p:tab>
                     </p:tabView>
                     <br/>
-                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 0}" actionListener="#{featureSettingController.saveFeatures}"
+                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 0 or featureSettingController.tabIndex == 1}" actionListener="#{featureSettingController.saveFeatures}"
                                      value="#{msg.Save}" update=":SiteInfoEditVersionForm " icon="ui-icon-check"/>
-                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 2}" actionListener="#{featureSettingController.saveMenuOrder}"
+                    <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 3}" actionListener="#{featureSettingController.saveMenuOrder}"
                                      value="#{msg.Save}" update=":SiteInfoEditVersionForm " icon="ui-icon-check"/>
                 </h:form>
                 <p:dialog modal="true" id="Links" widgetVar="Links" header="激活链接" appendTo="@(body)">
