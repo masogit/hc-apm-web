@@ -145,19 +145,16 @@
 
                         <p:column headerText="#{msg.assetClassification32}" >
                             <p:outputPanel id="classificationPanel">
-                                <p:selectOneMenu id="classificationSelect"
-                                                 value="#{item.assetClassification32}"
-                                                 rendered="#{item.editing}"
-                                                 style="width:100%">
-                                    <f:selectItem itemLabel="请选择" noSelectionOption="true" />
-<!--                                    <f:selectItem itemLabel="#{item.category1}" itemValue="#{item.category1}" rendered="#{not empty item.category1}"/>-->
-<!--                                    <f:selectItem itemLabel="#{item.category2}" itemValue="#{item.category2}" rendered="#{not empty item.category2}"/>-->
-<!--                                    <f:selectItem itemLabel="#{item.category3}" itemValue="#{item.category3}" rendered="#{not empty item.category3}"/>-->
-                                    <f:selectItems value="#{item.availableCategories}"
-                                                   var="cat"
-                                                   itemLabel="#{cat}"
-                                                   itemValue="#{cat}" />
-                                </p:selectOneMenu>
+                                <p:autoComplete appendTo="@(body)" id="classificationSelect" dropdown="true" value="#{item.assetClassification32Dto}"  scrollHeight="300"   rendered="#{item.editing}"
+                                                forceSelection="true"  completeMethod="#{detailsController.autoAssetClassification32()}"
+                                                var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter" >
+                                    <p:column>
+                                        <h:outputText value="#{t.label}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.value}"/>
+                                    </p:column>
+                                </p:autoComplete>
                                 <h:outputText value="#{item.assetClassification32}" rendered="#{not item.editing}" />
                             </p:outputPanel>
                         </p:column>

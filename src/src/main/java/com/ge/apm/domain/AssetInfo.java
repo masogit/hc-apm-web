@@ -6,6 +6,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -1089,7 +1090,7 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Transient
     @TableField(exist = false)
-    private List<String> availableCategories;
+    private SelectItemDto assetClassification32Dto;
 
     @Transient
     @TableField(exist = false)
@@ -3447,16 +3448,6 @@ public class AssetInfo implements ChineseName, Serializable {
         this.category3 = category3;
     }
 
-
-
-    public List<String> getAvailableCategories() {
-        return availableCategories;
-    }
-
-    public void setAvailableCategories(List<String> availableCategories) {
-        this.availableCategories = availableCategories;
-    }
-
     public boolean isEditing() { return editing; }
     public void setEditing(boolean editing) { this.editing = editing; }
 
@@ -3466,5 +3457,13 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setCategoryRadio(String categoryRadio) {
         this.categoryRadio = categoryRadio;
+    }
+
+    public SelectItemDto getAssetClassification32Dto() {
+        return assetClassification32Dto;
+    }
+
+    public void setAssetClassification32Dto(SelectItemDto assetClassification32Dto) {
+        this.assetClassification32Dto = assetClassification32Dto;
     }
 }
