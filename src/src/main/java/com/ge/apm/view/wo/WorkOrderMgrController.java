@@ -1222,7 +1222,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, selectedAssetTypeList, "1*"));
         }
-        List<SearchFilter> assetTypeFilters = this.searchFilters.stream().filter(item -> "assetInfo.assetType".equals(item.fieldName)).collect(Collectors.toList());
+        List<SearchFilter> assetTypeFilters = this.searchFilters.stream().filter(item -> "assetInfo.assetType".equals(item.fieldName) && "EQ".equals(item.operator.name())).collect(Collectors.toList());
         if (ObjectUtil.isNotEmpty(assetTypeFilters)) {
             SearchFilter searchFilter = assetTypeFilters.get(0);
             String assetType = (String) searchFilter.value;

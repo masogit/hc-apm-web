@@ -210,23 +210,27 @@
                                 </p:column>
 
                                 <p:column headerText="AI推荐分类Top1" >
-                                    <p:selectOneRadio id="category1" value="#{item.categoryRadio}"   >
+                                    <p:selectOneRadio id="category1" value="#{item.categoryRadio}"  rendered="#{not empty item.category1}"  >
                                         <f:selectItem itemLabel="#{item.category1}" itemValue="#{item.category1}"/>
                                         <p:ajax listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}" event="change" process="@this" update="datalist1"/>
                                     </p:selectOneRadio>
                                 </p:column>
                                 <p:column headerText="AI推荐分类Top2" >
-                                    <p:selectOneRadio id="category2" value="#{item.categoryRadio}"   >
+                                    <p:selectOneRadio id="category2" value="#{item.categoryRadio}"  rendered="#{not empty item.category2}" >
                                         <f:selectItem  itemLabel="#{item.category2}" itemValue="#{item.category2}"/>
                                         <p:ajax  listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}" event="change" process="@this" update="datalist1"/>
                                     </p:selectOneRadio>
                                 </p:column>
                                 <p:column headerText="AI推荐分类Top3" >
-                                    <p:selectOneRadio id="category3" value="#{item.categoryRadio}"   >
+                                    <p:selectOneRadio id="category3" value="#{item.categoryRadio}"   rendered="#{not empty item.category3}">
                                         <f:selectItem  itemLabel="#{item.category3}" itemValue="#{item.category3}"/>
                                         <p:ajax listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}"  event="change" process="@this" update="datalist1"/>
                                     </p:selectOneRadio>
                                 </p:column>
+
+                                <f:facet name="{Toolbar}">
+                                    <p:commandButton  oncomplete="PF('batchAssetClassification32Dialog').show()"  icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="批量设置设备32分类" />
+                                </f:facet>
                             </p:dataTable>
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group ">
@@ -243,6 +247,27 @@
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                      action="details?faces-redirect=true"
                     />
+
+                    <p:dialog id="batchAssetClassification32Dialog" widgetVar="batchAssetClassification32Dialog" modal="true" resizable="true" draggable="true" width="30%" height="200px" header="批量设置设备32分类">
+                        <p:selectOneRadio  value="#{batchEditAssetClassificationController.batchAssetClassification32}"  >
+                            <f:selectItem  itemLabel="批量设置成Top1" itemValue="1"/>
+                            <f:selectItem  itemLabel="手动设置" itemValue="2"/>
+                            <f:ajax/>
+                        </p:selectOneRadio>
+
+                        <p:commandButton  actionListener="#{batchEditAssetClassificationController.saveBatchAssetClassification32}"
+                                          value="#{msg.Save}"
+                                          icon="ui-icon-check"
+                                          process="@this" update="datalist1"
+                                          oncomplete="PF('batchAssetClassification32Dialog').hide()"
+                        />
+
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                         onclick="PF('relRuleAssetDialog').hide()"
+                        />
+                    </p:dialog>
+
+
                 </h:form>
 
             </div>
