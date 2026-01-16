@@ -92,7 +92,16 @@ public class DetailsController extends GenericCRUDController<AssetInfo> implemen
         setUserSearchFilters();
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         addMisingClinicalDeptOrg(res.getContent());
+        assetClassification32Dto(res.getContent());
         return res;
+    }
+
+    private void assetClassification32Dto(List<AssetInfo> content) {
+        for (AssetInfo assetInfo : content) {
+            assetInfo.setAssetClassification32Dto(new SelectItemDto(assetInfo.getAssetClassification32(),null));
+        }
+
+
     }
 
     private void addMisingClinicalDeptOrg(List<AssetInfo> currentPageAssets) {
@@ -286,28 +295,40 @@ public class DetailsController extends GenericCRUDController<AssetInfo> implemen
         selected=asset;
         selected.setEditing(true);
         editing=true;
-        if(CollectionUtils.isEmpty(asset.getAvailableCategories())){
-            AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
-            assetClassificationModel.setBrand(asset.getMakerShortName());
-            assetClassificationModel.setPattern(asset.getFunctionType());
-            assetClassificationModel.setSourceName(asset.getName());
-            assetClassificationModel.setFactory(asset.getManufacture());
-            List<SelectItemDto> selectItemDtos = masterDataService.autoAssetClassification32(assetClassificationModel);
-            if(!CollectionUtils.isEmpty(selectItemDtos)){
-                List<String> collect = selectItemDtos.stream().map(SelectItemDto::getLabel).collect(Collectors.toList());
-                asset.setAvailableCategories(collect);
-            }
-
-
-        }
+//        if(CollectionUtils.isEmpty(asset.getAvailableCategories())){
+//            AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+//            assetClassificationModel.setBrand(asset.getMakerShortName());
+//            assetClassificationModel.setPattern(asset.getFunctionType());
+//            assetClassificationModel.setSourceName(asset.getName());
+//            assetClassificationModel.setFactory(asset.getManufacture());
+//            List<SelectItemDto> selectItemDtos = masterDataService.autoAssetClassification32(assetClassificationModel);
+//            if(!CollectionUtils.isEmpty(selectItemDtos)){
+////                List<String> collect = selectItemDtos.stream().map(SelectItemDto::getLabel).collect(Collectors.toList());
+//                asset.setAvailableCategories(selectItemDtos);
+//            }
+//        }
 
     }
+    public  List<SelectItemDto>  autoAssetClassification32() {
+
+
+        AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setBrand(selected.getMakerShortName());
+        assetClassificationModel.setPattern(selected.getFunctionType());
+        assetClassificationModel.setSourceName(selected.getName());
+        assetClassificationModel.setFactory(selected.getManufacture());
+
+        return  masterDataService.autoAssetClassification32(assetClassificationModel);
+
+    }
+
 
     public void cancel(AssetInfo assetInfo) {
         assetInfo.setEditing(false);
     }
 
     public void saveDetail(AssetInfo assetInfo) {
+        assetInfo.setAssetClassification32(assetInfo.getAssetClassification32Dto().getLabel());
         dao.save(assetInfo);
         assetInfo.setEditing(false);
 
