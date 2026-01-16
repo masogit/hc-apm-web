@@ -494,10 +494,8 @@ public class MeasuringService {
             if("AI".equalsIgnoreCase(identifyPatterns)){
                 params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
                 JSONObject  jsonObject = templateService.getJsonObject( GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,newFile,url->url.replace("{type}","/"+ApplicationType.FORM_OCR_WORKFLOWS.name()));
-                String bizStatusCode = jsonObject.getString("bizStatusCode");
-                if("ok".equalsIgnoreCase(bizStatusCode)){
-                    JSONObject data = jsonObject.getJSONObject("data");
-                    WorkflowResponse workflowResponse = data.toJavaObject(WorkflowResponse.class);
+                if(jsonObject != null){
+                    WorkflowResponse workflowResponse = jsonObject.toJavaObject(WorkflowResponse.class);
                     Result result = workflowResponse.getData();
                     JSONObject outputs = result.getOutputs();
                     JSONObject output = outputs.getJSONObject("output");

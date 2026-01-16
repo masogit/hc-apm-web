@@ -118,6 +118,10 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     private AssetInfoRepository  assetInfoRepository;
 
 
+    @Getter
+    @Setter
+    private Integer batchAssetClassification32;
+
 
     @Getter
     @Setter
@@ -374,7 +378,7 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
             if(!b){
                 selectAsset.add(assetInfo);
                 assetInfo.setCategoryRadio(assetInfo.getAssetClassification32());
-                if(org.springframework.util.CollectionUtils.isEmpty(assetInfo.getAvailableCategories())) {
+                if(StringUtils.isEmpty(assetInfo.getCategory1())) {
                     AssetClassificationModel assetClassificationModel = new AssetClassificationModel();
                     assetClassificationModel.setBrand(assetInfo.getMakerShortName());
                     assetClassificationModel.setPattern(assetInfo.getFunctionType());
@@ -382,21 +386,12 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
                     assetClassificationModel.setFactory(assetInfo.getManufacture());
                     Map<String, Object> resMapByAsset = masterDataService.getResMapByAsset(assetClassificationModel);
                     if (resMapByAsset != null) {
-                        assetInfo.setCategory1(resMapByAsset.get("category") != null ? (String) resMapByAsset.get("category") : null);
-                        assetInfo.setCategory2(resMapByAsset.get("category2") != null ? (String) resMapByAsset.get("category2") : null);
-                        assetInfo.setCategory3(resMapByAsset.get("category3") != null ? (String) resMapByAsset.get("category3") : null);
-
-                        List<String> objects = new ArrayList<>();
-                        if (org.apache.commons.lang3.StringUtils.isNotBlank((String) resMapByAsset.get("category"))) {
-                            objects.add((String) resMapByAsset.get("category"));
+                        assetInfo.setCategory1(!StringUtils.isEmpty(resMapByAsset.get("category")) ? (String) resMapByAsset.get("category") : null);
+                        assetInfo.setCategory2(!StringUtils.isEmpty(resMapByAsset.get("category2")) ? (String) resMapByAsset.get("category2") : null);
+                        assetInfo.setCategory3(!StringUtils.isEmpty(resMapByAsset.get("category3")) ? (String) resMapByAsset.get("category3") : null);
+                        if(assetInfo.getCategory1()==null && assetInfo.getCategory2()==null && assetInfo.getCategory3()==null){
+                            assetInfo.setCategory1(AssetClassification32Enum.NON_MEDICAL_EQUIPMENT.getDisplayName());
                         }
-                        if (org.apache.commons.lang3.StringUtils.isNotBlank((String) resMapByAsset.get("category2"))) {
-                            objects.add((String) resMapByAsset.get("category2"));
-                        }
-                        if (org.apache.commons.lang3.StringUtils.isNotBlank((String) resMapByAsset.get("category3"))) {
-                            objects.add((String) resMapByAsset.get("category3"));
-                        }
-                        assetInfo.setAvailableCategories(objects);
                     }
                 }
             }
@@ -432,6 +427,16 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     public List<String> getAssetClassification32All(){
 
         return AssetClassification32Enum.getAllDisplayNameList();
+    }
+
+
+    public void saveBatchAssetClassification32() {
+        if(1==batchAssetClassification32){
+            for (AssetInfo assetInfo : selectedAssetsed2) {
+                assetInfo.setAssetClassification32(assetInfo.getCategory1());
+                assetInfo.setCategoryRadio(assetInfo.getCategory1());
+            }
+        }
     }
 
     @Override
