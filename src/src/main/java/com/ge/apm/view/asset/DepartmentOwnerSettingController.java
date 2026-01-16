@@ -66,7 +66,10 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
 
     private OrgInfo ownerOrgInfo;
     private OrgInfo deptOrg;
+    @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
+    @Getter @Setter
+    private String filterOrgName;
 
     //选定科室过滤
     private OrgInfoTreeService orgInfoTreeService;
@@ -162,7 +165,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
             this.updateSearchFilter(new SearchFilter("deptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetFilter)));
         }
 
-        List<SearchFilter> assetTypeFilters = this.searchFilters.stream().filter(item -> "assetType".equals(item.fieldName)).collect(Collectors.toList());
+        List<SearchFilter> assetTypeFilters = this.searchFilters.stream().filter(item -> "assetInfo.assetType".equals(item.fieldName) && "EQ".equals(item.operator.name())).collect(Collectors.toList());
         if (ObjectUtil.isNotEmpty(assetTypeFilters)) {
             SearchFilter searchFilter = assetTypeFilters.get(0);
             String assetType = (String) searchFilter.value;
