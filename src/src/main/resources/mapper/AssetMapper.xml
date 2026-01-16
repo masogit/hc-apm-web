@@ -76,6 +76,7 @@
             ai.*,
             al.modify_time AS terminateOperationDate,
             al.modify_by AS terminateOperation,
+            ai.make_short_name as makerShortName,
             wo.id AS workOrderId
         FROM
             asset_info ai
