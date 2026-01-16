@@ -32,4 +32,9 @@ public interface HisAdministrativeOfficesRepository extends GenericRepositoryUUI
 
     HisAdministrativeOffices findByHisKsidAndHosId(String hisKsid, String hosId);
     HisAdministrativeOffices findByHisKsidAndHosIdAndSiteUid(String hisKsid, String hosId,String SiteUid);
+
+    @Query(value = "select * from his_administrative_offices  where tenant_uid=?1",nativeQuery = true)
+    List<HisAdministrativeOffices> findByTenantUid(String tenant_uid);
+    @Query(value = "select * from his_administrative_offices  where tenant_uid=?1 and hos_id in ?2",nativeQuery = true)
+    List<HisAdministrativeOffices> findByTenantUidAndHosIdIn(String tenant_uid,List<String> hosId);
 }
