@@ -7,12 +7,12 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.OwnerConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.view.uaa.AssetTypeGroupTreeController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
@@ -46,7 +46,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     private UserCommonService userCommonService;
     private OwnerConfigService ownerConfigService;
     private OrgInfoRepository orgInfoDao;
-    private AssetTypeGroupTreeController assetTypeGroupTreeController;
+    private AssetTypeGroupService assetTypeGroupService;
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
 
     private List<UserAccount> userAccountList;
@@ -94,7 +94,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
-        assetTypeGroupTreeController = WebUtil.getBean(AssetTypeGroupTreeController.class);
+        assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupTreeComponentController.registerController(this);
 
@@ -162,6 +162,16 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
             this.updateSearchFilter(new SearchFilter("deptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetFilter)));
         }
 
+        List<SearchFilter> assetTypeFilters = this.searchFilters.stream().filter(item -> "assetType".equals(item.fieldName)).collect(Collectors.toList());
+        if (ObjectUtil.isNotEmpty(assetTypeFilters)) {
+            SearchFilter searchFilter = assetTypeFilters.get(0);
+            String assetType = (String) searchFilter.value;
+            List<AssetTypeGroup> assetTypeGroupsMatchingByEncoded = this.assetTypeGroupList.stream().filter(item -> item.getEncoded().equals(assetType)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByEncoded, assetTypeGroupList);
+            Set<String> assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            searchFilters.remove(searchFilter);
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
+        }
         if (currentUser.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, currentUser.getAssetTypeGroupMap().keySet(), "1*"));
         }
