@@ -363,7 +363,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("RequestorTelephone_xlsx"), workOrderExportPojo.getTelephone());
             workOrderMap.put(WebUtil.getMessage("CurrentLocation_xlsx"), workOrderExportPojo.getLocationName());
             //workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
-            workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getIbStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getIbStatus()) : "");
             workOrderMap.put(WebUtil.getMessage("WorkOrderTypeNew_xlsx"), workOrderExportPojo.getWorkOrderType() != null ? FieldValueMessageController.fieldValue("workOrderType", workOrderExportPojo.getWorkOrderType().toString()) : "");
             workOrderMap.put(WebUtil.getMessage("CoworkerEntryType_xlsx"), FieldValueMessageController.fieldValue(I18N_HOUR_TYPE, workOrderExportPojo.getCoworkerEntryType() == null ? "0" : workOrderExportPojo.getCoworkerEntryType().toString()));
             workOrderMap.put(WebUtil.getMessage("CoworkerEntryDetail_xlsx"), workOrderExportPojo.getCoworkerEntryDetail());
