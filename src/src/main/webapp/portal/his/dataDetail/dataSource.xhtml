@@ -124,7 +124,15 @@
                                             <h:outputText value="#{item.totalAmount}"/>
                                         </p:column>
                                         <p:column headerText="执行科室">
-                                            <h:outputText value="#{item.execDept}"/>
+
+                                            <f:facet name="header">
+                                                <p:autoComplete dropdown="true" value="#{hisEquipmentDataSourceController.filterExecDept}" appendTo="@(Body)"
+                                                                scrollHeight="300"  forceSelection="true" completeMethod="#{hisEquipmentDataSourceController.autoCompleteDeptName}" size="5" >
+                                                    <p:ajax event="itemSelect" listener="#{hisEquipmentDataSourceController.onClinicalDeptNameFilterChange}" process="@this"  update="HisDataSourceTab:IouListForm:datalist"/>
+                                                    <p:ajax process="@this" listener="#{hisEquipmentDataSourceController.onClinicalDeptNameFilterChange}" update="HisDataSourceTab:IouListForm:datalist"/>
+                                                </p:autoComplete>
+                                            </f:facet>
+                                            <h:outputText value="#{item.ksName}" />
                                         </p:column>
                                         <p:column headerText="执行科室代码"
                                                   filterBy="#{item.execDeptCode}"
@@ -160,7 +168,7 @@
                                         <!--                        <h:outputText value="#{item.isMatched}"/>-->
                                         <!--                    </p:column>-->
                                         <f:facet name="{Toolbar}">
-                                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                            <p:commandButton title="一次最多只能下载5万条数据" icon="ui-icon-arrowstop-1-s" disabled="#{hisEquipmentDataSourceController.datalistSize>50000}"
                                                              class="btn btn-sm btn-gray" ajax="false" validateClient="false" immediate="true">
                                                 <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
                                             </p:commandButton>

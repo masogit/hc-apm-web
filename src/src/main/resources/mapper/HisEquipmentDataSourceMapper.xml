@@ -5,7 +5,8 @@
     <select id="queryList" resultType="com.ge.apm.domain.his.HisEquipmentDataSource">
 
 
-           select source.*,sfxm.sfxm_name as sfxmName ,sfxm.sfxm_lb  as sfxmLb  from  his_equipment_data_source source left join  his_equipment_sfxm sfxm  on  source.device_dept_code=sfxm.sfxm_id and source.org_code=sfxm.hos_id and   source.tenant_uid=sfxm.tenant_uid
+           select source.*,sfxm.sfxm_name as sfxmName ,sfxm.sfxm_lb  as sfxmLb ,hao.his_ksname ksName from  his_equipment_data_source source left join  his_equipment_sfxm sfxm  on  source.device_dept_code=sfxm.sfxm_id and source.org_code=sfxm.hos_id and   source.tenant_uid=sfxm.tenant_uid
+        left join  his_administrative_offices hao on hao.his_ksid=source.exec_dept_code and hao.hos_id=source.org_code  and   hao.tenant_uid=source.tenant_uid
         <include refid="queryCondition"/>
         <if test="orderBy != null">
             ORDER BY ${orderBy}
@@ -42,6 +43,13 @@
             </if>
             <if test="execDeptCode!=null">
                 and  source.exec_dept_code like concat('%',#{execDeptCode},'%')
+            </if>
+            <if test="execDept != null and execDept.size > 0">
+            AND
+                source.exec_dept_code IN
+            <foreach item="item" collection="execDept" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
             </if>
 
             <if test="sfxmName!=null">

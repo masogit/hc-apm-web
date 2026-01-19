@@ -224,7 +224,8 @@ public class TableDefinitionService {
         	}
         }
         report.setData(dataList);
-        report.setCreatedDate(new Date());
+        report.setLastModifiedDate(new Date());
+        report.setOfflineUpdateDate(new Date());
         v2PmOrderService.saveReport(report);
     }
 
