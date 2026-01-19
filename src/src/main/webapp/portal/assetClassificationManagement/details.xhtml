@@ -7,6 +7,17 @@
 
     <ui:define name="content">
         <style>
+            body > .ui-autocomplete-panel.ui-widget-content td {
+                text-align: left !important;
+                padding: 6px 10px !important;
+                border: none !important;
+                color: #333 !important;
+            }
+            body > .ui-autocomplete-panel.ui-widget-content .ui-autocomplete-row.ui-state-highlight td,
+            body > .ui-autocomplete-panel.ui-widget-content .ui-autocomplete-row:hover td {
+                background: #5c8bd6 !important;
+                color: white !important;
+            }
             .ui-selectbooleanbutton {
                 background: #3e464c !important;
                 color: #fff !important;
@@ -53,13 +64,6 @@
             .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row:hover {
                 background: #5c8bd6 !important;
                 color: #ffffff !important;
-                cursor: pointer;
-            }
-
-            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row.ui-state-highlight td,
-            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row:hover td {
-                color: #ffffff !important;
-                text-align: left !important;
             }
         </style>
         <div class="ui-g">
@@ -176,7 +180,7 @@
                             <p:outputPanel id="classificationPanel">
                                 <p:autoComplete appendTo="@(body)" id="classificationSelect" dropdown="true" value="#{item.assetClassification32Dto}"  scrollHeight="300"   rendered="#{item.editing}"
                                                 forceSelection="true"  completeMethod="#{detailsController.autoAssetClassification32()}"
-                                                var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter"  style="width: 150px"  >
+                                                var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter" styleClass="blue-highlight-autocomplete"  style="width: 150px"  >
                                     <p:column>
                                         <h:outputText value="#{t.label}"/>
                                     </p:column>
