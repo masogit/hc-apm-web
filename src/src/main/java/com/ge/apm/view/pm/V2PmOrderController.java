@@ -10,6 +10,7 @@ import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
+import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
@@ -46,6 +47,7 @@ import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateField;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
@@ -1056,7 +1058,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             newReport.setBoType("pm-performance-report");
         if (tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getSafetyReport()))
             newReport.setBoType("pm-safety-report");
+        newReport.setCreatedDate(new Date());
+        TableSchema table = JSONObject.parseObject(tbd.getSchema(), TableSchema.class);
+        Map<String, Object> tableValue = MapUtil.newHashMap();
+        table.getGroups().stream().flatMap(i-> i.getItems().stream())
+                .filter(i-> !com.google.common.base.Strings.isNullOrEmpty(i.getDefaultValue()))
+                .filter(i-> !tableValue.containsKey(i.getKey()))
+                .forEach(i-> tableValue.put(i.getKey(), i.getDefaultValue()));
         pmOrderService.saveReport(newReport);
+        tableService.saveTableDate(newReport, tableValue);
     }
 
     public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {

@@ -7,6 +7,17 @@
 
     <ui:define name="content">
         <style>
+            body > .ui-autocomplete-panel.ui-widget-content td {
+                text-align: left !important;
+                padding: 6px 10px !important;
+                border: none !important;
+                color: #333 !important;
+            }
+            body > .ui-autocomplete-panel.ui-widget-content .ui-autocomplete-row.ui-state-highlight td,
+            body > .ui-autocomplete-panel.ui-widget-content .ui-autocomplete-row:hover td {
+                background: #5c8bd6 !important;
+                color: white !important;
+            }
             .ui-selectbooleanbutton {
                 background: #3e464c !important;
                 color: #fff !important;
@@ -31,6 +42,28 @@
 
             .vertical-radio-aligned .ui-radiobutton-box {
                 vertical-align: middle;
+            }
+            .blue-highlight-autocomplete .ui-autocomplete-panel table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel td {
+                text-align: left !important;     /* ←←← 核心修复 */
+                padding: 6px 10px !important;
+                border: none !important;
+                background: transparent !important;
+                color: #333 !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row {
+                background: transparent !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row.ui-state-highlight,
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row:hover {
+                background: #5c8bd6 !important;
+                color: #ffffff !important;
             }
         </style>
         <div class="ui-g">
@@ -62,7 +95,7 @@
                                  widgetVar="varDataList" liveResize="true" resizeMode="fit"
                                  selectionMode="single" scrollable="false"
                                  selection="#{detailsController.selected}"
-                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" scrollHeight="800px"
 
                                  rowKey="#{item.id}" sortMode="single"  sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -143,11 +176,11 @@
                             <h:outputText value="#{item.registrationNo}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.assetClassification32}" >
+                        <p:column headerText="#{msg.assetClassification32}" style="width: 160px" >
                             <p:outputPanel id="classificationPanel">
                                 <p:autoComplete appendTo="@(body)" id="classificationSelect" dropdown="true" value="#{item.assetClassification32Dto}"  scrollHeight="300"   rendered="#{item.editing}"
                                                 forceSelection="true"  completeMethod="#{detailsController.autoAssetClassification32()}"
-                                                var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter" >
+                                                var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter" styleClass="blue-highlight-autocomplete"  style="width: 150px"  >
                                     <p:column>
                                         <h:outputText value="#{t.label}"/>
                                     </p:column>
