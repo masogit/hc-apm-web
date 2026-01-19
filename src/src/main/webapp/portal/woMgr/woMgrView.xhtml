@@ -121,6 +121,10 @@
                         <label class="label">#{msg.repairReportSendPlace}</label>
                         <p:outputLabel value="#{fieldMsg.fieldValue('repairReportSendPlace', workOrderMgrController.selected.serviceRequest.repairReportSendPlace)}" />
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.repairCurrentStatus}</label>
+                        <p:outputLabel value="#{fieldMsg.fieldValue('assetStatus', workOrderMgrController.selected.serviceRequest.ibStatus)}" />
+                    </h:panelGroup>
                 </p:panelGrid>
                 <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
                     <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}" emptyMessage="#{msg.noRecordFound}">

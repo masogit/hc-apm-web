@@ -221,6 +221,16 @@ public class WorkOrderExportPojo {
 
     private Double  travelTime;
 
+    private String ibStatus;
+
+    public String getIbStatus() {
+        return ibStatus;
+    }
+
+    public void setIbStatus(String ibStatus) {
+        this.ibStatus = ibStatus;
+    }
+
     public String getCoworkerEntryDetail() {
         return coworkerEntryDetail;
     }

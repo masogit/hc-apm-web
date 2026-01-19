@@ -2423,6 +2423,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             requestContext.addCallbackParam("validationFailed", true);
         } else {
             selectedAsset.setStatus(currentStatus);
+            if(currentStatus != null){
+                newServiceRequest.setIbStatus(String.valueOf(currentStatus));
+            }
             newServiceRequest.setAssetLocation(locationName);
             newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList,null);

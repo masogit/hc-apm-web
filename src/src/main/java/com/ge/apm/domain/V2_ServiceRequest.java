@@ -226,6 +226,17 @@ public class V2_ServiceRequest implements Serializable {
     @Column(name = "voice_to_text", columnDefinition = "text")
     private String voiceToText;
 
+    @Column(name="ib_status")
+    private String ibStatus;
+
+    public String getIbStatus() {
+        return ibStatus;
+    }
+
+    public void setIbStatus(String ibStatus) {
+        this.ibStatus = ibStatus;
+    }
+
     public String getExternalWorkOrder() {
         return externalWorkOrder;
     }
