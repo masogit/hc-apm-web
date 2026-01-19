@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.OwnerConfigRepository;
 import com.ge.apm.domain.*;
@@ -46,10 +47,12 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     private UserCommonService userCommonService;
     private OwnerConfigService ownerConfigService;
     private OrgInfoRepository orgInfoDao;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private AssetTypeGroupService assetTypeGroupService;
     private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
 
     private List<UserAccount> userAccountList;
+    private List<UserAccount> workerList;
 
     private UserAccount woOwner;
     private UserAccount woOwner2;
@@ -96,12 +99,14 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
 
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupTreeComponentController.registerController(this);
 
-        userAccountList = userCommonService.getWorkerList(null,null);
+        workerList = userCommonService.getWorkerList(null,null);
+        userAccountList = new ArrayList<>(workerList);
         currentUser = UserContextService.getCurrentUserAccount();
         enableAssetTypeGroup = currentUser.isEnableAssetTypeGroup();
         assetTypeGroupList = currentUser.getAssetTypeGroupList();
@@ -121,7 +126,9 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
             case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
                 AssetTypeGroup assetTypeGroup = (AssetTypeGroup) eventObject;
                 selected.setAssetType(assetTypeGroup.getEncoded());
-                this.resetOwnerConfig();
+                List<String> userUidList = assetTypeGroupRepository.findUserUidListByEncoded(currentUser.getTenantUID(), assetTypeGroup.getEncoded());
+                userAccountList = workerList.stream().filter(user -> userUidList.contains(user.getUid())).collect(Collectors.toList());
+                loadOwnerConfig();
                 break;
             default:
                 break;
@@ -210,7 +217,12 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.resetOwnerConfig();
 
         if(deptOrg != null){
-            List<OwnerConfig> ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID());
+            List<OwnerConfig> ownerConfigList;
+            if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isNotEmpty(selected.getAssetType())) {
+                ownerConfigList = ownerConfigService.loadAssetTypeOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID(), selected.getAssetType());
+            } else {
+                ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID());
+            }
             for(OwnerConfig ownerConfig : ownerConfigList){
                 this.woOwner = ownerConfig.getWoOwner();
                 this.woOwner2 = ownerConfig.getWoOwner2();
@@ -248,7 +260,12 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
             return;
         }
 
-        List<OwnerConfig> ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), ownerOrgInfo.getSiteUID());
+        List<OwnerConfig> ownerConfigList;
+        if (currentUser.isEnableAssetTypeGroup()) {
+            ownerConfigList = ownerConfigService.loadAssetTypeOwnerConfig(deptOrg.getUid(), ownerOrgInfo.getSiteUID(), selected.getAssetType());
+        } else {
+            ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), ownerOrgInfo.getSiteUID());
+        }
 
         OwnerConfig ownerConfig = new OwnerConfig();
 
