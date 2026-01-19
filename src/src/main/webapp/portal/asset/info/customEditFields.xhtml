@@ -396,7 +396,8 @@
             <label class="label">#{msg.assetClassification32}</label>
             <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetInfoEditController.selectItemDto}" scrollHeight="300"     readonly="#{!assetInfoEditController.needEdit('assetClassification32')}"
                             forceSelection="true"  completeMethod="#{assetInfoEditController.autoAssetClassification32()}"
-                            var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter" >
+                            var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter"
+                            styleClass="blue-highlight-autocomplete"  >
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.assetClassification32Change()}" />
                 <p:column>
                     <h:outputText value="#{t.label}"/>
