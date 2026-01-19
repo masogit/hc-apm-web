@@ -22,6 +22,7 @@
                         <label class="label">#{msg.reminderRule}<span style="color:red">*</span></label>
                         <p:selectOneMenu value="#{reminderRuleController.selected.type}" required="true" disabled="#{reminderRuleController.selected.id != null}">
                             <p:ajax event="change" update="noticeTypeRoleGroup"/>
+                            <p:ajax event="itemSelect" listener="#{reminderRuleController.selectedRuleType()}" update="saveButton"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('reminderRule')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
@@ -65,7 +66,7 @@
 <!--                        </p:selectOneRadio>-->
 <!--                    </h:panelGroup>-->
                 </p:panelGrid>
-                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{reminderRuleController.save('base')}" update=":reminderRuleEditDlg,:reminderRuleListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'reminderRuleEditDialog');" />
+                <p:commandButton id="saveButton" validateClient="true" disabled="#{!reminderRuleController.canSave}" value="#{msg.Save}" actionListener="#{reminderRuleController.save('base')}" update=":reminderRuleEditDlg,:reminderRuleListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'reminderRuleEditDialog');" />
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('reminderRuleEditDialog').hide()"/>
             </h:form>
         </p:dialog>
