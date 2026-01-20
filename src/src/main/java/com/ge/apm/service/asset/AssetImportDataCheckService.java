@@ -57,6 +57,7 @@ public class AssetImportDataCheckService {
 
     protected   ConfigCacheService configCacheService = WebUtil.getBean(ConfigCacheService.class);
 
+    protected UserAccount currentUser = UserContextService.getCurrentUserAccount();
     protected Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     protected String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
     public Map<String, String> assetFunctionTypes = i18nMap(FieldValueMessageController.getFieldValueList("assetFunctionType", siteId));
@@ -168,7 +169,7 @@ public class AssetImportDataCheckService {
     protected Map<String, AssetTypeGroup> assetTypeGroupMap = new HashMap<>();
 
     public Map checkData(List<AssetImport> assetImportList, List<Map<String, Object>> importOrgMap, List<AssetInfo> unCheckNurseSiteMaintainList, Progress progress) {
-        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
+        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(currentUser.getUid());
         assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
         /*if (!crossSite) {
             //only selected site can import clinical dept, otherwise clinical dept excel sheet is meaningless.
@@ -187,7 +188,7 @@ public class AssetImportDataCheckService {
         result.put("unCheckedNurseSite", Boolean.FALSE);
         Map<String, OrgInfo> orgNamesUriCache = null;
         if (crossSite) {
-            orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
+            orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(currentUser.getTenantUID());
         }
         for (AssetImport assetImport : assetImportList) {
 
@@ -232,12 +233,6 @@ public class AssetImportDataCheckService {
                 assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                 result.put("canBeImport", Boolean.FALSE);
                 assetImport.addErrMsg("错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
-            }
-
-            if (StringUtils.isEmpty(assetImport.getDepartNum()) && StringUtils.isEmpty(assetImport.getUid())) {
-                assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
-                result.put("canBeImport", Boolean.FALSE);
-                assetImport.addErrMsg("错误: 设备编号是必须的");
             }
             if (StringUtils.isEmpty(assetImport.getName())) {
                 assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
@@ -436,31 +431,28 @@ public class AssetImportDataCheckService {
                 assetImport.addErrMsg("错误: 设备编号重复");
             }
 
-            if (!StringUtils.isEmpty(assetImport.getDepartNum())) {
-                if (assetImport.getDepartNum().length() > 64) {
+            //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
+            if ((AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || AssetFileImportSupportingService.ASSET_CODE_MERGE_TWO.equals(assetCodeConfig))) {
+                if (StringUtils.isEmpty(assetImport.getDepartNum()) && StringUtils.isEmpty(assetImport.getUid())) {
                     assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                     result.put("canBeImport", Boolean.FALSE);
-                    assetImport.addErrMsg("错误: 设备编号不能超过64位");
-                }
-
-                //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
-                if ((AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || AssetFileImportSupportingService.ASSET_CODE_MERGE_TWO.equals(assetCodeConfig))) {
-
-
+                    assetImport.addErrMsg("错误: 设备编号是必须的");
+                } else {
+                    if (assetImport.getDepartNum().length() > 64) {
+                        assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                        result.put("canBeImport", Boolean.FALSE);
+                        assetImport.addErrMsg("错误: 设备编号不能超过64位");
+                    }
                     if (!assetImport.getDepartNum().equals(assetImport.getFinancingNum()) && !StringUtils.isEmpty(assetImport.getFinancingNum())) {
                         assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                         result.put("canBeImport", Boolean.FALSE);
                         assetImport.addErrMsg("错误: 资产编码与设备编码不相同不允许导入");
                     } else {
                         assetImport.setFinancingNum(assetImport.getDepartNum());
-
                         if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                             assetImport.setQrCode(assetImport.getDepartNum());
                         }
-
                     }
-
-
                 }
             }
 
@@ -506,7 +498,7 @@ public class AssetImportDataCheckService {
                 }
             }
             // 资产分类校验
-            if (UserContextService.getCurrentUserAccount().isEnableAssetTypeGroup()) {
+            if (currentUser.isEnableAssetTypeGroup()) {
                 if (ObjectUtil.isEmpty(assetImport.getAssetType())) {
                     assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                     result.put("canBeImport", Boolean.FALSE);
@@ -835,9 +827,9 @@ public class AssetImportDataCheckService {
                 asset.setIbDeviceStatus(5);
                 asset.setVisibleStatus(1);
             }
-            asset.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
+            asset.setCreatedBy(currentUser.getName());
             asset.setCreatedDate(now);
-            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
+            asset.setLastModifiedBy(currentUser.getName());
             asset.setLastModifiedDate(now);
 
             if (asset.getDeviceStatus() == null) {
@@ -853,7 +845,7 @@ public class AssetImportDataCheckService {
 
         } else {
             //update
-            asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
+            asset.setLastModifiedBy(currentUser.getName());
             asset.setLastModifiedDate(now);
             cleanRelatedFieldsWhenUpdating(asset);
         }

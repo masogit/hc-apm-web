@@ -1122,13 +1122,17 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isYiMaiYangGuangTenant() {
-        if(synchronizeWorkOrder == null){
-            synchronizeWorkOrder = Boolean.FALSE;
-            String value = getConfigItemValue( "synchronizeWorkOrder");
-            synchronizeWorkOrder=Boolean.TRUE.toString().equalsIgnoreCase(value);
-        }
-        return synchronizeWorkOrder;
+        return accessContainsApmFeature("MVS_WORK_ORDER");
     }
+
+//    public boolean isYiMaiYangGuangTenant() {
+//        if(synchronizeWorkOrder == null){
+//            synchronizeWorkOrder = Boolean.FALSE;
+//            String value = getConfigItemValue( "synchronizeWorkOrder");
+//            synchronizeWorkOrder=Boolean.TRUE.toString().equalsIgnoreCase(value);
+//        }
+//        return synchronizeWorkOrder;
+//    }
 
     public static boolean isYiMaiYangGuangTenantForServer() {
         return WebUtil.getBean(UserContextService.class).isYiMaiYangGuangTenant();

@@ -2662,14 +2662,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SelectItemDto selectItemDto;
 
     public  List<SelectItemDto>  autoAssetClassification32() {
-
-
         AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
         assetClassificationModel.setBrand(selected.getMakerShortName());
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getName());
-        assetClassificationModel.setFactory(selected.getManufacture());
-
+        if(selected.getManufacture()!=null){
+            assetClassificationModel.setFactory(selected.getManufacture());
+        }else if(selected.getManufactureId()!=null){
+            Supplier supplier = supplierDao.findByUid((selected.getManufactureId()));
+            assetClassificationModel.setFactory(supplier!=null?supplier.getName():null);
+        }
         return  masterDataService.autoAssetClassification32(assetClassificationModel);
 
     }
