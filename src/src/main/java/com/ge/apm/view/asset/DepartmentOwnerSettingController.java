@@ -217,9 +217,11 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.resetOwnerConfig();
 
         if(deptOrg != null){
-            List<OwnerConfig> ownerConfigList;
-            if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isNotEmpty(selected.getAssetType())) {
-                ownerConfigList = ownerConfigService.loadAssetTypeOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID(), selected.getAssetType());
+            List<OwnerConfig> ownerConfigList = ListUtil.empty();
+            if (currentUser.isEnableAssetTypeGroup()) {
+                if (ObjectUtil.isNotEmpty(selected.getAssetType())) {
+                    ownerConfigList = ownerConfigService.loadAssetTypeOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID(), selected.getAssetType());
+                }
             } else {
                 ownerConfigList = ownerConfigService.loadDepartmentOwnerConfig(deptOrg.getUid(), selectedOrg.getSiteUID());
             }
@@ -241,6 +243,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
 
     //新增按钮动作
     public void createOwerConfig(){
+        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, "");
         this.resetOwnerConfig();
         this.deptOrg = null;
         this.selected = new OwnerConfig();
