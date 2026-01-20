@@ -85,7 +85,8 @@ public class AssetTypeGroupTreeComponentController implements ServerEventInterfa
         List<String> list = Arrays.asList(str.split("#"));
         if (StringUtils.isEmpty(list.get(0))) {
             selectedAssetTypeGroup = null;
+        } else {
+            selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(list.get(0), list.get(1));
         }
-        selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(list.get(0), list.get(1));
     }
 }
