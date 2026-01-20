@@ -420,6 +420,7 @@ public class WorkOrderExportService {
             workOrderMap.put("spare08", workOrderExportPojo.getSpare08());
             workOrderMap.put("spare09", workOrderExportPojo.getSpare09());
             workOrderMap.put("spare10", workOrderExportPojo.getSpare10());
+            workOrderMap.put("case_priority",    FieldValueMessageController.fieldValue("casePriority", workOrderExportPojo.getCasePriority().toString()));
             workOrderMap.put("main_sub", "sub".equals(workOrderExportPojo.getMainSub())?"子工单":"主工单");
             workOrderMap.put("related_order_number", Optional.of(srMap.get(workOrderExportPojo.getSrId()).size()-1).orElse(null));
             resultList.add(workOrderMap);
