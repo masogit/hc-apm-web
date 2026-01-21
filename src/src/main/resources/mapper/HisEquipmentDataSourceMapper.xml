@@ -87,7 +87,7 @@
             </if>
 
             <if test="endDate!=null">
-                and  source.exec_time <![CDATA[<=]]>  #{endDate}
+                and  source.exec_time <![CDATA[<]]>  #{endDate}
             </if>
 
             <if test="execTime!=null">
