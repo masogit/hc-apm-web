@@ -347,6 +347,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("CoworkerManhours_xlsx"), workOrderExportPojo.getCoworkManHour());
             workOrderMap.put(WebUtil.getMessage("FinalRating_xlsx"), workOrderExportPojo.getFeedbackRating());
             workOrderMap.put(WebUtil.getMessage("FaultType_xlsx"), workOrderExportPojo.getCaseTypeName());
+            workOrderMap.put(WebUtil.getMessage("DiagnosticProcess_xlsx"), workOrderExportPojo.getDiagnosticProcess());
             workOrderMap.put(WebUtil.getMessage("ReasonDescription_xlsx"), workOrderExportPojo.getPatProblems());
             workOrderMap.put(WebUtil.getMessage("patActions"), workOrderExportPojo.getPatActions());
             workOrderMap.put(WebUtil.getMessage("patTests"), workOrderExportPojo.getPatTests());

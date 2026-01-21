@@ -91,12 +91,6 @@
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(3).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" itemDisabled="#{!assetInfoEditController.hasScrappedAuthority()}"/>
                         </p:selectOneRadio>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.patProblems}</label>
-                        <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="3"  cols="40"  maxlength="500"   >
-                            <p:ajax />
-                        </p:inputTextarea>
-                    </h:panelGroup>
                     <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').rendered}">
                         <label class="label">
                             #{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').label
@@ -108,7 +102,18 @@
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
+                    <h:panelGroup rendered="#{workOrderMgrController.showDigitalSignature()}">
+                        <label class="label">#{msg.diagnosticProcess}</label>
+                        <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.diagnosticProcess}" rows="3"  cols="40"  maxlength="500"   >
+                            <p:ajax />
+                        </p:inputTextarea>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.patProblems}</label>
+                        <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="3"  cols="40"  maxlength="500"   >
+                            <p:ajax />
+                        </p:inputTextarea>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.patActions}</label>
                         <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="3"  cols="40"  maxlength="500"  >
@@ -123,8 +128,6 @@
                         </p:inputTextarea>
                     </h:panelGroup>
                 </p:panelGrid>
-
-
                 <p:fieldset legend="#{msg.requestImage}" toggleable="false" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
                     <p:dataGrid id="requestImage" var="fileitem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="5" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}" emptyMessage="#{msg.noRecordFound}">
                         <p:panel  style="text-align:center">

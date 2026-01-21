@@ -225,14 +225,19 @@
                                             </c:otherwise>
                                         </c:choose>
                                     </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.patProblems}</label>
-                                        <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
-                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').rendered}">
                                         <label class="label"> #{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').label}</label>
                                         <p:outputLabel value="#{fieldMsg.fieldValue('workOrderType', woItem.workOrderType)}" />
                                     </h:panelGroup>
+                                    <h:panelGroup rendered="#{workOrderMgrController.showDigitalSignature()}">
+                                        <label class="label">#{msg.diagnosticProcess}</label>
+                                        <p:outputLabel value="#{woItem.diagnosticProcess}" title="#{woItem.diagnosticProcess}" style="word-wrap: break-word;"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.patProblems}</label>
+                                        <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
+                                    </h:panelGroup>
+
                                     <h:panelGroup>
                                         <label class="label">#{msg.patActions}</label>
                                         <p:outputLabel value="#{woItem.patActions}" style="word-wrap: break-word;"/>

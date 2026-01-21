@@ -603,6 +603,16 @@ class WorkOrderActionForm {
 
     String comName;
     Double travelTime;
+    String  diagnosticProcess;
+
+    public String getDiagnosticProcess() {
+        return diagnosticProcess;
+    }
+
+    public void setDiagnosticProcess(String diagnosticProcess) {
+        this.diagnosticProcess = diagnosticProcess;
+    }
+
     public Integer getCoworkerEntryType() {
         return coworkerEntryType;
     }
