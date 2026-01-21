@@ -179,7 +179,7 @@ public class WorkOrderReportProvider {
                 "aft.fault_name as caseTypeName, " +
                 "ai.status as assetStatus, " +
                 "wo.external_quotation as externalQuotation," +
-                "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes ," +
+                "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.diagnostic_process as diagnosticProcess,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes ," +
                 "wo.sieble_number as siebleNumber,wo.call_center_number as callCenterNumber, " +
                 "(select string_agg(concat('开始时间:',woh.start_time,'结束时间:', woh.end_time, '工时:', cast(woh.hours as decimal(10,2)),'备注:', woh.remark, ';'),'') from v2_work_order_man_hours_detail woh where woh.wo_id=wo.id GROUP BY woh.wo_id) as workHourDetail, " +
                 "wo.entry_type as entryType, " +
@@ -251,7 +251,7 @@ public class WorkOrderReportProvider {
                 "aft.fault_name as caseTypeName, " +
                 "ai.status as assetStatus, " +
                 "wo.external_quotation as externalQuotation," +
-                "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes ," +
+                "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.diagnostic_process as diagnosticProcess, wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes ," +
                 "wo.sieble_number as siebleNumber,wo.call_center_number as callCenterNumber, " +
                 "(select string_agg(concat('开始时间:',woh.start_time,'结束时间:', woh.end_time, '工时:', cast(woh.hours as decimal(10,2)),'备注:', woh.remark, ';'),'') from v2_work_order_man_hours_detail woh where woh.wo_id=wo.id GROUP BY woh.wo_id) as workHourDetail, " +
                 "wo.entry_type as entryType, " +

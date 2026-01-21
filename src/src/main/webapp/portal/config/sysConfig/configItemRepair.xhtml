@@ -422,6 +422,21 @@
                                disabled="#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').configItemValue == null}"/>
             </h:panelGroup>
 
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('showDiagnosticProcess').name.concat('(').concat(systemConfigItemController.configItemMap.get('showDiagnosticProcess').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('showDiagnosticProcess').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('showDiagnosticProcess'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showDiagnosticProcess'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('showDiagnosticProcess').configItemValue == null}"/>
+            </h:panelGroup>
+
         </p:panelGrid>
     </ui:composition>
 
