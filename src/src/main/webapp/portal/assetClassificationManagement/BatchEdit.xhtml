@@ -164,12 +164,12 @@
                                 <p:ajax event="page" />
                                 <p:column width="40" id="checkBoxCol1">
                                     <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox2">
-                                        <p:ajax event="change" listener="#{batchEditAssetClassificationController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)"/>
+                                        <p:ajax event="change" listener="#{batchEditAssetClassificationController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2) batchButton"/>
                                         <f:attribute name="assetObj" value="#{item}"/>
                                     </p:selectBooleanCheckbox>
                                     <f:facet name="header">
                                         <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.allSelected2}" id="selectCheckBoxHeader2" class="selectCheckBoxHeader2">
-                                            <p:ajax event="change" listener="#{batchEditAssetClassificationController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2)"/>
+                                            <p:ajax event="change" listener="#{batchEditAssetClassificationController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2) batchButton"/>
                                         </p:selectBooleanCheckbox>
                                     </f:facet>
                                 </p:column>
@@ -229,7 +229,7 @@
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">
-                                    <p:commandButton  oncomplete="PF('batchAssetClassification32Dialog').show()"  icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="批量设置设备32分类" />
+                                    <p:commandButton id="batchButton" validateClient="false" immediate="true" disabled="#{empty batchEditAssetClassificationController.selectedAssetsed2}"  oncomplete="PF('batchAssetClassification32Dialog').show()"  icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="批量设置设备32分类" />
                                 </f:facet>
                             </p:dataTable>
                         </p:panelGrid>
@@ -248,25 +248,6 @@
                                      action="details?faces-redirect=true"
                     />
 
-                    <p:dialog id="batchAssetClassification32Dialog" widgetVar="batchAssetClassification32Dialog" modal="true" resizable="true" draggable="true" width="30%" height="200px" header="批量设置设备32分类">
-                        <p:selectOneRadio  value="#{batchEditAssetClassificationController.batchAssetClassification32}"  >
-                            <f:selectItem  itemLabel="批量设置成Top1" itemValue="1"/>
-                            <f:selectItem  itemLabel="手动设置" itemValue="2"/>
-                            <f:ajax/>
-                        </p:selectOneRadio>
-
-                        <p:commandButton  actionListener="#{batchEditAssetClassificationController.saveBatchAssetClassification32}"
-                                          value="#{msg.Save}"
-                                          icon="ui-icon-check"
-                                          process="@this" update="datalist1"
-                                          oncomplete="PF('batchAssetClassification32Dialog').hide()"
-                        />
-
-                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                         onclick="PF('relRuleAssetDialog').hide()"
-                        />
-                    </p:dialog>
-
 
                 </h:form>
 
@@ -274,24 +255,50 @@
         </div>
 
         <script>
-            // $(function() {
-            //     if (PF('deptMenu')) {
-            //         PF('deptMenu').jq.off('click.selectCheckboxMenuFix'); // 防止重复绑定
-            //         PF('deptMenu').jq.find('.ui-chkbox-all').on('click.selectCheckboxMenuFix', function() {
-            //             setTimeout(() => PF('deptMenu').fireChangeEvent(), 10);
-            //         });
-            //     }
-            // });
-            $(function() {
-                // 监听 "Select All" 按钮点击
-                PF('deptMenu').jq.find('.ui-chkbox-all').on('click.selectCheckboxMenuFix', function() {
-                    // 延迟一点，等 UI 更新完成
-                    setTimeout(function() {
-                        // 手动触发 change 事件
-                        PF('deptMenu').fireChangeEvent();
-                    }, 10);
-                });
-            });
+
         </script>
+        <p:dialog id="batchAssetClassification32Dialog"
+                  widgetVar="batchAssetClassification32Dialog"
+                  modal="true" resizable="true" draggable="true"
+                  width="30%" height="200px" header="批量设置设备32分类">
+            <h:form id="batchAssetClassification32Dialogform">
+
+                <p:selectOneRadio value="#{batchEditAssetClassificationController.batchAssetClassification32}">
+                    <f:selectItem itemLabel="批量设置成Top1" itemValue="1"/>
+                    <f:selectItem itemLabel="手动设置" itemValue="2"/>
+                    <p:ajax event="change"  update="batchAssetClassification32Dialogform:manualSelectPanel"/>
+                </p:selectOneRadio>
+
+                <h:panelGroup id="manualSelectPanel" >
+                    <h:panelGroup rendered="#{batchEditAssetClassificationController.batchAssetClassification32==2}">
+                        <p:selectOneMenu
+                                value="#{batchEditAssetClassificationController.selectedAssetClassification32}">
+                            <f:selectItem itemLabel="请选择" noSelectionOption="true" />
+                            <f:selectItems value="#{batchEditAssetClassificationController.assetClassification32All}"
+                                           var="cat"
+                                           itemLabel="#{cat}"
+                                           itemValue="#{cat}" />
+                            <p:ajax event="change"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                </h:panelGroup>
+                <br/>
+
+                <p:commandButton
+                        actionListener="#{batchEditAssetClassificationController.saveBatchAssetClassification32}"
+                        value="#{msg.Save}"
+                        icon="ui-icon-check"
+                        process="@this" update=":batchEditAssetClassificationForm:datalist1  :batchAssetClassification32Dialogform"
+                        oncomplete="PF('batchAssetClassification32Dialog').hide()" />
+
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                 onclick="PF('batchAssetClassification32Dialog').hide(); return false;" />
+            </h:form>
+
+
+
+        </p:dialog>
+
     </ui:define>
 </ui:composition>

@@ -118,9 +118,11 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     private AssetInfoRepository  assetInfoRepository;
 
 
-    @Getter
-    @Setter
+
     private Integer batchAssetClassification32;
+
+
+    private String selectedAssetClassification32;
 
 
     @Getter
@@ -436,7 +438,15 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
                 assetInfo.setAssetClassification32(assetInfo.getCategory1());
                 assetInfo.setCategoryRadio(assetInfo.getCategory1());
             }
+        } else if (2==batchAssetClassification32 && !StringUtils.isEmpty(selectedAssetClassification32)) {
+
+            for (AssetInfo assetInfo : selectedAssetsed2) {
+                assetInfo.setAssetClassification32(selectedAssetClassification32);
+                assetInfo.setCategoryRadio(selectedAssetClassification32);
+            }
         }
+        batchAssetClassification32=null;
+        selectedAssetClassification32=null;
     }
 
     @Override
@@ -489,5 +499,21 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
 
     public void setSelectsDeptOrgUid(List<String> selectsDeptOrgUid) {
         this.selectsDeptOrgUid = selectsDeptOrgUid;
+    }
+
+    public Integer getBatchAssetClassification32() {
+        return batchAssetClassification32;
+    }
+
+    public void setBatchAssetClassification32(Integer batchAssetClassification32) {
+        this.batchAssetClassification32 = batchAssetClassification32;
+    }
+
+    public String getSelectedAssetClassification32() {
+        return selectedAssetClassification32;
+    }
+
+    public void setSelectedAssetClassification32(String selectedAssetClassification32) {
+        this.selectedAssetClassification32 = selectedAssetClassification32;
     }
 }

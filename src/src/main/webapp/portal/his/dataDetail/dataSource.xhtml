@@ -123,11 +123,11 @@
                                                   filterMatchMode="GTE">
                                             <h:outputText value="#{item.totalAmount}"/>
                                         </p:column>
-                                        <p:column headerText="执行科室">
-
+                                        <p:column headerText="执行科室" style="width: 120px">
                                             <f:facet name="header">
-                                                <p:autoComplete dropdown="true" value="#{hisEquipmentDataSourceController.filterExecDept}" appendTo="@(Body)"
-                                                                scrollHeight="300"  forceSelection="true" completeMethod="#{hisEquipmentDataSourceController.autoCompleteDeptName}" size="5" >
+                                                <h:outputText value="执行科室"/><br/>
+                                                <p:autoComplete  dropdown="true" value="#{hisEquipmentDataSourceController.filterExecDept}" appendTo="@(Body)"
+                                                                scrollHeight="300"  forceSelection="true" completeMethod="#{hisEquipmentDataSourceController.autoCompleteDeptName}" size="5" style="width: 100px" >
                                                     <p:ajax event="itemSelect" listener="#{hisEquipmentDataSourceController.onClinicalDeptNameFilterChange}" process="@this"  update="HisDataSourceTab:IouListForm:datalist"/>
                                                     <p:ajax process="@this" listener="#{hisEquipmentDataSourceController.onClinicalDeptNameFilterChange}" update="HisDataSourceTab:IouListForm:datalist"/>
                                                 </p:autoComplete>
