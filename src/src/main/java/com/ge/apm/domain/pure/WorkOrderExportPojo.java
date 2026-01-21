@@ -225,6 +225,16 @@ public class WorkOrderExportPojo {
 
     private Integer casePriority;
 
+    private String  diagnosticProcess;
+
+    public String getDiagnosticProcess() {
+        return diagnosticProcess;
+    }
+
+    public void setDiagnosticProcess(String diagnosticProcess) {
+        this.diagnosticProcess = diagnosticProcess;
+    }
+
     public String getIbStatus() {
         return ibStatus;
     }

@@ -107,6 +107,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("fix_error_type", WebUtil.getMessage("FaultType_xlsx"));
 
         COPY_KEY_MAPPING.put("fix_owner", WebUtil.getMessage("CurrentOwner_xlsx"));
+        COPY_KEY_MAPPING.put("diagnostic_process", WebUtil.getMessage("DiagnosticProcess_xlsx"));
         COPY_KEY_MAPPING.put("fix_reason", WebUtil.getMessage("ReasonDescription_xlsx"));
         COPY_KEY_MAPPING.put("fix_solution", WebUtil.getMessage("patActions"));
         COPY_KEY_MAPPING.put("fix_validation", WebUtil.getMessage("TestbeforeDelivery_xlsx"));
