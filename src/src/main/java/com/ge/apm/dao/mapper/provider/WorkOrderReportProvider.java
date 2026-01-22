@@ -262,7 +262,7 @@ public class WorkOrderReportProvider {
                 "wo.work_order_type as workOrderType, " +
                 "wo.main_sub as mainSub, " +
                 "sr.case_priority as casePriority," +
-                "ai.spare01,ai.spare02,ai.spare03,ai.spare04,ai.spare05,ai.spare06,ai.spare07,ai.spare08,ai.spare09,ai.spare10 " +
+                "ai.spare01,ai.spare02,ai.spare03,ai.spare04,ai.spare05,ai.spare06,ai.spare07,ai.spare08,ai.spare09,ai.spare10,sr.ib_status as ibStatus " +
                 "from v2_work_order wo " +
                 "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
                 "INNER JOIN mvs_ib_mapping m1 ON wo.asset_uid = m1.mvs_ib_uid OR wo.asset_uid = m1.e_home_ib_uid " +
