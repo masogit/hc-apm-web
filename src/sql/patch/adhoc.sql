@@ -9,3 +9,7 @@ DELETE FROM reminder_rule WHERE tenant_uid IN (SELECT uid FROM tenant_info WHERE
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修工单是否显示诊断过程', 'showDiagnosticProcess', '维修工单是否显示诊断过程', 'f','t',3 where not exists(select * from config_item where key = 'showDiagnosticProcess');
 
+
+-- YHAAO-27053
+insert into public.config_item(uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text, '-', ''), 4, '[{"label": "工单类型", "field":"orderType"},{"label": "院区名称", "field":"siteName"},{"label": "设备名称", "field":"assetName"},,{"label": "工单编号", "field":"srNum"}]', '维修报告单名称配置', 'WorkOrderReportNameConfiguration', '维修报告单名称配置', 'f', 't', 10 where not exists ( select * from config_item where key = 'WorkOrderReportNameConfiguration');
