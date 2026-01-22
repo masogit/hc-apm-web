@@ -1,10 +1,12 @@
 package com.ge.apm.dao.mapper.provider;
 
+import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/12/14.
@@ -261,7 +263,7 @@ public class WorkOrderReportProvider {
                 "from v2_work_order wo " +
                 "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
                 "INNER JOIN mvs_ib_mapping m1 ON wo.asset_uid = m1.mvs_ib_uid OR wo.asset_uid = m1.e_home_ib_uid " +
-                "INNER JOIN asset_info ai ON ai.id = wo.asset_id " +
+                "INNER JOIN asset_info ai ON m1.ib_uid = ai.uid " +
                 "INNER JOIN user_org uo ON uo.org_uid IN (ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.clinical_dept_uid) " +
                 "LEFT JOIN user_account ua ON ua.id = sr.requestor_id " +
                 "LEFT JOIN asset_fault_type aft ON aft.id=wo.case_type " +
@@ -341,6 +343,14 @@ public class WorkOrderReportProvider {
     public String buildFilter(List<SearchFilter> searchFilterList) {
 
         StringBuilder sb = new StringBuilder();
+        long count = searchFilterList.stream().filter(filter -> "userUid".equals(filter.fieldName)).count();
+        if (count > 0) {
+            List<SearchFilter> orgFilter = searchFilterList.stream().filter(filter -> "orgUID".equals(filter.fieldName)).collect(Collectors.toList());
+            List<SearchFilter> tenantFilter = searchFilterList.stream().filter(filter -> "tenantUID".equals(filter.fieldName)).collect(Collectors.toList());
+            searchFilterList.removeAll(orgFilter);
+            searchFilterList.removeAll(tenantFilter);
+            sb.append(" and (wo.tenant_uid in ('68fc4f19938546d7bdfaf2d405cd6e6d','").append(UserContextService.getCurrentUserAccount().getTenantUID()).append("')) ");
+        }
         for (SearchFilter searchFilter : searchFilterList) {
             String tempColumn = searchFilter.fieldName;
             Object value = searchFilter.value;
@@ -503,11 +513,11 @@ public class WorkOrderReportProvider {
                     }else if(tempColumn.equals("srNum")){
                         sb.append(" and sr.sr_num = '").append(value).append("'");
                     }else if(tempColumn.equals("requestTime")){
-                            if (op.equals(SearchFilter.Operator.GTE)) {
-                                sb.append(" and sr.request_time>='").append(value).append("' ");
-                            } else if (op.equals(SearchFilter.Operator.LT)) {
-                                sb.append(" and sr.request_time<'").append(value).append("' ");
-                            }
+                        if (op.equals(SearchFilter.Operator.GTE)) {
+                            sb.append(" and sr.request_time>='").append(value).append("' ");
+                        } else if (op.equals(SearchFilter.Operator.LT)) {
+                            sb.append(" and sr.request_time<'").append(value).append("' ");
+                        }
                     }
                 }
             }
