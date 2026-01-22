@@ -124,6 +124,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             selected.setInstitutionUid(loginUser.getInstitutionUID());
             selected.setHospitalUid(loginUser.getHospitalUID());
             selected.setSiteUid(loginUser.getSiteUID());
+            initWechatTemplate();
+            wechatParam = selected.getWechatParam();
         } else if ("Edit".equals(crudActionName) && "base".equals(actionName)) {
             selected.setState(-1);
         }
@@ -284,6 +286,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         switch (selected.getType()) {
             case "AssetLifecycle":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_LIFECYCLE_MSG, WechatParam.class));
+                break;
+            case "Measuring":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.MEASURING_MSG, WechatParam.class));
                 break;
             case "AssetWarrantyDate":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_WARRANTY_DATE_MSG, WechatParam.class));
