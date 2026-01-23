@@ -239,6 +239,8 @@ public enum GatewayURL {
     // site to site auto ack
     SITE_TO_SITE_AUTO_ACK("/hcapmworkflowservice/api/apm/siteToSiteAllocation/autoAck"),
     PLATE_RECOGNITION("/hcapmassetservice/api/apm/asset/assetinfos/plateRecognition/{objectId}"),
+    DIFY_CREATE_SHARE_MESSAGE("/hcapmgateway/api/apm/model/share"),
+    DIFY_GET_SHARE_MESSAGE("/hcapmgateway/api/apm/model/shareMessage"),
     ;
     private final String url;
 
