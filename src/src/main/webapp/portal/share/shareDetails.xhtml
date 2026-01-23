@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:composition >
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                background-color: #f5f5f5;
+                color: #333;
+                line-height: 1.5;
+                padding: 20px;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chat-container {
+                max-width: 800px;
+                width: 100%;
+                margin: 0 auto;
+                flex: 1;
+                overflow-y: auto;
+                padding: 10px;
+            }
+
+            .message {
+                margin-bottom: 16px;
+                max-width: 70%;
+                word-wrap: break-word;
+                position: relative;
+            }
+
+            .message.user {
+                margin-left: auto;
+                text-align: right;
+            }
+
+            .bubble {
+                padding: 12px 16px;
+                border-radius: 18px;
+                display: inline-block;
+            }
+
+            .message.user .bubble {
+                background-color: #007aff;
+                color: white;
+                border-bottom-right-radius: 4px;
+            }
+
+            .message.other .bubble {
+                background-color: #e5e5ea;
+                color: #000;
+                border-bottom-left-radius: 4px;
+            }
+
+            .timestamp {
+                font-size: 0.75rem;
+                color: #999;
+                margin-top: 4px;
+                text-align: right;
+            }
+
+            .message.user .timestamp {
+                text-align: right;
+            }
+
+            .message.other .timestamp {
+                text-align: left;
+            }
+        </style>
+
+        <h:form id="departmentDetailForm"   >
+            <div class="chat-container" id="chatContainer">
+             <c:choose>
+                 <c:when test="#{not empty difyShareDetailsController.getMessages()}">
+                     <c:forEach  items="#{difyShareDetailsController.getMessages()}" var="item">
+                         <!-- 用户消息 -->
+                         <c:if test="#{item.key eq '0'}">
+                             <div class="message user">
+                                 <div class="bubble">#{item.label}</div>
+                             </div>
+                         </c:if>
+
+                         <!-- 助手消息 -->
+                         <c:if test="${item.key eq '1'}">
+                             <div class="message other">
+                                 <div class="bubble">
+                                     #{item.label}
+                                 </div>
+                             </div>
+                         </c:if>
+
+                     </c:forEach>
+                 </c:when>
+                 <c:otherwise>
+                         <div class="message user">
+                             <div class="bubble">分享链接已失效</div>
+                         </div>
+                 </c:otherwise>
+             </c:choose>
+
+            </div>
+        </h:form>
+
+    </ui:composition>
+</html>
