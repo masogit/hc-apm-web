@@ -433,7 +433,7 @@ public class AssetImportDataCheckService {
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
             if ((AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || AssetFileImportSupportingService.ASSET_CODE_MERGE_TWO.equals(assetCodeConfig))) {
-                if (StringUtils.isEmpty(assetImport.getDepartNum()) && StringUtils.isEmpty(assetImport.getUid())) {
+                if (StringUtils.isEmpty(assetImport.getDepartNum())) {
                     assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                     result.put("canBeImport", Boolean.FALSE);
                     assetImport.addErrMsg("错误: 设备编号是必须的");
