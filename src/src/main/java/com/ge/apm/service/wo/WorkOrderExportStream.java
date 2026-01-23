@@ -1,6 +1,8 @@
 package com.ge.apm.service.wo;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.domain.Progress;
+import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.wo.doctemplate.WorkOrderDocxRenderService;
 import com.ge.healthcare.cn.common.pdf.PDFConversion;
 import com.ge.healthcare.cn.common.pdf.PDFConversionUtil;
@@ -44,6 +46,8 @@ public class WorkOrderExportStream extends InputStream {
 
     private String exportType = "WORD";
 
+    private List<FieldColumnDto> fieldColumnDtos;
+
     private Map<String, Integer> fileNameMap;
 
     private Map<String, String> orderNameMap;
@@ -57,6 +61,8 @@ public class WorkOrderExportStream extends InputStream {
         zout = new ZipOutputStream(bout);
         this.renderService = renderService;
         this.exportType = renderService.getConfigItemValue("WorkOrderExportType");
+        String  WorkOrderReportNameConfigurationString = renderService.getConfigItemValue("WorkOrderReportNameConfiguration");
+        fieldColumnDtos = JSON.parseArray(WorkOrderReportNameConfigurationString, FieldColumnDto.class);
         this.progress = progress;
         if (CollectionUtils.isNotEmpty(workOrderData) && workOrderData.size() > 1) {
             this.setContentType("application/zip");
@@ -108,7 +114,28 @@ public class WorkOrderExportStream extends InputStream {
         deviceName = StringUtils.replace(deviceName, "\\", "-");
         deviceName = StringUtils.replace(deviceName, "/", "-");
         String srNumXlsx = WebUtil.getMessage("srNum_xlsx");
-        String name = "维修-"+siteName + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx"));
+        String srNUm = (String) map.get(WebUtil.getMessage("srNum_xlsx"));
+//        String name = "维修-"+siteName + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx"));
+        StringBuilder name = new StringBuilder();
+        for (FieldColumnDto fieldColumnDto : fieldColumnDtos) {
+            String fieldValue = null;
+            if ("orderType".equals(fieldColumnDto.getField())) {
+                fieldValue = "维修";
+            } else if ("siteName".equals(fieldColumnDto.getField())) {
+                fieldValue = siteName;
+            } else if ("assetName".equals(fieldColumnDto.getField())) {
+                fieldValue = deviceName;
+            } else if ("srNum".equals(fieldColumnDto.getField())) {
+                fieldValue = srNUm; // 注意变量名拼写是否一致（srNUm vs srNum）
+            }
+
+            if (fieldValue != null) {
+                if (name.length() > 0) {
+                    name.append("-");
+                }
+                name.append(fieldValue);
+            }
+        }
         String fileName = name + ".docx";
         String orderName = orderNameMap.get((String) map.get("woId"));
         if (ObjectUtil.isNotEmpty(orderName)) {
