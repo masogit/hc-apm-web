@@ -436,7 +436,33 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showDiagnosticProcess'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('showDiagnosticProcess').configItemValue == null}"/>
             </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').name.concat('(').concat(systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').key).concat(')')}</label>
 
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <!--                    <p:orderList-->
+                    <!--                                 value="#{systemConfigItemController.configItemMap.get('WorkOrdeRreportNameConfiguration').fieldColumnDtoList}"-->
+                    <!--                                 var="item"-->
+                    <!--                                 itemLabel="#{item.label}"-->
+                    <!--                                 itemValue="#{item}"-->
+                    <!--                                 controlsLocation="none"-->
+                    <!--                                 responsive="true">-->
+                    <!--                    </p:orderList>-->
+                    <p:dataTable var='item' value="#{systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').fieldColumnDtoList}" draggableRows="true">
+                        <p:column headerText="报表名称字段排序" >
+                            <h:outputText value="#{item.label}"  />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:panelGrid>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 
