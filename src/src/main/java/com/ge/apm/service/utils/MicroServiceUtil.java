@@ -557,4 +557,33 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return map;
     }
 
+    public JSONObject ocrCreated(String url, String token, File file) {
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+        MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
+        headers.setContentType(type);
+        headers.add("Authorization", token);
+        String name = file.getName();
+        logger.info("file name :{}",name);
+        try {
+            headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name));
+        } catch (Exception e) {
+            throw new RuntimeException("文件名加密异常");
+        }
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        FileSystemResource resource = new FileSystemResource(file);
+        body.add("file", resource);
+
+        HttpEntity<Map> requestEntity = new HttpEntity<>(body, headers);
+
+        String gatewayURL = getGatewayURL(url);
+
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            JSONObject data = new JSONObject((LinkedHashMap<String, Object>) response.getBody().get("data"));
+            return data;
+        }
+        return null;
+    }
+
 }

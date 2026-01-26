@@ -9,6 +9,12 @@
         <h:outputScript name="js/main.js"/>
     </ui:define>
     <ui:define name="content">
+        <style>
+            .export-btn-disabled {
+                opacity: 0.6;
+                cursor: not-allowed !important;
+            }
+        </style>
         <div class="ui-g">
             <div class="ui-g-12">
                 <div class="ui-g-12 card cardTitle">
@@ -168,9 +174,20 @@
                                         <!--                        <h:outputText value="#{item.isMatched}"/>-->
                                         <!--                    </p:column>-->
                                         <f:facet name="{Toolbar}">
-                                            <p:commandButton title="一次最多只能下载5万条数据" icon="ui-icon-arrowstop-1-s" disabled="#{hisEquipmentDataSourceController.datalistSize>50000}"
-                                                             class="btn btn-sm btn-gray" ajax="false" validateClient="false" immediate="true">
-                                                <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                                            <p:commandButton
+                                                    id="exportBtn"
+                                                    title="#{hisEquipmentDataSourceController.datalistSize > 50000 ? '一次最多只能下载5万条数据' : '导出Excel'}"
+                                                    icon="ui-icon-arrowstop-1-s"
+                                                    class="btn btn-sm btn-gray #{hisEquipmentDataSourceController.datalistSize > 50000 ? 'export-btn-disabled' : ''}"
+                                                    ajax="false"
+                                                    onclick="return #{hisEquipmentDataSourceController.datalistSize lt 50000};"
+                                            >
+
+                                                <p:dataExporter
+                                                        type="xls"
+                                                        target="datalist"
+                                                        fileName="Iou_export"
+                                                        rendered="#{hisEquipmentDataSourceController.datalistSize lt 50000}" />
                                             </p:commandButton>
                                         </f:facet>
                                     </p:dataTable>
