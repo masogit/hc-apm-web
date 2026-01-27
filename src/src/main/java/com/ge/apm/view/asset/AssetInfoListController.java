@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.mapper.ContractInfoMapper;
 import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.*;
@@ -88,6 +89,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private ContractInfoMapper contractInfoMapper;
 
     private QRPreViewerBean qrPreViewerBean;
+    private ConfigItemService configItemService;
 
     //选定科室过滤
     private String filterClinicalDeptOrg;
@@ -210,6 +212,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private UserAccount user;
     //    private Map<String, UserAccount> createdByMap;
     private List<AssetInfo> resultList = new ArrayList<>();
+    @Getter @Setter
+    private Boolean showMasterEquipment;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -244,7 +249,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
         qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
+        configItemService = WebUtil.getBean(ConfigItemService.class);
         user = UserContextService.getCurrentUserAccount();
+        showMasterEquipment = configItemService.getConfigItemByKey("showMasterEquipment", user);
         assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
         this.selectedMap = new HashMap();
