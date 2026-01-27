@@ -17,3 +17,7 @@ select replace(uuid_generate_v4()::text, '-', ''), 4, '[{"label": "工单类型"
 insert into public.config_item(uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 select replace(uuid_generate_v4()::text, '-', ''), 5, '[{"label": "工单类型", "field":"orderType"},{"label": "院区名称", "field":"siteName"},{"label": "设备名称", "field":"assetName"},,{"label": "工单编号", "field":"srNum"}]', '保养报告单名称配置', 'PmOrderReportNameConfiguration', '保养报告单名称配置', 'f', 't', 10
     where not exists ( select * from config_item where key = 'PmOrderReportNameConfiguration');
+
+-- YHAAO-27155 是否显示主子设备按钮
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '是否显示主子设备按钮', 'showMasterEquipment', '是否显示主子设备按钮', 'f','t',3 where not exists(select * from config_item where key = 'showMasterEquipment');

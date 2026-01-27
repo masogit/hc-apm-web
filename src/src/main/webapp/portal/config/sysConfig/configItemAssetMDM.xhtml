@@ -61,6 +61,20 @@
                                disabled="#{systemConfigItemController.configItemMap.get('enableDeviceReplication').configItemValue == null}"/>
             </h:panelGroup>
 
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('showMasterEquipment').name.concat('(').concat(systemConfigItemController.configItemMap.get('showMasterEquipment').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('showMasterEquipment').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('showMasterEquipment'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showMasterEquipment'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('showMasterEquipment').configItemValue == null}"/>
+            </h:panelGroup>
+
             <!--<h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('displayMaintenanceField').name.concat('(').concat(systemConfigItemController.configItemMap.get('displayMaintenanceField').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('displayMaintenanceField').showValue}" style="width: 15%;">
