@@ -61,32 +61,21 @@
 
                 <h:form id="searchForm">
                     <h:panelGrid id="filterType" columns="4" style="float: right">
+                        <h:panelGroup>
+                            <p:selectOneMenu id="option" value="#{assetInfoListController.queryType}" widgetVar="masterEquipmentWidget" style="opacity:0; width:0; height:0; overflow:hidden; border:none;">
+                                <f:selectItem itemLabel="#{msg.All}" itemValue="1"/>
+                                <f:selectItem itemLabel="#{msg.ParentDevice}" itemValue="2"/>
+                                <f:selectItem itemLabel="#{msg.ChildDevice}" itemValue="3"/>
+                                <p:ajax listener="#{assetInfoListController.assetGroupChangeListener}" update="AssetInfoListForm" />
+                            </p:selectOneMenu>
+                            <!-- 自定义按钮：点击直接弹出下拉 -->
+                            <p:commandButton value="主子设备"
+                                             type="button"
+                                             icon="fa fa-angle-down"
+                                             iconPos="right"
+                                             onclick="PF('masterEquipmentWidget').show(); return false;" rendered="#{assetInfoListController.showMasterEquipment}"/>
+                        </h:panelGroup>
                         <h:panelGroup style="float: right"  rendered="#{assetInfoListController.showWarrantyAlert}">
-<!--                            <span >#{msg.Legend}：</span>-->
-<!--                            <span class="warrantyExpireSoon">#{msg.MorWExpireSoon}</span>-->
-<!--                            <span></span>-->
-<!--                            <span class="warrantyExpired">#{msg.MorWExpired}</span>-->
-
-<!--                            <p:commandButton id="btnwarranty" value="维保质保" type="button" icon="fa fa-angle-down" iconPos="right"/>-->
-
-<!--                            <p:overlayPanel widgetVar="varPanelwarranty" for="btnwarranty"-->
-<!--                                            hideEffect="fade" dynamic="true" modal="false"-->
-<!--                                            style="padding:5px; width:210px; height: 200px">-->
-
-<!--                                <p:selectCheckboxMenu value="#{assetInfoListController.warrantyStatus}"-->
-<!--                                                      label="维保或质保"-->
-<!--                                                      updateLabel="true"-->
-<!--                                                      scrollHeight="150"-->
-<!--                                                      panelStyle="width:200px">-->
-<!--                                    <f:selectItem itemLabel="维保临期" itemValue="1"/>-->
-<!--                                    <f:selectItem itemLabel="维保逾期" itemValue="2"/>-->
-<!--                                    <f:selectItem itemLabel="质保临期" itemValue="3"/>-->
-<!--                                    <f:selectItem itemLabel="质保逾期" itemValue="4"/>-->
-<!--                                    <p:ajax event="change" update="AssetInfoListForm"/>-->
-<!--                                </p:selectCheckboxMenu>-->
-
-<!--                            </p:overlayPanel>-->
-
                             <p:selectCheckboxMenu id="warrantyMenu"
                                                   widgetVar="warrantyMenuWidget"
                                                   value="#{assetInfoListController.warrantyStatus}"
@@ -102,19 +91,14 @@
                                 <p:ajax event="change" update="AssetInfoListForm"/>
                             </p:selectCheckboxMenu>
 
-                        <!-- 自定义按钮：点击直接弹出下拉 -->
-                        <p:commandButton id="btnwarranty"
+                            <!-- 自定义按钮：点击直接弹出下拉 -->
+                            <p:commandButton id="btnwarranty"
                                          value="维保质保"
                                          type="button"
                                          icon="fa fa-angle-down"
                                          iconPos="right"
                                          onclick="PF('warrantyMenuWidget').show(); return false;" />
                         </h:panelGroup>
-<!--                        <h:panelGroup>-->
-<!--                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="#{msg.All}" />-->
-<!--                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="#{msg.ParentDevice}"/>-->
-<!--                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="#{msg.ChildDevice}"/>-->
-<!--                        </h:panelGroup>-->
                     </h:panelGrid>
 
                     <h:panelGrid id="searchPanel" columns="3">
