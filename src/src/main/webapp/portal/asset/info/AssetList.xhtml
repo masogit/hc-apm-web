@@ -1080,6 +1080,17 @@
                                 </p:column>
                             </c:if>
 
+                            <c:if test="#{columnItem eq 'usageCount'}">
+                                <p:column headerText="#{msg.usageCount}" sortBy="#{item.usageCount}" filterBy="#{item.usageCount}" filterMatchMode="GE">
+                                    <h:outputText value="#{item.usageCount}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'ratingUsageCount'}">
+                                <p:column headerText="#{msg.ratingUsageCount}" sortBy="#{item.ratingUsageCount}" filterBy="#{item.ratingUsageCount}" filterMatchMode="GE">
+                                    <h:outputText value="#{item.ratingUsageCount}"/>
+                                </p:column>
+                            </c:if>
 
                             <c:if test="#{columnItem eq 'spare01'}">
                                 <p:column headerText="#{msg.spare01}" sortBy="#{item.spare01}">

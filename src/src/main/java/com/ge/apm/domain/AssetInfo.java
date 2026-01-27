@@ -899,6 +899,14 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "offline_update_date")
     private Date offlineUpdateDate;
 
+    @Getter @Setter
+    @Column(name = "usage_count")
+    private Integer usageCount;
+
+    @Getter @Setter
+    @Column(name = "rating_usage_count")
+    private Integer ratingUsageCount;
+
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
     }

@@ -855,6 +855,13 @@ public class AssetImport implements Serializable {
 
     private String lastCheckCompany;
 
+    @Getter @Setter
+    @ExcelProperty("usageCount")
+    private Integer usageCount;
+    @Getter @Setter
+    @ExcelProperty("ratingUsageCount")
+    private Integer ratingUsageCount;
+
     public AssetImport() {
     }
 

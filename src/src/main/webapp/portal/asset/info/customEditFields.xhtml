@@ -1349,4 +1349,22 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'usageCount')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.usageCount}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['usageCount'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoEditController.selected.usageCount}" required="#{assetInfoEditController.customConfig.assetFields['usageCount'].required}"
+                           requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('usageCount')}" >
+                <p:ajax />
+            </p:inputNumber>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'ratingUsageCount')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.ratingUsageCount}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['ratingUsageCount'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoEditController.selected.ratingUsageCount}" required="#{assetInfoEditController.customConfig.assetFields['ratingUsageCount'].required}"
+                           requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('ratingUsageCount')}" >
+                <p:ajax />
+            </p:inputNumber>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>
