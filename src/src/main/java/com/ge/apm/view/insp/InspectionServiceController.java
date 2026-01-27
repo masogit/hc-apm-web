@@ -303,6 +303,11 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         if ("EventRecordTab".equals(event.getTab().getId())) {
             AssetInfoDetailController assetInfoDetailController =  WebUtil.getBean(AssetInfoDetailController.class);
             query(assetInfoDetailController.getSelected());
+        }else if("bindRule".equals(event.getTab().getId())){
+            AssetInfoDetailController assetInfoDetailController =  WebUtil.getBean(AssetInfoDetailController.class);
+            AssetBindRuleController assetBindRuleController =  WebUtil.getBean(AssetBindRuleController.class);
+            assetBindRuleController.setAssetUid(assetInfoDetailController.getSelected().getUid());
+            assetBindRuleController.loadNurseRuleList();
         }
     }
 
