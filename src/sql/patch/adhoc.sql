@@ -21,3 +21,7 @@ select replace(uuid_generate_v4()::text, '-', ''), 5, '[{"label": "工单类型"
 -- YHAAO-27155 是否显示主子设备按钮
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '是否显示主子设备按钮', 'showMasterEquipment', '是否显示主子设备按钮', 'f','t',3 where not exists(select * from config_item where key = 'showMasterEquipment');
+
+-- 供应商字段长度设置128
+ALTER TABLE asset_info ALTER COLUMN vendor TYPE VARCHAR(128);
+ALTER TABLE supplier ALTER COLUMN name TYPE VARCHAR(128);
