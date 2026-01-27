@@ -92,7 +92,7 @@ public class AssetInfo implements ChineseName, Serializable {
     @TableField(exist = false)
     private String manufactureTel;//制造商电话
 
-    @Size(max = 64)
+    @Size(max = 128)
     @Column(name = "vendor")
     private String vendor;//供应商名称 =Supplier.name
 
