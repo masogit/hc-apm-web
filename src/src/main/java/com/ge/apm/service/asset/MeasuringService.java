@@ -11,6 +11,7 @@ import com.ge.apm.dao.mapper.MeasuringCertificateDetailMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.OCRTemplateService;
+import com.ge.apm.service.PDFSplitFileUtil;
 import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.I18nMessageService;
@@ -23,6 +24,9 @@ import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfReader;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -48,16 +52,16 @@ import webapp.framework.util.DateUtil;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -458,14 +462,14 @@ public class MeasuringService {
         return resultList;
     }
     public List<MeasuringCertificateDetail> handleZipOCR(UploadedFile file,UserAccount account,String identifyPatterns) throws IOException {
-        List<MeasuringCertificateDetail> resultList = Lists.newArrayList();
+        List<MeasuringCertificateDetail> resultList = new ArrayList<>();
         progress = 0;
         // 获取压缩文件中的每个子文件
         try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
-                MeasuringCertificateDetail detailList = handleOcr(zipInputStream, entry,identifyPatterns);
-                resultList.add(detailList);
+                List<MeasuringCertificateDetail> detailList = handleOcr(zipInputStream, entry,identifyPatterns);
+                resultList.addAll(detailList);
                 progress ++;
             }
             progress = 100;
@@ -476,8 +480,9 @@ public class MeasuringService {
         resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         return resultList;
     }
-    public MeasuringCertificateDetail handleOcr(ZipInputStream zis,ZipEntry entry,String identifyPatterns){
+    public List<MeasuringCertificateDetail> handleOcr(ZipInputStream zis,ZipEntry entry,String identifyPatterns){
         File newFile = null;
+        List<MeasuringCertificateDetail> measuringCertificateDetailResult = new ArrayList<>();
         try {
             byte[] buffer = new byte[1024];
             File destDir = new File(FILE_SCAN_FOLDER);
@@ -492,27 +497,43 @@ public class MeasuringService {
             }
             Map<String, Object> params = new HashMap<>();
             if("AI".equalsIgnoreCase(identifyPatterns)){
-                params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
-                JSONObject  jsonObject = templateService.getJsonObject( GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,newFile,url->url.replace("{type}","/"+ApplicationType.FORM_OCR_WORKFLOWS.name()));
-                if(jsonObject != null){
-                    WorkflowResponse workflowResponse = jsonObject.toJavaObject(WorkflowResponse.class);
-                    Result result = workflowResponse.getData();
-                    JSONObject outputs = result.getOutputs();
-                    JSONObject output = outputs.getJSONObject("output");
-                    JSONObject content = output.getJSONObject("content");
-                    JSONObject json = new JSONObject();
-                    json.put("certificateNo",content.getString("cetification_id"));
-                    json.put("assetManufacturer",content.getString("manufactory"));
-                    json.put("checkPerson",content.getString("checked_by"));
-                    json.put("assetModel",content.getString("pattern"));
-                    json.put("assetSN",content.getString("serial_num"));
-                    json.put("assetName",content.getString("device_name"));
-                    json.put("checkCompany",content.getString("check_company"));
-                    json.put("department",content.getString("applicant"));
-                    json.put("status",content.getString("conclusion"));
-                    json.put("validDateTo",content.getString("valid_util"));
-                    json.put("checkDate",content.getString("verify_date"));
-                    return handleOcrResult(json, newFile);
+//                params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
+//                JSONObject  jsonObject = templateService.getJsonObject( GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN,params,newFile,url->url.replace("{type}","/"+ApplicationType.FORM_OCR_WORKFLOWS.name()));
+                List<String> workflowResponseListCopy = new ArrayList<>();
+                List<WorkflowResponse> workflowResponseList = getWorkflowResponse(newFile);
+                if(CollectionUtils.isNotEmpty(workflowResponseList)){
+                    Set<String> cetificationIdList = new HashSet<>();
+                    List<V2_BlobObject> blobObjects = new ArrayList<>();
+                    for (WorkflowResponse item: workflowResponseList){
+                        Result result = item.getData();
+                        JSONObject outputs = result.getOutputs();
+                        JSONObject output = outputs.getJSONObject("output");
+                        JSONObject content = output.getJSONObject("content");
+                        JSONObject json = new JSONObject();
+                        String cetificationId = content.getString("cetification_id");
+                        if(StringUtils.isEmpty(cetificationId) || !cetificationIdList.add(cetificationId) ){
+                            continue;
+                        }
+                        json.put("certificateNo", cetificationId);
+                        json.put("assetManufacturer",content.getString("manufactory"));
+                        json.put("checkPerson",content.getString("checked_by"));
+                        json.put("assetModel",content.getString("pattern"));
+                        json.put("assetSN",content.getString("serial_num"));
+                        json.put("assetName",content.getString("device_name"));
+                        json.put("checkCompany",content.getString("check_company"));
+                        json.put("department",content.getString("applicant"));
+                        json.put("status",content.getString("conclusion"));
+                        json.put("validDateTo",content.getString("valid_util"));
+                        json.put("checkDate",content.getString("verify_date"));
+                        MeasuringCertificateDetail measuringCertificateDetail = handleOcrResult(json, newFile,blobObjects);
+                        if(measuringCertificateDetail == null) continue;
+                        List<V2_BlobObject> measuringAttachList = measuringCertificateDetail.getMeasuringAttachList();
+                        if(CollectionUtils.isNotEmpty(measuringAttachList)){
+                            blobObjects = measuringCertificateDetail.getMeasuringAttachList();
+                        }
+                        measuringCertificateDetailResult.add(measuringCertificateDetail);
+                    }
+                    return measuringCertificateDetailResult;
                 }else{
                     LOGGER.info("AI 识别 失败：{}",newFile.getName());
                 }
@@ -522,7 +543,9 @@ public class MeasuringService {
                 jsonObject = templateService.getJsonObject(GatewayURL.OCR_DOCUMENT, params, newFile);
                 JSONArray data = jsonObject.getJSONArray("data");
                 if(data != null && data.size() > 0){
-                    return handleOcrResult(data.getJSONObject(0), newFile);
+                    MeasuringCertificateDetail measuringCertificateDetail = handleOcrResult(data.getJSONObject(0), newFile);
+                    measuringCertificateDetailResult.add(measuringCertificateDetail);
+                    return measuringCertificateDetailResult;
                 }
             }
 
@@ -536,8 +559,66 @@ public class MeasuringService {
         }
         return null;
     }
+    public List<WorkflowResponse> getWorkflowResponse(File newFile){
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        List<File> files = null;
+        try {
+            List<CompletableFuture<WorkflowResponse>> futures = new ArrayList<>();
+            files = PDFSplitFileUtil.splitPdfByPage(newFile);
+            String token = UserContextService.getAccessToken();
+            for (File file : files) {
+                CompletableFuture<WorkflowResponse> action = CompletableFuture.supplyAsync(() -> {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
+                    JSONObject s = templateService.getJsonObject(GatewayURL.FILES_UPLOAD_AND_WORKFLOWS_RUN, params, file, url -> url.replace("{type}", "/" + ApplicationType.FORM_OCR_WORKFLOWS.name()),token);
+                    if (s != null) {
+                        WorkflowResponse workflowResponse = s.toJavaObject(WorkflowResponse.class);
+                        return workflowResponse;
+                    } else {
+                        return new WorkflowResponse();
+                    }
+                }, executor).handle((result, ex) -> { // handle 同时处理正常和异常
+                    if (ex != null) {
+                        // 异常
+                        return new WorkflowResponse();
+                    } else {
+                        return result;
+                    }
+                });
+                futures.add(action);
+            }
+            CompletableFuture<Void> all = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            all.join();
+           return  futures.stream().map(item->{
+                try {
+                    return item.get();
+                } catch (InterruptedException e) {
+                    LOGGER.error(e.getLocalizedMessage(),e.getMessage());
+                } catch (ExecutionException e) {
+                    LOGGER.error(e.getLocalizedMessage(),e.getMessage());
+                }
+                return  null;
+            }).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(!CollectionUtils.isEmpty(files)){
+                for (File file : files) {
+                    if(file != null && file.exists()){
+                        file.delete();
+                    }
+                }
 
-    private MeasuringCertificateDetail handleOcrResult(JSONObject data, File newFile) throws IOException {
+            }
+            executor.shutdown();
+        }
+
+    }
+
+    private MeasuringCertificateDetail handleOcrResult(JSONObject data, File newFile)  {
+        return handleOcrResult(data,newFile,null);
+    }
+    private MeasuringCertificateDetail handleOcrResult(JSONObject data, File newFile,List<V2_BlobObject> v2BlobObjects) {
         MeasuringCertificateDetail result = null;
         JSONObject object= data;
         try {
@@ -590,8 +671,12 @@ public class MeasuringService {
                 measuringCertificateDetailDao.save(collect);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
             }
-
-            templateService.saveTemplateFile(fileToByteArray(newFile), result.getCertificateNo().replaceAll("/", "-") + ".pdf", "application/pdf", V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, result.getId());
+            if(CollectionUtils.isEmpty(v2BlobObjects)){
+                V2_BlobObject v2BlobObject = templateService.saveTemplateFile(fileToByteArray(newFile), result.getCertificateNo().replaceAll("/", "-") + ".pdf", "application/pdf", V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, result.getId());
+                result.setMeasuringAttachList(Arrays.asList(v2BlobObject));
+            }else{
+                templateService.saveBlobObject(v2BlobObjects,result.getId());
+            }
             // 更新设备计量日期
             updateMeasuringDate(assetInfos.get(0));
             SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(result,(PropertyFilter)(o,n,v)->!n.equals("assetInfo")));
