@@ -1073,6 +1073,8 @@ public class AssetFileImportBaseService {
         }else{
             newAsset.setCreateType("Edit");
         }
+        newAsset.setUsageCount(importData.getUsageCount());
+        newAsset.setRatingUsageCount(importData.getRatingUsageCount());
         return newAsset;
     }
 

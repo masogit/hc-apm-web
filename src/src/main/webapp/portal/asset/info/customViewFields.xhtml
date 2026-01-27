@@ -839,4 +839,20 @@
             <p:inputText id="spare10" value="#{assetInfoDetailController.selected.spare10}" readonly="true" title="#{assetInfoDetailController.selected.spare10}"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'usageCount')}">
+        <h:panelGroup>
+            <label class="label">#{msg.usageCount}</label>
+            <p:inputText id="usageCount" value="#{assetInfoDetailController.selected.usageCount}" readonly="true" title="#{assetInfoDetailController.selected.usageCount}">
+                <f:convertNumber maxFractionDigits="1" minFractionDigits="1" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'ratingUsageCount')}">
+        <h:panelGroup>
+            <label class="label">#{msg.ratingUsageCount}</label>
+            <p:inputText id="ratingUsageCount" value="#{assetInfoDetailController.selected.ratingUsageCount}" readonly="true" title="#{assetInfoDetailController.selected.ratingUsageCount}">
+                <f:convertNumber maxFractionDigits="1" minFractionDigits="1" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>
