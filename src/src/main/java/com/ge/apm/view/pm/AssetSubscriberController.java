@@ -180,10 +180,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public void getQueryAssetsList() {
 		if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
 			List<AssetInfo> queryList = assetTagService.getAssetList(queryAsset1);
-			if(CollectionUtils.isNotEmpty(queryList)){
-				selectAssetInfos=new ArrayList<>(queryList);
-			}
-
+			selectAssetInfos=new ArrayList<>(queryList);
 			if(CollectionUtils.isNotEmpty(selectAsset)){
 				selectAssetInfos.removeAll(new ArrayList<>(selectAsset));
 
