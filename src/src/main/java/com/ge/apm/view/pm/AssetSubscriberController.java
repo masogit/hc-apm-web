@@ -10,8 +10,11 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
@@ -29,6 +32,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collector;
@@ -84,6 +88,38 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private TreeNode selectedNode;
 	private List<OrgInfo> clinicalDeptList;
 
+
+
+
+
+	@Getter
+	@Setter
+	private List<AssetInfo> selectAssetInfos;
+
+
+	@Getter
+	@Setter
+	private Boolean allSelected1 = Boolean.FALSE;
+	@Getter
+	@Setter
+	private Boolean allSelected2 = Boolean.FALSE;
+	@Getter
+	@Setter
+	private Map<String, Boolean> selectedAssetUidTable1;
+	@Getter
+	@Setter
+	private Map<String, Boolean> selectedAssetUidTable2;
+	@Getter
+	@Setter
+	private Set<AssetInfo> selectedAssetsed1;
+	@Getter
+	@Setter
+	private Set<AssetInfo> selectedAssetsed2;
+	@Getter
+	@Setter
+	private Set<AssetInfo> selectAsset;
+
+
 	@Override
 	protected void init() {
 		this.selectedMap = new HashMap();
@@ -94,7 +130,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-		targetAssets = new ArrayList<>();
+//		targetAssets = new ArrayList<>();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 		tenantUserList = tenantUserList.stream().distinct().collect(toList());
@@ -114,6 +150,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				queryAsset1.setSiteUID(currentUser.getSiteUID());
 			}
 		}
+		selectedAssetUidTable1=new HashMap<>();
+		selectedAssetUidTable2=new HashMap<>();
+		selectedAssetsed1=new HashSet<>();
+		selectedAssetsed2=new HashSet<>();
+		selectAsset=new HashSet<>();
 		initAssets();
         initOrgTree();
 	}
@@ -138,14 +179,19 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 	public void getQueryAssetsList() {
 		if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
-			sourceAssets = assetTagService.getAssetList(queryAsset1);
+			List<AssetInfo> queryList = assetTagService.getAssetList(queryAsset1);
+			selectAssetInfos=new ArrayList<>(queryList);
+			if(CollectionUtils.isNotEmpty(selectAsset)){
+				selectAssetInfos.removeAll(new ArrayList<>(selectAsset));
 
-			sourceAssets = new ArrayList(sourceAssets);
-			sourceAssets.removeAll(targetAssets);
+			}
+//			sourceAssets = new ArrayList(sourceAssets);
+//			sourceAssets.removeAll(selectAsset);
 		}else{
-			sourceAssets = new ArrayList<AssetInfo>();
+//			sourceAssets = new ArrayList<AssetInfo>();
+			selectAssetInfos=new ArrayList<>();
 		}
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+//		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
 	}
 	public void initOrgTree() {
 		uaaService = WebUtil.getBean(UaaService.class);
@@ -242,13 +288,14 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		isSelectedCurrentPage = !delMsgList.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
 	}
 	public void initAssets() {
-		sourceAssets = new ArrayList<>();
-		targetAssets.forEach((item) -> {
-			if (sourceAssets.contains(item)) {
-				sourceAssets.remove(item);
-			}
-		});
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+//		sourceAssets = new ArrayList<>();
+//		targetAssets.forEach((item) -> {
+//			if (sourceAssets.contains(item)) {
+//				sourceAssets.remove(item);
+//			}
+//		});
+//		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+		selectAssetInfos=new ArrayList<>();
 	}
 	public void onSelectAllOfPage() {
 		for(MessageSubscriber msgsbu:delMsgList){
@@ -291,9 +338,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
 		this.selected.setSubscribeUserId(currentUser.getId());
-		targetAssets = new ArrayList<AssetInfo>();
-		sourceAssets =new ArrayList<AssetInfo>();
-		availableAssets =new DualListModel<AssetInfo>();
+//		targetAssets = new ArrayList<AssetInfo>();
+//		sourceAssets =new ArrayList<AssetInfo>();
+//		availableAssets =new DualListModel<AssetInfo>();
+		selectAssetInfos=new ArrayList<>();
 		level0=true;
 		level1=true;
 		level2=true;
@@ -365,7 +413,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
         MessageSubscriber msgsub= null;
         List<MessageSubscriber> msgsubList = new ArrayList<>();
 		if(this.getCRUDActionName().equals(WebUtil.getMessage("Create"))) {
-			if(targetAssets.isEmpty()){
+			if(selectAsset.isEmpty()){
 				WebUtil.addErrorMessage(WebUtil.getMessage("EquipmentMustBeSelectedErrMsg"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
@@ -395,7 +443,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				}
 			}
 
-			for(AssetInfo assetInfo:targetAssets ){
+			for(AssetInfo assetInfo:selectAsset ){
 				msgsub= new MessageSubscriber();
 				msgsub.setAssetId(assetInfo.getId());
 				msgsub.setSubscribeUserId(selected.getSubscribeUserId());
@@ -460,6 +508,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			selected.setLastModifiedDate(new Date());
 			super.save();
 		}
+		clearAll();
 	}
 	public void selectedSetting(){
 		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(toList());
@@ -593,6 +642,103 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
 		return filter;
 	}
+
+	public void addCheckedDevice(){
+		for (AssetInfo assetInfo : selectedAssetsed1) {
+			boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
+			if(!b){
+				selectAsset.add(assetInfo);
+			}
+		}
+		allSelected1 = Boolean.FALSE;
+		selectedAssetsed1.clear();
+		selectedAssetUidTable1.clear();
+	}
+
+
+	public void deleteCheckedDevice(){
+		for (AssetInfo assetInfo : selectedAssetsed2) {
+			boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
+			if(b){
+				selectAsset.remove(assetInfo);
+			}
+		}
+		allSelected2 = Boolean.FALSE;
+		selectedAssetsed2.clear();
+		selectedAssetUidTable2.clear();
+	}
+	public void clearAll(){
+		selectAsset.clear();
+		allSelected1 = Boolean.FALSE;
+		selectedAssetsed1.clear();
+		selectedAssetUidTable1.clear();
+		allSelected2 = Boolean.FALSE;
+		selectedAssetsed2.clear();
+		selectedAssetUidTable2.clear();
+
+	}
+
+
+
+
+
+
+
+	public void addAssetsOfCurrentPage1(AjaxBehaviorEvent event) {
+		if(allSelected1) {
+			selectAssetInfos.stream().forEach(t -> {
+				selectedAssetUidTable1.put(t.getUid(), Boolean.TRUE);
+				selectedAssetsed1.add(t);
+			});
+		} else {
+			selectAssetInfos.stream().forEach(t -> {
+				selectedAssetUidTable1.put(t.getUid(), Boolean.FALSE);
+				selectedAssetsed1.remove(t);
+			});
+		}
+	}
+	public void addAssetsOfCurrentPage2(AjaxBehaviorEvent event) {
+		if(allSelected2) {
+			selectAsset.stream().forEach(t -> {
+				selectedAssetUidTable2.put(t.getUid(), Boolean.TRUE);
+				selectedAssetsed2.add(t);
+			});
+		} else {
+			selectAsset.stream().forEach(t -> {
+				selectedAssetUidTable2.put(t.getUid(), Boolean.FALSE);
+				selectedAssetsed2.remove(t);
+			});
+		}
+	}
+
+
+	public void updateSelctedAssetList1(AjaxBehaviorEvent event) {
+		SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+		AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+		if(box.isSelected()) {
+			selectedAssetsed1.add(asset);
+		} else {
+			selectedAssetsed1.remove(asset);
+		}
+		allSelected1=selectAssetInfos.stream().allMatch(item-> Optional.ofNullable(selectedAssetUidTable1.get(item.getUid())).orElse(Boolean.FALSE));
+	}
+	public void updateSelctedAssetList2(AjaxBehaviorEvent event) {
+		SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+		AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+		if(box.isSelected()) {
+			selectedAssetsed2.add(asset);
+		} else {
+			selectedAssetsed2.remove(asset);
+		}
+		allSelected2=selectAssetInfos.stream().allMatch(item->Optional.ofNullable(selectedAssetUidTable2.get(item.getUid())).orElse(Boolean.FALSE));
+	}
+
+
+
+
+
+
+
 	public List<UserAccount> getTenantUserList() {
 		return tenantUserList;
 	}

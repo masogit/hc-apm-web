@@ -61,19 +61,26 @@
 
                 <h:form id="searchForm">
                     <h:panelGrid id="filterType" columns="4" style="float: right">
+<!--                        <h:panelGroup>-->
+<!--                            <p:selectOneMenu id="option" value="#{assetInfoListController.queryType}" widgetVar="masterEquipmentWidget" style="opacity:0; width:0; height:0; overflow:hidden; border:none;">-->
+<!--                                <f:selectItem itemLabel="#{msg.All}" itemValue="1"/>-->
+<!--                                <f:selectItem itemLabel="#{msg.ParentDevice}" itemValue="2"/>-->
+<!--                                <f:selectItem itemLabel="#{msg.ChildDevice}" itemValue="3"/>-->
+<!--                                <p:ajax listener="#{assetInfoListController.assetGroupChangeListener}" update="AssetInfoListForm" />-->
+<!--                            </p:selectOneMenu>-->
+<!--                            &lt;!&ndash; 自定义按钮：点击直接弹出下拉 &ndash;&gt;-->
+<!--                            <p:commandButton value="主子设备"-->
+<!--                                             type="button"-->
+<!--                                             icon="fa fa-angle-down"-->
+<!--                                             iconPos="right"-->
+<!--                                             onclick="PF('masterEquipmentWidget').show(); return false;" rendered="#{assetInfoListController.showMasterEquipment}"/>-->
+<!--                        </h:panelGroup>-->
                         <h:panelGroup>
-                            <p:selectOneMenu id="option" value="#{assetInfoListController.queryType}" widgetVar="masterEquipmentWidget" style="opacity:0; width:0; height:0; overflow:hidden; border:none;">
-                                <f:selectItem itemLabel="#{msg.All}" itemValue="1"/>
-                                <f:selectItem itemLabel="#{msg.ParentDevice}" itemValue="2"/>
-                                <f:selectItem itemLabel="#{msg.ChildDevice}" itemValue="3"/>
-                                <p:ajax listener="#{assetInfoListController.assetGroupChangeListener}" update="AssetInfoListForm" />
-                            </p:selectOneMenu>
-                            <!-- 自定义按钮：点击直接弹出下拉 -->
-                            <p:commandButton value="主子设备"
-                                             type="button"
-                                             icon="fa fa-angle-down"
-                                             iconPos="right"
-                                             onclick="PF('masterEquipmentWidget').show(); return false;" rendered="#{assetInfoListController.showMasterEquipment}"/>
+                            <p:menuButton id="reportButton" value="主子设备" rendered="#{assetInfoListController.showMasterEquipment}">
+                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setQueryType(1)}" value="#{msg.All}" update="AssetInfoListForm"/>
+                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setQueryType(2)}" value="#{msg.ParentDevice}" update="AssetInfoListForm"/>
+                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setQueryType(3)}" value="#{msg.ChildDevice}" update="AssetInfoListForm"/>
+                            </p:menuButton>
                         </h:panelGroup>
                         <h:panelGroup style="float: right"  rendered="#{assetInfoListController.showWarrantyAlert}">
                             <p:selectCheckboxMenu id="warrantyMenu"
@@ -1080,6 +1087,17 @@
                                 </p:column>
                             </c:if>
 
+                            <c:if test="#{columnItem eq 'usageCount'}">
+                                <p:column headerText="#{msg.usageCount}" sortBy="#{item.usageCount}" filterBy="#{item.usageCount}" filterMatchMode="GE">
+                                    <h:outputText value="#{item.usageCount}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'ratingUsageCount'}">
+                                <p:column headerText="#{msg.ratingUsageCount}" sortBy="#{item.ratingUsageCount}" filterBy="#{item.ratingUsageCount}" filterMatchMode="GE">
+                                    <h:outputText value="#{item.ratingUsageCount}"/>
+                                </p:column>
+                            </c:if>
 
                             <c:if test="#{columnItem eq 'spare01'}">
                                 <p:column headerText="#{msg.spare01}" sortBy="#{item.spare01}">

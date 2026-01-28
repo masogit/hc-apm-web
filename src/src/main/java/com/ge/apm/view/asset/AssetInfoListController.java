@@ -824,7 +824,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                     assetList =  orderByForParentAndChildren(assetList);
                 }
-                assetInfoService.setWarrantyStatus(currentPageAssets);
+                assetInfoService.setWarrantyStatus(assetList);
                 startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow,encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
             }
         } else {
@@ -832,7 +832,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
                 assetList =  orderByForParentAndChildren(assetList);
             }
-            assetInfoService.setWarrantyStatus(currentPageAssets);
+            assetInfoService.setWarrantyStatus(assetList);
             ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
             template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW,encodedToAssetTypeGroupPath,listSysAuthGroupNamePathInHierarchyMap);
         }
