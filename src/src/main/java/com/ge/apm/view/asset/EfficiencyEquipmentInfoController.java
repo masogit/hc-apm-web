@@ -1,10 +1,12 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.AssetCostDTO;
 import com.ge.apm.domain.dto.DepreciationResultData;
+import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -23,6 +25,8 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.component.datatable.DataTable;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -54,6 +58,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -126,10 +131,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
 
     private HisEquipmentDataResultMapper hisEquipmentDataResultMapper;
-
-
+    private ConfigItemValueRepository configItemValueRepository;
     private AssetCostAmountInfoMapper assetCostAmountInfoMapper;
-
     private IotPerformanceInfoMapper iotPerformanceInfoMapper;
 
     private StreamedContent excelFile;
@@ -155,6 +158,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     private Sort lastPageSort;
 
+    @Getter@Setter
+    private List<FieldColumnDto> fieldColumnDtoList = new ArrayList<>();
+
     @Override
     protected GenericRepositoryUUID<EfficiencyEquipmentInfo> getDAO() {
         return efficiencyEquipmentInfoRepository;
@@ -178,13 +184,24 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         assetDepreciationMapper = WebUtil.getBean(AssetDepreciationMapper.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 
         this.selectedMap = new HashMap<>();
         filterObject=new HashMap<>();
         loadClinicalDeptList();
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), "EfficiencyEquipmentColumn");
+        List<FieldColumnDto> list =  JSON.parseArray(value, FieldColumnDto.class);
+        if(!org.springframework.util.CollectionUtils.isEmpty(list)){
+            fieldColumnDtoList = list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
+        }
     }
 
-
+    public Boolean showFilterRender(String field){
+        if(CollectionUtils.isEmpty(fieldColumnDtoList)){
+            return Boolean.FALSE;
+        }
+        return fieldColumnDtoList.stream().filter(item -> item.getField().equals(field)).findFirst().isPresent();
+    }
 
     @Override
     protected Page<EfficiencyEquipmentInfo> loadData(PageRequest pageRequest) {
@@ -370,9 +387,34 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 //    }
     @Override
     public void onFilter(FilterEvent event) {
-        onFilterCustom(event, this::numberField);
+        super.onFilter(event);
+        onFilterCustoms(event, this::numberField, this::dateTimeField);
         this.selectedMap.clear();
     }
+
+    public void onFilterCustoms(FilterEvent event, BiFunction<String, String, Boolean>... functions) {
+        if (searchFilters == null) searchFilters = new ArrayList<>();
+        searchFilters.clear();
+        if (getFiltersFromDynaColumns()) return;
+        getFilterMatchModes((DataTable)event.getComponent());
+        for (Map.Entry<String, Object> filter: event.getFilters().entrySet()) {
+            String fieldName = filter.getKey();
+            Object filterValue = filter.getValue();
+            if (filterValue == null) continue;
+            String filterVal = filterValue.toString();
+            if (StringUtils.isEmpty(filterVal)) continue;
+            for(BiFunction<String, String, Boolean> function : functions){
+                if (function.apply(fieldName, filterVal)) {
+                    continue;
+                }
+            }
+            String matchMode = filterMatchModes.get(fieldName);
+            addFilter(fieldName, matchMode, filterValue);
+        }
+        setSiteFilter();
+        setHospitalFilter();
+    }
+
 protected boolean numberField(String fieldName, String filterVal) {
     if (isNumberField(fieldName)) {
         processNumberFiled(filterVal, fieldName);
@@ -421,19 +463,19 @@ protected boolean numberField(String fieldName, String filterVal) {
                 case "serialNum":
                     param.put("serialNum", searchFilter.value);
                     break;
+                case "financingNum":
+                    param.put("financingNum", searchFilter.value);
+                    break;
                 case "displayName":
                     param.put("displayName", searchFilter.value);
                     break;
-
                 case "assetGroup":
                     try {
                         param.put("assetGroup", Integer.parseInt(searchFilter.value.toString()));
                     }catch (Exception e){
                         logger.error("his设备绩效 assetGroup 搜索数值转换异常 e:",e);
                     }
-
                     break;
-
                 case "qrCode":
                     param.put("qrCode", searchFilter.value);
                     break;
@@ -459,6 +501,22 @@ protected boolean numberField(String fieldName, String filterVal) {
                         }
                     }catch (Exception e){
                         logger.error("his设备绩效数值区间搜索数值转换异常 e:",e);
+                    }
+
+                    break;
+                case "purchaseDate":
+                    try {
+                        Date dv =  (Date)searchFilter.value;
+                        String pararName;
+                        if (searchFilter.operator.name().equals("GTE")) {
+                            pararName= fieldName+"GTE";
+                            param.put(pararName, dv);
+                        } else {
+                            pararName=fieldName+"LTE";
+                            param.put(pararName, dv);
+                        }
+                    }catch (Exception e){
+                        logger.error("his设备绩效时间区间搜索数值转换异常 e:",e);
                     }
 
                     break;
