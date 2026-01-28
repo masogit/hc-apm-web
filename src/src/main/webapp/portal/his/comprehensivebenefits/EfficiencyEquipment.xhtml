@@ -71,9 +71,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <p:commandButton process="@this"
-                                             value="查询" update="EfficiencyEquipmentInfoListForm"
-                                              />
+                            <p:commandButton process="@this" value="查询" update="EfficiencyEquipmentInfoListForm"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </h:form>
@@ -121,114 +119,141 @@
                             </h:panelGroup>
 
                         </p:column>
-                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetName}"/>
-                        </p:column>
+                        <c:forEach items="#{efficiencyEquipmentInfoController.fieldColumnDtoList}" var="fieldItem">
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetName'}">
+                                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.assetName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'displayName'}">
+                                <p:column headerText="展示名称" filterBy="#{item.displayName}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.displayName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'functionType'}">
+                                <p:column headerText="#{msg.functionType}"  filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.functionType}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'financingNum'}">
+                                <p:column headerText="#{msg.financingNum}"  filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.financingNum}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'makerShortName'}">
+                                <p:column headerText="#{msg.makerShortName}"   filterBy="#{item.makerShortName}" filterMatchMode="LIKE" >
+                                    <h:outputText value="#{item.makerShortName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'serialNum'}">
+                                <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}"
+                                          filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.serialNum}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'qrCode'}">
+                                <p:column headerText="#{msg.QRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}" >
+                                    <h:outputText value="#{item.qrCode}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'clinicalDeptName'}">
+                                <p:column headerText="#{msg.clinicalDeptName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                        <p:autoComplete dropdown="true" value="#{efficiencyEquipmentInfoController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{efficiencyEquipmentInfoController.autoCompleteDeptName}" size="5">
+                                            <p:ajax event="itemSelect" listener="#{efficiencyEquipmentInfoController.onClinicalDeptNameFilterChange}" process="@this"  update=":EfficiencyEquipmentInfoListForm:datalist"/>
+                                            <p:ajax process="@this" listener="#{efficiencyEquipmentInfoController.onClinicalDeptNameFilterChange}" update=":EfficiencyEquipmentInfoListForm:datalist"/>
+                                        </p:autoComplete>
+                                    </f:facet>
+                                    <h:outputText value="#{item.clinicalDeptName}" />
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetGroup'}">
+                                <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu  onchange="PF('varDataList').filter()"   value="#{efficiencyEquipmentInfoController.filterAssetGroup}" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'purchasePrice'}">
+                                <p:column headerText="采购金额"  filterBy="#{item.purchasePrice}" filterMatchMode="GET"  sortBy="#{item.purchasePrice}">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterPurchasePrice" widgetVar="varFilterPurchasePrice" value="#{efficiencyEquipmentInfoController.filterObject['purchasePrice']}"/>
+                                    </f:facet>
 
-                        <p:column headerText="展示名称" filterBy="#{item.displayName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.displayName}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.functionType}"  filterBy="#{item.functionType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.functionType}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.makerShortName}"   filterBy="#{item.makerShortName}" filterMatchMode="LIKE" >
-                            <h:outputText value="#{item.makerShortName}"/>
-                        </p:column>
+                                    <h:outputText value="#{item.purchasePrice}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'purchaseDate'}">
+                                <p:column headerText="采购日期"  filterBy="#{item.purchaseDate}" filterMatchMode="GET"  sortBy="#{item.purchaseDate}">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterPurchaseDate" widgetVar="varFilterPurchaseDate" value="#{efficiencyEquipmentInfoController.filterObject['purchaseDate']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.purchaseDate}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'income'}">
+                                <p:column headerText="收入(元)" filterBy="#{item.income}" filterMatchMode="GET"   sortBy="#{item.income}">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterIncome" widgetVar="varFilterIncome" value="#{efficiencyEquipmentInfoController.filterObject['income']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.income}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'cost'}">
+                                <p:column headerText="成本(元)"   filterBy="#{item.cost}" filterMatchMode="GET"  sortBy="#{item.cost}">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterCost" widgetVar="varFilterCost" value="#{efficiencyEquipmentInfoController.filterObject['cost']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.cost}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'profits'}">
+                                <p:column headerText="利润(元)"    filterBy="#{item.profits}" filterMatchMode="GET" sortBy="#{item.profits}">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterProfits" widgetVar="varFilterProfits" value="#{efficiencyEquipmentInfoController.filterObject['profits']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.profits}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'profitsRate'}">
+                                <p:column headerText="利润率(%)" filterBy="#{item.profitsRate}" filterMatchMode="GET" sortBy="#{item.profitsRate}">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterProfitsRate" widgetVar="varFilterProfitsRate" value="#{efficiencyEquipmentInfoController.filterObject['profitsRate']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.profitsRate}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'positiveRate'}">
+                                <p:column headerText="阳性率(%)"  filterBy="#{item.positiveRate}" filterMatchMode="GET" sortBy="#{item.positiveRate}">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterPositiveRate" widgetVar="varFilterPositiveRate" value="#{efficiencyEquipmentInfoController.filterObject['positiveRate']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.positiveRate}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="1" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
 
-                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.serialNum}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.QRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}" >
-                            <h:outputText value="#{item.qrCode}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                <p:autoComplete dropdown="true" value="#{efficiencyEquipmentInfoController.filterClinicalDeptOrg}" appendTo="@(Body)"
-                                                scrollHeight="300"  forceSelection="true" completeMethod="#{efficiencyEquipmentInfoController.autoCompleteDeptName}" size="5">
-                                    <p:ajax event="itemSelect" listener="#{efficiencyEquipmentInfoController.onClinicalDeptNameFilterChange}" process="@this"  update=":EfficiencyEquipmentInfoListForm:datalist"/>
-                                    <p:ajax process="@this" listener="#{efficiencyEquipmentInfoController.onClinicalDeptNameFilterChange}" update=":EfficiencyEquipmentInfoListForm:datalist"/>
-                                </p:autoComplete>
-                            </f:facet>
-                            <h:outputText value="#{item.clinicalDeptName}" />
-                        </p:column>
+                        </c:forEach>
 
-                        <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu  onchange="PF('varDataList').filter()"   value="#{efficiencyEquipmentInfoController.filterAssetGroup}" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
-
-                        </p:column>
-<!--                        -->
-                        <p:column headerText="采购金额"  filterBy="#{item.purchasePrice}" filterMatchMode="GET"  sortBy="#{item.purchasePrice}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterPurchasePrice" widgetVar="varFilterPurchasePrice" value="#{efficiencyEquipmentInfoController.filterObject['purchasePrice']}"/>
-                            </f:facet>
-
-                            <h:outputText value="#{item.purchasePrice}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </h:outputText>
-                        </p:column>
-
-<!--                        <p:column headerText="使用率" >-->
-<!--                            <h:outputText value="#{item.usageRate}"/>-->
-<!--                        </p:column>-->
-
-<!--                        <p:column headerText="检查人次" >-->
-<!--                            <h:outputText value="#{item.checkNumberPeople}">-->
-<!--                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />-->
-<!--                            </h:outputText>-->
-<!--                        </p:column>-->
-
-<!--                        <p:column headerText="检查时长" >-->
-<!--                            <h:outputText value="#{item.checkTimeLength}"/>-->
-<!--                        </p:column>-->
-<!--                        -->
-                        <p:column headerText="收入(元)" filterBy="#{item.income}" filterMatchMode="GET"   sortBy="#{item.income}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterIncome" widgetVar="varFilterIncome" value="#{efficiencyEquipmentInfoController.filterObject['income']}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.income}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="成本(元)"   filterBy="#{item.cost}" filterMatchMode="GET"  sortBy="#{item.cost}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterCost" widgetVar="varFilterCost" value="#{efficiencyEquipmentInfoController.filterObject['cost']}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.cost}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="利润(元)"    filterBy="#{item.profits}" filterMatchMode="GET" sortBy="#{item.profits}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterProfits" widgetVar="varFilterProfits" value="#{efficiencyEquipmentInfoController.filterObject['profits']}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.profits}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="利润率(%)" filterBy="#{item.profitsRate}" filterMatchMode="GET" sortBy="#{item.profitsRate}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterProfitsRate" widgetVar="varFilterProfitsRate" value="#{efficiencyEquipmentInfoController.filterObject['profitsRate']}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.profitsRate}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="阳性率(%)"  filterBy="#{item.positiveRate}" filterMatchMode="GET" sortBy="#{item.positiveRate}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterPositiveRate" widgetVar="varFilterPositiveRate" value="#{efficiencyEquipmentInfoController.filterObject['positiveRate']}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.positiveRate}">
-                                <f:convertNumber maxFractionDigits="2" minFractionDigits="1" />
-                            </h:outputText>
-                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"   actionListener="#{efficiencyEquipmentInfoController.editBatch1}" oncomplete="PF('efficiencyEquipmentInfoEditBatch').show()"  disabled="#{not efficiencyEquipmentInfoController.isChecked()}"/>
                             <p:commandButton title="导出效益设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{efficiencyEquipmentInfoController.exportExcel}" update=":growl"

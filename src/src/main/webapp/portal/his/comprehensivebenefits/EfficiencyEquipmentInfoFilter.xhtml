@@ -11,8 +11,20 @@
 
     <h:form>
 
+        <p:overlayPanel  widgetVar="panelFilterPurchaseDate" for="EfficiencyEquipmentInfoListForm:datalist:filterPurchaseDate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel for="cal1" />
+                <p:calendar id="cal1" widgetVar="varPurchaseDateFrom" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                <p:outputLabel for="cal2"/>
+                <p:calendar id="cal2" widgetVar="varPurchaseDateTo" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+            </h:panelGrid>
+            <p:commandButton onclick="PF('panelFilterPurchaseDate').hide();setDateFilter('varDataList', 'varFilterPurchaseDate', 'varPurchaseDateFrom', 'varPurchaseDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterPurchaseDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+        </p:overlayPanel>
 
-        <p:overlayPanel widgetVar="panelFilterPurchasePrice" for="EfficiencyEquipmentInfoListForm:datalist:filterPurchasePrice" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterPurchasePrice" for="EfficiencyEquipmentInfoListForm:datalist:filterPurchasePrice" dismissable="false" rendered="#{efficiencyEquipmentInfoController.showFilterRender('purchasePrice')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varPurchasePriceFrom" >
@@ -26,7 +38,7 @@
         </p:overlayPanel>
 
 
-        <p:overlayPanel widgetVar="panelFilterIncome" for="EfficiencyEquipmentInfoListForm:datalist:filterIncome" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterIncome" for="EfficiencyEquipmentInfoListForm:datalist:filterIncome" dismissable="false" rendered="#{efficiencyEquipmentInfoController.showFilterRender('income')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varIncomeFrom" >
@@ -40,7 +52,7 @@
         </p:overlayPanel>
 
 
-        <p:overlayPanel widgetVar="panelFilterCost" for="EfficiencyEquipmentInfoListForm:datalist:filterCost" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterCost" for="EfficiencyEquipmentInfoListForm:datalist:filterCost" dismissable="false" rendered="#{efficiencyEquipmentInfoController.showFilterRender('cost')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varCostFrom" >
@@ -53,7 +65,7 @@
             <p:commandButton onclick="PF('panelFilterCost').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
-        <p:overlayPanel widgetVar="panelFilterProfits" for="EfficiencyEquipmentInfoListForm:datalist:filterProfits" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterProfits" for="EfficiencyEquipmentInfoListForm:datalist:filterProfits" dismissable="false" rendered="#{efficiencyEquipmentInfoController.showFilterRender('profits')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varProfitsFrom" >
@@ -67,7 +79,7 @@
         </p:overlayPanel>
 
 
-        <p:overlayPanel widgetVar="panelFilterProfitsRate" for="EfficiencyEquipmentInfoListForm:datalist:filterProfitsRate" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterProfitsRate" for="EfficiencyEquipmentInfoListForm:datalist:filterProfitsRate" dismissable="false" rendered="#{efficiencyEquipmentInfoController.showFilterRender('profitsRate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varProfitsRateFrom" >
@@ -80,7 +92,7 @@
             <p:commandButton onclick="PF('panelFilterProfitsRate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
-        <p:overlayPanel widgetVar="panelFilterPositiveRate" for="EfficiencyEquipmentInfoListForm:datalist:filterPositiveRate" dismissable="false">
+        <p:overlayPanel widgetVar="panelFilterPositiveRate" for="EfficiencyEquipmentInfoListForm:datalist:filterPositiveRate" dismissable="false" rendered="#{efficiencyEquipmentInfoController.showFilterRender('positiveRate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:inputNumber minValue="0" decimalPlaces="2" widgetVar="varPositiveRateFrom" >
