@@ -184,6 +184,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             certificateNo = object.getString("cetification_id");
         }
         if(StringUtils.isEmpty(certificateNo)){
+            this.selected = new MeasuringCertificateDetail();
             throw new BusinessException("证件编号为空");
         }
         this.selected.setCertificateNo(certificateNo);
@@ -222,6 +223,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             department = object.getString("applicant");
         }
         if(StringUtils.isEmpty(department)){
+            this.selected = new MeasuringCertificateDetail();
             throw new BusinessException("送检单位为空");
         }
         this.selected.setDepartment(department);
@@ -271,6 +273,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 Date checkDate = format.parse(checkDateStr);
                 this.selected.setCheckDate(checkDate);
             }else{
+                this.selected = new MeasuringCertificateDetail();
                 throw new BusinessException("检定日期为空");
             }
         } catch (ParseException e) {
