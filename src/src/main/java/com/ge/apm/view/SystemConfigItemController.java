@@ -185,7 +185,6 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
                 if(10 == configItem.getValueType()){
                     configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
-                    fieldRenderedMap = configItem.getFieldColumnDtoList().stream().collect(Collectors.toMap(dto -> configItem.getKey() + "_" + dto.getField(), FieldColumnDto::getRendered));
                 }
             }
         }
