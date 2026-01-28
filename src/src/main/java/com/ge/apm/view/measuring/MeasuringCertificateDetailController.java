@@ -7,6 +7,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.dao.OCRTemplateRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.OCRTemplateService;
 import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.service.common.ConfigItemService;
@@ -32,6 +33,7 @@ import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.ResourceAccessException;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -41,6 +43,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -165,9 +168,13 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             }
             storageFile(file);
             WebUtil.addSuccessMessage("计量报告上传识别成功");
-        } catch (Exception e) {
+        }catch (BusinessException e){
             logger.error(e);
-            WebUtil.addErrorMessage("计量报告上传失败");
+            WebUtil.addErrorMessage(e.getMessage()+" 请上传计量报告文件!");
+        }
+        catch (Exception e) {
+            logger.error(e);
+            WebUtil.addErrorMessage("识别失败!");
         }
     }
     public void setObject(JSONObject object){
@@ -175,6 +182,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         String certificateNo = object.getString("certificateNo");
         if(certificateNo == null){
             certificateNo = object.getString("cetification_id");
+        }
+        if(StringUtils.isEmpty(certificateNo)){
+            throw new BusinessException("证件编号为空");
         }
         this.selected.setCertificateNo(certificateNo);
         String assetManufacturer = object.getString("assetManufacturer");
@@ -210,6 +220,9 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         String department = object.getString("department");
         if(department == null){
             department = object.getString("applicant");
+        }
+        if(StringUtils.isEmpty(department)){
+            throw new BusinessException("送检单位为空");
         }
         this.selected.setDepartment(department);
         String status = object.getString("status");
@@ -257,6 +270,8 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 }
                 Date checkDate = format.parse(checkDateStr);
                 this.selected.setCheckDate(checkDate);
+            }else{
+                throw new BusinessException("检定日期为空");
             }
         } catch (ParseException e) {
             e.printStackTrace();

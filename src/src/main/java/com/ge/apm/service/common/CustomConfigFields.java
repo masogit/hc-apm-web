@@ -146,6 +146,8 @@ public enum CustomConfigFields {
     spare10(fieldName, "spare10" ,Text),  //备用字段10
     exceptionReason(fieldName, "exceptionReason" ,Text),  //备用字段10
     assetClassification32(fieldName, "assetClassification32" ,Text),  //设备32分类
+    usageCount(fieldName, "usageCount" ,Text),  //已使用次数
+    ratingUsageCount(fieldName, "ratingUsageCount" ,Text),  //额定使用次数
 
 
     ;
