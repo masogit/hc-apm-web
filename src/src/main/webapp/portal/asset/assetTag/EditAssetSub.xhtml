@@ -112,7 +112,7 @@
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                          rows="10" emptyMessage="#{msg.noRecordFound}"
-                                         rowsPerPageTemplate="5,10,20,50">
+                                         rowsPerPageTemplate="5,10,20,50,100,500">
                                 <p:ajax event="page" />
                                 <p:column width="40" id="checkBoxCol">
                                     <p:selectBooleanCheckbox value="#{assetSubscriberController.selectedAssetUidTable1[item.uid]}" class="selectCheckBox1">
@@ -159,7 +159,7 @@
                                          paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                          rows="10" emptyMessage="#{msg.noRecordFound}" rowKey="#{item.id}"
-                                         rowsPerPageTemplate="5,10,20,50">
+                                         rowsPerPageTemplate="5,10,20,50,100,500">
                                 <p:ajax event="page" />
                                 <p:column width="40" id="checkBoxCol1">
                                     <p:selectBooleanCheckbox value="#{assetSubscriberController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox2">
