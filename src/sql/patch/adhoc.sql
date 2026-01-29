@@ -27,8 +27,11 @@ ALTER TABLE asset_info ALTER COLUMN vendor TYPE VARCHAR(128);
 ALTER TABLE supplier ALTER COLUMN name TYPE VARCHAR(128);
 
 
-
 -- YHAAO-27110
 insert into public.config_item(uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 select replace(uuid_generate_v4()::text, '-', ''), 18, '[{"label":"设备名称","field":"assetName","required":true,"rendered":true},{"label":"展示名称","field":"displayName","required":false,"rendered":true},{"label":"设备型号","field":"functionType","required":false,"rendered":true},{"label":"资产编号","field":"financingNum","required":false,"rendered":true},{"label":"品牌/制造商简称","field":"makerShortName","required":false,"rendered":true},{"label":"制造商序列号","field":"serialNum","required":false,"rendered":true},{"label":"二维码","field":"qrCode","required":false,"rendered":true},{"label":"所属科室","field":"clinicalDeptName","required":false,"rendered":true},{"label":"设备分类","field":"assetGroup","required":false,"rendered":true},{"label":"采购金额","field":"purchasePrice","required":false,"rendered":true},{"label":"采购日期","field":"purchaseDate","required":false,"rendered":true},{"label":"收入(元)","field":"income","required":false,"rendered":true},{"label":"成本(元)","field":"cost","required":false,"rendered":true},{"label":"利润(元)","field":"profits","required":false,"rendered":true},{"label":"利润率(%)","field":"profitsRate","required":false,"rendered":true},{"label":"阳性率(%)","field":"positiveRate","required":false,"rendered":true}]', '设备综合效益分析动态列', 'EfficiencyEquipmentColumn', '设备综合效益分析动态列', 'f', 't', 10
     where not exists ( select * from config_item where key = 'EfficiencyEquipmentColumn');
+
+
+-- his his_equipment_data_source_split 加联合索引 跑result表
+CREATE INDEX IF NOT exists his_equipment_data_source_split_create_date_is_sum_idx ON his_equipment_data_source_split (create_date asc, is_sum);
