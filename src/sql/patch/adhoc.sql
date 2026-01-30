@@ -35,3 +35,7 @@ select replace(uuid_generate_v4()::text, '-', ''), 18, '[{"label":"设备名称"
 
 -- his his_equipment_data_source_split 加联合索引 跑result表
 CREATE INDEX IF NOT exists his_equipment_data_source_split_create_date_is_sum_idx ON his_equipment_data_source_split (create_date asc, is_sum);
+
+-- YHAAO-27251 删除重复数据
+delete from  shared_asset_req_detail where id in('2c9b85829bc6426e019bf82a5ac65ca8','2c9b85829bc6426e019c038f7044280f');
+delete from  shared_asset_request where id in('2c9b85829bc6426e019c038f7044280e','2c9b85829bc6426e019c03b3f84d2b2d','2c9b85829bc6426e019bf82a5a645ca6','2c9b85829bc6426e019bf842c1e05cee');
