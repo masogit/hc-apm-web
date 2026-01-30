@@ -106,6 +106,28 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @Transient
     private Integer assetId;//设备分类名称
 
+    @Transient
+    private String financingNum;
+
+    @Transient
+    private Date purchaseDate;
+
+    public String getFinancingNum() {
+        return financingNum;
+    }
+
+    public void setFinancingNum(String financingNum) {
+        this.financingNum = financingNum;
+    }
+
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(Date purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
     public String getUid() {
         return uid;
     }

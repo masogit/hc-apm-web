@@ -107,6 +107,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("fix_error_type", WebUtil.getMessage("FaultType_xlsx"));
 
         COPY_KEY_MAPPING.put("fix_owner", WebUtil.getMessage("CurrentOwner_xlsx"));
+        COPY_KEY_MAPPING.put("diagnostic_process", WebUtil.getMessage("DiagnosticProcess_xlsx"));
         COPY_KEY_MAPPING.put("fix_reason", WebUtil.getMessage("ReasonDescription_xlsx"));
         COPY_KEY_MAPPING.put("fix_solution", WebUtil.getMessage("patActions"));
         COPY_KEY_MAPPING.put("fix_validation", WebUtil.getMessage("TestbeforeDelivery_xlsx"));
@@ -138,6 +139,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("spare09", "spare09");
         COPY_KEY_MAPPING.put("spare10", "spare10");
         COPY_KEY_MAPPING.put("related_order_number","related_order_number");
+        COPY_KEY_MAPPING.put("case_priority", WebUtil.getMessage("casePriority"));
         COPY_KEY_MAPPING.put("travel_time", WebUtil.getMessage("travelTime"));
     }
 

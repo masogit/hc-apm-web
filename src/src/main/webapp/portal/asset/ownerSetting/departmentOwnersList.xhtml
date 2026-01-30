@@ -43,18 +43,25 @@
                         <h:outputText value="#{item.siteOrgInfo.name}"/>
                     </p:column>
 
-                    <p:column headerText="#{msg.clinicalDeptName}"  width="100">
-                        <f:facet name="header">
-                            <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                            <p:autoComplete dropdown="true" value="#{departmentOwnerSettingController.filterClinicalDeptOrgName}" appendTo="@(Body)"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{departmentOwnerSettingController.autoCompleteDeptFilter}" size="5">
-                                <p:ajax event="itemSelect" listener="#{departmentOwnerSettingController.onClinicalDeptFilterChange}" process="@this"  update="datalist_departmentOwner" />
-                                <p:ajax process="@this" listener="#{departmentOwnerSettingController.onClinicalDeptFilterChange}" update="datalist_departmentOwner" />
-                            </p:autoComplete>
+                    <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.deptOrgInfo.shortName}" filterMatchMode="LIKE" width="100">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_departmentOwner').filter()" value="#{departmentOwnerSettingController.filterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{departmentOwnerSettingController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                            </p:selectOneMenu>
                         </f:facet>
                         <h:outputText value="#{item.deptOrgInfo.shortName}"/>
                     </p:column>
 
+                    <p:column headerText="#{msg.assetTypeGroup}" sortBy="#{item.assetType}" filterBy="#{item.assetType}" filterMatchMode="EQ" rendered="#{departmentOwnerSettingController.enableAssetTypeGroup}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_departmentOwner').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{departmentOwnerSettingController.assetTypeGroupList}" var="item" itemLabel="#{item.name}" itemValue="#{item.encoded}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{departmentOwnerSettingController.assetTypeGroupMap.get(item.assetType).displayName}"/>
+                    </p:column>
                     <p:column headerText="#{msg.RepairOwner}" filterBy="#{item.woOwner.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.woOwner.name}"/>
                     </p:column>

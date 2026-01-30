@@ -24,6 +24,7 @@ public enum ExportFields {
 
     SITENAME("所属院区","Site Name"),
     TRAVELTIME("路途工时","Travel Time"),
+    ENDTIME("实际完成时间","End Time"),
     ;
 
     private final String english;

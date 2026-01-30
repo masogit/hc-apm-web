@@ -57,6 +57,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private UaaService uaaService;
     private OrgInfoService orgInfoService;
     private ReminderRuleOrgRepository ruleOrgRepository;
+    private TenantInfoRepository tenantInfoRepository;
 
     private UserAccount loginUser;
     private List<SysRole> roles;
@@ -69,6 +70,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private TreeNode[] selectedAccessOrgNodes;
     private Integer state = -1;
     private String type;
+    private boolean canSave = true;
 
     @Override
     protected ReminderRuleRepository getDAO() {
@@ -85,6 +87,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
         ruleOrgRepository = WebUtil.getBean(ReminderRuleOrgRepository.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         roles = sysRoleRepository.find();
         customRoles = uaaService.getTenantCustomRoles(loginUser.getTenantUID());
@@ -121,6 +124,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             selected.setInstitutionUid(loginUser.getInstitutionUID());
             selected.setHospitalUid(loginUser.getHospitalUID());
             selected.setSiteUid(loginUser.getSiteUID());
+            initWechatTemplate();
+            wechatParam = selected.getWechatParam();
         } else if ("Edit".equals(crudActionName) && "base".equals(actionName)) {
             selected.setState(-1);
         }
@@ -282,6 +287,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             case "AssetLifecycle":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_LIFECYCLE_MSG, WechatParam.class));
                 break;
+            case "Measuring":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.MEASURING_MSG, WechatParam.class));
+                break;
             case "AssetWarrantyDate":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ASSET_WARRANTY_DATE_MSG, WechatParam.class));
                 break;
@@ -355,6 +363,21 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             }
         }
         return comment;
+    }
+
+    public void selectedRuleType() {
+        switch (this.selected.getType()) {
+            case "AssetLifecycle" :
+                TenantInfo tenantInfo = tenantInfoRepository.findByUid(loginUser.getTenantUID());
+                if (!tenantInfo.getFeatureList().contains("ASSET_DEVICE_OVERDUE")) {
+                    canSave = false;
+                    WebUtil.addErrorMessage("请先开启效期管理！");
+                }
+                break;
+            default:
+                canSave = true;
+                break;
+        }
     }
 
     public List<OrgInfo> getHospitalList(String orgLevel) {

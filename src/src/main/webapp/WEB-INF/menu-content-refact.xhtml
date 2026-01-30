@@ -41,7 +41,7 @@
                            <p:menuitem fragment="um084" id="um084" value="#{msg.AssetApproval}" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_AUDIT_APPROVE')}"/>
                            <p:menuitem fragment="um087" id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_BATCH_IMPORT')}"/>
                            <p:menuitem fragment="um088"  id="um088" value="#{msg.inventoryWorkorder}" outcome="/portal/inventory/inventoryOrderDetailAssetInfoMainAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_EDIT')}"/>
-<!--                           <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_TEMPLATE_VIEW')}"/>-->
+<!--                       <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_TEMPLATE_VIEW')}"/>-->
                            <p:menuitem fragment="um090" id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_HISTORY_VIEW')}"/>
                            <p:menuitem fragment="um092" id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_VIEW')}"/>
                            <p:menuitem fragment="um094" id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EVALUATION_VIEW')}"/>
@@ -415,7 +415,6 @@
             <p:menuitem fragment="um53" id="um53" value="#{msg.profile}" icon="fa fa-user-circle fa-fw" outcome="/portal/profile.xhtml"/>
             <!-- 注销 -->
             <p:menuitem id="logout" value="#{msg.Logout}" icon="fa fa-window-close-o fa-fw" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>
-
         </pu:menu>
     </div>
 

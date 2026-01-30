@@ -195,7 +195,7 @@ public class WorkOrderReportExportController implements Serializable {
 //        String fileName = "APM_WorkOrder_Template.xlsx";
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if(!userContextService.isLocale()){
-//             fileName = "APM_WorkOrder_Template_en.xlsx";
+//             fileName = "APM_WorkOrder_Template_en.xlsx";-
             systemTemplateEnum=SystemTemplateEnum.WORK_ORDER_REPORT_EXCEL_EN;
         }
 
@@ -285,6 +285,12 @@ public class WorkOrderReportExportController implements Serializable {
 //            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
             //WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
             byte[] templateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.WORK_ORDER_REPORT, currentUser);
+
+//            data.sort((a, b) -> {
+//                String noA = (String) a.getOrDefault(WebUtil.getMessage("srNum_xlsx"), "");
+//                String noB = (String) b.getOrDefault(WebUtil.getMessage("srNum_xlsx"), "");
+//                return noA.compareTo(noB);
+//            });
             WorkOrderExportStream workOrderExportStream=new WorkOrderExportStream(data,templateBytes,renderService,progress);
             exportDocx = new DefaultStreamedContent(workOrderExportStream, workOrderExportStream.getContentType(), workOrderExportStream.getFileName());
         } catch (IOException e) {
