@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import com.deepoove.poi.data.PictureRenderData;
@@ -10,6 +11,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.bo.parser.SchemaParser;
 import com.ge.apm.domain.bo.render.*;
+import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
@@ -573,6 +575,9 @@ public class PmReportService {
         long count = pmOrders.values().stream().filter(i -> i).count();
 //        byte[] activeTemplateBytes = this.pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
         String pmOrderExportType = configItemService.getConfigItemByKeyToString("PMOrderExportType", user);
+        String  PmOrderReportNameConfigurationString = configItemService.getConfigItemByKeyToString("PmOrderReportNameConfiguration",user);
+        List<FieldColumnDto> fieldColumnDtos = JSON.parseArray(PmOrderReportNameConfigurationString, FieldColumnDto.class);
+
         byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.PM_ORDER_REPORT, user);
 
         String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
@@ -584,7 +589,30 @@ public class PmReportService {
                     try {
                         V2_PmOrder pmOrder = pmOrderService.findById(id);
                         OrgInfo orgByUid = cacheService.findOrgByUid(pmOrder.getSiteUID());
-                        String name = "保养-"+orgByUid.getName()+"-"+pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
+//                        String name = "保养-"+orgByUid.getName()+"-"+pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
+
+                        StringBuilder fileName = new StringBuilder();
+                        for (FieldColumnDto fieldColumnDto : fieldColumnDtos) {
+                            String fieldValue = null;
+                            if ("orderType".equals(fieldColumnDto.getField())) {
+                                fieldValue = "保养";
+                            } else if ("siteName".equals(fieldColumnDto.getField())) {
+                                fieldValue = orgByUid.getName();
+                            } else if ("assetName".equals(fieldColumnDto.getField())) {
+                                fieldValue = pmOrder.getAssetName();
+                            } else if ("srNum".equals(fieldColumnDto.getField())) {
+                                fieldValue = pmOrder.getPmNum();
+                            }
+
+                            if (fieldValue != null) {
+                                if (fileName.length() > 0) {
+                                    fileName.append("-");
+                                }
+                                fileName.append(fieldValue);
+                            }
+                        }
+                        String name = fileName + ".docx";
+
                         byte[] bytes = generate(pmOrder, activeTemplateBytes);
                         if("pdf".equalsIgnoreCase(pmOrderExportType)){
                             bytes = getPDF(bytes);

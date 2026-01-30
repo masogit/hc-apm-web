@@ -347,6 +347,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("CoworkerManhours_xlsx"), workOrderExportPojo.getCoworkManHour());
             workOrderMap.put(WebUtil.getMessage("FinalRating_xlsx"), workOrderExportPojo.getFeedbackRating());
             workOrderMap.put(WebUtil.getMessage("FaultType_xlsx"), workOrderExportPojo.getCaseTypeName());
+            workOrderMap.put(WebUtil.getMessage("DiagnosticProcess_xlsx"), workOrderExportPojo.getDiagnosticProcess());
             workOrderMap.put(WebUtil.getMessage("ReasonDescription_xlsx"), workOrderExportPojo.getPatProblems());
             workOrderMap.put(WebUtil.getMessage("patActions"), workOrderExportPojo.getPatActions());
             workOrderMap.put(WebUtil.getMessage("patTests"), workOrderExportPojo.getPatTests());
@@ -363,7 +364,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("RequestorTelephone_xlsx"), workOrderExportPojo.getTelephone());
             workOrderMap.put(WebUtil.getMessage("CurrentLocation_xlsx"), workOrderExportPojo.getLocationName());
             //workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
-            workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getIbStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getIbStatus()) : "");
             workOrderMap.put(WebUtil.getMessage("WorkOrderTypeNew_xlsx"), workOrderExportPojo.getWorkOrderType() != null ? FieldValueMessageController.fieldValue("workOrderType", workOrderExportPojo.getWorkOrderType().toString()) : "");
             workOrderMap.put(WebUtil.getMessage("CoworkerEntryType_xlsx"), FieldValueMessageController.fieldValue(I18N_HOUR_TYPE, workOrderExportPojo.getCoworkerEntryType() == null ? "0" : workOrderExportPojo.getCoworkerEntryType().toString()));
             workOrderMap.put(WebUtil.getMessage("CoworkerEntryDetail_xlsx"), workOrderExportPojo.getCoworkerEntryDetail());
@@ -420,6 +421,7 @@ public class WorkOrderExportService {
             workOrderMap.put("spare08", workOrderExportPojo.getSpare08());
             workOrderMap.put("spare09", workOrderExportPojo.getSpare09());
             workOrderMap.put("spare10", workOrderExportPojo.getSpare10());
+            workOrderMap.put(WebUtil.getMessage("casePriority"), FieldValueMessageController.fieldValue("casePriority", workOrderExportPojo.getCasePriority().toString()));
             workOrderMap.put("main_sub", "sub".equals(workOrderExportPojo.getMainSub())?"子工单":"主工单");
             workOrderMap.put("related_order_number", Optional.of(srMap.get(workOrderExportPojo.getSrId()).size()-1).orElse(null));
             resultList.add(workOrderMap);

@@ -341,12 +341,12 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
-        OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
-        if (deptOrg.getOrgType() == 4) {
-            filterOrg = deptOrg;
-        } else {
-            filterOrg = null;
-        }
+        filterOrg = (OrgInfo) selectedNode.getData();
+//        if (deptOrg.getOrgType() == 4) {
+//            filterOrg = deptOrg;
+//        } else {
+//            filterOrg = null;
+//        }
     }
 
     public void onTabChange(TabChangeEvent event){

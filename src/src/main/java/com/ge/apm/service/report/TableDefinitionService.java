@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -193,6 +194,13 @@ public class TableDefinitionService {
     }
 
     public void saveTableDate(UnstructuredDataCollection report, Map<String, Object> tableValue) {
+        if (ObjectUtil.isEmpty(report.getId())) {
+            report.setCreatedDate(new Date());
+            v2PmOrderService.saveReport(report);
+        } else {
+            report.setLastModifiedDate(new Date());
+            report.setOfflineUpdateDate(new Date());
+        }
         final String reportId = report.getId();
         List<UnstructuredData> dataList = udDao.findByCollectionId(reportId);
         if(dataList!=null){
@@ -224,7 +232,6 @@ public class TableDefinitionService {
         	}
         }
         report.setData(dataList);
-        report.setCreatedDate(new Date());
         v2PmOrderService.saveReport(report);
     }
 

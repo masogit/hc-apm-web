@@ -396,8 +396,15 @@
             <label class="label">#{msg.assetClassification32}</label>
             <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetInfoEditController.selectItemDto}" scrollHeight="300"     readonly="#{!assetInfoEditController.needEdit('assetClassification32')}"
                             forceSelection="true"  completeMethod="#{assetInfoEditController.autoAssetClassification32()}"
-                            var="t" itemLabel="#{t.label}  #{t.value}" itemValue="#{t}" converter="stringIdentityConverter"  >
+                            var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter"
+                            styleClass="blue-highlight-autocomplete"  >
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.assetClassification32Change()}" />
+                <p:column>
+                    <h:outputText value="#{t.label}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.value}"/>
+                </p:column>
             </p:autoComplete>
         </h:panelGroup>
     </c:if>
@@ -1340,6 +1347,24 @@
             <p:inputText id="spare10" value="#{assetInfoEditController.selected.spare10}" disabled="#{!assetInfoEditController.needEdit('spare10')}">
                 <p:ajax />
             </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'usageCount')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.usageCount}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['usageCount'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoEditController.selected.usageCount}" required="#{assetInfoEditController.customConfig.assetFields['usageCount'].required}"
+                           requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('usageCount')}" >
+                <p:ajax />
+            </p:inputNumber>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'ratingUsageCount')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.ratingUsageCount}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['ratingUsageCount'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoEditController.selected.ratingUsageCount}" required="#{assetInfoEditController.customConfig.assetFields['ratingUsageCount'].required}"
+                           requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('ratingUsageCount')}" >
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
 </ui:composition>

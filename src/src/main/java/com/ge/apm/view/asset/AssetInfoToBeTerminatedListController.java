@@ -299,6 +299,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 case "importEquipment":
                     sql="order by ai.import_equipment ";
                     break;
+                case "makerShortName":
+                    sql="order by ai.make_short_name ";
+                    break;
                 case "proprietaryClass":
                     sql="order by ai.proprietary_class ";
                     break;

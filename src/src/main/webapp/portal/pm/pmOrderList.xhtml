@@ -16,7 +16,7 @@
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="pmTab:searchForm:treeNodeNameFilter @this" update="pmTab:searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="pmTab:searchForm:treeNodeNameFilter @this" update="pmTab" value="确定"/>
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{v2PmOrderController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox"     dynamic="false"  cache="false"   propagateSelectionUp="#{orgTreeController.propagateSelectionUp}"    >
+                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{v2PmOrderController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="false"  cache="false" propagateSelectionUp="#{orgTreeController.propagateSelectionUp}">
                             <p:ajax process="@this" event="select" listener="#{v2PmOrderController.onSelectSiteTreeNode}"/>
                             <p:ajax process="@this" event="unselect" listener="#{v2PmOrderController.onUnSelectSiteTreeNode}"/>
                             <p:ajax process="@this" event="expand"/>
@@ -132,14 +132,12 @@
                     <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                 </p:column>
                 <!--所属科室-->
-                <p:column headerText="#{msg.clinicalDeptName}"  width="100">
-                    <f:facet name="header">
-                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                        <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}" appendTo="@(Body)"
-                                        scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
-                            <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist" oncomplete="updateSelectAllCheckBox();" />
-                            <p:ajax listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist" oncomplete="updateSelectAllCheckBox();" />
-                        </p:autoComplete>
+                <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" width="100">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{v2PmOrderController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
                     </f:facet>
                     <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                 </p:column>

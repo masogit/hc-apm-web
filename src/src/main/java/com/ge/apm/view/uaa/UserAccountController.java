@@ -805,6 +805,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         deleteDisabled = true;
         selectAllButton = false;
         accessOrgTree = new DefaultTreeNode("root", null, null);
+        assetTypeGroupList = assetTypeGroupMapper.findDtoByTenantUid(tenantUid);
+        assetTypeGroupMap = assetTypeGroupList.stream().distinct().collect(Collectors.toMap(AssetTypeGroupDto::getUid, t -> t));
+
     }
 
     private void userAssetTypeUpdate() {

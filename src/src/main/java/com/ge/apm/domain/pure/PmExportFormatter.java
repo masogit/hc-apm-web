@@ -101,6 +101,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ORDERCOMMENTS.getChinese(), this.getComments());
             map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
             map.put(ExportFields.TRAVELTIME.getChinese(), this.getTravelTime());
+            map.put(ExportFields.ENDTIME.getChinese(), v2_pmOrder.getEndTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getChinese(), this.getActualCompletionTime());
             }
@@ -136,6 +137,7 @@ public class PmExportFormatter<T> {
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getEnglish(), this.getActualCompletionTime());
             }
+            map.put(ExportFields.ENDTIME.getEnglish(), v2_pmOrder.getEndTime());
         }
         return map;
     }

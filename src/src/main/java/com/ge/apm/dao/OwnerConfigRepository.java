@@ -16,4 +16,5 @@ public interface OwnerConfigRepository extends GenericRepositoryUUID<OwnerConfig
 
     public List<OwnerConfig> findByAssetGroupIDAndAssetGroupSecondaryIDAndSiteUID(Integer assetGroupID, Integer assetGroupSecondaryID, String siteUID);
 
+    List<OwnerConfig> findByDeptUIDAndSiteUIDAndAssetType(String clinicalDeptUID, String siteUID, String assetType);
 }

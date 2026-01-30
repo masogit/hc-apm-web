@@ -191,6 +191,8 @@
         ai.asset_group AS assetGroup,
         ai.make_short_name AS makerShortName,
         ai.id AS assetId,
+        ai.financing_num as financingNum,
+        ai.purchase_date as purchaseDate,
         e.positive_rate AS positiveRate,
         e.display_name AS displayName,
         (COALESCE(income.income, 0) - COALESCE(expense.cost, 0) - COALESCE(d.total_depreciation, 0)) AS profits,
@@ -257,6 +259,9 @@
         <if test="serialNum != null  and serialNum!='' ">
             AND ai.serial_num like concat('%',#{serialNum},'%')
         </if>
+        <if test="financingNum != null  and financingNum!='' ">
+            AND ai.financing_num like concat('%',#{financingNum},'%')
+        </if>
         <if test="clinicalDeptName != null and clinicalDeptName!='' ">
             AND ai.clinical_dept_name like concat('%',#{clinicalDeptName},'%')
         </if>
@@ -277,6 +282,12 @@
         </if>
         <if test="makerShortName != null and makerShortName!='' ">
             AND ai.make_short_name like concat('%',#{makerShortName},'%')
+        </if>
+        <if test="purchaseDateGTE != null ">
+            and  ai.purchase_date >= #{purchaseDateGTE}
+        </if>
+        <if test="purchaseDateLTE != null ">
+            and  ai.purchase_date <![CDATA[<=]]> #{purchaseDateLTE}
         </if>
         )
         SELECT

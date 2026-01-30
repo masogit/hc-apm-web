@@ -201,6 +201,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setRepairReportSendPlace(newServiceRequest.getRepairReportSendPlace());
         formData.setRepairSource(newServiceRequest.getSrRepairSource());
         formData.setRequestorPhone(newServiceRequest.getRequestorPhone());
+        formData.setIbStatus(newServiceRequest.getIbStatus());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -350,9 +351,18 @@ class ServiceRequestForm {
     String orderType;
 
     String repairReportSendPlace;
-
+    String ibStatus;
     String repairSource;
     private String requestorPhone;
+
+    public String getIbStatus() {
+        return ibStatus;
+    }
+
+    public void setIbStatus(String ibStatus) {
+        this.ibStatus = ibStatus;
+    }
+
     public String getRepairReportSendPlace() {
         return repairReportSendPlace;
     }
@@ -593,6 +603,16 @@ class WorkOrderActionForm {
 
     String comName;
     Double travelTime;
+    String  diagnosticProcess;
+
+    public String getDiagnosticProcess() {
+        return diagnosticProcess;
+    }
+
+    public void setDiagnosticProcess(String diagnosticProcess) {
+        this.diagnosticProcess = diagnosticProcess;
+    }
+
     public Integer getCoworkerEntryType() {
         return coworkerEntryType;
     }

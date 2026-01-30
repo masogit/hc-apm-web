@@ -61,15 +61,21 @@ public class PreViewerBean implements ServerEventInterface {
         microServiceUtil= WebUtil.getBean(MicroServiceUtil.class);
         String objectId = WebUtil.getRequestParameter("objectId");
         if (ObjectUtil.isNotEmpty(objectId)) {
-            onServerEvent("", objectId);
+            try {
+                onServerEvent("", objectId);
+            }catch (Exception e){
+                logger.error("onServerEvent error:",e);
+            }
         }
     }
 
     @Override
-    public void onServerEvent(String eventName, Object eventObject) {
+    public void onServerEvent(String eventName, Object eventObject){
         if(eventObject instanceof String){
             String  objectId= (String) eventObject;
             this.objectId = objectId;
+            /*fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+            blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);*/
             List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(objectId);
             //ehome 数据  type 为空 需要做此操作
             if(!CollectionUtils.isEmpty(allByObjectStorageId)) {
@@ -83,8 +89,13 @@ public class PreViewerBean implements ServerEventInterface {
             }
              if(!CollectionUtils.isEmpty(allByObjectStorageId)){
                 blobObject = allByObjectStorageId.get(0);
+                streamedContent = fileDownloadService.getFile(objectId);
                 //type = objectType.contains("image") ? 0 : (objectType.contains("pdf") ? 1 : -1);
-                getTypeByObject();
+                 try {
+                     getTypeByObject();
+                 }catch (Exception e){
+                     logger.error("onServerEvent error:",e);
+                 }
             }
         }else if(eventObject instanceof StreamedContent){
             try {
@@ -101,7 +112,7 @@ public class PreViewerBean implements ServerEventInterface {
         }
     }
 
-    public void getTypeByObject(){
+    public void getTypeByObject() throws IOException {
         if(blobObject == null){
             type = -1;
         }else {
@@ -116,7 +127,8 @@ public class PreViewerBean implements ServerEventInterface {
                     blobObject.getObjectName().toLowerCase().contains(".pdf")
             ){
                 type = 1;
-                pdfUrl = getHttpURL(objectId);
+                //pdfUrl = getHttpURL(objectId);
+                getTypeByObjectStreamed();
                 logger.info("pdfUrl:" + pdfUrl);
             }else{
                 type = -1;
@@ -140,10 +152,10 @@ public class PreViewerBean implements ServerEventInterface {
                 type = 1;
                 String key = UUID.randomUUID().toString();
                 FileInfoResult fileInfoResult= new FileInfoResult();
-                fileInfoResult.setObjectType(streamedContent.getContentType());
+                fileInfoResult.setObjectType("application/pdf");
                 fileInfoResult.setObjectName(streamedContent.getName());
-                fileInfoResult.setObjectSize((long)streamedContent.getContentLength());
                 fileInfoResult.setBytes(IOUtils.toByteArray(streamedContent.getStream()));
+                fileInfoResult.setObjectSize((long)fileInfoResult.getBytes().length);
                 DocumentInMemoryUtil.put(key,fileInfoResult);
                 HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
                 pdfUrl = request.getContextPath() +"/web/preview/"+key;

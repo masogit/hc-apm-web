@@ -420,4 +420,26 @@ public class BlobFileService {
 
         mqUtils.sendToMq(mqContext);
     }
+
+    public JSONObject ocrCreated(String url, UploadedFile file) {
+
+        String path;
+        try {
+            path = fsService.saveUploadedFile(file);
+        } catch (Exception ex) {
+            Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+
+        String token = UserContextService.getAccessToken();
+        if (token == null || token.isEmpty()) {
+            WebUtil.addErrorMessage("do not have premission");
+            return null;
+        }
+
+        JSONObject ocrResult = microService.ocrCreated(url, token, new File(path));
+        fsService.deleteUploadedFile(path);
+
+        return ocrResult;
+    }
 }

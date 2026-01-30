@@ -37,7 +37,7 @@
                         <!--设备分类-->
                         <label class ="label">#{msg.assetGroup}</label>
                         <p:selectOneMenu value="#{assetSubscriberController.queryAsset1.assetGroup}" disabled="false" >
-                            <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="AssetsPickList" />
+                            <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="datalist" />
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
@@ -49,7 +49,7 @@
                             <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetSubscriberController.orgTree}" selection="#{assetSubscriberController.selectedNode}" var="node" selectionMode="single">
-                                        <p:ajax process="@this" event="select" update="scriTab:AssetSubscribEditForm:selectedOrgName, scriTab:AssetSubscribEditForm:AssetsPickList, scriTab:AssetSubscribEditForm:clinicalDeptName" listener="#{assetSubscriberController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="select" update="scriTab:AssetSubscribEditForm:selectedOrgName, scriTab:AssetSubscribEditForm:datalist, scriTab:AssetSubscribEditForm:clinicalDeptName" listener="#{assetSubscriberController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
 
@@ -64,7 +64,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.clinicalDeptId}</label>
                             <p:selectOneMenu id="clinicalDeptName" value="#{assetSubscriberController.queryAsset1.clinicalDeptId}">
-                                <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="AssetsPickList" />
+                                <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="datalist" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{assetSubscriberController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
@@ -72,35 +72,133 @@
                         <h:panelGroup>
                             <label class="label">#{msg.measuringItemCategory}</label>
                             <p:selectOneMenu id="measuringItemCategory" value="#{assetSubscriberController.queryAsset1.measuringItemCategory}">
-                                <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="AssetsPickList" />
+                                <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="datalist" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                 </p:panelGrid>
                     <!--<h:panelGroup gaolei>-->
-                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
-                            itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
-                            required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
-                    <f:facet name="sourceCaption">#{msg.EquipmentToBeSelected}</f:facet>
-                    <f:facet name="targetCaption">#{msg.SelectedEquipment}</f:facet>
-                    <p:ajax event="transfer" listener="#{assetSubscriberController.onAssetsTransfer}" />
-                    <p:column style="float: left;width:30%;">
-                        <h:outputText value="#{item.name}" />
-                    </p:column>
-                    <p:column style="float: left;width:30%;">
-                        <h:outputText value="#{item.departNum}" />
-                    </p:column>
-                    <p:column style="float: left;width:30%;">
-                        <h:outputText value="#{item.clinicalDeptName}" />
-                    </p:column>
-                    <!--<p:column style="float: left;width:30%;">
-                        <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
-                    </p:column>-->
-                    <!--<p:column>
-                        <h:outputText value="#{item.functionType}" />
-                    </p:column>-->
-                </p:pickList>
+<!--                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"-->
+<!--                            itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"-->
+<!--                            required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">-->
+<!--                    <f:facet name="sourceCaption">#{msg.EquipmentToBeSelected}</f:facet>-->
+<!--                    <f:facet name="targetCaption">#{msg.SelectedEquipment}</f:facet>-->
+<!--                    <p:ajax event="transfer" listener="#{assetSubscriberController.onAssetsTransfer}" async="" />-->
+<!--                    <p:column style="float: left;width:30%;">-->
+<!--                        <h:outputText value="#{item.name}" />-->
+<!--                    </p:column>-->
+<!--                    <p:column style="float: left;width:30%;">-->
+<!--                        <h:outputText value="#{item.departNum}" />-->
+<!--                    </p:column>-->
+<!--                    <p:column style="float: left;width:30%;">-->
+<!--                        <h:outputText value="#{item.clinicalDeptName}" />-->
+<!--                    </p:column>-->
+<!--                    &lt;!&ndash;<p:column style="float: left;width:30%;">-->
+<!--                        <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>-->
+<!--                    </p:column>&ndash;&gt;-->
+<!--                    &lt;!&ndash;<p:column>-->
+<!--                        <h:outputText value="#{item.functionType}" />-->
+<!--                    </p:column>&ndash;&gt;-->
+<!--                </p:pickList>-->
+
+
+                    <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}"  legend="设备" id="assetList" style="margin-bottom:20px">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+                            <p:dataTable id="datalist" value="#{assetSubscriberController.selectAssetInfos}"
+                                         var="item"
+                                         lazy="true" paginator="true" paginatorPosition="both"
+                                         paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.id}"
+                                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                                         rowsPerPageTemplate="20,50,100,500">
+                                <p:ajax event="page" />
+                                <p:column width="40" id="checkBoxCol">
+                                    <p:selectBooleanCheckbox value="#{assetSubscriberController.selectedAssetUidTable1[item.uid]}" class="selectCheckBox1">
+                                        <p:ajax event="change" listener="#{assetSubscriberController.updateSelctedAssetList1}" update="@(.selectCheckBoxHeader1)"/>
+                                        <f:attribute name="assetObj" value="#{item}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <f:facet name="header">
+                                        <p:selectBooleanCheckbox value="#{assetSubscriberController.allSelected1}" id="selectCheckBoxHeader1" class="selectCheckBoxHeader1">
+                                            <p:ajax event="change" listener="#{assetSubscriberController.addAssetsOfCurrentPage1}" update="@(.selectCheckBox1)"/>
+                                        </p:selectBooleanCheckbox>
+                                    </f:facet>
+                                </p:column>
+                                <p:column headerText="#{msg.assetName}">
+                                    <h:outputText value="#{item.name}" />
+                                </p:column>
+                                <p:column headerText="#{msg.functionType}" >
+                                    <h:outputText value="#{item.functionType}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.assetGroup}">
+                                    <h:outputText value="#{fieldMsg.doGetFieldValue('assetGroup',item.assetGroup)}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.departNum}">
+                                    <h:outputText value="#{item.departNum}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.qrCode}" >
+                                    <h:outputText value="#{item.qrCode}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.clinicalDeptName}">
+                                    <h:outputText value="#{item.clinicalDeptName}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panelGrid>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+                            <p:commandButton validateClient="true" actionListener="#{assetSubscriberController.addCheckedDevice}" value="添加已勾选设备" icon="fa fa-filter" process="@form" update="assetList assetList2 :growl"
+                            >
+                            </p:commandButton>
+                        </p:panelGrid>
+                        <p:panelGrid columns="1" layout="grid" id="assetList2" styleClass="ui-panelgrid-blank form-group ">
+                            <p:dataTable id="datalist1" value="#{assetSubscriberController.selectAsset}"
+                                         var="item"
+                                         widgetVar="selectedTable"
+                                         lazy="true" paginator="true" paginatorPosition="both"
+                                         paginatorAlwaysVisible="true" sortOrder="descending" sortBy="#{item.id}"
+                                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                         rows="20" emptyMessage="#{msg.noRecordFound}" rowKey="#{item.id}"
+                                         rowsPerPageTemplate="20,50,100,500">
+                                <p:ajax event="page" />
+                                <p:column width="40" id="checkBoxCol1">
+                                    <p:selectBooleanCheckbox value="#{assetSubscriberController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox2">
+                                        <p:ajax event="change" listener="#{assetSubscriberController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)"/>
+                                        <f:attribute name="assetObj" value="#{item}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <f:facet name="header">
+                                        <p:selectBooleanCheckbox value="#{assetSubscriberController.allSelected2}" id="selectCheckBoxHeader2" class="selectCheckBoxHeader2">
+                                            <p:ajax event="change" listener="#{assetSubscriberController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2)"/>
+                                        </p:selectBooleanCheckbox>
+                                    </f:facet>
+                                </p:column>
+                                <p:column headerText="#{msg.assetName}" >
+                                    <h:outputText value="#{item.name}" />
+                                </p:column>
+                                <p:column headerText="#{msg.functionType}"  >
+                                    <h:outputText value="#{item.functionType}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.assetGroup}" >
+                                    <h:outputText value="#{fieldMsg.doGetFieldValue('assetGroup',item.assetGroup)}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.departNum}" >
+                                    <h:outputText value="#{item.departNum}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.qrCode}" >
+                                    <h:outputText value="#{item.qrCode}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.clinicalDeptName}" >
+                                    <h:outputText value="#{item.clinicalDeptName}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panelGrid>
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+                            <p:commandButton  validateClient="true" actionListener="#{assetSubscriberController.deleteCheckedDevice}" value="删除已勾选设备" update="assetList assetList2 :growl" icon="ui-icon-check"/>
+                            <p:commandButton  value="全部清空" actionListener="#{assetSubscriberController.clearAll}"  icon="ui-icon-cancel" update="assetList assetList2 :growl" />
+                        </p:panelGrid>
+                    </p:fieldset>
+
+
                     <!--</h:panelGroup>-->
                 </p:fieldset>
                 <p:fieldset legend="#{msg.MessageSettings}">
@@ -179,24 +277,24 @@
                             </h:panelGrid>
                         </h:panelGroup>
                     </h:panelGrid>
-                    <h:panelGrid columns="2" rendered = "#{userContextService.isLocale()}">
-                        <h:panelGroup>
-                            <h:panelGrid columns="2">
-                                <p:outputLabel value="#{msg.ExpirationReminderEvent}:"/>
-                            </h:panelGrid>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <h:panelGrid columns="2">
-                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.expirationReminderEvent}"/>
-                            </h:panelGrid>
-                        </h:panelGroup>
-                    </h:panelGrid>
+<!--                    <h:panelGrid columns="2" rendered = "#{userContextService.isLocale()}">-->
+<!--                        <h:panelGroup>-->
+<!--                            <h:panelGrid columns="2">-->
+<!--                                <p:outputLabel value="#{msg.ExpirationReminderEvent}:"/>-->
+<!--                            </h:panelGrid>-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup>-->
+<!--                            <h:panelGrid columns="2">-->
+<!--                                <p:selectBooleanCheckbox value="#{assetSubscriberController.selected.expirationReminderEvent}"/>-->
+<!--                            </h:panelGrid>-->
+<!--                        </h:panelGroup>-->
+<!--                    </h:panelGrid>-->
                 </p:fieldset>
                 <br/>
 
             </h:panelGroup>
 
-            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
+            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscribEditForm :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
 
             <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{assetSubscriberController.cancel()}" icon="ui-icon-cancel" update="scriTab:TagSubscriberForm" onclick="PF('AssetSubscribEditDialog').hide()"/>
         </h:form>
@@ -205,9 +303,9 @@
     <script>
         function handleToSave(xhr, status, args) {
             if(args.addAsset){
-                $('#scriTab\\:AssetSubscribEditForm\\:AssetsPickList').addClass("ui-state-error");
+                // $('#scriTab\\:AssetSubscribEditForm\\:datalist1').addClass("ui-state-error");
             }else if(args.priority){
-                $('#scriTab\\:AssetSubscribEditForm\\:grid').addClass("ui-state-error");
+                // $('#scriTab\\:AssetSubscribEditForm\\:grid').addClass("ui-state-error");
             }
             else{
                 handleSubmit(args, 'AssetSubscribEditDialog');

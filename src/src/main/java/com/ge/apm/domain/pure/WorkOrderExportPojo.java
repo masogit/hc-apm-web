@@ -221,6 +221,28 @@ public class WorkOrderExportPojo {
 
     private Double  travelTime;
 
+    private String ibStatus;
+
+    private Integer casePriority;
+
+    private String  diagnosticProcess;
+
+    public String getDiagnosticProcess() {
+        return diagnosticProcess;
+    }
+
+    public void setDiagnosticProcess(String diagnosticProcess) {
+        this.diagnosticProcess = diagnosticProcess;
+    }
+
+    public String getIbStatus() {
+        return ibStatus;
+    }
+
+    public void setIbStatus(String ibStatus) {
+        this.ibStatus = ibStatus;
+    }
+
     public String getCoworkerEntryDetail() {
         return coworkerEntryDetail;
     }
@@ -1037,5 +1059,13 @@ public class WorkOrderExportPojo {
 
     public void setTravelTime(Double travelTime) {
         this.travelTime = travelTime;
+    }
+
+    public Integer getCasePriority() {
+        return casePriority;
+    }
+
+    public void setCasePriority(Integer casePriority) {
+        this.casePriority = casePriority;
     }
 }

@@ -20,6 +20,7 @@ public class ReminderRule implements Serializable {
     private static final long serialVersionUID = 8492409962179388085L;
 
     public static final String ASSET_LIFECYCLE_MSG = "{'first':'即将达到使用年限的设备提醒','keyword1':'设备名称:{name},设备编号:{departNum},制造商序列号:{serialNum}'}";
+    public static final String MEASURING_MSG = "{'first':'资产计量提醒','keyword1':'{name}计量提醒'}";
     public static final String ASSET_WARRANTY_DATE_MSG = "{'first':'即将到达维保截止日期设备提醒','keyword1':'{name},{departNum}'}";
     public static final String ASSET_PROBATION_EXPIRATION_MSG = "{'first':'设备试用到期提醒','keyword1':'{name},{functionType},{assetDeptName}'}";
     public static final String CONTRACT_OVERDUE_MSG = "{'first':'合同应到货日期逾期提醒','keyword1':'{name}合同已逾期，请尽快处理！'}";

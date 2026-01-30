@@ -8,6 +8,31 @@
                 xmlns:apm="http://www.ge.com/tags/apm">
 
     <ui:define name="content">
+
+        <style>
+            .blue-highlight-autocomplete .ui-autocomplete-panel table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel td {
+                text-align: left !important;     /* ←←← 核心修复 */
+                padding: 6px 10px !important;
+                border: none !important;
+                background: transparent !important;
+                color: #333 !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row {
+                background: transparent !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row.ui-state-highlight,
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row:hover {
+                background: #5c8bd6 !important;
+                color: #ffffff !important;
+            }
+        </style>
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
         <script type="text/javascript" src="#{request.contextPath}/portal/js/viewer.min.js"></script>
         <link rel="stylesheet" href="#{request.contextPath}/portal/css/viewer.min.css"/>
@@ -213,10 +238,18 @@
                                     </c:if>
                                     <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CLASSIFICATION_MANAGEMENT_') and  userContextService.canRender('ASSET_CLASSIFICATION_MANAGEMENT')  }">
                                         <label class="label">#{msg.assetClassification32}</label>
+
                                         <p:autoComplete id="assetClassification32" dropdown="true" value="#{assetArrivedListEditController.selectItemDto}" scrollHeight="300"
                                                         forceSelection="true"  completeMethod="#{assetArrivedListEditController.autoAssetClassification32()}"
-                                                        var="t" itemLabel="#{t.label}  #{t.value}" itemValue="#{t}" converter="stringIdentityConverter"  >
+                                                        var="t" itemLabel="#{t.label}" itemValue="#{t}" converter="labelValueConverter"
+                                                        styleClass="blue-highlight-autocomplete"  >
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.assetClassification32Change()}" />
+                                            <p:column>
+                                                <h:outputText value="#{t.label}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <h:outputText value="#{t.value}"/>
+                                            </p:column>
                                         </p:autoComplete>
                                     </h:panelGroup>
                                 </p:panelGrid>
