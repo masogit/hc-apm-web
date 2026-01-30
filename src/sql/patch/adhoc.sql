@@ -39,3 +39,7 @@ CREATE INDEX IF NOT exists his_equipment_data_source_split_create_date_is_sum_id
 -- YHAAO-27251 删除重复数据
 delete from  shared_asset_req_detail where id in('2c9b85829bc6426e019bf82a5ac65ca8','2c9b85829bc6426e019c038f7044280f');
 delete from  shared_asset_request where id in('2c9b85829bc6426e019c038f7044280e','2c9b85829bc6426e019c03b3f84d2b2d','2c9b85829bc6426e019bf82a5a645ca6','2c9b85829bc6426e019bf842c1e05cee');
+
+-- YHAAO-26046 云版贴码,转到本地版
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, '', 'apm本地版,但在云版盘点并贴码,二维码解析转发到对应本地版', 'cloudQrCodeToLocalApm', '云版二维码转发到本地版', 'f','t',1 where not exists(select * from config_item where key = 'cloudQrCodeToLocalApm');
+
