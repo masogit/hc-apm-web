@@ -72,7 +72,9 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     @Setter
     @Getter
     private WorkflowConfig.AttachmentCategory attachmentCategory;
-
+    @Setter
+    @Getter
+    private String treeNodeNameFilter;
 
     private ConfigCacheService cacheService;
 
@@ -907,6 +909,12 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         }
 
         return true;
+    }
+
+    public void filterNodeByName(){
+        if (!org.springframework.util.StringUtils.isEmpty(treeNodeNameFilter)) {
+            uaaService.filterTreeNode(orgTree, treeNodeNameFilter, 3, 3);
+        }
     }
 
     public OrgInfo getSelectedUserOrg() {
