@@ -680,16 +680,16 @@
                                     <h:outputText value="#{item.assetInfo.name}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Level1RulePM}" rendered="#{assetBindRuleController.pmLevelFour}">
-                                    <h:outputText value="#{assetBindRuleController.getRuleName(item.ruleUIDInspection)}"/>
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUIDInspection)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUIDInspection)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Level2RulePM}"   >
-                                    <h:outputText value="#{assetBindRuleController.getRuleName(item.ruleUID2)}"/>
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID2)}" immediate="false" process="@this"   action="#{assetBindRuleController.preparePmRule(item.ruleUID2)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Level3RulePM}"   >
-                                    <h:outputText value="#{assetBindRuleController.getRuleName(item.ruleUID)}"/>
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID)}" oncomplete="PF('PmOrderRuleEditDialog').show()" />
                                 </p:column>
                                 <p:column headerText="#{msg.Level4RulePM}" rendered="#{assetBindRuleController.pmLevelFour}">
-                                    <h:outputText value="#{assetBindRuleController.getRuleName(item.ruleUID4)}"/>
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID4)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID4)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
                                 </p:column>
                                 <p:column headerText="#{msg.departNum}"  >
                                     <h:outputText value="#{item.assetInfo.departNum}"/>
@@ -721,11 +721,6 @@
                                 <p:column headerText="#{msg.QRCode}" exportable="true" width="150"  filterBy="#{item.assetInfo.qrCode}" >
                                     <h:outputText value="#{item.assetInfo.qrCode}"/>
                                 </p:column>
-                                <p:column headerText="操作" exportable="false" >
-                                    <p:commandLink  title="查看" value="查看" update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID)}" oncomplete="PF('PmOrderRuleEditDialog').show()">
-                                    </p:commandLink>
-                                </p:column>
-
                             </p:dataTable>
                         </p:fieldset>
                         <p:fieldset legend="已绑定日常检查规则">
@@ -735,7 +730,8 @@
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                 <p:column headerText="配置名称" filterBy="#{item.name}" filterMatchMode="LIKE" sortBy="#{item.namePyCode}">
-                                    <h:outputText value="#{item.name}" />
+                                    <p:commandLink  title="查看" value="#{item.name}" update=":maintainConfigEditForm" action="#{assetBindRuleController.prepareNurseSiteConfig(item.id)}" oncomplete="PF('maintainConfigEditDialog').show()">
+                                    </p:commandLink>
                                 </p:column>
                                 <p:column headerText="创建人">
                                     <h:outputText value="#{assetBindRuleController.getUserName(item.createByUid)}" />
@@ -752,10 +748,6 @@
                                     <h:outputText value="#{item.modifyDate}" >
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                     </h:outputText>
-                                </p:column>
-                                <p:column headerText="操作" exportable="false" >
-                                    <p:commandLink  title="查看" value="查看" update=":maintainConfigEditForm" action="#{assetBindRuleController.prepareNurseSiteConfig(item.id)}" oncomplete="PF('maintainConfigEditDialog').show()">
-                                    </p:commandLink>
                                 </p:column>
                             </p:dataTable>
                         </p:fieldset>
