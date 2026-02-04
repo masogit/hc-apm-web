@@ -294,7 +294,7 @@
 
             </h:panelGroup>
 
-            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscribEditForm :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
+            <p:commandButton  actionListener="#{assetSubscriberController.saveAssetSub()}" value="#{msg.Save}" update="scriTab:AssetTagSubscribEditForm scriTab:AssetSubscriberForm :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
 
             <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{assetSubscriberController.cancel()}" icon="ui-icon-cancel" update="scriTab:TagSubscriberForm" onclick="PF('AssetSubscribEditDialog').hide()"/>
         </h:form>
