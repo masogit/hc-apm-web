@@ -114,21 +114,19 @@ public class AssetBindRuleController {
 
     public List<NurseSiteMaintainConfigCheckItem> getListPairCheckItems() {
         String strTemp=this.selectedNurseSiteMaintainConfig.getCheckItemsDetail();
-        if(listPairCheckItems==null){
-            List<NurseSiteMaintainConfigCheckItem> list=new ArrayList<NurseSiteMaintainConfigCheckItem>();
-            if(StringUtils.isNotEmpty(strTemp)){
-                JSONArray jsonArray= JSONObject.parseArray(strTemp);
-                for(int i=0;i<jsonArray.size();++i){
-                    NurseSiteMaintainCheckItem p1= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
-                    NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1,(JSONObject) jsonArray.get(i));
-                    if (p.getKey()==null) {
-                        p.setKey(new Date().getTime());
-                    }
-                    list.add(p);
+        List<NurseSiteMaintainConfigCheckItem> list=new ArrayList<NurseSiteMaintainConfigCheckItem>();
+        if(StringUtils.isNotEmpty(strTemp)){
+            JSONArray jsonArray= JSONObject.parseArray(strTemp);
+            for(int i=0;i<jsonArray.size();++i){
+                NurseSiteMaintainCheckItem p1= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
+                NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1,(JSONObject) jsonArray.get(i));
+                if (p.getKey()==null) {
+                    p.setKey(new Date().getTime());
                 }
+                list.add(p);
             }
-            listPairCheckItems=list;
         }
+        listPairCheckItems=list;
         return listPairCheckItems;
     }
 
@@ -221,6 +219,16 @@ public class AssetBindRuleController {
             ruleName = pmOrderRules.stream().map(PmOrderRule::getName).collect(Collectors.joining("|"));
         }
         return ruleName;
+    }
+
+    public List<PmOrderRule> getRules(String ruleUID){
+        List<PmOrderRule> pmOrderRules = ListUtil.newArrayList();
+        for (String ruleUid : StringUtils.split(ruleUID, '|')) {
+            if (ObjectUtil.isNotEmpty(ruleMap.get(ruleUid))) {
+                pmOrderRules.add(ruleMap.get(ruleUid));
+            }
+        }
+        return pmOrderRules;
     }
 
     public boolean getPmRule(){

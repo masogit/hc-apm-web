@@ -689,7 +689,9 @@
                                     <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID)}" oncomplete="PF('PmOrderRuleEditDialog').show()" />
                                 </p:column>
                                 <p:column headerText="#{msg.Level4RulePM}" rendered="#{assetBindRuleController.pmLevelFour}">
-                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID4)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID4)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
+                                    <ui:repeat value="#{assetBindRuleController.getRules(item.ruleUID4)}" var="f" varStatus="status">
+                                        <p:commandLink value="#{f.name}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(f.uid)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/><br/>
+                                    </ui:repeat>
                                 </p:column>
                                 <p:column headerText="#{msg.departNum}"  >
                                     <h:outputText value="#{item.assetInfo.departNum}"/>
