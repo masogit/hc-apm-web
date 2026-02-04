@@ -683,7 +683,7 @@
                                     <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUIDInspection)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUIDInspection)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Level2RulePM}"   >
-                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID2)}" immediate="false" process="@this"   action="#{assetBindRuleController.preparePmRule(item.ruleUID2)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID2)}" immediate="false" process="@this" update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID2)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Level3RulePM}"   >
                                     <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID)}" oncomplete="PF('PmOrderRuleEditDialog').show()" />
