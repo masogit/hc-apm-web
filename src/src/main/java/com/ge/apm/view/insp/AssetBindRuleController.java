@@ -188,6 +188,10 @@ public class AssetBindRuleController {
 
 
     public void preparePmRule(String uid){
+        pmOrderRule = new PmOrderRule();
+        tableDefinitionEs = new TableDefinition();
+        tableDefinition = new TableDefinition();
+        checkItemLists = new ArrayList<>();
         pmOrderRule = pmOrderRuleRepository.findByUid(uid);
         if(StrUtil.isNotEmpty(pmOrderRule.getSafetyReport())){
             tableDefinitionEs = templateDao.findById(pmOrderRule.getSafetyReport());
