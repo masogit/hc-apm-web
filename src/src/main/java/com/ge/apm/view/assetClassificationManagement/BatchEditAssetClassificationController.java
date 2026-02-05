@@ -339,7 +339,7 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
         } else {
             selectedAssetsed2.remove(asset);
         }
-        allSelected2=selectAssetInfos.stream().allMatch(item->Optional.ofNullable(selectedAssetUidTable2.get(item.getUid())).orElse(Boolean.FALSE));
+        allSelected2=selectAsset.stream().allMatch(item->Optional.ofNullable(selectedAssetUidTable2.get(item.getUid())).orElse(Boolean.FALSE));
     }
 
 
