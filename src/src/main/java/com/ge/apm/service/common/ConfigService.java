@@ -96,7 +96,7 @@ public class ConfigService {
 
     public boolean isInsulateTenant(String tenantUid){
         TenantInfo tenant = cacheService.getTenantByUid(tenantUid);
-        return Optional.ofNullable(tenant).map(i->null!=i.getInsulate()).orElse(false);
+        return Optional.ofNullable(tenant).map(TenantInfo::getInsulate).orElse(false);
     }
 
     public Optional<WorkflowConfig> findInheritableWorkflowConfigByCurrentUser() {
