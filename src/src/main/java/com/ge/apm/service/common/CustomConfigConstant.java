@@ -72,6 +72,7 @@ public class CustomConfigConstant {
                 "manufacture", "manufactureTel", "makerShortName",
                 "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassificationName","medicalApparatusClassificationCode","medicalApparatusClassification","assetGroup",
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
+                "usageCount", "ratingUsageCount",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
                 "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
                 "installDate", "factoryWarrantyDate", "warrantyDate", "terminateDate", "lastPmDate", "lastQaDate",
@@ -123,6 +124,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
+                "usageCount", "ratingUsageCount",
                 "lastQaDate", "lastMeteringDate", "lastInventoryDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline", "warrantyStatus");
     }
 
@@ -169,6 +171,7 @@ public class CustomConfigConstant {
                 "functionGrade", "functionGroup", "assetCode68","medicalApparatusClassification", "capitalSource", "riskGrade", "measureGrade", "emergencyEquipment", "importEquipment",
                 "isPm","isFixed", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
+                "usageCount", "ratingUsageCount",
                 "lastPmDate", "lastQaDate", "lastMeteringDate", "lastInventoryDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod","createdBy");
     }
 

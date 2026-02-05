@@ -106,7 +106,7 @@ public class AssetTagService {
                 assetFilters.add(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, queryAsset.getMeasuringItemCategory()));
             }
             //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
-            Pageable pageable = new PageRequest(0, 5000);
+            Pageable pageable = new PageRequest(0, 50000);
             Page page = assetDao.findBySearchFilter(assetFilters, pageable);
             return page.getContent();
         }else{

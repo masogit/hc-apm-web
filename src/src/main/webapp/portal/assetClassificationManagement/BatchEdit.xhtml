@@ -163,8 +163,8 @@
                                          rowsPerPageTemplate="5,10,20,50">
                                 <p:ajax event="page" />
                                 <p:column width="40" id="checkBoxCol1">
-                                    <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox2">
-                                        <p:ajax event="change" listener="#{batchEditAssetClassificationController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2) batchButton"/>
+                                    <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.selectedAssetUidTable2[item.uid]}" id="selectCheckBox2" class="selectCheckBox2">
+                                        <p:ajax event="change" listener="#{batchEditAssetClassificationController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)  :batchEditAssetClassificationForm:datalist1"/>
                                         <f:attribute name="assetObj" value="#{item}"/>
                                     </p:selectBooleanCheckbox>
                                     <f:facet name="header">

@@ -92,7 +92,7 @@ public class AssetInfo implements ChineseName, Serializable {
     @TableField(exist = false)
     private String manufactureTel;//制造商电话
 
-    @Size(max = 64)
+    @Size(max = 128)
     @Column(name = "vendor")
     private String vendor;//供应商名称 =Supplier.name
 
@@ -898,6 +898,14 @@ public class AssetInfo implements ChineseName, Serializable {
     @Getter @Setter
     @Column(name = "offline_update_date")
     private Date offlineUpdateDate;
+
+    @Getter @Setter
+    @Column(name = "usage_count")
+    private Integer usageCount;
+
+    @Getter @Setter
+    @Column(name = "rating_usage_count")
+    private Integer ratingUsageCount;
 
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;

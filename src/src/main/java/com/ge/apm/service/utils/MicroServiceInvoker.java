@@ -81,6 +81,10 @@ public class MicroServiceInvoker {
         return baseURL + url.toString();
     }
 
+    public String getGatewayURL(String url) {
+        return baseURL + url;
+    }
+
     public String getPdfPreViewUrl(){
         return pdfPreViewUrl;
     }

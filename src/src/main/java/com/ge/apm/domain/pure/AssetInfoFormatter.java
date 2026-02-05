@@ -710,6 +710,14 @@ public class AssetInfoFormatter {
         return assetInfo.getAssetCode68();
     }
 
+    public Integer getUsageCount() {
+        return assetInfo.getUsageCount();
+    }
+
+    public Integer getRatingUsageCount() {
+        return assetInfo.getRatingUsageCount();
+    }
+
     public String getAssetCode68AsString() {
         if (assetInfo.getAssetCode68() == null) return null;
 
@@ -1028,6 +1036,8 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
+        map.put(getMessage("usageCount"), assetInfo.getUsageCount());
+        map.put(getMessage("ratingUsageCount"), assetInfo.getRatingUsageCount());
         return map;
 
     }
@@ -1184,6 +1194,8 @@ public class AssetInfoFormatter {
         map.put(getMessage("productFamily"), assetInfo.getProductFamily());
         map.put(getMessage("productSegment"), this.getProductSegmentAsString());
         map.put(getMessage("warrantyStatus"), assetInfo.getWarrantyStatus());
+        map.put(getMessage("usageCount"), assetInfo.getUsageCount());
+        map.put(getMessage("ratingUsageCount"), assetInfo.getRatingUsageCount());
         return map;
 
     }

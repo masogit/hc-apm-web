@@ -17,3 +17,29 @@ select replace(uuid_generate_v4()::text, '-', ''), 4, '[{"label": "工单类型"
 insert into public.config_item(uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 select replace(uuid_generate_v4()::text, '-', ''), 5, '[{"label": "工单类型", "field":"orderType"},{"label": "院区名称", "field":"siteName"},{"label": "设备名称", "field":"assetName"},,{"label": "工单编号", "field":"srNum"}]', '保养报告单名称配置', 'PmOrderReportNameConfiguration', '保养报告单名称配置', 'f', 't', 10
     where not exists ( select * from config_item where key = 'PmOrderReportNameConfiguration');
+
+-- YHAAO-27155 是否显示主子设备按钮
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '是否显示主子设备按钮', 'showMasterEquipment', '是否显示主子设备按钮', 'f','t',3 where not exists(select * from config_item where key = 'showMasterEquipment');
+
+-- 供应商字段长度设置128
+ALTER TABLE asset_info ALTER COLUMN vendor TYPE VARCHAR(128);
+ALTER TABLE supplier ALTER COLUMN name TYPE VARCHAR(128);
+
+
+-- YHAAO-27110
+insert into public.config_item(uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text, '-', ''), 18, '[{"label":"设备名称","field":"assetName","required":true,"rendered":true},{"label":"展示名称","field":"displayName","required":false,"rendered":true},{"label":"设备型号","field":"functionType","required":true,"rendered":true},{"label":"资产编号","field":"financingNum","required":true,"rendered":true},{"label":"品牌/制造商简称","field":"makerShortName","required":true,"rendered":true},{"label":"制造商序列号","field":"serialNum","required":true,"rendered":true},{"label":"二维码","field":"qrCode","required":false,"rendered":true},{"label":"所属科室","field":"clinicalDeptName","required":true,"rendered":true},{"label":"设备分类","field":"assetGroup","required":false,"rendered":true},{"label":"采购金额","field":"purchasePrice","required":true,"rendered":true},{"label":"采购日期","field":"purchaseDate","required":true,"rendered":true},{"label":"收入(元)","field":"income","required":false,"rendered":true},{"label":"成本(元)","field":"cost","required":false,"rendered":true},{"label":"利润(元)","field":"profits","required":false,"rendered":true},{"label":"利润率(%)","field":"profitsRate","required":false,"rendered":true},{"label":"阳性率(%)","field":"positiveRate","required":false,"rendered":true}]', '设备综合效益分析动态列', 'EfficiencyEquipmentColumn', '设备综合效益分析动态列', 'f', 't', 10
+    where not exists ( select * from config_item where key = 'EfficiencyEquipmentColumn');
+
+
+-- his his_equipment_data_source_split 加联合索引 跑result表
+CREATE INDEX IF NOT exists his_equipment_data_source_split_create_date_is_sum_idx ON his_equipment_data_source_split (create_date asc, is_sum);
+
+-- YHAAO-27251 删除重复数据
+delete from  shared_asset_req_detail where id in('2c9b85829bc6426e019bf82a5ac65ca8','2c9b85829bc6426e019c038f7044280f');
+delete from  shared_asset_request where id in('2c9b85829bc6426e019c038f7044280e','2c9b85829bc6426e019c03b3f84d2b2d','2c9b85829bc6426e019bf82a5a645ca6','2c9b85829bc6426e019bf842c1e05cee');
+
+-- YHAAO-26046 云版贴码,转到本地版
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, '', 'apm本地版,但在云版盘点并贴码,二维码解析转发到对应本地版', 'cloudQrCodeToLocalApm', '云版二维码转发到本地版', 'f','t',1 where not exists(select * from config_item where key = 'cloudQrCodeToLocalApm');
+

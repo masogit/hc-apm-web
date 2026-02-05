@@ -1,17 +1,17 @@
 package com.ge.apm.view;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetProbationRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetProbation;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.view.asset.AssetFileAttachmentController;
 import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -33,6 +33,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -575,5 +577,19 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             return DateUtil.offsetMonth(planEndDate, -3);
         }
         return null;
+    }
+
+    public void ocrCreated(FileUploadEvent event) {
+        JSONObject jsonObject = blobService.ocrCreated(GatewayURL.EXTERNAL_ASSET_OCR.toString(), event.getFile());
+        String assetDeptName = jsonObject.getString("assetDeptName");
+        String deptContactName = jsonObject.getString("deptContactName");
+        assetDept = assetDeptList.stream().filter(dept -> assetDeptName.equals(dept.getName())).findAny().orElse(null);
+        if (ObjectUtil.isNotEmpty(assetDept)) {
+            deptContactList = uaaService.getUsersByDeptUidAndRole(this.assetDept.getUid(), "ClinicalStaff");
+            deptContact = deptContactList.stream().filter(user -> deptContactName.equals(user.getName())).findAny().orElse(null);
+        }
+        selected.setDeptContactTel(jsonObject.getString("deptContactTel"));
+        selected.setName(jsonObject.getString("name"));
+        selected.setFunctionType(jsonObject.getString("functionType"));
     }
 }

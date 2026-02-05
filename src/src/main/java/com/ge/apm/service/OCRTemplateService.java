@@ -17,6 +17,7 @@ import com.ge.healthcare.cn.common.ocr.support.MatcherType;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
@@ -214,6 +215,10 @@ public class OCRTemplateService extends MicroServiceInvoker {
     }
     public JSONObject getJsonObject(GatewayURL gatewayURL, Map<String, Object> param, File file, Function<String,String> function) {
         String token = UserContextService.getAccessToken();
+        return getJsonObject(gatewayURL,param,file,function,token);
+    }
+
+    public JSONObject getJsonObject(GatewayURL gatewayURL, Map<String, Object> param, File file, Function<String,String> function,String token) {
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("multipart/form-data;charset=UTF-8");
         headers.setContentType(type);
@@ -265,6 +270,19 @@ public class OCRTemplateService extends MicroServiceInvoker {
         v2BlobObject.setBoType(boType);
         blobObjectRepository.save(v2BlobObject);
         return v2BlobObject;
+    }
+
+    public List<V2_BlobObject>  saveBlobObject(List<V2_BlobObject> v2BlobObject,String uid){
+        List<V2_BlobObject> resultObject= new ArrayList<>();
+        for (V2_BlobObject item : v2BlobObject) {
+            V2_BlobObject blobObject = new V2_BlobObject();
+            BeanUtils.copyProperties(item,blobObject);
+            blobObject.setId(null);
+            blobObject.setBoUuid(uid);
+            blobObjectRepository.save(blobObject);
+            resultObject.add(blobObject);
+        }
+        return resultObject;
     }
 
     public void deleteTemplateFile(List<V2_BlobObject> listBlobObject){
