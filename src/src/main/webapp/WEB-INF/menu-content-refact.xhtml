@@ -138,7 +138,7 @@
                    </c:when>
                    <c:when test="#{item eq 'INSTALL'}">
                        <!-- 到货安装 -->
-                       <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-truck fa-fw" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('INSTALL_')}">
+                       <p:submenu   id="umarrival_01"  label="#{msg.arrivalInstallation}" icon="fa fa-truck fa-fw" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('INSTALL_')}">
                            <p:menuitem fragment="um01041" id="um01041" value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_LIST_VIEW')}"/>
                            <p:menuitem fragment="um01042" id="um01042" value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('INSTALL_STORE_VIEW')}"/>
                            <p:menuitem fragment="um01043" id="um01043" value="#{msg.CheckAndStore}" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.needInstorageCheck() and userContextService.accessContainsFunctionMenu('INSTALL_CHECK_EDIT')}"/>
@@ -147,7 +147,7 @@
                    </c:when>
                    <c:when test="#{item eq 'HISPERFORMANCE'}">
                        <!-- his绩效分析 -->
-                       <p:submenu  label="#{msg.hisPerform}" icon="fa fa-line-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_')and userContextService.canRender('HISPERFORMANCE')}">
+                       <p:submenu id="his000_01"  label="#{msg.hisPerform}" icon="fa fa-line-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_')and userContextService.canRender('HISPERFORMANCE')}">
                            <p:menuitem fragment="his011"  id="his011" value="综合效益科室汇总"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipmentDeptAssetDetail.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_DEPARTMENT')}"/>
                            <p:menuitem fragment="his009" id="his009" value="设备综合效益分析"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_EQUIPMENT')}"/>
                            <p:menuitem fragment="his010" id="his010" value="数据录入"  outcome="/portal/his/dataEntry/dataEntry.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DATA_ENTRY')}"/>
@@ -191,7 +191,7 @@
                    </c:when>
                    <c:when test="#{item eq 'BUDGET'}">
                        <!-- 预算管理-->
-                       <p:submenu label="#{msg.BudgetMgr}" icon="fa fa-usd fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_') and userContextService.canRender('BUDGET')}">
+                       <p:submenu  id="umbudge_01" label="#{msg.BudgetMgr}" icon="fa fa-usd fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_') and userContextService.canRender('BUDGET')}">
                            <p:menuitem fragment="um409" id="um409"  value="年度采购预算入口" outcome="/portal/budget/config/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_ANNUAL_ENTRANCE_EDIT')}"/>
                            <p:menuitem fragment="um410" id="um410" value="#{msg.YearPurchase}" outcome="/portal/budget/application/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_ANNUAL_SUBSCRIPTION_EDIT')}"/>
                            <p:menuitem fragment="um411" id="um411" value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_TEMPORARY_SUBSCRIPTION_EDIT')}"/>

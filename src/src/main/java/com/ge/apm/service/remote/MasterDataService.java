@@ -26,7 +26,7 @@ import java.util.Map;
 @Service
 public class MasterDataService  extends MicroServiceInvoker {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(MasterDataService.class);
 
 
 
@@ -121,8 +121,12 @@ public class MasterDataService  extends MicroServiceInvoker {
                 d = Double.parseDouble(value.toString());
             }
             int percent = (int) Math.round(d * 100);
+            if(percent==0){
+                percent=1;
+            }
             return percent + "%";
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
+            logger.error("设备32分类匹配值转换error: ",e);
             return "0%";
         }
     }

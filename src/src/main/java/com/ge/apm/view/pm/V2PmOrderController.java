@@ -1058,14 +1058,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             newReport.setBoType("pm-performance-report");
         if (tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getSafetyReport()))
             newReport.setBoType("pm-safety-report");
-        newReport.setCreatedDate(new Date());
+//        newReport.setCreatedDate(new Date());
         TableSchema table = JSONObject.parseObject(tbd.getSchema(), TableSchema.class);
         Map<String, Object> tableValue = MapUtil.newHashMap();
         table.getGroups().stream().flatMap(i-> i.getItems().stream())
                 .filter(i-> !com.google.common.base.Strings.isNullOrEmpty(i.getDefaultValue()))
                 .filter(i-> !tableValue.containsKey(i.getKey()))
                 .forEach(i-> tableValue.put(i.getKey(), i.getDefaultValue()));
-        pmOrderService.saveReport(newReport);
+//        pmOrderService.saveReport(newReport);
         tableService.saveTableDate(newReport, tableValue);
     }
 

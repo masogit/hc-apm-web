@@ -627,7 +627,8 @@ public class WordReportExportService {
 
             AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
             String assetUid = assetInfo.getUid();
-            String title = assetInfo.getName() + "(" + assetInfo.getDepartNum() + ")" + "-" + DateFormatUtils.format(dataMap.get(1), "yyyy-MM");
+            String functionType = ObjectUtil.isNotEmpty(assetInfo.getFunctionType()) ? "-" + assetInfo.getFunctionType() : "";
+            String title = assetInfo.getName() + functionType + "(" + assetInfo.getDepartNum() + ")" + "-" + DateFormatUtils.format(dataMap.get(1), "yyyy-MM");
             checkItemMap.put("checkTitle",title);
 
             List<Object> objects = new ArrayList<>();

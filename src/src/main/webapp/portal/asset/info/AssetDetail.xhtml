@@ -659,10 +659,107 @@
                             <p:commandButton id="departmentCovert" value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
                         </h:panelGroup>
                     </p:panelGrid>-->
+
+                    <p:tab title="已绑定规则" id="bindRule">
+                        <p:fieldset legend="已绑定保养规则">
+                            <p:dataTable var="item" value="#{assetBindRuleController.getPmOrderRuleList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
+                                         paginator="true" paginatorPosition="bottom" rows="5"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                <p:column headerText="#{msg.StartUsingDate}" >
+                                    <h:outputText value="#{item.assetInfo.installDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.PurchaseDate}">
+                                    <h:outputText value="#{item.assetInfo.purchaseDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.AssetName}" >
+                                    <h:outputText value="#{item.assetInfo.name}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.Level1RulePM}" rendered="#{assetBindRuleController.pmLevelFour}">
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUIDInspection)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUIDInspection)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
+                                </p:column>
+                                <p:column headerText="#{msg.Level2RulePM}"   >
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID2)}" immediate="false" process="@this" update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID2)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
+                                </p:column>
+                                <p:column headerText="#{msg.Level3RulePM}"   >
+                                    <p:commandLink value="#{assetBindRuleController.getRuleName(item.ruleUID)}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(item.ruleUID)}" oncomplete="PF('PmOrderRuleEditDialog').show()" />
+                                </p:column>
+                                <p:column headerText="#{msg.Level4RulePM}" rendered="#{assetBindRuleController.pmLevelFour}">
+                                    <ui:repeat value="#{assetBindRuleController.getRules(item.ruleUID4)}" var="f" varStatus="status">
+                                        <p:commandLink value="#{f.name}" immediate="false" process="@this"  update=":PmOrderRuleEditForm" action="#{assetBindRuleController.preparePmRule(f.uid)}" oncomplete="PF('PmOrderRuleEditDialog').show()"/><br/>
+                                    </ui:repeat>
+                                </p:column>
+                                <p:column headerText="#{msg.departNum}"  >
+                                    <h:outputText value="#{item.assetInfo.departNum}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.serialNum}"  >
+                                    <h:outputText value="#{item.assetInfo.serialNum}"/>
+                                </p:column>
+                                <p:column  headerText="#{msg.assetGroup}" >
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetGroup', item.assetInfo.assetGroup)}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.clinicalDeptName}"   >
+                                    <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nationalStandardCode}">
+                                    <h:outputText value="#{item.assetInfo.nationalStandardCode}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.makerShortName}"  filterBy="#{item.assetInfo.makerShortName}" >
+                                    <h:outputText value="#{item.assetInfo.makerShortName}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.manufacture}" filterBy="#{item.assetInfo.manufacture}">
+                                    <h:outputText value="#{item.assetInfo.manufacture}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.ConfigurationDate}" width="6%" filterBy="#{item.createdDate}">
+                                    <h:outputText value="#{item.createdDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.QRCode}" exportable="true" width="150"  filterBy="#{item.assetInfo.qrCode}" >
+                                    <h:outputText value="#{item.assetInfo.qrCode}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                        <p:fieldset legend="已绑定日常检查规则">
+
+                            <p:dataTable var="item" value="#{assetBindRuleController.nurseSiteMaintainConfigList}" emptyMessage="#{msg.noRecordFound}"
+                                         paginator="true" paginatorPosition="bottom" rows="5"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                <p:column headerText="配置名称" filterBy="#{item.name}" filterMatchMode="LIKE" sortBy="#{item.namePyCode}">
+                                    <p:commandLink  title="查看" value="#{item.name}" update=":maintainConfigEditForm" action="#{assetBindRuleController.prepareNurseSiteConfig(item.id)}" oncomplete="PF('maintainConfigEditDialog').show()">
+                                    </p:commandLink>
+                                </p:column>
+                                <p:column headerText="创建人">
+                                    <h:outputText value="#{assetBindRuleController.getUserName(item.createByUid)}" />
+                                </p:column>
+                                <p:column headerText="创建日期">
+                                    <h:outputText value="#{item.createDate}" >
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="修改人">
+                                    <h:outputText value="#{assetBindRuleController.getUserName(item.modifyByUid)}" />
+                                </p:column>
+                                <p:column headerText="修改日期">
+                                    <h:outputText value="#{item.modifyDate}" >
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                    </p:tab>
                 </p:tabView>
 
                 <ui:include src="AssetScrap.xhtml"/>
                 <ui:include src="AssetDepartmentConvert.xhtml"/>
+                <ui:include src="AssetBindRuleMaintainConfig.xhtml"/>
+                <ui:include src="AssetBindRulePmConfig.xhtml"/>
 
                 <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
                     <h:form id="qrCodeLibShowForm">
