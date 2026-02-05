@@ -838,31 +838,40 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         }
     }
 
-
-
     public List<OrgInfo> LoadSiteNameListMVS() {
-        if (CollectionUtils.isEmpty(orgListMVS)) {
-            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
-                orgListMVS = bySearchFilterMVS.stream()
-                        .map(item -> Optional.ofNullable(item.getAssetInfo())
-                                .map(info -> Optional.ofNullable(info.getSiteUID())
-                                        .orElse(null))
-                                .orElse(null))
-                        .filter(Objects::nonNull) // 过滤掉所有 null 值
-                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
-                        .stream()
-                        .map(val -> configCacheService.findOrgByUid(val))
-                        .collect(Collectors.toList());
-                if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
-                    orgListMVS = Collections.emptyList();
-                }
-            }
-            if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
+        orgListMVS = uaaService.getUserAccessibleSiteList(loginUser.getUid());
+        if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
                 orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
-            }
+        } else {
+            orgListMVS = Collections.emptyList();
         }
         return orgListMVS;
     }
+
+//    public List<OrgInfo> LoadSiteNameListMVS() {
+//        orgListMVS = Collections.emptyList();
+//        if (CollectionUtils.isEmpty(orgListMVS)) {
+//            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+//                orgListMVS = bySearchFilterMVS.stream()
+//                        .map(item -> Optional.ofNullable(item.getAssetInfo())
+//                                .map(info -> Optional.ofNullable(info.getSiteUID())
+//                                        .orElse(null))
+//                                .orElse(null))
+//                        .filter(Objects::nonNull) // 过滤掉所有 null 值
+//                        .collect(Collectors.toSet()) // 转换为 Set 以去除重复项
+//                        .stream()
+//                        .map(val -> configCacheService.findOrgByUid(val))
+//                        .collect(Collectors.toList());
+//                if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+//                    orgListMVS = Collections.emptyList();
+//                }
+//            }
+//            if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
+//                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+//            }
+//        }
+//        return orgListMVS;
+//    }
 
 
     private void loadMVSClinicalDeptList() {

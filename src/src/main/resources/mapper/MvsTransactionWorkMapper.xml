@@ -30,78 +30,99 @@
     <!-- 查询优化建议 -->
     <select id="loadData" resultMap="eHomeTransactionWorkOrderMap">
         SELECT
-            id, ucm_id, sr_id, sr_num,
-            total_man_hour, pat_problems, pat_actions, pat_tests,
-            status, current_person_name, type_key, parent_key,
-            close_time, comment, sr_context, wo_context,
-            attachments_context, parts_context, hours_context,
-            created_by, created_date, modified_date
-        FROM mvs_transaction_work_order
+        t.id,
+        t.ucm_id,
+        t.sr_id,
+        t.sr_num,
+        t.total_man_hour,
+        t.pat_problems,
+        t.pat_actions,
+        t.pat_tests,
+        t.status,
+        t.current_person_name,
+        t.type_key,
+        t.parent_key,
+        t.close_time,
+        t.comment,
+        t.sr_context,
+        t.wo_context,
+        t.attachments_context,
+        t.parts_context,
+        t.hours_context,
+        t.created_by,
+        t.created_date,
+        t.modified_date
+        FROM mvs_transaction_work_order t
         WHERE 1=1
         <if test="srNum != null">
-            and sr_Num like concat('%', #{srNum}, '%')
+            and t.sr_Num like concat('%', #{srNum}, '%')
         </if>
         <if test="status!= null ">
-            and status = #{status}
+            and t.status = #{status}
         </if>
         <if test="typeKey != null ">
-            and type_key = #{typeKey}
+            and t.type_key = #{typeKey}
         </if>
         <if test="msgKeyArray != null and msgKeyArray.length > 0">
-            and  type_key IN
+            and  t.type_key IN
             <foreach item="item" index="index" collection="msgKeyArray" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
         <if test="woNum != null ">
-            and (wo_context::jsonb) ->> 'woNum' like concat('%', #{woNum}, '%')
+            and (t.wo_context::jsonb) ->> 'woNum' like concat('%', #{woNum}, '%')
         </if>
         <if test="ownerName != null ">
-            and (wo_context::jsonb) ->> 'ownerName' like concat('%', #{ownerName}, '%')
+            and (t.wo_context::jsonb) ->> 'ownerName' like concat('%', #{ownerName}, '%')
         </if>
         <if test="faultDesc != null ">
-            and (sr_context::jsonb) ->> 'faultDesc' like concat('%', #{faultDesc}, '%')
+            and (t.sr_context::jsonb) ->> 'faultDesc' like concat('%', #{faultDesc}, '%')
         </if>
         <if test="customerName != null ">
-            and (sr_context::jsonb) ->> 'customerName' like concat('%', #{customerName}, '%')
+            and (t.sr_context::jsonb) ->> 'customerName' like concat('%', #{customerName}, '%')
         </if>
         <if test="umids != null and umids.length > 0">
-            and  ucm_id IN
+            and  t.ucm_id IN
             <foreach item="item" index="index" collection="umids" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
         <if test="startDate != null">
             AND TO_TIMESTAMP(
-            (sr_context::jsonb ->> 'acceptanceTime')::bigint / 1000
+            (t.sr_context::jsonb ->> 'acceptanceTime')::bigint / 1000
             ) >= TO_TIMESTAMP(#{startDate}, 'YYYY-MM-DD')
         </if>
         <if test="endDate != null">
             AND TO_TIMESTAMP(
-            (sr_context::jsonb ->> 'acceptanceTime')::bigint / 1000
+            (t.sr_context::jsonb ->> 'acceptanceTime')::bigint / 1000
             ) &lt;= TO_TIMESTAMP(#{endDate}, 'YYYY-MM-DD') + INTERVAL '1 DAY'
         </if>
         <if test="startDateOpen != null">
             AND TO_TIMESTAMP(
-            (wo_context::jsonb ->> 'createdDate')::bigint / 1000
+            (t.wo_context::jsonb ->> 'createdDate')::bigint / 1000
             ) >= TO_TIMESTAMP(#{startDateOpen}, 'YYYY-MM-DD')
         </if>
         <if test="endDateOpen != null">
             AND TO_TIMESTAMP(
-            (wo_context::jsonb ->> 'createdDate')::bigint / 1000
+            (t.wo_context::jsonb ->> 'createdDate')::bigint / 1000
             ) &lt;= TO_TIMESTAMP(#{endDateOpen}, 'YYYY-MM-DD') + INTERVAL '1 DAY'
         </if>
         <if test="startDateClose != null">
             AND TO_TIMESTAMP(
-            (wo_context::jsonb ->> 'closeTime')::bigint / 1000
+            (t.wo_context::jsonb ->> 'closeTime')::bigint / 1000
             ) >= TO_TIMESTAMP(#{startDateClose}, 'YYYY-MM-DD')
         </if>
         <if test="endDateClose != null">
             AND TO_TIMESTAMP(
-            (wo_context::jsonb ->> 'closeTime')::bigint / 1000
+            (t.wo_context::jsonb ->> 'closeTime')::bigint / 1000
             ) &lt;= TO_TIMESTAMP(#{endDateClose}, 'YYYY-MM-DD') + INTERVAL '1 DAY'
         </if>
-        order by sr_num desc
+        AND NOT EXISTS (
+        SELECT 1
+        FROM v2_service_request sr
+        WHERE sr.id = t.sr_id
+        )
+        order by t.sr_num desc
         </select>
 
 </mapper>
