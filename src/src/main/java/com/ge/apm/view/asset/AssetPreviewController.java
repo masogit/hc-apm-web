@@ -113,7 +113,7 @@ public class AssetPreviewController extends JpaCRUDController<AssetInfo> {
                 infos.stream().forEach(e->{
                     if (e.getParentAssetId() != null) {
                         List<AssetInfo> childAssets = parentAssetMap.get(e.getParentAssetId());
-                        List<AssetInfo> removeChildAssets = childAssets.stream().filter(asset -> assetMap.get(asset.getId()).getIsDeleted() && !assetMap.get(asset.getId()).getIsValid()).collect(Collectors.toList());
+                        List<AssetInfo> removeChildAssets = childAssets.stream().filter(asset -> assetMap.get(asset.getId()).getIsDeleted() || !assetMap.get(asset.getId()).getIsValid()).collect(Collectors.toList());
                         if (childAssets.size() == removeChildAssets.size()) {
                             removeAssets.add(assetMap.get(e.getParentAssetId()));
                         }
