@@ -158,6 +158,8 @@
 <!--                           <p:menuitem fragment="his005" id="his005" value="#{msg.manualTasks}" outcome="/portal/his/other/manualJob.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_MANUAL_TASK')}"/>-->
                            <p:menuitem fragment="his007" id="his007" value="#{msg.chargeDetailSource}" outcome="/portal/his/dataDetail/dataSource.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_SOURCE')}"/>
                            <p:menuitem fragment="his008" id="his008" value="#{msg.chargeDetailResult}" outcome="/portal/his/dataDetail/dataResult.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
+                           <p:menuitem fragment="his008" id="his012" value="设备收费项目匹配" outcome="/portal/his/apmAssetMatchSfxm/assetSfxm.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
+
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'REPAIR'}">

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<div class="ui-g">
+    <div class="ui-g-12">
+        <div class="ui-g-12 card">
+            <h:form id="IouListForm">
+
+                <p:dataTable id="datalist" value="#{hisAssetSfxmUnMatchController.lazyModel}" var="item"
+                             widgetVar="varDataList"
+                             selectionMode="single" selection="#{hisAssetSfxmUnMatchController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="filter" listener="#{hisAssetSfxmUnMatchController.onFilter}"  />
+                    <p:column headerText="apm设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetName}"/>
+                    </p:column>
+                    <p:column headerText="机构代码" sortBy="#{item.orgCode}" filterBy="#{item.orgCode}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.orgCode}"/>
+                    </p:column>
+
+                    <p:column headerText="收费项目代码" sortBy="#{item.sfxmId}" filterBy="#{item.sfxmId}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.sfxmId}"/>
+                    </p:column>
+                    <p:column headerText="收费项目名称" sortBy="#{item.sfxmName}"
+                              filterBy="#{item.eqLb}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.sfxmName}"/>
+                    </p:column>
+
+                    <p:column headerText="创建日期" sortBy="#{item.createDate}">
+                        <h:outputText value="#{item.createDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="操作" filterMatchMode="LIKE" exportable="false">
+                        <p:commandButton value="取消匹配" action="#{hisAssetSfxmUnMatchController.initDate(item.id)}" update="@(form)" oncomplete="PF('hisAdjustBusinessDialog').show()">
+                        </p:commandButton>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                         class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="HisAssetAdjustBusiness.xhtml"/>
+        </div>
+    </div>
+
+
+
+</div>
+</html>
