@@ -1,0 +1,35 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:his="http://www.ge.com/tags/his">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="设备收费代码匹配"/>
+            </div>
+
+            <div class="ui-g-12 card ">
+                <h:form id="HisOrgForm">
+                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                        <his:selectOrg update="@(form)"></his:selectOrg>
+                    </div>
+                </h:form>
+                <p:tabView id="HisTab" class="tabs">
+                    <p:tab title="设备收费代码匹配" id="showList">
+                        <ui:include src="assetSfxmMatch.xhtml"/>
+                    </p:tab>
+                    <p:tab title="取消匹配" id="result">
+                        <ui:include src="hisAssetSfxmUnmatch.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT exists  idx_asm_asset_sfxm ON his_asset_sfxm_match (asset_uid, sfxm_id);
