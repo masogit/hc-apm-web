@@ -204,6 +204,16 @@ public class MultiLevelApproval implements Serializable {
     @Transient
     private String handlerPerson;
 
+    @Transient
+    private String assetName;
+    @Transient
+    private String makerShortName;
+    @Transient
+    private String functionType;
+    @Transient
+    private String applyUserName;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private UserAccount applyUser;

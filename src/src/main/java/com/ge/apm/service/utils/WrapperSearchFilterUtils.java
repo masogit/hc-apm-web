@@ -65,4 +65,56 @@ public class WrapperSearchFilterUtils {
         }
         return wrapper;
     }
+
+
+
+    /*
+     *     fieldName不需要转换，直接在页面上写成sql中的字段
+     */
+    public static <T> Wrapper<T> convert(Collection<SearchFilter> searchFilters, Wrapper<T> wrapper) {
+        if (ObjectUtil.isEmpty(searchFilters)) {
+            return new EntityWrapper<>();
+        }
+        for (SearchFilter filter : searchFilters) {
+            String fieldName = filter.fieldName;
+            Object filterValue = filter.value;
+            switch (filter.operator) {
+                case EQ:
+                    wrapper.eq(fieldName, filterValue);
+                    break;
+                case LIKE:
+                    if (filterValue != null) {
+                        wrapper.like("lower(" + fieldName + ")", filterValue.toString().toLowerCase());
+                    }
+                    break;
+                case LT:
+                    wrapper.lt(fieldName, filterValue);
+                    break;
+                case LTE:
+                    wrapper.le(fieldName, filterValue);
+                    break;
+                case GT:
+                    wrapper.gt(fieldName, filterValue);
+                    break;
+                case GTE:
+                    wrapper.ge(fieldName, filterValue);
+                    break;
+                case IsNull:
+                    wrapper.isNull(fieldName);
+                    break;
+                case IsNotNull:
+                    wrapper.isNotNull(fieldName);
+                    break;
+                case IN:
+                    wrapper.in(fieldName, (Collection) filterValue);
+                    break;
+                case NotIN:
+                    wrapper.notIn(fieldName, (Collection) filterValue);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return wrapper;
+    }
 }

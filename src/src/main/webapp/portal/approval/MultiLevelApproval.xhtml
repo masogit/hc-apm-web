@@ -35,7 +35,7 @@
                              selectionMode="single" scrollable="false"
                              selection="#{multiLevelApprovalListController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                             rowKey="#{item.id}" sortMode="single" sortBy="#{item.createdDate}"
+                             rowKey="#{item.id}" sortMode="single"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -43,13 +43,13 @@
                     <p:ajax event="rowSelect" listener="#{multiLevelApprovalListController.onRowSelect}" update="ItemDetailViewForm"/>
                     <p:ajax event="filter" listener="#{multiLevelApprovalListController.onFilter}"/>
 
-                    <p:column headerText="#{msg.ApprovalNumber}"   filterBy="#{item.approvalNumber}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.ApprovalNumber}"   filterBy="#{item.la.approva_number}" filterMatchMode="LIKE"  >
                         <h:outputText value="#{item.approvalNumber}"/>
                     </p:column>
-                    <p:column headerText="#{msg.BusinessNumber}" filterBy="#{item.businessNumber}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.BusinessNumber}" filterBy="#{item.la.businessNumber}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.businessNumber}"/>
                     </p:column>
-                    <p:column headerText="#{msg.BusinessType}"  filterBy="#{item.businessType}" filterMatchMode="EQ" >
+                    <p:column headerText="#{msg.BusinessType}"  filterBy="#{item.la.businessType}" filterMatchMode="EQ" >
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()" value="#{multiLevelApprovalListController.filterBusinessType}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -58,15 +58,25 @@
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.applicationDepartment}" filterMatchMode="LIKE"  >
+                    <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.la.applicationDepartment}" filterMatchMode="LIKE"  >
 <!--                        <c:if test="#{item.applyUser.org.orgType eq 4}">-->
                             <h:outputText value="#{item.applicationDepartment}"/>
 <!--                        </c:if>-->
                     </p:column>
-                    <p:column headerText="#{msg.RequestedBy}" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
-                        <h:outputText value="#{item.applyUser.name}"/>
+
+                    <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.a.name}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.assetName}"/>
                     </p:column>
-                    <p:column headerText="#{msg.ApprovalStatus}" filterBy="#{item.approvalStatus}" filterMatchMode="EQ" >
+                    <p:column headerText="#{msg.makerShortName}" filterBy="#{item.a.maker_short_name}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.makerShortName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.functionType}" filterBy="#{item.a.function_type}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.functionType}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.RequestedBy}" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
+                        <h:outputText value="#{item.applyUserName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.ApprovalStatus}" filterBy="#{item.la.approvalStatus}" filterMatchMode="EQ" >
 
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()"  value="#{multiLevelApprovalListController.status}" >
@@ -78,7 +88,7 @@
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.ApprovalTime}" sortBy="#{item.actualApproverDate}" rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
+                    <p:column headerText="#{msg.ApprovalTime}" sortBy="#{item.la.actualApproverDate}" rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
                         <h:outputText value="#{item.actualApproverDate}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
                         </h:outputText>
