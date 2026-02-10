@@ -1,12 +1,19 @@
 package com.ge.apm.view.approval;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.mapper.MultiLevelApprovalMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.utils.WrapperSearchFilterUtils;
+import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -14,6 +21,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
@@ -42,6 +50,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private MultiLevelApprovalController multiLevelApprovalController;
+    private MultiLevelApprovalMapper multiLevelApprovalMapper;
 
     private UserAccountRepository userAccountRepository;
     private OrgInfoRepository orgInfoRepository;
@@ -67,6 +76,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     protected void init() {
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         multiLevelApprovalController =  WebUtil.getBean(MultiLevelApprovalController.class);
+        multiLevelApprovalMapper =  WebUtil.getBean(MultiLevelApprovalMapper.class);
 
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         orgInfoRepository =  WebUtil.getBean(OrgInfoRepository.class);
@@ -84,27 +94,37 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-
-        if (TAB_INITIATID_BY_ME.equals(currentTabId)) {
-            this.updateSearchFilter(new SearchFilter("initiateApproverUid", SearchFilter.Operator.EQ, user.getUid()));
-
-        } else if (TAB_PENDING_APPROVAL_BY_ME.equals(currentTabId)) {
-
-            this.removeFilterOnField("approvalStatus");
-            searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING,"1*2+"));
-            searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING,"1*2+"));
-
-            this.updateSearchFilter(new SearchFilter("approvalNodeStatus", SearchFilter.Operator.EQ, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING));
-            this.updateSearchFilter(new SearchFilter("approvalUid", SearchFilter.Operator.LIKE, APPROVAL_SEPARATOR + user.getUid() + APPROVAL_SEPARATOR));
-
-        } else {//approved by me
-            this.updateSearchFilter(new SearchFilter("actualApproverUid", SearchFilter.Operator.EQ, user.getUid()));
-            this.updateSearchFilter(new SearchFilter("approvalNodeStatus", SearchFilter.Operator.NE, ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING));
+        Wrapper<NurseSiteMaintainConfig> wrapper = new EntityWrapper<>();
+        Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
+        Sort sort = pageRequest.getSort();
+        if (ObjectUtil.isNotEmpty(sort)) {
+            for (Sort.Order order : sort) {
+                Sort.Direction direction = order.getDirection();
+                if(order.getProperty().contains(".")){
+                    String property = ZipUtil.camelToUnderline(order.getProperty());
+                    wrapper.orderBy(property , "ASC".equals(direction.name()));
+                }else{
+                    String property = ZipUtil.camelToUnderline(order.getProperty());
+                    wrapper.orderBy("la." + property , "ASC".equals(direction.name()));
+                }
+            }
+        }else {
+            wrapper.orderBy("la.approva_number", false);
         }
 
-        addRequiredSortByCreatedDate(pageRequest);
-        Page<MultiLevelApproval> result = multiLevelApprovalRepository.findBySearchFilter(this.searchFilters, pageRequest);
-//        addApplicantClinicalDeptName(result.getContent());
+        if (TAB_INITIATID_BY_ME.equals(currentTabId)) {
+            wrapper.andNew().eq("la.initiate_approver_uid", user.getUid());
+        } else if (TAB_PENDING_APPROVAL_BY_ME.equals(currentTabId)) {
+            wrapper.andNew().eq("la.approval_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING).or().eq("la.approval_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+            wrapper.andNew().eq("la.approval_node_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+            wrapper.andNew().like("la.approval_uid", APPROVAL_SEPARATOR + user.getUid() + APPROVAL_SEPARATOR);
+        } else {//approved by me
+           wrapper.andNew().eq("la.actual_approver_uid", user.getUid());
+            wrapper.andNew().ne("la.approval_node_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+        }
+        WrapperSearchFilterUtils.convert(searchFilters, wrapper);
+        List<MultiLevelApproval> list = multiLevelApprovalMapper.loadData(pagination, wrapper, user.getTenantUID());
+        Page<MultiLevelApproval> result = new PageImpl<>(list, pageRequest, pagination.getTotal());
         return result;
     }
 
@@ -127,7 +147,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     }
 
     private PageRequest addRequiredSortByCreatedDate(PageRequest pageRequest) {
-        final String FIELD_CREATD_DATE = "createdDate";
+        final String FIELD_CREATD_DATE = "approvalNumber";//更改为按照审批号倒序
         Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
         boolean exists = false;
         while(orders.hasNext()){
