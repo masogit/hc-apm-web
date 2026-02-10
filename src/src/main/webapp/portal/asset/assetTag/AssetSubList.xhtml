@@ -57,7 +57,7 @@
                         <h:outputText value="#{item.assetInfo.qrCode}" />
                     </p:column>
 
-                    <p:column headerText="#{msg.RepairEvent}" filterBy="#{assetSubscriberController.repairEventLevelCsv(item)}" sortBy="#{assetSubscriberController.repairEventLevelCsv(item)}">
+                    <p:column headerText="#{msg.RepairEvent}" filterBy="#{assetSubscriberController.repairEventLevelCsv(item)}">
                         <!-- 显示：把勾选的紧急程度用逗号拼接 -->
                         <h:outputText value="#{assetSubscriberController.repairEventLabelCsv(item)}" />
 
