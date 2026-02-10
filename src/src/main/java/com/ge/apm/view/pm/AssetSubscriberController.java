@@ -758,7 +758,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 	public void applyBatchUpdate() {
 		if (selectedMap == null || selectedMap.isEmpty()) {
-			WebUtil.addErrorMessage("Please select at least one record.");
+			WebUtil.addErrorMessage("请勾选记录.");
 			return;
 		}
 		List<MessageSubscriber> subscribers = dao.findByIds(selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toSet()));
@@ -771,7 +771,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			});
 		}
 		dao.save(subscribers);
-		WebUtil.addSuccessMessage("Batch update success.");
+		WebUtil.addSuccessMessage("批量修改成功.");
 	}
 
 	public boolean checkBatchEdit() {
