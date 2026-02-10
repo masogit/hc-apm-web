@@ -6,6 +6,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -106,11 +107,22 @@ public class AssetPreviewController extends JpaCRUDController<AssetInfo> {
                 List<SearchFilter> temp = new ArrayList<>();
                 temp.add(new SearchFilter("id", SearchFilter.Operator.IN,assetInfoMap.keySet()));
                 List<AssetInfo> infos = dao.findBySearchFilter(temp);
+                Map<Integer, AssetInfo> assetMap = infos.stream().collect(Collectors.toMap(AssetInfo::getId, v -> v, (o1, o2) -> o2));
+                Map<Integer, List<AssetInfo>> parentAssetMap = infos.stream().filter(asset -> asset.getParentAssetId() != null).collect(Collectors.groupingBy(AssetInfo::getParentAssetId));
+                List<AssetInfo> removeAssets = ListUtil.newArrayList();
                 infos.stream().forEach(e->{
+                    if (e.getParentAssetId() != null) {
+                        List<AssetInfo> childAssets = parentAssetMap.get(e.getParentAssetId());
+                        List<AssetInfo> removeChildAssets = childAssets.stream().filter(asset -> assetMap.get(asset.getId()).getIsDeleted() || !assetMap.get(asset.getId()).getIsValid()).collect(Collectors.toList());
+                        if (childAssets.size() == removeChildAssets.size()) {
+                            removeAssets.add(assetMap.get(e.getParentAssetId()));
+                        }
+                        removeAssets.addAll(removeChildAssets);
+                    }
                     e.setRank(assetInfoMap.get(e.getId()).getRank());
                     e.setBranchIds(assetInfoMap.get(e.getId()).getBranchIds());
                 });
-
+                infos.removeAll(removeAssets);
                 if(queryType == 2){
                     infos = infos.stream().filter(a -> a.getRank() == 0).collect(Collectors.toList());
                 }else if (queryType == 3){

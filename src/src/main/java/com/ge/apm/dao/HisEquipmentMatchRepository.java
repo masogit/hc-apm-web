@@ -29,4 +29,9 @@ public interface HisEquipmentMatchRepository extends GenericRepositoryUUID<HisEq
 
     @Query("select o from HisEquipmentMatch o  where o.id in ?1 ")
     public List<HisEquipmentMatch> findByIds(List<String> ids);
+
+
+
+    @Query(value="select * from his_equipment_match  where asset_uid = ?1 ",nativeQuery = true)
+    public List<HisEquipmentMatch> findByAssetUid(String id);
 }
