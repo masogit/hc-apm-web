@@ -339,22 +339,22 @@
                     </p:menuButton>
                     <p:commandButton id="exportAllWo" ajax="false" value="#{msg.ExportAllReports}" style="display: none"
                                      actionListener="#{workOrderReportExportController.exportAllWo()}"
-                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :reportButton">
                         <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
                     </p:commandButton>
                     <p:commandButton id="exportSelectedWo" ajax="false" value="#{msg.SelectAndExportReports}" style="display: none"
                                      actionListener="#{workOrderReportExportController.exportSelectedWo()}"
-                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :reportButton">
                         <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
                     </p:commandButton>
                     <p:commandButton id="exportAllWoDocx" ajax="false" value="#{msg.ExportAllDetails}" style="display: none"
                                      actionListener="#{workOrderReportExportController.exportAllWoDocx()}"
-                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl" onclick="startProgress();">
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :reportButton" onclick="startProgress();">
                         <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
                     </p:commandButton>
                     <p:commandButton id="exportSelectedWoDocx" ajax="false" value="#{msg.SelectAndExportDetails}" style="display: none"
                                      actionListener="#{workOrderReportExportController.exportSelectedWoDocx()}"
-                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                     icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :reportButton">
                         <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
                     </p:commandButton>
                 </c:otherwise>
