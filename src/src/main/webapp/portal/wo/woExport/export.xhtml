@@ -202,6 +202,7 @@
         <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
         <p:ajax event="rowSelectCheckbox" update="reportButton"/>
         <p:ajax event="rowUnselectCheckbox" update="reportButton"/>
+        <p:ajax event="toggleSelect" update="reportButton"/>
 <!--        <p:ajax event="filter" listener="#{workOrderReportExportController.reflashData()}" update="datalist"/>-->
         <p:column headerText="#{msg.srNum}" filterBy="#{item.报修单号}"
                   filterValue="#{workOrderReportExportController.filterMap.srNum}" filterMatchMode="contains">
