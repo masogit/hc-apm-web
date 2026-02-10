@@ -58,6 +58,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     private OrgInfo selectedUserOrg;
     //private TenantInfo selectedTenant;
     private TreeNode orgTree;
+    private TreeNode orgSearchTree;
     private TreeNode selectedNode;
     private UaaService uaaService;
     private OrgInfo selectedOrg;
@@ -912,9 +913,28 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     }
 
     public void filterNodeByName(){
+        orgSearchTree =  cloneTreeNode(orgTree);;
         if (!org.springframework.util.StringUtils.isEmpty(treeNodeNameFilter)) {
-            uaaService.filterTreeNode(orgTree, treeNodeNameFilter, 3, 3);
+            uaaService.filterTreeNode(orgSearchTree, treeNodeNameFilter, 3, 3);
         }
+    }
+
+    public TreeNode cloneTreeNode(TreeNode originalNode) {
+        if (originalNode == null) {
+            return null;
+        }
+
+        // 创建新的节点
+        TreeNode clonedNode = new DefaultTreeNode(originalNode.getType(), originalNode.getData(), null);
+
+        // 递归克隆子节点
+        for (TreeNode child : originalNode.getChildren()) {
+            TreeNode clonedChild = cloneTreeNode(child);
+            clonedChild.setParent(clonedNode);
+            clonedNode.getChildren().add(clonedChild);
+        }
+
+        return clonedNode;
     }
 
     public OrgInfo getSelectedUserOrg() {
@@ -987,5 +1007,13 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
     public void setTelRepEnd(Date telRepEnd) {
         this.telRepEnd = telRepEnd;
+    }
+
+    public TreeNode getOrgSearchTree() {
+        return orgSearchTree;
+    }
+
+    public void setOrgSearchTree(TreeNode orgSearchTree) {
+        this.orgSearchTree = orgSearchTree;
     }
 }
