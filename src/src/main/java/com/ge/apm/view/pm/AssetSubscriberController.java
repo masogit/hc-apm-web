@@ -9,11 +9,9 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -23,8 +21,6 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.context.LocaleHolder;
-import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -36,7 +32,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collector;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -786,8 +782,18 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		if (collect.isEmpty() || collect.size() == 1) {
 			return true;
 		}
-		// 只检验设备二维码是否一直
-		return searchFilters.stream().filter(v -> v.fieldName.equals("assetInfo.qrCode")).count() < 0;
+		AtomicBoolean disable = new AtomicBoolean(false);
+		List<MessageSubscriber> list = dao.findByIds(collect);
+		MessageSubscriber first = list.get(0);
+		list.forEach(v -> {
+			if (!Objects.equals(first.getLevel0(), v.getLevel0())
+					|| !Objects.equals(first.getLevel1(), v.getLevel1())
+					|| !Objects.equals(first.getLevel2(), v.getLevel2())
+					|| !Objects.equals(first.getIsReceiveTimeoutMsg(), v.getIsReceiveTimeoutMsg())) {
+				disable.set(true);
+			}
+		});
+		return disable.get();
 	}
 
 	public void addAssetsOfCurrentPage1(AjaxBehaviorEvent event) {
