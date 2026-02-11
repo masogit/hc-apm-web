@@ -34,6 +34,27 @@ public class ServiceRequestMsg implements Serializable {
     private Date sendTime;
     @Column(name = "message")
     private String message;
+    @Column(name = "audit_user_uid")
+    private String auditUserUid;
+    @Column(name = "audit_user_name")
+    private String auditUserName;
+
+    public String getAuditUserUid() {
+        return auditUserUid;
+    }
+
+    public void setAuditUserUid(String auditUserUid) {
+        this.auditUserUid = auditUserUid;
+    }
+
+    public String getAuditUserName() {
+        return auditUserName;
+    }
+
+    public void setAuditUserName(String auditUserName) {
+        this.auditUserName = auditUserName;
+    }
+
 
     public ServiceRequestMsg() {
     }

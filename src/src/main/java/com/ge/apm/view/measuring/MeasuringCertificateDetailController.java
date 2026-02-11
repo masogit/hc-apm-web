@@ -288,11 +288,11 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         try {
             MeasuringCertificateDetail detail = selected;
             logger.info("save:"+detail.toString());
-            if(assetInfo == null){
-                WebUtil.addErrorMessage("请输入 设备序列号SN|资产编号|二维码|设备编号 绑定设备信息");
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                return;
-            }
+//            if(assetInfo == null){
+//                WebUtil.addErrorMessage("请输入 设备序列号SN|资产编号|二维码|设备编号 绑定设备信息");
+//                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//                return;
+//            }
             String certificateNo = detail.getCertificateNo();
             if(Objects.isNull(certificateNo)){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -313,7 +313,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 dao.save(detail);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
             }
-            measuringService.updateMeasuringDate(assetInfo);
+            if(assetInfo!=null){
+                measuringService.updateMeasuringDate(assetInfo);
+
+            }
             for (StreamedContent item : streamedContents) {
                 templateService.savFile(IOUtils.toByteArray(item.getStream()),item.getName(),item.getContentType(), V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring,detail.getId());
             }

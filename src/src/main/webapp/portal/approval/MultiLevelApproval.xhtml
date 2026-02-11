@@ -46,10 +46,10 @@
                     <p:column headerText="#{msg.ApprovalNumber}"   filterBy="#{item.la.approva_number}" filterMatchMode="LIKE"  >
                         <h:outputText value="#{item.approvalNumber}"/>
                     </p:column>
-                    <p:column headerText="#{msg.BusinessNumber}" filterBy="#{item.la.businessNumber}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.BusinessNumber}" filterBy="#{item.la.business_number}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.businessNumber}"/>
                     </p:column>
-                    <p:column headerText="#{msg.BusinessType}"  filterBy="#{item.la.businessType}" filterMatchMode="EQ" >
+                    <p:column headerText="#{msg.BusinessType}"  filterBy="#{item.la.business_type}" filterMatchMode="EQ" >
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()" value="#{multiLevelApprovalListController.filterBusinessType}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -58,7 +58,7 @@
                         </f:facet>
                         <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.la.applicationDepartment}" filterMatchMode="LIKE"  >
+                    <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.la.application_department}" filterMatchMode="LIKE"  >
 <!--                        <c:if test="#{item.applyUser.org.orgType eq 4}">-->
                             <h:outputText value="#{item.applicationDepartment}"/>
 <!--                        </c:if>-->
@@ -76,7 +76,7 @@
                     <p:column headerText="#{msg.RequestedBy}" filterBy="#{item.applyUser.name}" filterMatchMode="LIKE"  >
                         <h:outputText value="#{item.applyUserName}"/>
                     </p:column>
-                    <p:column headerText="#{msg.ApprovalStatus}" filterBy="#{item.la.approvalStatus}" filterMatchMode="EQ" >
+                    <p:column headerText="#{msg.ApprovalStatus}" filterBy="#{item.la.approval_status}" filterMatchMode="EQ" >
 
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('approvalList').filter()"  value="#{multiLevelApprovalListController.status}" >
