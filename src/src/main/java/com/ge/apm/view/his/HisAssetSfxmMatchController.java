@@ -55,6 +55,7 @@ public class HisAssetSfxmMatchController extends GenericCRUDUUIDController<HisAs
         orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
         orgComponentController.registerController(this);
         assetInfoDto = new AssetInfoDto();
+        assetInfoDto.setPurchasePrice(500000d);
         hisEquipmentSfxm=new HisEquipmentSfxm();
 
 
@@ -175,6 +176,7 @@ public class HisAssetSfxmMatchController extends GenericCRUDUUIDController<HisAs
         hisAssetSfxmMatch.setSfxmName(connTargetAsset.getSfxmName());
         hisAssetSfxmMatch.setOrgCode(connTargetAsset.getHosId());
         hisAssetSfxmMatch.setTenantUid(connTargetAsset.getTenantUid());
+        hisAssetSfxmMatch.setSfxmLb(connTargetAsset.getSfxmLb());
         hisAssetSfxmMatch.setSiteUid(connTargetAsset.getSiteUid());
         hisAssetSfxmMatch.setCreateDate(new Date());
         hisAssetSfxmMatch.setCreateBy( UserContextService.getCurrentUserAccount().getUid());
