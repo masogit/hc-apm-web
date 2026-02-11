@@ -32,7 +32,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.*;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
@@ -129,7 +129,7 @@ public class MeasuringService {
     private ConfigItemService configItemService;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
-        boolean flag = false;
+        boolean flag = true;
         AssetInfo tempAssetInfo = null;
         StringBuilder errorInfo = new StringBuilder();
         List<AssetInfo> tempAssetInfoList = null;
@@ -137,12 +137,13 @@ public class MeasuringService {
         if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getAssetSN())){
             tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[设备序列号SN不能匹配到资产设备]");
+//                errorInfo.append("[设备序列号SN不能匹配到资产设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
-                    flag = true;
+//                    flag = true;
                 }else{
                     errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                    flag = false;
                 }
             }
         }
@@ -150,12 +151,13 @@ public class MeasuringService {
         if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getFinanceNo()) && !flag){
             tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[资产编号不能匹配到设备]");
+//                errorInfo.append("[资产编号不能匹配到设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
-                    flag = true;
+//                    flag = true;
                 }else{
                     errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                    flag = false;
                 }
             }
         }
@@ -164,12 +166,13 @@ public class MeasuringService {
         if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getQrCode()) && !flag){
             tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[二维码不能匹配到设备]");
+//                errorInfo.append("[二维码不能匹配到设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
-                    flag = true;
+//                    flag = true;
                 }else{
                     errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                    flag = false;
                 }
             }
         }
@@ -177,9 +180,9 @@ public class MeasuringService {
         if(flag && tempAssetInfoList.size() == 1){
             tempAssetInfo = tempAssetInfoList.get(0);
         }
-
+        List<MeasuringCertificateDetail> mcdList = null;
         if(tempAssetInfo != null){
-            List<MeasuringCertificateDetail> mcdList = null;
+
             MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
 
             if(measuringCertificateDetail.getCertificateNo() != null){
@@ -189,38 +192,45 @@ public class MeasuringService {
             if(mcdList == null || mcdList.isEmpty()){
                 mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
             }
-            SystemEventAuditEnum eventAuditEnum = null;
-            //如果查询到具体的计量记录,做更新操作，否则新增计量记录
-            if(mcdList != null && !mcdList.isEmpty()) {
-                MeasuringCertificateDetail tempMcd = mcdList.get(0);
-                measuringCertificateDetail.setId(tempMcd.getId());
-                measuringCertificateDetail.setCreatedBy(tempMcd.getCreatedBy());
-                measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
-                measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
-                measuringCertificateDetail.setLastModifiedDate(new Date());
-                eventAuditEnum =SystemEventAuditEnum.MEASURE_IMPORT_UPLOAD;
-            } else {
-                measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
-                measuringCertificateDetail.setCreatedDate(new Date());
-                eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
-            }
-
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
-            measuringCertificateDetailDao.save(measuringCertificateDetail);
-            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
-            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
             //目标设备的所有计量记录
             updateMeasuringDate( tempAssetInfo);
 
+        }else{
+            if(measuringCertificateDetail.getCertificateNo() != null){
+                mcdList = measuringCertificateDetailDao.findByCertificateNoAndTenantUIDOrderByCheckDateDesc( measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+                if(mcdList != null && !mcdList.isEmpty()   && mcdList.get(0).getAssetUID()!=null   ) {
+                    errorInfo.append("[计量证书编号已关联设备]");
+                    flag = false;
+                }
+            }
         }
-
         if(!flag){
             measuringCertificateDetail.setErrorInfo(errorInfo.toString());
             return measuringCertificateDetail;
-        }else{
-            return null;
         }
+        SystemEventAuditEnum eventAuditEnum = null;
+        //如果查询到具体的计量记录,做更新操作，否则新增计量记录
+        if(mcdList != null && !mcdList.isEmpty()) {
+            MeasuringCertificateDetail tempMcd = mcdList.get(0);
+            measuringCertificateDetail.setId(tempMcd.getId());
+            measuringCertificateDetail.setCreatedBy(tempMcd.getCreatedBy());
+            measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
+            measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+            measuringCertificateDetail.setLastModifiedDate(new Date());
+            eventAuditEnum =SystemEventAuditEnum.MEASURE_IMPORT_UPLOAD;
+        } else {
+            measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            measuringCertificateDetail.setCreatedDate(new Date());
+            eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
+        }
+        measuringCertificateDetailDao.save(measuringCertificateDetail);
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
+        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+
+        return null;
+
     }
     public void sendMq(AssetInfo assetInfo,UserAccount userAccount) {
         MqContext mqContext = new MqContext();
@@ -806,8 +816,10 @@ public class MeasuringService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         sdf.setLenient(false);
         List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
-        HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
-            HSSFSheet sheet = workbook.getSheetAt(0);
+
+        Workbook workbook = WorkbookFactory.create(file.getInputstream());
+//        HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
+           Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null) {
                 return null;
             }
@@ -819,7 +831,7 @@ public class MeasuringService {
                 StringBuilder errorInfo = new StringBuilder();
 //                String errorInfo = "";
 
-                HSSFRow row = sheet.getRow(j);
+                Row row = sheet.getRow(j);
 
                 MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
                 detail.setTenantUID(selectedOrg.getTenantUID());
@@ -990,6 +1002,147 @@ public class MeasuringService {
 
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
                 HSSFCell cell = row.getCell(j);
+                if (cell == null) {
+                    continue;
+                }
+                try {
+                    hasCertificationNo = HEADER_CERTIFICATION_NO.equals(cell.getStringCellValue()) ? true : hasCertificationNo;
+                    hasApplianceName = HEADER_APPLIANCE_NAME.equals(cell.getStringCellValue()) ? true : hasApplianceName;
+                    hasManufacture = HEADER_MANUFACTURE.equals(cell.getStringCellValue()) ? true : hasManufacture;
+                    hasModel = HEADER_MODEL.equals(cell.getStringCellValue()) ? true : hasModel;
+                    hasAssetSN = HEADER_ASSET_SN.equals(cell.getStringCellValue()) ? true : hasAssetSN;
+                    hasAssetNo = HEADER_ASSET_NO.equals(cell.getStringCellValue()) ? true : hasAssetNo;
+                    hasApplianceNo = HEADER_APPLIANCE_NO.equals(cell.getStringCellValue()) ? true : hasApplianceNo;
+                    hasVerificationConclusion = HEADER_VERIFICATION_CONCLUSION.equals(cell.getStringCellValue()) ? true : hasVerificationConclusion;
+                    hasVerificationDate = HEADER_VERIFICATION_DATE.equals(cell.getStringCellValue()) ? true : hasVerificationDate;
+                    hasExpireDate = HEADER_EXPIRE_DATE.equals(cell.getStringCellValue()) ? true : hasExpireDate;
+                    hasVerificationUnit = HEADER_VERIFICATION_UNIT.equals(cell.getStringCellValue()) ? true : hasVerificationUnit;
+                    hasVerifier = HEADER_VERIFIER.equals(cell.getStringCellValue()) ? true : hasVerifier;
+                    hasItem = HEADER_ITEM.equals(cell.getStringCellValue()) ? true : hasItem;
+                    hasCategory = HEADER_CATEGORY.equals(cell.getStringCellValue()) ? true : hasCategory;
+                    hasClinicalDept = HEADER_CLINICAL_DEPT.equals(cell.getStringCellValue()) ? true : hasClinicalDept;
+                    hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
+                    hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
+                    hasQrCode = HEADER_QR_CODE.equals(cell.getStringCellValue()) ? true : hasQrCode;
+                    switch (cell.getStringCellValue()) {
+                        case HEADER_CERTIFICATION_NO:
+                            hasCertificationNo = true;
+                            header.put("CERTIFICATION_NO_CELL", j);
+                            break;
+                        case HEADER_APPLIANCE_NAME:
+                            hasApplianceName = true;
+                            header.put("APPLIANCE_NAME_CELL", j);
+                            break;
+                        case HEADER_MANUFACTURE:
+                            hasManufacture = true;
+                            header.put("MANUFACTURE_CELL", j);
+                            break;
+                        case HEADER_MODEL:
+                            hasModel = true;
+                            header.put("MODEL_CELL", j);
+                            break;
+                        case HEADER_ASSET_SN:
+                            hasAssetSN = true;
+                            header.put("ASSET_SN_CELL", j);
+                            break;
+                        case HEADER_ASSET_NO:
+                            hasAssetNo = true;
+                            header.put("ASSET_NO_CELL", j);
+                            break;
+                        case HEADER_APPLIANCE_NO:
+                            hasApplianceNo = true;
+                            header.put("APPLIANCE_NO_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_CONCLUSION:
+                            hasVerificationConclusion = true;
+                            header.put("VERIFICATION_CONCLUSION_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_DATE:
+                            hasVerificationDate = true;
+                            header.put("VERIFICATION_DATE_CELL", j);
+                            break;
+                        case HEADER_EXPIRE_DATE:
+                            hasExpireDate = true;
+                            header.put("EXPIRE_DATE_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_UNIT:
+                            hasVerificationUnit = true;
+                            header.put("VERIFICATION_UNIT_CELL", j);
+                            break;
+                        case HEADER_VERIFIER:
+                            hasVerifier = true;
+                            header.put("VERIFIER_CELL", j);
+                            break;
+                        case HEADER_ITEM:
+                            hasItem = true;
+                            header.put("ITEM_CELL", j);
+                            break;
+                        case HEADER_CATEGORY:
+                            hasCategory = true;
+                            header.put("CATEGORY_CELL", j);
+                            break;
+                        case HEADER_CLINICAL_DEPT:
+                            hasClinicalDept = true;
+                            header.put("CLINICAL_DEPT_CELL", j);
+                            break;
+                        case HEADER_REMARK:
+                            hasRemark = true;
+                            header.put("REMARK_CELL", j);
+                            break;
+                        case HEADER_FILE_NO:
+                            hasFileNo = true;
+                            header.put("FILE_NO_CELL", j);
+                            break;
+                        case HEADER_QR_CODE:
+                            hasQrCode = true;
+                            header.put("QR_CODE_CELL", j);
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug(e.getMessage());
+                }
+            }
+            if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetSN && hasAssetNo
+                    && hasApplianceNo && hasVerificationConclusion && hasVerificationDate && hasExpireDate
+                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo) {
+                header.put("HEADER_ROW", i);
+                break;
+            }
+        }
+        return header;
+    }
+
+
+    private Map<String, Integer> findHeader(Sheet sheet) {
+        Map<String, Integer> header = new HashMap<>();
+        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) {
+                continue;
+            }
+            boolean hasCertificationNo = false;
+            boolean hasApplianceName = false;
+            boolean hasManufacture = false;
+            boolean hasModel = false;
+            boolean hasAssetSN = false;
+            boolean hasAssetNo = false;
+            boolean hasApplianceNo = false;
+            boolean hasVerificationConclusion = false;
+            boolean hasVerificationDate = false;
+            boolean hasExpireDate = false;
+            boolean hasVerificationUnit = false;
+            boolean hasVerifier = false;
+            boolean hasItem = false;
+            boolean hasCategory = false;
+            boolean hasClinicalDept = false;
+            boolean hasRemark = false;
+            boolean hasFileNo = false;
+            boolean hasQrCode = false;
+
+            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
+                Cell cell = row.getCell(j);
                 if (cell == null) {
                     continue;
                 }

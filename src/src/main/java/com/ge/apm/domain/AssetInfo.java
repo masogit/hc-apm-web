@@ -881,6 +881,11 @@ public class AssetInfo implements ChineseName, Serializable {
     @TableField(exist = false)
     private String checkPerson;
 
+
+    @Transient
+    @TableField(exist = false)
+    private String department;
+
     @Transient
     @TableField(exist = false)
     private String boUuid;
@@ -3473,5 +3478,13 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setAssetClassification32Dto(SelectItemDto assetClassification32Dto) {
         this.assetClassification32Dto = assetClassification32Dto;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }
