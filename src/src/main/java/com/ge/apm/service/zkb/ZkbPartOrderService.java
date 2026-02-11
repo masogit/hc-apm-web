@@ -2291,6 +2291,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(zkbPartOrder.getStatus()) && !isAllYes){
             closedBack(zkbPartOrder,userAccount);
+            this.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         }else{
             partsClosed(zkbPartOrder,zkbPartOrderReturnList,userAccount);
         }
