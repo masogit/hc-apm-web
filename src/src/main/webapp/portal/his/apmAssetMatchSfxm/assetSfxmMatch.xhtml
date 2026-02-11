@@ -12,6 +12,11 @@
                         <div style="display:inline-block;float: left;">
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" style=" width: 800px;float: right;">
                                 <h:panelGroup>
+                                    <label class='label'>金额:(元)</label>
+                                    <p:inputNumber id="purchasePrice" value="#{hisAssetMatchController.assetInfoDto.purchasePrice}" decimalPlaces="0" minValue="0" required="true" requiredMessage="金额大于等于0！">
+                                    </p:inputNumber>
+                                </h:panelGroup>
+                                <h:panelGroup>
                                     <label class='label'>apm资产编号</label>
                                     <p:inputText id="departNum" rows="1" cols="10"
                                                  value="#{hisAssetSfxmMatchController.assetInfoDto.departNum}"/>
@@ -30,7 +35,7 @@
                         </div>
 
                         <div style="width: 120px;float: left;margin: 25px -80px 0px 15px;">
-                            <p:commandButton  actionListener="#{hisAssetSfxmMatchController.firstQueryOrder}"
+                            <p:commandButton validateClient="true"  actionListener="#{hisAssetSfxmMatchController.firstQueryOrder}"
                                              value="apm设备检索" update="apmPickList"/>
                         </div>
 
@@ -94,16 +99,16 @@
                                     <p:inputText id="sfxmId" rows="1" cols="10"
                                                  value="#{hisAssetSfxmMatchController.hisEquipmentSfxm.sfxmId}"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class='label'>联机医院机构代码</label>
-                                    <p:inputText id="hosId" rows="1" cols="10"
-                                                 value="#{hisAssetSfxmMatchController.hisEquipmentSfxm.hosId}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class='label'>收费项目分类</label>
-                                    <p:inputText id="sfxmLb" rows="1" cols="10"
-                                                 value="#{hisAssetSfxmMatchController.hisEquipmentSfxm.sfxmLb}"/>
-                                </h:panelGroup>
+<!--                                <h:panelGroup>-->
+<!--                                    <label class='label'>联机医院机构代码</label>-->
+<!--                                    <p:inputText id="hosId" rows="1" cols="10"-->
+<!--                                                 value="#{hisAssetSfxmMatchController.hisEquipmentSfxm.hosId}"/>-->
+<!--                                </h:panelGroup>-->
+<!--                                <h:panelGroup>-->
+<!--                                    <label class='label'>收费项目分类</label>-->
+<!--                                    <p:inputText id="sfxmLb" rows="1" cols="10"-->
+<!--                                                 value="#{hisAssetSfxmMatchController.hisEquipmentSfxm.sfxmLb}"/>-->
+<!--                                </h:panelGroup>-->
                             </p:panelGrid>
                         </div>
 
@@ -116,8 +121,8 @@
                                     itemValue="#{coitem}" itemLabel="#{coitem.sfxmName}" showCheckbox="false" responsive="true"
                                     showSourceFilter="false" showTargetFilter="false" filterMatchMode="contains" converter="hisEquipmentSfxm"
                                     required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
-                            <f:facet name="sourceCaption">联机待选设备</f:facet>
-                            <f:facet name="targetCaption">联机已选设备</f:facet>
+                            <f:facet name="sourceCaption">所有收费项目</f:facet>
+                            <f:facet name="targetCaption">已选收费项目</f:facet>
                             <p:ajax event="transfer" update="connPickList" />
                             <p:column style="float: left;width:25%;">
                                 <h:outputText value="#{coitem.sfxmName}" />
@@ -128,7 +133,7 @@
                             <p:column style="float: left;width:25%;">
                                 <h:outputText value="#{coitem.sfxmLb}" />
                             </p:column>
-                            <p:column>
+                            <p:column  style="float: left;width:20;">
                                 <h:outputText value="#{coitem.hosId}" />
                             </p:column>
                         </p:pickList>

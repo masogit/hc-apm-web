@@ -20,22 +20,37 @@
                              rowsPerPageTemplate="20,50,100,500">
 
                     <p:ajax event="filter" listener="#{hisAssetSfxmUnMatchController.onFilter}"  />
-                    <p:column headerText="apm设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
-                              filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetName}"/>
-                    </p:column>
-                    <p:column headerText="机构代码" sortBy="#{item.orgCode}" filterBy="#{item.orgCode}"
+
+                    <p:column headerText="医院机构代码" sortBy="#{item.orgCode}" filterBy="#{item.orgCode}"
                               filterMatchMode="LIKE">
                         <h:outputText value="#{item.orgCode}"/>
                     </p:column>
+                    <p:column headerText="资产名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetName}"/>
+                    </p:column>
+                    <p:column headerText="二维码" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.qrCode}"/>
+                    </p:column>
 
-                    <p:column headerText="收费项目代码" sortBy="#{item.sfxmId}" filterBy="#{item.sfxmId}"
+                    <p:column headerText="科室名称" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                    </p:column>
+
+                    <p:column headerText="His收费代码" sortBy="#{item.sfxmId}" filterBy="#{item.sfxmId}"
                               filterMatchMode="LIKE">
                         <h:outputText value="#{item.sfxmId}"/>
                     </p:column>
-                    <p:column headerText="收费项目名称" sortBy="#{item.sfxmName}"
-                              filterBy="#{item.eqLb}" filterMatchMode="LIKE">
+                    <p:column headerText="His收费项目名称" sortBy="#{item.sfxmName}"
+                              filterBy="#{item.sfxmName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.sfxmName}"/>
+                    </p:column>
+
+                    <p:column headerText="His收费项目分类" sortBy="#{item.sfxmLb}"
+                              filterBy="#{item.sfxmLb}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.sfxmLb}"/>
                     </p:column>
 
                     <p:column headerText="创建日期" sortBy="#{item.createDate}">
