@@ -9,6 +9,12 @@
     <ui:composition>
         <div class="ui-g-12 card">
             <h:form id="measuringAssetListForm" rendered="#{measureAssetListController.customRoleAuth.authSearch}">
+
+                <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="匹配台账结果"     process="@this" update="measuringTab"  disabled="#{measureAssetListController.matchType==1}"  actionListener="#{measureAssetListController.initMatchResult(1)}" />
+                    <p:commandButton value="未匹配台账结果"   process="@this" update="measuringTab"  disabled="#{measureAssetListController.matchType==2}"  actionListener="#{measureAssetListController.initMatchResult(2)}" />
+                </h:panelGrid>
+
                 <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;" rendered="#{userContextService.hasCurrentTenantName('')}">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
                 <p:dataTable id="datalist_measuringAsset" value="#{measureAssetListController.lazyModel}" var="item" widgetVar="varDataList_measuringAsset"
                              selectionMode="single" selection="#{measureAssetListController.selected}"
@@ -32,23 +38,23 @@
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="设备名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                    <p:column rendered="#{measureAssetListController.matchType==1}" headerText="设备名称" filterBy="#{item.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.name}"/>
                     </p:column>
-                    <p:column headerText="设备序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                    <p:column rendered="#{measureAssetListController.matchType==1}"  headerText="设备序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.serialNum}"/>
                     </p:column>
-                    <p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+                    <p:column rendered="#{measureAssetListController.matchType==1}" headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.financingNum}"/>
                     </p:column>
                     <p:column headerText="#{msg.QRCode}" width="150" sortBy="#{item.qrCode}"
-                              filterBy="#{item.qrCode}" filterMatchMode="LIKE" rendered="#{measureAssetListController.isYunNanFuWai()}">
+                              filterBy="#{item.qrCode}" filterMatchMode="LIKE" rendered="#{measureAssetListController.isYunNanFuWai() and  measureAssetListController.matchType==1}">
                         <h:outputText value="#{item.qrCode}"/>
                     </p:column>
-                    <p:column headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                    <p:column rendered="#{measureAssetListController.matchType==1}"   headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.functionType}"/>
                     </p:column>
-                    <p:column headerText="#{msg.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                    <p:column rendered="#{measureAssetListController.matchType==1}"   headerText="#{msg.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
@@ -57,14 +63,14 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="#{msg.clinicalDeptName}">
+                    <p:column rendered="#{measureAssetListController.matchType==1}"   headerText="#{msg.clinicalDeptName}">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                             <p:inputText id="clinicalDept"  value="#{measureAssetListController.filterOrg.name}"  readonly="true"/>
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                    <p:column headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
+                    <p:column rendered="#{measureAssetListController.matchType==1}"   headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}"/>
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()">
@@ -73,7 +79,7 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="计量类别" filterBy="#{item.measuringItemCategory}" filterMatchMode="EQ">
+                    <p:column rendered="#{measureAssetListController.matchType==1}"   headerText="计量类别" filterBy="#{item.measuringItemCategory}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory',item.measuringItemCategory)}"/>
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()">
@@ -85,6 +91,24 @@
                     <p:column headerText="计量证书编号" filterBy="#{item.meteringNO}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.meteringNO}"/>
                     </p:column>
+
+
+                    <p:column rendered="#{measureAssetListController.matchType==2}" headerText="器具名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+                    <p:column rendered="#{measureAssetListController.matchType==2}" headerText="型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.functionType}"/>
+                    </p:column>
+                    <p:column rendered="#{measureAssetListController.matchType==2}" headerText="制造厂" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.manufacture}"/>
+                    </p:column>
+
+                    <p:column rendered="#{measureAssetListController.matchType==2}" headerText="设备序列号SN" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.serialNum}"/>
+                    </p:column>
+
+
+
                     <p:column headerText="检定结论" filterBy="#{item.verificationConclusion}" filterMatchMode="EQ">
                      <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">
@@ -94,12 +118,18 @@
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}"/>
                     </p:column>
-                    <p:column headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
+                    <p:column rendered="#{measureAssetListController.matchType==1}"    headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.measuringType}"/>
                     </p:column>
                     <p:column headerText="检测单位" filterBy="#{item.lastCheckCompany}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.lastCheckCompany}"/>
                     </p:column>
+
+                    <p:column headerText="送检单位" filterBy="#{item.department}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.department}"/>
+                    </p:column>
+
+
                     <p:column headerText="检测人" filterBy="#{item.checkPerson}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.checkPerson}"/>
                     </p:column>
@@ -111,7 +141,7 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="下次计量日期" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
+                    <p:column headerText="#{measureAssetListController.matchType==1 ? '下次计量日期':'有效期至'}" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>
@@ -120,15 +150,25 @@
                         </h:outputText>
                     </p:column>
 
+                    <p:column width="110" rendered="#{measureAssetListController.matchType==2}" headerText="#{msg.Actions}" exportable="false">
+                        <p:commandButton  value="关联设备" process="@this"  actionListener="#{measureAssetListController.matchAsset(item.uid)}"  oncomplete="PF('AssetSelectDlg').show()" update="measuringTab:assetSelectForm"/>
+                    </p:column>
+
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" action="#{measuringCertificateDetailController.createAction()}" title="#{msg.Create}" />
                         <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUuids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
                         <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm" disabled="#{empty measureAssetListController.selected}" >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType==1}" >
                             <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export"/>
                         </p:commandButton>
+
+                        <p:commandButton  rendered="#{measureAssetListController.matchType==2}"  title="导出无台账计量数据" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{measureAssetListController.exportExcel}" update=":growl"
+                                         onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                            <p:fileDownload value="#{measureAssetListController.excelFile}" />
+                        </p:commandButton>
+
                         <p:commandButton id="downloadAllId" title="#{msg.DownloadFile}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false"
                                          actionListener="#{measureAssetListController.downloadSelectedFile()}" update=":growl">
                             <p:fileDownload value="#{measureAssetListController.exportFile}" />
@@ -137,6 +177,8 @@
                 </p:dataTable>
             </h:form>
             <ui:include src="measuringResultList.xhtml"/>
+
+            <ui:include src="AssetSelect.xhtml" />
             <p:dialog id="BatchRepairDlg" widgetVar="BatchRepairDialog" modal="true" resizable="true" draggable="true" width="1050"
                       height="600" header="批量报修设备">
                 <h:form id="BatchRepairForm">

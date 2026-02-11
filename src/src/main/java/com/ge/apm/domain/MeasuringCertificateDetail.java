@@ -167,6 +167,9 @@ public class MeasuringCertificateDetail implements Serializable {
     private String validDateToDisplay;
 
     @Transient
+    private String statusName;
+
+    @Transient
     private List<V2_BlobObject> measuringAttachList;
 
     public String getId() {
@@ -479,6 +482,15 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setMeasuringAttachList(List<V2_BlobObject> measuringAttachList) {
         this.measuringAttachList = measuringAttachList;
+    }
+
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 
     @Override
