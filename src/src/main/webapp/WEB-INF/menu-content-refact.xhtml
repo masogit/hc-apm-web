@@ -152,13 +152,13 @@
                            <p:menuitem fragment="his009" id="his009" value="设备综合效益分析"  outcome="/portal/his/comprehensivebenefits/EfficiencyEquipment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_EFFICIENCY_EQUIPMENT')}"/>
                            <p:menuitem fragment="his010" id="his010" value="数据录入"  outcome="/portal/his/dataEntry/dataEntry.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DATA_ENTRY')}"/>
                            <p:menuitem fragment="his001" id="his001" value="#{msg.deviceMatching}" outcome="/portal/his/hisAsset/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DEVICE_MATCHING')}"/>
+                           <p:menuitem fragment="his008" id="his012" value="收费代码与设备匹配" outcome="/portal/his/apmAssetMatchSfxm/assetSfxm.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
                            <p:menuitem fragment="his002"  id="his002" value="#{msg.deptMatching}" outcome="/portal/his/hisClinical/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DEPT_MATCHING')}"/>
                            <p:menuitem fragment="his003"  id="his003" value="#{msg.deviceGrouping}" outcome="/portal/his/hisGroup/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_DEVICE_GROUP_EDIT')}"/>
                            <p:menuitem fragment="his004" id="his004" value="#{msg.chargeCode}" outcome="/portal/his/hisChargeCode/groupMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_CODE')}"/>
 <!--                           <p:menuitem fragment="his005" id="his005" value="#{msg.manualTasks}" outcome="/portal/his/other/manualJob.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_MANUAL_TASK')}"/>-->
                            <p:menuitem fragment="his007" id="his007" value="#{msg.chargeDetailSource}" outcome="/portal/his/dataDetail/dataSource.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_SOURCE')}"/>
                            <p:menuitem fragment="his008" id="his008" value="#{msg.chargeDetailResult}" outcome="/portal/his/dataDetail/dataResult.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
-                           <p:menuitem fragment="his008" id="his012" value="设备收费项目匹配" outcome="/portal/his/apmAssetMatchSfxm/assetSfxm.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
 
                        </p:submenu>
                    </c:when>
