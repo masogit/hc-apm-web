@@ -600,6 +600,7 @@
                                     </h:outputText>
                                     <h:outputText value="#{msgItem.senderUserName}"  style="padding-left: 10px"/>
                                     <h:outputText value="#{msgItem.message}"  style="padding-left: 10px"/>
+                                    <h:outputText value="#{msgItem.auditUserName}"  style="padding-left: 10px"/>
                                 </p:dataList>
                                 <p:commandButton value="#{msg.addMessage}"  process="@this" update="woTab:msgAddDlg" oncomplete="PF('msgAddDlg').show();" />
                             </h:panelGroup>
