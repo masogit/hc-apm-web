@@ -8,7 +8,19 @@
 
     <ui:composition>
         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('QualityControlScreeningOptions').name.concat('(').concat(systemConfigItemController.configItemMap.get('QualityControlScreeningOptions').key).concat(')')}</label>
+                <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('QualityControlScreeningOptions').showValue}" style="width: 95%;">
+                    <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
+                    <f:selectItems value="#{systemConfigItemController.configItemMap.get('QualityControlScreeningOptions').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('QualityControlScreeningOptions'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('QualityControlScreeningOptions'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('QualityControlScreeningOptions').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 
