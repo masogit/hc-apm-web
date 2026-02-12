@@ -129,87 +129,86 @@ public class MeasuringService {
     private ConfigItemService configItemService;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
-        boolean flag = true;
+        boolean flag = false;
+        boolean failureFlag = false;
+
+
         AssetInfo tempAssetInfo = null;
         StringBuilder errorInfo = new StringBuilder();
         List<AssetInfo> tempAssetInfoList = null;
-
-        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getAssetSN())){
-            tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-//                errorInfo.append("[设备序列号SN不能匹配到资产设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-//                    flag = true;
-                }else{
-                    errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
-                    flag = false;
+        List<MeasuringCertificateDetail> mcdList = null;
+        if(measuringCertificateDetail.getCertificateNo() != null){
+            mcdList = measuringCertificateDetailDao.findByCertificateNoAndTenantUIDOrderByCheckDateDesc( measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+            if(mcdList != null && !mcdList.isEmpty()  ) {
+                MeasuringCertificateDetail measuringCertificateDetail1 = mcdList.get(0);
+                if(measuringCertificateDetail1.getAssetUID()!=null){
+                    if(!measuringCertificateDetail1.getAssetSN().equals(measuringCertificateDetail.getAssetSN())  && !measuringCertificateDetail1.getFinanceNo().equals(measuringCertificateDetail.getFinanceNo())  && !measuringCertificateDetail1.getQrCode().equals(measuringCertificateDetail.getQrCode()) ){
+                        failureFlag=true;
+                        errorInfo.append("[计量证书编号已绑定其他设备");
+                    }else{
+                        measuringCertificateDetail.setAssetUID(measuringCertificateDetail1.getAssetUID());
+                    }
                 }
+            }else{
+                if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getAssetSN())){
+                    tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+                    if(CollectionUtils.isNotEmpty(tempAssetInfoList)  && tempAssetInfoList.size()>1 ){
+                        errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        failureFlag=true;
+                    }
+
+                }
+                if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getFinanceNo()) && (CollectionUtils.isEmpty(tempAssetInfoList) || tempAssetInfoList.size()>1   )){
+                    tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+                    if(CollectionUtils.isNotEmpty(tempAssetInfoList)  && tempAssetInfoList.size()>1 ){
+                        errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        failureFlag=true;
+                    }
+                }
+                // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
+                if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getQrCode())   && (CollectionUtils.isEmpty(tempAssetInfoList) || tempAssetInfoList.size()>1   )){
+                    tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
+                    if(CollectionUtils.isNotEmpty(tempAssetInfoList)  && tempAssetInfoList.size()>1 ){
+                        errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        failureFlag=true;
+                    }
+
+                }
+
             }
+        }else{
+            failureFlag=true;
+            errorInfo.append("[计量证书编号不能为空]");
         }
 
-        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getFinanceNo()) && !flag){
-            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-//                errorInfo.append("[资产编号不能匹配到设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-//                    flag = true;
-                }else{
-                    errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
-                    flag = false;
-                }
-            }
+
+        if( failureFlag  && (CollectionUtils.isEmpty(tempAssetInfoList)  ||  tempAssetInfoList.size()>1 )){
+            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
+            return measuringCertificateDetail;
         }
 
-        // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
-        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getQrCode()) && !flag){
-            tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-//                errorInfo.append("[二维码不能匹配到设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-//                    flag = true;
-                }else{
-                    errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
-                    flag = false;
-                }
-            }
-        }
-
-        if(flag && tempAssetInfoList.size() == 1){
+        if( CollectionUtils.isNotEmpty(tempAssetInfoList) &&  tempAssetInfoList.size() == 1){
             tempAssetInfo = tempAssetInfoList.get(0);
         }
-        List<MeasuringCertificateDetail> mcdList = null;
+
         if(tempAssetInfo != null){
 
-            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
-
-            if(measuringCertificateDetail.getCertificateNo() != null){
-                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
-            }
-
-            if(mcdList == null || mcdList.isEmpty()){
-                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-            }
+//            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
+//
+//            if(measuringCertificateDetail.getCertificateNo() != null){
+//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+//            }
+//
+//            if(mcdList == null || mcdList.isEmpty()){
+//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
+//            }
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
 
             //目标设备的所有计量记录
             updateMeasuringDate( tempAssetInfo);
 
-        }else{
-            if(measuringCertificateDetail.getCertificateNo() != null){
-                mcdList = measuringCertificateDetailDao.findByCertificateNoAndTenantUIDOrderByCheckDateDesc( measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
-                if(mcdList != null && !mcdList.isEmpty()   && mcdList.get(0).getAssetUID()!=null   ) {
-                    errorInfo.append("[计量证书编号已关联设备]");
-                    flag = false;
-                }
-            }
         }
-        if(!flag){
-            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
-            return measuringCertificateDetail;
-        }
+
         SystemEventAuditEnum eventAuditEnum = null;
         //如果查询到具体的计量记录,做更新操作，否则新增计量记录
         if(mcdList != null && !mcdList.isEmpty()) {
