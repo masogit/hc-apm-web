@@ -141,6 +141,14 @@
                                             <p:ajax listener="#{orgInfoController.checkOrgCode()}" process="@this"  update=":growl" ></p:ajax>
                                         </p:inputText>
                                     </h:panelGroup>
+
+
+                                    <h:panelGroup>
+                                        <label class="label">医院级别分类</label>
+                                        <p:inputText id="Hospitallevelclassification" value="#{orgInfoController.hospitalLevelClassification}" required="false" >
+                                        </p:inputText>
+                                    </h:panelGroup>
+
                                     <br/>
                                     <p:spacer></p:spacer>
                                     <p:commandButton style="width: 90px;margin-top: -10px;" process=":editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update=":editForm:orgTree :editPanel :growl"/>
