@@ -48,6 +48,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private boolean countyArea = false;
 
     private String orgName;
+
+    private String hospitalLevelClassification;
     private String orgNameEn;
     private String retrieval;
     private UserAccount loginUser;
@@ -193,6 +195,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
+        hospitalLevelClassification = null;
         OrgInfo org = new OrgInfo();
         org.setSiteId(tenantId);
 
@@ -220,6 +224,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         contactPerson = null;
         contactPhone = null;
         orgCode=null;
+        hospitalLevelClassification = null;
         if (selected == null) {
             return;
         }
@@ -250,6 +255,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
+        hospitalLevelClassification = null;
         if (selected == null) {
             return;
         }
@@ -280,6 +287,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
+        hospitalLevelClassification = null;
         if (selected == null) {
             return;
         }
@@ -380,6 +389,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setAddress(address);
         selected.setContactPerson(contactPerson);
         selected.setContactPhone(contactPhone);
+        selected.setHospitalLevelClassification(hospitalLevelClassification);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
         configCacheService.cleanOrgInfoCacheByUid(selected.getUid());
@@ -421,6 +431,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         contactPerson = null;
         contactPhone = null;
         orgCode = null;
+        hospitalLevelClassification=null;
     }
 
     public void buildOrdTree46AfterSave(String institutionUID) {
@@ -669,6 +680,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = selected.getAddress();
         contactPerson = selected.getContactPerson();
         contactPhone = selected.getContactPhone();
+        hospitalLevelClassification=selected.getHospitalLevelClassification();
         if (selected != null) {
             isShow = selected.getOrgType() == 2;
             acShow = selected.getOrgType() == 4;
@@ -835,5 +847,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void setFailureType(Integer failureType) {
         this.failureType = failureType;
+    }
+
+    public String getHospitalLevelClassification() {
+        return hospitalLevelClassification;
+    }
+
+    public void setHospitalLevelClassification(String hospitalLevelClassification) {
+        this.hospitalLevelClassification = hospitalLevelClassification;
     }
 }
