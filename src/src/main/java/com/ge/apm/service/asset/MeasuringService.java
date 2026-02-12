@@ -149,7 +149,8 @@ public class MeasuringService {
                         measuringCertificateDetail.setAssetUID(measuringCertificateDetail1.getAssetUID());
                     }
                 }
-            }else{
+            }
+            if(CollectionUtils.isEmpty(mcdList) ||   mcdList.get(0).getAssetUID()==null ){
                 if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getAssetSN())){
                     tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
                     if(CollectionUtils.isNotEmpty(tempAssetInfoList)  && tempAssetInfoList.size()>1 ){
@@ -174,8 +175,10 @@ public class MeasuringService {
                     }
 
                 }
-
             }
+
+
+
         }else{
             failureFlag=true;
             errorInfo.append("[计量证书编号不能为空]");
