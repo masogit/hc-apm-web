@@ -263,6 +263,8 @@
                   width="30%" height="200px" header="批量设置设备32分类">
             <h:form id="batchAssetClassification32Dialogform">
 
+
+                <br/>
                 <p:selectOneRadio value="#{batchEditAssetClassificationController.batchAssetClassification32}">
                     <f:selectItem itemLabel="批量设置成Top1" itemValue="1"/>
                     <f:selectItem itemLabel="手动设置" itemValue="2"/>
@@ -280,20 +282,27 @@
                                            itemValue="#{cat}" />
                             <p:ajax event="change"/>
                         </p:selectOneMenu>
+                        <br/>
                     </h:panelGroup>
 
+
                 </h:panelGroup>
-                <br/>
 
-                <p:commandButton
-                        actionListener="#{batchEditAssetClassificationController.saveBatchAssetClassification32}"
-                        value="#{msg.Save}"
-                        icon="ui-icon-check"
-                        process="@this" update=":batchEditAssetClassificationForm:datalist1  :batchAssetClassification32Dialogform"
-                        oncomplete="PF('batchAssetClassification32Dialog').hide()" />
+                <br/><br/><br/>
+                <h:panelGroup  >
 
-                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                 onclick="PF('batchAssetClassification32Dialog').hide(); return false;" />
+                    <p:commandButton
+                            actionListener="#{batchEditAssetClassificationController.saveBatchAssetClassification32}"
+                            value="#{msg.Save}"
+                            icon="ui-icon-check"
+                            process="@this" update=":batchEditAssetClassificationForm:datalist1  :batchAssetClassification32Dialogform"
+                            oncomplete="PF('batchAssetClassification32Dialog').hide()" />
+
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                     onclick="PF('batchAssetClassification32Dialog').hide(); return false;" />
+                </h:panelGroup>
+
+
             </h:form>
 
 
