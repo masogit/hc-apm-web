@@ -643,31 +643,41 @@ public class MeasuringService {
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
             List<AssetInfo> assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
-            if(CollectionUtils.isEmpty(assetInfos)){
-                result.setCertificateNo(object.getString("certificateNo"));
-                result.setErrorInfo(assetSN + ",未匹配到设备");
-                result.setStatus(-1);
-                return result;
-            }
+//            if(CollectionUtils.isEmpty(assetInfos)){
+//                result.setCertificateNo(object.getString("certificateNo"));
+//                result.setErrorInfo(assetSN + ",未匹配到设备");
+//                result.setStatus(-1);
+//                return result;
+//            }
             if(assetInfos.size() > 1){
                 result.setCertificateNo(object.getString("certificateNo"));
                 result.setErrorInfo(assetSN + ",匹配到"+assetInfos.size() +"台设备");
                 result.setStatus(-1);
                 return result;
             }
-            List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
+            if(CollectionUtils.isNotEmpty(assetInfos)){
+                List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
+                    MeasuringCertificateDetail measureDetail = new MeasuringCertificateDetail();
+                    setObject(measureDetail, object);
+                    measureDetail.setAssetUID(item.getUid());
+                    measureDetail.setAssetSN(item.getSerialNum());
+                    measureDetail.setQrCode(item.getQrCode());
+                    measureDetail.setSiteUID(item.getSiteUID());
+                    measureDetail.setHospitalUID(item.getHospitalUID());
+                    measureDetail.setInstitutionUID(item.getInstitutionUID());
+                    measureDetail.setTenantUID(item.getTenantUID());
+                    return measureDetail;
+                }).collect(Collectors.toList());
+                result = collect.get(0);
+            }else{
                 MeasuringCertificateDetail measureDetail = new MeasuringCertificateDetail();
                 setObject(measureDetail, object);
-                measureDetail.setAssetUID(item.getUid());
-                measureDetail.setAssetSN(item.getSerialNum());
-                measureDetail.setQrCode(item.getQrCode());
-                measureDetail.setSiteUID(item.getSiteUID());
-                measureDetail.setHospitalUID(item.getHospitalUID());
-                measureDetail.setInstitutionUID(item.getInstitutionUID());
-                measureDetail.setTenantUID(item.getTenantUID());
-                return measureDetail;
-            }).collect(Collectors.toList());
-            result = collect.get(0);
+                measureDetail.setSiteUID(currentUserAccount.getSiteUID());
+                measureDetail.setHospitalUID(currentUserAccount.getHospitalUID());
+                measureDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
+                measureDetail.setTenantUID(currentUserAccount.getTenantUID());
+            }
+
             List<SearchFilter> searchFilterList = new ArrayList<>();
             searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,result.getCertificateNo()));
             searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
@@ -680,7 +690,7 @@ public class MeasuringService {
                 result = detail;
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
             }else{
-                measuringCertificateDetailDao.save(collect);
+                measuringCertificateDetailDao.save(result);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
             }
             if(CollectionUtils.isEmpty(v2BlobObjects)){
