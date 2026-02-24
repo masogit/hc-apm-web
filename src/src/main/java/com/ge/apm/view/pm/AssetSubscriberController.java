@@ -202,7 +202,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
 //		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
-		orgTree = uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID());
+		orgTree = uaaService.getOrgFullTreeByTenantWithoutClinical(loginUser.getTenantUID());
 //		OrgInfo rootOrg = new OrgInfo();
 //		rootOrg.setId(-1);
 //		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
