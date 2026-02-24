@@ -33,7 +33,7 @@
                 <!-- 定义远程命令：用于在面板关闭时刷新 userList -->
                 <p:remoteCommand
                         name="refreshUserListRC"
-                        update="userList display"
+                        update="userList"
                         process="@this"
                         global="false" />
             </h:panelGroup>
@@ -66,7 +66,7 @@
                             <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetSubscriberController.orgTree}" selection="#{assetSubscriberController.selectedNode}" var="node" selectionMode="single">
-                                        <p:ajax process="@this" event="select" update="scriTab:AssetSubscribEditForm:selectedOrgName, scriTab:AssetSubscribEditForm:datalist, scriTab:AssetSubscribEditForm:clinicalDeptName scriTab:AssetSubscribEditForm:userList" listener="#{assetSubscriberController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="select" update="scriTab:AssetSubscribEditForm:selectedOrgName, scriTab:AssetSubscribEditForm:datalist, scriTab:AssetSubscribEditForm:clinicalDeptName" listener="#{assetSubscriberController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
 

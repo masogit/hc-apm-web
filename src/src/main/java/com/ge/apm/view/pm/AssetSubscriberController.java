@@ -201,16 +201,16 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		uaaService = WebUtil.getBean(UaaService.class);
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
-		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
-
-		OrgInfo rootOrg = new OrgInfo();
-		rootOrg.setId(-1);
-		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-		orgTree = new DefaultTreeNode("root",null,null);
-		TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
-		rootNode.getChildren().add(treeNode);
-		//rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
-		rootNode.setExpanded(true);
+//		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+		orgTree = uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID());
+//		OrgInfo rootOrg = new OrgInfo();
+//		rootOrg.setId(-1);
+//		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+//		orgTree = new DefaultTreeNode("root",null,null);
+//		TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+//		rootNode.getChildren().add(treeNode);
+//		//rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
+//		rootNode.setExpanded(true);
 
 	}
 
@@ -252,7 +252,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 
 		this.getQueryAssetsList();
-		selectUserName = null;
 	}
 
 
@@ -289,22 +288,22 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public void changeSubId(){
 		UserAccount userAccount =  userAccountRepository.getById(selected.getSubscribeUserId());
 		selectUserName = userAccount.getName();
-		String userOrg = userAccount.getUid();
+//		String userOrg = userAccount.getUid();
 		if (CollectionUtils.isNotEmpty(subscribeUserIds) && subscribeUserIds.size() > 1) {
 			List<UserAccount> userAccountList = userAccountRepository.getByIds(subscribeUserIds.stream().collect(Collectors.toSet()));
 			selectUserName = userAccountList.stream().map(UserAccount::getName).collect(Collectors.joining(","));
-			// 多选用户的情况下 取最高层级用户
-			Optional<UserAccount> highest =
-					userAccountList.stream()
-							.min(Comparator.comparing(
-									UserAccount::getOrgLevel,
-									Comparator.nullsLast(Integer::compareTo)
-							));
-			if (highest.isPresent()) {
-				userOrg = highest.get().getUid();
-			}
+//			// 多选用户的情况下 取最高层级用户
+//			Optional<UserAccount> highest =
+//					userAccountList.stream()
+//							.min(Comparator.comparing(
+//									UserAccount::getOrgLevel,
+//									Comparator.nullsLast(Integer::compareTo)
+//							));
+//			if (highest.isPresent()) {
+//				userOrg = highest.get().getUid();
+//			}
 		}
-		orgTree = createSiteOrgTree(userOrg);
+//		orgTree = createSiteOrgTree(userOrg);
 //		System.out.println(selectedOrg);
 //		selectedOrg=null;
 	}
