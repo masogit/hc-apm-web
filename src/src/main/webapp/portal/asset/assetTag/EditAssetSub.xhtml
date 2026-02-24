@@ -10,6 +10,33 @@
     <!--新增 标签关注/修改 标签关注-->
     <p:dialog class="acl1" id="AssetSubscribEditDlg" height="550" width="1300" widgetVar="AssetSubscribEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSubscriberController.CRUDActionName} #{msg.EquipmentFocus}">
         <h:form id="AssetSubscribEditForm">
+            <h:panelGroup>
+                <label class="label">#{msg.subscriber}</label>
+                <p:selectCheckboxMenu
+                        id = "userList"
+                        rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}"
+                        value="#{assetSubscriberController.subscribeUserIds}"
+                        label="#{assetSubscriberController.selectUserName}"
+                        filter="true"
+                        converter="javax.faces.Integer"
+                        filterMatchMode="contains"
+                        panelStyle="width:280px" style="width:15%;height: 40px"
+                        scrollHeight="260"
+                        onHide="refreshUserListRC()"
+                >
+                    <f:selectItems value="#{assetSubscriberController.tenantUserList}"
+                                   var="u"
+                                   itemLabel="#{u.name}"
+                                   itemValue="#{u.id}" />
+                    <p:ajax event="change" listener="#{assetSubscriberController.onSubscribeUsersChange}"/>
+                </p:selectCheckboxMenu>
+                <!-- 定义远程命令：用于在面板关闭时刷新 userList -->
+                <p:remoteCommand
+                        name="refreshUserListRC"
+                        update="userList"
+                        process="@this"
+                        global="false" />
+            </h:panelGroup>
             <h:panelGroup id="display" rendered="#{assetSubscriberController.selected != null}">
                 <p:fieldset legend="#{msg.SelectedEquipment}" rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Edit)}" >
                     <h:panelGroup>
@@ -66,33 +93,6 @@
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.subscriber}</label>
-                            <p:selectCheckboxMenu
-                                    id = "userList"
-                                    rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}"
-                                    value="#{assetSubscriberController.subscribeUserIds}"
-                                    label="#{assetSubscriberController.selectUserName}"
-                                    filter="true"
-                                    converter="javax.faces.Integer"
-                                    filterMatchMode="contains"
-                                    panelStyle="width:280px" style="width:50%;height: 40px"
-                                    scrollHeight="260"
-                                    onHide="refreshUserListRC()"
-                                    >
-                                <f:selectItems value="#{assetSubscriberController.getUserByOrgTree()}"
-                                               var="u"
-                                               itemLabel="#{u.name}"
-                                               itemValue="#{u.id}" />
-                                <p:ajax event="change" listener="#{assetSubscriberController.onSubscribeUsersChange}"/>
-                            </p:selectCheckboxMenu>
-                            <!-- 定义远程命令：用于在面板关闭时刷新 userList -->
-                            <p:remoteCommand
-                                    name="refreshUserListRC"
-                                    update="userList"
-                                    process="@this"
-                                    global="false" />
                         </h:panelGroup>
                 </p:panelGrid>
                     <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}"  legend="设备" id="assetList" style="margin-bottom:20px">

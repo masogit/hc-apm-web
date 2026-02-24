@@ -253,7 +253,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 		this.getQueryAssetsList();
 		selectUserName = null;
-		subscribeUserIds = new ArrayList<>();
 	}
 
 
@@ -289,6 +288,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public List<AssetInfo> assetList =null;
 	public void changeSubId(){
 		selectUserName = userAccountRepository.getById(selected.getSubscribeUserId()).getName();
+		if (CollectionUtils.isNotEmpty(subscribeUserIds) && subscribeUserIds.size() > 1) {
+			selectUserName = userAccountRepository.getByIds(subscribeUserIds.stream().collect(Collectors.toSet())).stream().map(UserAccount::getName).collect(Collectors.joining(","));
+		}
 //		orgTree=createSiteOrgTree(userAccountRepository.getById(selected.getSubscribeUserId()).getUid());
 //		System.out.println(selectedOrg);
 //		selectedOrg=null;
