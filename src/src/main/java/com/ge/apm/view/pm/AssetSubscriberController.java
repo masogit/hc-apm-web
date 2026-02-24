@@ -287,11 +287,24 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 	public List<AssetInfo> assetList =null;
 	public void changeSubId(){
-		selectUserName = userAccountRepository.getById(selected.getSubscribeUserId()).getName();
+		UserAccount userAccount =  userAccountRepository.getById(selected.getSubscribeUserId());
+		selectUserName = userAccount.getName();
+		String userOrg = userAccount.getUid();
 		if (CollectionUtils.isNotEmpty(subscribeUserIds) && subscribeUserIds.size() > 1) {
-			selectUserName = userAccountRepository.getByIds(subscribeUserIds.stream().collect(Collectors.toSet())).stream().map(UserAccount::getName).collect(Collectors.joining(","));
+			List<UserAccount> userAccountList = userAccountRepository.getByIds(subscribeUserIds.stream().collect(Collectors.toSet()));
+			selectUserName = userAccountList.stream().map(UserAccount::getName).collect(Collectors.joining(","));
+			// 多选用户的情况下 取最高层级用户
+			Optional<UserAccount> highest =
+					userAccountList.stream()
+							.min(Comparator.comparing(
+									UserAccount::getOrgLevel,
+									Comparator.nullsLast(Integer::compareTo)
+							));
+			if (highest.isPresent()) {
+				userOrg = highest.get().getUid();
+			}
 		}
-//		orgTree=createSiteOrgTree(userAccountRepository.getById(selected.getSubscribeUserId()).getUid());
+		orgTree = createSiteOrgTree(userOrg);
 //		System.out.println(selectedOrg);
 //		selectedOrg=null;
 	}
@@ -621,7 +634,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 
 	public TreeNode createSiteOrgTree(String userUid) {
-
 		List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(userUid);
 		TreeNode siteTree = buildTree(siteList);
 		expandedByOrgType(siteTree, 2);
