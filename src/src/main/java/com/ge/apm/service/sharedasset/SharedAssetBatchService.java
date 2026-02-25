@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.WebUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -146,11 +147,12 @@ public class SharedAssetBatchService {
         return sharedAssetReqDetail;
     }
 
-    public ResponseEntity<LinkedHashMap> batchLeaseAssets(String requestType, String clinicalDeptUID, List<AssetInfo> leaseAssets) {
+    public ResponseEntity<LinkedHashMap> batchLeaseAssets(String requestType, String clinicalDeptUID, List<AssetInfo> leaseAssets,Date applyTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         Map<String, Object> reqData = new HashMap<>();
         reqData.put("clinicalDeptUID", clinicalDeptUID);
         reqData.put("type", requestType);
-
+        reqData.put("applyTime", sdf.format(applyTime));
         List<Map<String, Object>> reqDetails = new LinkedList<>();
         Map<String, Object> reqDetail;
         for(AssetInfo assetInfo : leaseAssets) {
