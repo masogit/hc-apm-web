@@ -6,7 +6,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 
 -- YHAAO-27330 增加配置项，“质控管理筛选条件”【通用版/区域版】
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 11, null, '质控管理筛选条件', 'QualityControlManagementScreeningConditions', '质控管理筛选条件', 'f', 't', 7 , '[{"key":"通用版","value":"1"},{"key":"区域版","value":"2"}]' where not exists (select * from config_item where key = 'QualityControlManagementScreeningConditions');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 11, '1', '质控管理筛选条件', 'QualityControlManagementScreeningConditions', '质控管理筛选条件', 'f', 't', 7 , '[{"key":"通用版","value":"1"},{"key":"区域版","value":"2"}]' where not exists (select * from config_item where key = 'QualityControlManagementScreeningConditions');
 
 --YHAAO-27299  医院区域分类配置
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, null, '医院区域分类', 'HospitalAreaClassification', '医院区域分类', 'f', 't', 1 where not exists(select * from config_item where key = 'HospitalAreaClassification');
