@@ -10,3 +10,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 --YHAAO-27299  医院区域分类配置
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, null, '医院区域分类', 'HospitalAreaClassification', '医院区域分类', 'f', 't', 1 where not exists(select * from config_item where key = 'HospitalAreaClassification');
+
+
+-- YHAAO-27381
+update  shared_asset_req_detail  set charging_begin_time = charging_begin_time + '1 day' where id='2c9b85829c28ab57019c89216fd269c8' and charging_begin_time = '2026-01-14 15:37:55';
