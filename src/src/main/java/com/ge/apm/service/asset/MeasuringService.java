@@ -697,6 +697,7 @@ public class MeasuringService {
                 measureDetail.setHospitalUID(currentUserAccount.getHospitalUID());
                 measureDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
                 measureDetail.setTenantUID(currentUserAccount.getTenantUID());
+                result = measureDetail;
             }
 
             List<SearchFilter> searchFilterList = new ArrayList<>();
@@ -721,7 +722,9 @@ public class MeasuringService {
                 templateService.saveBlobObject(v2BlobObjects,result.getId());
             }
             // 更新设备计量日期
-            updateMeasuringDate(assetInfos.get(0));
+            if(CollectionUtils.isNotEmpty(assetInfos)){
+                updateMeasuringDate(assetInfos.get(0));
+            }
             SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(result,(PropertyFilter)(o,n,v)->!n.equals("assetInfo")));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         } catch (Exception e) {
@@ -797,6 +800,8 @@ public class MeasuringService {
             }else{
                 detail.setStatus(1);
             }
+        }else{
+            detail.setStatus(3);
         }
 
         try {
