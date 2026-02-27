@@ -684,6 +684,9 @@ public void treeSearchCondition(){
 
     public void matchAsset(String uid) {
         selectedMeasuringCertificateDetail = measuringCertificateDetailDao.findById(uid);
+        assetSearchForm = new BudgetAssetSearchForm();
+        assetInfoList=new ArrayList<>();
+
     }
 
 

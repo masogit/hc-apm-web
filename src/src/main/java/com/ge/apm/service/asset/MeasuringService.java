@@ -905,7 +905,7 @@ public class MeasuringService {
 
                     detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
                 }
-                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null) {
+                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null &&   !StringUtils.isEmpty( row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue() )  ) {
                     try {
                         detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
                     }catch (Exception ex){

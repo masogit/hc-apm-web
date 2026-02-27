@@ -151,7 +151,7 @@
                     </p:column>
 
                     <p:column width="110" rendered="#{measureAssetListController.matchType==2}" headerText="#{msg.Actions}" exportable="false">
-                        <p:commandButton  value="关联设备" process="@this"  actionListener="#{measureAssetListController.matchAsset(item.uid)}"  oncomplete="PF('AssetSelectDlg').show()" update="measuringTab:assetSelectForm"/>
+                        <p:commandButton  value="关联设备" process="@this"  actionListener="#{measureAssetListController.matchAsset(item.uid)}"  oncomplete="PF('AssetSelectDlg').show()" update="measuringTab:assetSelectForm  measuringTab:assetSearchForm"/>
                     </p:column>
 
                     <f:facet name="{Toolbar}">
