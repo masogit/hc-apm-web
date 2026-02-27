@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
@@ -92,12 +93,14 @@ public class MeasuringCertificateDetail implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Column(name = "check_date")
+    @DateTimeFormat("yyyy/MM/dd")
     private Date checkDate;
 
     //有效期至
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Column(name = "valid_date_to")
+    @DateTimeFormat("yyyy/MM/dd")
     private Date validDateTo;
 
     //检测单位
