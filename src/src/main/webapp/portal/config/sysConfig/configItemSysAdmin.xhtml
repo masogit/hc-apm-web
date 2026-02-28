@@ -175,6 +175,20 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableDeptSecondmentAdjustReturnTime'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('enableDeptSecondmentAdjustReturnTime').configItemValue == null}"/>
             </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('HospitalAreaClassification').name.concat('(').concat(systemConfigItemController.configItemMap.get('HospitalAreaClassification').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('HospitalAreaClassification').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('HospitalAreaClassification').validation}" pattern="#{systemConfigItemController.configItemMap.get('HospitalAreaClassification').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('HospitalAreaClassification'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('HospitalAreaClassification'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('HospitalAreaClassification').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 

@@ -62,6 +62,28 @@
         <where>${ew.sqlSegment}</where>
     </select>
 
+    <select id="selectMeasureUnpairedResult" resultMap="assetBean">
+        SELECT mcd.id uid,
+        mcd.asset_name as name,
+        mcd.certificate_no,
+
+        mcd.asset_model function_type,
+
+        mcd.asset_manufacturer  manufacture,
+        mcd.asset_sn   serial_num,
+        mcd.status,
+        mcd.type measuring_type,
+        mcd.check_company last_check_company,
+
+        mcd.valid_date_to next_metering_date,
+        mcd.check_date,
+        mcd.check_person,
+        mcd.department  department,
+        mcd.id as bo_uuid
+        FROM  measuring_certificate_detail mcd
+        <where>${ew.sqlSegment}</where>
+    </select>
+
     <select id="findAssetByMaintainConfigParentId" resultType="com.ge.apm.domain.AssetInfo">
         select ai.* from asset_info ai left join nurse_site_maintain_config_item nsmci on ai.uid = nsmci.asset_uid
         <where>${ew.sqlSegment}</where>

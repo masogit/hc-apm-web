@@ -259,7 +259,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     public void batchLeaseAssets() {
         if(leaseAssets != null && leaseAssets.size() > 0) {
             String clinicalDeptUID = leaseDeptList.stream().filter(dept -> leaseDeptName.equals(dept.getName())).map(dept -> dept.getUid()).findFirst().get();
-            ResponseEntity<LinkedHashMap> responseEntity = sharedAssetBatchService.batchLeaseAssets(requestType, clinicalDeptUID ,leaseAssets);
+            ResponseEntity<LinkedHashMap> responseEntity = sharedAssetBatchService.batchLeaseAssets(requestType, clinicalDeptUID ,leaseAssets,batchChargingBeginDate);
             Map responseBody = responseEntity.getBody();
             if(SERVICE_RESPONSE_STATUS_OK.equals(responseBody.get(SERVICE_RESPONSE_BIZ_CODE))) {
                 submittedLeaseAssets = leaseAssets;

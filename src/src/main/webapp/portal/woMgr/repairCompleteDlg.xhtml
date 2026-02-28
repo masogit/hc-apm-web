@@ -91,6 +91,17 @@
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(3).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" itemDisabled="#{!assetInfoEditController.hasScrappedAuthority()}"/>
                         </p:selectOneRadio>
                     </h:panelGroup>
+
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.intExtType}</label>
+                        <p:selectOneMenu value="#{workOrderMgrController.selectedWorkOrder.intExtType}" required="false" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType').subList(0,2)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+
                     <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').rendered}">
                         <label class="label">
                             #{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').label

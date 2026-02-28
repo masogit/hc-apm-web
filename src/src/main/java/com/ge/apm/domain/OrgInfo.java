@@ -139,6 +139,8 @@ public class OrgInfo implements Serializable, ChineseName {
 
     @Column(name = "contact_phone")
     private String contactPhone;
+    @Column(name = "hospital_level_classification")
+    private String  hospitalLevelClassification;
 
     @Transient
     private String assetType;
@@ -496,6 +498,14 @@ public class OrgInfo implements Serializable, ChineseName {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getHospitalLevelClassification() {
+        return hospitalLevelClassification;
+    }
+
+    public void setHospitalLevelClassification(String hospitalLevelClassification) {
+        this.hospitalLevelClassification = hospitalLevelClassification;
     }
 
     public OrgInfo(Integer id) {
