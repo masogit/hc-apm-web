@@ -195,6 +195,8 @@ public class SharedAssetStockService {
         Map<String, Object> reqDetail = asset.buildLeaseReqDetail();
         List reqDetailList = (List) reqData.get("details");
         reqDetailList.add(reqDetail);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        reqData.put("applyTime",sdf.format(chargingBeginTime));
 
         ResponseEntity<LinkedHashMap> borrowResponse = sharedAssetService.leaseAssets(reqData);
         return borrowResponse;

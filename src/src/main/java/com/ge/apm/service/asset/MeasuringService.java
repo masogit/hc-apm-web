@@ -32,7 +32,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.*;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
@@ -130,97 +130,109 @@ public class MeasuringService {
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
+        boolean failureFlag = false;
+
+
         AssetInfo tempAssetInfo = null;
         StringBuilder errorInfo = new StringBuilder();
         List<AssetInfo> tempAssetInfoList = null;
-
-        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getAssetSN())){
-            tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[设备序列号SN不能匹配到资产设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-                    flag = true;
-                }else{
-                    errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+        List<MeasuringCertificateDetail> mcdList = null;
+        if(measuringCertificateDetail.getCertificateNo() != null){
+            mcdList = measuringCertificateDetailDao.findByCertificateNoAndTenantUIDOrderByCheckDateDesc( measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+            if(mcdList != null && !mcdList.isEmpty()  ) {
+                MeasuringCertificateDetail measuringCertificateDetail1 = mcdList.get(0);
+                if(measuringCertificateDetail1.getAssetUID()!=null){
+                    if(!measuringCertificateDetail1.getAssetSN().equals(measuringCertificateDetail.getAssetSN())  && !measuringCertificateDetail1.getFinanceNo().equals(measuringCertificateDetail.getFinanceNo())  && !measuringCertificateDetail1.getQrCode().equals(measuringCertificateDetail.getQrCode()) ){
+                        failureFlag=true;
+                        errorInfo.append("[计量证书编号已绑定其他设备");
+                    }else{
+                        measuringCertificateDetail.setAssetUID(measuringCertificateDetail1.getAssetUID());
+                    }
                 }
             }
-        }
+            if(CollectionUtils.isEmpty(mcdList) ||   mcdList.get(0).getAssetUID()==null ){
+                if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getAssetSN())){
+                    tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+                    if(CollectionUtils.isNotEmpty(tempAssetInfoList)  && tempAssetInfoList.size()>1 ){
+                        errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        failureFlag=true;
+                    }
 
-        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getFinanceNo()) && !flag){
-            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[资产编号不能匹配到设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-                    flag = true;
-                }else{
-                    errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                }
+                if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getFinanceNo()) && (CollectionUtils.isEmpty(tempAssetInfoList) || tempAssetInfoList.size()>1   )){
+                    tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+                    if(CollectionUtils.isNotEmpty(tempAssetInfoList)  && tempAssetInfoList.size()>1 ){
+                        errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        failureFlag=true;
+                    }
+                }
+                // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
+                if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getQrCode())   && (CollectionUtils.isEmpty(tempAssetInfoList) || tempAssetInfoList.size()>1   )){
+                    tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
+                    if(CollectionUtils.isNotEmpty(tempAssetInfoList)  && tempAssetInfoList.size()>1 ){
+                        errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        failureFlag=true;
+                    }
+
                 }
             }
+
+
+
+        }else{
+            failureFlag=true;
+            errorInfo.append("[计量证书编号不能为空]");
         }
 
-        // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
-        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getQrCode()) && !flag){
-            tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[二维码不能匹配到设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-                    flag = true;
-                }else{
-                    errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
-                }
-            }
+
+        if( failureFlag  && (CollectionUtils.isEmpty(tempAssetInfoList)  ||  tempAssetInfoList.size()>1 )){
+            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
+            return measuringCertificateDetail;
         }
 
-        if(flag && tempAssetInfoList.size() == 1){
+        if( CollectionUtils.isNotEmpty(tempAssetInfoList) &&  tempAssetInfoList.size() == 1){
             tempAssetInfo = tempAssetInfoList.get(0);
         }
 
         if(tempAssetInfo != null){
-            List<MeasuringCertificateDetail> mcdList = null;
-            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
 
-            if(measuringCertificateDetail.getCertificateNo() != null){
-                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
-            }
-
-            if(mcdList == null || mcdList.isEmpty()){
-                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-            }
-            SystemEventAuditEnum eventAuditEnum = null;
-            //如果查询到具体的计量记录,做更新操作，否则新增计量记录
-            if(mcdList != null && !mcdList.isEmpty()) {
-                MeasuringCertificateDetail tempMcd = mcdList.get(0);
-                measuringCertificateDetail.setId(tempMcd.getId());
-                measuringCertificateDetail.setCreatedBy(tempMcd.getCreatedBy());
-                measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
-                measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
-                measuringCertificateDetail.setLastModifiedDate(new Date());
-                eventAuditEnum =SystemEventAuditEnum.MEASURE_IMPORT_UPLOAD;
-            } else {
-                measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
-                measuringCertificateDetail.setCreatedDate(new Date());
-                eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
-            }
-
+//            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
+//
+//            if(measuringCertificateDetail.getCertificateNo() != null){
+//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+//            }
+//
+//            if(mcdList == null || mcdList.isEmpty()){
+//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
+//            }
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
-            measuringCertificateDetailDao.save(measuringCertificateDetail);
-            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
-            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
             //目标设备的所有计量记录
             updateMeasuringDate( tempAssetInfo);
 
         }
 
-        if(!flag){
-            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
-            return measuringCertificateDetail;
-        }else{
-            return null;
+        SystemEventAuditEnum eventAuditEnum = null;
+        //如果查询到具体的计量记录,做更新操作，否则新增计量记录
+        if(mcdList != null && !mcdList.isEmpty()) {
+            MeasuringCertificateDetail tempMcd = mcdList.get(0);
+            measuringCertificateDetail.setId(tempMcd.getId());
+            measuringCertificateDetail.setCreatedBy(tempMcd.getCreatedBy());
+            measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
+            measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+            measuringCertificateDetail.setLastModifiedDate(new Date());
+            eventAuditEnum =SystemEventAuditEnum.MEASURE_IMPORT_UPLOAD;
+        } else {
+            measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            measuringCertificateDetail.setCreatedDate(new Date());
+            eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
         }
+        measuringCertificateDetailDao.save(measuringCertificateDetail);
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
+        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+
+        return null;
+
     }
     public void sendMq(AssetInfo assetInfo,UserAccount userAccount) {
         MqContext mqContext = new MqContext();
@@ -235,105 +247,126 @@ public class MeasuringService {
     }
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo_For_ShaoYiFu(MeasuringCertificateDetail measuringCertificateDetail) {
+
+
         boolean flag = false;
+        boolean failureFlag = false;
         AssetInfo tempAssetInfo = null;
         StringBuilder errorInfo = new StringBuilder();
         List<AssetInfo> tempAssetInfoList = null;
+        List<MeasuringCertificateDetail> mcdList = null;
+        if(measuringCertificateDetail.getCertificateNo() != null){
+            mcdList = measuringCertificateDetailDao.findByCertificateNoAndTenantUIDOrderByCheckDateDesc( measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+            if(mcdList != null && !mcdList.isEmpty()  ) {
+                MeasuringCertificateDetail measuringCertificateDetail1 = mcdList.get(0);
+                if(measuringCertificateDetail1.getAssetUID()!=null){
+                    if(!measuringCertificateDetail1.getAssetSN().equals(measuringCertificateDetail.getAssetSN())  && !measuringCertificateDetail1.getFinanceNo().equals(measuringCertificateDetail.getFinanceNo())  && !measuringCertificateDetail1.getQrCode().equals(measuringCertificateDetail.getQrCode()) ){
+                        failureFlag=true;
+                        errorInfo.append("[计量证书编号已绑定其他设备");
+                    }else{
+                        measuringCertificateDetail.setAssetUID(measuringCertificateDetail1.getAssetUID());
+                    }
+                }
+            }
+            if(CollectionUtils.isEmpty(mcdList) ||   mcdList.get(0).getAssetUID()==null ){
 
-        if(null != measuringCertificateDetail.getFinanceNo() && !"".equals(measuringCertificateDetail.getFinanceNo())){
-            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList.size() == 1){
-                flag = true;
-            } else {
-                //开始匹配sn号
-                tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
-                if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                    errorInfo.append("[资产编号不能匹配到设备]");
-                }else if(tempAssetInfoList.size() == 1){
-                    flag = true;
-                }else{
-                    errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                if(null != measuringCertificateDetail.getFinanceNo() && !"".equals(measuringCertificateDetail.getFinanceNo())){
+                    tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+                    if(tempAssetInfoList.size() == 1){
+                        flag = true;
+                    } else {
+                        //开始匹配sn号
+                        tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+                        if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+
+                        }else if(tempAssetInfoList.size() == 1){
+                            flag = true;
+                        }else{
+                            failureFlag=true;
+                            errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        }
+                    }
+                }
+                if(!flag && (null != measuringCertificateDetail.getAssetSN() && !"".equals(measuringCertificateDetail.getAssetSN()))){
+                    tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+                    if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+
+                    }else{
+                        if(tempAssetInfoList.size() == 1){
+                            flag = true;
+                        }else{
+                            failureFlag=true;
+                            errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        }
+                    }
+                }
+                // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
+                if(!flag && (null != measuringCertificateDetail.getQrCode() && !"".equals(measuringCertificateDetail.getQrCode()))){
+                    tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
+                    if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+
+                    }else{
+                        if(tempAssetInfoList.size() == 1){
+                            flag = true;
+                        }else{
+                            failureFlag=true;
+                            errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
+                        }
+                    }
+                }
+                else if ((null == measuringCertificateDetail.getFinanceNo() || "".equals(measuringCertificateDetail.getFinanceNo()))
+                        && (null == measuringCertificateDetail.getAssetSN() || "".equals(measuringCertificateDetail.getAssetSN()))
+                        && null == measuringCertificateDetail.getQrCode() || "".equals(measuringCertificateDetail.getQrCode())){
+                    errorInfo.append("[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]");
+                    failureFlag=true;
+                }
+
+                if(flag){
+                    if(tempAssetInfoList.size() == 1){
+                        tempAssetInfo = tempAssetInfoList.get(0);
+                    }
                 }
             }
-        }
-        if(!flag && (null != measuringCertificateDetail.getAssetSN() && !"".equals(measuringCertificateDetail.getAssetSN()))){
-            tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[设备序列号SN不能匹配到资产设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-                    errorInfo = new StringBuilder();
-                    flag = true;
-                }else{
-                    errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
-                }
-            }
-        }
-        // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
-        if(!flag && (null != measuringCertificateDetail.getQrCode() && !"".equals(measuringCertificateDetail.getQrCode()))){
-            tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo.append("[二维码不能匹配到资产设备]");
-            }else{
-                if(tempAssetInfoList.size() == 1){
-                    errorInfo = new StringBuilder();
-                    flag = true;
-                }else{
-                    errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
-                }
-            }
-        }
-        else if ((null == measuringCertificateDetail.getFinanceNo() || "".equals(measuringCertificateDetail.getFinanceNo()))
-                && (null == measuringCertificateDetail.getAssetSN() || "".equals(measuringCertificateDetail.getAssetSN()))
-                && null == measuringCertificateDetail.getQrCode() || "".equals(measuringCertificateDetail.getQrCode())){
-            errorInfo.append("[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]");
+        }else{
+            failureFlag=true;
+            errorInfo.append("[计量证书编号不能为空]");
         }
 
-        if(flag){
-            if(tempAssetInfoList.size() == 1){
-                tempAssetInfo = tempAssetInfoList.get(0);
-            }
+        if( failureFlag  && (CollectionUtils.isEmpty(tempAssetInfoList)  ||  tempAssetInfoList.size()>1 )){
+            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
+            return measuringCertificateDetail;
+        }
+
+        if( CollectionUtils.isNotEmpty(tempAssetInfoList) &&  tempAssetInfoList.size() == 1){
+            tempAssetInfo = tempAssetInfoList.get(0);
         }
 
         if(tempAssetInfo != null){
-            List<MeasuringCertificateDetail> mcdList = null;
-            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
-
-            if(measuringCertificateDetail.getCertificateNo() != null){
-                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
-            }
-
-            if(mcdList == null || mcdList.isEmpty()){
-                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-            }
-
-            //如果查询到具体的计量记录,做更新操作，否则新增计量记录
-            if(mcdList != null && !mcdList.isEmpty()) {
-                MeasuringCertificateDetail tempMcd = mcdList.get(0);
-                measuringCertificateDetail.setId(tempMcd.getId());
-                measuringCertificateDetail.setCreatedBy(tempMcd.getCreatedBy());
-                measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
-                measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
-                measuringCertificateDetail.setLastModifiedDate(new Date());
-            } else {
-                measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
-                measuringCertificateDetail.setCreatedDate(new Date());
-            }
-
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
-            measuringCertificateDetailDao.save(measuringCertificateDetail);
-
-            updateMeasuringDate(tempAssetInfo);
-
+            //目标设备的所有计量记录
+            updateMeasuringDate( tempAssetInfo);
 
         }
-
-        if(!flag){
-            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
-            return measuringCertificateDetail;
-        }else{
-            return null;
+        SystemEventAuditEnum eventAuditEnum = null;
+        //如果查询到具体的计量记录,做更新操作，否则新增计量记录
+        if(mcdList != null && !mcdList.isEmpty()) {
+            MeasuringCertificateDetail tempMcd = mcdList.get(0);
+            measuringCertificateDetail.setId(tempMcd.getId());
+            measuringCertificateDetail.setCreatedBy(tempMcd.getCreatedBy());
+            measuringCertificateDetail.setCreatedDate(tempMcd.getCreatedDate());
+            measuringCertificateDetail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+            measuringCertificateDetail.setLastModifiedDate(new Date());
+            eventAuditEnum =SystemEventAuditEnum.MEASURE_IMPORT_UPLOAD;
+        } else {
+            measuringCertificateDetail.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            measuringCertificateDetail.setCreatedDate(new Date());
+            eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
         }
+        measuringCertificateDetailDao.save(measuringCertificateDetail);
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
+        systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+
+        return null;
     }
 
     public void updateMeasuringDate( AssetInfo tempAssetInfo) {
@@ -631,31 +664,42 @@ public class MeasuringService {
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
             List<AssetInfo> assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
-            if(CollectionUtils.isEmpty(assetInfos)){
-                result.setCertificateNo(object.getString("certificateNo"));
-                result.setErrorInfo(assetSN + ",未匹配到设备");
-                result.setStatus(-1);
-                return result;
-            }
+//            if(CollectionUtils.isEmpty(assetInfos)){
+//                result.setCertificateNo(object.getString("certificateNo"));
+//                result.setErrorInfo(assetSN + ",未匹配到设备");
+//                result.setStatus(-1);
+//                return result;
+//            }
             if(assetInfos.size() > 1){
                 result.setCertificateNo(object.getString("certificateNo"));
                 result.setErrorInfo(assetSN + ",匹配到"+assetInfos.size() +"台设备");
                 result.setStatus(-1);
                 return result;
             }
-            List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
+            if(CollectionUtils.isNotEmpty(assetInfos)){
+                List<MeasuringCertificateDetail> collect = assetInfos.stream().map(item -> {
+                    MeasuringCertificateDetail measureDetail = new MeasuringCertificateDetail();
+                    setObject(measureDetail, object);
+                    measureDetail.setAssetUID(item.getUid());
+                    measureDetail.setAssetSN(item.getSerialNum());
+                    measureDetail.setQrCode(item.getQrCode());
+                    measureDetail.setSiteUID(item.getSiteUID());
+                    measureDetail.setHospitalUID(item.getHospitalUID());
+                    measureDetail.setInstitutionUID(item.getInstitutionUID());
+                    measureDetail.setTenantUID(item.getTenantUID());
+                    return measureDetail;
+                }).collect(Collectors.toList());
+                result = collect.get(0);
+            }else{
                 MeasuringCertificateDetail measureDetail = new MeasuringCertificateDetail();
                 setObject(measureDetail, object);
-                measureDetail.setAssetUID(item.getUid());
-                measureDetail.setAssetSN(item.getSerialNum());
-                measureDetail.setQrCode(item.getQrCode());
-                measureDetail.setSiteUID(item.getSiteUID());
-                measureDetail.setHospitalUID(item.getHospitalUID());
-                measureDetail.setInstitutionUID(item.getInstitutionUID());
-                measureDetail.setTenantUID(item.getTenantUID());
-                return measureDetail;
-            }).collect(Collectors.toList());
-            result = collect.get(0);
+                measureDetail.setSiteUID(currentUserAccount.getSiteUID());
+                measureDetail.setHospitalUID(currentUserAccount.getHospitalUID());
+                measureDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
+                measureDetail.setTenantUID(currentUserAccount.getTenantUID());
+                result = measureDetail;
+            }
+
             List<SearchFilter> searchFilterList = new ArrayList<>();
             searchFilterList.add(new SearchFilter("certificateNo", SearchFilter.Operator.EQ,result.getCertificateNo()));
             searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
@@ -668,7 +712,7 @@ public class MeasuringService {
                 result = detail;
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
             }else{
-                measuringCertificateDetailDao.save(collect);
+                measuringCertificateDetailDao.save(result);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_CREATE;
             }
             if(CollectionUtils.isEmpty(v2BlobObjects)){
@@ -678,7 +722,9 @@ public class MeasuringService {
                 templateService.saveBlobObject(v2BlobObjects,result.getId());
             }
             // 更新设备计量日期
-            updateMeasuringDate(assetInfos.get(0));
+            if(CollectionUtils.isNotEmpty(assetInfos)){
+                updateMeasuringDate(assetInfos.get(0));
+            }
             SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(result,(PropertyFilter)(o,n,v)->!n.equals("assetInfo")));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         } catch (Exception e) {
@@ -754,6 +800,8 @@ public class MeasuringService {
             }else{
                 detail.setStatus(1);
             }
+        }else{
+            detail.setStatus(3);
         }
 
         try {
@@ -806,8 +854,10 @@ public class MeasuringService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         sdf.setLenient(false);
         List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
-        HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
-            HSSFSheet sheet = workbook.getSheetAt(0);
+
+        Workbook workbook = WorkbookFactory.create(file.getInputstream());
+//        HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
+           Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null) {
                 return null;
             }
@@ -819,7 +869,7 @@ public class MeasuringService {
                 StringBuilder errorInfo = new StringBuilder();
 //                String errorInfo = "";
 
-                HSSFRow row = sheet.getRow(j);
+                Row row = sheet.getRow(j);
 
                 MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
                 detail.setTenantUID(selectedOrg.getTenantUID());
@@ -860,7 +910,7 @@ public class MeasuringService {
 
                     detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
                 }
-                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null) {
+                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null &&   !StringUtils.isEmpty( row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue() )  ) {
                     try {
                         detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
                     }catch (Exception ex){
@@ -990,6 +1040,147 @@ public class MeasuringService {
 
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
                 HSSFCell cell = row.getCell(j);
+                if (cell == null) {
+                    continue;
+                }
+                try {
+                    hasCertificationNo = HEADER_CERTIFICATION_NO.equals(cell.getStringCellValue()) ? true : hasCertificationNo;
+                    hasApplianceName = HEADER_APPLIANCE_NAME.equals(cell.getStringCellValue()) ? true : hasApplianceName;
+                    hasManufacture = HEADER_MANUFACTURE.equals(cell.getStringCellValue()) ? true : hasManufacture;
+                    hasModel = HEADER_MODEL.equals(cell.getStringCellValue()) ? true : hasModel;
+                    hasAssetSN = HEADER_ASSET_SN.equals(cell.getStringCellValue()) ? true : hasAssetSN;
+                    hasAssetNo = HEADER_ASSET_NO.equals(cell.getStringCellValue()) ? true : hasAssetNo;
+                    hasApplianceNo = HEADER_APPLIANCE_NO.equals(cell.getStringCellValue()) ? true : hasApplianceNo;
+                    hasVerificationConclusion = HEADER_VERIFICATION_CONCLUSION.equals(cell.getStringCellValue()) ? true : hasVerificationConclusion;
+                    hasVerificationDate = HEADER_VERIFICATION_DATE.equals(cell.getStringCellValue()) ? true : hasVerificationDate;
+                    hasExpireDate = HEADER_EXPIRE_DATE.equals(cell.getStringCellValue()) ? true : hasExpireDate;
+                    hasVerificationUnit = HEADER_VERIFICATION_UNIT.equals(cell.getStringCellValue()) ? true : hasVerificationUnit;
+                    hasVerifier = HEADER_VERIFIER.equals(cell.getStringCellValue()) ? true : hasVerifier;
+                    hasItem = HEADER_ITEM.equals(cell.getStringCellValue()) ? true : hasItem;
+                    hasCategory = HEADER_CATEGORY.equals(cell.getStringCellValue()) ? true : hasCategory;
+                    hasClinicalDept = HEADER_CLINICAL_DEPT.equals(cell.getStringCellValue()) ? true : hasClinicalDept;
+                    hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
+                    hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
+                    hasQrCode = HEADER_QR_CODE.equals(cell.getStringCellValue()) ? true : hasQrCode;
+                    switch (cell.getStringCellValue()) {
+                        case HEADER_CERTIFICATION_NO:
+                            hasCertificationNo = true;
+                            header.put("CERTIFICATION_NO_CELL", j);
+                            break;
+                        case HEADER_APPLIANCE_NAME:
+                            hasApplianceName = true;
+                            header.put("APPLIANCE_NAME_CELL", j);
+                            break;
+                        case HEADER_MANUFACTURE:
+                            hasManufacture = true;
+                            header.put("MANUFACTURE_CELL", j);
+                            break;
+                        case HEADER_MODEL:
+                            hasModel = true;
+                            header.put("MODEL_CELL", j);
+                            break;
+                        case HEADER_ASSET_SN:
+                            hasAssetSN = true;
+                            header.put("ASSET_SN_CELL", j);
+                            break;
+                        case HEADER_ASSET_NO:
+                            hasAssetNo = true;
+                            header.put("ASSET_NO_CELL", j);
+                            break;
+                        case HEADER_APPLIANCE_NO:
+                            hasApplianceNo = true;
+                            header.put("APPLIANCE_NO_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_CONCLUSION:
+                            hasVerificationConclusion = true;
+                            header.put("VERIFICATION_CONCLUSION_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_DATE:
+                            hasVerificationDate = true;
+                            header.put("VERIFICATION_DATE_CELL", j);
+                            break;
+                        case HEADER_EXPIRE_DATE:
+                            hasExpireDate = true;
+                            header.put("EXPIRE_DATE_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_UNIT:
+                            hasVerificationUnit = true;
+                            header.put("VERIFICATION_UNIT_CELL", j);
+                            break;
+                        case HEADER_VERIFIER:
+                            hasVerifier = true;
+                            header.put("VERIFIER_CELL", j);
+                            break;
+                        case HEADER_ITEM:
+                            hasItem = true;
+                            header.put("ITEM_CELL", j);
+                            break;
+                        case HEADER_CATEGORY:
+                            hasCategory = true;
+                            header.put("CATEGORY_CELL", j);
+                            break;
+                        case HEADER_CLINICAL_DEPT:
+                            hasClinicalDept = true;
+                            header.put("CLINICAL_DEPT_CELL", j);
+                            break;
+                        case HEADER_REMARK:
+                            hasRemark = true;
+                            header.put("REMARK_CELL", j);
+                            break;
+                        case HEADER_FILE_NO:
+                            hasFileNo = true;
+                            header.put("FILE_NO_CELL", j);
+                            break;
+                        case HEADER_QR_CODE:
+                            hasQrCode = true;
+                            header.put("QR_CODE_CELL", j);
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug(e.getMessage());
+                }
+            }
+            if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetSN && hasAssetNo
+                    && hasApplianceNo && hasVerificationConclusion && hasVerificationDate && hasExpireDate
+                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo) {
+                header.put("HEADER_ROW", i);
+                break;
+            }
+        }
+        return header;
+    }
+
+
+    private Map<String, Integer> findHeader(Sheet sheet) {
+        Map<String, Integer> header = new HashMap<>();
+        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) {
+                continue;
+            }
+            boolean hasCertificationNo = false;
+            boolean hasApplianceName = false;
+            boolean hasManufacture = false;
+            boolean hasModel = false;
+            boolean hasAssetSN = false;
+            boolean hasAssetNo = false;
+            boolean hasApplianceNo = false;
+            boolean hasVerificationConclusion = false;
+            boolean hasVerificationDate = false;
+            boolean hasExpireDate = false;
+            boolean hasVerificationUnit = false;
+            boolean hasVerifier = false;
+            boolean hasItem = false;
+            boolean hasCategory = false;
+            boolean hasClinicalDept = false;
+            boolean hasRemark = false;
+            boolean hasFileNo = false;
+            boolean hasQrCode = false;
+
+            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
+                Cell cell = row.getCell(j);
                 if (cell == null) {
                     continue;
                 }
