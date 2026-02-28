@@ -1820,7 +1820,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             if(!userContextService.hasAnyRole("AssetHead,AssetStaff")){
                 if (Strings.isNullOrEmpty(query)) {
-                    queryIndex = 8;
+                    if(userContextService.accessContainsFunctionMenu("MAINTAIN_ORDER_ACCEPT")){
+                        queryIndex = 8;
+                    }else{
+                        queryIndex = -1;
+                    }
                 } else {
                     queryIndex = Integer.valueOf(query);
                     searchList(queryIndex);
