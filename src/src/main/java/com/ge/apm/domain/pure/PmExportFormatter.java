@@ -80,7 +80,9 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
             map.put(ExportFields.FUNCTIONTYPE.getChinese(), this.getFunctionType());
-            map.put(ExportFields.ASSETGROUP.getChinese(),this.getFromI18(i18nAssetGroup,v2_pmOrder.getAssetInfo().getAssetGroup()));
+            if(v2_pmOrder.getAssetInfo().getAssetGroup()!=null){
+                map.put(ExportFields.ASSETGROUP.getChinese(),this.getFromI18(i18nAssetGroup,v2_pmOrder.getAssetInfo().getAssetGroup()));
+            }
 //            if("1".equals(this.getRuleLevel())){
 //                map.put(ExportFields.RUNLEVEL.getChinese(), "巡检");
 //            }else if("4".equals(this.getRuleLevel())){
