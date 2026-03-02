@@ -345,9 +345,6 @@ public class MeasuringService {
 
         if(tempAssetInfo != null){
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
-            //目标设备的所有计量记录
-            updateMeasuringDate( tempAssetInfo);
-
         }
         SystemEventAuditEnum eventAuditEnum = null;
         //如果查询到具体的计量记录,做更新操作，否则新增计量记录
@@ -365,6 +362,10 @@ public class MeasuringService {
             eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
         }
         measuringCertificateDetailDao.save(measuringCertificateDetail);
+        if (tempAssetInfo != null) {
+            //目标设备的所有计量记录
+            updateMeasuringDate( tempAssetInfo);
+        }
         SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
