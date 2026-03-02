@@ -68,6 +68,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static org.primefaces.component.inputnumber.InputNumber.PropertyKeys.type;
+
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -910,14 +912,32 @@ public class MeasuringService {
 
                     detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
                 }
-                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null &&   !StringUtils.isEmpty( row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue() )  ) {
+                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null ) {
+                    boolean hasValue = false;
                     try {
-                        detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                        CellType cellType = row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum();
+                        Cell expireDateCell = row.getCell(header.get("EXPIRE_DATE_CELL"));
+
+                        if (CellType.NUMERIC.equals(cellType) && org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(expireDateCell)) {
+                            hasValue = true;
+                        }
+
+                        else if (CellType.STRING.equals(cellType)) {
+                            String strVal = expireDateCell.getStringCellValue();
+                            if (!StringUtils.isEmpty(strVal)) {
+                                hasValue = true;
+                            }
+                        }
+                        if(hasValue){
+                            detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                        }
                     }catch (Exception ex){
                         errorInfo.append("[有效期至格式不对]");
                     }
+                    if(hasValue){
+                        detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
+                    }
 
-                    detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("VERIFICATION_UNIT_CELL")) != null){
                     detail.setCheckCompany(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
