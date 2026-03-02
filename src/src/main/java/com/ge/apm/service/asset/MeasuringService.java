@@ -197,21 +197,7 @@ public class MeasuringService {
         }
 
         if(tempAssetInfo != null){
-
-//            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
-//
-//            if(measuringCertificateDetail.getCertificateNo() != null){
-//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
-//            }
-//
-//            if(mcdList == null || mcdList.isEmpty()){
-//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-//            }
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
-
-            //目标设备的所有计量记录
-            updateMeasuringDate( tempAssetInfo);
-
         }
 
         SystemEventAuditEnum eventAuditEnum = null;
@@ -230,6 +216,10 @@ public class MeasuringService {
             eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
         }
         measuringCertificateDetailDao.save(measuringCertificateDetail);
+        if (tempAssetInfo != null) {
+            //目标设备的所有计量记录
+            updateMeasuringDate( tempAssetInfo);
+        }
         SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
