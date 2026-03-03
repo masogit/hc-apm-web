@@ -258,6 +258,7 @@ public class MeasuringService {
                         errorInfo.append("[计量证书编号已绑定其他设备");
                     }else{
                         measuringCertificateDetail.setAssetUID(measuringCertificateDetail1.getAssetUID());
+                        tempAssetInfo=assetInfoDao.findByUid(measuringCertificateDetail1.getAssetUID());
                     }
                 }
             }
