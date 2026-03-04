@@ -652,7 +652,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
     public String tenantMaxExecDate(){
 
         String tenantUID = loginUser.getTenantUID();
-
+         //    CREATE INDEX CONCURRENTLY idx_ds_tenant_time_all ON his_equipment_data_source (tenant_uid, exec_time DESC);
         Date  execDate=sourceDao.getTenantMaxExecDate(tenantUID);
         if (execDate!=null){
             String format = "yyyy-MM-dd";
