@@ -10,3 +10,9 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 -- YHAAO-27381
 update  shared_asset_req_detail  set charging_begin_time = charging_begin_time + '1 day' where id='2c9b85829c28ab57019c89216fd269c8' and charging_begin_time = '2026-01-14 15:37:55';
+
+
+
+--his 源数据匹配设备  job 创建索引
+CREATE INDEX CONCURRENTLY IF NOT exists  idx_ds_correct_order ON his_equipment_data_source (org_code, device_code, site_uid, exec_time DESC) WHERE is_matched IS NOT TRUE;
+
