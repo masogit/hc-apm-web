@@ -679,6 +679,7 @@ public void treeSearchCondition(){
         selectedMeasuringCertificateDetail.setDepartNum(selectAsset.getDepartNum());
         selectedMeasuringCertificateDetail.setFinanceNo(selectAsset.getFinancingNum());
         measuringCertificateDetailDao.save(selectedMeasuringCertificateDetail);
+        measuringService.updateMeasuringDate(selectAsset);
     }
 
 
