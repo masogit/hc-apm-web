@@ -55,7 +55,10 @@
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.locationName}" filterMatchMode="LIKE" sortBy="#{item.locationName}">
 			<h:outputText value="#{item.locationName}" />
 		</p:column>
-		
+		<p:column headerText="#{msg.assetOwnerName}" rendered="#{inventoryOrderDetailAssetInfoNoWorkOrderController.inventoryDisplayRepairOwner}">
+			<h:outputText value="#{item.assetOwnerName}" />
+		</p:column>
+
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalistNoWorkOrder" fileName="InventoryOrderDetailAssetInfo_export" />
