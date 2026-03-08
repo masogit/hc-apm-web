@@ -33,7 +33,7 @@ public interface NurseSiteMaintainConfigRepository extends GenericRepositoryUUID
 
 	@Transactional
 	@Modifying
-	@Query(value = "delete from nurse_site_maintain_config where id in ?1", nativeQuery = true)
+	@Query(value = "uptate nurse_site_maintain_config set deleted= true where id in ?1", nativeQuery = true)
 	public void deleteMaintainConfigData(Set<String> ids);
 
 	@Query(value="select o.* from nurse_site_maintain_config o where o.deleted = true and o.delete_result = false",nativeQuery=true)
