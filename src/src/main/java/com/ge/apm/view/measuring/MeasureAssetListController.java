@@ -286,6 +286,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     public void initMatchResult(int matchType) {
         this.matchType=matchType;
         searchFilters=new ArrayList<>();
+        this.selected=null;
 
     }
     @Override
@@ -418,11 +419,29 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<MeasuringCertificateDetail> getMeasuringResult(){
-        return measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+        List<MeasuringCertificateDetail>  list=new ArrayList<>();
+        if(matchType==1){
+            list= measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+
+        }else{
+            MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(this.selected.getBoUuid());
+            if(byId!=null){
+                list.add(byId);
+            }
+        }
+        return list;
     }
 
     public void onSelectMeasureAsset(){
-        measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+        if(matchType==1){
+            measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+        }else{
+            MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(this.selected.getBoUuid());
+            if(byId!=null){
+                measuringCertificateList=new ArrayList<>();
+                measuringCertificateList.add(byId);
+            }
+        }
     }
 
     public void uploadMeasuringFile(FileUploadEvent event) {
