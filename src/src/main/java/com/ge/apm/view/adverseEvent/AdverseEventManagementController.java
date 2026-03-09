@@ -55,9 +55,10 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class AdverseEventManagementController extends JpaCRUDController<AdverseEvents> {
+public class AdverseEventManagementController extends AdverseEventBaseController {
     private Logger log = Logger.getLogger(AdverseEventManagementController.class.getName());
     /*接口类*/
+    private AdverseEventsRepository adverseEventsRepository;
     private AssetInfoRepository assetInfoRepository;
     private OrgInfoRepository orgInfoRepository;
     private I18nMessageRepository i18nDao;
@@ -66,8 +67,6 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private UaaService uaaService;
     private CustomConfigService ccService;
     private WordReportExportService exportService;
-    private AdverseEventsRepository adverseEventsRepository;
-    private BlobFileService blobService;
     private AdverseEventServiceClient adverseEventServiceClient;
     private ConfigCacheService configCacheService;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
@@ -111,10 +110,8 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     private TreeNode deptOrgTree;
     @Getter@Setter
     private OrgInfo selectAdverseSite; //选定的所属院区
-    @Getter@Setter
-    private List<TempFileUtil> injuryPerformance;
-    @Getter@Setter
-    private List<TempFileUtil> mechanicalFailure;
+
+
     private AdverseEventsService adverseEventsService;
     private boolean renderedSearchForm = true;
 
@@ -146,6 +143,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
     @Override
     protected void init() {
         /*接口类*/
+        adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
@@ -156,8 +154,6 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         exportService = WebUtil.getBean(WordReportExportService.class);
-        adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
-        blobService = WebUtil.getBean(BlobFileService.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
@@ -464,10 +460,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         this.selected.setProductName(null);
     }
 
-    @Override
-    protected GenericRepository<AdverseEvents> getDAO() {
-        return adverseEventsRepository;
-    }
+
 
     public void tempSaveAdverseEventCreate(Integer status) throws RuntimeException {
         if (status == 0) {
@@ -478,7 +471,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         }
 
         Integer oldStatus = selected.getStatus();
-        processFile();
+        processFile(selected);
         selected.setStatus(status);
         selected.setDevicesClass(assetType);
 
@@ -524,28 +517,7 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         }
     }
 
-    private void processFile() {
-        if (!CollectionUtils.isEmpty(injuryPerformance)) {
-            List<AdverseEventsFile> harmPerformFile = CollectionUtils.isEmpty(selected.getHarmPerformFile())?new ArrayList<>():selected.getHarmPerformFile();
-            injuryPerformance.forEach(v -> {
-                AdverseEventsFile adverseEventsFile = saveTempFile(v);
-                if(adverseEventsFile != null){
-                    harmPerformFile.add(adverseEventsFile);
-                }
-            });
-            selected.setHarmPerformFile(harmPerformFile);
-        }
-        if (!CollectionUtils.isEmpty(mechanicalFailure)) {
-            List<AdverseEventsFile> deviceFaultPerformFile = CollectionUtils.isEmpty(selected.getDeviceFaultPerformFile())?new ArrayList<>():selected.getDeviceFaultPerformFile();
-            mechanicalFailure.forEach(v -> {
-                AdverseEventsFile adverseEventsFile = saveTempFile(v);
-                if(adverseEventsFile != null){
-                    deviceFaultPerformFile.add(adverseEventsFile);
-                }
-            });
-            selected.setDeviceFaultPerformFile(deviceFaultPerformFile);
-        }
-    }
+
 
     public void removeAdverseFile(){
         List<AdverseEventsFile> list = new ArrayList<>();
@@ -626,55 +598,11 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
         return canExport;
     }
 
-    public AdverseEventsFile saveTempFile(TempFileUtil tempFile) {
-        V2_BlobObject blobObject = blobService.uploadFile(tempFile.getInputStream(), tempFile.getFileName());
-        if(blobObject == null){
-            return null;
-        }
-        AdverseEventsFile file = new AdverseEventsFile();
-        file.setCreatedDate(new Date());
-        if(blobObject != null){
-            file.setObjectId(blobObject.getObjectStorageId());
-            file.setObjectName(blobObject.getObjectName());
-            file.setObjectType(blobObject.getObjectType());
-            file.setObjectSize(blobObject.getObjectSize());
-        }
-        return file;
-    }
 
-    public void tempInjuryPerformanceFileUpload(FileUploadEvent event) {
-        UploadedFile file = event.getFile();
-        injuryPerformance.add(TempFileUtil.builder()
-                .fileName(file.getFileName())
-                .contentType(file.getContentType())
-                .contents(file.getContents())
-                .build());
-    }
 
-    public void tempMechanicalFailureFileUpload(FileUploadEvent event) {
-        UploadedFile file = event.getFile();
-        mechanicalFailure.add(TempFileUtil.builder()
-                .fileName(file.getFileName())
-                .contentType(file.getContentType())
-                .contents(file.getContents())
-                .build());
-    }
 
-    public void removeTempHarmPerform(TempFileUtil file) {
-        injuryPerformance.remove(file);
-    }
 
-    public void removeTempDeviceFaultPerform(TempFileUtil file) {
-        mechanicalFailure.remove(file);
-    }
 
-    public void removeHarmPerformFile(AdverseEventsFile file) {
-        selected.getHarmPerformFile().remove(file);
-    }
-
-    public void removeDeviceFaultPerformFile(AdverseEventsFile file) {
-        selected.getDeviceFaultPerformFile().remove(file);
-    }
 
     public boolean getRenderedSearchForm() {
         return this.renderedSearchForm;
@@ -705,28 +633,12 @@ public class AdverseEventManagementController extends JpaCRUDController<AdverseE
 
     }
 
-    public void exportFile(TempFileUtil tempFileUtil) {
-        try {
-            InputStream inputStream = tempFileUtil.getInputStream();
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-            response.setHeader("Content-Disposition", "attachment;filename=" + tempFileUtil.getFileName());
-            StreamUtils.copy(inputStream, response.getOutputStream());
-            facesContext.responseComplete();
-            facesContext.renderResponse();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+
+    @Override
+    protected GenericRepository<AdverseEvents> getDAO() {
+        return adverseEventsRepository;
     }
 
-    public void exportFiled(AdverseEventsFile adverseEventsFile) throws IOException {
-        InputStream inputStream = blobService.getBlobObjectByStorageId(adverseEventsFile.getObjectId()).getStream();
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-        response.setHeader("Content-Disposition", "attachment;filename=" + adverseEventsFile.getObjectName());
-        StreamUtils.copy(inputStream, response.getOutputStream());
-        facesContext.responseComplete();
-        facesContext.renderResponse();
-    }
 
 }
