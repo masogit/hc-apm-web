@@ -189,6 +189,27 @@
         <if test="mainSub != null">
             AND t.main_sub = #{mainSub}
         </if>
+        <if test="ruleName != null">
+            AND t.rule_name = #{ruleName}
+        </if>
+        <if test="period != null">
+            AND t.period = #{period}
+        </if>
+        <if test="periodUnit != null">
+            AND t.period_unit = #{periodUnit}
+        </if>
+        <if test="creatorName != null">
+            AND t.creator_name = #{creatorName}
+        </if>
+        <if test="ownerName != null">
+            AND t.owner_name = #{ownerName}
+        </if>
+        <if test="currentStepName1 != null">
+            AND t.current_step_name = #{currentStepName1}
+        </if>
+        <if test="intExtType != null">
+            AND t.int_ext_type = #{intExtType}
+        </if>
               AND a.is_valid
               AND NOT a.is_deleted
               AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
