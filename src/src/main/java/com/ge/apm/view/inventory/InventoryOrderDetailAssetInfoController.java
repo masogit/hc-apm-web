@@ -61,6 +61,8 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	private Set<String> clinicalDeptOrgUidSet;
 	@Getter @Setter
 	private List<OrgInfo> clinicalDeptList;
+	@Getter @Setter
+	private Boolean inventoryDisplayRepairOwner = Boolean.FALSE;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -71,6 +73,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+		inventoryDisplayRepairOwner = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayRepairOwner")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
 		isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));

@@ -118,6 +118,10 @@ public class AssetPreviewController extends JpaCRUDController<AssetInfo> {
                             removeAssets.add(assetMap.get(e.getParentAssetId()));
                         }
                         removeAssets.addAll(removeChildAssets);
+                    } else if (e.getIsDeleted() || !e.getIsValid()) {
+                        removeAssets.add(e);
+                        List<AssetInfo> childAssets = parentAssetMap.get(e.getId());
+                        removeAssets.addAll(childAssets);
                     }
                     e.setRank(assetInfoMap.get(e.getId()).getRank());
                     e.setBranchIds(assetInfoMap.get(e.getId()).getBranchIds());

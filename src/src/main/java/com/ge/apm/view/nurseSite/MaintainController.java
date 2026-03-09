@@ -162,9 +162,9 @@ public class MaintainController implements ServerEventInterface{
 		if (ObjectUtil.isNotEmpty(selectedSite)) {
 			param.put("siteUid", selectedSite.getUid());
 		}
-		if (currentUser.isEnableAssetTypeGroup()) {
-			param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
-		}
+//		if (currentUser.isEnableAssetTypeGroup()) {
+//			param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+//		}
 		return nurseSiteMaintainService.searchMaintain(param);
 	}
 

@@ -68,6 +68,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static org.primefaces.component.inputnumber.InputNumber.PropertyKeys.type;
+
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -147,6 +149,7 @@ public class MeasuringService {
                         errorInfo.append("[计量证书编号已绑定其他设备");
                     }else{
                         measuringCertificateDetail.setAssetUID(measuringCertificateDetail1.getAssetUID());
+                        tempAssetInfo=assetInfoDao.findByUid(measuringCertificateDetail1.getAssetUID());
                     }
                 }
             }
@@ -195,21 +198,7 @@ public class MeasuringService {
         }
 
         if(tempAssetInfo != null){
-
-//            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
-//
-//            if(measuringCertificateDetail.getCertificateNo() != null){
-//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
-//            }
-//
-//            if(mcdList == null || mcdList.isEmpty()){
-//                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-//            }
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
-
-            //目标设备的所有计量记录
-            updateMeasuringDate( tempAssetInfo);
-
         }
 
         SystemEventAuditEnum eventAuditEnum = null;
@@ -228,6 +217,10 @@ public class MeasuringService {
             eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
         }
         measuringCertificateDetailDao.save(measuringCertificateDetail);
+        if (tempAssetInfo != null) {
+            //目标设备的所有计量记录
+            updateMeasuringDate( tempAssetInfo);
+        }
         SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
@@ -265,6 +258,7 @@ public class MeasuringService {
                         errorInfo.append("[计量证书编号已绑定其他设备");
                     }else{
                         measuringCertificateDetail.setAssetUID(measuringCertificateDetail1.getAssetUID());
+                        tempAssetInfo=assetInfoDao.findByUid(measuringCertificateDetail1.getAssetUID());
                     }
                 }
             }
@@ -343,9 +337,6 @@ public class MeasuringService {
 
         if(tempAssetInfo != null){
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
-            //目标设备的所有计量记录
-            updateMeasuringDate( tempAssetInfo);
-
         }
         SystemEventAuditEnum eventAuditEnum = null;
         //如果查询到具体的计量记录,做更新操作，否则新增计量记录
@@ -363,6 +354,10 @@ public class MeasuringService {
             eventAuditEnum = SystemEventAuditEnum.MEASURE_IMPORT_CREATE;
         }
         measuringCertificateDetailDao.save(measuringCertificateDetail);
+        if (tempAssetInfo != null) {
+            //目标设备的所有计量记录
+            updateMeasuringDate( tempAssetInfo);
+        }
         SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, measuringCertificateDetail.getId(), Boolean.TRUE, "","measuring", JSONArray.toJSONString(measuringCertificateDetail));
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
@@ -910,14 +905,32 @@ public class MeasuringService {
 
                     detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
                 }
-                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null &&   !StringUtils.isEmpty( row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue() )  ) {
+                if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null ) {
+                    boolean hasValue = false;
                     try {
-                        detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                        CellType cellType = row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum();
+                        Cell expireDateCell = row.getCell(header.get("EXPIRE_DATE_CELL"));
+
+                        if (CellType.NUMERIC.equals(cellType) && org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(expireDateCell)) {
+                            hasValue = true;
+                        }
+
+                        else if (CellType.STRING.equals(cellType)) {
+                            String strVal = expireDateCell.getStringCellValue();
+                            if (!StringUtils.isEmpty(strVal)) {
+                                hasValue = true;
+                            }
+                        }
+                        if(hasValue){
+                            detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                        }
                     }catch (Exception ex){
                         errorInfo.append("[有效期至格式不对]");
                     }
+                    if(hasValue){
+                        detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
+                    }
 
-                    detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("VERIFICATION_UNIT_CELL")) != null){
                     detail.setCheckCompany(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
