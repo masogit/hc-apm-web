@@ -116,6 +116,7 @@
                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 6)}" itemValue="#{fieldMsg.fieldValue('woSteps', 6)}" />
                         </p:selectOneMenu>
                     </f:facet>
+                    <h:outputText value="#{item.currentStepName}" style="display: none"/>
                     <p:graphicImage  width="165" height="38" name="#{workOrderMgrMvsController.getStepImg(item)}"/>
                 </p:column>
                 <!--当前处理步骤 for 全部-->
@@ -131,6 +132,7 @@
                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 9)}" itemValue="#{fieldMsg.fieldValue('woSteps', 9)}" />
                         </p:selectOneMenu>
                     </f:facet>
+                    <h:outputText value="#{item.currentStepName}" style="display: none"/>
                     <p:graphicImage  width="165" height="38" name="#{workOrderMgrMvsController.getStepImg(item)}"/>
                 </p:column>
                 <p:column width="90" headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}">

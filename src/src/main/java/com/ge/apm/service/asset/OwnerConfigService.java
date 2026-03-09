@@ -34,4 +34,7 @@ public class OwnerConfigService {
 
     }
 
+    public List<OwnerConfig> loadAssetTypeOwnerConfig(String clinicalDeptUID, String siteUID, String assetType) {
+        return ownerConfigDao.findByDeptUIDAndSiteUIDAndAssetType(clinicalDeptUID, siteUID, assetType);
+    }
 }

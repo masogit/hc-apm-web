@@ -163,13 +163,13 @@
                                          rowsPerPageTemplate="5,10,20,50">
                                 <p:ajax event="page" />
                                 <p:column width="40" id="checkBoxCol1">
-                                    <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.selectedAssetUidTable2[item.uid]}" class="selectCheckBox2">
-                                        <p:ajax event="change" listener="#{batchEditAssetClassificationController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)"/>
+                                    <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.selectedAssetUidTable2[item.uid]}" id="selectCheckBox2" class="selectCheckBox2">
+                                        <p:ajax event="change" listener="#{batchEditAssetClassificationController.updateSelctedAssetList2}" update="@(.selectCheckBoxHeader2)  :batchEditAssetClassificationForm:datalist1"/>
                                         <f:attribute name="assetObj" value="#{item}"/>
                                     </p:selectBooleanCheckbox>
                                     <f:facet name="header">
                                         <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.allSelected2}" id="selectCheckBoxHeader2" class="selectCheckBoxHeader2">
-                                            <p:ajax event="change" listener="#{batchEditAssetClassificationController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2)"/>
+                                            <p:ajax event="change" listener="#{batchEditAssetClassificationController.addAssetsOfCurrentPage2}" update="@(.selectCheckBox2) batchButton"/>
                                         </p:selectBooleanCheckbox>
                                     </f:facet>
                                 </p:column>
@@ -210,23 +210,27 @@
                                 </p:column>
 
                                 <p:column headerText="AI推荐分类Top1" >
-                                    <p:selectOneRadio id="category1" value="#{item.categoryRadio}"   >
+                                    <p:selectOneRadio id="category1" value="#{item.categoryRadio}"  rendered="#{not empty item.category1}"  >
                                         <f:selectItem itemLabel="#{item.category1}" itemValue="#{item.category1}"/>
                                         <p:ajax listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}" event="change" process="@this" update="datalist1"/>
                                     </p:selectOneRadio>
                                 </p:column>
                                 <p:column headerText="AI推荐分类Top2" >
-                                    <p:selectOneRadio id="category2" value="#{item.categoryRadio}"   >
+                                    <p:selectOneRadio id="category2" value="#{item.categoryRadio}"  rendered="#{not empty item.category2}" >
                                         <f:selectItem  itemLabel="#{item.category2}" itemValue="#{item.category2}"/>
                                         <p:ajax  listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}" event="change" process="@this" update="datalist1"/>
                                     </p:selectOneRadio>
                                 </p:column>
                                 <p:column headerText="AI推荐分类Top3" >
-                                    <p:selectOneRadio id="category3" value="#{item.categoryRadio}"   >
+                                    <p:selectOneRadio id="category3" value="#{item.categoryRadio}"   rendered="#{not empty item.category3}">
                                         <f:selectItem  itemLabel="#{item.category3}" itemValue="#{item.category3}"/>
                                         <p:ajax listener="#{batchEditAssetClassificationController.categoryRadioChange(item)}"  event="change" process="@this" update="datalist1"/>
                                     </p:selectOneRadio>
                                 </p:column>
+
+                                <f:facet name="{Toolbar}">
+                                    <p:commandButton id="batchButton" validateClient="false" immediate="true" disabled="#{empty batchEditAssetClassificationController.selectedAssetsed2}"  oncomplete="PF('batchAssetClassification32Dialog').show()"  icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="批量设置设备32分类" />
+                                </f:facet>
                             </p:dataTable>
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group ">
@@ -243,30 +247,67 @@
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                      action="details?faces-redirect=true"
                     />
+
+
                 </h:form>
 
             </div>
         </div>
 
         <script>
-            // $(function() {
-            //     if (PF('deptMenu')) {
-            //         PF('deptMenu').jq.off('click.selectCheckboxMenuFix'); // 防止重复绑定
-            //         PF('deptMenu').jq.find('.ui-chkbox-all').on('click.selectCheckboxMenuFix', function() {
-            //             setTimeout(() => PF('deptMenu').fireChangeEvent(), 10);
-            //         });
-            //     }
-            // });
-            $(function() {
-                // 监听 "Select All" 按钮点击
-                PF('deptMenu').jq.find('.ui-chkbox-all').on('click.selectCheckboxMenuFix', function() {
-                    // 延迟一点，等 UI 更新完成
-                    setTimeout(function() {
-                        // 手动触发 change 事件
-                        PF('deptMenu').fireChangeEvent();
-                    }, 10);
-                });
-            });
+
         </script>
+        <p:dialog id="batchAssetClassification32Dialog"
+                  widgetVar="batchAssetClassification32Dialog"
+                  modal="true" resizable="true" draggable="true"
+                  width="30%" height="200px" header="批量设置设备32分类">
+            <h:form id="batchAssetClassification32Dialogform">
+
+
+                <br/>
+                <p:selectOneRadio value="#{batchEditAssetClassificationController.batchAssetClassification32}">
+                    <f:selectItem itemLabel="批量设置成Top1" itemValue="1"/>
+                    <f:selectItem itemLabel="手动设置" itemValue="2"/>
+                    <p:ajax event="change"  update="batchAssetClassification32Dialogform:manualSelectPanel"/>
+                </p:selectOneRadio>
+
+                <h:panelGroup id="manualSelectPanel" >
+                    <h:panelGroup rendered="#{batchEditAssetClassificationController.batchAssetClassification32==2}">
+                        <p:selectOneMenu
+                                value="#{batchEditAssetClassificationController.selectedAssetClassification32}">
+                            <f:selectItem itemLabel="请选择" noSelectionOption="true" />
+                            <f:selectItems value="#{batchEditAssetClassificationController.assetClassification32All}"
+                                           var="cat"
+                                           itemLabel="#{cat}"
+                                           itemValue="#{cat}" />
+                            <p:ajax event="change"/>
+                        </p:selectOneMenu>
+                        <br/>
+                    </h:panelGroup>
+
+
+                </h:panelGroup>
+
+                <br/><br/><br/>
+                <h:panelGroup  >
+
+                    <p:commandButton
+                            actionListener="#{batchEditAssetClassificationController.saveBatchAssetClassification32}"
+                            value="#{msg.Save}"
+                            icon="ui-icon-check"
+                            process="@this" update=":batchEditAssetClassificationForm:datalist1  :batchAssetClassification32Dialogform"
+                            oncomplete="PF('batchAssetClassification32Dialog').hide()" />
+
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                     onclick="PF('batchAssetClassification32Dialog').hide(); return false;" />
+                </h:panelGroup>
+
+
+            </h:form>
+
+
+
+        </p:dialog>
+
     </ui:define>
 </ui:composition>

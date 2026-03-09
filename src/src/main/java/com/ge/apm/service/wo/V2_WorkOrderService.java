@@ -486,6 +486,7 @@ public class V2_WorkOrderService {
             formData.setTel(externalTempUser.getTel());
         }
         formData.setTravelTime(selectedWorkOrder.getTravelTime());
+        formData.setDiagnosticProcess(selectedWorkOrder.getDiagnosticProcess());
         normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {

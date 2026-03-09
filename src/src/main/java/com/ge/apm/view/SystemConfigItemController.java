@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.component.datatable.DataTable;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -41,6 +42,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -137,6 +139,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(16,"MVS院级工单");
         categoryMap.put(17,"IB报表链接");
         categoryMap.put(18,"列表字段配置");
+        categoryMap.put(19,"质控管理");
 
 
     }
@@ -257,7 +260,15 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
             }else if(category.equals("18")){
                 configItemList = configItemList.stream().filter(t -> t.getCategory().equals(18)).collect(Collectors.toList());
-                selectedConfigItemChange();
+                for(ConfigItem configItem : configItemList){
+                    List<FieldColumnDto> list = configItemMap.get(configItem.getKey()).getFieldColumnDtoList();
+
+                    Map<String, Boolean> map = list.stream().collect(Collectors.toMap(
+                            dto -> configItem.getKey() + "_" + dto.getField(),
+                            FieldColumnDto::getRendered
+                    ));
+                    fieldRenderedMap.putAll(map);
+                }
             }
             this.searchFilters = null;
         }  else {
@@ -271,9 +282,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     }
 
     public void selectedConfigItemChange(){
-        System.out.println(itemValue);
         List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
-        fieldRenderedMap = list.stream().collect(Collectors.toMap(FieldColumnDto::getField, FieldColumnDto::getRendered));
+        fieldRenderedMap = list.stream().collect(Collectors.toMap(
+                dto -> itemValue + "_" + dto.getField(),
+                FieldColumnDto::getRendered
+        ));
     }
 
 
@@ -324,7 +337,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         deleteConfig(configItemS);
     }
 
-        public void deleteConfig(ConfigItem configItem) {
+    public void deleteConfig(ConfigItem configItem) {
         if(this.selectSite != null){
             ConfigItemValue configItemValue = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), this.selectSite.getSiteUID());
             if (ObjectUtil.isNotEmpty(configItemValue)) {
@@ -351,7 +364,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
                 if (10 == configItem.getValueType()){
                     configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
-                    fieldRenderedMap = configItem.getFieldColumnDtoList().stream().collect(Collectors.toMap(FieldColumnDto::getField, FieldColumnDto::getRendered));
+                    fieldRenderedMap = new HashMap<>();
+                    for (FieldColumnDto dto : configItem.getFieldColumnDtoList()) {
+                        String key = configItem.getKey() + "_" + dto.getField();
+                        fieldRenderedMap.put(key, dto.getRendered());
+                    }
                 }
             }
             WebUtil.addErrorMessage("删除成功！");
@@ -695,7 +712,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         logger.info(event.toString());
         List<FieldColumnDto> list = configItemMap.get(itemValue).getFieldColumnDtoList();
         for (FieldColumnDto dto : list){
-            dto.setRendered(fieldRenderedMap.get(dto.getField()));
+            dto.setRendered(fieldRenderedMap.get(itemValue + "_" + dto.getField()));
         }
     }
 
@@ -705,7 +722,29 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         for (FieldColumnDto dto : list){
             if(field.equals(dto.getField())){
                 logger.info(dto.getRendered());
-                fieldRenderedMap.put(dto.getField(),dto.getRendered());
+                fieldRenderedMap.put(itemValue + "_"+ dto.getField(),dto.getRendered());
+            }
+        }
+    }
+
+    public void onItemRowReorderCommon(ReorderEvent event){
+        logger.info(event.toString());
+        logger.info(((DataTable)event.getSource()).getClientId());
+        String ty = ((DataTable)event.getSource()).getClientId();
+        ty = ty.replaceAll("configItemForm:tabView:", "");
+        List<FieldColumnDto> list = configItemMap.get(ty).getFieldColumnDtoList();
+        for (FieldColumnDto dto : list){
+            dto.setRendered(fieldRenderedMap.get(ty + "_" + dto.getField()));
+        }
+    }
+
+    public void columnSelectedChangeCommon(String field,String type){
+        logger.info(field);
+        List<FieldColumnDto> list = configItemMap.get(type).getFieldColumnDtoList();
+        for (FieldColumnDto dto : list){
+            if(field.equals(dto.getField())){
+                logger.info(dto.getRendered());
+                fieldRenderedMap.put(type + "_"+ dto.getField(),dto.getRendered());
             }
         }
     }

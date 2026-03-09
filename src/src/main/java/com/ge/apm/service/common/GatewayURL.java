@@ -96,6 +96,7 @@ public enum GatewayURL {
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    EXTERNAL_ASSET_OCR("/hcapmworkflowservice/api/apm/asset/probation/ocrCreated"),
     //supplier Api
     SUPPLIER_WX_CODE_IMAGE("/hcapmgateway/api/apm/weChat/wxaCodeImage"),
     SUPPLIER_WX_QRCODE_IMAGE("/hcapmgateway/api/apm/weChat/qrCodeImage"),
@@ -238,6 +239,8 @@ public enum GatewayURL {
     // site to site auto ack
     SITE_TO_SITE_AUTO_ACK("/hcapmworkflowservice/api/apm/siteToSiteAllocation/autoAck"),
     PLATE_RECOGNITION("/hcapmassetservice/api/apm/asset/assetinfos/plateRecognition/{objectId}"),
+    DIFY_CREATE_SHARE_MESSAGE("/hcapmgateway/api/apm/model/share"),
+    DIFY_GET_SHARE_MESSAGE("/hcapmgateway/api/apm/model/shareMessage"),
     ;
     private final String url;
 

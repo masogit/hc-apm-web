@@ -1,10 +1,7 @@
 
 package com.ge.apm.view.his;
 
-import com.ge.apm.dao.ExcelImportRecordRepository;
-import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
-import com.ge.apm.dao.HisEquipmentDataSourceRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.HisEquipmentDataSourceMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -14,16 +11,19 @@ import com.ge.apm.service.his.load.HisEquipmentDataSourceImportService;
 import com.ge.apm.service.his.load.HisEquipmentImportService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
@@ -40,9 +40,11 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author
@@ -70,6 +72,13 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 
     private String sfxmId;  //过滤His收费代码
     private String sfxmName;//过滤His收费名称
+
+
+
+    @Getter @Setter
+    private List<OrgInfo> execDeptList;
+    @Getter @Setter
+    private String filterExecDept;
     private List<HisAssetGroupAssetMatch> currentPagePmOrders;
 
     List<HisAssetGroupAssetMatch> startList = new ArrayList<>();
@@ -89,6 +98,13 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 
     private List<ExcelImportRecord> excelImportRecords;
 
+    private HisAdministrativeOfficesRepository hisAdministrativeOfficesRepository;
+
+    @Getter @Setter
+    private Set<String> execDeptOrgUidSet;
+    @Getter @Setter
+    private Long datalistSize;
+
     @Override
     protected void init() {
         sourceDao =  WebUtil.getBean(HisEquipmentDataSourceRepository.class);
@@ -101,6 +117,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         hisRequestParamsDto = new HisRequestParamsDto();
         hisEquipmentDataSourceImportService = WebUtil.getBean(HisEquipmentDataSourceImportService.class);
         excelImportRecordRepository = WebUtil.getBean(ExcelImportRecordRepository.class);
+        hisAdministrativeOfficesRepository = WebUtil.getBean(HisAdministrativeOfficesRepository.class);
 
         orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
         hisEquipmentDataSourceMapper = WebUtil.getBean(HisEquipmentDataSourceMapper.class);
@@ -108,7 +125,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         initExcelImportRecords();
         hisRequestParamsDto.setEndDate(new Date());
         hisRequestParamsDto.setStartDate(DateUtil.addMonth(new Date(), -3));
-
+        loadExecDeptList();
     }
 
     public void initExcelImportRecords() {
@@ -124,6 +141,50 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
     public void rebuildOrgTree(String tenantUid) {
         orgTree = uaaService.buildOrgTree(tenantUid, "", -1, -1);
         enableOrgTree = uaaService.buildEnableOrgTree(loginUser.getUid(), loginUser.getOrgInfoUID(), selectedOrg);
+    }
+
+    private void loadExecDeptList() {
+        OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
+
+        List<HisAdministrativeOffices> lists = hisAdministrativeOfficesRepository.findByTenantUid(loginUser.getTenantUID());
+        execDeptList = new ArrayList<>();
+        for (HisAdministrativeOffices list : lists) {
+            OrgInfo orgInfo = new OrgInfo();
+            orgInfo.setName(list.getHisKsname());
+            orgInfo.setUid(list.getHisKsid());
+            orgInfo.setSiteUID(list.getSiteUid());
+            execDeptList.add(orgInfo);
+        }
+        if (null != selectedOrg) {
+            execDeptList = execDeptList.stream().filter(item -> item.getSiteUID().equals(selectedOrg.getSiteUID())).collect(Collectors.toList());
+        }
+    }
+
+    public List<String> autoCompleteDeptName(String query) {
+        if (execDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.execDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterExecDept = (String) ((SelectEvent) event).getObject();
+        }
+        if (!Strings.isNullOrEmpty(filterExecDept) && !execDeptList.stream().anyMatch(item -> filterExecDept.equals(item.getName()))) {
+            filterExecDept = null;
+        }
+        if (filterExecDept != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.execDeptList.stream().filter(item -> item.getName().equals(filterExecDept)).collect(Collectors.toList());
+            execDeptOrgUidSet=orgInfosMatchingByName.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            execDeptOrgUidSet = Collections.emptySet();
+        }
     }
 
     @Override
@@ -156,6 +217,9 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         }
         if (hisRequestParamsDto.getEndDate() != null) {
             param.put("endDate",DateUtil.getDateAddOneDay(hisRequestParamsDto.getEndDate()));
+        }
+        if(CollectionUtils.isNotEmpty(execDeptOrgUidSet)){
+            param.put("execDept", execDeptOrgUidSet);
         }
 
         Sort sort = pageRequest.getSort();
@@ -198,9 +262,9 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 
 
         List<HisEquipmentDataSource> hisEquipmentDataSourceList = hisEquipmentDataSourceMapper.queryList(param);
-        Long count = hisEquipmentDataSourceMapper.selectListCount(param);
+        datalistSize = hisEquipmentDataSourceMapper.selectListCount(param);
 
-        return  new PageImpl<>(hisEquipmentDataSourceList, pageRequest, count);
+        return  new PageImpl<>(hisEquipmentDataSourceList, pageRequest, datalistSize);
 
     }
 
@@ -588,7 +652,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
     public String tenantMaxExecDate(){
 
         String tenantUID = loginUser.getTenantUID();
-
+         //    CREATE INDEX CONCURRENTLY idx_ds_tenant_time_all ON his_equipment_data_source (tenant_uid, exec_time DESC);
         Date  execDate=sourceDao.getTenantMaxExecDate(tenantUID);
         if (execDate!=null){
             String format = "yyyy-MM-dd";

@@ -130,9 +130,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "pat_tests")
     private String patTests;
 
+    @Column(name = "diagnostic_process")
+    private String  diagnosticProcess;
+
     @Column(name = "close_time")
     private Date closeTime;
-
 
     @Column(name = "status_start_time")
     private Date statusStartTime;
@@ -1133,5 +1135,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setTravelTime(Double travelTime) {
         this.travelTime = travelTime;
+    }
+
+    public String getDiagnosticProcess() {
+        return diagnosticProcess;
+    }
+
+    public void setDiagnosticProcess(String diagnosticProcess) {
+        this.diagnosticProcess = diagnosticProcess;
     }
 }

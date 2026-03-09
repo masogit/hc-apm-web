@@ -8,7 +8,7 @@
 
 <ui:composition>
     <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
-
+        <p:growl id="growl" showDetail="true" />
         <div id="aiButton" style="position: fixed; bottom: 90px; right: 0px; z-index: 9999;font-size: 20px">
             <button
                     style="background-color: white; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);border-radius: 100%;  width: 45px; height: 45px; padding:6px;"
@@ -59,6 +59,72 @@
 
 
         </p:dialog>
+        <p:dialog id="shareDialog" widgetVar="shareDialog"
+                   header="分享对话" modal="false"
+                  resizable="false" draggable="true" closable="true" fitViewport="true"
+                  width="800" style="z-index: 10000;"  maximizable="true"
+        >
+            <style>
+                .share_button{
+                    background-color: #1a73e8;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease;
+                    font-weight: 500;
+                    box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2);
+                }
+                .share_container{
+                    width: 100%;
+                    min-height: 300px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 24px;
+                    box-sizing: border-box;
+                    background-color: #f9fafb;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                }
+                .share_link{
+                    font-size: 16px;
+                    color: #1a73e8;
+                    text-decoration: none;
+                    word-break: break-all;
+                    padding: 12px 16px;
+                    background-color: #ffffff;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    width: 100%;
+                    max-width: 500px;
+                    text-align: center;
+                    font-family: 'Courier New', monospace;
+                    margin-bottom: 20px;
+                    transition: all 0.2s ease;
+                    cursor: pointer;
+                }
+            </style>
+            <div id="shareContainer"  class="share_container">
+
+                <div  class="link share_link"
+                     onclick="navigator.clipboard.writeText(this.textContent).then(() => alert('链接已复制！'))">
+                    https://www.qianwen.com/share/chat/42acf1487b6b4830b312362e20c1d2c2
+                </div>
+
+                <div class="action-buttons" style="width: 100%; max-width: 500px; text-align: center;">
+                    <button type="button" class="btn btn-copy share_button"
+                            onmouseover="this.style.backgroundColor='#0d62c9'"
+                            onmouseout="this.style.backgroundColor='#1a73e8'"
+                            onclick="navigator.clipboard.writeText(document.querySelector('#shareContainer .link').textContent).then(() => { alert('链接已复制到剪贴板！'); })">
+                        复制链接
+                    </button>
+                </div>
+
+            </div>
+        </p:dialog>
 
         <h:outputScript>
             function movePreloadedIframe() {
@@ -102,6 +168,9 @@
                     } else if (data.payload === 'hide') {
                         showGlobalLoading();
                     }
+                }else if(data.type === 'sharePage'){
+                    PF('shareDialog').show()
+                    document.querySelector('#shareContainer .link').textContent =window.location.origin+"/geapm/portal/share/shareDetails.xhtml?userShareId="+data.data.shareId
                 }
             });
         </h:outputScript>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="hisAdjustBusinessDialog"  widgetVar="hisAdjustBusinessDialog" modal="true" resizable="true" draggable="true" header="#{msg.selectAsset}" appendTo="@(body)" width="40%" showHeader="false">
+        <h:form id="selectAssetForm">
+            <p:fieldset legend="取消设备收费代码匹配时间" >
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">取消设备收费代码匹配起始时间</label>
+                        <p:calendar timeZone="GMT+8" label="取消设备收费代码匹配起始时间"
+                                    required="true"
+                                    pattern="yyyy/MM/dd"
+                                    value="#{hisAssetSfxmUnMatchController.hisAdjustBusinessJob.dataStartDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true"
+                                    navigator="true" mask="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">取消设备收费代码匹配结束时间</label>
+                        <p:calendar timeZone="GMT+8" label="取消设备收费代码匹配结束时间"
+                                    required="true"
+                                    pattern="yyyy/MM/dd"
+                                    value="#{hisAssetSfxmUnMatchController.hisAdjustBusinessJob.dataEndDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true"
+                                    navigator="true" mask="true"/>
+                    </h:panelGroup>
+
+                </p:panelGrid>
+            </p:fieldset>
+            <p:commandButton value="#{msg.Confirm}" icon="ui-icon-check" update="@(form) growl" actionListener="#{hisAssetSfxmUnMatchController.onSelectCurrent(hisAssetSfxmUnMatchController.hisAdjustBusinessJob.equipmentMatchId)}" oncomplete="handleSubmit(args, 'hisAdjustBusinessDialog');">
+                <p:confirm header="取消匹配设备" message="确定取消该条设备匹配吗?取消之后此设备将不再参与绩效计算,并且所选时间内数据会被清除,请慎重操作！！！" icon="ui-icon-warning"/>
+            </p:commandButton>
+            <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('hisAdjustBusinessDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+</html>

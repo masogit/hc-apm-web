@@ -4,21 +4,22 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.aop.SystemEventAuditAopAspect;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.MeasuringCertificateDetailRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.service.wo.WorkflowService;
+import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.preview.PreViewerBean;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
@@ -26,14 +27,17 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.wo.WorkOrderMgrController;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -41,6 +45,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
@@ -54,11 +59,14 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -105,6 +113,33 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private MeasuringService measuringService;
     private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
+    @Getter
+    private int matchType=1;
+
+    @Getter
+    @Setter
+    private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
+
+    @Getter  @Setter
+    private List<AssetInfo> assetInfoList ;
+
+
+    @Getter  @Setter
+    private TreeNode orgTreeSearch;
+    @Getter  @Setter
+    private TreeNode orgTree;
+
+    @Getter  @Setter
+    private OrgInfo org;
+    private OrgInfoRepository orgDao;
+    @Getter @Setter
+    private AssetInfo selectAsset;
+    private I18nMessageService i18nMessageService;
+    private MeasuringCertificateDetail selectedMeasuringCertificateDetail;
+
+    private SystemTemplateService systemTemplateService;
+
+    private StreamedContent excelFile;
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -132,6 +167,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         this.searchFilters = new ArrayList<>();
         totalMeasureExpireMonths();
         currentTenantInfo = ccService.getTenantByUid(UserContextService.getCurrentUserAccount().getTenantUID());
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+
+        org = orgDao.findById(currentUser.getOrgInfoId());
+
+        TreeNode treeNodeSearch = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(currentUser.getSiteUID(), null);
+        orgTreeSearch = initOrgTree(treeNodeSearch);
     }
 
     @Override
@@ -142,19 +185,105 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
-        Wrapper<AssetInfo> wrapper = convert();
-        Sort sort = pageRequest.getSort();
-        for (Sort.Order order : sort) {
-            Sort.Direction direction = order.getDirection();
-            String property = ZipUtil.camelToUnderline(order.getProperty());
-            String prefix = "check_date".equals(property) ? "mcd." : "ai.";
-            wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
+
+        if(matchType==1){
+            Wrapper<AssetInfo> wrapper = convert();
+            Sort sort = pageRequest.getSort();
+            for (Sort.Order order : sort) {
+                Sort.Direction direction = order.getDirection();
+                String property = ZipUtil.camelToUnderline(order.getProperty());
+                String prefix = "check_date".equals(property) ? "mcd." : "ai.";
+                wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
+            }
+            wrapper.orderBy("mcd.id");
+            currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
+        }else{
+            Wrapper<AssetInfo> wrapper1 = measureUnpairedResultConvert();
+            currentPageAssets = assetInfoMapper.selectMeasureUnpairedResult(pagination, wrapper1);
+
+            int i=1;
+            for (AssetInfo currentPageAsset : currentPageAssets) {
+                currentPageAsset.setId(i);
+                i++;
+            }
         }
-        wrapper.orderBy("mcd.id");
-        currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
+
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
     }
 
+    private Wrapper<AssetInfo> measureUnpairedResultConvert() {
+        Wrapper<AssetInfo> wrapper = new EntityWrapper<>();
+
+        if (!this.hasFilterOnField("siteUID")) {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+            wrapper.andNew();
+            wrapper.in("mcd.tenant_uid", orgUidList);
+            wrapper.or().in("mcd.institution_uid", orgUidList);
+            wrapper.or().in("mcd.hospital_uid", orgUidList);
+            wrapper.or().in("mcd.site_uid", orgUidList);
+
+        }
+
+        wrapper.isNull("mcd.asset_uid");
+
+
+        if(this.hasFilterOnField("name")){
+            String name = searchFilters.stream().filter(sf -> "name".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("name", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.like("mcd.asset_name", name);
+        }
+
+        if(this.hasFilterOnField("functionType")){
+            String functionType = searchFilters.stream().filter(sf -> "functionType".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("functionType", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.like("mcd.asset_model", functionType);
+        }
+        if(this.hasFilterOnField("manufacture")){
+            String manufacture = searchFilters.stream().filter(sf -> "manufacture".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("manufacture", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.like("mcd.asset_model", manufacture);
+        }
+        if(this.hasFilterOnField("serialNum")){
+            String serialNum = searchFilters.stream().filter(sf -> "serialNum".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("serialNum", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.like("mcd.asset_sn", serialNum);
+        }
+
+
+        if(this.hasFilterOnField("verificationConclusion")){
+            Integer verificationConclusion = Integer.valueOf(searchFilters.stream().filter(sf -> "verificationConclusion".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("verificationConclusion", SearchFilter.Operator.EQ, 0)).value.toString());
+            wrapper.eq("mcd.status", verificationConclusion);
+        }
+        if(this.hasFilterOnField("measuringItemCategory")){
+            Integer measuringItemCategory = Integer.valueOf(searchFilters.stream().filter(sf -> "measuringItemCategory".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, 0)).value.toString());
+            this.updateSearchFilter(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, measuringItemCategory, "1*"));
+        }
+
+        if(this.hasFilterOnField("checkDate")){
+            List<SearchFilter> checkDateFilters = searchFilters.stream().filter(sf -> "checkDate".equals(sf.fieldName)).collect(Collectors.toList());
+            WrapperSearchFilterUtils.convert(checkDateFilters, wrapper, "mcd");
+        }
+        if(this.hasFilterOnField("nextMeteringDate")){
+            List<SearchFilter> nextMeteringDateFilters = searchFilters.stream().filter(sf -> "nextMeteringDate".equals(sf.fieldName)).collect(Collectors.toList());
+            List<SearchFilter> validDateToFilters = ListUtil.newArrayList();
+            for (SearchFilter nextMeteringDateFilter : nextMeteringDateFilters) {
+                validDateToFilters.add(new SearchFilter("validDateTo", nextMeteringDateFilter.operator, nextMeteringDateFilter.value));
+            }
+            WrapperSearchFilterUtils.convert(validDateToFilters, wrapper, "mcd");
+        }
+        if(this.hasFilterOnField("meteringNO")){
+            String meteringNO = searchFilters.stream().filter(sf -> "meteringNO".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("meteringNO", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.like("mcd.certificate_no", meteringNO);
+        }
+        if(this.hasFilterOnField("checkPerson")){
+            String checkPerson = searchFilters.stream().filter(sf -> "checkPerson".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("checkPerson", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.like("mcd.check_person", checkPerson);
+        }
+        return wrapper;
+    }
+
+    public void initMatchResult(int matchType) {
+        this.matchType=matchType;
+        searchFilters=new ArrayList<>();
+
+    }
     @Override
     public void onFilter(FilterEvent event) {
         super.onFilter(event);
@@ -341,12 +470,12 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
-        OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
-        if (deptOrg.getOrgType() == 4) {
-            filterOrg = deptOrg;
-        } else {
-            filterOrg = null;
-        }
+        filterOrg = (OrgInfo) selectedNode.getData();
+//        if (deptOrg.getOrgType() == 4) {
+//            filterOrg = deptOrg;
+//        } else {
+//            filterOrg = null;
+//        }
     }
 
     public void onTabChange(TabChangeEvent event){
@@ -443,12 +572,162 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         measuringCertificateDetailDao.delete(boUuid);
         blobService.deleteBlobFileByBoUuid(boUuid);
         WebUtil.addSuccessMessage("删除成功");
-        AssetInfo assetInfo = dao.findByUid(uid);
-        measuringService.updateMeasuringDate(assetInfo);
+        if(matchType==1){
+            AssetInfo assetInfo = dao.findByUid(uid);
+            measuringService.updateMeasuringDate(assetInfo);
+        }
         this.selected = null;
         SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(currentUser, SystemEventAuditEnum.MEASURE_DELETE, boUuid, Boolean.TRUE, "","measuring", "");
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
+    }
+
+
+
+    public void searchAsset(){
+        if(StrUtil.isEmpty(assetSearchForm.getApplicationDeptId())){
+            WebUtil.addErrorMessage("清输入申请科室！");
+            return;
+        }
+        assetInfoList =queryAssetByCondition(assetSearchForm);
+    }
+
+    public void resetAssetSearch(){
+        assetSearchForm = new BudgetAssetSearchForm();
+    }
+
+    public void onSearchTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        assetSearchForm.setDept(orgInfo);
+        assetSearchForm.setApplicationDeptId(orgInfo.getUid());
+        assetSearchForm.setDeptName(orgInfo.getName());
+    }
+
+
+    public List<AssetInfo> queryAssetByCondition( BudgetAssetSearchForm assetSearchForm) {
+
+        List<AssetInfo> assetInfos = new ArrayList<>();
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
+        if (StrUtil.isNotEmpty(assetSearchForm.getApplicationDeptId())) {
+            filters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, assetSearchForm.getApplicationDeptId()));
+        }
+        if (StrUtil.isNotEmpty(assetSearchForm.getAssetName())) {
+            filters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetName()));
+        }
+        if (StrUtil.isNotEmpty(assetSearchForm.getAssetBrand())) {
+            filters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, assetSearchForm.getAssetBrand()));
+        }
+        if (StrUtil.isNotEmpty(assetSearchForm.getAssetModel())) {
+            filters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, assetSearchForm.getAssetModel()));
+        }
+        if (StrUtil.isNotEmpty(assetSearchForm.getSerialNum())) {
+            filters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, assetSearchForm.getSerialNum()));
+        }
+        if (StrUtil.isNotEmpty(assetSearchForm.getFinancingNum())) {
+            filters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, assetSearchForm.getFinancingNum()));
+        }
+        assetInfos = dao.findBySearchFilter(filters);
+        return assetInfos;
+    }
+
+
+
+public void treeSearchCondition(){
+    TreeNode treeNodeEdit = null;
+    if(StrUtil.isEmpty(assetSearchForm.getDeptName())){
+        treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4);
+    }else{
+        treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4, assetSearchForm.getDeptName());
+    }
+    orgTree = initOrgTree(treeNodeEdit);
+}
+    public TreeNode initOrgTree(TreeNode treeNode) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        } else {
+            // 用户在科室级别时, 可选择所在科室
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(org.getOrgType() == 4);
+            node.setRowKey("org_" + org.getId());
+            rootNode.getChildren().add(node);
+        }
+        rootNode.setExpanded(true);
+        return orgTree;
+    }
+
+    public void saveSelectedAsset(){
+        if(selectAsset == null){
+            WebUtil.addErrorMessage("请选择设备！");
+            return;
+        }
+        if(selectedMeasuringCertificateDetail==null){
+            WebUtil.addErrorMessage("计量数据不存在！");
+            return;
+        }
+        selectedMeasuringCertificateDetail.setAssetUID(selectAsset.getUid());
+        selectedMeasuringCertificateDetail.setQrCode(selectAsset.getQrCode());
+        selectedMeasuringCertificateDetail.setAssetSN(selectAsset.getSerialNum());
+        selectedMeasuringCertificateDetail.setDepartNum(selectAsset.getDepartNum());
+        selectedMeasuringCertificateDetail.setFinanceNo(selectAsset.getFinancingNum());
+        measuringCertificateDetailDao.save(selectedMeasuringCertificateDetail);
+        measuringService.updateMeasuringDate(selectAsset);
+    }
+
+
+    public void matchAsset(String uid) {
+        selectedMeasuringCertificateDetail = measuringCertificateDetailDao.findById(uid);
+        assetSearchForm = new BudgetAssetSearchForm();
+        assetInfoList=new ArrayList<>();
+
+    }
+
+
+    public void exportExcel()  {
+        try {
+            Set<String> uids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
+
+            if(CollectionUtils.isEmpty(uids)){
+                WebUtil.addWarnMessage("请选择数据");
+                return;
+            }
+            byte[] stream =systemTemplateService.getTemplateFileByte(SystemTemplateEnum.MEASURING_RESULT_EXPORT,currentUser);
+
+            List<SearchFilter> filters = new ArrayList<>();
+            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, uids));
+            List<MeasuringCertificateDetail> list = measuringCertificateDetailDao.findBySearchFilter(filters);
+            List<I18nMessage> messages = i18nMessageService.getByMsgType("measuringStatus");
+
+            Map<String, String> measuringStatusMap  = messages.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValueZh, (value1, value2) -> value1));
+
+            list.forEach(item->item.setStatusName(measuringStatusMap.get(item.getStatus().toString())));
+
+            byte[] bytes = EasyExcelExportUtil.exportExcel(stream, list, new HashMap<>());
+
+            excelFile = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "application/vnd.ms-excel", "无台账计量数据.xlsx");
+
+
+        }catch (Exception e){
+            logger.error("导出无台账计量数据异常 e:",e);
+        }
+
+    }
+
+
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(StreamedContent excelFile) {
+        this.excelFile = excelFile;
     }
 
 }

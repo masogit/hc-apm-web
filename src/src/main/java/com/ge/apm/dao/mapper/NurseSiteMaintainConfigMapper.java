@@ -15,4 +15,7 @@ public interface NurseSiteMaintainConfigMapper extends BaseMapper<NurseSiteMaint
     List<NurseSiteMaintainConfig> findList(Pagination pagination, @Param("ew") Wrapper<NurseSiteMaintainConfig> wrapper);
 
     List<NurseSiteMaintainConfig> searchMaintainConfig(Map<String, Object> param);
+
+
+    List<NurseSiteMaintainConfig> selectByAssetUid(@Param("assetUid") String assetUid);
 }

@@ -125,7 +125,8 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
             logger.info("Invoke PmOrderAction "+actionName+" has finished "+responseMap.get("data"));
             return (String) responseMap.get("bizStatusCode");
         } else {
-            return null;
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
         }
     }
 

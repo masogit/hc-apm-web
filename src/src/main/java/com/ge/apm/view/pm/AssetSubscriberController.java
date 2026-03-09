@@ -9,9 +9,10 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
@@ -20,8 +21,6 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.context.LocaleHolder;
-import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -29,9 +28,11 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collector;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -84,6 +85,45 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private TreeNode selectedNode;
 	private List<OrgInfo> clinicalDeptList;
 
+	// 维修事件（紧急程度）列表页筛选：多选 1/2/3/4（不改动实体类）
+	@Getter
+	@Setter
+	private List<String> repairEventFilter = new ArrayList<>();
+
+	@Getter
+	@Setter
+	private List<AssetInfo> selectAssetInfos;
+
+
+	@Getter
+	@Setter
+	private Boolean allSelected1 = Boolean.FALSE;
+	@Getter
+	@Setter
+	private Boolean allSelected2 = Boolean.FALSE;
+	@Getter
+	@Setter
+	private Map<String, Boolean> selectedAssetUidTable1;
+	@Getter
+	@Setter
+	private Map<String, Boolean> selectedAssetUidTable2;
+	@Getter
+	@Setter
+	private Set<AssetInfo> selectedAssetsed1;
+	@Getter
+	@Setter
+	private Set<AssetInfo> selectedAssetsed2;
+	@Getter
+	@Setter
+	private Set<AssetInfo> selectAsset;
+	@Getter @Setter
+	private List<Integer> subscribeUserIds = new ArrayList<>();
+	@Getter @Setter
+	private String selectUserName;
+	@Getter @Setter
+	private MessageSubscriber batch = new MessageSubscriber();
+
+
 	@Override
 	protected void init() {
 		this.selectedMap = new HashMap();
@@ -94,11 +134,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-		targetAssets = new ArrayList<>();
+//		targetAssets = new ArrayList<>();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 		tenantUserList = tenantUserList.stream().distinct().collect(toList());
-		 tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
+		tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
 		tenantUserList.sort(new PinYinComparatorByName());
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoDao.findByUid(currentUser.getSiteUID()).getOrgType();
@@ -114,6 +154,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				queryAsset1.setSiteUID(currentUser.getSiteUID());
 			}
 		}
+		selectedAssetUidTable1=new HashMap<>();
+		selectedAssetUidTable2=new HashMap<>();
+		selectedAssetsed1=new HashSet<>();
+		selectedAssetsed2=new HashSet<>();
+		selectAsset=new HashSet<>();
 		initAssets();
         initOrgTree();
 	}
@@ -138,30 +183,42 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 	public void getQueryAssetsList() {
 		if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
-			sourceAssets = assetTagService.getAssetList(queryAsset1);
+			List<AssetInfo> queryList = assetTagService.getAssetList(queryAsset1);
+			selectAssetInfos=new ArrayList<>(queryList);
+			if(CollectionUtils.isNotEmpty(selectAsset)){
+				selectAssetInfos.removeAll(new ArrayList<>(selectAsset));
 
-			sourceAssets = new ArrayList(sourceAssets);
-			sourceAssets.removeAll(targetAssets);
+			}
+//			sourceAssets = new ArrayList(sourceAssets);
+//			sourceAssets.removeAll(selectAsset);
 		}else{
-			sourceAssets = new ArrayList<AssetInfo>();
+//			sourceAssets = new ArrayList<AssetInfo>();
+			selectAssetInfos=new ArrayList<>();
 		}
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+//		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
 	}
 	public void initOrgTree() {
 		uaaService = WebUtil.getBean(UaaService.class);
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
-		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+//		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+		orgTree = uaaService.getOrgFullTreeByTenantWithoutClinical(loginUser.getTenantUID());
+//		OrgInfo rootOrg = new OrgInfo();
+//		rootOrg.setId(-1);
+//		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+//		orgTree = new DefaultTreeNode("root",null,null);
+//		TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+//		rootNode.getChildren().add(treeNode);
+//		//rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
+//		rootNode.setExpanded(true);
 
-		OrgInfo rootOrg = new OrgInfo();
-		rootOrg.setId(-1);
-		rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-		orgTree = new DefaultTreeNode("root",null,null);
-		TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
-		rootNode.getChildren().add(treeNode);
-		//rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
-		rootNode.setExpanded(true);
+	}
 
+	public List<UserAccount> getUserByOrgTree() {
+		if (null != selectedOrg) {
+			return uaaService.getUsersByDeptUid(selectedOrg.getUid());
+		}
+		return new ArrayList<>();
 	}
 
 	public String getSelectedAssetName(){
@@ -195,7 +252,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 
 		this.getQueryAssetsList();
-
 	}
 
 
@@ -230,25 +286,40 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 	public List<AssetInfo> assetList =null;
 	public void changeSubId(){
-		//assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
-		orgTree=createSiteOrgTree(userAccountRepository.getById(selected.getSubscribeUserId()).getUid());
-		System.out.println(selectedOrg);
-		selectedOrg=null;
-
-		//addFilter();
+		UserAccount userAccount =  userAccountRepository.getById(selected.getSubscribeUserId());
+		selectUserName = userAccount.getName();
+//		String userOrg = userAccount.getUid();
+		if (CollectionUtils.isNotEmpty(subscribeUserIds) && subscribeUserIds.size() > 1) {
+			List<UserAccount> userAccountList = userAccountRepository.getByIds(subscribeUserIds.stream().collect(Collectors.toSet()));
+			selectUserName = userAccountList.stream().map(UserAccount::getName).collect(Collectors.joining(","));
+//			// 多选用户的情况下 取最高层级用户
+//			Optional<UserAccount> highest =
+//					userAccountList.stream()
+//							.min(Comparator.comparing(
+//									UserAccount::getOrgLevel,
+//									Comparator.nullsLast(Integer::compareTo)
+//							));
+//			if (highest.isPresent()) {
+//				userOrg = highest.get().getUid();
+//			}
+		}
+//		orgTree = createSiteOrgTree(userOrg);
+//		System.out.println(selectedOrg);
+//		selectedOrg=null;
 	}
 
 	public void onItemSelected() {
 		isSelectedCurrentPage = !delMsgList.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
 	}
 	public void initAssets() {
-		sourceAssets = new ArrayList<>();
-		targetAssets.forEach((item) -> {
-			if (sourceAssets.contains(item)) {
-				sourceAssets.remove(item);
-			}
-		});
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+//		sourceAssets = new ArrayList<>();
+//		targetAssets.forEach((item) -> {
+//			if (sourceAssets.contains(item)) {
+//				sourceAssets.remove(item);
+//			}
+//		});
+//		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+		selectAssetInfos=new ArrayList<>();
 	}
 	public void onSelectAllOfPage() {
 		for(MessageSubscriber msgsbu:delMsgList){
@@ -291,14 +362,17 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
 		this.selected.setSubscribeUserId(currentUser.getId());
-		targetAssets = new ArrayList<AssetInfo>();
-		sourceAssets =new ArrayList<AssetInfo>();
-		availableAssets =new DualListModel<AssetInfo>();
+//		targetAssets = new ArrayList<AssetInfo>();
+//		sourceAssets =new ArrayList<AssetInfo>();
+//		availableAssets =new DualListModel<AssetInfo>();
+		selectAssetInfos=new ArrayList<>();
 		level0=true;
 		level1=true;
 		level2=true;
 		isReceiveTimeoutMsg=true;
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
+		selectUserName = null;
+		subscribeUserIds = new ArrayList<>();
 	}
 	@Override
 	protected Page<MessageSubscriber> loadData(PageRequest pageRequest) {
@@ -317,16 +391,40 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			searchFilters.add(new SearchFilter("subscriberUser.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
 		}
 
-		if(searchFilters.size() <= 0){
-			result=dao.findAll(pageRequest);
-			delMsgList = result.getContent();
-			return result;
-		}else{
-			result= dao.findBySearchFilter(searchFilters, pageRequest);
-			delMsgList = result.getContent();
-			return result;
+		boolean hasRepairEventFilter = (repairEventFilter != null && !repairEventFilter.isEmpty());
+
+		if(hasRepairEventFilter) {
+			repairEventFilter.forEach(v -> {
+				switch (v) {
+					case "1":
+						searchFilters.add(new SearchFilter("level0", SearchFilter.Operator.EQ, true, "1*5+"));
+						break;
+					case "2":
+						searchFilters.add(new SearchFilter("level1", SearchFilter.Operator.EQ, true, "1*5+"));
+						break;
+					case "3":
+						searchFilters.add(new SearchFilter("level2", SearchFilter.Operator.EQ, true, "1*5+"));
+						break;
+					case "4":
+						searchFilters.add(new SearchFilter("isReceiveTimeoutMsg", SearchFilter.Operator.EQ, true, "1*5+"));
+						break;
+				}
+			});
+		} else {
+			this.removeFilterOnField("level0");
+			this.removeFilterOnField("level1");
+			this.removeFilterOnField("level2");
+			this.removeFilterOnField("isReceiveTimeoutMsg");
 		}
-	}
+
+		if (searchFilters.size() == 0) {
+			result = dao.findAll(pageRequest);
+        } else {
+			result = dao.findBySearchFilter(searchFilters, pageRequest);
+        }
+        delMsgList = result.getContent();
+        return result;
+    }
 	//如果是新增，只有后台itadmin进来 可以修改。 如果是修改 全灰色
 	public Boolean subscribe(){
 		if(this.getCRUDActionName().equals(WebUtil.getMessage("Edit"))){
@@ -362,25 +460,14 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 
 	public void saveAssetSub(){
-        MessageSubscriber msgsub= null;
-        List<MessageSubscriber> msgsubList = new ArrayList<>();
 		if(this.getCRUDActionName().equals(WebUtil.getMessage("Create"))) {
-			if(targetAssets.isEmpty()){
+			if(selectAsset.isEmpty()){
 				WebUtil.addErrorMessage(WebUtil.getMessage("EquipmentMustBeSelectedErrMsg"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
 			}
-			/* 如果加上合同等消息推送 替换成这个if
-			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){*/
             List<Boolean> messages = ListUtil.toList(selected.getLevel0(), selected.getLevel1(), selected.getLevel2(), selected.getIsReceiveTimeoutMsg(),
                     selected.getMeterHit(), selected.getExpirationReminderEvent());
-//            if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false ){
-//                if((LocaleHolder.getLocale().toString().equalsIgnoreCase("zh") && selected.getMeterHit()==false) || selected.getExpirationReminderEvent()==false){
-//                    WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
-//                } else {
-//                    WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
-//                }
             if (!messages.contains(Boolean.TRUE)) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
                 RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
@@ -394,48 +481,86 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 					return;
 				}
 			}
-
-			for(AssetInfo assetInfo:targetAssets ){
-				msgsub= new MessageSubscriber();
-				msgsub.setAssetId(assetInfo.getId());
-				msgsub.setSubscribeUserId(selected.getSubscribeUserId());
-				msgsub.setLevel0(selected.getLevel0());
-				msgsub.setLevel1(selected.getLevel1());
-				msgsub.setLevel2(selected.getLevel2());
-				msgsub.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
-				//如果紧急程度任选了一个 说明维修事件被选择了
-				if(selected.getLevel0() || selected.getLevel1() ||selected.getLevel2())
-					msgsub.setRepairHit(true);
-				else
-					msgsub.setRepairHit(false);
-				msgsub.setContractDueHit(selected.getContractDueHit());
-				msgsub.setMainRepHit(selected.getMainRepHit());
-				msgsub.setMeterHit(selected.getMeterHit());
-				msgsub.setExpirationReminderEvent(selected.getExpirationReminderEvent());
-				msgsub.setTenantUID(assetInfo.getTenantUID());
-				msgsub.setHospitalUID(assetInfo.getHospitalUID());
-				msgsub.setInstitutionUID(assetInfo.getInstitutionUID());
-				msgsub.setSiteUID(assetInfo.getSiteUID());
-				msgsub.setCreatedBy(currentUser.getName());
-				msgsub.setCreatedDate(new Date());
-				msgsub.setLastModifiedBy(currentUser.getName());
-				msgsub.setLastModifiedDate(new Date());
-				msgsubList.add(msgsub);
+			// Create：支持多关注人；同人同设备重复 -> 关注项取合集（OR 合并）
+			List<Integer> userIds;
+			if (subscribeUserIds != null && !subscribeUserIds.isEmpty()) {
+				userIds = subscribeUserIds;
+			} else {
+				// 兼容：如果页面还是走单选
+				userIds = Collections.singletonList(selected.getSubscribeUserId());
 			}
-
-
-			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(toList());
-			List<MessageSubscriber> msglist = dao.getMsgListByAssetIdAndUserId(idList,selected.getSubscribeUserId());
-			if(msglist.size()>0){
-				WebUtil.addErrorMessage(WebUtil.getMessage("DuplicateCreateSubscriptionsErrMsg"));
-				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
+			if(CollectionUtils.isEmpty(subscribeUserIds) && selected.getSubscribeUserId() == 0){
+				WebUtil.addErrorMessage(WebUtil.getMessage("please select users!"));
 				return;
 			}
-			dao.save(msgsubList);
-			WebUtil.addSuccessMessage(WebUtil.getMessage("EquipmentSubscriptionSuccessTip"));
+			List<AssetInfo> assets = new ArrayList<>(selectAsset);
+			List<Integer> assetIdList = assets.stream().map(AssetInfo::getId).collect(toList());
 
-			assetName=null;
-		}else{
+			List<MessageSubscriber> toCreate = new ArrayList<>();
+			List<MessageSubscriber> toUpdate = new ArrayList<>();
+
+			for (Integer userId : userIds) {
+				// 查出该 userId 在这些 assetId 上已存在的订阅
+				List<MessageSubscriber> existingList = dao.getMsgListByAssetIdAndUserId(assetIdList, userId);
+				Map<Integer, MessageSubscriber> existingByAssetId = existingList.stream()
+						.collect(Collectors.toMap(MessageSubscriber::getAssetId, x -> x, (a, b) -> a));
+
+				for (AssetInfo assetInfo : assets) {
+					MessageSubscriber exist = existingByAssetId.get(assetInfo.getId());
+					if (exist != null) {
+						// ③ 同一人同一设备：关注项取合集（OR 合并）
+						exist.setLevel0(orBool(exist.getLevel0(), selected.getLevel0()));
+						exist.setLevel1(orBool(exist.getLevel1(), selected.getLevel1()));
+						exist.setLevel2(orBool(exist.getLevel2(), selected.getLevel2()));
+						exist.setIsReceiveTimeoutMsg(exist.getIsReceiveTimeoutMsg() || selected.getIsReceiveTimeoutMsg());
+						exist.setContractDueHit(orBool(exist.getContractDueHit(), selected.getContractDueHit()));
+						exist.setMainRepHit(orBool(exist.getMainRepHit(), selected.getMainRepHit()));
+						exist.setMeterHit(orBool(exist.getMeterHit(), selected.getMeterHit()));
+						exist.setExpirationReminderEvent(orBool(exist.getExpirationReminderEvent(), selected.getExpirationReminderEvent()));
+						// repairHit：只要 level0/1/2 有一个为 true 就算选择了维修事件
+						boolean mergedRepair = b(exist.getLevel0()) || b(exist.getLevel1()) || b(exist.getLevel2());
+						exist.setRepairHit(mergedRepair);
+						exist.setLastModifiedBy(currentUser.getName());
+						exist.setLastModifiedDate(new Date());
+						toUpdate.add(exist);
+					} else {
+						MessageSubscriber messageSubscriber = new MessageSubscriber();
+						messageSubscriber.setAssetId(assetInfo.getId());
+						messageSubscriber.setSubscribeUserId(userId);
+						messageSubscriber.setLevel0(selected.getLevel0());
+						messageSubscriber.setLevel1(selected.getLevel1());
+						messageSubscriber.setLevel2(selected.getLevel2());
+						messageSubscriber.setIsReceiveTimeoutMsg(selected.getIsReceiveTimeoutMsg());
+						boolean repair = b(selected.getLevel0()) || b(selected.getLevel1()) || b(selected.getLevel2());
+						messageSubscriber.setRepairHit(repair);
+						messageSubscriber.setContractDueHit(selected.getContractDueHit());
+						messageSubscriber.setMainRepHit(selected.getMainRepHit());
+						messageSubscriber.setMeterHit(selected.getMeterHit());
+						messageSubscriber.setExpirationReminderEvent(selected.getExpirationReminderEvent());
+						messageSubscriber.setTenantUID(assetInfo.getTenantUID());
+						messageSubscriber.setHospitalUID(assetInfo.getHospitalUID());
+						messageSubscriber.setInstitutionUID(assetInfo.getInstitutionUID());
+						messageSubscriber.setSiteUID(assetInfo.getSiteUID());
+						messageSubscriber.setCreatedBy(currentUser.getName());
+						messageSubscriber.setCreatedDate(new Date());
+						messageSubscriber.setLastModifiedBy(currentUser.getName());
+						messageSubscriber.setLastModifiedDate(new Date());
+						toCreate.add(messageSubscriber);
+					}
+				}
+			}
+			// 统一落库（Spring Data 的 save(Iterable) 通常支持；你原来 dao.save(list) 也是这么用的）
+			if (!toUpdate.isEmpty()) {
+				dao.save(toUpdate);
+			}
+			if (!toCreate.isEmpty()) {
+				dao.save(toCreate);
+			}
+
+			WebUtil.addSuccessMessage(WebUtil.getMessage("EquipmentSubscriptionSuccessTip"));
+			assetName = null;
+			subscribeUserIds = new ArrayList<>();
+		} else {
 			if(selected.getIsReceiveTimeoutMsg()){
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
 					WebUtil.addErrorMessage(WebUtil.getMessage("BeSureToSelectPriority"));
@@ -443,9 +568,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 					return;
 				}
 			}
-			/* 如果加上合同等消息推送 替换成这个if
-			* if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
-					selected.getContractDueHit()==false && selected.getMeterHit()==false)*/
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getMeterHit()==false && selected.getExpirationReminderEvent()==false){
 				WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
@@ -455,11 +577,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				selected.setRepairHit(false);
 			else
 				selected.setRepairHit(true);
-
 			selected.setLastModifiedBy(currentUser.getName());
 			selected.setLastModifiedDate(new Date());
 			super.save();
 		}
+		clearAll();
 	}
 	public void selectedSetting(){
 		List<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item->item.getKey()).collect(toList());
@@ -492,9 +614,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}else{
 			level2=false;
 		}
-//		if(queryAsset!=null)
-//			queryAsset.setName(selected.getAssetInfo().getName());
-
 
 	}
 
@@ -512,19 +631,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 		return true;
 	}
-	/*public void addFilter() {
-        orgTree=createSiteOrgTree();
-		sourceAssets = getAssetList();
-		targetAssets.forEach((item) -> {
-			if (sourceAssets.contains(item)) {
-				sourceAssets.remove(item);
-			}
-		});
-		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
-	}*/
 
 	public TreeNode createSiteOrgTree(String userUid) {
-
 		List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(userUid);
 		TreeNode siteTree = buildTree(siteList);
 		expandedByOrgType(siteTree, 2);
@@ -557,32 +665,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		rootNode.setExpanded(true);
 		return rootNode;
 	}
-/**/
-	/*public List<AssetInfo> getAssetList() {
-		List<AssetInfo> astLIst =assetList;
-		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
-			astLIst=	astLIst.stream().filter(item->item.getFunctionType()!=null &&item.getFunctionType().equals(queryAsset.getFunctionType())).collect(Collectors.toList());
-		}
-		if (StringUtils.isNotEmpty(queryAsset.getName())) {
-			astLIst=	astLIst.stream().filter(item->item.getName()!=null && item.getName().equals(queryAsset.getName())).collect(Collectors.toList());
-		}
-
-		if(null != queryAsset.getManufactureId()){
-			astLIst=	astLIst.stream().filter(item->item.getManufactureId()!=null && item.getManufactureId().equals(queryAsset.getManufactureId())).collect(Collectors.toList());
-		}
-		if (null != queryAsset.getAssetGroup()) {
-			astLIst=	astLIst.stream().filter(item->item.getAssetGroup()!=null && item.getAssetGroup().equals(queryAsset.getAssetGroup())).collect(Collectors.toList());
-		}
-		if (null != queryAsset.getFunctionType()) {
-			astLIst=	astLIst.stream().filter(item->item.getFunctionType()!=null &&item.getFunctionType().equals(queryAsset.getFunctionType())).collect(Collectors.toList());
-
-		}
-		if(!astLIst.isEmpty()){
-			return astLIst;
-		}
-
-		return new ArrayList<>();
-	}*/
 
 	private UserCommonService userCommonService;
 
@@ -593,6 +675,189 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
 		return filter;
 	}
+
+	public void addCheckedDevice(){
+		for (AssetInfo assetInfo : selectedAssetsed1) {
+			boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
+			if(!b){
+				selectAsset.add(assetInfo);
+			}
+		}
+		allSelected1 = Boolean.FALSE;
+		selectedAssetsed1.clear();
+		selectedAssetUidTable1.clear();
+	}
+
+
+	public void deleteCheckedDevice(){
+		for (AssetInfo assetInfo : selectedAssetsed2) {
+			boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
+			if(b){
+				selectAsset.remove(assetInfo);
+			}
+		}
+		allSelected2 = Boolean.FALSE;
+		selectedAssetsed2.clear();
+		selectedAssetUidTable2.clear();
+	}
+	public void clearAll(){
+		selectAsset.clear();
+		allSelected1 = Boolean.FALSE;
+		selectedAssetsed1.clear();
+		selectedAssetUidTable1.clear();
+		allSelected2 = Boolean.FALSE;
+		selectedAssetsed2.clear();
+		selectedAssetUidTable2.clear();
+
+	}
+
+	public String repairEventLabelCsv(MessageSubscriber item) {
+		if(item == null) {
+			return "";
+		}
+		List<String> labels = new ArrayList<>();
+		if(Boolean.TRUE.equals(item.getLevel0())) labels.add(casePriorityLabel("1"));
+		if(Boolean.TRUE.equals(item.getLevel1())) labels.add(casePriorityLabel("2"));
+		if(Boolean.TRUE.equals(item.getLevel2())) labels.add(casePriorityLabel("3"));
+		if(item.getIsReceiveTimeoutMsg()) labels.add(casePriorityLabel("4"));
+		return String.join(",", labels);
+	}
+
+	/**
+	 * 列表页过滤/排序辅助：返回紧急程度 value 的 CSV（例如："1,2,4"）
+	 */
+	public String repairEventLevelCsv(MessageSubscriber item) {
+		if(item == null) {
+			return "";
+		}
+		List<String> levels = new ArrayList<>();
+		if(Boolean.TRUE.equals(item.getLevel0())) levels.add("1");
+		if(Boolean.TRUE.equals(item.getLevel1())) levels.add("2");
+		if(Boolean.TRUE.equals(item.getLevel2())) levels.add("3");
+		if(item.getIsReceiveTimeoutMsg()) levels.add("4");
+		return String.join(",", levels);
+	}
+
+	private String casePriorityLabel(String code) {
+		try {
+			FacesContext fc = FacesContext.getCurrentInstance();
+			if(fc == null) {
+				return code;
+			}
+			String expr = "#{fieldMsg.fieldValue('casePriority','" + code + "')}";
+			Object v = fc.getApplication().evaluateExpressionGet(fc, expr, Object.class);
+			return v == null ? code : String.valueOf(v);
+		} catch (Exception e) {
+			return code;
+		}
+	}
+
+	public void onSubscribeUsersChange() {
+		if (subscribeUserIds != null && !subscribeUserIds.isEmpty()) {
+			this.selected.setSubscribeUserId(subscribeUserIds.get(0));
+			changeSubId();
+		} else {
+			selectUserName = null;
+			this.selected.setSubscribeUserId(0);
+		}
+	}
+
+	private boolean b(Boolean v) {
+		return Boolean.TRUE.equals(v);
+	}
+	private Boolean orBool(Boolean a, Boolean b) {
+		return (Boolean.TRUE.equals(a) || Boolean.TRUE.equals(b));
+	}
+
+	public void applyBatchUpdate() {
+		if (selectedMap == null || selectedMap.isEmpty()) {
+			WebUtil.addErrorMessage("请勾选记录.");
+			return;
+		}
+		List<MessageSubscriber> subscribers = dao.findByIds(selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toSet()));
+		if(CollectionUtils.isNotEmpty(subscribers)) {
+			subscribers.forEach(v -> {
+				v.setLevel0(batch.getLevel0());
+				v.setLevel1(batch.getLevel1());
+				v.setLevel2(batch.getLevel2());
+				v.setIsReceiveTimeoutMsg(batch.getIsReceiveTimeoutMsg());
+			});
+		}
+		dao.save(subscribers);
+		WebUtil.addSuccessMessage("批量修改成功.");
+	}
+
+	public boolean checkBatchEdit() {
+		if (selectedMap.isEmpty()) {
+			return true;
+		}
+		Set<Integer> collect = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toSet());
+		if (collect.isEmpty() || collect.size() == 1) {
+			return true;
+		}
+		AtomicBoolean disable = new AtomicBoolean(false);
+		List<MessageSubscriber> list = dao.findByIds(collect);
+		MessageSubscriber first = list.get(0);
+		list.forEach(v -> {
+			if (!Objects.equals(first.getLevel0(), v.getLevel0())
+					|| !Objects.equals(first.getLevel1(), v.getLevel1())
+					|| !Objects.equals(first.getLevel2(), v.getLevel2())
+					|| !Objects.equals(first.getIsReceiveTimeoutMsg(), v.getIsReceiveTimeoutMsg())) {
+				disable.set(true);
+			}
+		});
+		return disable.get();
+	}
+
+	public void addAssetsOfCurrentPage1(AjaxBehaviorEvent event) {
+		if(allSelected1) {
+			selectAssetInfos.stream().forEach(t -> {
+				selectedAssetUidTable1.put(t.getUid(), Boolean.TRUE);
+				selectedAssetsed1.add(t);
+			});
+		} else {
+			selectAssetInfos.stream().forEach(t -> {
+				selectedAssetUidTable1.put(t.getUid(), Boolean.FALSE);
+				selectedAssetsed1.remove(t);
+			});
+		}
+	}
+	public void addAssetsOfCurrentPage2(AjaxBehaviorEvent event) {
+		if(allSelected2) {
+			selectAsset.stream().forEach(t -> {
+				selectedAssetUidTable2.put(t.getUid(), Boolean.TRUE);
+				selectedAssetsed2.add(t);
+			});
+		} else {
+			selectAsset.stream().forEach(t -> {
+				selectedAssetUidTable2.put(t.getUid(), Boolean.FALSE);
+				selectedAssetsed2.remove(t);
+			});
+		}
+	}
+
+
+	public void updateSelctedAssetList1(AjaxBehaviorEvent event) {
+		SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+		AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+		if(box.isSelected()) {
+			selectedAssetsed1.add(asset);
+		} else {
+			selectedAssetsed1.remove(asset);
+		}
+		allSelected1=selectAssetInfos.stream().allMatch(item-> Optional.ofNullable(selectedAssetUidTable1.get(item.getUid())).orElse(Boolean.FALSE));
+	}
+	public void updateSelctedAssetList2(AjaxBehaviorEvent event) {
+		SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
+		AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
+		if(box.isSelected()) {
+			selectedAssetsed2.add(asset);
+		} else {
+			selectedAssetsed2.remove(asset);
+		}
+		allSelected2=selectAssetInfos.stream().allMatch(item->Optional.ofNullable(selectedAssetUidTable2.get(item.getUid())).orElse(Boolean.FALSE));
+	}
+
 	public List<UserAccount> getTenantUserList() {
 		return tenantUserList;
 	}

@@ -80,7 +80,9 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
             map.put(ExportFields.FUNCTIONTYPE.getChinese(), this.getFunctionType());
-            map.put(ExportFields.ASSETGROUP.getChinese(),this.getFromI18(i18nAssetGroup,v2_pmOrder.getAssetInfo().getAssetGroup()));
+            if(v2_pmOrder.getAssetInfo().getAssetGroup()!=null){
+                map.put(ExportFields.ASSETGROUP.getChinese(),this.getFromI18(i18nAssetGroup,v2_pmOrder.getAssetInfo().getAssetGroup()));
+            }
 //            if("1".equals(this.getRuleLevel())){
 //                map.put(ExportFields.RUNLEVEL.getChinese(), "巡检");
 //            }else if("4".equals(this.getRuleLevel())){
@@ -101,6 +103,7 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ORDERCOMMENTS.getChinese(), this.getComments());
             map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
             map.put(ExportFields.TRAVELTIME.getChinese(), this.getTravelTime());
+            map.put(ExportFields.ENDTIME.getChinese(), v2_pmOrder.getEndTime());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getChinese(), this.getActualCompletionTime());
             }
@@ -136,6 +139,7 @@ public class PmExportFormatter<T> {
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getEnglish(), this.getActualCompletionTime());
             }
+            map.put(ExportFields.ENDTIME.getEnglish(), v2_pmOrder.getEndTime());
         }
         return map;
     }

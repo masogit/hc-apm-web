@@ -48,6 +48,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private boolean countyArea = false;
 
     private String orgName;
+
     private String orgNameEn;
     private String retrieval;
     private UserAccount loginUser;
@@ -193,6 +194,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
+
         OrgInfo org = new OrgInfo();
         org.setSiteId(tenantId);
 
@@ -220,6 +223,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         contactPerson = null;
         contactPhone = null;
         orgCode=null;
+
         if (selected == null) {
             return;
         }
@@ -250,6 +254,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
+
         if (selected == null) {
             return;
         }
@@ -280,6 +286,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
         if (selected == null) {
             return;
         }
@@ -836,4 +843,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public void setFailureType(Integer failureType) {
         this.failureType = failureType;
     }
+
+
 }

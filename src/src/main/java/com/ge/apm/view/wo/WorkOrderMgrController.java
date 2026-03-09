@@ -27,6 +27,7 @@ import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.simpleparts.*;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -70,7 +71,6 @@ import org.springframework.util.ObjectUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -260,6 +260,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private OrgTreeController orgTreeController;
     private AssetInfoRepository assetInfoRepository;
+    private AssetTypeGroupService assetTypeGroupService;
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
@@ -320,6 +321,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter @Setter
     private TreeNode[] selectedAccessOrgNodes;
     @Getter @Setter
+    private TreeNode[] selectedAssetTypeNodes;
+    @Getter @Setter
     private String newMessage;
     @Getter @Setter
     private Map<String, String> repairTipMessageMap = MapUtil.newHashMap();
@@ -337,8 +340,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private String displayModeCasePriority;
 
-    @Setter@Getter
-    private String pageType ;
+    @Setter @Getter
+    private String pageType;
+
+    @Getter @Setter
+    private boolean enableAssetTypeGroup;
+    @Setter @Getter
+    private List<AssetTypeGroup> assetTypeGroupList;
+    @Setter @Getter
+    private Map<String, AssetTypeGroup> assetTypeGroupMap;
 
     @Override
     protected void init() {
@@ -349,6 +359,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
             loginUser = UserContextService.getCurrentUserAccount();
+            enableAssetTypeGroup = loginUser.isEnableAssetTypeGroup();
+            assetTypeGroupList = loginUser.getAssetTypeGroupList();
+            assetTypeGroupMap = loginUser.getAssetTypeGroupMap();
             currentCustomConfig = ccService.getCurrentCustomConfig(
                     loginUser.getSiteUID());
             aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -390,6 +403,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
             orgTreeController = WebUtil.getBean(OrgTreeController.class);
             assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+            assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -792,6 +806,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                                 || StringUtils.equals(item.getTenantUID(), selectSite.getSiteUID()))
                         .collect(Collectors.toList());
             }
+            if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+                List<String> selectedSiteUidList = Arrays.stream(selectedAccessOrgNodes).map(node -> (OrgInfo) node.getData()).map(OrgInfo::getSiteUID).collect(Collectors.toList());
+                clinicalDeptList = clinicalDeptList.stream()
+                        .filter(item -> selectedSiteUidList.contains(item.getSiteUID())
+                                || selectedSiteUidList.contains(item.getHospitalUID())
+                                || selectedSiteUidList.contains(item.getInstitutionUID())
+                                || selectedSiteUidList.contains(item.getTenantUID()))
+                        .collect(Collectors.toList());
+            }
         } catch (Exception e) {
             LOGGER.error("loadClinicalDeptList occur exception", e);
             throw e;
@@ -1191,6 +1214,24 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
 
         // 资产分类权限
+        if (ObjectUtil.isNotEmpty(selectedAssetTypeNodes)) {
+            List<String> selectedAssetTypeList = ListUtil.newArrayList();
+            for (TreeNode selectedAssetTypeNode : selectedAssetTypeNodes) {
+                AssetTypeGroup assetTypeGroup =(AssetTypeGroup) selectedAssetTypeNode.getData();
+                selectedAssetTypeList.add(assetTypeGroup.getEncoded());
+            }
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, selectedAssetTypeList, "1*"));
+        }
+        List<SearchFilter> assetTypeFilters = this.searchFilters.stream().filter(item -> "assetInfo.assetType".equals(item.fieldName) && "EQ".equals(item.operator.name())).collect(Collectors.toList());
+        if (ObjectUtil.isNotEmpty(assetTypeFilters)) {
+            SearchFilter searchFilter = assetTypeFilters.get(0);
+            String assetType = (String) searchFilter.value;
+            List<AssetTypeGroup> assetTypeGroupsMatchingByEncoded = this.assetTypeGroupList.stream().filter(item -> item.getEncoded().equals(assetType)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByEncoded, assetTypeGroupList);
+            Set<String> assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            searchFilters.remove(searchFilter);
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet, "1*"));
+        }
         if (loginUser.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, loginUser.getAssetTypeGroupMap().keySet(), "1*"));
         }
@@ -2382,6 +2423,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             requestContext.addCallbackParam("validationFailed", true);
         } else {
             selectedAsset.setStatus(currentStatus);
+            if(currentStatus != null){
+                newServiceRequest.setIbStatus(String.valueOf(currentStatus));
+            }
             newServiceRequest.setAssetLocation(locationName);
             newServiceRequest.setSrRepairSource(RepairSourceEnum.Accounts.name());
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList,null);
@@ -4481,6 +4525,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
+        loadClinicalDeptList();
         filterClinicalDeptOrg = null;
         filterAssetDeptOrg = null;
         clinicalDeptOrgUidSet = null;
@@ -4507,6 +4552,34 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         for (TreeNode item : root.getChildren()) {
             setTreeNodes(item, isSelected);
         }
+    }
+
+    public void onSelectAssetTypeTreeNode(NodeSelectEvent event) {
+        this.searchFilters.clear();
+        setAssetTypeTreeNodes(event.getTreeNode(), true);
+    }
+
+
+    public void onUnSelectAssetTypeTreeNode(NodeUnselectEvent event) {
+        this.searchFilters.clear();
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void setAssetTypeTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
+    }
+
+    public Boolean showDigitalSignature() {
+        String showDiagnosticProcess = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(),loginUser.getTenantUID(), "showDiagnosticProcess");
+        return StrUtil.isNotEmpty(showDiagnosticProcess) && "true".equals(showDiagnosticProcess);
     }
 }
 

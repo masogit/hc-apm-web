@@ -15,6 +15,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.cache.CacheService;
 import com.ge.apm.service.common.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
@@ -71,6 +72,11 @@ public class CustomConfigController {
     private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
     private List<AssetTypeGroup> assetTypeGroups = new ArrayList<>();
 
+
+    private OrgInfoRepository orgInfoDao;
+
+    private CacheService cacheService;
+
     @Setter
     @Getter
     private String newName;
@@ -91,6 +97,9 @@ public class CustomConfigController {
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
+        cacheService = WebUtil.getBean(CacheService.class);
+
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
@@ -597,12 +606,19 @@ public class CustomConfigController {
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage("已保存");
         updateConfigInfo();
+
+        List<String> siteOrgUidsByParentUid = orgInfoDao.getSiteOrgUidsByParentUid(selectSite.getSiteUID());
+        cacheService.evictSiteConfigByUids(siteOrgUidsByParentUid);
+
     }
 
     public void deleteConfig() {
         ccService.removeConfig(selectSite);
         loadConfigForSite(selectSite.getUid());
         WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
+
+        List<String> siteOrgUidsByParentUid = orgInfoDao.getSiteOrgUidsByParentUid(selectSite.getSiteUID());
+        cacheService.evictSiteConfigByUids(siteOrgUidsByParentUid);
     }
 
     public boolean isSystemFields(String key) {

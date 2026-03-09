@@ -63,10 +63,10 @@ public class CustomConfigService {
     @Cacheable(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#siteUid")
     public CustomConfigObject getCurrentCustomConfig(String siteUid) {
         OrgInfo org = configCacheService.findOrgByUid(siteUid);
-        if (configService.isInsulateTenant(org.getTenantUID())) {
-            CustomConfig res = getCustomConfigBySite(siteUid);
-            return res == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
-        }
+//        if (configService.isInsulateTenant(org.getTenantUID())) {
+//            CustomConfig res = getCustomConfigBySite(siteUid);
+//            return res == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
+//        }
         List<CustomConfig> configList = customConfigDao.findBySiteUIDIn(Arrays.asList(org.getSiteUID(), org.getHospitalUID(), org.getInstitutionUID(), org.getTenantUID()));
         if (null == configList || configList.isEmpty()) {
             return getDefalutCustomConfigObject();

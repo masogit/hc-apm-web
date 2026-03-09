@@ -3,6 +3,8 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.MessageSubscriber;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
 
@@ -18,5 +20,6 @@ public interface MessageSubscriberRepository extends GenericRepository<MessageSu
     @Query(value="select ms.* from message_subscriber ms where ms.asset_id in ?1 and ms.subscribe_user_id=?2",nativeQuery = true)
     public  List<MessageSubscriber> getMsgListByAssetIdAndUserId(Collection<Integer> assetId, Integer userId);
 
-
+    @Query(value="select o.* from message_subscriber o where o.id in ?1",nativeQuery=true)
+    List<MessageSubscriber> findByIds(Set<Integer> collect1);
 }

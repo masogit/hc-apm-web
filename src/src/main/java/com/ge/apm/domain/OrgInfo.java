@@ -497,7 +497,6 @@ public class OrgInfo implements Serializable, ChineseName {
     public void setStatus(Integer status) {
         this.status = status;
     }
-
     public OrgInfo(Integer id) {
 		super();
 		this.id = id;

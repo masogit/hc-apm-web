@@ -168,7 +168,6 @@ public class SecondmentAssetSettingController extends GenericCRUDController<Asse
             }else{
                 List<SearchFilter> searchFilters = new ArrayList<>();
                 searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,uid));
-                searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, Arrays.asList(2,4)));
                 List<SecondmentOrder> secondmentOrders = secondmentOrderRepository.findBySearchFilter(searchFilters);
                 if(CollectionUtils.isNotEmpty(secondmentOrders)){
                     tempStatus = 1;       // 占用

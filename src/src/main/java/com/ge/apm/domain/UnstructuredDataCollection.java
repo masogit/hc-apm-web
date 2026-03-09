@@ -43,6 +43,15 @@ public class UnstructuredDataCollection implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdDate;
+
+    @Column(name = "last_modified_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date lastModifiedDate;
+    @Column(name = "offline_update_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date offlineUpdateDate;
     
     @Column(name = "status")
     private String status = Status.Draft.toString();
@@ -105,6 +114,22 @@ public class UnstructuredDataCollection implements Serializable {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Date getOfflineUpdateDate() {
+        return offlineUpdateDate;
+    }
+
+    public void setOfflineUpdateDate(Date offlineUpdateDate) {
+        this.offlineUpdateDate = offlineUpdateDate;
     }
 
     public String getStatus() {

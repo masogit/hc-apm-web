@@ -12,6 +12,21 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="externalAssetEditForm">
+                    <p:fieldset legend="试用表上传">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <p:fileUpload id="fileUpload" fileUploadListener="#{assetProbationEditController.ocrCreated}"
+                                              mode="advanced"
+                                              dragDropSupport="false" style="width:100%" process="@this"
+                                              multiple="false"
+                                              update="externalAssetEditForm" auto="true" fileLimit="1"
+                                              invalidFileMessage="请上传pdf类型试用表!"
+                                              accept="image/*,application/pdf"
+                                              allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG|pdf|PDF)$/" label="添加并OCR识别"
+                                />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
                     <p:fieldset legend="#{msg.probationApplication.substring(0, 2).concat(msg.BasicInfo)}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>

@@ -113,4 +113,10 @@
         )
     </sql>
 
+    <select id="selectByAssetUid" resultMap="maintainConfigBean" >
+        select distinct nsmc.* from nurse_site_maintain_config nsmc
+        inner join nurse_site_maintain_config_item nsmci on nsmc.id = nsmci.parent_id
+        where nsmci.asset_uid = #{assetUid}
+    </select>
+
 </mapper>

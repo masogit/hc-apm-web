@@ -9,6 +9,12 @@
         <h:outputScript name="js/main.js"/>
     </ui:define>
     <ui:define name="content">
+        <style>
+            .export-btn-disabled {
+                opacity: 0.6;
+                cursor: not-allowed !important;
+            }
+        </style>
         <div class="ui-g">
             <div class="ui-g-12">
                 <div class="ui-g-12 card cardTitle">
@@ -20,7 +26,7 @@
                     </div>
                 </h:form>
                 <div class="ui-g-12 card ">
-                    <p:tabView id="HisDataSourceTab" class="tabs">
+                    <p:tabView id="HisDataSourceTab" class="tabs"  dynamic="true">
                         <p:tab title="收费结果数据" id="showList">
                             <div class="ui-g-12 card">
                                 <h:form id="IouListForm">
@@ -123,8 +129,16 @@
                                                   filterMatchMode="GTE">
                                             <h:outputText value="#{item.totalAmount}"/>
                                         </p:column>
-                                        <p:column headerText="执行科室">
-                                            <h:outputText value="#{item.execDept}"/>
+                                        <p:column headerText="执行科室" style="width: 120px">
+                                            <f:facet name="header">
+                                                <h:outputText value="执行科室"/><br/>
+                                                <p:autoComplete  dropdown="true" value="#{hisEquipmentDataSourceController.filterExecDept}" appendTo="@(Body)"
+                                                                scrollHeight="300"  forceSelection="true" completeMethod="#{hisEquipmentDataSourceController.autoCompleteDeptName}" size="5" style="width: 100px" >
+                                                    <p:ajax event="itemSelect" listener="#{hisEquipmentDataSourceController.onClinicalDeptNameFilterChange}" process="@this"  update="HisDataSourceTab:IouListForm:datalist"/>
+                                                    <p:ajax process="@this" listener="#{hisEquipmentDataSourceController.onClinicalDeptNameFilterChange}" update="HisDataSourceTab:IouListForm:datalist"/>
+                                                </p:autoComplete>
+                                            </f:facet>
+                                            <h:outputText value="#{item.ksName}" />
                                         </p:column>
                                         <p:column headerText="执行科室代码"
                                                   filterBy="#{item.execDeptCode}"
@@ -160,9 +174,20 @@
                                         <!--                        <h:outputText value="#{item.isMatched}"/>-->
                                         <!--                    </p:column>-->
                                         <f:facet name="{Toolbar}">
-                                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
-                                                             class="btn btn-sm btn-gray" ajax="false" validateClient="false" immediate="true">
-                                                <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                                            <p:commandButton
+                                                    id="exportBtn"
+                                                    title="#{hisEquipmentDataSourceController.datalistSize > 50000 ? '一次最多只能下载5万条数据' : '导出Excel'}"
+                                                    icon="ui-icon-arrowstop-1-s"
+                                                    class="btn btn-sm btn-gray #{hisEquipmentDataSourceController.datalistSize > 50000 ? 'export-btn-disabled' : ''}"
+                                                    ajax="false"
+                                                    onclick="return #{hisEquipmentDataSourceController.datalistSize lt 50000};"
+                                            >
+
+                                                <p:dataExporter
+                                                        type="xls"
+                                                        target="datalist"
+                                                        fileName="Iou_export"
+                                                        rendered="#{hisEquipmentDataSourceController.datalistSize lt 50000}" />
                                             </p:commandButton>
                                         </f:facet>
                                     </p:dataTable>

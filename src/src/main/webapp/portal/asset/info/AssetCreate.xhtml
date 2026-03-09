@@ -51,6 +51,35 @@
                 color: #CC0090;
             }
 
+            .blue-highlight-autocomplete .ui-autocomplete-panel table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel td {
+                text-align: left !important;     /* ←←← 核心修复 */
+                padding: 6px 10px !important;
+                border: none !important;
+                background: transparent !important;
+                color: #333 !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row {
+                background: transparent !important;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row.ui-state-highlight,
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row:hover {
+                background: #5c8bd6 !important;
+                color: #ffffff !important;
+                cursor: pointer;
+            }
+
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row.ui-state-highlight td,
+            .blue-highlight-autocomplete .ui-autocomplete-panel .ui-autocomplete-row:hover td {
+                color: #ffffff !important;
+                text-align: left !important;
+            }
         </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
