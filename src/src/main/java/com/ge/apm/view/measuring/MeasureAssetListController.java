@@ -7,6 +7,7 @@ import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
+import com.ge.apm.dao.mapper.MeasureAssetMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.asset.BlobFileService;
@@ -137,6 +138,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private I18nMessageService i18nMessageService;
     private MeasuringCertificateDetail selectedMeasuringCertificateDetail;
 
+    private MeasureAssetMapper measureAssetMapper;
+
     private SystemTemplateService systemTemplateService;
 
     private StreamedContent excelFile;
@@ -159,6 +162,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         preViewerBean = WebUtil.getBean(PreViewerBean.class);
         measuringService = WebUtil.getBean(MeasuringService.class);
         systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
+        measureAssetMapper = WebUtil.getBean(MeasureAssetMapper.class);
         WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
         measurementRepairVisible = woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair();
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -694,16 +698,17 @@ public void treeSearchCondition(){
     public void exportExcel()  {
         try {
             Set<String> uids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-
-            if(CollectionUtils.isEmpty(uids)){
-                WebUtil.addWarnMessage("请选择数据");
-                return;
-            }
             byte[] stream =systemTemplateService.getTemplateFileByte(SystemTemplateEnum.MEASURING_RESULT_EXPORT,currentUser);
+            List<MeasuringCertificateDetail> list=new ArrayList<>();
+            if(CollectionUtils.isEmpty(uids)){
+                Wrapper<AssetInfo> wrapper = measureUnpairedResultConvert();
+                list=  measureAssetMapper.selectMeasureUnpairedResult(wrapper);
 
-            List<SearchFilter> filters = new ArrayList<>();
-            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, uids));
-            List<MeasuringCertificateDetail> list = measuringCertificateDetailDao.findBySearchFilter(filters);
+            }else{
+                List<SearchFilter> filters = new ArrayList<>();
+                filters.add(new SearchFilter("id", SearchFilter.Operator.IN, uids));
+                list= measuringCertificateDetailDao.findBySearchFilter(filters);
+            }
             List<I18nMessage> messages = i18nMessageService.getByMsgType("measuringStatus");
 
             Map<String, String> measuringStatusMap  = messages.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValueZh, (value1, value2) -> value1));
