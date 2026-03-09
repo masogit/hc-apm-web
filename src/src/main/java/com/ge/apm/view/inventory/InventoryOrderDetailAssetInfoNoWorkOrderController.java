@@ -60,6 +60,8 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
     private Set<String> clinicalDeptOrgUidSet;
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
+    @Getter @Setter
+    private Boolean inventoryDisplayRepairOwner = Boolean.FALSE;
 
 	@Override
 	protected void init() {
@@ -73,6 +75,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
 		currentUser = UserContextService.getCurrentUserAccount();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+        inventoryDisplayRepairOwner = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayRepairOwner")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
         loadClinicalDeptList();
 	}
 

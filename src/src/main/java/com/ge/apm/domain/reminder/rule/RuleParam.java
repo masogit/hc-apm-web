@@ -41,6 +41,8 @@ public class RuleParam {
 
     private Integer pushNum = 0;
 
+    private Integer emergencyEquipment = 0;
+
     private List<Integer> assetInfoIds;
 
     private Map<Integer, List<MessageSubscriber>> usersMap;

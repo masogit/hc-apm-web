@@ -869,6 +869,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
     public void cancelPMorder() {
+        if( userContextService.isEnableBtnByKey("enableCheckCancelReason") && StringUtils.isBlank(cancelReason)){
+            WebUtil.addErrorMessage("取消原因不能为空！");
+            return;
+        }
         pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
     }
 

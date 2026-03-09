@@ -69,6 +69,14 @@
                                 </p:panelGrid>
                             </h:panelGroup>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{reminderRuleController.selected.type eq 'WorkOrder'}">
+                            <label class="label">是否急救设备?<span style="color:red">*</span></label>
+                            <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.emergencyEquipment}" required="true"
+                                             requiredMessage="#{msg.riskGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('riskGrade')}" >
+                                <f:selectItem itemLabel="#{msg.All}" itemValue="0"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
 <!--                        <h:panelGroup rendered="false">-->
                         <h:panelGroup id="wechatTemplate" rendered="#{reminderRuleController.selected.reminderType eq msg.wechat}">
                             <label class="label">#{msg.wechatTemplateSetting}</label>

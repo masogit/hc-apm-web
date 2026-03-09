@@ -190,17 +190,10 @@ public class WordReportExportService {
                     updateByMap.put(assetInfo.getUid(), nurseSiteMaintainItem.getUpdateByUid());
 
                 }
-                if (map.containsKey(scheduleDate)) {
-                    map.get(scheduleDate).addAll(items);
-                    stringMap.get(scheduleDate).putAll(assetUidMap);
-                    commentMapMap.get(scheduleDate).putAll(commentMap);
-                    updateByMapMap.get(scheduleDate).putAll(updateByMap);
-                } else {
-                    map.put(scheduleDate, items);
-                    stringMap.put(scheduleDate,assetUidMap);
-                    commentMapMap.put(scheduleDate,commentMap);
-                    updateByMapMap.put(scheduleDate,updateByMap);
-                }
+                map.computeIfAbsent(scheduleDate, k -> new ArrayList<>()).addAll(items);
+                stringMap.computeIfAbsent(scheduleDate, k -> new HashMap<>()).putAll(assetUidMap);
+                commentMapMap.computeIfAbsent(scheduleDate, k -> new HashMap<>()).putAll(commentMap);
+                updateByMapMap.computeIfAbsent(scheduleDate, k -> new HashMap<>()).putAll(updateByMap);
             }
             List<NurseSiteMaintainItem> nurseSiteMaintainItemList= null;
             int num =0;
@@ -341,17 +334,21 @@ public class WordReportExportService {
                     updateByMap.put(assetInfo.getName(), nurseSiteMaintainItem.getUpdateByUid());
 
                 }
-                if (map.containsKey(scheduleDate)) {
-                    map.get(scheduleDate).addAll(items);
-                    stringMap.get(scheduleDate).putAll(assetNameMap);
-                    commentMapMap.get(scheduleDate).putAll(commentMap);
-                    updateByMapMap.get(scheduleDate).putAll(updateByMap);
-                } else {
-                    map.put(scheduleDate, items);
-                    stringMap.put(scheduleDate,assetNameMap);
-                    commentMapMap.put(scheduleDate,commentMap);
-                    updateByMapMap.put(scheduleDate,updateByMap);
-                }
+//                if (map.containsKey(scheduleDate)) {
+//                    map.get(scheduleDate).addAll(items);
+//                    stringMap.get(scheduleDate).putAll(assetNameMap);
+//                    commentMapMap.get(scheduleDate).putAll(commentMap);
+//                    updateByMapMap.get(scheduleDate).putAll(updateByMap);
+//                } else {
+//                    map.put(scheduleDate, items);
+//                    stringMap.put(scheduleDate,assetNameMap);
+//                    commentMapMap.put(scheduleDate,commentMap);
+//                    updateByMapMap.put(scheduleDate,updateByMap);
+//                }
+                map.computeIfAbsent(scheduleDate, k -> new ArrayList<>()).addAll(items);
+                stringMap.computeIfAbsent(scheduleDate, k -> new HashMap<>()).putAll(assetNameMap);
+                commentMapMap.computeIfAbsent(scheduleDate, k -> new HashMap<>()).putAll(commentMap);
+                updateByMapMap.computeIfAbsent(scheduleDate, k -> new HashMap<>()).putAll(updateByMap);
             }
             List<NurseSiteMaintainItemHistory> nurseSiteMaintainItemList= null;
             int num =0;
