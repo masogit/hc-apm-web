@@ -53,11 +53,11 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class AdverseEventApproveController extends JpaCRUDController<AdverseEvents> {
+public class AdverseEventApproveController extends AdverseEventBaseController{
     private Logger log = Logger.getLogger(AdverseEventApproveController.class.getName());
     /*接口类*/
-    private UserContextService userContextService;
     private AdverseEventsRepository adverseEventsRepository;
+    private UserContextService userContextService;
     private AdverseEventServiceClient adverseEventServiceClient;
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private ConfigCacheService configCacheService;
@@ -75,12 +75,8 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     private List<AdverseEvents> currentPageAdverse;
     @Getter@Setter
     private OrgInfo selectAdverseSite; //选定的所属院区
-    @Getter@Setter
-    private List<TempFileUtil> injuryPerformance;
-    @Getter@Setter
-    private List<TempFileUtil> mechanicalFailure;
-    private BlobFileService blobService;
-    private boolean readOnlyCreateForm = true;
+
+    private boolean readOnlyCreateForm = false;
 
     private boolean readOnlyEditForm = false;
     @Getter@Setter
@@ -119,13 +115,14 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
     @Override
     protected void init() {
         /*接口类*/
+        adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         adverseEventsRepository = WebUtil.getBean(AdverseEventsRepository.class);
         adverseEventServiceClient = WebUtil.getBean(AdverseEventServiceClient.class);
         adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
-        blobService = WebUtil.getBean(BlobFileService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         /*属性类*/
@@ -239,14 +236,11 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
         return canSendMail;
     }
 
-    @Override
-    protected GenericRepository<AdverseEvents> getDAO() {
-        return adverseEventsRepository;
-    }
 
     public void tempSaveAdverseEventApprove(Integer status) throws RuntimeException {
         int oldStatus = selected.getStatus();
         selected.setStatus(status);
+        processFile(selected);
         try {
             AdverseEvents result = adverseEventServiceClient.tempSaveAdverseEvents(UserContextService.getAccessToken(), selected);
             if (!ObjectUtils.isEmpty(result)) {
@@ -256,6 +250,14 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
                     readOnlyEditForm = false;
                 } else {
                     readOnlyEditForm = true;
+                }
+                injuryPerformance.clear();
+                mechanicalFailure.clear();
+                if(CollectionUtils.isEmpty(selected.getHarmPerformFile())){
+                    selected.setHarmPerformFile(new ArrayList<>());
+                }
+                if(CollectionUtils.isEmpty(selected.getDeviceFaultPerformFile())){
+                    selected.setDeviceFaultPerformFile(new ArrayList<>());
                 }
                 MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
             }
@@ -400,5 +402,10 @@ public class AdverseEventApproveController extends JpaCRUDController<AdverseEven
 
     public boolean harmDegreeLever(Integer harmDegree) {
         return harmDegree != null && harmDegree == 1;
+    }
+
+    @Override
+    protected GenericRepository<AdverseEvents> getDAO() {
+        return adverseEventsRepository;
     }
 }
