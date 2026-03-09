@@ -224,7 +224,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             wrapper.or().in("mcd.site_uid", orgUidList);
 
         }
-
+        wrapper.andNew();
         wrapper.isNull("mcd.asset_uid");
 
 
