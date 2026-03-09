@@ -97,40 +97,43 @@
                     </f:facet>
                     <h:outputText value="#{v2PmOrderMvsController.getOrgInfoByUid(item.assetInfo.clinicalDeptUID).name}"/>
                 </p:column>
-                <p:column headerText="#{msg.locationName}"  filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderMvsController.showLocationName()}">
+                <p:column headerText="#{msg.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderMvsController.showLocationName()}">
                     <h:outputText value="#{item.assetInfo.locationName}"/>
                 </p:column>
-                <p:column>
-                    <f:facet name="header">
-                        <h:outputText value="#{msg.PmOrderRule}"/><br/>
-                    </f:facet>
+                <p:column headerText="#{msg.PmOrderRule}" filterBy="#{item.ruleName}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.ruleName}"/>
                 </p:column>
-                <p:column headerText="保养周期">
+                <p:column headerText="保养周期" filterBy="#{item.period}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.period}"/>
                 </p:column>
-                <p:column headerText="保养周期单位">
+                <p:column headerText="保养周期单位" filterBy="#{item.periodUnit}" filterMatchMode="LIKE">
                     <h:outputText value="#{v2PmOrderMvsController.getPeriodUnit(item.periodUnit)}"/>
                 </p:column>
-                <p:column headerText="#{msg.Creator}" >
+                <p:column headerText="#{msg.Creator}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.creatorName}"/>
                 </p:column>
-                <p:column headerText="#{msg.Owner}" >
+                <p:column headerText="#{msg.Owner}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.ownerName}"/>
                 </p:column>
                 <p:column headerText="保养编号"  filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.pmNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.CurrentProcessingStep}"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                <p:column headerText="#{msg.CurrentProcessingStep}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsController.stepFileter}"  rendered="#{v2PmOrderMvsController.queryIndex==-1}">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsController.stepFileter}">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{pmOrderGlobalController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
                         </p:selectOneMenu>
                     </f:facet>
                     <h:outputText value="#{item.currentStepName}"/>
                 </p:column>
-                <p:column headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="LIKE" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType')}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
                 <p:column headerText="#{msg.PlannedCompletionTime}" filterBy="#{item.planTime}" filterMatchMode="GTE" >
