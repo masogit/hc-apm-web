@@ -12,7 +12,8 @@
         </h:outputStylesheet>
         <div class="ui-g-12 card">
             <p:tabView>
-                <p:tab title="批量导入计量附件">
+                <p:ajax event="tabChange" listener="#{measureFromZipController.onChange}" update=":measuringTab:zipErrListForm" />
+                <p:tab title="批量导入计量附件" id="t1">
                     <h:form enctype="multipart/form-data" rendered="#{measureFromZipController.customRoleAuth.authSearch}">
                         <p:fieldset  legend="批量导入计量附件" id="uploaderFile">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -33,7 +34,7 @@
                         </p:fieldset>
                     </h:form>
                 </p:tab>
-                <p:tab title="批量OCR计量附件" >
+                <p:tab title="批量OCR计量附件" id="t2">
                     <h:form enctype="multipart/form-data" >
                         <p:fieldset  legend="批量OCR计量附件" id="uploaderFileOCR">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
