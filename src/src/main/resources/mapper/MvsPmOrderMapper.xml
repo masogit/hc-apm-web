@@ -196,7 +196,7 @@
             AND t.period = #{period}
         </if>
         <if test="periodUnit != null">
-            AND t.period_unit like CONCAT('%', #{periodUnit}, '%')
+            AND t.period_unit = #{periodUnit}
         </if>
         <if test="creatorName != null">
             AND t.creator_name like CONCAT('%', #{creatorName}, '%')

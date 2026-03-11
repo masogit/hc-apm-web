@@ -107,6 +107,15 @@
                     <h:outputText value="#{item.period}"/>
                 </p:column>
                 <p:column headerText="保养周期单位" filterBy="#{item.periodUnit}" filterMatchMode="LIKE">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsController.stepFileter}">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="年" itemValue="y" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="月" itemValue="m" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="周" itemValue="w" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="日" itemValue="d" noSelectionOption="true"/>
+                        </p:selectOneMenu>
+                    </f:facet>
                     <h:outputText value="#{v2PmOrderMvsController.getPeriodUnit(item.periodUnit)}"/>
                 </p:column>
                 <p:column headerText="#{msg.Creator}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
