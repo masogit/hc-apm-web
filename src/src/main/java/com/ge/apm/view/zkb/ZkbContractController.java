@@ -137,7 +137,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     public String qtyRender(String type, String contractType, String value){
         if(userContextService.isZkbUser()) {
-            if(ZkbContract.ContractType.DI.toString().equals(contractType)){
+            if(ZkbContract.ContractType.DI.toString().equals(contractType) || ZkbContract.ContractType.ULS_OEC.toString().equals(contractType)){
                 if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
                     ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(type) ||
                     ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
