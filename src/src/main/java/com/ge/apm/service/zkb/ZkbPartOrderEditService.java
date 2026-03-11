@@ -579,7 +579,7 @@ public class ZkbPartOrderEditService {
                     if(contractCount - selected.getQty() < 0){
                         reLog.append("合同备件剩余名额不足，请检查！");
                     }
-                }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())) {
+                }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())) {
                     if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
                         if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
                             Integer contractCount = zkbContract.getPartHighQuota() == null ? 0 : zkbContract.getPartHighQuota();
@@ -605,7 +605,7 @@ public class ZkbPartOrderEditService {
                     }
                 }
             }
-            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                 if(assetInfo.getAssetGroup().equals(1)){
                     String el = "";
                     if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
@@ -722,7 +722,7 @@ public class ZkbPartOrderEditService {
             }else{
                 if(!ZkbConstantUtil.NORMAL_TWO.equals(selected.getArtificialType())){
                     ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
-                    if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                    if((ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
 
                     } else if(ZkbConstantUtil.NORMAL_ONE.equals(selected.getArtificialType()) && ZkbConstantUtil.T.equals(selected.getSsaKeyFlag())){
 
@@ -771,7 +771,7 @@ public class ZkbPartOrderEditService {
     public String checkSaveItem(ZkbPartOrder selected, ZkbContract selectedContract, AssetInfo assetInfo, ZkbPartOrderItem zkbPartOrderItem){
         StringBuilder rsLog = new StringBuilder();
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())) {
-            if (ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+            if (ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
                 if (assetInfo.getAssetGroup().equals(1)) {
                     if (ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())) {
                         ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(zkbPartOrderItem.getPartNo());
@@ -827,7 +827,7 @@ public class ZkbPartOrderEditService {
                 }
                 /*if (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
                     return "当前合同剩余备件名额为"+zkbContract.getSpareQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个备件名额！";
-                } else if (ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())) {
+                } else if (ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())) {
                     if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
                         if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
                             return "当前合同剩余高值备件名额为"+zkbContract.getPartHighQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个高值备件名额！";
@@ -936,7 +936,7 @@ public class ZkbPartOrderEditService {
                     }
                 }
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), assetInfo.getUid());
-                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                if((ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                     return "该申请不扣任何名额";
                 }
                 if(ZkbConstantUtil.T.equals(zkbPartOrder.getSsaKeyFlag())){

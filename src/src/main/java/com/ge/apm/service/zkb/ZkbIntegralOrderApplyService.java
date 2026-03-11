@@ -669,7 +669,7 @@ public class ZkbIntegralOrderApplyService extends MicroServiceInvoker {
     }
 
     public String contractTypeToCatType(String contractType){
-        if(ZkbContract.ContractType.DI.name().equals(contractType)){
+        if(ZkbContract.ContractType.DI.name().equals(contractType) || ZkbContract.ContractType.ULS_OEC.name().equals(contractType)){
             return "Radiation";
         }else if(ZkbContract.ContractType.CCS.name().equals(contractType) || ZkbContract.ContractType.CCSB.name().equals(contractType) || ZkbContract.ContractType.Biomed.name().equals(contractType)){
             return "Ultrasonic";
