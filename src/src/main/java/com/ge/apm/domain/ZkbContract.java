@@ -29,7 +29,7 @@ public class ZkbContract implements ChineseName, Serializable {
     }
 
     public enum ContractType {
-        PCB,Biomed,CCS,DI,CCSB
+        PCB,Biomed,CCS,DI,CCSB,ULS_OEC
     }
 
     public enum ModifyTypeEnum{

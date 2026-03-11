@@ -571,7 +571,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
                 a = unReturnQty;
                 b = zkbContract.getSpareQuotaTotal();
-            }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+            }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                 a = unReturnQty;
                 b = (zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal()) + (zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal());
             }else {
@@ -835,7 +835,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
                 boolean isNewPartChange = false;
                 if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
-                    if(ZkbContract.ContractType.DI.toString().equals(c.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(c.getContractType()) || "PCB MVS".equals(c.getContractType())){
+                    if(ZkbContract.ContractType.DI.toString().equals(c.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(c.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(c.getContractType()) || "PCB MVS".equals(c.getContractType())){
                         AssetInfo a = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                         if(a != null && a.getAssetGroup() != null && a.getAssetGroup().equals(1)){
                             isNewPartChange = true;
@@ -1657,7 +1657,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())){
             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
             if(ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                 return;
@@ -1843,7 +1843,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     return;
                 }
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
-                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                if((ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                     return;
                 }
                 if(ZkbConstantUtil.T.equals(zkbPartOrder.getScoreFlag())){
@@ -1881,7 +1881,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && "highMachine".equals(zkbContractAsset.getAssetType())){
             return false;
         }
-        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
             AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
             if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
                 int partHighQuotaTotal = zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal();
