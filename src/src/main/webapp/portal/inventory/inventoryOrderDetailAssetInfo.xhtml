@@ -53,7 +53,7 @@
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		<p:column headerText="#{msg.assetOwnerName}" rendered="#{inventoryOrderDetailAssetInfoController.inventoryDisplayRepairOwner}">
+		<p:column headerText="#{msg.assetOwnerName}" filterBy="#{item.assetInfo.assetOwnerName}" filterMatchMode="LIKE" rendered="#{inventoryOrderDetailAssetInfoController.inventoryDisplayRepairOwner}">
 			<h:outputText value="#{item.assetInfo.assetOwnerName}" />
 		</p:column>
 
