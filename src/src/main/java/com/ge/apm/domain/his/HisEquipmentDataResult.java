@@ -99,4 +99,8 @@ public class HisEquipmentDataResult implements Serializable {
 
     @Column(name = "receipt_num",scale = 4)
     private BigDecimal receiptNum;//项目数量
+
+
+    @Column(name = "check_people_number")
+    private Long checkPeopleNumber;
 }
