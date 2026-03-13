@@ -124,6 +124,7 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
         adminFeatureActives = dao.findByHospitalUID(selectHospital.getUid());
         List<String> hasFeature = adminFeatureActives.stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toList());
         List<String> featureList = JSONArray.parseArray(features).toJavaList(String.class);
+        featureList.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED.name());
         List<ApmAdminActiveFeature> waitActiveList = Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
         waitActiveList.forEach(v -> {
             if (hasFeature.contains(v.name())) {
@@ -145,6 +146,7 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
 
     public List<ApmAdminActiveFeature> findAdminActiveFeatures() {
         List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+        featureList.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED.name());
         return Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
     }
 
