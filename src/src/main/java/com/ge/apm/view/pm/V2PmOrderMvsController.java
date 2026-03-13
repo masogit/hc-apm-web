@@ -531,6 +531,27 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                     break;
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
+                    break;
+                case "ruleName":
+                    params.put("ruleName", searchFilter.value);
+                    break;
+                case "period":
+                    params.put("period", Integer.valueOf(searchFilter.value.toString()));
+                    break;
+                case "periodUnit":
+                    params.put("periodUnit", searchFilter.value);
+                    break;
+                case "creatorName":
+                    params.put("creatorName", searchFilter.value);
+                    break;
+                case "ownerName":
+                    params.put("ownerName", searchFilter.value);
+                    break;
+                case "currentStepName":
+                    params.put("currentStepName1", searchFilter.value);
+                    break;
+                case "intExtType":
+                    params.put("intExtType", Integer.valueOf(searchFilter.value.toString()));
                 default:
                     break;
             }

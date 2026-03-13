@@ -59,6 +59,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String  contactPhone;
     private Integer failureType;
     private String orgCode;
+    private String gradeNature;
+
+    private String region;
     private UserCommonService userCommonService;
     private ConfigCacheService configCacheService;
 
@@ -357,6 +360,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return false;
     }
 
+    public boolean checkGradeNature() {
+        if (StringUtils.isEmpty(gradeNature)) {
+            return false;
+        }
+        OrgInfo orgInfo = dao
+                .findFirstByTenantUIDAndOrgCode(selected.getTenantUID(), orgCode);
+        if (orgInfo != null&&!orgCode.equals(selected.getOrgCode())) {
+            WebUtil.addErrorMessage(orgCode + "已经存在");
+            return true;
+        }
+        return false;
+    }
+
     public void saveSelectedOrg() {
         //判断是否有权限(只能操作当前登录用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
@@ -387,6 +403,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setAddress(address);
         selected.setContactPerson(contactPerson);
         selected.setContactPhone(contactPhone);
+        selected.setGradeNature(gradeNature);
+        selected.setRegion(region);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
         configCacheService.cleanOrgInfoCacheByUid(selected.getUid());
@@ -428,6 +446,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         contactPerson = null;
         contactPhone = null;
         orgCode = null;
+        gradeNature = null;
+        region = null;
     }
 
     public void buildOrdTree46AfterSave(String institutionUID) {
@@ -676,6 +696,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = selected.getAddress();
         contactPerson = selected.getContactPerson();
         contactPhone = selected.getContactPhone();
+        gradeNature = selected.getGradeNature();
+        region = selected.getRegion();
         if (selected != null) {
             isShow = selected.getOrgType() == 2;
             acShow = selected.getOrgType() == 4;
@@ -735,6 +757,22 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public String getOrgCode() {
         return orgCode;
+    }
+
+    public String getGradeNature() {
+        return gradeNature;
+    }
+
+    public void setGradeNature(String gradeNature) {
+        this.gradeNature = gradeNature;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public void setOrgCode(String orgCode) {

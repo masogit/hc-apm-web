@@ -326,6 +326,16 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             case "PmOrder":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.PM_ORDER_MSG, WechatParam.class));
                 break;
+            case "PmOrderToDoTask":
+                String messageType = selected.getRuleParam().getMessageType();
+                String msgStr = ReminderRule.PM_ORDER_TO_DO_TASK_MSG;
+                if ("overdue".equals(messageType)) {
+                    msgStr = msgStr.replace("content", "逾期未完成");
+                } else {
+                    msgStr = msgStr.replace("content", "临期待保养");
+                }
+                selected.setWechatParam(JSON.parseObject(msgStr, WechatParam.class));
+                break;
             default:
                 break;
         }
@@ -383,6 +393,19 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             default:
                 canSave = true;
                 break;
+        }
+    }
+
+    public void messageTypeChange() {
+        if ("PmOrderToDoTask".equals(selected.getType())) {
+            String messageType = selected.getRuleParam().getMessageType();
+            String msgStr = ReminderRule.PM_ORDER_TO_DO_TASK_MSG;
+            if ("overdue".equals(messageType)) {
+                msgStr = msgStr.replace("content", "逾期未完成");
+            } else {
+                msgStr = msgStr.replace("content", "临期待保养");
+            }
+            selected.setWechatParam(JSON.parseObject(msgStr, WechatParam.class));
         }
     }
 

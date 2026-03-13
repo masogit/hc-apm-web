@@ -7,7 +7,9 @@ import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
+import org.primefaces.component.tabview.Tab;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
@@ -34,12 +36,15 @@ public class MeasureFromZipController {
     private UserAccount currentUser;
     private UploadedFile file;
     private List<MeasuringCertificateDetail> resultList;
+    private List<MeasuringCertificateDetail> resultListOCR;
     private UserAuth customRoleAuth;
 
     private OCRTemplateRepository ocrTemplateRepository;
 
     private ConfigItemService configItemService;
     private int progress;
+
+    private String tabId = "";
     @PostConstruct
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
@@ -58,7 +63,7 @@ public class MeasureFromZipController {
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
     public void handleZipFileUploadOCR(FileUploadEvent event) throws IOException {
-        resultList = new ArrayList<>();
+        resultListOCR = new ArrayList<>();
         String identifyPatterns = configItemService.getConfigItemByKeyToString("identifyPatterns",currentUser);
         if("local".equals(identifyPatterns)){
             List<OCRTemplate> ocrTemplates = getOCRTemplates();
@@ -68,8 +73,8 @@ public class MeasureFromZipController {
                 return ;
             }
         }
-        resultList = measuringService.handleZipOCR(event.getFile(), currentUser,identifyPatterns);
-        if(!CollectionUtils.isEmpty(resultList)){
+        resultListOCR = measuringService.handleZipOCR(event.getFile(), currentUser,identifyPatterns);
+        if(!CollectionUtils.isEmpty(resultListOCR)){
             FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
@@ -82,6 +87,12 @@ public class MeasureFromZipController {
 
     }
 
+    public void onChange(TabChangeEvent event) {
+        Tab activeTab = event.getTab();
+        tabId = activeTab.getId();
+
+    }
+
     public UploadedFile getFile() {
         return file;
     }
@@ -91,6 +102,9 @@ public class MeasureFromZipController {
     }
 
     public List<MeasuringCertificateDetail> getResultList() {
+        if("t2".equals(tabId)){
+            return resultListOCR;
+        }
         return resultList;
     }
 

@@ -61,6 +61,4 @@ public class WechatParam {
         this.linkUrl = linkUrl;
     }
 
-
-
 }

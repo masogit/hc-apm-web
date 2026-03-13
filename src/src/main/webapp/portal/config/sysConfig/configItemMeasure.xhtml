@@ -48,6 +48,28 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('identifyPatterns'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('identifyPatterns').configItemValue == null}"/>
             </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('measuringRemindDays').name.concat('(').concat(systemConfigItemController.configItemMap.get('measuringRemindDays').key).concat(')')}</label>
+                <p:inputNumber value="#{systemConfigItemController.configItemMap.get('measuringRemindDays').showValue}" style="width: 95%;" decimalPlaces="0"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('measuringRemindDays'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('measuringRemindDays'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('measuringRemindDays').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('measuringReminderTimes').name.concat('(').concat(systemConfigItemController.configItemMap.get('measuringReminderTimes').key).concat(')')}</label>
+                <p:inputNumber value="#{systemConfigItemController.configItemMap.get('measuringReminderTimes').showValue}" style="width: 95%;" decimalPlaces="0"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('measuringReminderTimes'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('measuringReminderTimes'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('measuringReminderTimes').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 
