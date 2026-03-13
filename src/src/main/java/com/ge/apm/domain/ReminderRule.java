@@ -33,6 +33,7 @@ public class ReminderRule implements Serializable {
     public static final String ADJUSTMENT_CENTER_RETURN_MSG = "{'first':'设备借用超期','keyword1':'检测到{clinicalDeptName}已借用设备{assetName}({assetNumber})已超过{chargingDays}天，请尽快归还！'}";
     public static final String WORK_ORDER_MSG = "{'first':'{orderNum}维修工单逾期提醒','keyword1':'您有维修工单超过{timeout}小时仍未完成，请尽快处理。'}";
     public static final String PM_ORDER_MSG = "{'first':'{orderNum}保养工单逾期提醒','keyword1':'您有保养工单超过{timeout}小时仍未完成，请尽快处理。'}";
+    public static final String PM_ORDER_TO_DO_TASK_MSG = "{'first':'保养待办任务提醒','keyword1':'资产保养content单数'}";
 
     @Id
     @GeneratedValue(generator = "uuid")

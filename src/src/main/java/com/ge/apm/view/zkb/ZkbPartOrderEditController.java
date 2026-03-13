@@ -312,7 +312,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 spareArtificialFlag = true;
                 selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
             }
-        }else if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType())){
+        }else if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(selectedContract.getContractType())){
             int partHighQuota = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
             int consumableQuota = selectedContract.getConsumableQuota() == null ? 0 : selectedContract.getConsumableQuota();
 
@@ -461,7 +461,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public boolean isItemCreateDisabled(){
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
-            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
                 if (assetInfo.getAssetGroup().equals(1)) {
                     return StrUtil.isEmpty(selected.getRadiationQuotaType());
                 }
@@ -626,7 +626,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         }else{
                             this.selected.setRemainQty(0);
                         }
-                    }else if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                    }else if((ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(selectedContract.getContractType())) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                         Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                         this.selected.setRemainQty(contractCount);
                     }else if(ZkbConstantUtil.T.equals(selected.getSsaKeyFlag())){
