@@ -309,7 +309,7 @@
                     <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3 or v2PmOrderController.selected.finished eq true}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
                 </p:selectOneRadio>
                 <h:panelGroup>
-                    <label class="label">#{msg.CancellationReason}<span style="color:red">#{v2PmOrderController.selected.pmType eq 4 ? '*' : ''} </span></label>
+                    <label class="label">#{msg.CancellationReason}<span style="color:red">#{!userContextService.isEnableBtnByKey('enableCheckCancelReason') or v2PmOrderController.selected.pmType eq 4 ? '*' : ''} </span></label>
                     <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" required="#{v2PmOrderController.selected.pmType eq 4 ? true :false}" requiredMessage="#{msg.CancelReasonCannotBeEmpty}"/>
                 </h:panelGroup>
                 <br></br>
@@ -329,7 +329,7 @@
                     <f:selectItem itemDisabled="#{not v2PmOrderController.periodShow}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
                 </p:selectOneRadio>
                 <h:panelGroup>
-                    <label class="label">#{msg.CancellationReason}<span style="color:red">#{v2PmOrderController.batchCancelFlag() ? '*' : ''} </span></label>
+                    <label class="label">#{msg.CancellationReason}<span style="color:red">#{!userContextService.isEnableBtnByKey('enableCheckCancelReason') or v2PmOrderController.batchCancelFlag() ? '*' : ''} </span></label>
                     <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" required="#{v2PmOrderController.batchCancelFlag() ? true :false}" requiredMessage="#{msg.CancelReasonCannotBeEmpty}"/>
                 </h:panelGroup>
                 <br></br>
