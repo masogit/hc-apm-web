@@ -10,3 +10,6 @@ CREATE INDEX CONCURRENTLY IF NOT exists idx_a_perfect_lateral ON his_equipment_d
 --YHAAO-26795 添加计量消息提醒配置项
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 7, '', '计量提醒提前天数', 'measuringRemindDays', '计量提醒提前天数', 'f', 't', 2 where not exists(select * from config_item where key = 'measuringRemindDays');
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 7, '', '计量提醒提前次数', 'measuringReminderTimes', '计量提醒提前次数', 'f', 't', 2 where not exists(select * from config_item where key = 'measuringReminderTimes');
+
+-- 增加配置项 维修工单备件预估单价是否必填 YHAAO-27474
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修工单备件预估单价是否必填', 'enableCheckPartsPrice', '维修工单备件预估单价是否必填', 'f', 't', 3 where not exists (select * from config_item where key = 'enableCheckPartsPrice');
