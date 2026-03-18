@@ -202,26 +202,26 @@
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==0 || workOrderMgrController.selectedWorkOrder.entryType==2  || workOrderMgrController.selectedWorkOrder.entryType==null}">
-                            <label class="label">#{workOrderMgrController.getManHourShow()}</label>
+                            <label class="label">#{workOrderMgrController.getManHourShow()}(小时)</label>
                             <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==1 || workOrderMgrController.selectedWorkOrder.entryType==3}">
-                            <label class="label">#{workOrderMgrController.getManHourShow()}</label>
+                            <label class="label">#{workOrderMgrController.getManHourShow()}(小时)</label>
                             <p:inputNumber id="manHours_input2" readonly="true" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.otherExpense}</label>
-                            <p:inputNumber minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" >
+                            <p:inputNumber minValue="0" maxValue="99999999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" >
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.ExternalExpenses}</label>
-                            <p:inputNumber  minValue="0"  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}">
+                            <p:inputNumber  minValue="0"  maxValue="99999999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>

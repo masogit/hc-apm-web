@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AdminFeatureActive;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MessageUtil;
@@ -22,6 +19,7 @@ import lombok.Setter;
 import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -42,6 +40,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     TenantInfoRepository dao;
     private ConfigCacheService configCacheService;
     private AdminFeatureActiveRepository featureActiveRepository;
+    private AdminCustomActiveRepository customActiveRepository;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
     @Getter
@@ -62,6 +61,9 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     @Getter
     @Setter
     private String selectedFeature;
+    @Getter
+    @Setter
+    private String selectedCustomFeature;
     @Getter
     @Setter
     private List<OrgInfo> hospitalList;
@@ -88,13 +90,25 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     private List<AdminFeatureActive> adminFeatureActives;
     @Getter
     @Setter
+    private List<AdminCustomActive> adminCustomFeatureActives;
+    @Getter
+    @Setter
     private List<AdminFeatureActive> filterAdminFeatureActives = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<AdminCustomActive> filterAdminCustomFeatureActives = new ArrayList<>();
     @Getter
     @Setter
     private Integer tabIndex = 0;
     @Getter
     @Setter
     private String link;
+    @Getter
+    @Setter
+    private String customFunctionName;
+    @Getter
+    @Setter
+    private String customFunctionComment;
     @Getter
     @Setter
     private String hospitalStr;
@@ -104,12 +118,12 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
 
     @Override
     protected void init() {
-
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         featureActiveRepository = WebUtil.getBean(AdminFeatureActiveRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userService = WebUtil.getBean(UserCommonService.class);
+        customActiveRepository = WebUtil.getBean(AdminCustomActiveRepository.class);
         String tenantUid = "";
         String encodeStr = WebUtil.getRequestParameter("str");
         if (encodeStr != null) {
@@ -122,6 +136,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         selectedFeature = "ALL";
         hospitalList = orgDao.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
         buildActiveMap(tenantInfo.getFeatureList());
+        buildCustomActive();
         initModuleSetting();
     }
 
@@ -173,6 +188,28 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         }
     }
 
+    public void changeCustomActiveListener() {
+        if (StringUtils.hasText(selectedCustomFeature) && selectedCustomFeature.equals("ALL")) {
+            filterAdminCustomFeatureActives = adminCustomFeatureActives.stream().filter(v -> v.getHospitalUID() != null).collect(Collectors.toList());
+        } else {
+            filterAdminCustomFeatureActives = adminCustomFeatureActives.stream().filter(v -> v.getFeatureKey().equals(selectedCustomFeature)).collect(Collectors.toList());
+            String comment = Optional.ofNullable(filterAdminCustomFeatureActives.get(0)).orElse(new AdminCustomActive()).getActiveComment();
+            List<String> activeHospital = filterAdminCustomFeatureActives.stream().filter(v -> v.getHospitalUID() != null).map(AdminCustomActive::getHospitalUID).collect(Collectors.toList());
+            hospitalList.stream().filter(hospital -> !activeHospital.contains(hospital.getUid())).forEach(hospital -> {
+                AdminCustomActive featureActive = new AdminCustomActive();
+                featureActive.setFeatureKey(selectedCustomFeature);
+                featureActive.setHospitalUID(hospital.getUid());
+                featureActive.setTenantUID(hospital.getTenantUID());
+                featureActive.setActiveComment(comment);
+                filterAdminCustomFeatureActives.add(featureActive);
+            });
+            filterAdminCustomFeatureActives = filterAdminCustomFeatureActives.stream().filter(v -> v.getHospitalUID() != null).collect(Collectors.toList());
+        }
+        if (StringUtils.hasText(hospitalStr)) {
+            filterAdminCustomFeatureActives = filterAdminCustomFeatureActives.stream().filter(v -> getHospitalName(v.getHospitalUID()).contains(hospitalStr)).collect(Collectors.toList());
+        }
+    }
+
     private void buildActiveMap(String features) {
         adminFeatureActives = featureActiveRepository.findByTenantUID(tenantInfo.getUid());
         filterAdminFeatureActives = adminFeatureActives;
@@ -185,6 +222,14 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         // 若模块映射已初始化，则同步模块勾选状态
         if (moduleFeatureMap != null && !moduleFeatureMap.isEmpty()) {
             refreshModuleChecked();
+        }
+    }
+
+    private void buildCustomActive() {
+        adminCustomFeatureActives = customActiveRepository.findByTenantUID(tenantInfo.getUid());
+        filterAdminCustomFeatureActives = adminCustomFeatureActives.stream().filter(v -> v.getHospitalUID() != null).collect(Collectors.toList());
+        if (StringUtils.hasText(selectedCustomFeature) && !selectedCustomFeature.equals("ALL")) {
+            changeCustomActiveListener();
         }
     }
 
@@ -276,9 +321,16 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
         List<ApmAdminActiveFeature> features = Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
         features.add(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING);
-//        features.add(ApmAdminActiveFeature.MEASUREOCR);
         features.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED);
         return features;
+    }
+
+    public Set<String> findAdminCustomActiveFeatures() {
+        List<AdminCustomActive> adminCustomActives = customActiveRepository.findByTenantUID(tenantInfo.getUid());
+        if (CollectionUtils.isEmpty(adminCustomActives)) {
+            return new HashSet<>();
+        }
+        return adminCustomActives.stream().map(AdminCustomActive::getFeatureKey).collect(Collectors.toSet());
     }
 
     public void hospitalChange() {
@@ -339,6 +391,29 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         buildActiveMap(tenantInfo.getFeatureList());
         MessageUtil.outPutReturnFacesMessage("激活成功", FacesMessage.SEVERITY_INFO);
     }
+
+    public void addCustomHospital(AdminCustomActive adminCustomActive) {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        adminCustomActive.setActiveUser(userAccount.getUid());
+        adminCustomActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
+        adminCustomActive.setCreateDate(new Date());
+        adminCustomActive.setActiveDate(new Date());
+        adminCustomActive.setActiveComment(adminCustomActive.getActiveComment());
+        customActiveRepository.save(adminCustomActive);
+        buildCustomActive();
+        MessageUtil.outPutReturnFacesMessage("激活成功", FacesMessage.SEVERITY_INFO);
+    }
+
+    public void addCustomActive() {
+        AdminCustomActive adminCustomActive = new AdminCustomActive();
+        adminCustomActive.setCreateDate(new Date());
+        adminCustomActive.setFeatureKey(customFunctionName);
+        adminCustomActive.setActiveComment(customFunctionComment);
+        adminCustomActive.setTenantUID(tenantInfo.getUid());
+        customActiveRepository.save(adminCustomActive);
+        buildCustomActive();
+    }
+
 
     public void saveFeatures(){
         try {

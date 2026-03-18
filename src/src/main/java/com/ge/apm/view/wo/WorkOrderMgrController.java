@@ -2786,6 +2786,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     //保存一个备件
     public void saveItem(){
+        if(!userContextService.isEnableBtnByKey("enableCheckPartsPrice") && null ==itemDetail.getPartsPrice()){
+            WebUtil.addErrorMessage("维修工单备件预估单价必填！");
+            return;
+        }
         //合同价格"默认等于"预估单价
         if(itemDetail.getParts()==null && partsItem==null) {
             WebUtil.addErrorMessage("备件名称必填！");

@@ -190,7 +190,7 @@
             AND t.main_sub = #{mainSub}
         </if>
         <if test="ruleName != null">
-            AND t.rule_name = #{ruleName}
+            AND t.rule_name like CONCAT('%', #{ruleName}, '%')
         </if>
         <if test="period != null">
             AND t.period = #{period}
@@ -199,13 +199,13 @@
             AND t.period_unit = #{periodUnit}
         </if>
         <if test="creatorName != null">
-            AND t.creator_name = #{creatorName}
+            AND t.creator_name like CONCAT('%', #{creatorName}, '%')
         </if>
         <if test="ownerName != null">
-            AND t.owner_name = #{ownerName}
+            AND t.owner_name like CONCAT('%', #{ownerName}, '%')
         </if>
         <if test="currentStepName1 != null">
-            AND t.current_step_name = #{currentStepName1}
+            AND t.current_step_name like CONCAT('%', #{currentStepName1}, '%')
         </if>
         <if test="intExtType != null">
             AND t.int_ext_type = #{intExtType}

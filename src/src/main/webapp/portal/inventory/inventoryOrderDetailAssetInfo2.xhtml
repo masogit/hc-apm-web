@@ -73,7 +73,7 @@
 				</p:selectOneMenu>
 			</f:facet>
 		</p:column>
-		<p:column headerText="#{msg.assetOwnerName}" rendered="#{inventoryOrderDetailAssetInfoController2.inventoryDisplayRepairOwner}">
+		<p:column headerText="#{msg.assetOwnerName}" filterBy="#{item.assetInfo.assetOwnerName}" filterMatchMode="LIKE" rendered="#{inventoryOrderDetailAssetInfoController2.inventoryDisplayRepairOwner}">
 			<h:outputText value="#{item.assetInfo.assetOwnerName}" />
 		</p:column>
 		<p:column headerText="#{msg.Actions}" style="width: 130px" rendered="#{!inventoryOrderDetailAssetInfoController.finished}" exportable="false">

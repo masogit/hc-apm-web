@@ -301,7 +301,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             }
                         }else{
                             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
-                            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                            if((ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                                 zkbPartOrderStatusVo.setWhetherDeductEdit(true);
                                 selected.setWhetherDeduct(ZkbConstantUtil.F);
                             }else if(selected.getSsaKeyFlag() != null && ZkbConstantUtil.T.equals(selected.getSsaKeyFlag())){
@@ -414,7 +414,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         return true;
                     }
                 }
-                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && "t".equals(zkbContract.getFirstYearFlag())){
+                if((ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())) && "t".equals(zkbContract.getFirstYearFlag())){
                     return false;
                 }else{
                     if(StringUtils.isNotEmpty(selected.getScoreFlag())){
@@ -829,7 +829,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.saveModifyApply(selected,currentUser);
         selected = zkbPartOrderRepository.findById(selected.getId());
         ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
-        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+        if((ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
             zkbPartOrderStatusVo.setWhetherDeductEdit(true);
             selected.setWhetherDeduct(ZkbConstantUtil.F);
         }else if(selected.getSsaKeyFlag() != null && ZkbConstantUtil.T.equals(selected.getSsaKeyFlag())){
@@ -1301,7 +1301,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderStatusVo.setWhetherDeductEdit(true);
         }else{
             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
-            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+            if((ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())) && ZkbConstantUtil.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                 zkbPartOrderStatusVo.setWhetherDeductEdit(true);
             }else if(selected.getSsaKeyFlag() != null && ZkbConstantUtil.T.equals(selected.getSsaKeyFlag())){
                 zkbPartOrderStatusVo.setWhetherDeductEdit(true);

@@ -122,7 +122,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public Boolean qtyRender(String type){
         //if(userContextService.isZkbUser()) {
-            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(selected.getContractType())){
                 if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
                     ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString().equals(type) ||
                     ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
@@ -209,11 +209,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     public void contractTypeSelect(){
         queryQuota();
         if ("Create".equalsIgnoreCase(actionName)) {
-            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
                 selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
             }
         }else {
-            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
                 if(StringUtils.isEmpty(selected.getQuotaDeductType())){
                     selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
                 }
