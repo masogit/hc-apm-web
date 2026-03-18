@@ -869,7 +869,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
     public void cancelPMorder() {
-        if( userContextService.isEnableBtnByKey("enableCheckCancelReason") && StringUtils.isBlank(cancelReason)){
+        if(!userContextService.isEnableBtnByKey("enableCheckCancelReason") && StringUtils.isBlank(cancelReason)){
             WebUtil.addErrorMessage("取消原因不能为空！");
             return;
         }
@@ -878,7 +878,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public void cancelBatchPMorder() {
-        pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
+        if(!userContextService.isEnableBtnByKey("enableCheckCancelReason") && StringUtils.isBlank(cancelReason)){
+            WebUtil.addErrorMessage("取消原因不能为空！");
+            return;
+        }
+       pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
     }
 
     public boolean getPmRule(){

@@ -40,7 +40,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.messageType}<span style="color:red">*</span></label >
                             <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.messageType}">
-                                <p:ajax event="change" update="pushSetting"/>
+                                <p:ajax event="change" update="pushSetting wechatTemplate" listener="#{reminderRuleController.messageTypeChange}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('messageType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>

@@ -39,6 +39,21 @@
                             </p:panelGrid>
                         </c:forEach>
                     </p:fieldset>
+                    <p:fieldset id="customFeatureList" legend="自定义功能列表">
+                        <c:forEach items="#{activeFeatureController.findAdminActiveCustomFeatures()}" var="item" varStatus="status" >
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:selectBooleanCheckbox disabled="#{activeFeatureController.oldCustomFunctionMap[item]}"
+                                                         value="#{activeFeatureController.selectCustomFunctionMap[item]}"
+                                                         itemLabel="#{item}">
+                                    <p:ajax update="customFeatureList"
+                                            listener="#{activeFeatureController.featureChange(item)}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:outputLabel value="#{item}"/>
+                                <p:outputLabel></p:outputLabel>
+                                <p:outputLabel></p:outputLabel>
+                            </p:panelGrid>
+                        </c:forEach>
+                    </p:fieldset>
                     <br/>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <p:scrollPanel style="width:580px;height:300px" mode="native">

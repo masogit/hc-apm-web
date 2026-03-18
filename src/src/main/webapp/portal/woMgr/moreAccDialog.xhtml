@@ -22,8 +22,8 @@
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
-                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice1"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
+                        <label class="label">#{msg.EstimatedUnitPriceRMB}<span >#{!userContextService.isEnableBtnByKey('enableCheckPartsPrice') ? '*' : ''} </span></label>
+                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="2" maxValue="99999999" id="partsPrice1"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="#{!userContextService.isEnableBtnByKey('enableCheckPartsPrice')}" requiredMessage="#{msg.EstimatedUnitPriceRMB} #{msg.ValidationRequire}" >
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)" >
                         </p:ajax>
 
@@ -84,7 +84,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ContractPriceRMB}</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPrice1" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
+                        <p:inputNumber  decimalPlaces="2" maxValue="99999999" id="closedPrice1" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
 
                             <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
                             </p:ajax>

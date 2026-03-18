@@ -312,16 +312,18 @@ public class AssetInfoBulkEditCheckService {
         for(AssetInfo as: assets){
             //临床助手检查进行中
             List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findByAssetUid(as.getUid());
-            if(!StringUtils.isEmpty(nurseSiteMaintainItemList) && nurseSiteMaintainItemList.size()>0){
-                Set<String> setMaintainIds = new HashSet<String>();
-                for (int i = 0; i < nurseSiteMaintainItemList.size(); i++) {
-                    setMaintainIds.add(nurseSiteMaintainItemList.get(i).getId());
+            if(!StringUtils.isEmpty(nurseSiteMaintainItemList) && !nurseSiteMaintainItemList.isEmpty()){
+                Set<String> setMaintainIds = new HashSet<>();
+                for (NurseSiteMaintainItem nurseSiteMaintainItem : nurseSiteMaintainItemList) {
+                    setMaintainIds.add(nurseSiteMaintainItem.getId());
                 }
                 Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainIds);
                 for (NurseSiteMaintainData nurseSiteMaintainData : maintainDataByParentIds) {
-                    Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? nurseSiteMaintainData.getCheckValue() :false;
+                    boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? nurseSiteMaintainData.getCheckValue() : false;
                     if(!checkValue){
-                        list.add(as);
+                        if (!list.contains(as)) {
+                            list.add(as);
+                        }
                     }
                 }
             }

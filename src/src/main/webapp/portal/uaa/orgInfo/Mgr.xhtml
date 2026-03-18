@@ -148,6 +148,14 @@
                                             <f:validateRegex pattern="(^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$)|(^0\d{2,3}-?\d{7,8}$)" />
                                         </p:inputText>
                                     </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.selected.orgType ne 4}">
+                                        <label class="label">等级性质</label>
+                                        <p:inputText id="gradeNature" value="#{orgInfoController.gradeNature}" required="false" requiredMessage="#{msg.gradeNature} #{msg.ValidationRequire}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.selected.orgType ne 4}">
+                                        <label class="label">所属区域</label>
+                                        <p:inputText id="region" value="#{orgInfoController.region}" required="false" requiredMessage="#{msg.region} #{msg.ValidationRequire}" />
+                                    </h:panelGroup>
 
                                     <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}" update="orgTree :growl"/>
                                     <h:inputHidden id="failureType" value="#{orgInfoController.failureType}"/>

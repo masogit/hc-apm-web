@@ -514,6 +514,9 @@ public class InventoryOrderService {
 				case "status":
 					param.put("status", Integer.parseInt(searchFilter.value.toString()));
 					break;
+				case "assetOwnerName":
+					param.put("assetOwnerName", searchFilter.value);
+					break;
 				case "lastModifiedDate":
 					if (searchFilter.operator.name().equals("GTE")) {
 						param.put("startDate", searchFilter.value);

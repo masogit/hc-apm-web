@@ -534,7 +534,7 @@ public class ZkbContractService {
             }
         }
 
-        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
             int partHighQuotaTotal = zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal();
             int partHighQuota = zkbContract.getPartHighQuota() == null ? 0 : zkbContract.getPartHighQuota();
             int partHighQuotaApply = zkbContract.getPartHighQuotaApply() == null ? 0 : zkbContract.getPartHighQuotaApply();
@@ -601,7 +601,7 @@ public class ZkbContractService {
         if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
             sb.append(StringAppendQuota("CCSB保养名额",nullToZero(zkbContract.getCcsbMaintenanceQuotaTotal()),nullToZero(zkbContract.getCcsbMaintenanceQuotaApply()),nullToZero(zkbContract.getCcsbMaintenanceQuota()),nullToZero(zkbContract.getCcsbMaintenanceQuotaUse())));
         }
-        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
             sb.append(StringAppendQuota("备件高值名额",nullToZero(zkbContract.getPartHighQuotaTotal()),nullToZero(zkbContract.getPartHighQuotaApply()),nullToZero(zkbContract.getPartHighQuota()),nullToZero(zkbContract.getPartHighQuotaUse())));
         }
         return sb.toString();
@@ -630,7 +630,7 @@ public class ZkbContractService {
             if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),currentUser);
             }
-            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString(),currentUser);
             }
             if(zkbContract.getConsumeGrowthDate() == null){
@@ -655,7 +655,7 @@ public class ZkbContractService {
             if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                 zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             }
-            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.ULS_OEC.toString().equals(zkbContract.getContractType())){
                 zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             }
 
