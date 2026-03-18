@@ -149,10 +149,13 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-
+                    <p:column width="110" headerText="是否上传附件" exportable="false">
+                        <h:outputText value="#{item.existFileFlag}"/>
+                    </p:column>
                     <p:column width="110" rendered="#{measureAssetListController.matchType==2}" headerText="#{msg.Actions}" exportable="false">
                         <p:commandButton  value="关联设备" process="@this"  actionListener="#{measureAssetListController.matchAsset(item.uid)}"  oncomplete="PF('AssetSelectDlg').show()" update="measuringTab:assetSelectForm  measuringTab:assetSearchForm"/>
                     </p:column>
+
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" action="#{measuringCertificateDetailController.createAction()}" title="#{msg.Create}" />
