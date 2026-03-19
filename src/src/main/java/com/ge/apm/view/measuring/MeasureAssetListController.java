@@ -212,7 +212,22 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
         }
 
+        for(AssetInfo assetInfo : currentPageAssets){
+            if(StrUtil.isNotEmpty(assetInfo.getBoUuid())){
+                assetInfo.setexistFileFlag(isExistFile(assetInfo.getBoUuid()));
+            }
+        }
+
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
+    }
+
+    public String isExistFile(String uuid){
+        List<V2_BlobObject> blobObjects = blobDao.findByBoUuid(uuid);
+        if(CollectionUtils.isEmpty(blobObjects)){
+            return "否";
+        }else{
+            return "是";
+        }
     }
 
     private Wrapper<AssetInfo> measureUnpairedResultConvert() {
