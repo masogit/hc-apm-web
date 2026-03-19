@@ -13,3 +13,11 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 -- 增加配置项 维修工单备件预估单价是否必填 YHAAO-27474
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修工单备件预估单价是否必填', 'enableCheckPartsPrice', '维修工单备件预估单价是否必填', 'f', 't', 3 where not exists (select * from config_item where key = 'enableCheckPartsPrice');
+
+
+
+update config_item set value_type = 9, default_value = '{"rendered":false,"label":"维修工单是否显示诊断过程","required":"false","requiredMessage":"维修工单是否显示诊断过程为必输项, 不能为空！"}' where key = 'showDiagnosticProcess';
+
+delete from config_item_value  where key = 'showDiagnosticProcess';
+
+
