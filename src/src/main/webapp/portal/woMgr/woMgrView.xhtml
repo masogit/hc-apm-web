@@ -229,7 +229,7 @@
                                         <label class="label"> #{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').label}</label>
                                         <p:outputLabel value="#{fieldMsg.fieldValue('workOrderType', woItem.workOrderType)}" />
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{workOrderMgrController.showDigitalSignature()}">
+                                    <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showDiagnosticProcess').rendered}}">
                                         <label class="label">#{msg.diagnosticProcess}</label>
                                         <p:outputLabel value="#{woItem.diagnosticProcess}" title="#{woItem.diagnosticProcess}" style="word-wrap: break-word;"/>
                                     </h:panelGroup>

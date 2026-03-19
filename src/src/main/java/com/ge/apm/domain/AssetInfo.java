@@ -1147,6 +1147,8 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     private String createType;
 
+    @Transient
+    private String existFileFlag;
 
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
@@ -3499,5 +3501,13 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getexistFileFlag() {
+        return existFileFlag;
+    }
+
+    public void setexistFileFlag(String existFileFlag) {
+        this.existFileFlag = existFileFlag;
     }
 }

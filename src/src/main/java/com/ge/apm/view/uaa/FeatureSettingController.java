@@ -193,12 +193,14 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             filterAdminCustomFeatureActives = adminCustomFeatureActives.stream().filter(v -> v.getHospitalUID() != null).collect(Collectors.toList());
         } else {
             filterAdminCustomFeatureActives = adminCustomFeatureActives.stream().filter(v -> v.getFeatureKey().equals(selectedCustomFeature)).collect(Collectors.toList());
+            String comment = Optional.ofNullable(filterAdminCustomFeatureActives.get(0)).orElse(new AdminCustomActive()).getActiveComment();
             List<String> activeHospital = filterAdminCustomFeatureActives.stream().filter(v -> v.getHospitalUID() != null).map(AdminCustomActive::getHospitalUID).collect(Collectors.toList());
             hospitalList.stream().filter(hospital -> !activeHospital.contains(hospital.getUid())).forEach(hospital -> {
                 AdminCustomActive featureActive = new AdminCustomActive();
                 featureActive.setFeatureKey(selectedCustomFeature);
                 featureActive.setHospitalUID(hospital.getUid());
                 featureActive.setTenantUID(hospital.getTenantUID());
+                featureActive.setActiveComment(comment);
                 filterAdminCustomFeatureActives.add(featureActive);
             });
             filterAdminCustomFeatureActives = filterAdminCustomFeatureActives.stream().filter(v -> v.getHospitalUID() != null).collect(Collectors.toList());

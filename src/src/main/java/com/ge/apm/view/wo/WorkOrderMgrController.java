@@ -4596,9 +4596,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
 
-    public Boolean showDigitalSignature() {
-        String showDiagnosticProcess = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(),loginUser.getTenantUID(), "showDiagnosticProcess");
-        return StrUtil.isNotEmpty(showDiagnosticProcess) && "true".equals(showDiagnosticProcess);
-    }
+
 }
 
