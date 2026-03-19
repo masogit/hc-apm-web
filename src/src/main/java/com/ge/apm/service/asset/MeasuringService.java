@@ -649,16 +649,21 @@ public class MeasuringService {
     private MeasuringCertificateDetail handleOcrResult(JSONObject data, File newFile,List<V2_BlobObject> v2BlobObjects) {
         MeasuringCertificateDetail result = null;
         JSONObject object= data;
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+
         try {
             result = new MeasuringCertificateDetail();
             String assetSN = object.getString("assetSN");
-            if(StringUtils.isEmpty(assetSN)) return null;
-            String[] split = assetSN.split("/");
-            List<SearchFilter> searchFilters = new ArrayList<>();
-            searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
-            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
-            List<AssetInfo> assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
+
+            List<AssetInfo> assetInfos=new ArrayList<>();
+            if(!StringUtils.isEmpty(assetSN)) {
+                String[] split = assetSN.split("/");
+                List<SearchFilter> searchFilters = new ArrayList<>();
+                searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
+                assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
+            };
+
 //            if(CollectionUtils.isEmpty(assetInfos)){
 //                result.setCertificateNo(object.getString("certificateNo"));
 //                result.setErrorInfo(assetSN + ",未匹配到设备");
