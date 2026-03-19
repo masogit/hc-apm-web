@@ -604,18 +604,34 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void delete(){
-        String uid = this.selected.getUid();
-        String boUuid = this.selected.getBoUuid();
-        if(Objects.isNull(boUuid)) return;
-        measuringCertificateDetailDao.delete(boUuid);
-        blobService.deleteBlobFileByBoUuid(boUuid);
-        WebUtil.addSuccessMessage("删除成功");
+        if(!selectedMap.isEmpty()) {
+            List<String> mcdUidList = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(mcdUidList)){
+                WebUtil.addErrorMessage("请先勾选设备");
+                return;
+            }
+            mcdUidList.forEach(item->{
+                delete(item);
+            });
+            WebUtil.addSuccessMessage("删除成功");
+            selectedMap.clear();
+        }else{
+            WebUtil.addErrorMessage("请先勾选设备");
+        }
+
+    }
+    public void delete(String mcdUid){
+        if(Objects.isNull(mcdUid)) return;
+        MeasuringCertificateDetail measuringCertificateDetail = measuringCertificateDetailDao.findById(mcdUid);
+        String uid = measuringCertificateDetail.getAssetUID();
+        measuringCertificateDetailDao.delete(mcdUid);
+        blobService.deleteBlobFileByBoUuid(mcdUid);
         if(matchType==1){
             AssetInfo assetInfo = dao.findByUid(uid);
             measuringService.updateMeasuringDate(assetInfo);
         }
         this.selected = null;
-        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(currentUser, SystemEventAuditEnum.MEASURE_DELETE, boUuid, Boolean.TRUE, "","measuring", "");
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(currentUser, SystemEventAuditEnum.MEASURE_DELETE, mcdUid, Boolean.TRUE, "","measuring", "");
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
     }
