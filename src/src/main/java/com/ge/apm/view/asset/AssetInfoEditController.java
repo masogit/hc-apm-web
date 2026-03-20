@@ -411,6 +411,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             qrCode = qr_Code;
             isStatus = true;
             createAssetInfo();
+            if(selected.getAssetClassification32()!=null){
+                selectItemDto=new SelectItemDto(selected.getAssetClassification32(),null);
+            }
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             rejectTextHistory = new ArrayList();
             if (null != createRequest.getFeedback()) {
