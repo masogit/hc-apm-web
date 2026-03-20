@@ -17,7 +17,7 @@
 
                 <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;" rendered="#{userContextService.hasCurrentTenantName('')}">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
                 <p:dataTable id="datalist_measuringAsset" value="#{measureAssetListController.lazyModel}" var="item" widgetVar="varDataList_measuringAsset"
-                              selection="#{measureAssetListController.selected}"
+                             selectionMode="single" selection="#{measureAssetListController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.check_date}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -25,7 +25,7 @@
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
 
-<!--                    <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm deleteButton"/>-->
+                    <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm "/>
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                     <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                     <p:column width="36"  id="checkBoxColumn" exportable="false">
