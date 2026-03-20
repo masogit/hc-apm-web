@@ -56,9 +56,11 @@
         mcd.valid_date_to next_metering_date,
         mcd.check_date,
         mcd.check_person,
-        mcd.id as bo_uuid
+        mcd.id as bo_uuid,
+        case when o.cu is not null then '是' else '否' end as exist_file_flag
         FROM asset_info ai
         INNER JOIN measuring_certificate_detail mcd ON mcd.asset_uid = ai.uid
+        left  join (select count(*) cu, bo_uuid from v2_blob_object where bo_type = 'Measuring' group by bo_uuid) o on o.bo_uuid = mcd.id
         <where>${ew.sqlSegment}</where>
     </select>
 
@@ -81,6 +83,7 @@
         mcd.department  department,
         mcd.id as bo_uuid
         FROM  measuring_certificate_detail mcd
+        left  join (select count(*) cu, bo_uuid from v2_blob_object where bo_type = 'Measuring' group by bo_uuid) o on o.bo_uuid = mcd.id
         <where>${ew.sqlSegment}</where>
     </select>
 

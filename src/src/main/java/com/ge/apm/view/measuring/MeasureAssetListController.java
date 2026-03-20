@@ -211,23 +211,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 i++;
             }
         }
-
-        for(AssetInfo assetInfo : currentPageAssets){
-            if(StrUtil.isNotEmpty(assetInfo.getBoUuid())){
-                assetInfo.setexistFileFlag(isExistFile(assetInfo.getBoUuid()));
-            }
-        }
-
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
-    }
-
-    public String isExistFile(String uuid){
-        List<V2_BlobObject> blobObjects = blobDao.findByBoUuid(uuid);
-        if(CollectionUtils.isEmpty(blobObjects)){
-            return "否";
-        }else{
-            return "是";
-        }
     }
 
     private Wrapper<AssetInfo> measureUnpairedResultConvert() {
@@ -294,6 +278,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         if(this.hasFilterOnField("checkPerson")){
             String checkPerson = searchFilters.stream().filter(sf -> "checkPerson".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("checkPerson", SearchFilter.Operator.EQ, 0)).value.toString();
             wrapper.like("mcd.check_person", checkPerson);
+        }
+        if(this.hasFilterOnField("existFileFlag")){
+            String checkPerson = searchFilters.stream().filter(sf -> "existFileFlag".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("existFileFlag", SearchFilter.Operator.EQ, 0)).value.toString();
+            if("0".equals(checkPerson)){
+                wrapper.isNotNull("o.cu");
+            }else if("1".equals(checkPerson)){
+                wrapper.isNull("o.cu");
+            }
         }
         return wrapper;
     }
@@ -390,7 +382,15 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             String checkPerson = searchFilters.stream().filter(sf -> "checkPerson".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("checkPerson", SearchFilter.Operator.EQ, 0)).value.toString();
             wrapper.like("mcd.check_person", checkPerson);
         }
-        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson");
+        if(this.hasFilterOnField("existFileFlag")){
+            String checkPerson = searchFilters.stream().filter(sf -> "existFileFlag".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("existFileFlag", SearchFilter.Operator.EQ, 0)).value.toString();
+            if("0".equals(checkPerson)){
+                wrapper.isNotNull("o.cu");
+            }else if("1".equals(checkPerson)){
+                wrapper.isNull("o.cu");
+            }
+        }
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag");
         List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
         WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
