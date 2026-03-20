@@ -149,7 +149,14 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column width="110" headerText="是否上传附件" exportable="false">
+                    <p:column width="110" headerText="是否上传附件" exportable="false"  filterBy="#{item.existFileFlag}" filterMatchMode="GTE" >
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="是" itemValue="0" noSelectionOption="true" />
+                                <f:selectItem itemLabel="否" itemValue="1" noSelectionOption="true" />
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{item.existFileFlag}"/>
                     </p:column>
                     <p:column width="110" rendered="#{measureAssetListController.matchType==2}" headerText="#{msg.Actions}" exportable="false">
