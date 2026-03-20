@@ -133,6 +133,8 @@ public class QrCodeLib implements Serializable {
     @Column(name = "lifecycle")
     private Double lifecycleInYear;
 
+    @Column(name = "asset_classification32")
+    private String assetClassification32;
     public String getDepartNum() {
         return departNum;
     }
@@ -441,5 +443,13 @@ public class QrCodeLib implements Serializable {
 
     public void setLifecycleInYear(Double lifecycleInYear) {
         this.lifecycleInYear = lifecycleInYear;
+    }
+
+    public String getAssetClassification32() {
+        return assetClassification32;
+    }
+
+    public void setAssetClassification32(String assetClassification32) {
+        this.assetClassification32 = assetClassification32;
     }
 }
