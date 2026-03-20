@@ -28,6 +28,8 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.ByteArrayContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
@@ -53,6 +55,8 @@ import java.util.regex.Pattern;
 @ManagedBean
 @ViewScoped
 public class MeasuringCertificateDetailController extends GenericCRUDUUIDController<MeasuringCertificateDetail> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeasuringCertificateDetailController.class);
     private static final String MEASURING_STATUS= "measuringStatus";
 
     private MeasuringCertificateDetailRepository dao;
@@ -86,6 +90,8 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     private String identifyPatterns;
 
+    private String identifyPostProcessorRule;
+
     @Override
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
@@ -98,6 +104,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         systemEventAuditUtil = WebUtil.getBean(SystemEventAuditAopAspect.class);
         configItemService = WebUtil.getBean(ConfigItemService.class);
         identifyPatterns = configItemService.getConfigItemByKeyToString("identifyPatterns", currentUser);
+        identifyPostProcessorRule = configItemService.getConfigItemByKeyToString("identifyPostProcessorRule", currentUser);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         if("Create".equals(actionName)){
@@ -177,8 +184,31 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             WebUtil.addErrorMessage("识别失败!");
         }
     }
+    public void postProcessorJSON(JSONObject data){
+        try {
+            if(StringUtils.isEmpty(identifyPostProcessorRule)) return;
+            JSONObject ruleJSON = JSONObject.parseObject(identifyPostProcessorRule);
+            LOGGER.info("data:{},ruleJSON:{}",data,ruleJSON);
+            if(ruleJSON == null || ruleJSON.isEmpty()) return;
+            for (Map.Entry<String, Object> stringObjectEntry : ruleJSON.entrySet()) {
+                String key = stringObjectEntry.getKey();
+                String regex =(String) stringObjectEntry.getValue();
+                String value =(String) data.get(key);
+                if(StringUtils.isEmpty(value))continue;
+                Pattern compile = Pattern.compile(regex);
+                Matcher matcher = compile.matcher(value);
+                if(matcher.find()){
+                    String group = matcher.group(1);
+                    data.put(key,group);
+                }
+            }
+            LOGGER.info("data:{}",data);
+        } catch (Exception e) {
+        }
+
+    }
     public void setObject(JSONObject object){
-        MeasuringCertificateDetail selected1 = this.selected;
+        postProcessorJSON(object);
         String certificateNo = object.getString("certificateNo");
         if(certificateNo == null){
             certificateNo = object.getString("cetification_id");

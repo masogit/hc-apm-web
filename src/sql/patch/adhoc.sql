@@ -20,4 +20,9 @@ update config_item set value_type = 9, default_value = '{"rendered":false,"label
 
 delete from config_item_value  where key = 'showDiagnosticProcess';
 
+-- YHAAO-27471
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 7, '{}', '识别后置处理规则', 'identifyPostProcessorRule', '识别后置处理规则', 'f', 't', 1 where not exists(select * from config_item where key = 'identifyPostProcessorRule');
+-- YHAAO-27381
+update shared_asset_req_detail set charging_begin_time = '2026-02-14 15:37:55' where id='2c9b85829c28ab57019c89216fd269c8';
+
 

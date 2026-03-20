@@ -25,7 +25,7 @@
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
 
-                    <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm deleteButton"/>
+                    <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm "/>
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                     <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                     <p:column width="36"  id="checkBoxColumn" exportable="false">
@@ -167,7 +167,7 @@
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" action="#{measuringCertificateDetailController.createAction()}" title="#{msg.Create}" />
                         <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUuids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
-                        <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm" disabled="#{empty measureAssetListController.selected}" >
+                        <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm"  >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType==1}" >
