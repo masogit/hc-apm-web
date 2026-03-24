@@ -93,10 +93,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     //选定科室过滤
     private String filterClinicalDeptOrg;
+    //选定院区过滤
+    private String filterSiteName;
     private String filterAssetDeptOrg;
     private String filterAccountingDeptOrgOrg;
     private Set<String> accountingDeptOrgUidSet;
     private Set<String> clinicalDeptOrgUidSet;
+    private Set<String> siteOrgUidSet;
     private String filterSpare01;
 
     private Set<String> spare01Set;
@@ -187,6 +190,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     List<String> customedColumns;
 
     private List<OrgInfo> clinicalDeptList;
+    private List<OrgInfo> siteList;
 
     private Integer assetGroup;
     private Integer assetClass;
@@ -258,6 +262,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.selectedObject = new HashMap();
         loadCustomConfig();
         loadClinicalDeptList();
+        loadSiteList();
         getRelRuleAssetUids();
         warrantyAlertDays = getWarrantyAlertDaysConfig();
         countyArea = userContextService.isCountyArea();
@@ -525,6 +530,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
+        if (siteOrgUidSet != null && !siteOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, new ArrayList<>(siteOrgUidSet), "1*"));
+        }else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
 
         if (accountingDeptOrgUidSet != null && !accountingDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("accountingDeptUID", SearchFilter.Operator.IN, new ArrayList<>(accountingDeptOrgUidSet), "1*"));
@@ -593,6 +603,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
         loadClinicalDeptList();
+        loadSiteList();
         filterClinicalDeptOrg = null;
         filterAssetDeptOrg = null;
         assetDeptOrgUidSet = null;
@@ -600,6 +611,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetGroup = null;
         assetGroupSecondary = null;
         filterAssetStatus = null;
+        filterSiteName = null;
         setTreeNodes(event.getTreeNode(), true);
 
     }
@@ -608,6 +620,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
         this.searchFilters.clear();
         loadClinicalDeptList();
+        loadSiteList();
         filterClinicalDeptOrg = null;
         filterAssetDeptOrg = null;
         assetDeptOrgUidSet = null;
@@ -636,6 +649,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void onSelectSiteTreeNode2(NodeSelectEvent event) {
         loadClinicalDeptList();
+        loadSiteList();
     }
 
     private void loadClinicalDeptList() {
@@ -658,6 +672,30 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
             }
             clinicalDeptList=new ArrayList<>(orgInfos);
+        }else{
+            selectSiteDeptList=null;
+        }
+    }
+    private void loadSiteList() {
+        siteList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+        if (selectedAccessOrgNodes!=null && selectedAccessOrgNodes.length>0){
+            Set<OrgInfo> orgInfos = new HashSet<>();
+            selectSiteDeptList=new ArrayList<>();
+            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+                if(!orgInfo.getOrgType().equals(3)){
+                    Set<OrgInfo> collect = siteList.stream().filter(item -> item.getSiteUID().equals(orgInfo.getSiteUID()) || item.getHospitalUID().equals(orgInfo.getSiteUID())
+                            || item.getInstitutionUID().equals(orgInfo.getSiteUID()) || item.getTenantUID().equals(orgInfo.getSiteUID())).collect(Collectors.toSet());
+                    orgInfos.addAll(collect);
+                }else{
+                    orgInfos.add(orgInfo);
+                }
+
+                selectSiteDeptList.add(orgInfo.getUid());
+
+            }
+            siteList=new ArrayList<>(orgInfos);
         }else{
             selectSiteDeptList=null;
         }
@@ -1121,7 +1159,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
+    public List<String> autoCompleteSiteName(String query) {
+        if (siteList == null) {
+            return Collections.emptyList();
+        }
 
+        List<OrgInfo> res = this.siteList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
     public List<String> autoCompleteSpare01Name(String query) {
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
 
@@ -1226,6 +1275,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
+    public void onSiteNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterSiteName = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterSiteName) && !siteList.stream().anyMatch(item -> filterSiteName.equals(item.getName()))) {
+            filterSiteName = null;
+        }
+
+        if (filterSiteName != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.siteList.stream().filter(item -> item.getName().equals(filterSiteName)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, siteList);
+            siteOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            siteOrgUidSet = Collections.emptySet();
         }
 
     }
@@ -1893,5 +1962,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
         this.selectedAccessOrgNodes = selectedAccessOrgNodes;
+    }
+
+    public String getFilterSiteName() {
+        return filterSiteName;
+    }
+
+    public void setFilterSiteName(String filterSiteName) {
+        this.filterSiteName = filterSiteName;
     }
 }
