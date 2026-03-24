@@ -115,7 +115,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showDiagnosticProcess').rendered}">
-                        <label class="label">#{msg.diagnosticProcess}</label>
+                        <label class="label">#{msg.diagnosticProcess}#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').required ? '*' : ''}</label>
                         <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.diagnosticProcess}" rows="3"  cols="40"  maxlength="500" required="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showDiagnosticProcess').required}"
                                          requiredMessage="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showDiagnosticProcess').requiredMessage}" >
                             <p:ajax />
