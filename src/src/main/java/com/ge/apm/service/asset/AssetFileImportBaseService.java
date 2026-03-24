@@ -40,6 +40,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -1043,7 +1044,18 @@ public class AssetFileImportBaseService {
         if (newAsset.getId() == null) {
             isCreate = true;
         }
-
+        //导入判断主设备id不能是自己
+        if (StringUtils.hasText(newAsset.getUid())) {
+            AtomicReference<Integer> assetId = new AtomicReference<>(Optional.ofNullable(newAsset.getId()).orElse(0));
+            if (newAsset.getParentAssetId() != null) {
+                if (assetId.get() == 0) {
+                    Optional.ofNullable(assetDao.findByUid(newAsset.getUid())).ifPresent(v -> assetId.set(v.getId()));
+                }
+                if (newAsset.getParentAssetId() == assetId.get()) {
+                    newAsset.setParentAssetId(null);
+                }
+            }
+        }
         // 如果租户开启资产分类，导入资产分类为空，则默认赋值第一个分类
         if (userAccount.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(newAsset.getAssetType())) {
             if (assetTypeGroupList.isEmpty()) {
