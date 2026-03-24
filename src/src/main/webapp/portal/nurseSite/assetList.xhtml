@@ -92,7 +92,10 @@
                 <label class="label">#{msg.locationName}</label>
                 <p:inputText value="#{assetSelectController.locationName}"/>
             </h:panelGroup>
-
+            <h:panelGroup>
+                <label class="label">二维码编号</label>
+                <p:inputText value="#{assetSelectController.qrCode}"/>
+            </h:panelGroup>
 
 			<p:commandButton validateClient="true" value="查询"
 				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:saveButtonId"
@@ -123,6 +126,15 @@
                 </p:column>
                 <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
                     <h:outputText value="#{asset.name}"/>
+                </p:column>
+                <p:column headerText="设备分类">
+                    <h:outputText value="#{fieldMsg.fieldValue('assetGroup',asset.assetGroup)}"/>
+                </p:column>
+                <p:column headerText="#{msg.clinicalDeptName}">
+                    <h:outputText value="#{asset.clinicalDeptName}"/>
+                </p:column>
+                <p:column headerText="#{msg.assetDeptName}">
+                    <h:outputText value="#{assetSelectController.getOrgInfoByUid(asset.assetDeptUID).name}"/>
                 </p:column>
                 <p:column headerText="#{msg.departNum}">
                     <h:outputText value="#{asset.departNum}"/>
@@ -164,6 +176,15 @@
                 </p:column>
                 <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
                     <h:outputText value="#{asset.name}"/>
+                </p:column>
+                <p:column headerText="设备分类">
+                    <h:outputText value="#{fieldMsg.fieldValue('assetGroup',asset.assetGroup)}"/>
+                </p:column>
+                <p:column headerText="#{msg.clinicalDeptName}">
+                    <h:outputText value="#{asset.clinicalDeptName}"/>
+                </p:column>
+                <p:column headerText="#{msg.assetDeptName}">
+                    <h:outputText value="#{assetSelectController.getOrgInfoByUid(asset.assetDeptUID).name}"/>
                 </p:column>
                 <p:column headerText="#{msg.departNum}">
                     <h:outputText value="#{asset.departNum}"/>
