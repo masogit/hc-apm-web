@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.BuildManagementRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -93,6 +94,9 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private List<OrgInfo> listCheckOrgInfo;
 
     private String locationName;
+
+    private String qrCode;
+
     private String locationCode;
     private BuildManagementRepository buildManagementRepository;
 
@@ -102,6 +106,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private List<AssetInfo> assets5Permit;
 
+    private ConfigCacheService configCacheService;
 
 
     private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
@@ -127,6 +132,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssets5 = new HashSet<>();
         currentUser = UserContextService.getCurrentUserAccount();
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         this.isSelectAll = Boolean.FALSE;
         i18nMessageList = FieldValueMessageController.getFieldValueList("assetGroup");
     }
@@ -199,7 +205,12 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.isAllSelectedAssetGroup = Boolean.FALSE;
         this.listCheckI18nMessage = new ArrayList<>();
     }
-
+    public OrgInfo getOrgInfoByUid(String uid) {
+        if (Strings.isNullOrEmpty(uid)) {
+            return null;
+        }
+        return configCacheService.findOrgByUid(uid);
+    }
 
     public void loadData4Edit(List<AssetInfo> assetInfos,String  siteUid) {
         this.is4Edit = Boolean.TRUE;
@@ -573,6 +584,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             }
             if(StringUtils.isNotBlank(this.getLocationName())) {
                 searchFilters.add(new SearchFilter("locationName", SearchFilter.Operator.LIKE, this.getLocationName(), "1*"));
+                ++count;
+            }
+            if(StringUtils.isNotBlank(this.getQrCode())) {
+                searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, this.getQrCode(), "1*"));
                 ++count;
             }
         }
