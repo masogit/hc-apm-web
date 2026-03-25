@@ -117,6 +117,8 @@ public class SharedAssetReqDetailService {
         String returnId = detail.getReturnId();
         if(StringUtils.isNotEmpty(returnId)){
             ids.add(returnId);
+        }else{
+            throw new RuntimeException("调剂设备未归还,不能删除!");
         }
         searchFilterList.add(new SearchFilter("id", SearchFilter.Operator.IN,ids));
         List<SharedAssetRequest> sharedAssetRequests = sharedDao.findBySearchFilter(searchFilterList);
