@@ -27,7 +27,7 @@
                             <p:treeNode type="org">
                                 <h:outputText value="#{node}" />
                             </p:treeNode>
-							<p:treeNode type="hidden" rendered="false"/>
+                            <p:treeNode type="hidden" rendered="false"/>
                         </p:tree>
                     </p:scrollPanel>
                 </p:overlayPanel>
@@ -38,29 +38,29 @@
                 <p:selectBooleanCheckbox id="selectAll" value="#{assetSelectController.isSelectAll}" itemLabel="全选" rendered="#{!assetSelectController.is4Edit}">
                     <p:ajax update="@parent:deptOrgInfoCreate" listener="#{assetSelectController.updateSelectAll()}"/>
                 </p:selectBooleanCheckbox>
-				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
-					filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectController.is4Edit}">
+                <p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
+                                  filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectController.is4Edit}">
                     <p:ajax update="@parent:selectAll" listener="#{assetSelectController.updateItem()}"/>
-					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-					<p:column style="float: left;text-align:left;">
-						<h:outputText value="#{t.name}" />
-					</p:column>
-				</p:selectManyMenu>
-				<p:selectOneMenu id="deptOrgInfoEdit" value="#{assetSelectController.listCheckOrgInfo[0]}" var="t" converter="orgInfoConverter" required="false" filter="false"
-					showCheckbox="false" style="width:100%" rendered="#{assetSelectController.is4Edit}" disabled="#{assetSelectController.is4Edit}">
-					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-					<p:column style="float: left;text-align:left;">
-						<h:outputText value="#{t.name}" />
-					</p:column>
-				</p:selectOneMenu>
-			</h:panelGroup>
+                    <f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                    <p:column style="float: left;text-align:left;">
+                        <h:outputText value="#{t.name}" />
+                    </p:column>
+                </p:selectManyMenu>
+                <p:selectOneMenu id="deptOrgInfoEdit" value="#{assetSelectController.listCheckOrgInfo[0]}" var="t" converter="orgInfoConverter" required="false" filter="false"
+                                 showCheckbox="false" style="width:100%" rendered="#{assetSelectController.is4Edit}" disabled="#{assetSelectController.is4Edit}">
+                    <f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                    <p:column style="float: left;text-align:left;">
+                        <h:outputText value="#{t.name}" />
+                    </p:column>
+                </p:selectOneMenu>
+            </h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备分类</label>
                 <p:selectBooleanCheckbox id="selectAllAssetGroup" value="#{assetSelectController.isAllSelectedAssetGroup}" itemLabel="全选" >
                     <p:ajax update="@parent:assetGroup" listener="#{assetSelectController.updateSelectAllAssetGroup()}"/>
                 </p:selectBooleanCheckbox>
                 <p:selectManyMenu  id="assetGroup" value="#{assetSelectController.listCheckI18nMessage}" var="t" converter="i18nMessageConverter" required="false" filter="true"
-                                  filterMatchMode="contains" showCheckbox="true" style="width:100%">
+                                   filterMatchMode="contains" showCheckbox="true" style="width:100%">
                     <p:ajax update="@parent:selectAllAssetGroup" listener="#{assetSelectController.updateItemAssetGroup()}"/>
                     <f:selectItems value="#{assetSelectController.i18nMessageList}" var="item" itemLabel="#{item.value}" itemValue="#{item}"/>
                     <p:column style="float: left;text-align:left;">
@@ -92,16 +92,13 @@
                 <label class="label">#{msg.locationName}</label>
                 <p:inputText value="#{assetSelectController.locationName}"/>
             </h:panelGroup>
-            <h:panelGroup>
-                <label class="label">二维码编号</label>
-                <p:inputText value="#{assetSelectController.qrCode}"/>
-            </h:panelGroup>
 
-			<p:commandButton validateClient="true" value="查询"
-				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:saveButtonId"
-				action="#{assetSelectController.findAssets2Maintain}" />
 
-		</p:panelGrid>
+            <p:commandButton validateClient="true" value="查询"
+                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:saveButtonId"
+                             action="#{assetSelectController.findAssets2Maintain}" />
+
+        </p:panelGrid>
 
         <!--asset search result list-->
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
@@ -127,15 +124,6 @@
                 <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
                     <h:outputText value="#{asset.name}"/>
                 </p:column>
-                <p:column headerText="设备分类">
-                    <h:outputText value="#{fieldMsg.fieldValue('assetGroup',asset.assetGroup)}"/>
-                </p:column>
-                <p:column headerText="#{msg.clinicalDeptName}">
-                    <h:outputText value="#{asset.clinicalDeptName}"/>
-                </p:column>
-                <p:column headerText="#{msg.assetDeptName}">
-                    <h:outputText value="#{assetSelectController.getOrgInfoByUid(asset.assetDeptUID).name}"/>
-                </p:column>
                 <p:column headerText="#{msg.departNum}">
                     <h:outputText value="#{asset.departNum}"/>
                 </p:column>
@@ -148,13 +136,13 @@
             </p:dataTable>
         </p:panelGrid>
 
-		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-			<p:commandButton validateClient="true" value="添加已勾选设备"
-				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:assets5maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
-				action="#{assetSelectController.addAssetInfo}" />
-		</p:panelGrid>
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:commandButton validateClient="true" value="添加已勾选设备"
+                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:assets5maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
+                             action="#{assetSelectController.addAssetInfo}" />
+        </p:panelGrid>
 
-		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
             <p:dataTable id="assets5maintain" value="#{assetSelectController.assets5Maintain}" var="asset"
                          selectionMode="single"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -177,15 +165,6 @@
                 <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
                     <h:outputText value="#{asset.name}"/>
                 </p:column>
-                <p:column headerText="设备分类">
-                    <h:outputText value="#{fieldMsg.fieldValue('assetGroup',asset.assetGroup)}"/>
-                </p:column>
-                <p:column headerText="#{msg.clinicalDeptName}">
-                    <h:outputText value="#{asset.clinicalDeptName}"/>
-                </p:column>
-                <p:column headerText="#{msg.assetDeptName}">
-                    <h:outputText value="#{assetSelectController.getOrgInfoByUid(asset.assetDeptUID).name}"/>
-                </p:column>
                 <p:column headerText="#{msg.departNum}">
                     <h:outputText value="#{asset.departNum}"/>
                 </p:column>
@@ -198,14 +177,14 @@
             </p:dataTable>
         </p:panelGrid>
 
-		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-			<p:commandButton validateClient="true" value="删除已勾选设备"
-				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:assets5maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
-				action="#{assetSelectController.removeAssetInfo}" />
-			<p:commandButton validateClient="true" value="清空"
-				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:assets5maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
-				action="#{assetSelectController.clearAssetInfo}" />
-		</p:panelGrid>
-	</div>
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:commandButton validateClient="true" value="删除已勾选设备"
+                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:assets5maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
+                             action="#{assetSelectController.removeAssetInfo}" />
+            <p:commandButton validateClient="true" value="清空"
+                             update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:assets5maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:assets5maintain :maintainConfigEditForm:saveButtonId"
+                             action="#{assetSelectController.clearAssetInfo}" />
+        </p:panelGrid>
+    </div>
 </ui:composition>
 </html>
