@@ -73,7 +73,7 @@ public class HisChargeCodeUnmatchController extends GenericCRUDUUIDController<Hi
             searchFilters.add(new SearchFilter("sfxmName", SearchFilter.Operator.LIKE, assetName.trim()));
         }
         if (StringUtils.isNotBlank(hisGroupName)) {
-            searchFilters.add(new SearchFilter("assetGroupName", SearchFilter.Operator.LIKE, hisGroupName.trim()));
+            searchFilters.add(new SearchFilter("hisAssetGroup.name", SearchFilter.Operator.LIKE, hisGroupName.trim()));
         }
         if(orgComponentController.getSelectedOrg() != null){
             searchFilters.add(new SearchFilter("hosId", SearchFilter.Operator.EQ, orgComponentController.getSelectedOrg().getOrgCode()));
