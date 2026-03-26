@@ -1101,18 +1101,6 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "asset_classification32")
     private String assetClassification32;
 
-    @JoinColumn(insertable = false, updatable = false, name = "clinical_dept_uid", referencedColumnName = "dept_uid")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private  OwnerConfig ownerConfig;
-
-    public OwnerConfig getOwnerConfig() {
-        return ownerConfig;
-    }
-
-    public void setOwnerConfig(OwnerConfig ownerConfig) {
-        this.ownerConfig = ownerConfig;
-    }
 
     @Transient
     @TableField(exist = false)
