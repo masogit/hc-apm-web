@@ -912,6 +912,10 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "rating_usage_count")
     private Integer ratingUsageCount;
 
+    @Getter @Setter
+    @Column(name = "epc")
+    private String epc;
+
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
     }
