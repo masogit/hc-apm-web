@@ -76,9 +76,9 @@
                 <label class="label">设备型号</label>
                 <p:inputText value="#{assetSelectController.functionType}"/>
             </h:panelGroup>
-            <h:panelGroup rendered="#{!assetSelectController.is4Edit}">
+            <h:panelGroup >
                 <label class="label">设备编号</label>
-                <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectController.departNum}"/>
+                <p:inputText id="departNumInput" value="#{assetSelectController.departNum}"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">是否急救类设备</label>
@@ -93,7 +93,7 @@
                 <p:inputText value="#{assetSelectController.locationName}"/>
             </h:panelGroup>
             <h:panelGroup>
-                <label class="label">二维码编号</label>
+                <label class="label">#{msg.qrCode}</label>
                 <p:inputText value="#{assetSelectController.qrCode}"/>
             </h:panelGroup>
 
@@ -142,7 +142,7 @@
                 <p:column headerText="#{msg.serialNum}">
                     <h:outputText value="#{asset.serialNum}"/>
                 </p:column>
-                <p:column headerText="二维码编号">
+                <p:column headerText="#{msg.qrCode}">
                     <h:outputText value="#{asset.qrCode}"/>
                 </p:column>
             </p:dataTable>
@@ -192,7 +192,7 @@
                 <p:column headerText="#{msg.serialNum}">
                     <h:outputText value="#{asset.serialNum}"/>
                 </p:column>
-                <p:column headerText="二维码编号">
+                <p:column headerText="#{msg.qrCode}">
                     <h:outputText value="#{asset.qrCode}"/>
                 </p:column>
             </p:dataTable>
