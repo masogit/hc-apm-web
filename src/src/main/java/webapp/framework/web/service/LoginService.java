@@ -77,6 +77,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     protected String bizStatusCode = "OK";
     protected MicroServiceUtil msUtil;
     protected int initialLogin; // 0:密码 , 1:手机 , 2,手机 -> 密码（双因素验证） 3,密码 -> 手机（）
+
+    protected String redirectUrl;
     public boolean isReadonlyFlag() {
         return readonlyFlag;
     }
@@ -316,6 +318,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             addErrorMessage(response, 401, "login_error");
             return;
         }
+        redirectUrl = request.getParameter("redirectUrl");
         initialLogin = 0; //密码登录
         UserContextService.removeLoginUser();
         doLogin(request, response, userName, passwordPlain);
