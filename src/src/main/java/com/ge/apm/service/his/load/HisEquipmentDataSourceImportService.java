@@ -168,11 +168,11 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "医院机构代码不能为空");
             isValidateData = false;
         }
-        if(hisEquipmentDataSource.getPatientRegistrationNum() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "病人住院号或门诊号不能为空");
-            isValidateData = false;
-        }
+//        if(hisEquipmentDataSource.getPatientRegistrationNum() == null){
+//            item.put("status", ImportStatus.Failure);
+//            ContractRow.addErrMessage(item, "病人住院号或门诊号不能为空");
+//            isValidateData = false;
+//        }
 //        if(hisEquipmentDataSource.getPrescriptionNum() == null){
 //            item.put("status", ImportStatus.Failure);
 //            ContractRow.addErrMessage(item, "医嘱号、处方号、申请单号不能为空");
