@@ -1,0 +1,351 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="调剂工单详情"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+
+                #{adjustmentTransferApplicationDetailController.initIdleEquipmentApplication()}
+
+                <p:fieldset legend="入库详情">
+                    <ui:include src="AdjustmentEquipmentDetail.xhtml"/>
+
+                </p:fieldset>
+                <p:fieldset legend="调剂详情">
+                    <ui:include src="AdjustmentTransferDetail.xhtml"/>
+                </p:fieldset>
+
+                    <p:fieldset legend="工单信息">
+                        <ui:include src="AdjustmentTransferInfoDetail.xhtml"/>
+                    </p:fieldset>
+                <h:form id="transferDetailForm">
+                    <p:fieldset legend="调剂中心处理意见"
+                                rendered="#{!(adjustmentTransferApplicationDetailController.selected.status==1 and ! userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))  and adjustmentTransferApplicationDetailController.selected.status!=3  }">
+
+
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                            <h:panelGroup>
+                                <label class="label">初步筛选结果</label>
+
+                                <p:selectOneRadio id="screeningPanel"
+                                                  disabled="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
+                                                  value="#{adjustmentTransferApplicationDetailController.selected.initialScreeningResult}">
+
+                                    <f:selectItem itemValue="matched" itemLabel="已匹配闲置设备"/>
+                                    <f:selectItem itemValue="unmatched" itemLabel="无匹配设备"/>
+
+                                    <p:ajax event="change" process="@this" update="transferDetailForm"/>
+                                </p:selectOneRadio>
+
+                                <h:panelGroup id="reasonInput"
+                                              rendered="#{adjustmentTransferApplicationDetailController.selected.initialScreeningResult == 'unmatched'}">
+                                    <h:outputLabel value="（说明原因）："/>
+                                    <p:inputText
+                                            readonly="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
+                                            value="#{adjustmentTransferApplicationDetailController.selected.screeningReason}">
+                                        <p:ajax/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">技术评估安排</label>
+
+                                <p:selectOneRadio id="assessmentPanel"
+                                                  disabled="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
+                                                  value="#{adjustmentTransferApplicationDetailController.selected.technicalAssessment}"
+                                >
+
+                                    <f:selectItem itemValue="none" itemLabel="无需现场评估"/>
+                                    <f:selectItem itemValue="needed" itemLabel="需组织专家评估"/>
+
+                                    <p:ajax event="change" process="@this" update="transferDetailForm"/>
+                                </p:selectOneRadio>
+
+                                <!-- 评估时间输入框，仅在选中“需组织专家评估”时显示 -->
+                                <h:panelGroup id="datePicker" layout="block"
+                                              rendered="#{adjustmentTransferApplicationDetailController.selected.technicalAssessment == 'needed'}">
+                                    <h:outputLabel value="（评估时间：）"/>
+                                    <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                disabled="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
+                                                locale="#{userContextService.getCalendarLocale()}"
+                                                pattern="#{userContextService.timeFormat()}"
+                                                value="#{adjustmentTransferApplicationDetailController.selected.assessmentTime}"
+                                                showOn="button" readonlyInput="false" showButtonPanel="true"
+                                                navigator="true" mask="true" style="width: 95%">
+                                        <p:ajax event="dateSelect"/>
+                                    </p:calendar>
+
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+
+                            <h:panelGroup>
+
+                                <label class="label">经办人签字</label>
+                                <p:graphicImage
+                                        rendered="#{adjustmentTransferApplicationDetailController.signatureId !=null}"
+                                        value="#{fileDownloadService.getFile(adjustmentTransferApplicationDetailController.signatureId)}"
+                                        height="80" width="100" stream="false">
+                                </p:graphicImage>
+                                <p:commandButton id="openSignature2"
+                                                 rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
+                                                 actionListener="#{adjustmentTransferApplicationDetailController.getSignature()}"
+                                                 value="添加签名" update="signatureDlg"
+                                                 oncomplete="PF('signatureDlg').show();"/>
+
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+
+                                <span class="label" style="display:block; margin-bottom:5px;">处理日期</span>
+                                <p:calendar
+                                        disabled="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
+                                        value="#{adjustmentTransferApplicationDetailController.selected.applicationPendingApprovalDate}"
+                                        pattern="yyyy-MM-dd HH:mm:ss"
+                                        showOn="button"
+                                        style="width:160px;"
+                                        readonlyInput="true"/>
+
+                            </h:panelGroup>
+
+
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="退回详情"
+                                rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=7 }">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">申请人</label>
+                                <p:inputText
+                                        value="#{adjustmentTransferApplicationDetailController.getUserNameByUid(adjustmentTransferApplicationDetailController.selected.returnUid)}"
+                                        readonly="true"
+                                >
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+
+                                <label class="label">申请时间</label>
+                                <p:calendar disabled="true"
+                                            value="#{adjustmentTransferApplicationDetailController.selected.returnDate}"
+                                            pattern="yyyy-MM-dd HH:mm:ss"
+                                            showOn="button"
+                                            style="width:160px;"
+                                            readonlyInput="true"/>
+
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+
+                                <label class="label">申请原因</label>
+                                <p:inputText
+                                        readonly="true"
+                                        value="#{adjustmentTransferApplicationDetailController.selected.returnReason}">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup
+                                    rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=8 }">
+                                <label class="label">审批人</label>
+                                <p:inputText
+                                        value="#{adjustmentTransferApplicationDetailController.getUserNameByUid(adjustmentTransferApplicationDetailController.selected.returnApprovalUid)}"
+                                        readonly="true"
+                                >
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup
+                                    rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=8 }">
+
+                                <label class="label">审批时间</label>
+                                <p:calendar disabled="true"
+                                            value="#{adjustmentTransferApplicationDetailController.selected.returnApprovalDate}"
+                                            pattern="yyyy-MM-dd HH:mm:ss"
+                                            showOn="button"
+                                            style="width:160px;"
+                                            readonlyInput="true"/>
+
+                            </h:panelGroup>
+
+                            <h:panelGroup
+                                    rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=8 }">
+
+                                <label class="label">审批结果</label>
+                                <p:inputText
+                                        value="#{adjustmentTransferApplicationDetailController.selected.returnApprovalResult==null?'':adjustmentTransferApplicationDetailController.selected.returnApprovalResult==1?'审批通过':'审批拒绝'}"
+                                        readonly="true"
+                                >
+                                    <p:ajax/>
+                                </p:inputText>
+
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+
+
+                    </p:fieldset>
+                    <p:commandButton immediate="true" value="同意" icon="ui-icon-check"
+                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.applicationApproval}"
+
+                                     update="transferDetailForm"
+                                     style="margin-left: 10px;"/>  <!--                             action="AdjustmentTransferApplication?faces-redirect=true"-->
+
+
+                    <p:commandButton immediate="true" value="退回" icon="ui-icon-cancel"
+                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.refuse}"
+                                     update="transferDetailForm"
+                                     style="margin-left: 10px;"/>
+
+                    <p:commandButton immediate="true" value="取消借用" icon="ui-icon-cancel"
+                                     rendered="#{ (adjustmentTransferApplicationDetailController.selected.status==1  or   adjustmentTransferApplicationDetailController.selected.status==4  ) and      adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.cancel}"
+                                     update="transferDetailForm"
+                                     style="margin-left: 10px;"/>
+
+
+                    <p:commandButton immediate="true" value="确认到货" icon="ui-icon-check"
+                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==4  and   adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.confirmReceipt}"
+                                     update="transferDetailForm"
+                                     style="margin-left: 10px;"/>
+
+                    <p:commandButton immediate="true" value="设备退回" icon="ui-icon-cancel"
+                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==5  and   adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()  and adjustmentTransferApplicationDetailController.returnValid()  }"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.beforeReturn}"
+                                     update="returnDlg"
+                                     oncomplete="PF('returnDlg').show();"
+                                     style="margin-left: 10px;"/>
+
+
+                    <p:commandButton immediate="true" value="审批通过" icon="ui-icon-cancel"
+                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.returnPass}"
+                                     update="transferDetailForm"
+                                     style="margin-left: 10px;"/>
+
+                    <p:commandButton immediate="true" value="审批拒绝" icon="ui-icon-cancel"
+                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.returnRefuse}"
+                                     update="transferDetailForm"
+                                     style="margin-left: 10px;"/>
+                    <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                     action="AdjustmentTransferApplication?faces-redirect=true"
+                                     style="margin-left: 10px;"/>
+
+                </h:form>
+
+                <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
+                    <h:form id="signatureForm">
+                        <h:panelGrid columnClasses="value" columns="1">
+                            <h:panelGroup>
+                                <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel"
+                                             base64Value="#{adjustmentTransferApplicationDetailController.signatureContent}"
+                                             guideline="false"
+                                             rendered="#{adjustmentTransferApplicationDetailController.signatureContentStream==null}"/>
+                                <p:graphicImage
+                                        value="#{adjustmentTransferApplicationDetailController.signatureContentStream}"
+                                        stream="false"
+                                        rendered="#{adjustmentTransferApplicationDetailController.signatureContentStream!=null}"></p:graphicImage>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <p:commandButton value="确认"
+                                         actionListener="#{adjustmentTransferApplicationDetailController.saveSignatureAndSubmitApprove()}"
+                                         update="transferDetailForm"
+                                         oncomplete="handleApproveSuccess(xhr, status, args);"/>
+                        <p:commandButton immediate="true" process="@this" value="重写"
+                                         actionListener="#{multiLevelApprovalController.resetSignature()}"
+                                         update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}"
+                                         onclick="PF('signatureDlg').hide()"/>
+                    </h:form>
+                    <script>
+                        function handleApproveSuccess(xhr, status, args) {
+                            if (xhr.status !== 206) {
+                                PF('signatureDlg').hide();
+                            }
+                        }
+                    </script>
+                </p:dialog>
+
+
+                <p:dialog id="returnDlg" widgetVar="returnDlg" header="设备退回确认" modal="true">
+                    <h:form id="returnForm">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">申请人</label>
+                                <p:inputText
+                                        value="#{adjustmentTransferApplicationDetailController.getUserNameByUid(adjustmentTransferApplicationDetailController.selected.returnUid)}"
+                                        readonly="true"
+                                >
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+
+                                <label class="label">申请时间</label>
+                                <p:calendar disabled="true"
+                                            value="#{adjustmentTransferApplicationDetailController.selected.returnDate}"
+                                            pattern="yyyy-MM-dd HH:mm:ss"
+                                            showOn="button"
+                                            style="width:160px;"
+                                            readonlyInput="true"/>
+
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+
+                                <label class="label">申请原因</label>
+                                <p:inputText
+
+                                        value="#{adjustmentTransferApplicationDetailController.selected.returnReason}">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton value="确认退回"
+                                         actionListener="#{adjustmentTransferApplicationDetailController.equipmentReturn()}"
+                                         update="transferDetailForm"
+                                         oncomplete="handleApproveSuccess(xhr, status, args);"/>
+
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}"
+                                         onclick="PF('returnDlg').hide()"/>
+                    </h:form>
+                    <script>
+                        function handleApproveSuccess(xhr, status, args) {
+                            if (xhr.status !== 206) {
+                                PF('returnDlg').hide();
+                            }
+                        }
+                    </script>
+                </p:dialog>
+            </div>
+
+
+        </div>
+
+
+        <script>
+
+
+        </script>
+    </ui:define>
+</ui:composition>
