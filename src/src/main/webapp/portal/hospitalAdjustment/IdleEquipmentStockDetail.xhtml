@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="调剂设备详情"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                #{idleEquipmentStockDetailController.initStock()}
+
+
+                <ui:include src="AdjustmentEquipmentDetail.xhtml"/>
+                <h:form id="stockDetailForm">
+
+
+                    <h:panelGroup>
+                        <p:commandButton immediate="true" value="申请借用" icon="ui-icon-check"
+                                         rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')  and  !idleEquipmentStockDetailController.isBorrowing()  and  idleEquipmentStockDetailController.selected.status==1 }"
+                                         update="adjustmentBorrowingDlg"
+                                         oncomplete="PF('adjustmentBorrowingDlg').show();"
+                                         actionListener="#{idleEquipmentStockDetailController.initBorrowing()}"
+                                         style="margin-left: 10px;"/>
+
+                        <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                         action="IdleEquipmentStock?faces-redirect=true"
+                                         style="margin-left: 10px;"/>
+                    </h:panelGroup>
+
+                </h:form>
+
+
+            </div>
+
+        </div>
+
+        <ui:include src="AdjustmentBorrowingApplication.xhtml"/>
+
+        <script>
+
+
+        </script>
+    </ui:define>
+</ui:composition>

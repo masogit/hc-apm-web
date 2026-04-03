@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="adjustmentBorrowingDlg" widgetVar="adjustmentBorrowingDlg" modal="true" resizable="true"
+              draggable="true" header="调剂借用设备申请" appendTo="@(body)" width="60%">
+        <h:form id="transferForm" style="height:660px; overflow: auto;">
+            <p:fieldset legend="调入单位信息">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">单位名称</label>
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.unitName}"
+                                     style="width:95%">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">医共体所属类别</label>
+
+                        <p:selectOneRadio id="status"
+                                          value="#{idleEquipmentStockDetailController.application.medicalCommunityType}"
+                                          required="true"
+                                          requiredMessage="医共体所属类别 #{msg.ValidationRequire}">
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('MedicalConsortiumType')}"
+                                           var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <p:ajax event="change" process="@this"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+<!--                    <h:panelGroup>-->
+<!--                        <label class="label">申请科室</label>-->
+<!--                        <p:inputText value="#{idleEquipmentStockDetailController.application.department}"-->
+<!--                                     style="width:95%">-->
+<!--                            <p:ajax/>-->
+<!--                        </p:inputText>-->
+<!--                    </h:panelGroup>-->
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
+                        <p:selectOneMenu id="clinicalDeptName" class="SiteUIDChange"
+                                         value="#{idleEquipmentStockDetailController.filterDeptOrg}"
+                                         converter="orgInfoConverter" panelStyle="width:180px" style="width: 180px"
+                                         filter="true" filterMatchMode="contains" filterNormalize="true">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{idleEquipmentStockDetailController.autoCompleteDept('')}" var="item"
+                                           itemLabel="#{item.name}" itemValue="#{item}"/>
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">联系人</label>
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.contactPerson}">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">联系电话</label>
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.contactPhone}">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">申报日期</label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}" id="installDate"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{idleEquipmentStockDetailController.application.applicationDate}"
+                                    showOn="button" readonlyInput="false" showButtonPanel="true"
+                                    navigator="true" mask="true" style="width: 95%">
+                            <p:ajax event="dateSelect"/>
+                        </p:calendar>
+                    </h:panelGroup>
+                    <h:outputText/>
+                </p:panelGrid>
+            </p:fieldset>
+
+
+            <p:fieldset legend="需求设备基本要求">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">设备类型</label>
+
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.deviceType}">
+                            <f:selectItem itemLabel="诊断设备" itemValue="DIAGNOSTIC_EQUIPMENT"/>
+                            <f:selectItem itemLabel="治疗设备" itemValue="THERAPEUTIC_EQUIPMENT"/>
+                            <f:selectItem itemLabel="辅助医疗设备" itemValue="AUXILIARY_MEDICAL_EQUIPMENT"/>
+                            <f:selectItem itemLabel="通用医疗设备" itemValue="GENERAL_MEDICAL_EQUIPMENT"/>
+                            <f:selectItem itemLabel="其他" itemValue="OTHER"/>
+                            <p:ajax event="change" process="@this" update="@form"/>
+                        </p:selectOneRadio>
+
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.otherDeviceTypeNote}"
+                                     placeholder="请注明"
+                                     rendered="#{idleEquipmentStockDetailController.application.deviceType == 'OTHER'}"
+                                     style="margin-left: 10px;">
+                            <p:ajax event="change" update="@form"/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">具体设备名称</label>
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.specificDeviceName}">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">核心技术参数 (必填)</label>
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.coreTechnicalParams}">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">次要技术参数 (可选)：</label>
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.secondaryTechnicalParams}">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">预计使用时限：</label>
+                        <p:inputNumber value="#{idleEquipmentStockDetailController.application.estimatedUsageYears}">
+                            <p:ajax/>
+                        </p:inputNumber>
+                        <h:outputText value=" 年"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+
+
+            <p:fieldset legend="配套条件说明">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                    <h:panelGroup id="siteConditionStatus">
+                        <label class="label">场地条件：</label>
+
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.siteConditionStatus}">
+                            <f:selectItem itemLabel="已具备" itemValue="READY"/>
+                            <f:selectItem itemLabel="需改造" itemValue="NEEDS_RENOVATION"/>
+                            <p:ajax event="change" process="@this" update="siteConditionStatus"/>
+                        </p:selectOneRadio>
+
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.siteRenovationPlan}"
+                                     placeholder="说明改造计划"
+                                     rendered="#{idleEquipmentStockDetailController.application.siteConditionStatus == 'NEEDS_RENOVATION'}"
+                                     style="margin-top:5px; width:95%">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+
+
+                    <h:panelGroup id="powerSupplyStatus">
+                        <label class="label">电力保障：</label>
+
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.powerSupplyStatus}">
+                            <f:selectItem itemLabel="已满足" itemValue="SATISFIED"/>
+                            <f:selectItem itemLabel="需增容" itemValue="NEEDS_CAPACITY_INCREASE"/>
+                            <p:ajax event="change" process="@this" update="powerSupplyStatus"/>
+                        </p:selectOneRadio>
+
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.powerCapacityDemand}"
+                                     placeholder="说明增容需求"
+                                     rendered="#{idleEquipmentStockDetailController.application.powerSupplyStatus == 'NEEDS_CAPACITY_INCREASE'}"
+                                     style="margin-top:5px; width:95%">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="operatorStatus">
+                        <label class="label">操作人员：</label>
+
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.operatorStatus}">
+                            <f:selectItem itemLabel="已配备" itemValue="STAFFED"/>
+                            <f:selectItem itemLabel="需培训" itemValue="NEEDS_TRAINING"/>
+                            <p:ajax event="change" process="@this" update="operatorStatus"/>
+                        </p:selectOneRadio>
+
+
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.operatorQualificationNote}"
+                                     placeholder="注明资质"
+                                     rendered="#{idleEquipmentStockDetailController.application.operatorStatus == 'STAFFED'}"
+                                     style="margin-top:5px; width:95%">
+                            <p:ajax event="change" />
+                        </p:inputText>
+
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.operatorTrainingPlan}"
+                                     placeholder="说明培训计划"
+                                     rendered="#{idleEquipmentStockDetailController.application.operatorStatus == 'NEEDS_TRAINING'}"
+                                     style="margin-top:5px; width:95%">
+                            <p:ajax event="change" />
+                        </p:inputText>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">维护能力：</label>
+                        <p:selectOneRadio
+                                value="#{idleEquipmentStockDetailController.application.maintenanceCapability}">
+                            <f:selectItem itemLabel="自主维护" itemValue="SELF_MAINTENANCE"/>
+                            <f:selectItem itemLabel="需医共体技术支持" itemValue="NEEDS_TECH_SUPPORT"/>
+                            <p:ajax event="change"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+            <p:fieldset legend="附件材料清单" style="margin-bottom:20px">
+                <h:panelGroup>
+                    <p:commandButton value="批量删除文件" class="bathDeleteAttach" update=":transferForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{idleEquipmentStockDetailController.bathDeleteAttach}" disabled="#{!idleEquipmentStockDetailController.isChecked()}">
+                        <p:confirm header="批量删除文件" message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>
+                    </p:commandButton>
+                    <p:commandButton value="批量下载文件" class="bathDownloadAttach" actionListener="#{idleEquipmentStockDetailController.bathDownloadAttach}" disabled="#{!idleEquipmentStockDetailController.isChecked()}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                        <p:fileDownload value="#{contractInfoEditController.attachListFile}"/>
+                    </p:commandButton>
+                    <p:dataList id="AttachList" value="#{idleEquipmentStockDetailController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
+                        <f:facet name="header">
+                            <div class="ui-g" style="text-align:left">
+                                <div class="ui-g-1">
+                                    <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                        <p:ajax listener="#{idleEquipmentStockDetailController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                                <p:commandLink value="↑↓" actionListener="#{idleEquipmentStockDetailController.attachSort()}" update="AttachList"/>
+                                <h:outputText value="#{msg.AttachmentType}" class="ui-g-2"/>
+                                <h:outputText value="#{msg.FileName}" class="ui-g-3"/>
+                                <h:outputText value="#{msg.UploadTime}" class="ui-g-2" />
+                                <h:outputText value="#{msg.Uploader}" class="ui-g-2" />
+                                <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-1" />
+                            </div>
+                        </f:facet>
+
+                        <div class="ui-g">
+                            <div class="ui-g-1">
+                                <p:selectBooleanCheckbox value="#{idleEquipmentStockDetailController.blobObjectSelectedMap[fileitem.id]}" id="selectCheckBox" class="selectCheckBoxHeader">
+                                    <p:ajax process="@this" listener="#{idleEquipmentStockDetailController.pick(fileitem.id)}" update="@(.selectCheckBox) @(.selectCheckBox) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />
+                                </p:selectBooleanCheckbox>
+                            </div>
+                            <h:outputText value="#{fileitem.boSubTypeValue}" class="ui-g-2"/>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="ui-g-3"/>
+                            <!--                                    <p:link href="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" class="ui-g-3" >#{fileitem.objectName}</p:link>-->
+                            <h:outputText value="#{fileitem.createdDate}" class="ui-g-2">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                            <h:outputText value="#{idleEquipmentStockDetailController.getUserNameByUid(fileitem.createdBy)}" class="ui-g-2" />
+                            <!--                                <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()"/>-->
+                            <p:commandLink value="#{msg.Delete}" style="margin-right: 5px;" update="AttachList" actionListener="#{idleEquipmentStockDetailController.removeAttachmentById(fileitem.id)}" process="@this" >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandLink>
+                            <!--                                <p:commandLink value="#{msg.approveAttactments}" style="margin-right: 5px;"  update="AttachList" process="@this" actionListener="#{adjustmentApplicationCreateController.approveAttachmentById(fileitem.id)}" />-->
+                            <!--                                <p:commandLink value="#{msg.attactmentsApproved}" style="margin-right: 5px;"  process="@this"  rendered="#{!adjustmentApplicationCreateController.canApprove(fileitem.id)}" disabled="true"/>-->
+                        </div>
+                    </p:dataList>
+
+                </h:panelGroup>
+            </p:fieldset>
+
+            <p:commandButton value="提交申请" actionListener="#{idleEquipmentStockDetailController.applyForBorrowing}"
+                             update=":stockDetailForm"  oncomplete="handleSubmit(args, 'adjustmentBorrowingDlg'); "
+                             icon="ui-icon-check" style="margin-left: 10px;"/>
+
+            <p:commandButton immediate="true" value="取消"   icon="ui-icon-cancel"
+                             style="margin-left: 10px;"  onclick="PF('adjustmentBorrowingDlg').hide()"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.UploadFile}">
+        <h:form id="uploadDialogForm" >
+            <h:panelGroup id="display" >
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <p:selectOneMenu id="functionGroup" value="#{idleEquipmentStockDetailController.attachmentType}" autoWidth="false" style="width: 100%">
+                            <p:ajax process="@this" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{idleEquipmentStockDetailController.getContractAttachmentTypeList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.choseFileToUpload}</label>
+                        <p:dataList id="AttachUploadList" value="#{idleEquipmentStockDetailController.uploadedFileObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">#{msg.attachment}</f:facet>
+                            #{fileitem.objectName}
+                            <p:commandButton actionListener="#{idleEquipmentStockDetailController.removeUploadedFileObjects(fileitem.id)}" update="AttachUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{idleEquipmentStockDetailController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                      multiple="true" sizeLimit="209715200" update=":uploadDialogForm:AttachUploadList saveButton" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}200M"  label="#{msg.Add}" />
+                    </h:panelGroup>
+
+
+                </p:panelGrid>
+                <h:panelGroup>
+                    <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{idleEquipmentStockDetailController.finishUpload()}" disabled="#{empty idleEquipmentStockDetailController.uploadedFileObjects}" value="#{msg.Confirm}"
+                                     update=":transferForm:AttachList :uploadDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{idleEquipmentStockDetailController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadDialog').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

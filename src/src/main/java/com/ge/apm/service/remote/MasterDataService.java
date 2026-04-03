@@ -28,7 +28,31 @@ public class MasterDataService  extends MicroServiceInvoker {
 
     private Logger logger = LoggerFactory.getLogger(MasterDataService.class);
 
+    public List<Map<String, String>> getUserSignature() {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(header);
+        String url = getGatewayURL(GatewayURL.USER_SIGNATURE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            List<Map<String, String>> responseBody = (List<Map<String, String>>) response.getBody().get("data");
+            return responseBody;
+        } else {
+            return null;
+        }
+    }
 
+    public String addUserSignature(String signatureId) {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(signatureId, header);
+        String url = getGatewayURL(GatewayURL.USER_SIGNATURE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
 
     public Map<String, Object> saveAssetClassificationModel(AssetClassificationModel asset) {
         HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());

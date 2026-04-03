@@ -390,6 +390,20 @@
                            <p:menuitem fragment="um6200"  id="um6200" value="分类AI模型训练" outcome="/portal/assetClassificationManagement/modelTraining.xhtml" />
                        </p:submenu>
                    </c:when>
+
+
+                   <c:when test="#{item eq 'HOSPITAL_ADJUSTMENT'}">
+                       <p:submenu id="hospital_adjustment" label="院区间调剂" icon="fa fa-square-o fa-fw" rendered="#{userContextService.canRender('HOSPITAL_ADJUSTMENT') and userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_') }">
+                           <p:menuitem fragment="umadjustment001" id="umadjustment001" value="闲置设备申请"  outcome="/portal/hospitalAdjustment/IdleEquipmentApplication.xhtml"       rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION') }"/>
+                           <p:menuitem fragment="umadjustment002" id="umadjustment002" value="闲置设备库存" outcome="/portal/hospitalAdjustment/IdleEquipmentStock.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK') }"/>
+                           <p:menuitem fragment="umadjustment002" id="umadjustment003" value="调剂工作台" outcome="/portal/hospitalAdjustment/AdjustmentTransferApplication.xhtml"   rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_WORKBENCH')  }"/>
+
+
+                           <p:menuitem fragment="umadjustment001" id="umadjustment004" value="闲置设备入库受理"  outcome="/portal/hospitalAdjustment/IdleEquipmentApplication.xhtml"       rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ACCEPTANCE') }"/>
+                           <p:menuitem fragment="umadjustment001" id="umadjustment005" value="闲置设备调剂受理"  outcome="/portal/hospitalAdjustment/AdjustmentTransferApplication.xhtml"       rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE') }"/>
+
+                       </p:submenu>
+                   </c:when>
                </c:choose>
            </c:forEach>
 
