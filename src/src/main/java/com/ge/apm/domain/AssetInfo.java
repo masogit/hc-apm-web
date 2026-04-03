@@ -1580,7 +1580,7 @@ public class AssetInfo implements ChineseName, Serializable {
         this.assetTags = assetTags;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Set<AssetTags> assetTags;
 
