@@ -120,7 +120,7 @@
                         <p:ajax event="filter" listener="#{idleEquipmentApplicationController.onFilter}"/>
 
                         <p:column headerText="#{msg.Actions}" exportable="false" width="80" id="operatorColumn"
-                                  rendered="#{userContextService.hasAnyRole('HospitalAdjustmentAdmin')}">
+                                  rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')}">
                             <h:panelGroup>
                                 <p:link target="_new" title="#{msg.Edit}"
                                         outcome="#{idleEquipmentApplicationController.getEditPage(item.uid)}"
