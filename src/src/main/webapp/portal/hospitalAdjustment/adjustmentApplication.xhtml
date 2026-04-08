@@ -131,18 +131,14 @@
                             <h:panelGroup>
                                 <label class="label">累计使用年限</label>
                                 <div style="display: flex; align-items: center;">
-                                    <p:inputNumber id="usedYears" minValue="0" decimalPlaces="0"
-                                                   value="#{adjustmentApplicationCreateController.selected.usedYears}"
-                                                   style="width: 50px; margin-right: 5px;">
+                                    <p:inputNumber id="usedYears" minValue="0" decimalPlaces="0" maxValue="999"
+                                                   value="#{adjustmentApplicationCreateController.selected.usedYears}" validatorMessage="累计使用年限必须在 0 到 999 之间"
+                                                   style=" margin-right: 5px;">
                                         <p:ajax/>
+                                        <f:validateLongRange minimum="0" maximum="999" />
                                     </p:inputNumber>
                                     <span style="margin-right: 10px;">年</span>
-                                    <!--                                    <p:inputNumber id="usedMonths" minValue="0" max="11" decimalPlaces="0"-->
-                                    <!--                                                   value="#{adjustmentApplicationCreateController.selected.usedMonths}"-->
-                                    <!--                                                   style="width: 50px;">-->
-                                    <!--                                        <p:ajax/>-->
-                                    <!--                                    </p:inputNumber>-->
-                                    <!--                                    <span>月</span>-->
+
                                 </div>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -279,21 +275,21 @@
                             <h:panelGroup>
                                 <label class="label">预计闲置期限</label>
                                 <div style="display: flex; align-items: center;">
-                                    <p:inputNumber id="expectedIdleYears" minValue="0" decimalPlaces="0"
-                                                   value="#{adjustmentApplicationCreateController.selected.expectedIdleYears}"
-                                                   style="width: 60px; margin-right: 5px;">
+                                    <p:inputNumber id="expectedIdleYears" minValue="0" decimalPlaces="0" maxValue="999"
+                                                   value="#{adjustmentApplicationCreateController.selected.expectedIdleYears}"  validatorMessage="闲置年数必须在 0 到 999 之间">
                                         <p:ajax/>
+                                        <f:validateLongRange minimum="0" maximum="999" />
                                     </p:inputNumber>
-                                    <span style="margin-right: 10px;">年</span>
+                                    年
                                     <p:inputNumber id="expectedIdleMonths" minValue="0" max="11" decimalPlaces="0"
-                                                   value="#{adjustmentApplicationCreateController.selected.expectedIdleMonths}"
-                                                   style="width: 60px;">
+                                                   value="#{adjustmentApplicationCreateController.selected.expectedIdleMonths}"  validatorMessage="闲置月数必须在 0 到 11 之间"
+                                                >
                                         <p:ajax/>
+                                        <f:validateLongRange minimum="0" maximum="11"  />
                                     </p:inputNumber>
-                                    <span>月</span>
+                                    月
                                 </div>
                             </h:panelGroup>
-                            <h:outputText colspan="3"/>
                         </p:panelGrid>
                     </p:fieldset>
 
