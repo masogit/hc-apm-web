@@ -102,9 +102,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
             if (buttonType == 1) {
                 this.updateSearchFilter(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, visibleScope, "1*2+"));
                 this.updateSearchFilter(new SearchFilter("stockDeptUid", SearchFilter.Operator.IN, visibleScope, "1*2+"));
-                if (!this.hasFilterOnField("status")) {
-                    this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.IN, Arrays.asList(5, 6, 7,8,9)));
-                }
+                this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.EQ, 6));
 //                this.removeFilterOnField("borrowSiteUid");
 //                this.removeFilterOnField("borrowDeptUid");
             } else {

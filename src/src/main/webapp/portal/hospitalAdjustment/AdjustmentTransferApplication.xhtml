@@ -184,7 +184,7 @@
                                   filterBy="#{item.status}" filterMatchMode="EQ">
 
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('datalist').filter()"
+                                <p:selectOneMenu onchange="PF('datalist').filter()" rendered="#{adjustmentTransferApplicationController.buttonType==2  or  userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
                                                  value="#{adjustmentTransferApplicationController.filterStatus}"
                                                  converter="javax.faces.Integer">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
