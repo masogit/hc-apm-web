@@ -16,9 +16,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','OperatorQualification','操作人员资质证明','OperatorQualification',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','other','其他','other',NULL,-1);
 
-INSERT INTO sys_role( "name", "role_desc", "home_page", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") select  'HospitalAdjustmentAdmin', '医院院间调剂', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL from sys_role where not exists(select 1 from sys_role where name = 'HospitalAdjustmentAdmin') limit 1;
 
-INSERT INTO sys_role ( "name", "role_desc", "home_page", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") select   'InstitutionAdjustmentAdmin', '集团院间调剂', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL from sys_role where not exists(select 1 from sys_role where name = 'InstitutionAdjustmentAdmin') limit 1;
 -- 添加GEIB调用acct system client
 INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time,
                                 last_access_date)
