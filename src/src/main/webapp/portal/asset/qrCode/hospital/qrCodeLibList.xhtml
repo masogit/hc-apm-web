@@ -79,13 +79,13 @@
                                 <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterPlannedCompletionTime" value="#{qrCodeLibController.plannedCompletionTimeFormat}"/>
                             </f:facet>
                             <h:outputText value="#{item.issueDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd"/>
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="#{msg.submitDate}" sortBy="#{item.submitDate}" >
                             <h:outputText value="#{item.submitDate}">
-                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
 
