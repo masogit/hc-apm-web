@@ -189,7 +189,7 @@ public class AdjustmentTransferService {
 
 
         List<String> byIdsAndHospitalUID = userAccountRepository.getByIdsAndHospitalUID(userIds, Arrays.asList(stockHospitalUid, borrowHospitalUid));
-        wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_PENDING_REVIEW,byIdsAndHospitalUID,null);
+        wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE,byIdsAndHospitalUID,null);
     }
 
 }
