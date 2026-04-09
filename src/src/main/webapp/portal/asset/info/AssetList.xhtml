@@ -1106,7 +1106,7 @@
                             </c:if>
 
                             <c:if test="#{columnItem eq 'epc'}">
-                                <p:column headerText="#{msg.epc}" sortBy="#{item.epc}" filterBy="#{item.epc}" filterMatchMode="GE">
+                                <p:column headerText="#{msg.epc}" sortBy="#{item.epc}" filterBy="#{item.epc}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.epc}"/>
                                 </p:column>
                             </c:if>
