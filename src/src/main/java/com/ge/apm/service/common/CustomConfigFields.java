@@ -148,6 +148,7 @@ public enum CustomConfigFields {
     assetClassification32(fieldName, "assetClassification32" ,Text),  //设备32分类
     usageCount(fieldName, "usageCount" ,Text),  //已使用次数
     ratingUsageCount(fieldName, "ratingUsageCount" ,Text),  //额定使用次数
+    epc(fieldName, "epc" ,Text),  //epc码
 
 
     ;

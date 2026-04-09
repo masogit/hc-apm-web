@@ -1367,4 +1367,12 @@
             </p:inputNumber>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'epc')}">
+        <h:panelGroup >
+            <label class="label">#{msg.epc}</label>
+            <p:inputText id="epc" value="#{assetInfoEditController.selected.epc}" disabled="#{!assetInfoEditController.needEdit('epc')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

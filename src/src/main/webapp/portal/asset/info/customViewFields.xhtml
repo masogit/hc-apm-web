@@ -855,4 +855,10 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'epc')}">
+        <h:panelGroup >
+            <label class="label">#{msg.epc}</label>
+            <p:inputText id="epc" value="#{assetInfoDetailController.selected.epc}" readonly="true" title="#{assetInfoDetailController.selected.epc}"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

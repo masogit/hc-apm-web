@@ -644,4 +644,10 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'epc') and assetInfoDetailController.countyArea}" ><!--设备性质-->
+        <h:panelGroup >
+            <label class="label">#{msg.epc}</label>
+            <p:inputText id="epc" value="#{fieldMsg.fieldValue('epc', assetInfoDetailController.selected.epc)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>
