@@ -1105,6 +1105,12 @@
                                 </p:column>
                             </c:if>
 
+                            <c:if test="#{columnItem eq 'epc'}">
+                                <p:column headerText="#{msg.epc}" sortBy="#{item.epc}" filterBy="#{item.epc}" filterMatchMode="GE">
+                                    <h:outputText value="#{item.epc}"/>
+                                </p:column>
+                            </c:if>
+
                             <c:if test="#{columnItem eq 'spare01'}">
                                 <p:column headerText="#{msg.spare01}" sortBy="#{item.spare01}">
 
