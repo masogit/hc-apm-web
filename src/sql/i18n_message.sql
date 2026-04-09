@@ -6281,3 +6281,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- YHAAO-27085 资产添加已使用次数、额定使用次数字段
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','usageCount','已使用次数','usage count',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','ratingUsageCount','额定使用次数','rating usage count',NULL,-1);
+
+-- YHAAO-26808 资产新增epc码
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','epc','epc码','epc',NULL,-1);
