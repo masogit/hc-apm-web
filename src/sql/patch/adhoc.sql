@@ -28,3 +28,6 @@ VALUES (REPLACE(uuid_generate_v4()::text, '-', ''), '2a773154623311e7aeb25254001
 drop table if exists org_info_back;
 create table org_info_back as select * from org_info;
 delete from  org_info  where institution_uid = 'efee5c59ed704f25a8a1572984ae3417';
+
+-- YHAAO-27657
+ALTER TABLE qr_code_lib ALTER COLUMN issue_date TYPE TIMESTAMP;

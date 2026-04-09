@@ -41,8 +41,7 @@ public class QrCodeLib implements Serializable {
     @Size(max = 64)
     private String qrCode;
     @Column(name = "issue_date")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date issueDate;
     @Column(name = "submit_date")
     @Temporal(TemporalType.TIMESTAMP)
