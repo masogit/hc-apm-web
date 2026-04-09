@@ -1,20 +1,26 @@
 package com.ge.apm.service.hospitalAdjustment;
 
-import com.ge.apm.dao.AdjustmentTransferApplicationRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.IdleEquipmentStockRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.ExportService;
+import com.ge.apm.service.approval.WxMessageService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.core.message.MSGEvent;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class AdjustmentTransferService {
+    public static final Logger log = LoggerFactory.getLogger(AdjustmentTransferService.class);
 
     @Autowired
     private IdleEquipmentStockRepository stockRepository;
@@ -25,6 +31,15 @@ public class AdjustmentTransferService {
     private AssetInfoRepository assetInfoRepository;
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+
+    @Autowired
+    private CustomRoleRepository customRoleRepository;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
+    @Autowired
+    private WxMessageService wxMessageService;
 
     @Transactional
     public void cancel(AdjustmentTransferApplication selected, UserAccount currentUserAccount){
@@ -144,6 +159,37 @@ public class AdjustmentTransferService {
         assetInfoRepository.save(assetInfo);
         stockRepository.save(idleEquipmentStock);
         dao.save(selected);
+    }
+
+
+
+
+    public void approvalMsg(AdjustmentTransferApplication adjustmentTransferApplication){
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put("orderCode", adjustmentTransferApplication.getApplicationNumber());
+        stringMap.put("content", "设备调剂申请已通过，请确认信息后线下交接");
+        stringMap.put("date", DateUtil.formatDateTime(new Date()));
+
+        List<CustomRole> customRoles = customRoleRepository.findByTenantUidAndFunctionListContains(adjustmentTransferApplication.getTenantUid());
+        List<Integer> tenantRoleIds = new ArrayList<>();
+
+        for (CustomRole customRole : customRoles) {
+            List<String> strings = JSON.parseArray(customRole.getFunctionList(), String.class);
+            if(CollectionUtils.isNotEmpty(strings) && strings.contains(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())){
+                tenantRoleIds.add(customRole.getId());
+            }
+        }
+        if(CollectionUtils.isEmpty(tenantRoleIds)){
+            log.info("租户没有配置自定义调剂角色tenantUid:{}",adjustmentTransferApplication.getTenantUid());
+        }
+        List<Integer> userIds = userAccountRepository.findByCustomRoleId(tenantRoleIds);
+
+        String stockHospitalUid = adjustmentTransferApplication.getStockHospitalUid();
+        String borrowHospitalUid = adjustmentTransferApplication.getBorrowHospitalUid();
+
+
+        List<String> byIdsAndHospitalUID = userAccountRepository.getByIdsAndHospitalUID(userIds, Arrays.asList(stockHospitalUid, borrowHospitalUid));
+        wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_PENDING_REVIEW,byIdsAndHospitalUID,null);
     }
 
 }
