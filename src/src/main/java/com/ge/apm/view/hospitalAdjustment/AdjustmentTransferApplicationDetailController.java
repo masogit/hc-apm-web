@@ -306,6 +306,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         selected.setApplicationPendingApprovalUid(currentUserAccount.getUid());
         selected.setHandlerSignature(signatureId);
         dao.save(selected);
+        adjustmentTransferService.approvalMsg(selected);
         WebUtil.addSuccessMessage("审批完成");
 
     }

@@ -329,4 +329,11 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     List<UserAccount> findByZkbCourseId(String courseId);
 
     List<UserAccount> findByNameContains(String name);
+
+
+    @Query(value = "select user_id  from user_role  where  role_id in ?1 and role_type=1 ", nativeQuery = true)
+    List<Integer> findByCustomRoleId(List<Integer> roleId);
+
+    @Query(value= "select o.uid from user_account o where  o.id in ?1  and o.hospital_uid in ?2 ",nativeQuery=true)
+    public List<String> getByIdsAndHospitalUID(List<Integer> setIds,List<String> hospitalUids);
 }
