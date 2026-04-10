@@ -909,26 +909,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 //                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+9*"));
 //                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
 
-
                 if(autoDispatchAllowClaimByAssignee){
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNotNull, null, "1*3+8*5+owner*6+1oc*"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+1oc*"));
-
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNotNull, null, "1*3+8*5+owner*6+2oc*"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+2oc*"));
-
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNotNull, null, "1*3+8*5+owner*6+3oc*"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+3oc*"));
-
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+8*5+owner*6+oc*"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+8*5+owner*6+oc*"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+8*5+owner*6+oc*"));
-
-
-
-                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+oc*oce*"));
-                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID2", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+oc*oce*"));
-                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID3", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+oc*oce*"));
+                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID2", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID3", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*3+8*"));
                 }
                 List<Integer> tagGroupAssets = getTagGroupAssets();

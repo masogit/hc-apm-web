@@ -912,6 +912,10 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "rating_usage_count")
     private Integer ratingUsageCount;
 
+    @Getter @Setter
+    @Column(name = "epc")
+    private String epc;
+
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
     }
@@ -1101,18 +1105,6 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "asset_classification32")
     private String assetClassification32;
 
-    @JoinColumn(insertable = false, updatable = false, name = "clinical_dept_uid", referencedColumnName = "dept_uid")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private  OwnerConfig ownerConfig;
-
-    public OwnerConfig getOwnerConfig() {
-        return ownerConfig;
-    }
-
-    public void setOwnerConfig(OwnerConfig ownerConfig) {
-        this.ownerConfig = ownerConfig;
-    }
 
     @Transient
     @TableField(exist = false)
@@ -1588,7 +1580,7 @@ public class AssetInfo implements ChineseName, Serializable {
         this.assetTags = assetTags;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Set<AssetTags> assetTags;
 

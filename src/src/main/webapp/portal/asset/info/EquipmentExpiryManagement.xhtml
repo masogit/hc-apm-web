@@ -159,6 +159,10 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
+<!--                        <p:column headerText="超限状态" filterBy="#{item.lifecycle}" filterMatchMode="EQ">-->
+<!--                            <h:outputText-->
+<!--                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>-->
+<!--                        </p:column>-->
                         <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}"
                                   filterBy="#{item.serialNum}"
                                   filterMatchMode="LIKE">

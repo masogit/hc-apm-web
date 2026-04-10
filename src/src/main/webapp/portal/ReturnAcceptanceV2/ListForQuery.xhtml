@@ -284,7 +284,7 @@
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                     <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
                                 </p:commandButton>
-                                <p:commandButton rendered="#{userContextService.checkRole('SharedAssetMgmt')}" id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Delete}" actionListener="#{sharedAssetReqDetailForQueryController.deleteRecord}" update=":IouListForm" disabled="#{empty sharedAssetReqDetailForQueryController.selected}">
+                                <p:commandButton rendered="#{userContextService.checkRole('SharedAssetMgmt') and sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}" id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Delete}" actionListener="#{sharedAssetReqDetailForQueryController.deleteRecord}" update=":IouListForm" disabled="#{empty sharedAssetReqDetailForQueryController.selected}">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </f:facet>

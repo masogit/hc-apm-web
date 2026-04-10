@@ -1,0 +1,153 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="闲置设备库存"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <h:form id="searchForm" class="searchForm">
+                    <h:panelGroup>
+                        <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="AssetDetailListForm:datalist:btnOrg1" hideEffect="fade" dynamic="false" modal="false" >
+                            <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="searchForm:treeNodeNameFilter @this" update="AssetDetailListForm" value="确定"/>
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{idleEquipmentStockController.siteOrgTree}" selection="#{idleEquipmentStockController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false" propagateSelectionUp="#{orgTreeController.propagateSelectionUp}">
+                                    <p:ajax process="@this" event="select" listener="#{idleEquipmentStockController.onSelectSiteTreeNode}"/>
+                                    <p:ajax process="@this" event="unselect" listener="#{idleEquipmentStockController.onUnSelectSiteTreeNode}"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                </h:form>
+
+                <h:form id="AssetDetailListForm">
+
+                    <p:dataTable id="datalist" value="#{idleEquipmentStockController.lazyModel}" var="item"
+                                 widgetVar="datalist" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false"
+                                 selection="#{idleEquipmentStockController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.lastModifiedDate}"      rowKey="#{item.uid}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+
+                        <p:ajax  event="rowSelect" listener="#{idleEquipmentStockController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
+
+                        <p:ajax event="filter" listener="#{idleEquipmentStockController.onFilter}" />
+
+
+                        <p:column  headerText="设备名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+
+                        <p:column  headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.functionType}"/>
+                        </p:column>
+
+                        <p:column  headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+
+
+                        <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{idleEquipmentStockController.filterAssetGroup}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.stockSiteUid}" filterBy="#{item.stockSiteUid}" filterMatchMode="EQ" >
+                            <f:facet name="filter" >
+                                <p:autoComplete id="btnOrg1" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            </f:facet>
+                            <h:outputText value="#{idleEquipmentStockController.getSiteOrgName(item.stockSiteUid)}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.stockDeptName}" filterMatchMode="LIKE" width="100" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{idleEquipmentStockController.fileterOrgName}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{idleEquipmentStockController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{idleEquipmentStockController.getSiteOrgName(item.stockDeptUid)}"/>
+                        </p:column>
+                        <c:if test="#{columnItem eq 'manufacture'}">
+                            <p:column headerText="#{msg.manufacture}" sortBy="#{item.assetInfo.manufacture}" filterBy="#{item.assetInfo.manufacture}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.assetInfo.manufacture}"/>
+                            </p:column>
+                        </c:if>
+
+                        <p:column headerText="#{msg.makerShortName}" sortBy="#{item.assetInfo.makerShortName}" filterBy="#{item.assetInfo.makerShortName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.makerShortName}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        </p:column>
+
+                        <p:column headerText="申请状态" exportable="true" width="150" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+
+                            <f:facet name="filter">
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{idleEquipmentStockController.filterStatus}" converter="javax.faces.Integer"  >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="可借用" itemValue="1" />
+                                    <f:selectItem itemLabel="申请中" itemValue="2"  />
+                                    <f:selectItem itemLabel="已借用" itemValue="3"  />
+                                    <f:selectItem itemLabel="不可借" itemValue="4"  />
+
+
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{idleEquipmentStockController.statusName(item.status)}"/>
+                        </p:column>
+                        <p:column headerText="借用医院"  >
+
+                            <h:outputText value="#{idleEquipmentStockController.getSiteOrgName(item.borrowHospitalUid)}"/>
+                        </p:column>
+
+
+                    </p:dataTable>
+
+
+                </h:form>
+
+            </div>
+        </div>
+
+        <script>
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+        </script>
+    </ui:define>
+</ui:composition>

@@ -136,9 +136,9 @@
                     </f:facet>
                     <h:outputText value="#{item.currentStepName}"/>
                 </p:column>
-                <p:column headerText="#{msg.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="LIKE" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="EQ" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsController.stepFileter}" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType')}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>

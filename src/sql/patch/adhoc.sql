@@ -1,28 +1,33 @@
---YHAAO-27341 新增盘点是否显示维修责任人
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 12, false, '盘点是否显示维修责任人', 'InventoryDisplayRepairOwner', '盘点是否显示维修责任人', 'f', 't', 1 where not exists(select * from config_item where key = 'InventoryDisplayRepairOwner');
 
--- 增加配置项 取消保养工单取消原因是否必填 YHAAO-27380
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '保养工单取消原因是否必填', 'enableCheckCancelReason', '保养工单取消原因是否必填', 'f', 't', 3 where not exists (select * from config_item where key = 'enableCheckCancelReason');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MedicalConsortiumType', '医共体类别', 'Medical Consortium Type', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','1','牵头医院','1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','2','乡镇卫生院','1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','3','社区卫生服务中心','1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','4','社区卫生服务站','1',NULL,-1);
 
---his 源数据和收费代码和分组匹配  job 创建索引
-CREATE INDEX CONCURRENTLY IF NOT exists idx_a_perfect_lateral ON his_equipment_data_source (org_code, exec_dept_code, device_dept_code, exec_time DESC) WHERE is_matched IS NOT TRUE;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','ContractInvoice','购置合同/发票复印件','ContractInvoice',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','MaintenanceRecord','维修记录原件及复印件','MaintenanceRecord',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','InspectionReport','设备检测报告','InspectionReport',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','PhysicalPhoto','实物图片','PhysicalPhoto',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','other','其他','other',NULL,-1);
 
---YHAAO-26795 添加计量消息提醒配置项
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 7, '', '计量提醒提前天数', 'measuringRemindDays', '计量提醒提前天数', 'f', 't', 2 where not exists(select * from config_item where key = 'measuringRemindDays');
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 7, '', '计量提醒提前次数', 'measuringReminderTimes', '计量提醒提前次数', 'f', 't', 2 where not exists(select * from config_item where key = 'measuringReminderTimes');
-
--- 增加配置项 维修工单备件预估单价是否必填 YHAAO-27474
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'true', '维修工单备件预估单价是否必填', 'enableCheckPartsPrice', '维修工单备件预估单价是否必填', 'f', 't', 3 where not exists (select * from config_item where key = 'enableCheckPartsPrice');
-
-
-
-update config_item set value_type = 9, default_value = '{"rendered":false,"label":"维修工单是否显示诊断过程","required":"false","requiredMessage":"维修工单是否显示诊断过程为必输项, 不能为空！"}' where key = 'showDiagnosticProcess';
-
-delete from config_item_value  where key = 'showDiagnosticProcess';
-
--- YHAAO-27471
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 7, '{}', '识别后置处理规则', 'identifyPostProcessorRule', '识别后置处理规则', 'f', 't', 1 where not exists(select * from config_item where key = 'identifyPostProcessorRule');
--- YHAAO-27381
-update shared_asset_req_detail set charging_begin_time = '2026-02-14 15:37:55' where id='2c9b85829c28ab57019c89216fd269c8';
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','DemandDocument','需求论证报告','DemandDocument',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','SitePowerProof','场地/电力证明材料','SitePowerProof',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','OperatorQualification','操作人员资质证明','OperatorQualification',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','other','其他','other',NULL,-1);
 
 
+-- 添加GEIB调用acct system client
+INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time,
+                                last_access_date)
+VALUES (REPLACE(uuid_generate_v4()::text, '-', ''), '2a773154623311e7aeb25254001a1c14',
+        '1dee1cec8d7f440dbf26a2d1f21a8580', 'GEIB',
+        '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, clock_timestamp());
+
+-- 备份
+drop table if exists org_info_back;
+create table org_info_back as select * from org_info;
+delete from  org_info  where institution_uid = 'efee5c59ed704f25a8a1572984ae3417';
+
+-- YHAAO-27657
+ALTER TABLE qr_code_lib ALTER COLUMN issue_date TYPE TIMESTAMP;

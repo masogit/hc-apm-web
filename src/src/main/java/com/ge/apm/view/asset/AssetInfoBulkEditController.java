@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -105,6 +106,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private NurseSiteMaintainService nurseSiteMaintainService;
     private AssetScrapService assetScrapService;
     private GenerateOrderNumUtil generateOrderNumUtil;
+    private AssetTagsMapper assetTagsMapper;
+    private AssetTagsRepository assetTagsDao;
     //******* filter start
 
     @Getter @Setter
@@ -258,6 +261,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetDepartmentConvertService= WebUtil.getBean(AssetDepartmentConvertService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         generateOrderNumUtil = WebUtil.getBean(GenerateOrderNumUtil.class);
+        assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
+        assetTagsDao = WebUtil.getBean(AssetTagsRepository.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         assetTypeGroupTreeComponentController.registerController(this);
 
@@ -552,6 +557,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         for (AssetInfo assetInfo: newList) {
             assetInfo.setLastModifiedDate(now);
             dao.save(assetInfo);
+            saveOrUpdateAssetTags(assetInfo);
             onAfterNewObject(assetInfo);
         }
         this.saveAssetHistory(assetInfoList,newList);
@@ -565,6 +571,50 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             }
         }
         return "AssetList.xhtml?faces-redirect=true";
+    }
+
+    public List<String> autoCompleteTags(String query) {
+
+        List<String> tags = assetTagsMapper.getTagsByTenant(loginUser.getTenantUID());
+
+        if (org.springframework.util.StringUtils.isEmpty(query)) {
+            return tags;
+        }
+
+        tags = tags.stream().filter(tag -> tag.contains(query)).collect(Collectors.toList());
+
+        if (tags.isEmpty()) {
+            tags.add(query);
+        }
+
+        return tags;
+    }
+
+    private void saveOrUpdateAssetTags(AssetInfo assetInfo) {
+
+        List<String> existingTags = assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        List<String> currentTags = assetInfo.getTags();
+
+        List<String> newTags = new ArrayList<>(currentTags);
+        newTags.removeAll(existingTags);
+
+        List<String> removeTags = new ArrayList<>(existingTags);
+        removeTags.removeAll(currentTags);
+
+        //add new tags
+        newTags.stream().distinct().forEach(item -> {
+            AssetTags assetTags = new AssetTags();
+            assetTags.setAssetUid(assetInfo.getUid());
+            assetTags.setTenantUID(loginUser.getTenantUID());
+            assetTags.setTag(item);
+            assetTagsDao.save(assetTags);
+        });
+
+        //remove useless tags
+        removeTags.stream().distinct().forEach(item -> {
+            assetTagsMapper.removeTag(assetInfo.getUid(), item);
+        });
+
     }
 
     public void onAfterNewObject(AssetInfo object) {

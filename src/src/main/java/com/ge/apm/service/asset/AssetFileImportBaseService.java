@@ -1087,6 +1087,7 @@ public class AssetFileImportBaseService {
         }
         newAsset.setUsageCount(importData.getUsageCount());
         newAsset.setRatingUsageCount(importData.getRatingUsageCount());
+        newAsset.setEpc(importData.getEpc());
         return newAsset;
     }
 

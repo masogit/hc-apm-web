@@ -125,13 +125,21 @@
                 document.getElementById("password1").html = "";
                 document.getElementById("password2").html = "";
             }
-
             // clear local storage when logged out
-            var match = location.search.match(/uid=(\d+)/);
-            if(match) {
-                lscache.setBucket(+match[1]);
-                // only removes cache entries for this logged out user
-                lscache.flush();
+            var url = window.location.href;
+            var redirectUrl;
+            if(url.includes('?')){
+                const queryString = url.split('?')[1];
+                const params = new URLSearchParams(queryString);
+                var match = params.get('uid');
+                // var match = location.search.match(/uid=(\d+)/);
+                console.log("match:",match)
+                if(match) {
+                    lscache.setBucket(+match);
+                    // only removes cache entries for this logged out user
+                    lscache.flush();
+                }
+                redirectUrl = params.get('redirect');
             }
 
             function handleLoginError(xhr, status, exception) {
@@ -154,7 +162,21 @@
 
                     PF("dlgResetPassword").show();
                 }
+                if(redirectUrl){
+                    //  before redirect set token
+                    var token = "#{userContextService.getAccessToken()}";
+                    localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
+                    localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
+                    window.location.href = redirectUrl;
+                }
             }
+            window.onload = function() {
+                if(redirectUrl){
+                    document.getElementById('redirectUrl').value = redirectUrl;
+                }else{
+                    document.getElementById('redirectUrl').value = '';
+                }
+            };
 
         </h:outputScript>
     </h:head>
@@ -174,6 +196,7 @@
                 <div class="ui-g">
                     <div class="ui-g-12" style="padding: 0px; margin: 0px;">
                         <center>
+                            <h:inputHidden id="redirectUrl" value="1"/>
                             <label style="color: white;"><h1>#{msg.GE_APM}</h1></label>
                         </center>
                     </div>

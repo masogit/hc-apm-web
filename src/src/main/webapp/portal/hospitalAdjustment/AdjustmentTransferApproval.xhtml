@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="调剂工单详情"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="adjustmentTransferForm" >
+
+
+
+                    <p:fieldset legend="局药管中心审核意见" style="margin-bottom:20px"
+                                rendered="#{adjustmentApplicationDetailController.selected.status==2}">
+
+
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                     columnClasses="left-col, right-col">
+
+                            <h:panelGroup>
+                                <label class="label">审核结果</label>
+                                <div style="display:flex; align-items:center; flex-wrap:wrap; gap: 10px;">
+
+
+                                    <p:selectOneRadio value="#{adjustmentApplicationDetailController.selected.auditResult}" >
+                                        <f:selectItem itemLabel="符合条件" itemValue="true" />
+                                        <f:selectItem itemLabel="不符合条件" itemValue="false" />
+
+                                        <p:ajax event="change" process="@this" update="@form"/>
+                                    </p:selectOneRadio>
+
+
+                                    <p:inputText value="#{adjustmentApplicationDetailController.selected.registrationNumber}"
+                                                 placeholder="登记编号"
+                                                 style="width:150px;"
+                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == true}"/>
+
+                                    <p:inputText value="#{adjustmentApplicationDetailController.selected.auditResultReason}"
+                                                 placeholder="说明理由"
+                                                 style="width:200px;"
+                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == false}"/>
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup>
+
+                                <span class="label" style="display:block; margin-bottom:5px;">审核日期</span>
+                                <p:calendar value="#{adjustmentApplicationDetailController.selected.auditDate}"
+                                            pattern="yyyy-MM-dd"
+                                            showOn="button"
+                                            style="width:160px;"
+                                            readonlyInput="true"/>
+
+                            </h:panelGroup>
+
+
+                            <h:panelGroup>
+
+                                <label class="label">审核人签字</label>
+                                    <p:graphicImage rendered="#{adjustmentApplicationDetailController.signatureId !=null}" value="#{fileDownloadService.getFile(adjustmentApplicationDetailController.signatureId)}" height="80" width="100" stream="false" >
+                                    </p:graphicImage>
+                                <p:commandButton    id="openSignature2" actionListener="#{adjustmentApplicationDetailController.getSignature()}" value="添加签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
+
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:commandButton     actionListener="#{adjustmentApplicationDetailController.approval()}" value="审批" update="adjustmentApplicationForm"   />
+                    <p:commandButton     actionListener="#{adjustmentApplicationDetailController.approval()}" value="审批" update="adjustmentApplicationForm"   />
+
+
+                </h:form>
+                <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
+                    <h:form id="signatureForm">
+                        <h:panelGrid columnClasses="value" columns="1">
+                            <h:panelGroup>
+                                <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{adjustmentApplicationDetailController.signatureContent}"
+                                             guideline="false" rendered="#{adjustmentApplicationDetailController.signatureContentStream==null}" />
+                                <p:graphicImage value="#{adjustmentApplicationDetailController.signatureContentStream}" stream="false" rendered="#{adjustmentApplicationDetailController.signatureContentStream!=null}"></p:graphicImage>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <p:commandButton value="确认" actionListener="#{adjustmentApplicationDetailController.saveSignatureAndSubmitApprove()}" update=":adjustmentApplicationForm" oncomplete="handleApproveSuccess(xhr, status, args);"/>
+                        <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{multiLevelApprovalController.resetSignature()}" update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
+                    </h:form>
+                    <script>
+                        function handleApproveSuccess(xhr, status, args) {
+                            if(xhr.status!==206){
+                                PF('signatureDlg').hide();
+                            }
+                        }
+                    </script>
+                </p:dialog>
+            </div>
+        </div>
+
+
+        <script>
+
+        </script>
+    </ui:define>
+</ui:composition>

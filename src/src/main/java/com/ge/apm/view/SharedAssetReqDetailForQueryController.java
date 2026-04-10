@@ -468,7 +468,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             this.selected = null;
         } catch (Exception e) {
             logger.error("deleteRecord 目标方法执行失败 ,e: ", e);
-            throw new RuntimeException(e);
+            WebUtil.addErrorMessage(e.getMessage());
         }
 
     }

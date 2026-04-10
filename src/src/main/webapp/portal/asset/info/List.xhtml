@@ -394,8 +394,11 @@
                             <p:column headerText="#{msg.usageCount}" visible="false" exportable="true">
                                 <h:outputText value="#{item.usageCount}"/>
                             </p:column>
-                            <p:column headerText="#{msg.usageCount}" visible="false" exportable="true">
+                            <p:column headerText="#{msg.ratingUsageCount}" visible="false" exportable="true">
                                 <h:outputText value="#{item.ratingUsageCount}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.epc}" visible="false" exportable="true">
+                                <h:outputText value="#{item.epc}"/>
                             </p:column>
                         </p:dataTable>
                     </div>
