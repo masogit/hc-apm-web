@@ -159,7 +159,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
             }
             Map<String, String> mm =  FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-            //if(!mm.containsKey("notGeAsset")){
+            boolean hasManagePending = zkbPartOrderUserConfigList.stream().anyMatch(c -> ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType()));
+            if(!hasManagePending){
                 for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
                     if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(c.getConfigType()) ||
                         ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(c.getConfigType())
@@ -173,7 +174,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         disableNotGeAsset = true;
                     }
                 }
-            //}
+            }
         }
 
         tenantInfoList = zkbPartOrderService.getSourceTenantInfoList();
@@ -334,30 +335,67 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     pendingQty = 0;
                 }
             }else if(zkbPartOrderUserConfigList.size() == 2){
-                boolean is4ooRole = true;
-                boolean isCommercialRole = false;
-                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList) {
-                    if (StringUtils.isEmpty(c.getConfigType())) {
-                        is4ooRole = false;
+                String tsePendingStr = ZkbPartOrderStep.PartOrderStep.TsePending.toString();
+                String managePendingStr = ZkbPartOrderStep.PartOrderStep.ManagePending.toString();
+                // 提取非空且非空白的 configType
+                Set<String> configTypes = zkbPartOrderUserConfigList.stream().map(ZkbPartOrderUserConfig::getConfigType)
+                        .filter(Objects::nonNull).filter(ct -> !ct.trim().isEmpty()).collect(Collectors.toSet());
+                // 判断是否恰好包含 TsePending 和 ManagePending
+                boolean isTseAndManage = configTypes.size() == 2
+                        && configTypes.contains(tsePendingStr)
+                        && configTypes.contains(managePendingStr);
+                if (isTseAndManage) {
+                    int totalPendingQty = 0;
+                    for (ZkbPartOrderUserConfig config : zkbPartOrderUserConfigList) {
+                        String configType = config.getConfigType();
+                        if (configType == null || configType.trim().isEmpty()) {
+                            continue; // 双重保险校验
+                        }
+                        Map<String, Object> mmCopy = new HashMap<>(mm);
+                        if (tsePendingStr.equals(configType)) {
+                            if ("US".equals(config.getAssetType())) {
+                                mmCopy.put("onlineEngineer", config.getId());
+                            } else {
+                                mmCopy.put("assetTypeDi", config.getAssetType());
+                            }
+                            mmCopy.put("currentStep", tsePendingStr);
+                            totalPendingQty += zkbPartOrderMapper.queryPendCountByUserConfig(mmCopy);
+                        } else if (managePendingStr.equals(configType)) {
+                            if (StringUtils.isNotEmpty(config.getZone())) {
+                                List<String> zones = Arrays.asList(config.getZone().split(","));
+                                mmCopy.put("zone", zones);
+                                mmCopy.put("currentStep", managePendingStr);
+                                totalPendingQty += zkbPartOrderMapper.queryPendCountByUserConfig(mmCopy);
+                            }
+                        }
                     }
-                    if (!c.getConfigType().contains("Order")) {
-                        is4ooRole = false;
+                    pendingQty = totalPendingQty;
+                } else {
+                    boolean is4ooRole = true;
+                    boolean isCommercialRole = false;
+                    for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList) {
+                        if (StringUtils.isEmpty(c.getConfigType())) {
+                            is4ooRole = false;
+                        }
+                        if (!c.getConfigType().contains("Order")) {
+                            is4ooRole = false;
+                        }
+                        if (c.getConfigType().equals(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString())) {
+                            isCommercialRole = true;
+                        }
                     }
-                    if(c.getConfigType().equals(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString())){
-                        isCommercialRole = true;
+                    if (is4ooRole) {
+                        mm.put("ordersRole", ZkbConstantUtil.T);
                     }
-                }
-                if(is4ooRole) {
-                    mm.put("ordersRole", ZkbConstantUtil.T);
-                }
-                if(isCommercialRole) {
-                    List<String> currentSteps = new ArrayList<>();
-                    currentSteps.add(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
-                    currentSteps.add(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
-                    mm.put("currentSteps", currentSteps);
-                }
-                if(is4ooRole || isCommercialRole){
-                    pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+                    if (isCommercialRole) {
+                        List<String> currentSteps = new ArrayList<>();
+                        currentSteps.add(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                        currentSteps.add(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                        mm.put("currentSteps", currentSteps);
+                    }
+                    if (is4ooRole || isCommercialRole) {
+                        pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+                    }
                 }
             }else if(zkbPartOrderUserConfigList.size() == 3){
                 mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
@@ -541,6 +579,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                                 Predicate pre4 = builder.and(pre1, pre2);
                                 Predicate pre5 = builder.or(pre4, pre3);
                                 userConfigPredicates.add(pre5);*/
+                                userConfigPredicates.add(builder.isTrue(builder.literal(true)));
                             }
                         }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                             if (StringUtils.isEmpty(queryStatus)) {

@@ -1,0 +1,509 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="闲置设备入库申请详情"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="adjustmentApplicationForm" >
+
+                    <!-- 1. 申报单位信息 -->
+                    <p:fieldset legend="申报单位信息" id="assetList">
+                        <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">单位名称</label>
+                                <p:inputText value="#{adjustmentApplicationDetailController.selected.companyName}" readonly="true"
+                                >
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">医共体所属类别</label>
+                                <p:selectOneRadio id="status"
+                                                  value="#{adjustmentApplicationDetailController.selected.medicalConsortiumType}"
+                                                  required="true"
+                                                  requiredMessage="医共体所属类别 #{msg.ValidationRequire}" disabled="true">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('MedicalConsortiumType')}"
+                                                   var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax event="change" process="@this"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">联系人</label>
+                                <p:inputText value="#{adjustmentApplicationDetailController.selected.contactPerson}" readonly="true"
+                                             style="width: 95%">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">联系电话</label>
+                                <p:inputText value="#{adjustmentApplicationDetailController.selected.contactNumber}" readonly="true"
+                                             style="width: 95%">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">申报日期</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                            locale="#{userContextService.getCalendarLocale()}" id="installDate"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            value="#{adjustmentApplicationDetailController.selected.applicationDate}"
+                                            showOn="button" readonlyInput="false" showButtonPanel="true"
+                                            navigator="true" mask="true" style="width: 95%" disabled="true">
+                                    <p:ajax event="dateSelect"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:outputText/>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <!-- 2. 闲置设备基本信息 -->
+                    <p:fieldset legend="闲置设备基本信息" style="margin-bottom:20px">
+
+                        <!-- Row 1: 基础信息 -->
+                        <p:panelGrid columns="4" layout="grid"  styleClass="ui-panelgrid-blank form-group">
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetName}*</label>
+                                <p:inputText id="assetName" readonly="true"
+                                             value="#{adjustmentApplicationDetailController.selectedAsset.name}"
+                                             placeholder="#{msg.noAssetSelected}" required="true"
+                                             requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
+                                <p:commandButton class="popupIconButton" disabled="true"
+                                                 actionListener="#{selectAssetController.prepareDialogCallback(adjustmentApplicationDetailController, 'adjustmentApplicationForm')}"
+                                                 process="@this" icon="ui-icon-arrow-drop-down"
+                                                 update="selectAssetDlgAdjust  adjustmentApplicationForm:assetName"
+                                                 oncomplete="PF('varSelectAssetDlgAdjust').show();"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">设备型号/规格</label>
+                                <p:inputText id="modelSpec" readonly="true"
+                                             value="#{adjustmentApplicationDetailController.selectedAsset.functionType}"
+                                             style="width: 95%">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufacture}</label>
+                                <p:inputText id="manufacture" readonly="true"
+                                             value="#{adjustmentApplicationDetailController.selectedAsset.manufacture}"
+                                             style="width: 95%">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.purchaseDate}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                            locale="#{userContextService.getCalendarLocale()}" id="purchaseDate"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            value="#{adjustmentApplicationDetailController.selectedAsset.purchaseDate}"
+                                            showOn="button" readonlyInput="false" showButtonPanel="true"
+                                            navigator="true" mask="true" style="width: 95%" disabled="true">
+                                    <p:ajax event="dateSelect"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                        <!-- Row 2: 价格与年限 -->
+                        <p:panelGrid columns="4" layout="grid"  styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.purchasePrice} (元)</label>
+                                <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" readonly="true"
+                                               value="#{adjustmentApplicationDetailController.selectedAsset.purchasePrice}"
+                                               style="width: 95%">
+                                    <p:ajax/>
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">累计使用年限</label>
+                                <div style="display: flex; align-items: center;">
+                                    <p:inputNumber id="usedYears" minValue="0" decimalPlaces="0" readonly="true"
+                                                   value="#{adjustmentApplicationDetailController.selected.usedYears}"
+                                                   style="width: 100px; margin-right: 60px;">
+                                        <p:ajax/>
+                                    </p:inputNumber>
+                                    <span style="margin-right: 10px;">年</span>
+                                    <!--                                    <p:inputNumber id="usedMonths" minValue="0" max="11" decimalPlaces="0"-->
+                                    <!--                                                   value="#{adjustmentApplicationDetailController.selected.usedMonths}"-->
+                                    <!--                                                   style="width: 50px;">-->
+                                    <!--                                        <p:ajax/>-->
+                                    <!--                                    </p:inputNumber>-->
+                                    <!--                                    <span>月</span>-->
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">折旧期限 (规定)</label>
+                                <p:inputNumber minValue="0" maxValue="99" decimalPlaces="1" readonly="true"
+                                               value="#{adjustmentApplicationDetailController.selected.depreciationPeriodYears}"
+                                               requiredMessage="折旧期限 #{msg.ValidationRequire}" style="width: 95%">
+                                    <p:ajax/>
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">是否超折旧期限</label>
+                                <p:selectOneRadio
+                                        value="#{adjustmentApplicationDetailController.selected.overDepreciation}" disabled="true">
+                                    <f:selectItem itemLabel="是" itemValue="true"/>
+                                    <f:selectItem itemLabel="否" itemValue="false"/>
+                                    <p:ajax event="change" process="@this" update="@form"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{adjustmentApplicationDetailController.selected.overDepreciation == true}">
+                            <h:panelGroup>
+                                <label class="label">超期仍具备使用价值依据</label>
+                                <p:inputText readonly="true"
+                                        value="#{adjustmentApplicationDetailController.selected.overDepreciationReason}"
+                                        style="width: 95%;">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="2" layout="grid"  styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">设备现状</label>
+                                <p:selectOneRadio value="#{adjustmentApplicationDetailController.selected.deviceStatus}" disabled="true"
+                                >
+                                    <f:selectItem itemLabel="性能完好" itemValue="PERFECT"/>
+                                    <f:selectItem itemLabel="可修复后正常使用" itemValue="REPAIRABLE"/>
+                                    <f:selectItem itemLabel="超期仍具备使用价值" itemValue="STILL_USABLE"/>
+                                    <p:ajax event="change" process="@this"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">维修记录摘要 (近2年)</label>
+                                <p:inputText
+                                        value="#{adjustmentApplicationDetailController.selected.maintenanceSummary}" readonly="true"
+                                        style="width: 95%;">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">购置凭证编号</label>
+                                <p:inputText value="#{adjustmentApplicationDetailController.selected.purchaseVoucherNo}" readonly="true"
+                                             style="width: 95%;">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">设备产权性质</label>
+                                <div style="display:flex; align-items:center; flex-wrap:wrap;">
+                                    <p:selectOneRadio
+                                            value="#{adjustmentApplicationDetailController.selected.propertyNature}" disabled="true"
+                                    >
+                                        <f:selectItem itemLabel="国有资产" itemValue="STATE_OWNED"/>
+                                        <f:selectItem itemLabel="其他" itemValue="OTHER"/>
+                                        <p:ajax event="change" process="@this" update="@form"/>
+                                    </p:selectOneRadio>
+                                    <p:inputText readonly="true"
+                                            rendered="#{adjustmentApplicationDetailController.selected.propertyNature == 'OTHER'}"
+                                            value="#{adjustmentApplicationDetailController.selected.propertyNatureDesc}"
+                                            placeholder="请说明" style="width: 100px; margin-left: 5px;">
+                                        <p:ajax/>
+                                    </p:inputText>
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup colspan="2">
+                                <label class="label">是否存在权利瑕疵</label>
+                                <div style="display:flex; align-items:center; flex-wrap:wrap;">
+                                    <p:selectOneRadio disabled="true"
+                                            value="#{adjustmentApplicationDetailController.selected.hasRightsDefect}">
+                                        <f:selectItem itemLabel="无" itemValue="false"/>
+                                        <f:selectItem itemLabel="有" itemValue="true"/>
+                                        <p:ajax event="change" process="@this" update="@form"/>
+                                    </p:selectOneRadio>
+                                    <p:inputText readonly="true"
+                                            rendered="#{adjustmentApplicationDetailController.selected.hasRightsDefect == true}"
+                                            value="#{adjustmentApplicationDetailController.selected.rightsDefectDescription}"
+                                            placeholder="注明抵押、查封等" style="width: 120px; margin-left: 5px;">
+                                        <p:ajax/>
+                                    </p:inputText>
+                                </div>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+
+                    <p:fieldset legend="设置闲置原因" style="margin-bottom:20px">
+                        <p:panelGrid columns="4" layout="grid"  styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup colspan="4">
+                                <label class="label">闲置原因</label>
+                                <p:selectOneRadio disabled="true"
+                                                  value="#{adjustmentApplicationDetailController.selected.idleReasons}"
+                                                  required="true"
+                                                  requiredMessage="医共体所属类别 #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="业务调整" itemValue="BUSINESS_ADJUSTMENT"/>
+                                    <f:selectItem itemLabel="更新换代" itemValue="UPDATE_REPLACEMENT"/>
+                                    <f:selectItem itemLabel="科室撤并" itemValue="DEPARTMENT_MERGE"/>
+                                    <f:selectItem itemLabel="其他" itemValue="OTHER"/>
+                                    <p:ajax event="change" process="@this" update="@form"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+
+                        <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{adjustmentApplicationDetailController.selected.idleReasons != null and adjustmentApplicationDetailController.selected.idleReasons.contains('OTHER')}">
+                            <h:panelGroup>
+                                <label class="label">其他原因详细说明</label>
+                                <p:inputText readonly="true"
+                                        value="#{adjustmentApplicationDetailController.selected.otherReasonDescription}"
+                                        style="width: 95%;" required="true"
+                                        requiredMessage="请选择'其他'时需填写详细说明">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">预计闲置期限</label>
+                                <div style="display: flex; align-items: center;">
+                                    <p:inputNumber id="expectedIdleYears" minValue="0" decimalPlaces="0" readonly="true"
+                                                   value="#{adjustmentApplicationDetailController.selected.expectedIdleYears}"
+                                                   >
+                                        <p:ajax/>
+                                    </p:inputNumber>
+                                    <span style="margin-right: 10px;">年</span>
+                                    <p:inputNumber id="expectedIdleMonths" minValue="0" max="11" decimalPlaces="0" readonly="true"
+                                                   value="#{adjustmentApplicationDetailController.selected.expectedIdleMonths}"
+                                                 >
+                                        <p:ajax/>
+                                    </p:inputNumber>
+                                    <span>月</span>
+                                </div>
+                            </h:panelGroup>
+                            <h:outputText colspan="3"/>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset legend="附件材料清单" style="margin-bottom:20px">
+                    <h:panelGroup>
+<!--                        <p:commandButton value="批量删除文件" class="bathDeleteAttach" update=":adjustmentApplicationForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{adjustmentApplicationDetailController.bathDeleteAttach}" disabled="#{!adjustmentApplicationDetailController.isChecked()}">-->
+<!--                            <p:confirm header="批量删除文件" message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>-->
+<!--                        </p:commandButton>-->
+<!--                        <p:commandButton value="批量下载文件" class="bathDownloadAttach" actionListener="#{adjustmentApplicationDetailController.bathDownloadAttach}" disabled="#{!adjustmentApplicationDetailController.isChecked()}" onclick="PrimeFaces.monitorDownload(start, stop);">-->
+<!--                            <p:fileDownload value="#{contractInfoEditController.attachListFile}"/>-->
+<!--                        </p:commandButton>-->
+                        <p:dataList id="AttachList" value="#{adjustmentApplicationDetailController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
+                            <f:facet name="header">
+                                <div class="ui-g" style="text-align:left">
+<!--                                    <div class="ui-g-1">-->
+<!--                                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">-->
+<!--                                            <p:ajax listener="#{adjustmentApplicationDetailController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />-->
+<!--                                        </p:selectBooleanCheckbox>-->
+<!--                                    </div>-->
+<!--                                    <p:commandLink value="↑↓" actionListener="#{adjustmentApplicationDetailController.attachSort()}" update="AttachList"/>-->
+                                    <h:outputText value="#{msg.AttachmentType}" class="ui-g-2"/>
+                                    <h:outputText value="#{msg.FileName}" class="ui-g-3"/>
+                                    <h:outputText value="#{msg.UploadTime}" class="ui-g-2" />
+                                    <h:outputText value="#{msg.Uploader}" class="ui-g-2" />
+<!--                                    <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-1" />-->
+                                </div>
+                            </f:facet>
+
+                            <div class="ui-g">
+<!--                                <div class="ui-g-1">-->
+<!--&lt;!&ndash;                                    <p:selectBooleanCheckbox value="#{adjustmentApplicationDetailController.blobObjectSelectedMap[fileitem.id]}" id="selectCheckBox" class="selectCheckBoxHeader">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <p:ajax process="@this" listener="#{adjustmentApplicationDetailController.pick(fileitem.id)}" update="@(.selectCheckBox) @(.selectCheckBox) @(.bathDeleteAttach) @(.bathDownloadAttach)" oncomplete="updateSelectAllCheckBox();" />&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </p:selectBooleanCheckbox>&ndash;&gt;-->
+<!--                                </div>-->
+                                <h:outputText value="#{fileitem.boSubTypeValue}" class="ui-g-2"/>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="ui-g-3"/>
+                                <!--                                    <p:link href="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" class="ui-g-3" >#{fileitem.objectName}</p:link>-->
+                                <h:outputText value="#{fileitem.createdDate}" class="ui-g-2">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                                <h:outputText value="#{adjustmentApplicationDetailController.getUserNameByUid(fileitem.createdBy)}" class="ui-g-2" />
+                                <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()"/>
+<!--                                <p:commandLink value="#{msg.Delete}" style="margin-right: 5px;" update="AttachList" actionListener="#{adjustmentApplicationDetailController.removeAttachmentById(fileitem.id)}" process="@this" >-->
+<!--                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
+<!--                                </p:commandLink>-->
+<!--                                <p:commandLink value="#{msg.approveAttactments}" style="margin-right: 5px;"  update="AttachList" process="@this" actionListener="#{adjustmentApplicationDetailController.approveAttachmentById(fileitem.id)}" />-->
+<!--                                <p:commandLink value="#{msg.attactmentsApproved}" style="margin-right: 5px;"  process="@this"  rendered="#{!adjustmentApplicationDetailController.canApprove(fileitem.id)}" disabled="true"/>-->
+                            </div>
+                        </p:dataList>
+
+                    </h:panelGroup>
+                    </p:fieldset>
+
+                    <p:fieldset legend="局药管中心审核意见" style="margin-bottom:20px">
+
+
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                     columnClasses="left-col, right-col">
+
+                            <h:panelGroup>
+                                <label class="label">审核结果</label>
+                                <div style="display:flex; align-items:center; flex-wrap:wrap; gap: 10px;">
+
+
+                                    <p:selectOneRadio value="#{adjustmentApplicationDetailController.selected.auditResult}"  disabled="true">
+                                        <f:selectItem itemLabel="符合条件" itemValue="true" />
+                                        <f:selectItem itemLabel="不符合条件" itemValue="false" />
+
+                                        <p:ajax event="change" process="@this" update="@form"/>
+                                    </p:selectOneRadio>
+
+
+                                    <p:inputText value="#{adjustmentApplicationDetailController.selected.registrationNumber}" readonly="true"
+                                                 placeholder="登记编号"
+                                                 style="width:150px;"
+                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == true}"/>
+
+                                    <p:inputText value="#{adjustmentApplicationDetailController.selected.auditResultReason}" readonly="true"
+                                                 placeholder="说明理由"
+                                                 style="width:200px;"
+                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == false}"/>
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup>
+
+                                <span class="label" style="display:block; margin-bottom:5px;">审核日期</span>
+                                <p:calendar value="#{adjustmentApplicationDetailController.selected.auditDate}" disabled="true"
+                                            pattern="yyyy-MM-dd"
+                                            showOn="button"
+                                            style="width:160px;"
+                                            readonlyInput="true"/>
+
+                            </h:panelGroup>
+
+
+                            <h:panelGroup>
+
+                                <label class="label">审核人签字</label>
+                                <p:graphicImage rendered="#{adjustmentApplicationDetailController.selected.auditSignature !=null}" value="#{fileDownloadService.getFile(adjustmentApplicationDetailController.selected.auditSignature)}" height="80" width="100" stream="false" >
+                                </p:graphicImage>
+
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+                    </p:fieldset>
+
+
+
+                    <p:commandButton immediate="true" value="取消申请" icon="ui-icon-cancel"
+                                     rendered="#{adjustmentApplicationDetailController.selected.status==2 and  adjustmentApplicationDetailController.selected.applicationUserUid==adjustmentApplicationDetailController.currentUserAccount.uid }"
+                                     actionListener="#{adjustmentApplicationDetailController.cancel}" update="adjustmentApplicationForm"
+                                     style="margin-left: 10px;"/>
+
+                    <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                     action="IdleEquipmentApplication?faces-redirect=true"
+                                     style="margin-left: 10px;"/>
+                </h:form>
+            </div>
+        </div>
+        <ui:include src="/portal/preview/view.xhtml" />
+        <ui:include src="selectAssetDialogAdjustment.xhtml"/>
+
+<!--        <p:dialog header="提示" widgetVar="successMsg" modal="true" showEffect="fade" hideEffect="fade"-->
+<!--                  resizable="false">-->
+<!--            <p:outputLabel value="保存成功！"/>-->
+<!--            <p:commandButton value="确定" type="button" onclick="PF('successMsg').hide();"/>-->
+<!--        </p:dialog>-->
+
+
+        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.UploadFile}">
+            <h:form id="uploadDialogForm" >
+                <h:panelGroup id="display" >
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <p:selectOneMenu id="functionGroup" value="#{adjustmentApplicationDetailController.attachmentType}" autoWidth="false" style="width: 100%">
+                                <p:ajax process="@this" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{adjustmentApplicationDetailController.getContractAttachmentTypeList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.choseFileToUpload}</label>
+                            <p:dataList id="AttachUploadList" value="#{adjustmentApplicationDetailController.uploadedFileObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.attachment}</f:facet>
+                                #{fileitem.objectName}
+                                <p:commandButton actionListener="#{adjustmentApplicationDetailController.removeUploadedFileObjects(fileitem.id)}" update="AttachUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{adjustmentApplicationDetailController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                          multiple="true" sizeLimit="209715200" update=":uploadDialogForm:AttachUploadList saveButton" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}200M"  label="#{msg.Add}" />
+                        </h:panelGroup>
+
+
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{adjustmentApplicationDetailController.finishUpload()}" disabled="#{empty adjustmentApplicationDetailController.uploadedFileObjects}" value="#{msg.Confirm}"
+                                         update=":adjustmentApplicationForm:AttachList :uploadDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{contractInfoEditController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+        <script>
+            //<![CDATA[
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+            function handleValidFields(xhr, status, args) {
+                var valid = true;
+                if (args.confirmedUpDate) {
+                    $('#woTab\\:repairCompleteDialogForm\\:confirmedUpDate_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.caseType) {
+                    $('#woTab\\:repairCompleteDialogForm\\:caseType').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.repairResult) {
+                    $('#woTab\\:repairCompleteDialogForm\\:repairResult').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.manHours) {
+                    $('#woTab\\:repairCompleteDialogForm\\:manHours_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (valid) {
+                    handleSubmit(args, 'repairCompleteDialog');
+                }
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetContractEditForm\\:AttachList\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

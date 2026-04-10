@@ -718,6 +718,10 @@ public class AssetInfoFormatter {
         return assetInfo.getRatingUsageCount();
     }
 
+    public String getEpc() {
+        return assetInfo.getEpc();
+    }
+
     public String getAssetCode68AsString() {
         if (assetInfo.getAssetCode68() == null) return null;
 
@@ -1038,6 +1042,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
         map.put(getMessage("usageCount"), assetInfo.getUsageCount());
         map.put(getMessage("ratingUsageCount"), assetInfo.getRatingUsageCount());
+        map.put(getMessage("epc"), assetInfo.getEpc());
         return map;
 
     }
@@ -1196,6 +1201,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("warrantyStatus"), assetInfo.getWarrantyStatus());
         map.put(getMessage("usageCount"), assetInfo.getUsageCount());
         map.put(getMessage("ratingUsageCount"), assetInfo.getRatingUsageCount());
+        map.put(getMessage("epc"), assetInfo.getEpc());
         return map;
 
     }

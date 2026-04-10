@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.BuildManagementRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -58,7 +59,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private String emergencyEquipment;
 
     private Boolean isAllSelected = Boolean.FALSE;
-
+    
     private Boolean isAllSelected5 = Boolean.FALSE;
 
     private Boolean is4Edit = Boolean.FALSE;
@@ -73,7 +74,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private List<SearchFilter> searchFilters;
 
     private List<AssetInfo> assets4Maintain;
-
+    
     private List<AssetInfo> assets5Maintain;
 
     private Set<AssetInfo> selectedAssets;
@@ -83,16 +84,19 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private Set<AssetInfo> selectedAssets5;
 
     private Map<String, Boolean> selectedAssetUids;
-
+    
     private Map<String, Boolean> selectedAssetUids5;
 
     private ServerEventInterface callingController;
 
     private AssetSelectService assetSelectService;
-
+    
     private List<OrgInfo> listCheckOrgInfo;
 
     private String locationName;
+
+    private String qrCode;
+
     private String locationCode;
     private BuildManagementRepository buildManagementRepository;
 
@@ -102,6 +106,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private List<AssetInfo> assets5Permit;
 
+    private ConfigCacheService configCacheService;
 
 
     private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
@@ -127,6 +132,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssets5 = new HashSet<>();
         currentUser = UserContextService.getCurrentUserAccount();
         buildManagementRepository = WebUtil.getBean(BuildManagementRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         this.isSelectAll = Boolean.FALSE;
         i18nMessageList = FieldValueMessageController.getFieldValueList("assetGroup");
     }
@@ -180,13 +186,13 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.selectedAssets.forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
         OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
         this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getSiteUID());
-        if (this.listCheckOrgInfo == null) {
-            this.listCheckOrgInfo = new ArrayList<OrgInfo>();
-        }
-        else{
-            this.listCheckOrgInfo.clear();
-        }
-        listCheckOrgInfo.add(selectedDept);
+		if (this.listCheckOrgInfo == null) {
+			this.listCheckOrgInfo = new ArrayList<OrgInfo>();
+		}
+		else{
+			this.listCheckOrgInfo.clear();
+		}
+		listCheckOrgInfo.add(selectedDept);
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
 
         //sort assets by selected for edit view
@@ -199,7 +205,12 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.isAllSelectedAssetGroup = Boolean.FALSE;
         this.listCheckI18nMessage = new ArrayList<>();
     }
-
+    public OrgInfo getOrgInfoByUid(String uid) {
+        if (Strings.isNullOrEmpty(uid)) {
+            return null;
+        }
+        return configCacheService.findOrgByUid(uid);
+    }
 
     public void loadData4Edit(List<AssetInfo> assetInfos,String  siteUid) {
         this.is4Edit = Boolean.TRUE;
@@ -264,7 +275,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
         int filterCount=this.buildAdvancedSearchFilters();
         if(filterCount==0){
-            WebUtil.addErrorMessage("缺少筛选条件！");
+        	WebUtil.addErrorMessage("缺少筛选条件！");
         } else{
             if (currentUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(currentUser.getAssetTypeGroupList())) {
                 assets4Permit = ListUtil.empty();
@@ -308,7 +319,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         assets4Maintain=assets4Maintain.stream().filter(item->{
             String assetDeptUID = item.getAssetDeptUID();
             if(StringUtils.isBlank(assetDeptUID)) return true;
-            return collect.contains(assetDeptUID);
+                return collect.contains(assetDeptUID);
         }).collect(Collectors.toList());
     }
     public void addAssetInfo(){
@@ -317,12 +328,12 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
                 selectedAssets.add(assetInfo);
             }
         }
-        for(AssetInfo assetInfo: selectedAssets){
-            if(!assets5Maintain.contains(assetInfo)){
-                assets5Maintain.add(assetInfo);
-            }
-        }
-        this.tiggerEvent();
+    	for(AssetInfo assetInfo: selectedAssets){
+    		if(!assets5Maintain.contains(assetInfo)){
+    			assets5Maintain.add(assetInfo);
+    		}
+    	}
+    	this.tiggerEvent();
     }
 
     public void addAssetInfoPermit(){
@@ -337,7 +348,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             }
         }
     }
-
+    
     public void removeAssetInfo(){
         selectedAssets.removeAll(selectedAssets5);
         assets5Maintain.removeAll(selectedAssets5);
@@ -345,7 +356,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssetUids5.clear();
         this.tiggerEvent();
     }
-
+    
     public void clearAssetInfo(){
         this.selectedAssets.clear();
         assets5Maintain.clear();
@@ -449,7 +460,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             selectedAssetsed.remove(asset);
         }
     }
-
+    
     public void updateSelctedAssetList5(AjaxBehaviorEvent event) {
         log.debug("updateSelctedAssetList5");
         SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
@@ -473,8 +484,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     public List<String> autoCompleteDeptName(String query) {
         List<OrgInfo> res = deptList.stream().filter(item -> Strings.isNullOrEmpty(query)
-                        || item.getShortName().contains(query)
-                        || (item.getShortNamePyCode() == null ? false : item.getShortNamePyCode().contains(query.toLowerCase())))
+                || item.getShortName().contains(query)
+                || (item.getShortNamePyCode() == null ? false : item.getShortNamePyCode().contains(query.toLowerCase())))
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getShortName()).distinct().collect(Collectors.toList());
@@ -538,7 +549,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
      * used as the only search filter, others will be ignored
      */
     private int buildAdvancedSearchFilters() {
-        int count=0;
+    	int count=0;
         if(StringUtils.isNotBlank(this.getDepartNum())) {
             searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, this.getDepartNum(), "1*"));
             ++count;
@@ -560,19 +571,23 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
                 searchFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, this.getEmergencyEquipment(), "1*"));
                 ++count;
             }
-
+            
             if(listCheckOrgInfo!=null && !listCheckOrgInfo.isEmpty()){
-                Set<String> setOrgInfoUid=new HashSet<>();
+            	Set<String> setOrgInfoUid=new HashSet<>();
                 for (OrgInfo orgInfo : listCheckOrgInfo) {
                     setOrgInfoUid.add(orgInfo.getUid());
                 }
-                if(!setOrgInfoUid.isEmpty()){
-                    searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
+            	if(!setOrgInfoUid.isEmpty()){
+            		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, setOrgInfoUid, "1*3+"));
                     ++count;
-                }
+            	}
             }
             if(StringUtils.isNotBlank(this.getLocationName())) {
                 searchFilters.add(new SearchFilter("locationName", SearchFilter.Operator.LIKE, this.getLocationName(), "1*"));
+                ++count;
+            }
+            if(StringUtils.isNotBlank(this.getQrCode())) {
+                searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, this.getQrCode(), "1*"));
                 ++count;
             }
         }

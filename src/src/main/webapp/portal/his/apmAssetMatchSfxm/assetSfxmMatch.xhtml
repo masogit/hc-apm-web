@@ -13,23 +13,30 @@
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" style=" width: 800px;float: right;">
                                 <h:panelGroup>
                                     <label class='label'>金额:(元)</label>
-                                    <p:inputNumber id="purchasePrice" value="#{hisAssetMatchController.assetInfoDto.purchasePrice}" decimalPlaces="0" minValue="0" required="true" requiredMessage="金额大于等于0！">
+                                    <p:inputNumber id="purchasePrice" value="#{hisAssetSfxmMatchController.assetInfoDto.purchasePrice}" decimalPlaces="0" minValue="0" required="true" requiredMessage="金额大于等于0！">
+                                        <p:ajax/>
                                     </p:inputNumber>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class='label'>apm资产编号</label>
                                     <p:inputText id="departNum" rows="1" cols="10"
-                                                 value="#{hisAssetSfxmMatchController.assetInfoDto.departNum}"/>
+                                                 value="#{hisAssetSfxmMatchController.assetInfoDto.departNum}">
+                                        <p:ajax/>
+                                    </p:inputText>
                                 </h:panelGroup>
                                <h:panelGroup>
                                     <label class='label'>apm设备名称</label>
                                     <p:inputText id="name"  rows="1" cols="10"
-                                                 value="#{hisAssetSfxmMatchController.assetInfoDto.name}"/>
+                                                 value="#{hisAssetSfxmMatchController.assetInfoDto.name}">
+                                        <p:ajax/>
+                                    </p:inputText>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class='label'>apm设备型号</label>
                                     <p:inputText id="functionType" rows="1" cols="10"
-                                                 value="#{hisAssetSfxmMatchController.assetInfoDto.functionType}"/>
+                                                 value="#{hisAssetSfxmMatchController.assetInfoDto.functionType}">
+                                        <p:ajax/>
+                                    </p:inputText>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </div>

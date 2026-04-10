@@ -1,0 +1,309 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <style>
+            .warrantyExpireSoon {
+                background-color: #fca752 !important;
+                color: #000000 !important;
+            }
+
+            .warrantyExpired {
+                background-color: #f04134 !important;
+                color: #000000 !important;
+            }
+
+            .btn + .btn {
+                margin-left: 0
+            }
+
+            .ui-column-resizer:before {
+                content: none !important;
+            }
+
+            th {
+                font-size: 12px !important;
+            }
+
+            td {
+                font-size: 12px !important;
+                padding: 0px !important;
+            }
+
+            table .ui-chkbox-icon, td img {
+                zoom: 0.7 !important
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="闲置设备申请"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="AssetDetailListForm">
+
+<!--                    <h:panelGroup>-->
+<!--                        <p:overlayPanel widgetVar="varPanelOrg1"-->
+<!--                                        for="AssetDetailListForm:datalist:btnOrg1" hideEffect="fade" dynamic="false"-->
+<!--                                        modal="false">-->
+<!--                            <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>-->
+<!--                            <p:commandButton partialSubmit="true" icon="ui-icon-search"-->
+<!--                                             process="AssetDetailListForm:treeNodeNameFilter @this"-->
+<!--                                             update="AssetDetailListForm:orgTree"-->
+<!--                                             actionListener="#{orgTreeController.filterTreeNodeByNameType4()}"-->
+<!--                                             value="#{msg.Search}"/>-->
+<!--                            <p:commandButton partialSubmit="true" icon="ui-icon-search"-->
+<!--                                             process="AssetDetailListForm:treeNodeNameFilter @this"-->
+<!--                                             update="AssetDetailListForm"  oncomplete="PF('varPanelOrg1').hide()"-->
+<!--                                             value="确定"/>-->
+<!--                            <p:scrollPanel style="height:300px;border: 0" mode="native">-->
+<!--                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;"-->
+<!--                                        value="#{idleEquipmentApplicationController.siteOrgTree}"-->
+<!--                                        selection="#{idleEquipmentApplicationController.selectedAccessOrgNodes}"-->
+<!--                                        var="node" selectionMode="checkbox" dynamic="false" cache="false"-->
+<!--                                        propagateSelectionUp="true">-->
+<!--                                    <p:ajax process="@this" event="select"-->
+<!--                                            listener="#{idleEquipmentApplicationController.onSelectSiteTreeNode}"/>-->
+<!--                                    <p:ajax process="@this" event="unselect"-->
+<!--                                            listener="#{idleEquipmentApplicationController.onUnSelectSiteTreeNode}"/>-->
+<!--                                    <p:ajax process="@this" event="expand"/>-->
+<!--                                    <p:ajax process="@this" event="collapse"/>-->
+<!--                                    <p:treeNode type="org">-->
+<!--                                        <h:outputText value="#{node.name}"/>-->
+<!--                                    </p:treeNode>-->
+<!--                                    <p:treeNode type="hidden" rendered="false"/>-->
+<!--                                </p:tree>-->
+<!--                            </p:scrollPanel>-->
+<!--                        </p:overlayPanel>-->
+<!--                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <p:overlayPanel appendTo="AssetDetailListForm" widgetVar="varPanelOrg1" for="AssetDetailListForm:datalist:btnOrg1" hideEffect="fade" dynamic="false" modal="false" >
+                            <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="AssetDetailListForm:treeNodeNameFilter @this" update="AssetDetailListForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="AssetDetailListForm:treeNodeNameFilter @this" update="AssetDetailListForm" value="确定"/>
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{idleEquipmentApplicationController.siteOrgTree}" selection="#{idleEquipmentApplicationController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false" propagateSelectionUp="#{orgTreeController.propagateSelectionUp}">
+                                    <p:ajax process="@this" event="select" listener="#{idleEquipmentApplicationController.onSelectSiteTreeNode}"/>
+                                    <p:ajax process="@this" event="unselect" listener="#{idleEquipmentApplicationController.onUnSelectSiteTreeNode}"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <p:dataTable id="datalist" value="#{idleEquipmentApplicationController.lazyModel}" var="item"
+                                 widgetVar="datalist" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false"
+                                 selection="#{idleEquipmentApplicationController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.lastModifiedDate}"
+                                 rowKey="#{item.uid}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+
+                        <p:ajax event="rowSelect" listener="#{idleEquipmentApplicationController.onSelectAsset}"
+                                onstart="prepareAssetViewWindow();"
+                                oncomplete="openAssetViewWindow(xhr, status, args)"/>
+
+                        <p:ajax event="filter" listener="#{idleEquipmentApplicationController.onFilter}"/>
+
+                        <p:column headerText="#{msg.Actions}" exportable="false" width="80" id="operatorColumn"
+                                  rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')}">
+                            <h:panelGroup>
+                                <p:link target="_new" title="#{msg.Edit}"
+                                        outcome="#{idleEquipmentApplicationController.getEditPage(item.uid)}"
+                                        disabled="#{item.status!=1}">
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                </p:link>
+                                <p:commandLink id="deleteButton" title="#{msg.Delete}" update="datalist"
+                                               disabled="#{item.status==3  or item.status==4 }"
+                                               actionListener="#{idleEquipmentApplicationController.deleteIdleApplication(item)}">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                               icon="ui-icon-warning"/>
+                                </p:commandLink>
+
+                                <p:link target="_new1" title="复制"      disabled="#{item.status!=4}"
+                                        outcome="#{idleEquipmentApplicationController.getCopyPage(item.uid)}">
+                                    <p:graphicImage value="/images/icons/copyy.png" style="width: 30px; height: 30px;"/>
+                                </p:link>
+                            </h:panelGroup>
+                        </p:column>
+                        <p:column headerText="申请编号" sortBy="#{item.applicationNumber}"
+                                  filterBy="#{item.applicationNumber}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.applicationNumber}"/>
+                        </p:column>
+                        <p:column headerText="设备名称" sortBy="#{item.assetInfo.name}"
+                                  filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}"
+                                  filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.functionType}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}"
+                                  filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+
+
+                        <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}"
+                                  filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()"
+                                                 value="#{idleEquipmentApplicationController.filterAssetGroup}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.stockSiteUid}"
+                                  filterBy="#{item.stockSiteUid}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:autoComplete id="btnOrg1" widgetVar="varBtnOrg1" value="请选择院区" type="button"
+                                                icon="fa fa-angle-down"
+                                                iconPos="right"/>
+                            </f:facet>
+                            <h:outputText
+                                    value="#{idleEquipmentApplicationController.getSiteOrgName(item.stockSiteUid)}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.stockDeptName}"
+                                  filterMatchMode="LIKE" width="100">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()"
+                                                 value="#{idleEquipmentApplicationController.fileterOrgName}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItems value="#{idleEquipmentApplicationController.clinicalDeptList}"
+                                                   var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText
+                                    value="#{idleEquipmentApplicationController.getSiteOrgName(item.stockDeptUid)}"/>
+                        </p:column>
+                        <c:if test="#{columnItem eq 'manufacture'}">
+                            <p:column headerText="#{msg.manufacture}" sortBy="#{item.assetInfo.manufacture}"
+                                      filterBy="#{item.assetInfo.manufacture}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.assetInfo.manufacture}"/>
+                            </p:column>
+                        </c:if>
+
+                        <p:column headerText="#{msg.makerShortName}" sortBy="#{item.assetInfo.makerShortName}"
+                                  filterBy="#{item.assetInfo.makerShortName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.makerShortName}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.QRCode}" exportable="true" width="150"
+                                  sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        </p:column>
+
+                        <p:column headerText="申请状态" exportable="true" width="150" sortBy="#{item.status}"
+                                  filterBy="#{item.status}" filterMatchMode="EQ">
+
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()"
+                                                 value="#{idleEquipmentApplicationController.filterStatus}"
+                                                 converter="javax.faces.Integer">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItem itemLabel="暂存中" itemValue="1"
+                                                  itemDisabled="#{userContextService.hasAnyRole('InstitutionAdjustmentAdmin')}"/>
+                                    <f:selectItem itemLabel="待审批" itemValue="2"/>
+                                    <f:selectItem itemLabel="已通过" itemValue="3"/>
+                                    <f:selectItem itemLabel="已退回" itemValue="4"/>
+                                    <f:selectItem itemLabel="已取消" itemValue="5"
+                                                  itemDisabled="#{userContextService.hasAnyRole('InstitutionAdjustmentAdmin')}"/>
+
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{idleEquipmentApplicationController.statusName(item.status)}"/>
+                        </p:column>
+                        <p:column headerText="申请人" exportable="true" width="150" sortBy="#{item.userAccount.name}"
+                                  filterBy="#{item.userAccount.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.userAccount.name}"/>
+                        </p:column>
+
+                        <p:column headerText="申请日期" filterBy="#{item.applicationDate}" filterMatchMode="GET"
+                                  sortBy="#{item.applicationDate}">
+                            <f:facet name="filter">
+                                <p:inputText id="filterPurchaseDate" widgetVar="varFilterPurchaseDate"
+                                             value="#{idleEquipmentApplicationController.filterObject['applicationDate']}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.applicationDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="操作" exportable="false"
+                                  rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ACCEPTANCE')}">
+                            <p:commandLink action="#{idleEquipmentApplicationController.getInstallUrl(item.uid)}"
+                                           disabled="#{item.status!=2}" rendered="true">审批
+                            </p:commandLink>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                             title="#{msg.Create}"
+                                             actionListener="#{idleEquipmentApplicationController.prepareCreate}"
+                                             action="#{urlEncryptController.encodeUrlParam('adjustmentApplication.xhtml?actionName=Create')}"
+                                             rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')}"/>
+
+
+                        </f:facet>
+                    </p:dataTable>
+                    <p:overlayPanel widgetVar="panelFilterPurchaseDate"
+                                    for="AssetDetailListForm:datalist:filterPurchaseDate" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel for="cal1"/>
+                            <p:calendar id="cal1" widgetVar="varPurchaseDateFrom" effect="fold"
+                                        pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true"
+                                        placeholder="开始时间"/>
+                            <p:outputLabel for="cal2"/>
+                            <p:calendar id="cal2" widgetVar="varPurchaseDateTo" effect="fold"
+                                        pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true"
+                                        placeholder="结束时间"/>
+                        </h:panelGrid>
+                        <p:commandButton
+                                onclick="PF('panelFilterPurchaseDate').hide();setDateFilter('datalist', 'varFilterPurchaseDate', 'varPurchaseDateFrom', 'varPurchaseDateTo'); "
+                                title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterPurchaseDate').hide()" title="#{msg.Close}"
+                                         icon="ui-icon-close" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                </h:form>
+
+            </div>
+        </div>
+
+        <script>
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+        </script>
+    </ui:define>
+</ui:composition>

@@ -485,6 +485,9 @@
         <if test="assetName != null  and assetName!='' ">
             AND ai.name like concat('%',#{assetName},'%')
         </if>
+        <if test="displayName != null  and displayName!='' ">
+            AND e.display_name like concat('%',#{displayName},'%')
+        </if>
         <if test="serialNum != null  and serialNum!='' ">
             AND ai.serial_num like concat('%',#{serialNum},'%')
         </if>
