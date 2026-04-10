@@ -1,5 +1,7 @@
 package com.ge.apm.view.hospitalAdjustment;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -69,7 +71,9 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
     @Getter
     @Setter
     private List<V2_BlobObject> uploadedFileObjects = new ArrayList();
-
+    @Getter
+    @Setter
+    private List<String> attachments=new ArrayList<>();
     @Override
     protected GenericRepositoryUUID<IdleEquipmentApplication> getDAO() {
         return dao;
@@ -108,8 +112,11 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
             if(assetUid!=null){
                 selectedAsset = assetInfoRepository.findByUid(assetUid);
             }
-
             attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+            if(selected.getAttachments()!=null){
+                attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
+
+            }
         }else if("Copy".equalsIgnoreCase(actionName)){
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(dao.findByUid(selectedId));
@@ -119,6 +126,10 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
             }
 
             attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+            if(selected.getAttachments()!=null){
+                attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
+
+            }
             selected.setUid(null);
             for (V2_BlobObject attachement : attachements) {
                 attachement.setBoUuid(null);
@@ -155,6 +166,10 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
         selected.setLastModifiedBy(currentUserAccount.getUid());
         selected.setLastModifiedDate(new Date());
         selected.setTenantUid(currentUserAccount.getTenantUID());
+        selected.setAttachments(JSON.toJSONString(attachments));
+        if(CollectionUtils.isEmpty(attachments) || !attachments.contains("other")){
+            selected.setAttachmentsOtherDescription(null);
+        }
         if(selected.getStatus()==null){
             selected.setStatus(1);
         }
