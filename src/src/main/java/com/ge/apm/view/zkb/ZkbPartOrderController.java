@@ -374,20 +374,17 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         && configTypes.contains(managePendingStr);
                 if (isTseAndManage) {
                     int totalPendingQty = 0;
+                    boolean tseFlag = true; // Tse如果配置多个，则只计算一次
                     for (ZkbPartOrderUserConfig config : zkbPartOrderUserConfigList) {
                         String configType = config.getConfigType();
                         if (configType == null || configType.trim().isEmpty()) {
                             continue; // 双重保险校验
                         }
                         Map<String, Object> mmCopy = new HashMap<>(mm);
-                        if (tsePendingStr.equals(configType)) {
-                            if ("US".equals(config.getAssetType())) {
-                                mmCopy.put("onlineEngineer", config.getId());
-                            } else {
-                                mmCopy.put("assetTypeDi", config.getAssetType());
-                            }
+                        if (tsePendingStr.equals(configType) && tseFlag) {
                             mmCopy.put("currentStep", tsePendingStr);
                             totalPendingQty += zkbPartOrderMapper.queryPendCountByUserConfig(mmCopy);
+                            tseFlag = false;
                         } else if (managePendingStr.equals(configType)) {
                             if (StringUtils.isNotEmpty(config.getZone())) {
                                 List<String> zones = Arrays.asList(config.getZone().split(","));
@@ -430,12 +427,20 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             }
             List<ZkbPartOrderUserConfig> configList;
             if(ZkbPartOrder.DATA_TYPE_TEST.equals(zkbPartOrder.getDataType())){
-                configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                if (ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset())) {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.TsePending.name(), ZkbPartOrder.DATA_TYPE_TEST);
+                }else {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                }
             }else{
-                configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                if (ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset())) {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.TsePending.name(), ZkbPartOrder.DATA_TYPE_TEST);
+                } else {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                }
             }
             if(CollectionUtils.isNotEmpty(configList)){
-                List<String> names = configList.stream().map(ZkbPartOrderUserConfig::getName).collect(Collectors.toList());
+                List<String> names = configList.stream().map(ZkbPartOrderUserConfig::getName).distinct().collect(Collectors.toList());
                 String str = String.join(", ", names);
                 zkbPartOrder.setTechAuditer(str);
             }
