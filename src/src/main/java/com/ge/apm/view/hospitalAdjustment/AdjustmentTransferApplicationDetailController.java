@@ -78,7 +78,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     @Setter
     private List<AdjustmentTransferNodeProcess> process;
 
-
+    private StreamedContent exportFile;
     @Override
     protected GenericRepositoryUUID<AdjustmentTransferApplication> getDAO() {
         return dao;
@@ -447,5 +447,26 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         LocalDate currentLocalDate = LocalDate.now();
         long daysDiff = Math.abs(ChronoUnit.DAYS.between(targetLocalDate, currentLocalDate));
         return daysDiff <= 7;
+    }
+
+    public void download()   {
+        try {
+            byte[] download = adjustmentTransferService.download(selected);
+            exportFile= new DefaultStreamedContent(new ByteArrayInputStream(download), "application/msword", "调剂申请表.doc");
+
+        }catch (Exception e){
+            WebUtil.addErrorMessage("调剂申请表下载失败");
+            logger.error("调剂申请表下载失败 error: ",e);
+        }
+
+    }
+
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
     }
 }

@@ -250,6 +250,15 @@
                                      action="AdjustmentTransferApplication?faces-redirect=true"
                                      style="margin-left: 10px;"/>
 
+
+                    <p:commandButton  value="下载文件"
+                                     actionListener="#{adjustmentTransferApplicationDetailController.download}"
+                                     style="margin-left: 10px;" update=":growl"  ajax="false">
+
+                        <p:fileDownload value="#{adjustmentTransferApplicationDetailController.exportFile}"/>
+                    </p:commandButton>
+
+
                 </h:form>
 
                 <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
