@@ -78,7 +78,7 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
     @Getter
     private String signatureId;
 
-
+    private StreamedContent exportFile;
     @Override
     protected GenericRepositoryUUID<IdleEquipmentApplication> getDAO() {
         return dao;
@@ -444,6 +444,29 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
         dao.save(selected);
         WebUtil.addErrorMessage("已退回");
     }
+
+    public void download()   {
+        try {
+            byte[] download = idleEquipmentApplicationService.download(selected);
+            exportFile= new DefaultStreamedContent(new ByteArrayInputStream(download), "application/msword", "闲置设备申请表.doc");
+
+        }catch (Exception e){
+            WebUtil.addErrorMessage("调剂申请表下载失败");
+            logger.error("调剂申请表下载失败 error: ",e);
+        }
+
+    }
+
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
+
     public void approveAttachmentById(String blobId) {
         blobService.approveBlob(blobId, "1");
     }
