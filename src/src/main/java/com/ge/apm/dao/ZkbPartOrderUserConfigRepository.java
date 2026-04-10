@@ -46,9 +46,11 @@ public interface ZkbPartOrderUserConfigRepository extends GenericRepositoryUUID<
 
     List<ZkbPartOrderUserConfig> findByConfigTypeAndRegionAndLoginNameContains(String configType, String region, String loginName);
     List<ZkbPartOrderUserConfig> findByConfigTypeAndZoneContainsAndLoginNameContains(String configType, String zone, String loginName);
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndLoginNameContains(String configType, String loginName);
 
     List<ZkbPartOrderUserConfig> findByConfigTypeAndRegionAndLoginNameIsNotContaining(String configType, String region, String loginName);
     List<ZkbPartOrderUserConfig> findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(String configType, String region, String loginName);
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndLoginNameIsNotContaining(String configType, String loginName);
 
     @Query(value = "select * from zkb_part_order_user_config c where c.login_name = ?1 and c.config_type in ?2 ",nativeQuery = true)
     List<ZkbPartOrderUserConfig> queryForUnrealRoles(String loginName, List<String> configs);
