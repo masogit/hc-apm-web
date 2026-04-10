@@ -295,11 +295,11 @@
 
                     <p:fieldset legend="附件材料清单" style="margin-bottom:20px">
                     <h:panelGroup>
-                        <p:commandButton value="批量删除文件" class="bathDeleteAttach" update=":adjustmentApplicationForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{adjustmentApplicationCreateController.bathDeleteAttach}" disabled="#{!adjustmentApplicationCreateController.isChecked()}">
-                            <p:confirm header="批量删除文件" message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>
+                        <p:commandButton  value="批量删除文件"  validateClient="false" immediate="true" class="bathDeleteAttach" update=":adjustmentApplicationForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{adjustmentApplicationCreateController.bathDeleteAttach}" disabled="#{!adjustmentApplicationCreateController.isChecked()}">
+                            <p:confirm header="批量删除文件"  message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton value="批量下载文件" class="bathDownloadAttach" actionListener="#{adjustmentApplicationCreateController.bathDownloadAttach}" disabled="#{!adjustmentApplicationCreateController.isChecked()}" onclick="PrimeFaces.monitorDownload(start, stop);">
-                            <p:fileDownload value="#{contractInfoEditController.attachListFile}"/>
+                        <p:commandButton value="批量下载文件" validateClient="false"  immediate="true" class="bathDownloadAttach" actionListener="#{adjustmentApplicationCreateController.bathDownloadAttach}" disabled="#{!adjustmentApplicationCreateController.isChecked()}" onclick="PrimeFaces.monitorDownload(start, stop);"  >
+                            <p:fileDownload value="#{adjustmentApplicationCreateController.attachListFile}"/>
                         </p:commandButton>
                         <p:dataList id="AttachList" value="#{adjustmentApplicationCreateController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
                             <f:facet name="header">

@@ -265,7 +265,7 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
         });
     }
     public void bathDownloadAttach() {
-        String zipName = Optional.ofNullable(selected.getApplicationNumber()).orElse("") + selected.getUid() + ".zip";
+        String zipName = Optional.ofNullable(selected.getApplicationNumber()).orElse("") + "调剂借用申请表附件" + ".zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zipOut = new ZipOutputStream(bout)) {
             Map<String, V2_BlobObject> blobObjectMap = attachements.stream().collect(Collectors.toMap(V2_BlobObject::getId, t -> t));
             for (String blobId : selectedBlobIdList) {
