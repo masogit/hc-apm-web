@@ -1,22 +1,34 @@
 package com.ge.apm.service.hospitalAdjustment;
 
 import com.alibaba.fastjson.JSON;
+import com.deepoove.poi.data.PictureRenderData;
+import com.deepoove.poi.data.PictureType;
+import com.deepoove.poi.data.TextRenderData;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.ExportService;
+import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.approval.WxMessageService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
+import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.web.WebUtil;
+import com.deepoove.poi.data.style.Style;
 
+import java.io.IOException;
 import java.util.*;
+
+
 
 @Service
 public class AdjustmentTransferService {
@@ -40,7 +52,11 @@ public class AdjustmentTransferService {
 
     @Autowired
     private WxMessageService wxMessageService;
+    @Autowired
+    private SystemTemplateService systemTemplateService;
 
+    @Autowired
+    private BlobFileService blobFileService;
     @Transactional
     public void cancel(AdjustmentTransferApplication selected, UserAccount currentUserAccount){
 //        AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
@@ -192,4 +208,98 @@ public class AdjustmentTransferService {
         wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE,byIdsAndHospitalUID,null);
     }
 
+    public  byte[] download(AdjustmentTransferApplication selected ) throws IOException {
+
+        AdjustmentTransferApplication adjustmentTransferApplication = dao.findByUid(selected.getUid());
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        byte[] byteArray = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.HOSPITAL_ADJUSTMENT_APPLICATION, user);
+        HashMap<String, Object> datas= buildDatas(adjustmentTransferApplication);
+        return WordExportServiceUtil.generate(datas, byteArray, null);
+    }
+
+    TextRenderData checked = new TextRenderData("R", new Style("Wingdings 2", 10.5));
+
+    TextRenderData unchecked = new TextRenderData("\u00A3", new Style("Wingdings 2", 10.5));
+    private HashMap<String, Object> buildDatas(AdjustmentTransferApplication adjustmentTransferApplication) {
+
+        HashMap<String, Object> params = new HashMap<>();
+        IdleEquipmentStock idleEquipmentStock = adjustmentTransferApplication.getIdleEquipmentStock();
+        AssetInfo assetInfo = assetInfoRepository.findByUid(idleEquipmentStock.getAssetUid());
+
+        params.put("ck_lead", "1".equals(adjustmentTransferApplication.getMedicalCommunityType()) ? checked : unchecked);
+        params.put("ck_town", "2".equals(adjustmentTransferApplication.getMedicalCommunityType())  ? checked : unchecked);
+        params.put("ck_center", "3".equals(adjustmentTransferApplication.getMedicalCommunityType())  ? checked : unchecked);
+        params.put("ck_station", "4".equals(adjustmentTransferApplication.getMedicalCommunityType())  ? checked : unchecked);
+        OrgInfo borrowDeptName = orgInfoRepository.getByUid(adjustmentTransferApplication.getBorrowDeptUid());
+        params.put("unit_name",adjustmentTransferApplication.getUnitName());
+        params.put("dept_name",borrowDeptName.getName());
+        params.put("contact_person",adjustmentTransferApplication.getContactPerson());
+        params.put("contact_phone",adjustmentTransferApplication.getContactPhone());
+        params.put("application_date",DateUtil.format(adjustmentTransferApplication.getApplicationDate(), DatePattern.CHINESE_DATE_FORMAT));
+
+        params.put("check_diagnosis", "DIAGNOSTIC_EQUIPMENT".equals(adjustmentTransferApplication.getDeviceType()) ? checked : unchecked);
+        params.put("check_treatment", "THERAPEUTIC_EQUIPMENT".equals(adjustmentTransferApplication.getDeviceType())  ? checked : unchecked);
+        params.put("check_assist", "AUXILIARY_MEDICAL_EQUIPMENT".equals(adjustmentTransferApplication.getDeviceType())  ? checked : unchecked);
+        params.put("check_general", "GENERAL_MEDICAL_EQUIPMENT".equals(adjustmentTransferApplication.getDeviceType())  ? checked : unchecked);
+        params.put("check_other", "OTHER".equals(adjustmentTransferApplication.getDeviceType())  ? checked : unchecked);
+        params.put("other_device_type_note", adjustmentTransferApplication.getOtherDeviceTypeNote());
+
+        params.put("asset_name",assetInfo.getName());
+        params.put("core_technical_params",adjustmentTransferApplication.getCoreTechnicalParams());
+        params.put("secondary_technical_params",adjustmentTransferApplication.getSecondaryTechnicalParams());
+        params.put("estimated_usage_years",adjustmentTransferApplication.getEstimatedUsageYears());
+        params.put("check_emergency", "EMERGENCY".equals(adjustmentTransferApplication.getDescriptionOfUse()) ? checked : unchecked);
+        params.put("check_specialty", "SPECIALTY".equals(adjustmentTransferApplication.getDescriptionOfUse())  ? checked : unchecked);
+        params.put("check_routine", "ROUTINE".equals(adjustmentTransferApplication.getDescriptionOfUse())  ? checked : unchecked);
+        params.put("check_rescue", "RESCUE".equals(adjustmentTransferApplication.getDescriptionOfUse())  ? checked : unchecked);
+        params.put("check_purpose_other", "OTHER".equals(adjustmentTransferApplication.getDescriptionOfUse())  ? checked : unchecked);
+        params.put("other_description_of_use_note",adjustmentTransferApplication.getOtherDescriptionOfUseNote());
+
+        params.put("ready", "READY".equals(adjustmentTransferApplication.getSiteConditionStatus()) ? checked : unchecked);
+        params.put("needs_renovauion", "NEEDS_RENOVATION".equals(adjustmentTransferApplication.getSiteConditionStatus())  ? checked : unchecked);
+        params.put("site_renovation_plan", adjustmentTransferApplication.getSiteRenovationPlan());
+
+        params.put("satisfied", "SATISFIED".equals(adjustmentTransferApplication.getPowerSupplyStatus()) ? checked : unchecked);
+        params.put("needs_capacity_increase", "NEEDS_CAPACITY_INCREASE".equals(adjustmentTransferApplication.getPowerSupplyStatus())  ? checked : unchecked);
+        params.put("power_capacity_demand", adjustmentTransferApplication.getPowerCapacityDemand());
+
+        params.put("staffed", "STAFFED".equals(adjustmentTransferApplication.getOperatorStatus()) ? checked : unchecked);
+        params.put("needs_training", "NEEDS_TRAINING".equals(adjustmentTransferApplication.getOperatorStatus())  ? checked : unchecked);
+        params.put("operator_qualification_note", adjustmentTransferApplication.getOperatorQualificationNote());
+        params.put("operator_training_plan", adjustmentTransferApplication.getOperatorTrainingPlan());
+
+
+        params.put("self_maintenance", "SELF_MAINTENANCE".equals(adjustmentTransferApplication.getMaintenanceCapability()) ? checked : unchecked);
+        params.put("needs_tech_support", "NEEDS_TECH_SUPPORT".equals(adjustmentTransferApplication.getMaintenanceCapability())  ? checked : unchecked);
+
+
+
+        params.put("matched", "matched".equals(adjustmentTransferApplication.getInitialScreeningResult()) ? checked : unchecked);
+        params.put("unmatched", "unmatched".equals(adjustmentTransferApplication.getInitialScreeningResult())  ? checked : unchecked);
+        params.put("screening_reason", adjustmentTransferApplication.getScreeningReason());
+        params.put("none", "none".equals(adjustmentTransferApplication.getTechnicalAssessment()) ? checked : unchecked);
+        params.put("needed", "needed".equals(adjustmentTransferApplication.getTechnicalAssessment())  ? checked : unchecked);
+
+        if(adjustmentTransferApplication.getHandlerSignature()!=null){
+            byte[] handlerSignature = getSignatureBytes(adjustmentTransferApplication.getHandlerSignature());
+            params.put("handler_signature", new PictureRenderData(100, 70, PictureType.PNG, handlerSignature));
+
+        }
+        params.put("assessment_time",DateUtil.format(adjustmentTransferApplication.getAssessmentTime(), DatePattern.CHINESE_DATE_FORMAT));
+        params.put("application_pending_approval_date",DateUtil.format(adjustmentTransferApplication.getApplicationPendingApprovalDate(), DatePattern.CHINESE_DATE_FORMAT));
+
+        return params;
+    }
+
+    public byte[] getSignatureBytes(String storageId) {
+        byte[] signatureBytes = null;
+
+        try {
+            signatureBytes = IOUtils.toByteArray(blobFileService.getBlobObjectByStorageId(storageId).getStream());
+        } catch (IOException e) {
+            log.info("Error happens while get signature bytes", e);
+        }
+
+        return signatureBytes;
+    }
 }
