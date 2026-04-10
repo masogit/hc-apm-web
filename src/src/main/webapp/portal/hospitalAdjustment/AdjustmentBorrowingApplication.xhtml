@@ -129,6 +129,26 @@
                         </p:inputNumber>
                         <h:outputText value=" 年"/>
                     </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">用途说明</label>
+
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.descriptionOfUse}">
+                            <f:selectItem itemLabel="急救保障" itemValue="EMERGENCY"/>
+                            <f:selectItem itemLabel="重点专科建设" itemValue="SPECIALTY"/>
+                            <f:selectItem itemLabel="日常诊疗" itemValue="ROUTINE"/>
+                            <f:selectItem itemLabel="应急救治" itemValue="RESCUE"/>
+                            <f:selectItem itemLabel="其他" itemValue="OTHER"/>
+                            <p:ajax event="change" process="@this" update="@form"/>
+                        </p:selectOneRadio>
+
+                        <p:inputText value="#{idleEquipmentStockDetailController.application.otherDescriptionOfUseNote}"
+                                     placeholder="请注明"
+                                     rendered="#{idleEquipmentStockDetailController.application.descriptionOfUse == 'OTHER'}"
+                                     style="margin-left: 10px;">
+                            <p:ajax event="change" update="@form"/>
+                        </p:inputText>
+                    </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
 

@@ -81,7 +81,10 @@ public class AdjustmentTransferApplication implements Serializable {
     /** 其他设备类型注明 */
     @Column(name = "other_device_type_note")
     private String otherDeviceTypeNote;
-
+    @Column(name = "description_of_use")
+    private String descriptionOfUse;
+    @Column(name = "other_description_of_use_note")
+    private String otherDescriptionOfUseNote;
     /** 具体设备名称 */
     @Column(name = "specific_device_name")
     @NotNull(message = "具体设备名称不能为空")
@@ -689,6 +692,23 @@ public class AdjustmentTransferApplication implements Serializable {
 
     public void setBorrowHospitalUid(String borrowHospitalUid) {
         this.borrowHospitalUid = borrowHospitalUid;
+    }
+
+
+    public String getDescriptionOfUse() {
+        return descriptionOfUse;
+    }
+
+    public void setDescriptionOfUse(String descriptionOfUse) {
+        this.descriptionOfUse = descriptionOfUse;
+    }
+
+    public String getOtherDescriptionOfUseNote() {
+        return otherDescriptionOfUseNote;
+    }
+
+    public void setOtherDescriptionOfUseNote(String otherDescriptionOfUseNote) {
+        this.otherDescriptionOfUseNote = otherDescriptionOfUseNote;
     }
 
     @Override
