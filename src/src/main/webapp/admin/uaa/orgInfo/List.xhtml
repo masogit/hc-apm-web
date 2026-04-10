@@ -44,7 +44,8 @@
                             </p:overlayPanel>
 
                             <p:scrollPanel style="height:95%;border: 0" mode="native">
-                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgInfoController.orgTree}" var="node" selectionMode="single" selection="#{orgInfoController.selectedNode}" highlight="true">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgInfoController.orgTree}" var="node" selectionMode="single"  selection="#{orgInfoController.selectedNode}" highlight="true"
+                                       draggable="true" droppable="true" onDrop="#{orgInfoController.onDrop}">
                                     <p:ajax process="@this" event="select" listener="#{orgInfoController.onSelectTreeNode}" update=":editPanel"/>
 
                                     <p:treeNode type="org">

@@ -81,7 +81,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select name from org_info where id=?1", nativeQuery = true)
     public String getDepName(int id);
 
-    @Query("select o from OrgInfo o where institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1 order by name")
+    @Query("select o from OrgInfo o where institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1 order by parentUID,orgIndex,name")
     public List<OrgInfo> getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(String siteId);
 
     @Query("select o from OrgInfo o where orgType<>4 and (institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1)")

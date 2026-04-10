@@ -12,6 +12,8 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.component.tree.TreeDragDropInfo;
+import org.primefaces.event.DragDropEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -144,7 +146,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         } else {
             orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid());
         }
-        TreeNodeUtil.sortTreeNodeByName(orgTree);
+        //TreeNodeUtil.sortTreeNodeByName(orgTree);
 
         TreeNode currentOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, currentOrg);
 
@@ -729,6 +731,35 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             return true;
         }
         return false;
+    }
+
+    public boolean  onDrop(TreeDragDropInfo info){
+        OrgInfo drapNode = (OrgInfo) info.getDragNode().getData();
+        OrgInfo dropNode = (OrgInfo) info.getDropNode().getData();
+        if(!drapNode.getParentUID().equals(dropNode.getUid())){
+            return false;
+        }
+        List<OrgInfo> directChildren = uaaService.getDirectChildrenFromTree(orgTree, dropNode.getUid());
+        for(int i = 0; i< directChildren.size();i++){
+            OrgInfo orgInfo = directChildren.get(i);
+            logger.info("orgInfo.getUid():"+orgInfo.getUid() + " index: " + orgInfo.getOrgIndex());
+            if(orgInfo.getUid().equals(dropNode.getUid())){
+                continue;
+            }
+            if(i == info.getDropIndex()){
+                drapNode.setOrgIndex(i);
+                dao.save(drapNode);
+                continue;
+            }
+            if(orgInfo.getOrgIndex() != null && orgInfo.getOrgIndex().intValue() == i){
+                continue;
+            }
+            orgInfo.setOrgIndex(i);
+            dao.save(orgInfo);
+        }
+        buildOrdTree();
+
+        return true;
     }
 
     public boolean getAcShow() {
