@@ -410,6 +410,13 @@
                     <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                      action="IdleEquipmentApplication?faces-redirect=true"
                                      style="margin-left: 10px;"/>
+
+                    <p:commandButton  value="下载文件"
+                                      actionListener="#{adjustmentApplicationDetailController.download}"
+                                      style="margin-left: 10px;" update=":growl"  ajax="false">
+
+                        <p:fileDownload value="#{adjustmentApplicationDetailController.exportFile}"/>
+                    </p:commandButton>
                 </h:form>
             </div>
         </div>
