@@ -104,6 +104,8 @@ public class OrgInfo implements Serializable, ChineseName {
 
     @Column(name = "org_code")
     private String orgCode;
+    @Column(name = "org_index")
+    private Integer orgIndex = 0;
 
     @Transient
     private int lineNum;
@@ -571,6 +573,14 @@ public class OrgInfo implements Serializable, ChineseName {
 
     public void setSpare05(String spare05) {
         this.spare05 = spare05;
+    }
+
+    public Integer getOrgIndex() {
+        return orgIndex;
+    }
+
+    public void setOrgIndex(Integer orgIndex) {
+        this.orgIndex = orgIndex;
     }
 
     public OrgInfo(Integer id) {

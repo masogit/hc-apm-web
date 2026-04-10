@@ -23,6 +23,7 @@ import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.context.LocaleHolder;
@@ -1096,7 +1097,9 @@ public class UaaService {
         orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
         orgInfoFilters.add(new SearchFilter("parentUID", SearchFilter.Operator.IsNull, tenantUid));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
-        List<OrgInfo> orgList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+
+        Sort sort = new Sort(Sort.Direction.ASC, "parentUID","orgIndex", "name");
+        List<OrgInfo> orgList = orgInfoDao.findBySearchFilter(orgInfoFilters, sort);
         TreeNode root = new DefaultTreeNode("root", null, null);
         for(OrgInfo item : orgList){
             TreeNode siteNode = getOrgTreeBySite(item.getUid());
@@ -1655,6 +1658,7 @@ public class UaaService {
     public List<OrgInfo> getUserAccessibleSiteListByUid(String uid) {
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, uid));
+        Sort sort = new Sort(Sort.Direction.ASC, "orgIndex");
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
@@ -1778,5 +1782,36 @@ public class UaaService {
         orgUidList = ObjectUtil.isEmpty(orgUidList) ? ListUtil.newArrayList("-1") : orgUidList;
         return orgInfoMapper.filterNoneAsset(orgUidList);
     }
+
+
+    /**
+     * 根据父节点UID,从现有的TreeNode树结构中查找直接子节点(仅下一级)
+     * @param orgTree 已有的组织树
+     * @param parentUid 父节点UID
+     * @return 直接子节点的OrgInfo列表
+     */
+    public List<OrgInfo> getDirectChildrenFromTree(TreeNode orgTree, String parentUid) {
+        List<OrgInfo> directChildren = new ArrayList<>();
+
+        // 找到父节点
+        TreeNode parentNode = TreeNodeUtil.findNodeFromTree(orgTree,
+                orgInfoDao.findByUid(parentUid));
+
+        if (parentNode == null) {
+            logger.warn("Parent node not found for uid: " + parentUid);
+            return directChildren;
+        }
+
+        // 只获取直接子节点
+        for (TreeNode child : parentNode.getChildren()) {
+            OrgInfo orgInfo = (OrgInfo) child.getData();
+            if (orgInfo != null) {
+                directChildren.add(orgInfo);
+            }
+        }
+
+        return directChildren;
+    }
+
 
 }
