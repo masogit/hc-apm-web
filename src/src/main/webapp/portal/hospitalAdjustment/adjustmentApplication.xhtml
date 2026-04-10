@@ -293,7 +293,31 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset legend="附件材料清单" style="margin-bottom:20px">
+                    <p:fieldset legend="附件材料清单"   >
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup >
+                            <p:selectManyCheckbox  value="#{adjustmentApplicationCreateController.attachments}" style="width: 700px"    >
+
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentAttachmentType')}"
+                                               var="item"
+                                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <p:ajax event="change" process="@this" update="@form"/>
+                            </p:selectManyCheckbox>
+                        </h:panelGroup>
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{adjustmentApplicationCreateController.attachments.contains('other')}">
+                            <h:panelGroup>
+                                <label class="label">附件材料其他描述</label>
+                                <p:inputText
+                                        value="#{adjustmentApplicationCreateController.selected.attachmentsOtherDescription}"
+                                        style="width: 95%;" required="true"
+                                        requiredMessage="请选择'其他'时需填写详细说明">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
                     <h:panelGroup>
                         <p:commandButton  value="批量删除文件"  validateClient="false" immediate="true" class="bathDeleteAttach" update=":adjustmentApplicationForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{adjustmentApplicationCreateController.bathDeleteAttach}" disabled="#{!adjustmentApplicationCreateController.isChecked()}">
                             <p:confirm header="批量删除文件"  message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>

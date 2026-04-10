@@ -1,5 +1,6 @@
 package com.ge.apm.view.hospitalAdjustment;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.IdleEquipmentApplicationRepository;
 import com.ge.apm.dao.IdleEquipmentStockRepository;
@@ -77,7 +78,9 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
     private StreamedContent signatureContentStream;
     @Getter
     private String signatureId;
-
+    @Getter
+    @Setter
+    private List<String> attachments=new ArrayList<>();
     private StreamedContent exportFile;
     @Override
     protected GenericRepositoryUUID<IdleEquipmentApplication> getDAO() {
@@ -115,7 +118,10 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
         }
 
         attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+        if(selected.getAttachments()!=null){
+            attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
 
+        }
         List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
         contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
         blobObjectSelectedMap = new HashMap();
@@ -131,7 +137,10 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
         }
 
         attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+        if(selected.getAttachments()!=null){
+            attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
 
+        }
         List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
         contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
         blobObjectSelectedMap = new HashMap();

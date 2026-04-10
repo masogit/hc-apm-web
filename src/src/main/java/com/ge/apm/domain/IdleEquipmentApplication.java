@@ -158,6 +158,11 @@ public class IdleEquipmentApplication implements Serializable {
 
     @Column(name = "audit_user_uid")
     private String  auditUserUid;
+    @Column(name = "attachments")
+    private String attachments;
+
+    @Column(name = "attachments_other_description")
+    private String attachmentsOtherDescription;
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUid;
     @JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -549,6 +554,23 @@ public class IdleEquipmentApplication implements Serializable {
 
     public void setStockHospitalUid(String stockHospitalUid) {
         this.stockHospitalUid = stockHospitalUid;
+    }
+
+
+    public String getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getAttachmentsOtherDescription() {
+        return attachmentsOtherDescription;
+    }
+
+    public void setAttachmentsOtherDescription(String attachmentsOtherDescription) {
+        this.attachmentsOtherDescription = attachmentsOtherDescription;
     }
 
     @Override
