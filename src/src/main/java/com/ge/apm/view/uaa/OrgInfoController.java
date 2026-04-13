@@ -739,25 +739,31 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         if(!drapNode.getParentUID().equals(dropNode.getUid())){
             return false;
         }
-        List<OrgInfo> directChildren = uaaService.getDirectChildrenFromTree(orgTree, dropNode.getUid());
-        List<OrgInfo> changes = new ArrayList<>();
-        for(int i = 0; i< directChildren.size();i++){
-            OrgInfo orgInfo = directChildren.get(i);
-            logger.info("orgInfo.getUid():"+orgInfo.getUid() + " index: " + orgInfo.getOrgIndex());
-            if(orgInfo.getUid().equals(dropNode.getUid())){
-                continue;
+        //计算最后位置 正 -1 反
+        int dropIndex = info.getDropIndex();
+        if(drapNode.getOrgIndex() != null){
+            if(drapNode.getOrgIndex()  < dropIndex){
+                dropIndex--;
             }
-            if(i == info.getDropIndex()){
-                drapNode.setOrgIndex(i);
-                changes.add(orgInfo);
-                continue;
-            }
-            if(orgInfo.getOrgIndex() != null && orgInfo.getOrgIndex().intValue() == i){
-                continue;
-            }
-            changes.add(orgInfo);
-            orgInfo.setOrgIndex(i);
         }
+
+        List<OrgInfo> directChildren = uaaService.getDirectChildrenFromTree(orgTree, dropNode.getUid());
+        directChildren.removeIf(child -> child.getUid().equals(drapNode.getUid()));
+
+        List<OrgInfo> changes = new ArrayList<>();
+        int index = 0;
+        for(OrgInfo orgInfo : directChildren){
+            if(index == dropIndex){
+                drapNode.setOrgIndex(index);
+                changes.add(drapNode);
+                index++;
+            }
+
+            orgInfo.setOrgIndex(index);
+            changes.add(orgInfo);
+            index++;
+        }
+
         if(CollectionUtils.isNotEmpty(changes)){
             dao.save(changes);
             buildOrdTree();
