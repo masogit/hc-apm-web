@@ -228,6 +228,34 @@
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset legend="附件材料清单" style="margin-bottom:20px">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <p:selectManyCheckbox  value="#{idleEquipmentStockDetailController.attachments}" style="width: 700px"    >
+
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentBorrowAttachmentType')}"
+                                           var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+<!--                            <p:ajax event="change" process="@this" update="attachmentsOtherDescription"/>-->
+
+                            <p:ajax event="change" process="@this" update="transferForm:attachmentsOtherDescription"/>
+                        </p:selectManyCheckbox>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group" id="attachmentsOtherDescription"
+                           >
+                    <h:panelGroup    rendered="#{idleEquipmentStockDetailController.attachments.contains('other')}">
+                        <label class="label">附件材料其他描述</label>
+                        <p:inputText
+                                value="#{idleEquipmentStockDetailController.application.attachmentsOtherDescription}"
+                                style="width: 95%;" required="true"
+                                requiredMessage="请选择'其他'时需填写详细说明">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+
                 <h:panelGroup>
                     <p:commandButton value="批量删除文件"  validateClient="false" immediate="true"  class="bathDeleteAttach" update=":transferForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{idleEquipmentStockDetailController.bathDeleteAttach}" disabled="#{!idleEquipmentStockDetailController.isChecked()}">
                         <p:confirm header="批量删除文件"  message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>
@@ -248,7 +276,7 @@
                                 <h:outputText value="#{msg.FileName}" class="ui-g-3"/>
                                 <h:outputText value="#{msg.UploadTime}" class="ui-g-2" />
                                 <h:outputText value="#{msg.Uploader}" class="ui-g-2" />
-                                <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-1" />
+                                <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  update="uploadDialogForm" oncomplete="PF('uploadDialog').show()" class="ui-g-1" />
                             </div>
                         </f:facet>
 
@@ -294,7 +322,7 @@
                         <p:selectOneMenu id="functionGroup" value="#{idleEquipmentStockDetailController.attachmentType}" autoWidth="false" style="width: 100%">
                             <p:ajax process="@this" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{idleEquipmentStockDetailController.getContractAttachmentTypeList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
+                            <f:selectItems value="#{idleEquipmentStockDetailController.attachmentsList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>

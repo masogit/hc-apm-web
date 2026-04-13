@@ -1,5 +1,6 @@
 package com.ge.apm.view.hospitalAdjustment;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.IdleEquipmentApplicationRepository;
 import com.ge.apm.dao.IdleEquipmentStockRepository;
@@ -77,8 +78,10 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
     private StreamedContent signatureContentStream;
     @Getter
     private String signatureId;
-
-
+    @Getter
+    @Setter
+    private List<String> attachments=new ArrayList<>();
+    private StreamedContent exportFile;
     @Override
     protected GenericRepositoryUUID<IdleEquipmentApplication> getDAO() {
         return dao;
@@ -115,7 +118,10 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
         }
 
         attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+        if(selected.getAttachments()!=null){
+            attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
 
+        }
         List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
         contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
         blobObjectSelectedMap = new HashMap();
@@ -131,7 +137,10 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
         }
 
         attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+        if(selected.getAttachments()!=null){
+            attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
 
+        }
         List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
         contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
         blobObjectSelectedMap = new HashMap();
@@ -444,6 +453,29 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
         dao.save(selected);
         WebUtil.addErrorMessage("已退回");
     }
+
+    public void download()   {
+        try {
+            byte[] download = idleEquipmentApplicationService.download(selected);
+            exportFile= new DefaultStreamedContent(new ByteArrayInputStream(download), "application/msword", "闲置设备申请表.doc");
+
+        }catch (Exception e){
+            WebUtil.addErrorMessage("调剂申请表下载失败");
+            logger.error("调剂申请表下载失败 error: ",e);
+        }
+
+    }
+
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
+
     public void approveAttachmentById(String blobId) {
         blobService.approveBlob(blobId, "1");
     }

@@ -177,7 +177,24 @@ public class AdjustmentTransferService {
         dao.save(selected);
     }
 
+    @Transactional
+    public void refuse(AdjustmentTransferApplication selected,UserAccount userAccount) {
+        selected.setStatus(2);
+        selected.setUpdateTime(new Date());
+        selected.setUpdatedBy(userAccount.getUid());
+        selected.setApplicationPendingApprovalUid(userAccount.getUid());
 
+        IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
+
+        idleEquipmentStock.setLastModifiedDate(new Date());
+        idleEquipmentStock.setLastModifiedBy(userAccount.getUid());
+        idleEquipmentStock.setStatus(1);
+        idleEquipmentStock.setBorrowHospitalUid(null);
+        idleEquipmentStock.setBorrowSiteUid(null);
+        idleEquipmentStock.setBorrowDeptUid(null);
+        stockRepository.save(idleEquipmentStock);
+        dao.save(selected);
+    }
 
 
     public void approvalMsg(AdjustmentTransferApplication adjustmentTransferApplication){
@@ -302,4 +319,6 @@ public class AdjustmentTransferService {
 
         return signatureBytes;
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.ge.apm.view.hospitalAdjustment;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -26,6 +27,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -41,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -108,6 +109,10 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
     private WorkFlowService workFlowService;
 
     private IdleEquipmentStockService idleEquipmentStockService;
+
+    @Getter
+    @Setter
+    private List<String> attachments=new ArrayList<>();
     @Override
     protected void init() {
         dao = WebUtil.getBean(IdleEquipmentStockRepository.class);
@@ -135,8 +140,7 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
         String assetUid = selected.getAssetUid();
         assetInfo = assetInfoRepository.findByUid(assetUid);
         attachements=new ArrayList<>();
-        List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentBorrowAttachmentType");
-        contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+
 
     }
 
@@ -179,8 +183,26 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
             return;
         }
         selected.setBorrowDeptUid(filterDeptOrg.getUid());
+        application.setAttachments(JSON.toJSONString(attachments));
+        if(CollectionUtils.isEmpty(attachments) || !attachments.contains("other")){
+            application.setAttachmentsOtherDescription(null);
+        }
         try {
             idleEquipmentStockService.applyForBorrowing(selected,currentUserAccount,application);
+
+
+
+            if(CollectionUtils.isNotEmpty(attachements)  && attachements.stream().anyMatch(ite->ite.getBoUuid()==null) ){
+                attachements.stream().forEach(item -> {
+                    item.setBoUuid(application.getUid());
+                });
+                blobService.saveBlobObject(attachements);
+            }
+            if(CollectionUtils.isNotEmpty(removedAttachments)){
+                removedAttachments.stream().forEach(item -> {
+                    blobService.deleteBlobFileById(item);
+                });
+            }
             WebUtil.addSuccessMessage("调剂设备借用申请完成");
         }catch (Exception e){
             log.error("调剂设备借用申请异常 e:",e);
@@ -339,5 +361,15 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
     public String getUserNameByUid(String orgUid) {
         UserAccount user = userDao.getByUid(orgUid);
         return user == null ? orgUid : user.getName();
+    }
+
+    public List<I18nMessage>  attachmentsList(){
+        List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentBorrowAttachmentType");
+        List<I18nMessage>   contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(attachments)){
+            return new ArrayList<>();
+        }
+        return contractAttachmentTypeList.stream().filter(ite -> attachments.contains(ite.getMsgKey())).collect(Collectors.toList());
+
     }
 }

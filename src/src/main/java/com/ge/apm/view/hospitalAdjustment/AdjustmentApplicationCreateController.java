@@ -1,5 +1,7 @@
 package com.ge.apm.view.hospitalAdjustment;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -69,7 +71,9 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
     @Getter
     @Setter
     private List<V2_BlobObject> uploadedFileObjects = new ArrayList();
-
+    @Getter
+    @Setter
+    private List<String> attachments=new ArrayList<>();
     @Override
     protected GenericRepositoryUUID<IdleEquipmentApplication> getDAO() {
         return dao;
@@ -108,8 +112,11 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
             if(assetUid!=null){
                 selectedAsset = assetInfoRepository.findByUid(assetUid);
             }
-
             attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+            if(selected.getAttachments()!=null){
+                attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
+
+            }
         }else if("Copy".equalsIgnoreCase(actionName)){
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(dao.findByUid(selectedId));
@@ -119,6 +126,10 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
             }
 
             attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+            if(selected.getAttachments()!=null){
+                attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
+
+            }
             selected.setUid(null);
             for (V2_BlobObject attachement : attachements) {
                 attachement.setBoUuid(null);
@@ -137,8 +148,7 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
         if (selectedAsset == null) {
             selectedAsset = new AssetInfo();
         }
-        List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
-        contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+
         blobObjectSelectedMap = new HashMap();
     }
 
@@ -155,6 +165,10 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
         selected.setLastModifiedBy(currentUserAccount.getUid());
         selected.setLastModifiedDate(new Date());
         selected.setTenantUid(currentUserAccount.getTenantUID());
+        selected.setAttachments(JSON.toJSONString(attachments));
+        if(CollectionUtils.isEmpty(attachments) || !attachments.contains("other")){
+            selected.setAttachmentsOtherDescription(null);
+        }
         if(selected.getStatus()==null){
             selected.setStatus(1);
         }
@@ -381,6 +395,17 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
             if (v)
                 selectedBlobIdList.add(k);
         });
+    }
+
+
+    public List<I18nMessage>  attachmentsList(){
+        List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
+        List<I18nMessage>     contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(attachments)){
+            return new ArrayList<>();
+        }
+        return contractAttachmentTypeList.stream().filter(ite -> attachments.contains(ite.getMsgKey())).collect(Collectors.toList());
+
     }
     public void approveAttachmentById(String blobId) {
         blobService.approveBlob(blobId, "1");
