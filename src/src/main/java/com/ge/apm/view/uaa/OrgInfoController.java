@@ -740,6 +740,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             return false;
         }
         List<OrgInfo> directChildren = uaaService.getDirectChildrenFromTree(orgTree, dropNode.getUid());
+        List<OrgInfo> changes = new ArrayList<>();
         for(int i = 0; i< directChildren.size();i++){
             OrgInfo orgInfo = directChildren.get(i);
             logger.info("orgInfo.getUid():"+orgInfo.getUid() + " index: " + orgInfo.getOrgIndex());
@@ -748,16 +749,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             }
             if(i == info.getDropIndex()){
                 drapNode.setOrgIndex(i);
-                dao.save(drapNode);
+                changes.add(orgInfo);
                 continue;
             }
             if(orgInfo.getOrgIndex() != null && orgInfo.getOrgIndex().intValue() == i){
                 continue;
             }
+            changes.add(orgInfo);
             orgInfo.setOrgIndex(i);
-            dao.save(orgInfo);
         }
-        buildOrdTree();
+        if(CollectionUtils.isNotEmpty(changes)){
+            dao.save(changes);
+            buildOrdTree();
+        }
 
         return true;
     }
