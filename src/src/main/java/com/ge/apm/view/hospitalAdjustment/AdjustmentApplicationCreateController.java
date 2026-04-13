@@ -148,8 +148,7 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
         if (selectedAsset == null) {
             selectedAsset = new AssetInfo();
         }
-        List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
-        contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+
         blobObjectSelectedMap = new HashMap();
     }
 
@@ -396,6 +395,17 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
             if (v)
                 selectedBlobIdList.add(k);
         });
+    }
+
+
+    public List<I18nMessage>  attachmentsList(){
+        List<I18nMessage> contractAttachmentType = FieldValueMessageController.getFieldValueList("HospitalAdjustmentAttachmentType");
+        List<I18nMessage>     contractAttachmentTypeList = contractAttachmentType.stream().sorted(Comparator.comparingInt(I18nMessage::getId)).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(attachments)){
+            return new ArrayList<>();
+        }
+        return contractAttachmentTypeList.stream().filter(ite -> attachments.contains(ite.getMsgKey())).collect(Collectors.toList());
+
     }
     public void approveAttachmentById(String blobId) {
         blobService.approveBlob(blobId, "1");

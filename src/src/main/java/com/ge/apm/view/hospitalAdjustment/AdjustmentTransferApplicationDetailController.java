@@ -1,5 +1,6 @@
 package com.ge.apm.view.hospitalAdjustment;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -77,7 +78,9 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     @Getter
     @Setter
     private List<AdjustmentTransferNodeProcess> process;
-
+    @Getter
+    @Setter
+    private List<String> attachments=new ArrayList<>();
     private StreamedContent exportFile;
     @Override
     protected GenericRepositoryUUID<AdjustmentTransferApplication> getDAO() {
@@ -109,7 +112,10 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         setSelected(dao.findByUid(selectedId));
         filterDeptOrg = orgInfoRepository.findByUid(selected.getBorrowDeptUid());
         attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
+        if(selected.getAttachments()!=null){
+            attachments= JSONObject.parseArray(selected.getAttachments(),String.class);
 
+        }
         processNode();
         selected.setApplicationPendingApprovalDate(new Date());
         signatureId=selected.getHandlerSignature();

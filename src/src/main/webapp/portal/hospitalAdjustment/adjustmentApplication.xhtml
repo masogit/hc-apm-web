@@ -338,7 +338,7 @@
                                     <h:outputText value="#{msg.FileName}" class="ui-g-3"/>
                                     <h:outputText value="#{msg.UploadTime}" class="ui-g-2" />
                                     <h:outputText value="#{msg.Uploader}" class="ui-g-2" />
-                                    <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-1" />
+                                    <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  update="uploadDialogForm" oncomplete="PF('uploadDialog').show()" class="ui-g-1" />
                                 </div>
                             </f:facet>
 
@@ -407,7 +407,7 @@
                             <p:selectOneMenu id="functionGroup" value="#{adjustmentApplicationCreateController.attachmentType}" autoWidth="false" style="width: 100%">
                                 <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{adjustmentApplicationCreateController.getContractAttachmentTypeList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
+                                <f:selectItems value="#{adjustmentApplicationCreateController.attachmentsList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
