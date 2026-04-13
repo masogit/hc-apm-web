@@ -328,12 +328,10 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
             WebUtil.addWarnMessage("申请已经审批过");
             return;
         }
-        selected.setStatus(2);
-        selected.setUpdateTime(new Date());
-        selected.setUpdatedBy(currentUserAccount.getUid());
-        selected.setApplicationPendingApprovalUid(currentUserAccount.getUid());
         selected.setHandlerSignature(signatureId);
-        dao.save(selected);
+
+        adjustmentTransferService.refuse(selected,currentUserAccount);
+        WebUtil.addSuccessMessage("审批结束");
     }
     public void cancel(){
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
