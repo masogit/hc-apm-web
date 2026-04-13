@@ -234,7 +234,11 @@ public class AdjustmentTransferApplication implements Serializable {
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUid;
+    @Column(name = "attachments")
+    private String attachments;
 
+    @Column(name = "attachments_other_description")
+    private String attachmentsOtherDescription;
 
 
     @JoinColumn(insertable = false, updatable = false, name = "stock_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -709,6 +713,22 @@ public class AdjustmentTransferApplication implements Serializable {
 
     public void setOtherDescriptionOfUseNote(String otherDescriptionOfUseNote) {
         this.otherDescriptionOfUseNote = otherDescriptionOfUseNote;
+    }
+
+    public String getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getAttachmentsOtherDescription() {
+        return attachmentsOtherDescription;
+    }
+
+    public void setAttachmentsOtherDescription(String attachmentsOtherDescription) {
+        this.attachmentsOtherDescription = attachmentsOtherDescription;
     }
 
     @Override
