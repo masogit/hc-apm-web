@@ -1,5 +1,6 @@
 package com.ge.apm.service.hospitalAdjustment;
 
+import com.alibaba.fastjson.JSON;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.PictureType;
 import com.deepoove.poi.data.TextRenderData;
@@ -15,6 +16,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class IdleEquipmentApplicationService {
@@ -94,7 +97,10 @@ public class IdleEquipmentApplicationService {
         params.put("function_type",assetInfo.getFunctionType());
         params.put("manufacture",assetInfo.getManufacture());
         params.put("purchase_date", DateUtil.format(idleEquipmentApplication.getApplicationDate(), DatePattern.CHINESE_DATE_FORMAT));
-        params.put("purchase_price", BigDecimal.valueOf(assetInfo.getPurchasePrice()));
+        if(assetInfo.getPurchasePrice()!=null){
+            params.put("purchase_price", BigDecimal.valueOf(assetInfo.getPurchasePrice()));
+
+        }
         params.put("used_years",idleEquipmentApplication.getUsedYears());
         params.put("depreciation_period_years",idleEquipmentApplication.getDepreciationPeriodYears());
 
@@ -131,6 +137,19 @@ public class IdleEquipmentApplicationService {
         params.put("registration_number",idleEquipmentApplication.getRegistrationNumber());
         params.put("audit_result_reason",idleEquipmentApplication.getAuditResultReason());
 
+        List<String> strings = JSON.parseArray(idleEquipmentApplication.getAttachments(), String.class);
+        if(CollectionUtils.isNotEmpty(strings)){
+            params.put("ContractInvoice", strings.contains("ContractInvoice")? checked : unchecked);
+            params.put("MaintenanceRecord", strings.contains("MaintenanceRecord")? checked : unchecked);
+            params.put("InspectionReport", strings.contains("InspectionReport")? checked : unchecked);
+            params.put("PhysicalPhoto", strings.contains("PhysicalPhoto")? checked : unchecked);
+            params.put("attachment_other", strings.contains("other")? checked : unchecked);
+            if(strings.contains("other")){
+                params.put("attachments_other_description", idleEquipmentApplication.getAttachmentsOtherDescription());
+
+            }
+
+        }
 
 
 
