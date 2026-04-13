@@ -291,7 +291,7 @@
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup >
-                        <p:selectManyCheckbox  value="#{adjustmentApplicationDetailController.attachments}" style="width: 700px"    >
+                        <p:selectManyCheckbox  value="#{adjustmentApplicationDetailController.attachments}" style="width: 700px"   disabled="true"  >
 
                             <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentAttachmentType')}"
                                            var="item"
@@ -307,7 +307,7 @@
                         <label class="label">附件材料其他描述</label>
                         <p:inputText
                                 value="#{adjustmentApplicationDetailController.selected.attachmentsOtherDescription}"
-                                style="width: 95%;" required="true"
+                                style="width: 95%;" required="true" readonly="true"
                                 requiredMessage="请选择'其他'时需填写详细说明">
                             <p:ajax/>
                         </p:inputText>
