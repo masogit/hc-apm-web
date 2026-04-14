@@ -16,27 +16,27 @@
 
             <div class="ui-g-12 card">
 
-                <h:form id="searchForm" class="searchForm">
-                    <h:panelGroup>
-                        <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="AssetDetailListForm:datalist:btnOrg1" hideEffect="fade" dynamic="false" modal="false" >
-                            <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
-                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
-                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="searchForm:treeNodeNameFilter @this" update="AssetDetailListForm" value="确定"/>
-                            <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{idleEquipmentStockController.siteOrgTree}" selection="#{idleEquipmentStockController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false" propagateSelectionUp="#{orgTreeController.propagateSelectionUp}">
-                                    <p:ajax process="@this" event="select" listener="#{idleEquipmentStockController.onSelectSiteTreeNode}"/>
-                                    <p:ajax process="@this" event="unselect" listener="#{idleEquipmentStockController.onUnSelectSiteTreeNode}"/>
-                                    <p:ajax process="@this" event="expand"/>
-                                    <p:ajax process="@this" event="collapse"/>
-                                    <p:treeNode type="org">
-                                        <h:outputText value="#{node.name}"/>
-                                    </p:treeNode>
-                                    <p:treeNode type="hidden" rendered="false"/>
-                                </p:tree>
-                            </p:scrollPanel>
-                        </p:overlayPanel>
-                    </h:panelGroup>
-                </h:form>
+<!--                <h:form id="searchForm" class="searchForm">-->
+<!--                    <h:panelGroup>-->
+<!--                        <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="AssetDetailListForm:datalist:btnOrg1" hideEffect="fade" dynamic="false" modal="false" >-->
+<!--                            <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>-->
+<!--                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>-->
+<!--                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="searchForm:treeNodeNameFilter @this" update="AssetDetailListForm" value="确定"/>-->
+<!--                            <p:scrollPanel style="height:300px;border: 0" mode="native">-->
+<!--                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{idleEquipmentStockController.siteOrgTree}" selection="#{idleEquipmentStockController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false" propagateSelectionUp="#{orgTreeController.propagateSelectionUp}">-->
+<!--                                    <p:ajax process="@this" event="select" listener="#{idleEquipmentStockController.onSelectSiteTreeNode}"/>-->
+<!--                                    <p:ajax process="@this" event="unselect" listener="#{idleEquipmentStockController.onUnSelectSiteTreeNode}"/>-->
+<!--                                    <p:ajax process="@this" event="expand"/>-->
+<!--                                    <p:ajax process="@this" event="collapse"/>-->
+<!--                                    <p:treeNode type="org">-->
+<!--                                        <h:outputText value="#{node.name}"/>-->
+<!--                                    </p:treeNode>-->
+<!--                                    <p:treeNode type="hidden" rendered="false"/>-->
+<!--                                </p:tree>-->
+<!--                            </p:scrollPanel>-->
+<!--                        </p:overlayPanel>-->
+<!--                    </h:panelGroup>-->
+<!--                </h:form>-->
 
                 <h:form id="AssetDetailListForm">
 
@@ -81,9 +81,9 @@
                         </p:column>
 
                         <p:column headerText="#{msg.hospitalId}" sortBy="#{item.stockSiteUid}" filterBy="#{item.stockSiteUid}" filterMatchMode="EQ" >
-                            <f:facet name="filter" >
-                                <p:autoComplete id="btnOrg1" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                            </f:facet>
+<!--                            <f:facet name="filter" >-->
+<!--                                <p:autoComplete id="btnOrg1" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>-->
+<!--                            </f:facet>-->
                             <h:outputText value="#{idleEquipmentStockController.getSiteOrgName(item.stockSiteUid)}"/>
                         </p:column>
 

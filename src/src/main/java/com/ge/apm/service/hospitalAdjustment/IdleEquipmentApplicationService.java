@@ -96,7 +96,7 @@ public class IdleEquipmentApplicationService {
         params.put("asset_name",assetInfo.getName());
         params.put("function_type",assetInfo.getFunctionType());
         params.put("manufacture",assetInfo.getManufacture());
-        params.put("purchase_date", DateUtil.format(idleEquipmentApplication.getApplicationDate(), DatePattern.CHINESE_DATE_FORMAT));
+        params.put("purchase_date", DateUtil.format(assetInfo.getPurchaseDate(), DatePattern.CHINESE_DATE_FORMAT));
         if(assetInfo.getPurchasePrice()!=null){
             params.put("purchase_price", BigDecimal.valueOf(assetInfo.getPurchasePrice()));
 
@@ -133,7 +133,7 @@ public class IdleEquipmentApplicationService {
 
 
         params.put("audit_result_t", Boolean.TRUE.equals(idleEquipmentApplication.getAuditResult()) ? checked : unchecked);
-        params.put("audit_result_f", !Boolean.TRUE.equals(idleEquipmentApplication.getAuditResult())  ? checked : unchecked);
+        params.put("audit_result_f", Boolean.FALSE.equals(idleEquipmentApplication.getAuditResult())  ? checked : unchecked);
         params.put("registration_number",idleEquipmentApplication.getRegistrationNumber());
         params.put("audit_result_reason",idleEquipmentApplication.getAuditResultReason());
 
