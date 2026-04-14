@@ -435,7 +435,7 @@
                                      action="IdleEquipmentApplication?faces-redirect=true"
                                      style="margin-left: 10px;"/>
 
-                    <p:commandButton  value="下载文件"
+                    <p:commandButton  value="下载文件" rendered="#{adjustmentApplicationDetailController.selected.status!=1}"
                                       actionListener="#{adjustmentApplicationDetailController.download}"
                                       style="margin-left: 10px;" update=":growl"  ajax="false">
 

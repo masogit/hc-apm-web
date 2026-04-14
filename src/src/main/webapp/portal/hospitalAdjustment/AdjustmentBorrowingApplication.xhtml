@@ -88,7 +88,7 @@
                     <h:panelGroup>
                         <label class="label">设备类型</label>
 
-                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.deviceType}">
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.deviceType}" required="true"   requiredMessage="设备类型必填">
                             <f:selectItem itemLabel="诊断设备" itemValue="DIAGNOSTIC_EQUIPMENT"/>
                             <f:selectItem itemLabel="治疗设备" itemValue="THERAPEUTIC_EQUIPMENT"/>
                             <f:selectItem itemLabel="辅助医疗设备" itemValue="AUXILIARY_MEDICAL_EQUIPMENT"/>
@@ -98,7 +98,7 @@
                         </p:selectOneRadio>
 
                         <p:inputText value="#{idleEquipmentStockDetailController.application.otherDeviceTypeNote}"
-                                     placeholder="请注明"
+                                     placeholder="请注明" required="true" requiredMessage="设备类型 其他 注明必填"
                                      rendered="#{idleEquipmentStockDetailController.application.deviceType == 'OTHER'}"
                                      style="margin-left: 10px;">
                             <p:ajax event="change" update="@form"/>
@@ -133,7 +133,7 @@
                     <h:panelGroup>
                         <label class="label">用途说明</label>
 
-                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.descriptionOfUse}">
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.descriptionOfUse}"  required="true"   requiredMessage="用途说明必填">
                             <f:selectItem itemLabel="急救保障" itemValue="EMERGENCY"/>
                             <f:selectItem itemLabel="重点专科建设" itemValue="SPECIALTY"/>
                             <f:selectItem itemLabel="日常诊疗" itemValue="ROUTINE"/>
@@ -143,7 +143,7 @@
                         </p:selectOneRadio>
 
                         <p:inputText value="#{idleEquipmentStockDetailController.application.otherDescriptionOfUseNote}"
-                                     placeholder="请注明"
+                                     placeholder="请注明"   required="true" requiredMessage="用途说明 其他 注明必填"
                                      rendered="#{idleEquipmentStockDetailController.application.descriptionOfUse == 'OTHER'}"
                                      style="margin-left: 10px;">
                             <p:ajax event="change" update="@form"/>
@@ -159,14 +159,14 @@
                     <h:panelGroup id="siteConditionStatus">
                         <label class="label">场地条件：</label>
 
-                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.siteConditionStatus}">
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.siteConditionStatus}"  required="true"   requiredMessage="场地条件必填">
                             <f:selectItem itemLabel="已具备" itemValue="READY"/>
                             <f:selectItem itemLabel="需改造" itemValue="NEEDS_RENOVATION"/>
                             <p:ajax event="change" process="@this" update="siteConditionStatus"/>
                         </p:selectOneRadio>
 
                         <p:inputText value="#{idleEquipmentStockDetailController.application.siteRenovationPlan}"
-                                     placeholder="说明改造计划"
+                                     placeholder="说明改造计划"    required="true" requiredMessage="场地条件 需改造 说明改造计划必填"
                                      rendered="#{idleEquipmentStockDetailController.application.siteConditionStatus == 'NEEDS_RENOVATION'}"
                                      style="margin-top:5px; width:95%">
                             <p:ajax/>
@@ -177,14 +177,14 @@
                     <h:panelGroup id="powerSupplyStatus">
                         <label class="label">电力保障：</label>
 
-                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.powerSupplyStatus}">
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.powerSupplyStatus}"  required="true"   requiredMessage="电力保障必填">
                             <f:selectItem itemLabel="已满足" itemValue="SATISFIED"/>
                             <f:selectItem itemLabel="需增容" itemValue="NEEDS_CAPACITY_INCREASE"/>
                             <p:ajax event="change" process="@this" update="powerSupplyStatus"/>
                         </p:selectOneRadio>
 
                         <p:inputText value="#{idleEquipmentStockDetailController.application.powerCapacityDemand}"
-                                     placeholder="说明增容需求"
+                                     placeholder="说明增容需求"       required="true" requiredMessage="电力保障 需增容 说明增容需求必填"
                                      rendered="#{idleEquipmentStockDetailController.application.powerSupplyStatus == 'NEEDS_CAPACITY_INCREASE'}"
                                      style="margin-top:5px; width:95%">
                             <p:ajax/>
@@ -194,7 +194,7 @@
                     <h:panelGroup id="operatorStatus">
                         <label class="label">操作人员：</label>
 
-                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.operatorStatus}">
+                        <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.operatorStatus}"   required="true"   requiredMessage="操作人员必填">
                             <f:selectItem itemLabel="已配备" itemValue="STAFFED"/>
                             <f:selectItem itemLabel="需培训" itemValue="NEEDS_TRAINING"/>
                             <p:ajax event="change" process="@this" update="operatorStatus"/>
@@ -202,14 +202,14 @@
 
 
                         <p:inputText value="#{idleEquipmentStockDetailController.application.operatorQualificationNote}"
-                                     placeholder="注明资质"
+                                     placeholder="注明资质"   required="true" requiredMessage="操作人员 已配备 注明资质必填"
                                      rendered="#{idleEquipmentStockDetailController.application.operatorStatus == 'STAFFED'}"
                                      style="margin-top:5px; width:95%">
                             <p:ajax event="change" />
                         </p:inputText>
 
                         <p:inputText value="#{idleEquipmentStockDetailController.application.operatorTrainingPlan}"
-                                     placeholder="说明培训计划"
+                                     placeholder="说明培训计划"   required="true" requiredMessage="操作人员 需培训 说明培训计划必填"
                                      rendered="#{idleEquipmentStockDetailController.application.operatorStatus == 'NEEDS_TRAINING'}"
                                      style="margin-top:5px; width:95%">
                             <p:ajax event="change" />
@@ -219,7 +219,7 @@
                     <h:panelGroup>
                         <label class="label">维护能力：</label>
                         <p:selectOneRadio
-                                value="#{idleEquipmentStockDetailController.application.maintenanceCapability}">
+                                value="#{idleEquipmentStockDetailController.application.maintenanceCapability}"   required="true"   requiredMessage="维护能力必填">
                             <f:selectItem itemLabel="自主维护" itemValue="SELF_MAINTENANCE"/>
                             <f:selectItem itemLabel="需医共体技术支持" itemValue="NEEDS_TECH_SUPPORT"/>
                             <p:ajax event="change"/>
