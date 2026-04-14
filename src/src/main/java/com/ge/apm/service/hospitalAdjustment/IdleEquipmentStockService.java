@@ -49,6 +49,8 @@ public class IdleEquipmentStockService {
         application.setBorrowSiteUid(currentUserAccount.getSiteUID());
         application.setBorrowHospitalUid(currentUserAccount.getHospitalUID());
         application.setStatus(1);
+        application.setApplicationPendingApprovalUid(currentUserAccount.getUid());
+        application.setApplicationPendingApprovalDate(new Date());
 
         String hospitalAdjustmentApp = workFlowService.getOrderNumber("ADJUSTMENT_BORROW_APP"+currentUserAccount.getTenantUID());
         if(hospitalAdjustmentApp==null){

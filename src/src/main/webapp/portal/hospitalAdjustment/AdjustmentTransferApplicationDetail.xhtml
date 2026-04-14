@@ -208,7 +208,7 @@
                                      style="margin-left: 10px;"/>  <!--                             action="AdjustmentTransferApplication?faces-redirect=true"-->
 
 
-                    <p:commandButton immediate="true" value="退回" icon="ui-icon-cancel"
+                    <p:commandButton immediate="true" value="拒绝" icon="ui-icon-cancel"
                                      rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
                                      actionListener="#{adjustmentTransferApplicationDetailController.refuse}"
                                      update="transferDetailForm"
