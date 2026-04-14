@@ -212,7 +212,10 @@ public class AdjustmentTransferApplication implements Serializable {
     @Column(name = "pending_delivery_date")
     private Date pendingDeliveryDate;//待交付处理时间
 
-
+    @Column(name = "delivery_uid")
+    private String deliveryUid; //交付处理人
+    @Column(name = "delivery_date")
+    private Date deliveryDate;//交付处理时间
 
     @Column(name = "return_uid")
     private String returnUid; //退回处理人
@@ -730,6 +733,25 @@ public class AdjustmentTransferApplication implements Serializable {
     public void setAttachmentsOtherDescription(String attachmentsOtherDescription) {
         this.attachmentsOtherDescription = attachmentsOtherDescription;
     }
+
+
+    public String getDeliveryUid() {
+        return deliveryUid;
+    }
+
+    public void setDeliveryUid(String deliveryUid) {
+        this.deliveryUid = deliveryUid;
+    }
+
+    public Date getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(Date deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    }
+
+
 
     @Override
     public int hashCode() {

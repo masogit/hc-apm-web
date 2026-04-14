@@ -89,8 +89,8 @@ public class AdjustmentTransferService {
         selected.setStatus(5);
         selected.setUpdateTime(new Date());
         selected.setUpdatedBy(currentUserAccount.getUid());
-        selected.setPendingDeliveryUid(currentUserAccount.getUid());
-        selected.setPendingDeliveryDate(new Date());
+        selected.setDeliveryUid(currentUserAccount.getUid());
+        selected.setDeliveryDate(new Date());
         IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
         OrgInfo orgInfo = orgInfoRepository.getByUid(selected.getBorrowDeptUid());
 
@@ -153,11 +153,13 @@ public class AdjustmentTransferService {
 //            return;
 //        }
         selected.setStatus(9);
-        selected.setReturnDate(new Date());
-        selected.setReturnUid(currentUserAccount.getUid());
+
         selected.setReturnApprovalDate(new Date());
         selected.setReturnApprovalUid(currentUserAccount.getUid());
         selected.setReturnApprovalResult(2);
+
+        selected.setUpdatedBy(currentUserAccount.getUid());
+        selected.setUpdateTime(new Date());
         IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
         idleEquipmentStock.setStatus(1);
         idleEquipmentStock.setBorrowHospitalUid(null);
@@ -182,7 +184,6 @@ public class AdjustmentTransferService {
         selected.setStatus(2);
         selected.setUpdateTime(new Date());
         selected.setUpdatedBy(userAccount.getUid());
-        selected.setApplicationPendingApprovalUid(userAccount.getUid());
 
         IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
 
