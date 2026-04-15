@@ -74,7 +74,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "current_person_id")
     private Integer currentPersonId;
 
-    @Size(max = 16)
+    @Size(max = 32)
     @Column(name = "current_person_name")
     private String currentPersonName;
 
