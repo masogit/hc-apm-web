@@ -186,15 +186,15 @@
                                     value="#{idleEquipmentApplicationController.getSiteOrgName(item.stockSiteUid)}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.stockDeptName}"
-                                  filterMatchMode="LIKE" width="100">
+                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.stockDeptUid}"
+                                  filterMatchMode="EQ" width="100">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('datalist').filter()"
                                                  value="#{idleEquipmentApplicationController.fileterOrgName}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
                                                   noSelectionOption="true"/>
                                     <f:selectItems value="#{idleEquipmentApplicationController.clinicalDeptList}"
-                                                   var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                                   var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText
