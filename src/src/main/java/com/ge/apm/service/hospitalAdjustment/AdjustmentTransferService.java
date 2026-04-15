@@ -6,6 +6,7 @@ import com.deepoove.poi.data.PictureType;
 import com.deepoove.poi.data.TextRenderData;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -14,6 +15,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -57,6 +59,9 @@ public class AdjustmentTransferService {
 
     @Autowired
     private BlobFileService blobFileService;
+
+    @Autowired
+    private MqUtils mqUtils;
     @Transactional
     public void cancel(AdjustmentTransferApplication selected, UserAccount currentUserAccount){
 //        AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
@@ -97,6 +102,7 @@ public class AdjustmentTransferService {
         String assetUid = idleEquipmentStock.getAssetUid();
         AssetInfo assetInfo = assetInfoRepository.getByUid(assetUid);
         assetInfo.setClinicalDeptUID(selected.getBorrowDeptUid());
+        assetInfo.setClinicalDeptName(orgInfo.getName());
         assetInfo.setAssetDeptId(orgInfo.getId());
         assetInfo.setAssetDeptUID(orgInfo.getUid());
         assetInfo.setSiteUID(selected.getBorrowSiteUid());
@@ -107,6 +113,14 @@ public class AdjustmentTransferService {
         idleEquipmentStock.setLastModifiedBy(currentUserAccount.getUid());
         stockRepository.save(idleEquipmentStock);
         assetInfoRepository.save(assetInfo);
+
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("AdjustmentTransferService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("confirmReceipt");
+        mqContext.setDescribe("院区间调剂借用确认到货");
+
+        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
         dao.save(selected);
     }
 
@@ -134,6 +148,7 @@ public class AdjustmentTransferService {
         OrgInfo orgInfo = orgInfoRepository.getByUid(selected.getStockDeptUid());
         AssetInfo assetInfo = assetInfoRepository.getByUid(idleEquipmentStock.getAssetUid());
         assetInfo.setClinicalDeptUID(selected.getStockDeptUid());
+        assetInfo.setClinicalDeptName(orgInfo.getName());
         assetInfo.setAssetDeptUID(selected.getStockDeptUid());
         assetInfo.setAssetDeptId(orgInfo.getId());
         assetInfo.setSiteUID(selected.getStockSiteUid());
@@ -141,6 +156,16 @@ public class AdjustmentTransferService {
         assetInfoRepository.save(assetInfo);
         stockRepository.save(idleEquipmentStock);
         dao.save(selected);
+
+
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("AdjustmentTransferService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("returnPass");
+        mqContext.setDescribe("院区间调剂借用设备退回");
+        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
+
+
     }
 
     @Transactional
@@ -170,6 +195,7 @@ public class AdjustmentTransferService {
         OrgInfo orgInfo = orgInfoRepository.getByUid(selected.getStockDeptUid());
         AssetInfo assetInfo = assetInfoRepository.getByUid(idleEquipmentStock.getAssetUid());
         assetInfo.setClinicalDeptUID(selected.getStockDeptUid());
+        assetInfo.setClinicalDeptName(orgInfo.getName());
         assetInfo.setAssetDeptUID(selected.getStockDeptUid());
         assetInfo.setAssetDeptId(orgInfo.getId());
         assetInfo.setSiteUID(selected.getStockSiteUid());
@@ -177,6 +203,13 @@ public class AdjustmentTransferService {
         assetInfoRepository.save(assetInfo);
         stockRepository.save(idleEquipmentStock);
         dao.save(selected);
+
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("AdjustmentTransferService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("returnRefuse");
+        mqContext.setDescribe("院区间调剂借用设备退回");
+        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
     }
 
     @Transactional
