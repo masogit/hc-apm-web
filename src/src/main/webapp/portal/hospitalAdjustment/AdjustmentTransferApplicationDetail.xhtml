@@ -208,7 +208,7 @@
                                      style="margin-left: 10px;"/>  <!--                             action="AdjustmentTransferApplication?faces-redirect=true"-->
 
 
-                    <p:commandButton immediate="true" value="退回" icon="ui-icon-cancel"
+                    <p:commandButton immediate="true" value="拒绝" icon="ui-icon-cancel"
                                      rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
                                      actionListener="#{adjustmentTransferApplicationDetailController.refuse}"
                                      update="transferDetailForm"
@@ -280,7 +280,7 @@
                                          update="transferDetailForm"
                                          oncomplete="handleApproveSuccess(xhr, status, args);"/>
                         <p:commandButton immediate="true" process="@this" value="重写"
-                                         actionListener="#{multiLevelApprovalController.resetSignature()}"
+                                         actionListener="#{adjustmentTransferApplicationDetailController.resetSignature()}"
                                          update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
                         <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}"
                                          onclick="PF('signatureDlg').hide()"/>

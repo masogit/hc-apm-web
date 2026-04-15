@@ -127,12 +127,44 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         condition.add(selected.getApplicationPendingApprovalUid());
         condition.add(selected.getPendingDeliveryUid());
         condition.add(selected.getReturnUid());
+        condition.add(selected.getUpdatedBy());
+        condition.add(selected.getReturnApprovalUid());
         Set<String> collect1 = condition.stream().filter(i -> i != null).collect(Collectors.toSet());
         List<UserAccount> userAccounts = userDao.findByUidIn(collect1);
         Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
         addNode("待审批",collect.get(selected.getApplicationPendingApprovalUid()),selected.getApplicationPendingApprovalDate());
-        addNode("待交付",collect.get(selected.getPendingDeliveryUid()),selected.getPendingDeliveryDate());
-        addNode("设备退回",collect.get(selected.getReturnUid()),selected.getReturnDate());
+        if(selected.getStatus()==2){
+            addNode("审批未通过",collect.get(selected.getUpdatedBy()),selected.getUpdateTime());
+            return;
+        }
+
+        if(selected.getPendingDeliveryUid()!=null){
+            addNode("待交付",collect.get(selected.getPendingDeliveryUid()),selected.getPendingDeliveryDate());
+        }
+
+        if(selected.getDeliveryUid()!=null){
+            addNode("已交付",collect.get(selected.getDeliveryUid()),selected.getDeliveryDate());
+        }
+
+        if(selected.getReturnUid()!=null){
+            addNode("退回待审批",collect.get(selected.getReturnUid()),selected.getReturnDate());
+        }
+
+        if(selected.getStatus()==8){
+            addNode("已退回",collect.get(selected.getReturnApprovalUid()),selected.getReturnApprovalDate());
+            return;
+        }
+        if(selected.getStatus()==9){
+            addNode("退回审批不通过",collect.get(selected.getReturnApprovalUid()),selected.getReturnApprovalDate());
+        }
+
+        if(selected.getStatus()==6){
+            addNode("已完成",collect.get(selected.getUpdatedBy()),selected.getUpdateTime());
+            return;
+        }
+        if(selected.getStatus()==3){
+            addNode("已取消",collect.get(selected.getUpdatedBy()),selected.getUpdateTime());
+        }
     }
 
 
@@ -309,7 +341,10 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         selected.setStatus(4);
         selected.setUpdateTime(new Date());
         selected.setUpdatedBy(currentUserAccount.getUid());
-        selected.setApplicationPendingApprovalUid(currentUserAccount.getUid());
+        selected.setPendingDeliveryUid(currentUserAccount.getUid());
+        selected.setPendingDeliveryDate(new Date());
+
+
         selected.setHandlerSignature(signatureId);
         dao.save(selected);
         adjustmentTransferService.approvalMsg(selected);
