@@ -217,6 +217,7 @@ public class AdjustmentTransferService {
         selected.setStatus(2);
         selected.setUpdateTime(new Date());
         selected.setUpdatedBy(userAccount.getUid());
+        selected.setApplicationActualApprovalUid(userAccount.getUid());
 
         IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
 
@@ -237,6 +238,11 @@ public class AdjustmentTransferService {
         stringMap.put("content", "设备调剂申请已通过，请确认信息后线下交接");
         stringMap.put("date", DateUtil.formatDateTime(new Date()));
 
+        List<String> byIdsAndHospitalUID = getAdjustmentTransferApproval(adjustmentTransferApplication,true,false);
+        wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE,byIdsAndHospitalUID,null);
+    }
+
+    public List<String> getAdjustmentTransferApproval(AdjustmentTransferApplication adjustmentTransferApplication,boolean in,boolean out) {
         List<CustomRole> customRoles = customRoleRepository.findByTenantUidAndFunctionListContains(adjustmentTransferApplication.getTenantUid());
         List<Integer> tenantRoleIds = new ArrayList<>();
 
@@ -247,16 +253,43 @@ public class AdjustmentTransferService {
             }
         }
         if(CollectionUtils.isEmpty(tenantRoleIds)){
-            log.info("租户没有配置自定义调剂角色tenantUid:{}",adjustmentTransferApplication.getTenantUid());
+            log.info("租户没有配置自定义调剂角色tenantUid:{}", adjustmentTransferApplication.getTenantUid());
         }
         List<Integer> userIds = userAccountRepository.findByCustomRoleId(tenantRoleIds);
 
-        String stockHospitalUid = adjustmentTransferApplication.getStockHospitalUid();
-        String borrowHospitalUid = adjustmentTransferApplication.getBorrowHospitalUid();
+        List<String> strings = new ArrayList<>();
+        if(out){
+            String stockHospitalUid = adjustmentTransferApplication.getStockHospitalUid();
+            strings.add(stockHospitalUid);
+        }
+        if(in){
+            String borrowHospitalUid = adjustmentTransferApplication.getBorrowHospitalUid();
+            strings.add(borrowHospitalUid);
+        }
+        List<String> byIdsAndHospitalUID = userAccountRepository.getByIdsAndHospitalUID(userIds, strings);
+        return byIdsAndHospitalUID;
+    }
 
 
-        List<String> byIdsAndHospitalUID = userAccountRepository.getByIdsAndHospitalUID(userIds, Arrays.asList(stockHospitalUid, borrowHospitalUid));
-        wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE,byIdsAndHospitalUID,null);
+    public List<UserAccount>  getApprovalUser(String tenantUid,List<ApmFunction> functions){
+        List<CustomRole> customRoles = customRoleRepository.findByTenantUidAndFunctionListContains(tenantUid);
+        List<Integer> tenantRoleIds = new ArrayList<>();
+
+        for (CustomRole customRole : customRoles) {
+            List<String> strings = JSON.parseArray(customRole.getFunctionList(), String.class);
+            for (ApmFunction function : functions) {
+                if(CollectionUtils.isNotEmpty(strings) && strings.contains(function.name())){
+                    tenantRoleIds.add(customRole.getId());
+                }
+            }
+        }
+        if(CollectionUtils.isEmpty(tenantRoleIds)){
+            log.info("租户没有配置自定义调剂角色tenantUid:{}",tenantUid);
+            return new ArrayList<>();
+        }
+        List<Integer> userIds = userAccountRepository.findByCustomRoleId(tenantRoleIds);
+
+        return userAccountRepository.getByIds(new HashSet<>(userIds));
     }
 
     public  byte[] download(AdjustmentTransferApplication selected ) throws IOException {
