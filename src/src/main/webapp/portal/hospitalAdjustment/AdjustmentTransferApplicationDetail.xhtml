@@ -41,7 +41,7 @@
 
                                 <p:selectOneRadio id="screeningPanel"
                                                   disabled="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
-                                                  value="#{adjustmentTransferApplicationDetailController.selected.initialScreeningResult}">
+                                                  value="#{adjustmentTransferApplicationDetailController.selected.initialScreeningResult}" required="true" requiredMessage="初步筛选结果必填">
 
                                     <f:selectItem itemValue="matched" itemLabel="已匹配闲置设备"/>
                                     <f:selectItem itemValue="unmatched" itemLabel="无匹配设备"/>
@@ -52,7 +52,7 @@
                                 <h:panelGroup id="reasonInput"
                                               rendered="#{adjustmentTransferApplicationDetailController.selected.initialScreeningResult == 'unmatched'}">
                                     <h:outputLabel value="（说明原因）："/>
-                                    <p:inputText
+                                    <p:inputText  required="true" requiredMessage="说明原因必填"
                                             readonly="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
                                             value="#{adjustmentTransferApplicationDetailController.selected.screeningReason}">
                                         <p:ajax/>
@@ -65,7 +65,7 @@
 
                                 <p:selectOneRadio id="assessmentPanel"
                                                   disabled="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
-                                                  value="#{adjustmentTransferApplicationDetailController.selected.technicalAssessment}"
+                                                  value="#{adjustmentTransferApplicationDetailController.selected.technicalAssessment}"  required="true" requiredMessage="技术评估安排必填"
                                 >
 
                                     <f:selectItem itemValue="none" itemLabel="无需现场评估"/>
@@ -84,7 +84,7 @@
                                                 pattern="#{userContextService.timeFormat()}"
                                                 value="#{adjustmentTransferApplicationDetailController.selected.assessmentTime}"
                                                 showOn="button" readonlyInput="false" showButtonPanel="true"
-                                                navigator="true" mask="true" style="width: 95%">
+                                                navigator="true" mask="true" style="width: 95%"   required="true" requiredMessage="评估时间必填">
                                         <p:ajax event="dateSelect"/>
                                     </p:calendar>
 
@@ -100,7 +100,7 @@
                                         value="#{fileDownloadService.getFile(adjustmentTransferApplicationDetailController.signatureId)}"
                                         height="80" width="100" stream="false">
                                 </p:graphicImage>
-                                <p:commandButton id="openSignature2"
+                                <p:commandButton id="openSignature2" validateClient="false" immediate="true"
                                                  rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
                                                  actionListener="#{adjustmentTransferApplicationDetailController.getSignature()}"
                                                  value="添加签名" update="signatureDlg"
@@ -200,7 +200,7 @@
 
 
                     </p:fieldset>
-                    <p:commandButton immediate="true" value="同意" icon="ui-icon-check"
+                    <p:commandButton value="同意" icon="ui-icon-check"
                                      rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
                                      actionListener="#{adjustmentTransferApplicationDetailController.applicationApproval}"
 
@@ -208,7 +208,7 @@
                                      style="margin-left: 10px;"/>  <!--                             action="AdjustmentTransferApplication?faces-redirect=true"-->
 
 
-                    <p:commandButton immediate="true" value="拒绝" icon="ui-icon-cancel"
+                    <p:commandButton  value="拒绝" icon="ui-icon-cancel"
                                      rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
                                      actionListener="#{adjustmentTransferApplicationDetailController.refuse}"
                                      update="transferDetailForm"

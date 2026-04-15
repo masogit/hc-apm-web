@@ -21,7 +21,7 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">医共体所属类别</label>
+                        <label class="label">医共体所属类别<span style="color:red">*</span></label>
 
                         <p:selectOneRadio id="status"
                                           value="#{idleEquipmentStockDetailController.application.medicalCommunityType}"
@@ -86,7 +86,7 @@
             <p:fieldset legend="需求设备基本要求">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">设备类型</label>
+                        <label class="label">设备类型<span style="color:red">*</span></label>
 
                         <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.deviceType}" required="true"   requiredMessage="设备类型必填">
                             <f:selectItem itemLabel="诊断设备" itemValue="DIAGNOSTIC_EQUIPMENT"/>
@@ -111,7 +111,7 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">核心技术参数 (必填)</label>
+                        <label class="label">核心技术参数 (必填) <span style="color:red">*</span></label>
                         <p:inputText value="#{idleEquipmentStockDetailController.application.coreTechnicalParams}" required="true" requiredMessage="核心技术参数 #{msg.ValidationRequire}">
                             <p:ajax/>
                         </p:inputText>
@@ -124,14 +124,14 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">预计使用时限：</label>
-                        <p:inputNumber value="#{idleEquipmentStockDetailController.application.estimatedUsageYears}">
+                        <p:inputNumber value="#{idleEquipmentStockDetailController.application.estimatedUsageYears}" decimalPlaces="1" >
                             <p:ajax/>
                         </p:inputNumber>
                         <h:outputText value=" 年"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">用途说明</label>
+                        <label class="label">用途说明<span style="color:red">*</span></label>
 
                         <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.descriptionOfUse}"  required="true"   requiredMessage="用途说明必填">
                             <f:selectItem itemLabel="急救保障" itemValue="EMERGENCY"/>
@@ -157,7 +157,7 @@
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                     <h:panelGroup id="siteConditionStatus">
-                        <label class="label">场地条件：</label>
+                        <label class="label">场地条件<span style="color:red">*</span>：</label>
 
                         <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.siteConditionStatus}"  required="true"   requiredMessage="场地条件必填">
                             <f:selectItem itemLabel="已具备" itemValue="READY"/>
@@ -175,7 +175,7 @@
 
 
                     <h:panelGroup id="powerSupplyStatus">
-                        <label class="label">电力保障：</label>
+                        <label class="label">电力保障<span style="color:red">*</span>：</label>
 
                         <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.powerSupplyStatus}"  required="true"   requiredMessage="电力保障必填">
                             <f:selectItem itemLabel="已满足" itemValue="SATISFIED"/>
@@ -192,7 +192,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup id="operatorStatus">
-                        <label class="label">操作人员：</label>
+                        <label class="label">操作人员<span style="color:red">*</span>：</label>
 
                         <p:selectOneRadio value="#{idleEquipmentStockDetailController.application.operatorStatus}"   required="true"   requiredMessage="操作人员必填">
                             <f:selectItem itemLabel="已配备" itemValue="STAFFED"/>
@@ -217,7 +217,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">维护能力：</label>
+                        <label class="label">维护能力<span style="color:red">*</span>：</label>
                         <p:selectOneRadio
                                 value="#{idleEquipmentStockDetailController.application.maintenanceCapability}"   required="true"   requiredMessage="维护能力必填">
                             <f:selectItem itemLabel="自主维护" itemValue="SELF_MAINTENANCE"/>
