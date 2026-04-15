@@ -309,7 +309,7 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
     }
 
     public void bathDownloadAttach() {
-        String zipName = Optional.ofNullable(selected.getApplicationNumber()).orElse("") + selected.getAssetName() +"闲置设备申请表附件"+ ".zip";
+        String zipName = Optional.ofNullable(selected.getApplicationNumber()).orElse("")  +"闲置设备申请表附件"+ ".zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zipOut = new ZipOutputStream(bout)) {
             Map<String, V2_BlobObject> blobObjectMap = attachements.stream().collect(Collectors.toMap(V2_BlobObject::getId, t -> t));
             for (String blobId : selectedBlobIdList) {
