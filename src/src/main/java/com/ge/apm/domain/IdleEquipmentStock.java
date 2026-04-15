@@ -68,6 +68,11 @@ public class IdleEquipmentStock implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
+
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUid;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUid;
 
@@ -221,6 +226,15 @@ public class IdleEquipmentStock implements Serializable {
 
     public void setBorrowHospitalUid(String borrowHospitalUid) {
         this.borrowHospitalUid = borrowHospitalUid;
+    }
+
+
+    public String getInstitutionUid() {
+        return institutionUid;
+    }
+
+    public void setInstitutionUid(String institutionUid) {
+        this.institutionUid = institutionUid;
     }
 
     @Override
