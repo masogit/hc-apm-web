@@ -311,7 +311,7 @@
 
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
-                                <p:selectManyCheckbox  value="#{adjustmentApplicationDetailController.attachments}" style="width: 700px"    >
+                                <p:selectManyCheckbox  value="#{adjustmentApplicationDetailController.attachments}" style="width: 700px"    disabled="true" >
 
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentAttachmentType')}"
                                                    var="item"
@@ -409,7 +409,7 @@
                                 <div style="display:flex; align-items:center; flex-wrap:wrap; gap: 10px;">
 
 
-                                    <p:selectOneRadio value="#{adjustmentApplicationDetailController.selected.auditResult}" >
+                                    <p:selectOneRadio value="#{adjustmentApplicationDetailController.selected.auditResult}" required="true" requiredMessage="审核结果必填" >
                                         <f:selectItem itemLabel="符合条件" itemValue="true" />
                                         <f:selectItem itemLabel="不符合条件" itemValue="false" />
 
@@ -418,12 +418,12 @@
 
 
                                     <p:inputText value="#{adjustmentApplicationDetailController.selected.registrationNumber}"
-                                                 placeholder="登记编号"
+                                                 placeholder="登记编号"  required="true" requiredMessage="登记编号必填"
                                                  style="width:150px;"
                                                  rendered="#{adjustmentApplicationDetailController.selected.auditResult == true}"/>
 
                                     <p:inputText value="#{adjustmentApplicationDetailController.selected.auditResultReason}"
-                                                 placeholder="说明理由"
+                                                 placeholder="说明理由"  required="true" requiredMessage="说明理由必填"
                                                  style="width:200px;"
                                                  rendered="#{adjustmentApplicationDetailController.selected.auditResult == false}"/>
                                 </div>
@@ -445,14 +445,14 @@
                                 <label class="label">审核人签字</label>
                                     <p:graphicImage rendered="#{adjustmentApplicationDetailController.signatureId !=null}" value="#{fileDownloadService.getFile(adjustmentApplicationDetailController.signatureId)}" height="80" width="100" stream="false" >
                                     </p:graphicImage>
-                                <p:commandButton    id="openSignature2" actionListener="#{adjustmentApplicationDetailController.getSignature()}" value="添加签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
+                                <p:commandButton  immediate="true"   id="openSignature2" actionListener="#{adjustmentApplicationDetailController.getSignature()}" value="添加签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
 
                             </h:panelGroup>
 
                         </p:panelGrid>
                     </p:fieldset>
                     <p:commandButton  icon="ui-icon-check" rendered="#{adjustmentApplicationDetailController.selected.status==2 and   userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ACCEPTANCE')}"   actionListener="#{adjustmentApplicationDetailController.approval()}" value="审批同意" update="adjustmentApplicationForm"  />
-                    <p:commandButton immediate="true" value="退回"  rendered="#{adjustmentApplicationDetailController.selected.status==2 and   userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ACCEPTANCE')}"  icon="ui-icon-cancel" update="adjustmentApplicationForm"
+                    <p:commandButton  value="退回"  rendered="#{adjustmentApplicationDetailController.selected.status==2 and   userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ACCEPTANCE')}"  icon="ui-icon-cancel" update="adjustmentApplicationForm"
                                      actionListener="#{adjustmentApplicationDetailController.refuse}"
 
                                      style="margin-left: 10px;"/>

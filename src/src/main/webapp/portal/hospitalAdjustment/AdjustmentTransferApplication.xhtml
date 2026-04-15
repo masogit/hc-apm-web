@@ -146,9 +146,9 @@
                                     value="#{adjustmentTransferApplicationController.getSiteOrgName(item.stockSiteUid)}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.stockDeptName}"
+                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.stockDeptUid}"
                                   filterMatchMode="LIKE" >
-                            <h:outputText value="#{item.stockDeptName}"/>
+                            <h:outputText   value="#{adjustmentTransferApplicationController.getSiteOrgName(item.stockDeptUid)}"/>
                         </p:column>
                         <c:if test="#{columnItem eq 'manufacture'}">
                             <p:column headerText="#{msg.manufacture}" sortBy="#{item.idleEquipmentStock.assetInfo.manufacture}"
