@@ -16,6 +16,7 @@ public enum GatewayURL {
     GET_AUTHENTICATE_BY_OPEN_ID("/api/apm/security/userAccounts/authenticateWeChat"),
     GET_AUTHENTICATE_BY_USER_PASSWORD("/api/apm/security/userAccounts/authenticateBasic"),
     GET_AUTHENTICATE_BY_USER_PASSWORD_ENCRYPTED("/api/apm/security/userAccounts/authenticateInternal"),
+    GET_APMUSER_OR_SYSCLIENT("/api/apm/security/userAccounts/getApmUserOrSysClient"),
     // Objects
     UPLOAD_SINGLE_FILE_BY_URL("/hcapmobjecthubservice/api/apm/objectHub/objects/urlFile"),
     UPLOAD_SINGLE_FILE("/zuul/hcapmobjecthubservice/api/apm/objectHub/objects/single"),
