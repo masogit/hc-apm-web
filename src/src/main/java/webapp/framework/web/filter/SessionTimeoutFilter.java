@@ -73,7 +73,9 @@ public class SessionTimeoutFilter implements Filter {
                     return;
                 }
                 boolean notLogin = isNotLogin(httpServletRequest);
-                if(notLogin){
+                String token = request.getParameter("token");
+                String mobile = request.getParameter("mobile");
+                if(notLogin && !StringUtils.isEmpty(token) && !StringUtils.isEmpty(mobile)){
                     passLoginUtil.handler(httpServletRequest,httpServletResponse);
                     httpServletRequest.getSession().setAttribute("PHONE_SMSCODE_VALID",true);
                     String requestURI = httpServletRequest.getRequestURI();
