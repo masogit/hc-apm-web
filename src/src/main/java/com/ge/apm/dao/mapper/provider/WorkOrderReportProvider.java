@@ -346,14 +346,14 @@ public class WorkOrderReportProvider {
     public String buildFilter(List<SearchFilter> searchFilterList) {
 
         StringBuilder sb = new StringBuilder();
-        long count = searchFilterList.stream().filter(filter -> "userUid".equals(filter.fieldName)).count();
-        if (count > 0) {
-            List<SearchFilter> orgFilter = searchFilterList.stream().filter(filter -> "orgUID".equals(filter.fieldName)).collect(Collectors.toList());
-            List<SearchFilter> tenantFilter = searchFilterList.stream().filter(filter -> "tenantUID".equals(filter.fieldName)).collect(Collectors.toList());
-            searchFilterList.removeAll(orgFilter);
-            searchFilterList.removeAll(tenantFilter);
-            sb.append(" and (wo.tenant_uid in ('68fc4f19938546d7bdfaf2d405cd6e6d','").append(UserContextService.getCurrentUserAccount().getTenantUID()).append("')) ");
-        }
+//        long count = searchFilterList.stream().filter(filter -> "userUid".equals(filter.fieldName)).count();
+//        if (count > 0) {
+//            List<SearchFilter> orgFilter = searchFilterList.stream().filter(filter -> "orgUID".equals(filter.fieldName)).collect(Collectors.toList());
+//            List<SearchFilter> tenantFilter = searchFilterList.stream().filter(filter -> "tenantUID".equals(filter.fieldName)).collect(Collectors.toList());
+//            searchFilterList.removeAll(orgFilter);
+//            searchFilterList.removeAll(tenantFilter);
+//            sb.append(" and (wo.tenant_uid in ('68fc4f19938546d7bdfaf2d405cd6e6d','").append(UserContextService.getCurrentUserAccount().getTenantUID()).append("')) ");
+//        }
         for (SearchFilter searchFilter : searchFilterList) {
             String tempColumn = searchFilter.fieldName;
             Object value = searchFilter.value;
@@ -361,10 +361,10 @@ public class WorkOrderReportProvider {
 
             switch (tempColumn) {
                 case "tenantUID":
-                    sb.append(" and (wo.tenant_uid='").append(value).append("') ");
+                    sb.append(" and (ai.tenant_uid='").append(value).append("') ");
                     break;
                 case "orgUID":
-                    sb.append(" and (wo.tenant_uid='").append(value).append("' or wo.institution_uid='").append(value).append("' or wo.hospital_uid='").append(value).append("' or wo.site_uid='").append(value).append("') ");
+                    sb.append(" and (ai.tenant_uid='").append(value).append("' or ai.institution_uid='").append(value).append("' or ai.hospital_uid='").append(value).append("' or ai.site_uid='").append(value).append("') ");
                     break;
                 case "assetInfo.clinicalDeptUID": {
                     StringBuilder str = new StringBuilder();
