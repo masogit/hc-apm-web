@@ -92,7 +92,7 @@
             <label class="label">#{msg.assetOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required? '*':''}</span></label>
             <p:autoComplete id="assetOwnerName" value="#{assetInfoEditController.selectedObjectMap['assetOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName')}"
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required}" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
-                            var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
                 <p:column>
@@ -118,7 +118,7 @@
             <label class="label">#{msg.assetOwnerName2}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerName2'].required? '*':''}</span></label>
             <p:autoComplete id="assetOwnerName2" value="#{assetInfoEditController.selectedObjectMap['assetOwner2']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName2')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName2'].required}" requiredMessage="#{msg.assetOwnerName2} #{msg.ValidationRequire}"
-                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
                 <p:column>
@@ -144,7 +144,7 @@
             <label class="label">#{msg.assetOwnerName3}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetOwnerName3'].required? '*':''}</span></label>
             <p:autoComplete id="assetOwnerName3" value="#{assetInfoEditController.selectedObjectMap['assetOwner3']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName3')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName3'].required}" requiredMessage="#{msg.assetOwnerName3} #{msg.ValidationRequire}"
-                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
                 <p:column>
@@ -172,7 +172,7 @@
             <label class="label">#{msg.pmOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required? '*':''}</span></label>
             <p:autoComplete id="pmOwnerName" value="#{assetInfoEditController.selectedObjectMap['pmOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('pmOwnerName')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['pmOwnerName'].required}" requiredMessage="#{msg.PMOwner} #{msg.ValidationRequire}"
-                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:column>
@@ -193,7 +193,7 @@
             <label class="label">#{msg.measuringOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringOwner'].required? '*':''}</span></label>
             <p:autoComplete id="measuringOwner" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('measuringOwner')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['measuringOwner'].required}" requiredMessage="#{msg.pmOwnerId} #{msg.ValidationRequire}"
-                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:column>
@@ -212,7 +212,7 @@
             <label class="label">#{msg.patrolInspectionOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerName'].required? '*':''}</span></label>
             <p:autoComplete id="patrolInspectionOwnerName" value="#{assetInfoEditController.selectedObjectMap['patrolInspectionOwnerName']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('patrolInspectionOwnerName')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['patrolInspectionOwnerName'].required}" requiredMessage="#{msg.patrolInspectionOwnerName} #{msg.ValidationRequire}"
-                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
                 <p:column>
@@ -240,7 +240,7 @@
             <label class="label">#{msg.measuringOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['measuringOwnerName'].required? '*':''}</span></label>
             <p:autoComplete id="measuringOwnerName" value="#{assetInfoEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('measuringOwnerName')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['measuringOwnerName'].required}" requiredMessage="#{msg.measuringOwnerId} #{msg.ValidationRequire}"
-                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this"/>
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('measuringOwner')}" process="@this" />
                 <p:column>
@@ -339,7 +339,7 @@
 
             <p:autoComplete id="clinicalOwnerName" value="#{assetInfoEditController.selectedObjectMap['clinicalOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('clinicalOwnerName')}"
                             forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['clinicalOwnerName'].required}" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}"
-                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeClinicalOwnerList}" class="SiteUIDChange clinicalDeptNameChange">
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeClinicalOwnerList}" scrollHeight="300" class="SiteUIDChange clinicalDeptNameChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />
                 <p:column>
