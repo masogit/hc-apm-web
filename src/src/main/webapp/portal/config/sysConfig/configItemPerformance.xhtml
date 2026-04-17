@@ -45,6 +45,25 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('currentWorkingHours'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('currentWorkingHours').configItemValue == null}"/>
             </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost').name.concat('(').concat(systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost').configItemValue == null}"/>
+            </h:panelGroup>
+
+
+
+
         </p:panelGrid>
     </ui:composition>
 

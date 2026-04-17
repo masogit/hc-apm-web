@@ -244,6 +244,8 @@ public class DataEntryService {
         dataEntry.setAssetUid(selectAsset.getUid());
         dataEntry.setClinicalDeptUid(selectAsset.getClinicalDeptUID());
         dataEntry.setOperationUserUid(user.getUid());
+        dataEntry.setCreatedBy(user.getUid());
+        dataEntry.setCreatedName(user.getName());
         dataEntry.setCreatedDate(new Date());
         dataEntry.setLastModifiedBy(user.getUid());
         dataEntry.setLastModifiedDate(new Date());

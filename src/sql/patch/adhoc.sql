@@ -1,0 +1,2 @@
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 10, 'false', '维修成本是否纳入工单费用', 'maintenanceCostIncludedWorkOrderCost', '维修成本是否纳入工单费用', 'f','t',3 where not exists(select * from config_item where key = 'maintenanceCostIncludedWorkOrderCost');
