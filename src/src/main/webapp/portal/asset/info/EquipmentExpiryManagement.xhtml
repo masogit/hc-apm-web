@@ -146,11 +146,6 @@
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.registrationNo}"/>
                         </p:column>
-                        <p:column headerText="#{msg.lifecycle}" sortBy="#{item.lifecycle}"
-                                  filterBy="#{item.lifecycle}" filterMatchMode="EQ">
-                            <h:outputText
-                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
-                        </p:column>
                         <p:column headerText="#{msg.ManufactureDate}" sortBy="#{item.manufactDate}" filterBy="#{item.manufactDate}" filterMatchMode="GTE">
                             <f:facet name="filter">
                                 <p:inputText id="filterManufactureDate" widgetVar="varFilterManufactureDate" />
@@ -159,10 +154,20 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-<!--                        <p:column headerText="超限状态" filterBy="#{item.lifecycle}" filterMatchMode="EQ">-->
-<!--                            <h:outputText-->
-<!--                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>-->
-<!--                        </p:column>-->
+                        <p:column headerText="#{msg.lifecycle}" sortBy="#{item.lifecycle}"
+                                  filterBy="#{item.lifecycle}" filterMatchMode="EQ">
+                            <h:outputText
+                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.overrunState}" filterBy="#{item.overrunState}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('overrunState', item.overrunState)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('overrunState')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
                         <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}"
                                   filterBy="#{item.serialNum}"
                                   filterMatchMode="LIKE">

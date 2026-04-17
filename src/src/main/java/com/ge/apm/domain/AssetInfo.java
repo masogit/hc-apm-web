@@ -1109,7 +1109,6 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     @TableField(exist = false)
     private SelectItemDto assetClassification32Dto;
-
     @Transient
     @TableField(exist = false)
     private String category1;
@@ -1119,28 +1118,25 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     @TableField(exist = false)
     private String category3;
-
     @Transient
     @TableField(exist = false)
     private String categoryRadio;
-
     @Transient
     @TableField(exist = false)
     private boolean editing = false;
     @Transient
     @TableField(exist = false)
     private BigDecimal scaleAssessment;
-
     @Transient
     @TableField(exist = false)
     private String measuringAlertStatus;
-
-
     @Transient
     private String createType;
-
     @Transient
     private String existFileFlag;
+    @Transient
+    @Getter @Setter
+    private String overrunState;
 
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
