@@ -10,6 +10,9 @@ import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import org.joda.time.DateTime;
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -23,6 +26,7 @@ import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.view.sysutil.UserContextService;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.service.asset.QrCodeExportStream;
@@ -183,6 +187,47 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
+    }
+
+    @Override
+    public void onFilter(FilterEvent event) {
+        if(searchFilters==null) searchFilters = new ArrayList<SearchFilter>();
+        searchFilters.clear();
+
+        if(getFiltersFromDynaColumns()) return;
+
+        getFilterMatchModes((DataTable)event.getComponent());
+        for(Map.Entry<String, Object> filter: event.getFilters().entrySet()){
+            String fieldName = filter.getKey();
+            Object filterValue = filter.getValue();
+            if(filterValue==null) continue;
+
+            if(isDateTimeField(fieldName)){
+
+                if(filterValue!=null){
+                    // support lte & gte for datetime field
+                    String[] value = filterValue.toString().split("~");
+                    if(StringUtils.hasText(value[0])){
+                        Date from = TimeUtil.fromString("yyyy-MM-dd HH:mm:ss", value[0]).toDate();
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, from));
+                    }
+                    if(value.length > 1){
+                        if(StringUtils.hasText(value[1])){
+                            Date to = TimeUtil.fromString("yyyy-MM-dd HH:mm:ss", value[1]).toDate();
+                            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, to));
+                        }
+                    }
+
+                }
+                continue;
+            }
+
+            String matchMode = filterMatchModes.get(fieldName);
+            addFilter(fieldName, matchMode, filterValue);
+        }
+
+        setSiteFilter();
+        setHospitalFilter();
     }
 
     @Override
