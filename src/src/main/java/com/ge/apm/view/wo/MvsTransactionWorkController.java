@@ -316,7 +316,7 @@ public class MvsTransactionWorkController extends GenericCRUDUUIDController<EHom
                     break;
                 }
             }
-            List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(objectIds);
+            List<FileInfoResult> fileInfoResults = fileDownloadService.getNotByteFileInfoForEhome(objectIds);
             List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif");
             if (fileInfoResults == null) {
                 fileInfoResults = new ArrayList<>();
