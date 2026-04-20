@@ -24,7 +24,8 @@ public interface ConfigItemValueRepository extends GenericRepositoryUUID<ConfigI
             " coalesce(t5.tenant_uid,t4.tenant_uid,t3.tenant_uid,t2.tenant_uid) AS tenant_uid, " +
             " coalesce(t5.institution_uid,t4.institution_uid,t3.institution_uid,t2.institution_uid) AS institution_uid, " +
             " coalesce(t5.hospital_uid,t4.hospital_uid,t3.hospital_uid,t2.hospital_uid) AS hospital_uid, " +
-            " coalesce(t5.site_uid,t4.site_uid,t3.site_uid,t2.site_uid) AS site_uid " +
+            " coalesce(t5.site_uid,t4.site_uid,t3.site_uid,t2.site_uid) AS site_uid, " +
+            " coalesce(t5.custom_value,t4.custom_value,t3.custom_value,t2.custom_value) AS custom_value " +
             " FROM config_item t1 " +
             " LEFT JOIN config_item_value t2 ON t1.KEY = t2.KEY AND t2.site_uid = ?4 " +
             " LEFT JOIN config_item_value t3 ON t1.KEY = t3.KEY AND t3.site_uid = ?3 " +
