@@ -619,7 +619,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         attachListEhme = blobObjectRepository.findByBoUuidAndBoType(selected.getId(),  V2_BlobObject.BO_SUB_TYPE_EHOME);
         if(!CollectionUtils.isEmpty(attachListEhme)){
             Set<String> objectIds = attachListEhme.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
-            List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(objectIds);
+            List<FileInfoResult> fileInfoResults = fileDownloadService.getNotByteFileInfoForEhome(objectIds);
             List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif");
             if (fileInfoResults == null) {
                 fileInfoResults = new ArrayList<>();

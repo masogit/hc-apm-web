@@ -71,6 +71,18 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return ListUtil.empty();
     }
 
+    public List<FileInfoResult> getNotByteFiles(Collection<String> fileIds) {
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+        String gatewayURL = getGatewayURL(GatewayURL.GET_NOT_BYTE_FILES);
+        HttpEntity<Collection<String>> httpEntity = new HttpEntity<>(fileIds, headers);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, httpEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return JSON.parseArray(JSON.toJSONString(responseMap.get("data")), FileInfoResult.class);
+        }
+        return ListUtil.empty();
+    }
+
     public String getImgBase64(String fileId) {
         String res = "data:image/jpeg;base64,";
         try {

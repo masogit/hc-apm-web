@@ -24,6 +24,7 @@ public enum GatewayURL {
     DELETE_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
     DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/download"),
     GET_FILES("/hcapmobjecthubservice/api/apm/objectHub/objects/getByIdIn"),
+    GET_NOT_BYTE_FILES("/hcapmobjecthubservice/api/apm/objectHub/objects/getNotByteByIdIn"),
     AUTH_DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/auth/download"),
     SEARCH_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
 
