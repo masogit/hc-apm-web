@@ -207,11 +207,31 @@
 
 
             <h:panelGroup>
-                <label class="label">#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').name.concat('(').concat(systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').key).concat(')')}</label>
+               <!-- <label class="label">#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').name.concat('(').concat(systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
-                </p:selectOneRadio>
+                </p:selectOneRadio>-->
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">是否显示</label>
+                        <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').fieldColumnDto.rendered}" style="width: 30%;">
+                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">是否必填</label>
+                        <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').fieldColumnDto.required}" style="width: 30%;">
+                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">必填提示</label>
+                        <p:inputText value="#{systemConfigItemController.configItemMap.get('pmOrderShowTravelTime').fieldColumnDto.requiredMessage}" maxlength="300" />
+                    </h:panelGroup>
+                </p:panelGrid>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>

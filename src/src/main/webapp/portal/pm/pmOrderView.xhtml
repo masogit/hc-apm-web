@@ -92,7 +92,7 @@
                                 <p:outputLabel value="#{v2PmOrderController.selected.originalPmNum}"></p:outputLabel>
                             </h:panelGroup>
 
-                            <h:panelGroup rendered="#{!userContextService.isEnableBtnByKey('pmOrderShowTravelTime')}">
+                            <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'pmOrderShowTravelTime').rendered}">
                                 <label class="label">#{msg.travelTime}</label>
                                 <p:outputLabel id="travel_time"  value="#{v2PmOrderController.selected.travelTime}" />
                             </h:panelGroup>

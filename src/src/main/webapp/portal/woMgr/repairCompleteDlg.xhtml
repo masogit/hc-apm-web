@@ -378,9 +378,10 @@
                                 </p:column>
                             </p:dataTable>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{workOrderMgrController.workOrderShowTravelTime}">
-                            <label class="label">#{msg.travelTime}</label>
-                            <p:inputNumber minValue="0" maxValue="999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.travelTime}" >
+                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').rendered}">
+                            <label class="label">#{msg.travelTime}#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').required ? '*' : ''}</label>
+                            <p:inputNumber minValue="0" maxValue="999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.travelTime}" required="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').required}"
+                                           requiredMessage="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').requiredMessage}" >
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
