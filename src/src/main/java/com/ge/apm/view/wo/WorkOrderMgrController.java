@@ -421,8 +421,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("displayModeCasePriority", loginUser.getSiteUID());
             displayModeCasePriority = Optional.ofNullable(displayModeCasePriorityValue).map(ConfigItemValue::getValue).orElse("key");
 
-            ConfigItemValue autoDispatchAllowClaimByAssigneeValue = configItemValueRepository.findFirstByKeyAndSiteUid("autoDispatchAllowClaimByAssignee", loginUser.getSiteUID());
-            autoDispatchAllowClaimByAssignee = Optional.ofNullable(autoDispatchAllowClaimByAssigneeValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
+            String autoDispatchAllowClaimByAssigneeValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID(),"autoDispatchAllowClaimByAssignee");
+            autoDispatchAllowClaimByAssignee= Boolean.TRUE.toString().equalsIgnoreCase(autoDispatchAllowClaimByAssigneeValue);
             selectedBatchMap = new HashMap<>();
             currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
             enableAuditGroupConfiguration();
