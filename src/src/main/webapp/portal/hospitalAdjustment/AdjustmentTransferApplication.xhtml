@@ -56,6 +56,26 @@
 <!--                </h:form>-->
 
                 <h:form id="AssetDetailListForm">
+                    <h:panelGroup>
+                        <p:overlayPanel appendTo="AssetDetailListForm" widgetVar="varPanelOrg1" for="AssetDetailListForm:datalist:btnOrg1" hideEffect="fade" dynamic="false" modal="false" >
+                            <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="AssetDetailListForm:treeNodeNameFilter @this" update="AssetDetailListForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="AssetDetailListForm:treeNodeNameFilter @this" update="AssetDetailListForm" value="确定"/>
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{adjustmentTransferApplicationController.siteOrgTree}" selection="#{adjustmentTransferApplicationController.selectedAccessOrgNodes}" var="node" selectionMode="checkbox" dynamic="false" cache="false" propagateSelectionUp="#{orgTreeController.propagateSelectionUp}">
+                                    <p:ajax process="@this" event="select" listener="#{adjustmentTransferApplicationController.onSelectSiteTreeNode}"/>
+                                    <p:ajax process="@this" event="unselect" listener="#{adjustmentTransferApplicationController.onUnSelectSiteTreeNode}"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                         <p:commandButton value="借出工单"  rendered="#{!userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"    process="@this" update="AssetDetailListForm"  disabled="#{adjustmentTransferApplicationController.buttonType==1}"  actionListener="#{adjustmentTransferApplicationController.buttonTypeChange(1)}" />
                         <p:commandButton value="借入工单"   rendered="#{!userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"  process="@this" update="AssetDetailListForm"  disabled="#{adjustmentTransferApplicationController.buttonType==2}"  actionListener="#{adjustmentTransferApplicationController.buttonTypeChange(2)}" />
@@ -136,7 +156,7 @@
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.idleEquipmentStock.assetInfo.assetGroup)}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.stockSiteUid}"
+                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.stockSiteUid}"  filterBy="#{item.stockSiteUid}" filterMatchMode="EQ"
                                 >
                             <f:facet name="filter">
                                 <p:autoComplete id="btnOrg1" value="请选择院区" type="button" icon="fa fa-angle-down"
@@ -146,9 +166,15 @@
                                     value="#{adjustmentTransferApplicationController.getSiteOrgName(item.stockSiteUid)}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.stockDeptName}"
-                                  filterMatchMode="LIKE" >
-                            <h:outputText value="#{item.stockDeptName}"/>
+                        <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.stockDeptUid}"
+                                  filterMatchMode="EQ"  width="100" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{adjustmentTransferApplicationController.fileterOrgName}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{adjustmentTransferApplicationController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{idleEquipmentStockController.getSiteOrgName(item.stockDeptUid)}"/>
                         </p:column>
                         <c:if test="#{columnItem eq 'manufacture'}">
                             <p:column headerText="#{msg.manufacture}" sortBy="#{item.idleEquipmentStock.assetInfo.manufacture}"
@@ -174,8 +200,8 @@
                                     value="#{adjustmentTransferApplicationController.getSiteOrgName(item.borrowHospitalUid)}"/>
                         </p:column>
 
-                        <p:column headerText="借入科室" filterBy="#{item.borrowDeptUid}"
-                                  filterMatchMode="LIKE">
+                        <p:column headerText="借入科室"
+                               >
                             <h:outputText
                                     value="#{adjustmentTransferApplicationController.getSiteOrgName(item.borrowDeptUid)}"/>
                         </p:column>

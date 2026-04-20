@@ -65,7 +65,9 @@
                             <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                         </h:outputText>
                     </p:column>
-
+                    <p:column headerText="创建人"  filterBy="#{item.createdName}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.createdName}"/>
+                    </p:column>
                     <p:column headerText="修改人"  filterBy="#{item.lastModifiedUserAccount.name}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.lastModifiedUserAccount.name}"/>
                     </p:column>

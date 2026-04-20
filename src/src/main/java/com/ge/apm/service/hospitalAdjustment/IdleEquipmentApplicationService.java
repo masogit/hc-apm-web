@@ -49,7 +49,7 @@ public class IdleEquipmentApplicationService {
     private AssetInfoRepository assetInfoRepository;
     @Transactional
     public void idleEquipmentApproval(IdleEquipmentApplication selected, UserAccount currentUserAccount){
-
+        AssetInfo assetInfo = assetInfoRepository.findByUid(selected.getAssetUid());
         IdleEquipmentStock idleEquipmentStock = new IdleEquipmentStock();
         idleEquipmentStock.setStatus(1);
         idleEquipmentStock.setCreatedDate(new Date());
@@ -61,6 +61,7 @@ public class IdleEquipmentApplicationService {
         idleEquipmentStock.setStockDeptUid(selected.getStockDeptUid());
         idleEquipmentStock.setStockHospitalUid(selected.getStockHospitalUid());
         idleEquipmentStock.setTenantUid(currentUserAccount.getTenantUID());
+        idleEquipmentStock.setInstitutionUid(assetInfo.getInstitutionUID());
         stockRepository.save(idleEquipmentStock);
         dao.save(selected);
     }
