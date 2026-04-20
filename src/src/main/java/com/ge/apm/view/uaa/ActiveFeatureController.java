@@ -1,21 +1,17 @@
 package com.ge.apm.view.uaa;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.ge.apm.dao.AdminCustomActiveRepository;
 import com.ge.apm.dao.AdminFeatureActiveRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.AdminFeatureActive;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmAdminActiveFeature;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,10 +35,9 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
     private static final Logger log = LoggerFactory.getLogger(ActiveFeatureController.class);
 
     private TenantInfoRepository tenantInfoRepository;
-    private ConfigCacheService configCacheService;
     private AdminFeatureActiveRepository dao;
     private OrgInfoRepository orgDao;
-    private UserCommonService userService;
+    private AdminCustomActiveRepository customActiveRepository;
 
     @Getter
     @Setter
@@ -66,6 +61,14 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
 
     @Getter
     @Setter
+    private Map<String, Boolean> selectCustomFunctionMap = new HashMap<>();
+
+    @Getter
+    @Setter
+    private Map<String, Boolean> oldCustomFunctionMap = new HashMap<>();
+
+    @Getter
+    @Setter
     private OrgInfo selectHospital;
 
     @Getter
@@ -80,6 +83,8 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
     @Setter
     private boolean confirm = false;
 
+    private Map<String, String> customActive = new HashMap<>();
+
     @Override
     protected void init() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -91,11 +96,11 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
         if (userContextService.getLoginUser() == null || !StringUtils.hasText(hospitalUID)) {
             return;
         }
-        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-        userService = WebUtil.getBean(UserCommonService.class);
         dao = WebUtil.getBean(AdminFeatureActiveRepository.class);
+        customActiveRepository = WebUtil.getBean(AdminCustomActiveRepository.class);
+
         selectHospital = orgDao.findByUid(hospitalUID);
         if (ObjectUtils.isEmpty(selectHospital)) {
             return;
@@ -105,8 +110,9 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
             WebUtil.redirectTo("/accessdeniedzh.xhtml");
             return;
         }
+        customActive = customActiveRepository.findByTenantUIDAndHospitalUIDIsNull(selectHospital.getTenantUID()).stream().collect(Collectors.toMap(AdminCustomActive::getFeatureKey, AdminCustomActive::getActiveComment));
         buildActiveMap(tenantInfo.getFeatureList());
-
+        buildCustomActiveMap();
     }
 
     @Override
@@ -118,6 +124,7 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
         adminFeatureActives = dao.findByHospitalUID(selectHospital.getUid());
         List<String> hasFeature = adminFeatureActives.stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toList());
         List<String> featureList = JSONArray.parseArray(features).toJavaList(String.class);
+        featureList.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED.name());
         List<ApmAdminActiveFeature> waitActiveList = Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
         waitActiveList.forEach(v -> {
             if (hasFeature.contains(v.name())) {
@@ -127,9 +134,24 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
         });
     }
 
+    private void buildCustomActiveMap() {
+        List<AdminCustomActive> allCustomFeature = customActiveRepository.findByTenantUID(selectHospital.getTenantUID());
+        allCustomFeature.forEach(v -> {
+            if (selectHospital.getUid().equals(v.getHospitalUID())) {
+                selectCustomFunctionMap.put(v.getFeatureKey(), true);
+                oldCustomFunctionMap.put(v.getFeatureKey(), true);
+            }
+        });
+    }
+
     public List<ApmAdminActiveFeature> findAdminActiveFeatures() {
         List<String> featureList = JSONArray.parseArray(tenantInfo.getFeatureList()).toJavaList(String.class);
+        featureList.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED.name());
         return Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
+    }
+
+    public List<String> findAdminActiveCustomFeatures() {
+        return customActiveRepository.findByTenantUIDAndHospitalUIDIsNull(selectHospital.getTenantUID()).stream().map(AdminCustomActive::getFeatureKey).collect(Collectors.toList());
     }
 
     public void featureChange(String feature) {
@@ -140,25 +162,48 @@ public class ActiveFeatureController extends GenericCRUDUUIDController<AdminFeat
 
     public void addHospital() {
         selectFeatureMap = selectFeatureMap.entrySet().stream().filter(entry -> entry.getValue() && null == oldFeatureMap.get(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        if (CollectionUtils.isEmpty(selectFeatureMap)) {
+        selectCustomFunctionMap = selectCustomFunctionMap.entrySet().stream().filter(entry -> entry.getValue() && null == oldCustomFunctionMap.get(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        if (CollectionUtils.isEmpty(selectFeatureMap) && CollectionUtils.isEmpty(selectCustomFunctionMap)) {
             buildActiveMap(tenantInfo.getFeatureList());
+            buildCustomActiveMap();
             MessageUtil.outPutReturnFacesMessage("请勾选需要激活的功能", FacesMessage.SEVERITY_INFO);
             return;
         }
-        UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
-        adminFeatureActive.setHospitalUID(selectHospital.getUid());
-        adminFeatureActive.setTenantUID(tenantInfo.getUid());
-        adminFeatureActive.setActiveUser(userAccount.getUid());
-        adminFeatureActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
-        adminFeatureActive.setCreateDate(new Date());
-        adminFeatureActive.setActiveDate(new Date());
-        selectFeatureMap.forEach((k, v) -> {
-            adminFeatureActive.setId(null);
-            adminFeatureActive.setFeatureKey(k);
-            dao.save(adminFeatureActive);
-        });
+        if (!CollectionUtils.isEmpty(selectFeatureMap)) {
+            // 处理系统激活功能项目
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            AdminFeatureActive adminFeatureActive = new AdminFeatureActive();
+            adminFeatureActive.setHospitalUID(selectHospital.getUid());
+            adminFeatureActive.setTenantUID(tenantInfo.getUid());
+            adminFeatureActive.setActiveUser(userAccount.getUid());
+            adminFeatureActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
+            adminFeatureActive.setCreateDate(new Date());
+            adminFeatureActive.setActiveDate(new Date());
+            selectFeatureMap.forEach((k, v) -> {
+                adminFeatureActive.setId(null);
+                adminFeatureActive.setFeatureKey(k);
+                dao.save(adminFeatureActive);
+            });
+        }
+        // 处理自定义激活功能项目
+        if (!CollectionUtils.isEmpty(selectCustomFunctionMap)) {
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            AdminCustomActive adminCustomActive = new AdminCustomActive();
+            adminCustomActive.setHospitalUID(selectHospital.getUid());
+            adminCustomActive.setTenantUID(tenantInfo.getUid());
+            adminCustomActive.setActiveUser(userAccount.getUid());
+            adminCustomActive.setActiveRole(userAccount.getRoleNames().stream().collect(Collectors.joining(",")));
+            adminCustomActive.setCreateDate(new Date());
+            adminCustomActive.setActiveDate(new Date());
+            selectCustomFunctionMap.forEach((k, v) -> {
+                adminCustomActive.setActiveComment(customActive.get(k));
+                adminCustomActive.setId(null);
+                adminCustomActive.setFeatureKey(k);
+                customActiveRepository.save(adminCustomActive);
+            });
+        }
         buildActiveMap(tenantInfo.getFeatureList());
+        buildCustomActiveMap();
         MessageUtil.outPutReturnFacesMessage("保存成功", FacesMessage.SEVERITY_INFO);
     }
 

@@ -113,9 +113,11 @@
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{workOrderMgrController.showDigitalSignature()}">
-                        <label class="label">#{msg.diagnosticProcess}</label>
-                        <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.diagnosticProcess}" rows="3"  cols="40"  maxlength="500"   >
+
+                    <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showDiagnosticProcess').rendered}">
+                        <label class="label">#{msg.diagnosticProcess}#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').required ? '*' : ''}</label>
+                        <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.diagnosticProcess}" rows="3"  cols="40"  maxlength="500" required="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showDiagnosticProcess').required}"
+                                         requiredMessage="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showDiagnosticProcess').requiredMessage}" >
                             <p:ajax />
                         </p:inputTextarea>
                     </h:panelGroup>
@@ -200,26 +202,26 @@
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==0 || workOrderMgrController.selectedWorkOrder.entryType==2  || workOrderMgrController.selectedWorkOrder.entryType==null}">
-                            <label class="label">#{workOrderMgrController.getManHourShow()}</label>
+                            <label class="label">#{workOrderMgrController.getManHourShow()}(小时)</label>
                             <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selectedWorkOrder.entryType==1 || workOrderMgrController.selectedWorkOrder.entryType==3}">
-                            <label class="label">#{workOrderMgrController.getManHourShow()}</label>
+                            <label class="label">#{workOrderMgrController.getManHourShow()}(小时)</label>
                             <p:inputNumber id="manHours_input2" readonly="true" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.otherExpense}</label>
-                            <p:inputNumber minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" >
+                            <p:inputNumber minValue="0" maxValue="99999999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" >
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.ExternalExpenses}</label>
-                            <p:inputNumber  minValue="0"  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}">
+                            <p:inputNumber  minValue="0"  maxValue="99999999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
@@ -319,9 +321,9 @@
                                     </p:column>
                                 </c:if>
                                 <p:column headerText="#{msg.Actions}">
-                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
-                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditAccDetail(item)}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />
-                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,1)}" update="@(.accessList) woTab:repairCompleteDialogForm:addContractor" rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}">
+                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" disabled="#{workOrderMgrController.selectedWorkOrder.approvalStatus eq '1' or workOrderMgrController.selectedWorkOrder.approvalStatus eq '5'}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
+                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditAccDetail(item)}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id ne '000'}" disabled="#{workOrderMgrController.selectedWorkOrder.approvalStatus eq '1' or workOrderMgrController.selectedWorkOrder.approvalStatus eq '5'}"/>
+                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,1)}" update="@(.accessList) woTab:repairCompleteDialogForm:addContractor" rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}" disabled="#{workOrderMgrController.selectedWorkOrder.approvalStatus eq '1' or workOrderMgrController.selectedWorkOrder.approvalStatus eq '5'}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                     <h:outputText value="#{msg.Approved2}" rendered="#{item.id ne '000' and ( empty item.approved? false: item.approved)}" />
@@ -426,9 +428,9 @@
                 </p:fieldset>
                 <h:panelGroup id="commandButtonId">
                     <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
-                    <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);"/>
-                    <p:commandButton validateClient="false" id="oldApproval" style="display:none"    immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check"  rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                    <p:commandButton validateClient="true" immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check"  oncomplete="handleCheckApprovalCompletes(xhr, status, args);" />
+                    <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);" disabled="#{workOrderMgrController.selectedWorkOrder.approvalStatus eq '1' or workOrderMgrController.selectedWorkOrder.approvalStatus eq '5'}"/>
+                    <p:commandButton validateClient="false" id="oldApproval" style="display:none"    immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check"  rendered="#{!userContextService.hasCurrentTenantName('')}" disabled="#{workOrderMgrController.selectedWorkOrder.approvalStatus eq '1' or workOrderMgrController.selectedWorkOrder.approvalStatus eq '5'}"/>
+                    <p:commandButton validateClient="true" immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check"  oncomplete="handleCheckApprovalCompletes(xhr, status, args);" disabled="#{workOrderMgrController.selectedWorkOrder.approvalStatus eq '1' or workOrderMgrController.selectedWorkOrder.approvalStatus eq '5'}"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
                 </h:panelGroup>
             </h:panelGroup>

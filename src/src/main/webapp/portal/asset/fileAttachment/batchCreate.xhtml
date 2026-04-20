@@ -196,7 +196,7 @@
                                     <f:facet name="header">#{item.label}</f:facet>
                                     <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
-                                    <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload5" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload_#{item.boType}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>

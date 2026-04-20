@@ -12,6 +12,8 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.component.tree.TreeDragDropInfo;
+import org.primefaces.event.DragDropEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -59,6 +61,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String  contactPhone;
     private Integer failureType;
     private String orgCode;
+    private String gradeNature;
+
+    private String region;
     private UserCommonService userCommonService;
     private ConfigCacheService configCacheService;
 
@@ -141,7 +146,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         } else {
             orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid());
         }
-        TreeNodeUtil.sortTreeNodeByName(orgTree);
+        //TreeNodeUtil.sortTreeNodeByName(orgTree);
 
         TreeNode currentOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, currentOrg);
 
@@ -357,6 +362,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return false;
     }
 
+    public boolean checkGradeNature() {
+        if (StringUtils.isEmpty(gradeNature)) {
+            return false;
+        }
+        OrgInfo orgInfo = dao
+                .findFirstByTenantUIDAndOrgCode(selected.getTenantUID(), orgCode);
+        if (orgInfo != null&&!orgCode.equals(selected.getOrgCode())) {
+            WebUtil.addErrorMessage(orgCode + "已经存在");
+            return true;
+        }
+        return false;
+    }
+
     public void saveSelectedOrg() {
         //判断是否有权限(只能操作当前登录用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
@@ -387,6 +405,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setAddress(address);
         selected.setContactPerson(contactPerson);
         selected.setContactPhone(contactPhone);
+        selected.setGradeNature(gradeNature);
+        selected.setRegion(region);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
         configCacheService.cleanOrgInfoCacheByUid(selected.getUid());
@@ -428,6 +448,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         contactPerson = null;
         contactPhone = null;
         orgCode = null;
+        gradeNature = null;
+        region = null;
     }
 
     public void buildOrdTree46AfterSave(String institutionUID) {
@@ -676,6 +698,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = selected.getAddress();
         contactPerson = selected.getContactPerson();
         contactPhone = selected.getContactPhone();
+        gradeNature = selected.getGradeNature();
+        region = selected.getRegion();
         if (selected != null) {
             isShow = selected.getOrgType() == 2;
             acShow = selected.getOrgType() == 4;
@@ -709,6 +733,45 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return false;
     }
 
+    public boolean  onDrop(TreeDragDropInfo info){
+        OrgInfo drapNode = (OrgInfo) info.getDragNode().getData();
+        OrgInfo dropNode = (OrgInfo) info.getDropNode().getData();
+        if(!drapNode.getParentUID().equals(dropNode.getUid())){
+            return false;
+        }
+        //计算最后位置 正 -1 反
+        int dropIndex = info.getDropIndex();
+        if(drapNode.getOrgIndex() != null){
+            if(drapNode.getOrgIndex()  < dropIndex){
+                dropIndex--;
+            }
+        }
+
+        List<OrgInfo> directChildren = uaaService.getDirectChildrenFromTree(orgTree, dropNode.getUid());
+        directChildren.removeIf(child -> child.getUid().equals(drapNode.getUid()));
+
+        List<OrgInfo> changes = new ArrayList<>();
+        int index = 0;
+        for(OrgInfo orgInfo : directChildren){
+            if(index == dropIndex){
+                drapNode.setOrgIndex(index);
+                changes.add(drapNode);
+                index++;
+            }
+
+            orgInfo.setOrgIndex(index);
+            changes.add(orgInfo);
+            index++;
+        }
+
+        if(CollectionUtils.isNotEmpty(changes)){
+            dao.save(changes);
+            buildOrdTree();
+        }
+
+        return true;
+    }
+
     public boolean getAcShow() {
         return acShow;
     }
@@ -735,6 +798,22 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public String getOrgCode() {
         return orgCode;
+    }
+
+    public String getGradeNature() {
+        return gradeNature;
+    }
+
+    public void setGradeNature(String gradeNature) {
+        this.gradeNature = gradeNature;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public void setOrgCode(String orgCode) {

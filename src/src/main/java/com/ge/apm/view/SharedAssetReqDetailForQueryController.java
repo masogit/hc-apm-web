@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
@@ -63,7 +64,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetSwapIndexRepository swapIndexRepository=null;
     private UaaService uuaService;
     private CustomConfigService ccService;
-    @Autowired
+
     SharedAssetReqDetailService sharedAssetReqDetailService;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private Date filterBeginTime;
@@ -460,5 +461,15 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             e.printStackTrace();
         }
         return  null;
+    }
+    public void deleteRecord(){
+        try {
+            sharedAssetReqDetailService.deleteRecord(selected,dao,asiDao,sharedDao,apdDao);
+            this.selected = null;
+        } catch (Exception e) {
+            logger.error("deleteRecord 目标方法执行失败 ,e: ", e);
+            WebUtil.addErrorMessage(e.getMessage());
+        }
+
     }
 }

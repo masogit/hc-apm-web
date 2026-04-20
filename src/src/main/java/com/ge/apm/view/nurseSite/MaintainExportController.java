@@ -145,9 +145,9 @@ public class MaintainExportController {
         if (ObjectUtil.isNotEmpty(status)) {
             param.put("status", status);
         }
-        if (currentUser.isEnableAssetTypeGroup()) {
-            param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
-        }
+//        if (currentUser.isEnableAssetTypeGroup()) {
+//            param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
+//        }
         if (this.selectedOrg == null && (this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1)) {
             param.put("orgUidList", orgUidList);
         } else {

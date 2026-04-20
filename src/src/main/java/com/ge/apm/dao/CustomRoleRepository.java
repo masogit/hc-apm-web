@@ -26,4 +26,8 @@ public interface CustomRoleRepository extends GenericRepository<CustomRole> {
 
 
     List<CustomRole> findByTenantUIDAndNameIn(String tenantUID, List<String> newRoleNames);
+
+    @Query(value = "select  *  from  custom_role   where  tenant_uid=?1 ", nativeQuery = true)
+    List<CustomRole> findByTenantUidAndFunctionListContains(String tenantUid );
+
 }

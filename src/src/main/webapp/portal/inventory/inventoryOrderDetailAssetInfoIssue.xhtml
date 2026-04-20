@@ -90,6 +90,9 @@
 				</p:selectOneMenu>
 			</f:facet>
 		</p:column>
+		<p:column headerText="#{msg.assetOwnerName}" filterBy="#{item.assetInfo.assetOwnerName}" filterMatchMode="LIKE" rendered="#{inventoryOrderDetailAssetInfoIssueController.inventoryDisplayRepairOwner}">
+			<h:outputText value="#{item.assetInfo.assetOwnerName}" />
+		</p:column>
 		<p:column headerText="#{msg.Actions}" style="width: 130px" rendered="#{!inventoryOrderDetailAssetInfoController.finished}" exportable="false">
 			<p:commandButton id="updateButton" value="转入已盘点" actionListener="#{inventoryOrderDetailAssetInfoIssueController.transferInventorized(item)}"
 							 update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoIssueListForm :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm"

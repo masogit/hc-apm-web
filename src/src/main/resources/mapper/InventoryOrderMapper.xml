@@ -54,6 +54,9 @@
             <if test="locationName != null">
                 AND t.locationName like concat('%',#{locationName},'%')
             </if>
+            <if test="assetOwnerName != null">
+                AND t.assetOwnerName like concat('%',#{assetOwnerName},'%')
+            </if>
             <if test="isSolved != null">
                 AND t.isSolved = #{isSolved}
             </if>
@@ -100,6 +103,7 @@
                 ai.purchase_date purchaseDate,
                 ai.comments assetComments,
                 ai.make_short_name makerShortName,
+                ai.asset_owner_name assetOwnerName,
                 u.name inventoryName,
                 CASE WHEN iod.last_modified_date > ii.last_modified_date THEN iod.comment WHEN ii.comment IS NOT NULL THEN ii.comment ELSE iod.comment end,
                 CASE WHEN iod.last_modified_date > ii.last_modified_date THEN '' WHEN ii.is_solved = TRUE THEN '是' WHEN ii.is_solved = FALSE THEN '否' ELSE '' END isSolved,
@@ -270,7 +274,7 @@
 
     <sql id="noneOrderCondition">
         (
-        SELECT ai.id,ai.uid,ai.name,ai.clinical_dept_uid clinicalDeptUid,ai.clinical_dept_name clinicalDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName
+        SELECT ai.id,ai.uid,ai.name,ai.clinical_dept_uid clinicalDeptUid,ai.clinical_dept_name clinicalDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName, ai.asset_owner_name assetOwnerName
         FROM asset_info ai LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id
         <if test="orderIdList != null and orderIdList.size > 0">
             AND iod.inventory_order_id IN

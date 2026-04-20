@@ -41,8 +41,7 @@ public class QrCodeLib implements Serializable {
     @Size(max = 64)
     private String qrCode;
     @Column(name = "issue_date")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date issueDate;
     @Column(name = "submit_date")
     @Temporal(TemporalType.TIMESTAMP)
@@ -133,6 +132,8 @@ public class QrCodeLib implements Serializable {
     @Column(name = "lifecycle")
     private Double lifecycleInYear;
 
+    @Column(name = "asset_classification32")
+    private String assetClassification32;
     public String getDepartNum() {
         return departNum;
     }
@@ -441,5 +442,13 @@ public class QrCodeLib implements Serializable {
 
     public void setLifecycleInYear(Double lifecycleInYear) {
         this.lifecycleInYear = lifecycleInYear;
+    }
+
+    public String getAssetClassification32() {
+        return assetClassification32;
+    }
+
+    public void setAssetClassification32(String assetClassification32) {
+        this.assetClassification32 = assetClassification32;
     }
 }

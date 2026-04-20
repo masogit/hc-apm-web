@@ -57,7 +57,7 @@ public class HisEquipmentDataSource implements Serializable {
 
     @Column(name = "exec_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     Date execTime; //执行时间
 
     @Column(name = "exec_dept")

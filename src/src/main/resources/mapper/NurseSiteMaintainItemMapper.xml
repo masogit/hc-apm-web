@@ -27,7 +27,7 @@
 
     <select id="findJoinAssetList" resultMap="maintainBean">
         select nsmi.* from nurse_site_maintain_item nsmi left join asset_info ai on nsmi.asset_uid = ai.uid
-        <where>${ew.sqlSegment}</where>
+        <where>${ew.sqlSegment}</where> order by id
     </select>
 
 </mapper>

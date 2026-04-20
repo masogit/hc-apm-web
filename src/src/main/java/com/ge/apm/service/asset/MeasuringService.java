@@ -24,14 +24,10 @@ import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.PdfReader;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.primefaces.model.UploadedFile;
@@ -40,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -49,8 +44,6 @@ import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.nio.charset.Charset;
@@ -67,8 +60,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static org.primefaces.component.inputnumber.InputNumber.PropertyKeys.type;
 
 
 /**
@@ -490,13 +481,15 @@ public class MeasuringService {
         return resultList;
     }
     public List<MeasuringCertificateDetail> handleZipOCR(UploadedFile file,UserAccount account,String identifyPatterns) throws IOException {
+        String identifyPostProcessorRule = configItemService.getConfigItemByKeyToString("identifyPostProcessorRule",account);
+        JSONObject ruleJSON = getRuleJSON(identifyPostProcessorRule);
         List<MeasuringCertificateDetail> resultList = new ArrayList<>();
         progress = 0;
         // 获取压缩文件中的每个子文件
         try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
-                List<MeasuringCertificateDetail> detailList = handleOcr(zipInputStream, entry,identifyPatterns);
+                List<MeasuringCertificateDetail> detailList = handleOcr(zipInputStream, entry,identifyPatterns,ruleJSON);
                 resultList.addAll(detailList);
                 progress ++;
             }
@@ -508,7 +501,7 @@ public class MeasuringService {
         resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         return resultList;
     }
-    public List<MeasuringCertificateDetail> handleOcr(ZipInputStream zis,ZipEntry entry,String identifyPatterns){
+    public List<MeasuringCertificateDetail> handleOcr(ZipInputStream zis, ZipEntry entry, String identifyPatterns, JSONObject ruleJSON){
         File newFile = null;
         List<MeasuringCertificateDetail> measuringCertificateDetailResult = new ArrayList<>();
         try {
@@ -542,6 +535,7 @@ public class MeasuringService {
                         if(StringUtils.isEmpty(cetificationId) || !cetificationIdList.add(cetificationId) ){
                             continue;
                         }
+                        postProcessorJSON(content,ruleJSON);
                         json.put("certificateNo", cetificationId);
                         json.put("assetManufacturer",content.getString("manufactory"));
                         json.put("checkPerson",content.getString("checked_by"));
@@ -586,6 +580,33 @@ public class MeasuringService {
             }
         }
         return null;
+    }
+    public JSONObject getRuleJSON(String ruleStr){
+        try {
+            if(StringUtils.isEmpty(ruleStr)) return null;
+            return JSONObject.parseObject(ruleStr);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(),e);
+            return null;
+        }
+    }
+
+    public void postProcessorJSON(JSONObject data,JSONObject ruleJSON){
+        LOGGER.info("data:{},ruleJSON:{}",data,ruleJSON);
+        if(ruleJSON == null || ruleJSON.isEmpty()) return;
+        for (Map.Entry<String, Object> stringObjectEntry : ruleJSON.entrySet()) {
+            String key = stringObjectEntry.getKey();
+            String regex =(String) stringObjectEntry.getValue();
+            String value =(String) data.get(key);
+            if(StringUtils.isEmpty(value))continue;
+            Pattern compile = Pattern.compile(regex);
+            Matcher matcher = compile.matcher(value);
+            if(matcher.find()){
+                String group = matcher.group(1);
+                data.put(key,group);
+            }
+        }
+        LOGGER.info("data:{}",data);
     }
     public List<WorkflowResponse> getWorkflowResponse(File newFile){
         ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -649,16 +670,21 @@ public class MeasuringService {
     private MeasuringCertificateDetail handleOcrResult(JSONObject data, File newFile,List<V2_BlobObject> v2BlobObjects) {
         MeasuringCertificateDetail result = null;
         JSONObject object= data;
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+
         try {
             result = new MeasuringCertificateDetail();
             String assetSN = object.getString("assetSN");
-            if(StringUtils.isEmpty(assetSN)) return null;
-            String[] split = assetSN.split("/");
-            List<SearchFilter> searchFilters = new ArrayList<>();
-            searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
-            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
-            List<AssetInfo> assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
+
+            List<AssetInfo> assetInfos=new ArrayList<>();
+            if(!StringUtils.isEmpty(assetSN)) {
+                String[] split = assetSN.split("/");
+                List<SearchFilter> searchFilters = new ArrayList<>();
+                searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
+                assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
+            };
+
 //            if(CollectionUtils.isEmpty(assetInfos)){
 //                result.setCertificateNo(object.getString("certificateNo"));
 //                result.setErrorInfo(assetSN + ",未匹配到设备");

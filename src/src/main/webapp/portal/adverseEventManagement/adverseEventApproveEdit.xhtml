@@ -41,7 +41,7 @@
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">不良事件工单类型<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventApproveController.selected.adverseEventType}" id="adverseEventType" layout="custom" required="true" requiredMessage="不良事件工单类型不能为空"  disabled="#{adverseEventApproveController.readOnlyCreateForm}">
+                                    <p:selectOneRadio value="#{adverseEventApproveController.selected.adverseEventType}" id="adverseEventType" layout="custom" required="true" requiredMessage="不良事件工单类型不能为空"  disabled="true">
                                         <p:ajax event="change" update=":AdverseEventApproveEditForm:accordionCreate:repairReportSendPlaceGroup" />
                                         <f:selectItem itemValue="1" />
                                         <f:selectItem itemValue="2" />
@@ -63,7 +63,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告人姓名<span style="color:red">*</span></label>
-                                    <p:inputText id="serialNum" value="#{adverseEventApproveController.selected.reporterName}" required="true" requiredMessage="报告人姓名不能为空" readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    <p:inputText id="serialNum" value="#{adverseEventApproveController.selected.reporterName}" required="true" requiredMessage="报告人姓名不能为空" readonly="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告日期<span style="color:red">*</span></label>
@@ -77,11 +77,11 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">发生地</label>
-                                    <p:inputText id="occurredPlace" value="#{adverseEventApproveController.selected.occurredPlace}"  readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    <p:inputText id="occurredPlace" value="#{adverseEventApproveController.selected.occurredPlace}"  readonly="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup id="repairReportSendPlaceGroup">
                                     <label class="label">设备报修发生场地<span style="color:red">#{adverseEventApproveController.selected.adverseEventType eq '2' ? '*' : ''}</span></label>
-                                    <p:selectOneMenu value="#{adverseEventApproveController.selected.repairReportSendPlace}" required="#{adverseEventApproveController.selected.adverseEventType eq '2' ? true :false}" disabled="#{adverseEventApproveController.readOnlyCreateForm}">
+                                    <p:selectOneMenu value="#{adverseEventApproveController.selected.repairReportSendPlace}" required="#{adverseEventApproveController.selected.adverseEventType eq '2' ? true :false}" disabled="true">
                                         <f:selectItem itemLabel="请选择"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('repairReportSendPlace')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>

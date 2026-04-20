@@ -171,6 +171,11 @@ public class InventoryOrderDetail implements Serializable {
     @Getter @Setter
     private String assetStatus;
 
+    @ExcelIgnore
+    @Transient
+    @Getter @Setter
+    private String assetOwnerName;
+
 
     @ExcelProperty(value = "采购价格",index = 5)
     @Transient

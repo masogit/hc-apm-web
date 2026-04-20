@@ -909,11 +909,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 //                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+9*"));
 //                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
 
-
                 if(autoDispatchAllowClaimByAssignee){
                     searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID2", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID3", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*3+8*"));
                 }
                 List<Integer> tagGroupAssets = getTagGroupAssets();
@@ -2771,6 +2773,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
     //保存一个备件
     public void saveItem(){
+        if(!userContextService.isEnableBtnByKey("enableCheckPartsPrice") && null ==itemDetail.getPartsPrice()){
+            WebUtil.addErrorMessage("维修工单备件预估单价必填！");
+            return;
+        }
         //合同价格"默认等于"预估单价
         if(itemDetail.getParts()==null && partsItem==null) {
             WebUtil.addErrorMessage("备件名称必填！");
@@ -4577,9 +4583,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
 
-    public Boolean showDigitalSignature() {
-        String showDiagnosticProcess = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(),loginUser.getTenantUID(), "showDiagnosticProcess");
-        return StrUtil.isNotEmpty(showDiagnosticProcess) && "true".equals(showDiagnosticProcess);
-    }
+
 }
 

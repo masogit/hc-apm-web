@@ -159,7 +159,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
             }
             Map<String, String> mm =  FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-            //if(!mm.containsKey("notGeAsset")){
+            boolean hasManagePending = zkbPartOrderUserConfigList.stream().anyMatch(c -> ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType()));
+            if(!hasManagePending){
                 for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
                     if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(c.getConfigType()) ||
                         ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(c.getConfigType())
@@ -173,7 +174,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         disableNotGeAsset = true;
                     }
                 }
-            //}
+            }
         }
 
         tenantInfoList = zkbPartOrderService.getSourceTenantInfoList();
@@ -362,6 +363,39 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             }else if(zkbPartOrderUserConfigList.size() == 3){
                 mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
                 pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+            }else if(zkbPartOrderUserConfigList.size() == 4){
+                String tsePendingStr = ZkbPartOrderStep.PartOrderStep.TsePending.toString();
+                String managePendingStr = ZkbPartOrderStep.PartOrderStep.ManagePending.toString();
+                // 提取非空且非空白的 configType
+                Set<String> configTypes = zkbPartOrderUserConfigList.stream().map(ZkbPartOrderUserConfig::getConfigType)
+                        .filter(Objects::nonNull).filter(ct -> !ct.trim().isEmpty()).collect(Collectors.toSet());
+                // 判断是否恰好包含 TsePending 和 ManagePending
+                boolean isTseAndManage = configTypes.contains(tsePendingStr)
+                        && configTypes.contains(managePendingStr);
+                if (isTseAndManage) {
+                    int totalPendingQty = 0;
+                    boolean tseFlag = true; // Tse如果配置多个，则只计算一次
+                    for (ZkbPartOrderUserConfig config : zkbPartOrderUserConfigList) {
+                        String configType = config.getConfigType();
+                        if (configType == null || configType.trim().isEmpty()) {
+                            continue; // 双重保险校验
+                        }
+                        Map<String, Object> mmCopy = new HashMap<>(mm);
+                        if (tsePendingStr.equals(configType) && tseFlag) {
+                            mmCopy.put("currentStep", tsePendingStr);
+                            totalPendingQty += zkbPartOrderMapper.queryPendCountByUserConfig(mmCopy);
+                            tseFlag = false;
+                        } else if (managePendingStr.equals(configType)) {
+                            if (StringUtils.isNotEmpty(config.getZone())) {
+                                List<String> zones = Arrays.asList(config.getZone().split(","));
+                                mmCopy.put("zone", zones);
+                                mmCopy.put("currentStep", managePendingStr);
+                                totalPendingQty += zkbPartOrderMapper.queryPendCountByUserConfig(mmCopy);
+                            }
+                        }
+                    }
+                    pendingQty = totalPendingQty;
+                }
             }
         }
     }
@@ -393,12 +427,20 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             }
             List<ZkbPartOrderUserConfig> configList;
             if(ZkbPartOrder.DATA_TYPE_TEST.equals(zkbPartOrder.getDataType())){
-                configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                if (ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset())) {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.TsePending.name(), ZkbPartOrder.DATA_TYPE_TEST);
+                }else {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                }
             }else{
-                configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                if (ZkbConstantUtil.T.equals(zkbPartOrder.getNotGeAsset())) {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.TsePending.name(), ZkbPartOrder.DATA_TYPE_TEST);
+                } else {
+                    configList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByConfigTypeAndZoneContainsAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.TechnicalPending.name(), zkbPartOrder.getZone(), ZkbPartOrder.DATA_TYPE_TEST);
+                }
             }
             if(CollectionUtils.isNotEmpty(configList)){
-                List<String> names = configList.stream().map(ZkbPartOrderUserConfig::getName).collect(Collectors.toList());
+                List<String> names = configList.stream().map(ZkbPartOrderUserConfig::getName).distinct().collect(Collectors.toList());
                 String str = String.join(", ", names);
                 zkbPartOrder.setTechAuditer(str);
             }
@@ -541,6 +583,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                                 Predicate pre4 = builder.and(pre1, pre2);
                                 Predicate pre5 = builder.or(pre4, pre3);
                                 userConfigPredicates.add(pre5);*/
+                                userConfigPredicates.add(builder.isTrue(builder.literal(true)));
                             }
                         }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                             if (StringUtils.isEmpty(queryStatus)) {

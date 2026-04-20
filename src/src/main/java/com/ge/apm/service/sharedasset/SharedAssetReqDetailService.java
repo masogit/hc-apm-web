@@ -3,17 +3,28 @@ package com.ge.apm.service.sharedasset;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.SharedAssetReqDetailRepository;
+import com.ge.apm.dao.SharedAssetReqTypeRepository;
+import com.ge.apm.dao.SharedAssetRequestRepository;
 import com.ge.apm.dao.mapper.SharedAssetReqDetailMapper;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
+import com.ge.apm.domain.SharedAssetReqType;
+import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -93,5 +104,44 @@ public class SharedAssetReqDetailService {
             }
         }
         return ew;
+    }
+
+    @Transactional
+    public void deleteRecord(SharedAssetReqDetail detail, SharedAssetReqDetailRepository dao, AssetInfoRepository asiDao, SharedAssetRequestRepository sharedDao, SharedAssetReqTypeRepository apdDao){
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        String assetInfoId = detail.getAssetInfoId();
+        AssetInfo assetInfo = asiDao.findByUid(assetInfoId);
+        List<String> ids = new ArrayList<>();
+        String borrowId = detail.getBorrowId();
+        ids.add(borrowId);
+        String returnId = detail.getReturnId();
+        if(StringUtils.isNotEmpty(returnId)){
+            ids.add(returnId);
+        }else{
+            throw new RuntimeException("调剂设备未归还,不能删除!");
+        }
+        searchFilterList.add(new SearchFilter("id", SearchFilter.Operator.IN,ids));
+        List<SharedAssetRequest> sharedAssetRequests = sharedDao.findBySearchFilter(searchFilterList);
+        searchFilterList.clear();
+        searchFilterList.add(new SearchFilter("sharedId", SearchFilter.Operator.IN,ids));
+        List<SharedAssetReqType> sharedAssetReqTypes = apdDao.findBySearchFilter(searchFilterList);
+
+        dao.delete(detail);
+        searchFilterList.clear();
+        searchFilterList.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,ids));
+        List<SharedAssetReqDetail> sharedAssetReqDetails = dao.findBySearchFilter(searchFilterList);
+        if(CollectionUtils.isEmpty(sharedAssetReqDetails)){
+            apdDao.delete(sharedAssetReqTypes);
+            sharedDao.delete(sharedAssetRequests);
+        }
+        String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+        String assetDeptUID = assetInfo.getAssetDeptUID();
+        if(!clinicalDeptUID.equals(assetDeptUID)){
+            assetInfo.setAssetDeptUID(null);
+            assetInfo.setAssetDeptId(null);
+            assetInfo.setCleaned(Boolean.TRUE);
+            asiDao.save(assetInfo);
+        }
+
     }
 }

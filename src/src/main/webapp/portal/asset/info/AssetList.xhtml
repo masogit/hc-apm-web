@@ -585,11 +585,17 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'siteUID'}">
-                                <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
+                                <p:column headerText="#{msg.hospitalId}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.hospitalId}"/><br/>
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterSiteName}" appendTo="@(Body)"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteSiteName}" size="5">
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onSiteNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onSiteNameFilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
+                                        </p:autoComplete>
+
+                                    </f:facet>
                                     <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
-<!--                                    <f:facet name="filter">-->
-<!--                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" widgetVar="varPanelOrg2"/>-->
-<!--                                    </f:facet>-->
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'parentAssetId'}">
@@ -1096,6 +1102,12 @@
                             <c:if test="#{columnItem eq 'ratingUsageCount'}">
                                 <p:column headerText="#{msg.ratingUsageCount}" sortBy="#{item.ratingUsageCount}" filterBy="#{item.ratingUsageCount}" filterMatchMode="GE">
                                     <h:outputText value="#{item.ratingUsageCount}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'epc'}">
+                                <p:column headerText="#{msg.epc}" sortBy="#{item.epc}" filterBy="#{item.epc}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.epc}"/>
                                 </p:column>
                             </c:if>
 

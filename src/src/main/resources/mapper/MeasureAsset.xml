@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.MeasureAssetMapper">
+
+
+    <select id="selectMeasureUnpairedResult" resultType="com.ge.apm.domain.MeasuringCertificateDetail">
+        SELECT mcd.*
+
+        FROM  measuring_certificate_detail mcd
+        <where>${ew.sqlSegment}</where> limit 10000
+    </select>
+
+
+</mapper>

@@ -912,6 +912,10 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "rating_usage_count")
     private Integer ratingUsageCount;
 
+    @Getter @Setter
+    @Column(name = "epc")
+    private String epc;
+
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
     }
@@ -1101,6 +1105,7 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "asset_classification32")
     private String assetClassification32;
 
+
     @Transient
     @TableField(exist = false)
     private SelectItemDto assetClassification32Dto;
@@ -1134,6 +1139,8 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     private String createType;
 
+    @Transient
+    private String existFileFlag;
 
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
@@ -1573,7 +1580,7 @@ public class AssetInfo implements ChineseName, Serializable {
         this.assetTags = assetTags;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Set<AssetTags> assetTags;
 
@@ -3486,5 +3493,13 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getexistFileFlag() {
+        return existFileFlag;
+    }
+
+    public void setexistFileFlag(String existFileFlag) {
+        this.existFileFlag = existFileFlag;
     }
 }

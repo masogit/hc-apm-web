@@ -25,7 +25,7 @@
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
 
-                    <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm deleteButton"/>
+                    <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm "/>
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                     <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                     <p:column width="36"  id="checkBoxColumn" exportable="false">
@@ -149,15 +149,25 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-
+                    <p:column width="110" headerText="是否上传附件" exportable="false"  filterBy="#{item.existFileFlag}" filterMatchMode="GTE" >
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="是" itemValue="0" noSelectionOption="true" />
+                                <f:selectItem itemLabel="否" itemValue="1" noSelectionOption="true" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.existFileFlag}"/>
+                    </p:column>
                     <p:column width="110" rendered="#{measureAssetListController.matchType==2}" headerText="#{msg.Actions}" exportable="false">
                         <p:commandButton  value="关联设备" process="@this"  actionListener="#{measureAssetListController.matchAsset(item.uid)}"  oncomplete="PF('AssetSelectDlg').show()" update="measuringTab:assetSelectForm  measuringTab:assetSearchForm"/>
                     </p:column>
 
+
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" action="#{measuringCertificateDetailController.createAction()}" title="#{msg.Create}" />
                         <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUuids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
-                        <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm" disabled="#{empty measureAssetListController.selected}" >
+                        <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm"  >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType==1}" >

@@ -7,6 +7,7 @@ import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
+import com.ge.apm.dao.mapper.MeasureAssetMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.EasyExcelExportUtil;
 import com.ge.apm.service.asset.BlobFileService;
@@ -137,6 +138,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private I18nMessageService i18nMessageService;
     private MeasuringCertificateDetail selectedMeasuringCertificateDetail;
 
+    private MeasureAssetMapper measureAssetMapper;
+
     private SystemTemplateService systemTemplateService;
 
     private StreamedContent excelFile;
@@ -159,6 +162,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         preViewerBean = WebUtil.getBean(PreViewerBean.class);
         measuringService = WebUtil.getBean(MeasuringService.class);
         systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
+        measureAssetMapper = WebUtil.getBean(MeasureAssetMapper.class);
         WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
         measurementRepairVisible = woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair();
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -207,7 +211,6 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 i++;
             }
         }
-
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
     }
 
@@ -276,12 +279,21 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             String checkPerson = searchFilters.stream().filter(sf -> "checkPerson".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("checkPerson", SearchFilter.Operator.EQ, 0)).value.toString();
             wrapper.like("mcd.check_person", checkPerson);
         }
+        if(this.hasFilterOnField("existFileFlag")){
+            String checkPerson = searchFilters.stream().filter(sf -> "existFileFlag".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("existFileFlag", SearchFilter.Operator.EQ, 0)).value.toString();
+            if("0".equals(checkPerson)){
+                wrapper.isNotNull("o.cu");
+            }else if("1".equals(checkPerson)){
+                wrapper.isNull("o.cu");
+            }
+        }
         return wrapper;
     }
 
     public void initMatchResult(int matchType) {
         this.matchType=matchType;
         searchFilters=new ArrayList<>();
+        this.selected=null;
 
     }
     @Override
@@ -370,7 +382,15 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             String checkPerson = searchFilters.stream().filter(sf -> "checkPerson".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("checkPerson", SearchFilter.Operator.EQ, 0)).value.toString();
             wrapper.like("mcd.check_person", checkPerson);
         }
-        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson");
+        if(this.hasFilterOnField("existFileFlag")){
+            String checkPerson = searchFilters.stream().filter(sf -> "existFileFlag".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("existFileFlag", SearchFilter.Operator.EQ, 0)).value.toString();
+            if("0".equals(checkPerson)){
+                wrapper.isNotNull("o.cu");
+            }else if("1".equals(checkPerson)){
+                wrapper.isNull("o.cu");
+            }
+        }
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag");
         List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
         WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
@@ -414,11 +434,29 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<MeasuringCertificateDetail> getMeasuringResult(){
-        return measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+        List<MeasuringCertificateDetail>  list=new ArrayList<>();
+        if(matchType==1){
+            list= measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+
+        }else{
+            MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(this.selected.getBoUuid());
+            if(byId!=null){
+                list.add(byId);
+            }
+        }
+        return list;
     }
 
     public void onSelectMeasureAsset(){
-        measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+        if(matchType==1){
+            measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+        }else{
+            MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(this.selected.getBoUuid());
+            if(byId!=null){
+                measuringCertificateList=new ArrayList<>();
+                measuringCertificateList.add(byId);
+            }
+        }
     }
 
     public void uploadMeasuringFile(FileUploadEvent event) {
@@ -566,18 +604,34 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void delete(){
-        String uid = this.selected.getUid();
-        String boUuid = this.selected.getBoUuid();
-        if(Objects.isNull(boUuid)) return;
-        measuringCertificateDetailDao.delete(boUuid);
-        blobService.deleteBlobFileByBoUuid(boUuid);
-        WebUtil.addSuccessMessage("删除成功");
+        if(!selectedMap.isEmpty()) {
+            List<String> mcdUidList = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(mcdUidList)){
+                WebUtil.addErrorMessage("请先勾选设备");
+                return;
+            }
+            mcdUidList.forEach(item->{
+                delete(item);
+            });
+            WebUtil.addSuccessMessage("删除成功");
+            selectedMap.clear();
+        }else{
+            WebUtil.addErrorMessage("请先勾选设备");
+        }
+
+    }
+    public void delete(String mcdUid){
+        if(Objects.isNull(mcdUid)) return;
+        MeasuringCertificateDetail measuringCertificateDetail = measuringCertificateDetailDao.findById(mcdUid);
+        String uid = measuringCertificateDetail.getAssetUID();
+        measuringCertificateDetailDao.delete(mcdUid);
+        blobService.deleteBlobFileByBoUuid(mcdUid);
         if(matchType==1){
             AssetInfo assetInfo = dao.findByUid(uid);
             measuringService.updateMeasuringDate(assetInfo);
         }
         this.selected = null;
-        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(currentUser, SystemEventAuditEnum.MEASURE_DELETE, boUuid, Boolean.TRUE, "","measuring", "");
+        SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(currentUser, SystemEventAuditEnum.MEASURE_DELETE, mcdUid, Boolean.TRUE, "","measuring", "");
         systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
 
     }
@@ -694,16 +748,17 @@ public void treeSearchCondition(){
     public void exportExcel()  {
         try {
             Set<String> uids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-
-            if(CollectionUtils.isEmpty(uids)){
-                WebUtil.addWarnMessage("请选择数据");
-                return;
-            }
             byte[] stream =systemTemplateService.getTemplateFileByte(SystemTemplateEnum.MEASURING_RESULT_EXPORT,currentUser);
+            List<MeasuringCertificateDetail> list=new ArrayList<>();
+            if(CollectionUtils.isEmpty(uids)){
+                Wrapper<AssetInfo> wrapper = measureUnpairedResultConvert();
+                list=  measureAssetMapper.selectMeasureUnpairedResult(wrapper);
 
-            List<SearchFilter> filters = new ArrayList<>();
-            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, uids));
-            List<MeasuringCertificateDetail> list = measuringCertificateDetailDao.findBySearchFilter(filters);
+            }else{
+                List<SearchFilter> filters = new ArrayList<>();
+                filters.add(new SearchFilter("id", SearchFilter.Operator.IN, uids));
+                list= measuringCertificateDetailDao.findBySearchFilter(filters);
+            }
             List<I18nMessage> messages = i18nMessageService.getByMsgType("measuringStatus");
 
             Map<String, String> measuringStatusMap  = messages.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValueZh, (value1, value2) -> value1));

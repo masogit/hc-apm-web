@@ -59,6 +59,8 @@ public class InventoryOrderService {
 	private UserAccountRepository userAccountRepository;
 	@Autowired
 	private AssetTypeGroupRepository assetTypeGroupRepository;
+	@Autowired
+	private ConfigItemValueRepository configItemValueRepository;
 
 	private final Integer INVENTORY_NOT_FINISHED = 0; // 未盘点
 	private final Integer INVENTORY_FINISHED = 1; // 已盘点色弱
@@ -512,6 +514,9 @@ public class InventoryOrderService {
 				case "status":
 					param.put("status", Integer.parseInt(searchFilter.value.toString()));
 					break;
+				case "assetOwnerName":
+					param.put("assetOwnerName", searchFilter.value);
+					break;
 				case "lastModifiedDate":
 					if (searchFilter.operator.name().equals("GTE")) {
 						param.put("startDate", searchFilter.value);
@@ -617,6 +622,10 @@ public class InventoryOrderService {
 			}
 		}
 		return resultList;
+	}
+
+	public String getConfigValue(UserAccount currentUser, String key) {
+		return configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), key);
 	}
 
 }

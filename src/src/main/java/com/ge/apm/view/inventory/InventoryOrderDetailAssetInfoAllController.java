@@ -72,6 +72,8 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     private Set<String> clinicalDeptOrgUidSet;
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
+    @Getter @Setter
+    private Boolean inventoryDisplayRepairOwner = Boolean.FALSE;
 
     private StreamedContent excelFile;
 	@Override
@@ -88,6 +90,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 		currentUser = UserContextService.getCurrentUserAccount();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+        inventoryDisplayRepairOwner = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayRepairOwner")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
         loadClinicalDeptList();
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if (!Strings.isNullOrEmpty(enCodeParameters)) {

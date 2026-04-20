@@ -1,18 +1,33 @@
-CREATE INDEX IF NOT exists  idx_asm_asset_sfxm ON his_asset_sfxm_match (asset_uid, sfxm_id);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MedicalConsortiumType', '医共体类别', 'Medical Consortium Type', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','1','牵头医院','1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','2','乡镇卫生院','1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','3','社区卫生服务中心','1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('MedicalConsortiumType','4','社区卫生服务站','1',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','ContractInvoice','购置合同/发票复印件','ContractInvoice',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','MaintenanceRecord','维修记录原件及复印件','MaintenanceRecord',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','InspectionReport','设备检测报告','InspectionReport',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','PhysicalPhoto','实物图片','PhysicalPhoto',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','other','其他','other',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','DemandDocument','需求论证报告','DemandDocument',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','SitePowerProof','场地/电力证明材料','SitePowerProof',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','OperatorQualification','操作人员资质证明','OperatorQualification',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','other','其他','other',NULL,-1);
 
 
--- YHAAO-27330 增加配置项，“质控管理筛选条件”【通用版/区域版】
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 19, '1', '质控管理筛选条件', 'QualityControlManagementScreeningConditions', '质控管理筛选条件', 'f', 't', 7 , '[{"key":"通用版","value":"1"},{"key":"区域版","value":"2"}]' where not exists (select * from config_item where key = 'QualityControlManagementScreeningConditions');
+-- 添加GEIB调用acct system client
+INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time,
+                                last_access_date)
+VALUES (REPLACE(uuid_generate_v4()::text, '-', ''), '2a773154623311e7aeb25254001a1c14',
+        '1dee1cec8d7f440dbf26a2d1f21a8580', 'GEIB',
+        '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, clock_timestamp());
 
---YHAAO-27299  医院区域分类配置
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, null, '医院区域分类', 'HospitalAreaClassification', '医院区域分类', 'f', 't', 1 where not exists(select * from config_item where key = 'HospitalAreaClassification');
+-- 备份
+drop table if exists org_info_back;
+create table org_info_back as select * from org_info;
+delete from  org_info  where institution_uid = 'efee5c59ed704f25a8a1572984ae3417';
 
-
--- YHAAO-27381
-update  shared_asset_req_detail  set charging_begin_time = charging_begin_time + '1 day' where id='2c9b85829c28ab57019c89216fd269c8' and charging_begin_time = '2026-01-14 15:37:55';
-
-
-
---his 源数据匹配设备  job 创建索引
-CREATE INDEX CONCURRENTLY IF NOT exists  idx_ds_correct_order ON his_equipment_data_source (org_code, device_code, site_uid, exec_time DESC) WHERE is_matched IS NOT TRUE;
-
+-- YHAAO-27657
+ALTER TABLE qr_code_lib ALTER COLUMN issue_date TYPE TIMESTAMP;

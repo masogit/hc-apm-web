@@ -189,7 +189,10 @@ public class NurseSiteMaintainJob {
                         deleteUnCheckedMaintainData(id, assetUid, true);
                         NurseSiteMaintainConfig tempConfig = nurseSiteMaintainConfigRepository.findById(id);
                         if (tempConfig != null) {
-                            nurseSiteMaintainConfigRepository.delete(tempConfig);
+//                            nurseSiteMaintainConfigRepository.delete(tempConfig);
+                            //改为逻辑删除
+                            tempConfig.setDeleted(true);
+                            nurseSiteMaintainConfigRepository.save(tempConfig);
                         }
                     }
                 }

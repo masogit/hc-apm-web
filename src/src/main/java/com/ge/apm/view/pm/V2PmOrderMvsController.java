@@ -531,6 +531,27 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                     break;
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
+                    break;
+                case "ruleName":
+                    params.put("ruleName", searchFilter.value);
+                    break;
+                case "period":
+                    params.put("period", Integer.valueOf(searchFilter.value.toString()));
+                    break;
+                case "periodUnit":
+                    params.put("periodUnit", searchFilter.value);
+                    break;
+                case "creatorName":
+                    params.put("creatorName", searchFilter.value);
+                    break;
+                case "ownerName":
+                    params.put("ownerName", searchFilter.value);
+                    break;
+                case "currentStepName":
+                    params.put("currentStepName1", "已计划".equals(searchFilter.value) ? "进行中" : searchFilter.value);
+                    break;
+                case "intExtType":
+                    params.put("intExtType", Integer.valueOf(searchFilter.value.toString()));
                 default:
                     break;
             }
@@ -1116,6 +1137,15 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
             WebUtil.addErrorMessage(WebUtil.getMessage("FailedToGenerateTheMaintenanceReport"));
         }
     }
+
+    public List<String> getStepsInTableFilter() {
+        List<String> steps = new ArrayList<>();
+        steps.add("已计划");
+        steps.add("已取消");
+        steps.add("已关单");
+        return steps;
+    }
+
     public List<V2_BlobObject> getAttachListEhome() {
         return attachListEhome;
     }

@@ -53,6 +53,9 @@
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
+		<p:column headerText="#{msg.assetOwnerName}" filterBy="#{item.assetInfo.assetOwnerName}" filterMatchMode="LIKE" rendered="#{inventoryOrderDetailAssetInfoController.inventoryDisplayRepairOwner}">
+			<h:outputText value="#{item.assetInfo.assetOwnerName}" />
+		</p:column>
 
 		<f:facet name="{Toolbar}">
 			<p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量盘点" process="@this" update="@(.datalist1) :inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_BATH_INVENTORY') and !inventoryOrderDetailAssetInfoController.finished}" actionListener="#{inventoryOrderDetailAssetInfoController.bathInventory()}">

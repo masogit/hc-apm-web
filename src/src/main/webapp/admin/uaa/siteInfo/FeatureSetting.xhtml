@@ -882,6 +882,20 @@
                                     <p:outputLabel></p:outputLabel>
                                 </p:panelGrid>
                             </p:fieldset>
+
+                            <p:fieldset id="hospitalAdjustment" legend="院区间调剂">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['HOSPITAL_ADJUSTMENT']}"
+                                            itemLabel="院区间调剂">
+                                        <p:ajax update="hospitalAdjustment"
+                                                listener="#{featureSettingController.featureChange('HOSPITAL_ADJUSTMENT')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>院区间调剂</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
                         </p:tab>
                         <p:tab title="医院功能激活">
                             <p:fieldset id="activeFeature" legend="激活功能项">
@@ -969,6 +983,83 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
+                        <p:tab title="医院自定义功能激活">
+                            <p:fieldset id="customActiveFeature" legend="自定义功能项">
+                                <p:selectOneRadio value="#{featureSettingController.selectedCustomFeature}" id="selectedCustomActiveFeature" layout="custom">
+                                    <p:ajax event="change" listener="#{featureSettingController.changeCustomActiveListener}" update="@this activeCustomHospital"/>
+                                    <f:selectItem itemValue="ALL"/>
+                                    <f:selectItems value="#{featureSettingController.findAdminCustomActiveFeatures()}" var="item" itemValue="#{item}" />
+                                </p:selectOneRadio>
+                                <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <p:radioButton for="selectedCustomActiveFeature" itemIndex="0"/>
+                                        <h:outputLabel value="全部已激活" styleClass="radiolabelPF"/>
+                                    </h:panelGroup>
+                                    <c:forEach items="#{featureSettingController.findAdminCustomActiveFeatures()}" var="item" varStatus="status" >
+                                        <h:panelGroup>
+                                            <p:radioButton for="selectedCustomActiveFeature" itemIndex="#{status.index +1}"/>
+                                            <h:outputLabel value="#{item}" styleClass="radiolabelPF"/>
+                                        </h:panelGroup>
+                                    </c:forEach>
+                                </p:panelGrid>
+                                <p:commandButton id="addCustomActive" process="@this" value="新增自定义功能"
+                                                 class="btn btn-sm btn-gray"  update="CustomFunction " oncomplete="PF('CustomFunction').show()"
+                                />
+                            </p:fieldset>
+                            <p:fieldset id="activeCustomHospital" legend="自定义功能激活院区列表">
+                                <h:panelGroup>
+                                    <label class="label">医院名称：</label>
+                                    <p:inputText   id="hostpitalName" placeholder="模糊匹配,输入后点击任意空白处" value="#{featureSettingController.hospitalStr}" style="width: 50%">
+                                        <p:ajax event="blur" listener="#{featureSettingController.changeCustomActiveListener}" update="datalist"/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <p:dataTable id="datalistCustom" value="#{featureSettingController.filterAdminCustomFeatureActives}" rendered="#{featureSettingController.tabIndex == 4}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                             scrollable="false"
+                                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                             sortMode="single"
+                                             paginatorTemplate="{Toolbar}"
+                                             rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="操作" exportable="false">
+                                        <p:commandButton id="activeCustom" process="@this" value="#{featureSettingController.isActive(item.activeRole)?'已激活':'激活'}" disabled="#{featureSettingController.isActive(item.activeRole)}" actionListener="#{featureSettingController.addCustomHospital(item)}" update="datalistCustom" class="btn btn-sm btn-gray">
+                                            <p:confirm header="激活确认" message="是否确认激活！" icon="ui-icon-alert"/>
+                                        </p:commandButton>
+                                        <p:commandButton id="generateActiveLink" process="@this" value="生成激活链接" rendered="#{!featureSettingController.isActive(item.activeRole)}"
+                                                         actionListener="#{featureSettingController.generateActiveLink(item.hospitalUID)}" class="btn btn-sm btn-gray"
+                                                         update="Links " oncomplete="PF('Links').show()"
+                                        >
+                                        </p:commandButton>
+                                    </p:column>
+                                    <p:column headerText="医院名称">
+                                        <h:outputText value="#{featureSettingController.getHospitalName(item.hospitalUID)}"/>
+                                    </p:column>
+                                    <p:column headerText="功能模块">
+                                        <h:outputText value="#{item.featureKey}"/>
+                                    </p:column>
+                                    <p:column headerText="是否激活" visible="false">
+                                        <h:outputText value="#{featureSettingController.isActive(item.activeUser)?'已激活':'未激活'}"/>
+                                    </p:column>
+                                    <p:column headerText="激活人" >
+                                        <h:outputText value="#{featureSettingController.getUserName(item.activeUser)}"/>
+                                    </p:column>
+                                    <p:column headerText="激活人角色" >
+                                        <h:outputText value="#{featureSettingController.getRoleName(item.activeRole)}"/>
+                                    </p:column>
+                                    <p:column headerText="激活功能备注" >
+                                        <h:outputText value="#{item.activeComment}"/>
+                                    </p:column>
+                                    <p:column  headerText="激活时间">
+                                        <h:outputText value="#{item.activeDate}" >
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                        </h:outputText>
+                                    </p:column>
+                                    <f:facet name="{Toolbar}">
+                                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                            <p:dataExporter type="xls" target="datalistCustom" fileName="ActiveFeature"/>
+                                        </p:commandButton>
+                                    </f:facet>
+                                </p:dataTable>
+                            </p:fieldset>
+                        </p:tab>
                     </p:tabView>
                     <br/>
                     <p:commandButton validateClient="true" rendered="#{featureSettingController.tabIndex == 0 or featureSettingController.tabIndex == 1}" actionListener="#{featureSettingController.saveFeatures}"
@@ -984,10 +1075,34 @@
                         </h:panelGroup>
                     </h:panelGrid>
                 </p:dialog>
+                <p:dialog modal="true"
+                          id="CustomFunction"
+                          widgetVar="CustomFunction"
+                          header="自定义功能"
+                          appendTo="@(body)">
+                    <h:form>
+                        <h:panelGrid columns="1" cellpadding="5">
+
+                            <h:panelGroup>
+                                <label class="label">自定义功能名称: </label>
+                                <p:inputText value="#{featureSettingController.customFunctionName}" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">自定义功能备注: </label>
+                                <p:inputText value="#{featureSettingController.customFunctionComment}" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <p:commandButton
+                                value="#{msg.Save}"
+                                actionListener="#{featureSettingController.addCustomActive()}"
+                                update=":SiteInfoEditVersionForm:tabView:activeCustomHospital :SiteInfoEditVersionForm:tabView:customActiveFeature"
+                                icon="ui-icon-check"
+                                oncomplete="PF('CustomFunction').hide()" />
+                    </h:form>
+                </p:dialog>
             </div>
         </div>
-
-
     </ui:define>
 
 </ui:composition>

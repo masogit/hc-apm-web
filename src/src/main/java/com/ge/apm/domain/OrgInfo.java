@@ -104,6 +104,8 @@ public class OrgInfo implements Serializable, ChineseName {
 
     @Column(name = "org_code")
     private String orgCode;
+    @Column(name = "org_index")
+    private Integer orgIndex = 0;
 
     @Transient
     private int lineNum;
@@ -146,6 +148,25 @@ public class OrgInfo implements Serializable, ChineseName {
     @Transient
     private String orgName;
 
+    @Column(name = "grade_nature")
+    private String gradeNature;
+    @Column(name = "region")
+    private String region;
+
+    @Column(name = "spare01")
+    private String spare01;
+
+    @Column(name = "spare02")
+    private String spare02;
+
+    @Column(name = "spare03")
+    private String spare03;
+
+    @Column(name = "spare04")
+    private String spare04;
+
+    @Column(name = "spare05")
+    private String spare05;
     public String getAssetType() {
         return assetType == null ? "" : assetType;
     }
@@ -497,6 +518,71 @@ public class OrgInfo implements Serializable, ChineseName {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    public String getGradeNature() {
+        return gradeNature;
+    }
+
+    public void setGradeNature(String gradeNature) {
+        this.gradeNature = gradeNature;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getSpare01() {
+        return spare01;
+    }
+
+    public void setSpare01(String spare01) {
+        this.spare01 = spare01;
+    }
+
+    public String getSpare02() {
+        return spare02;
+    }
+
+    public void setSpare02(String spare02) {
+        this.spare02 = spare02;
+    }
+
+    public String getSpare03() {
+        return spare03;
+    }
+
+    public void setSpare03(String spare03) {
+        this.spare03 = spare03;
+    }
+
+    public String getSpare04() {
+        return spare04;
+    }
+
+    public void setSpare04(String spare04) {
+        this.spare04 = spare04;
+    }
+
+    public String getSpare05() {
+        return spare05;
+    }
+
+    public void setSpare05(String spare05) {
+        this.spare05 = spare05;
+    }
+
+    public Integer getOrgIndex() {
+        return orgIndex;
+    }
+
+    public void setOrgIndex(Integer orgIndex) {
+        this.orgIndex = orgIndex;
+    }
+
     public OrgInfo(Integer id) {
 		super();
 		this.id = id;
