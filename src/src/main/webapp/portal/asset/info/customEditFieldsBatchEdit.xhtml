@@ -62,7 +62,7 @@
         <h:panelGroup ><!--新增资产信息中的 维修负责人 -->
             <label class="label">#{msg.assetOwnerName}</label>
             <p:autoComplete id="assetOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('assetOwnerName')}"
-                            forceSelection="true"
+                            forceSelection="true" scrollHeight="300"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
@@ -86,7 +86,7 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerName2}</label>
             <p:autoComplete id="assetOwnerName2" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner2']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('assetOwnerName2')}"
-                            forceSelection="true" var="t"
+                            forceSelection="true" var="t" scrollHeight="300"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
@@ -110,7 +110,7 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerName3}</label>
             <p:autoComplete id="assetOwnerName3" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner3']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('assetOwnerName3')}"
-                            forceSelection="true" var="t"
+                            forceSelection="true" var="t" scrollHeight="300"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
@@ -136,7 +136,7 @@
         <h:panelGroup >
             <label class="label">#{msg.pmOwnerName}</label>
             <p:autoComplete id="pmOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['pmOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('pmOwnerName')}"
-                            forceSelection="true" var="t"
+                            forceSelection="true" var="t" scrollHeight="300"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
@@ -155,7 +155,7 @@
         <h:panelGroup >
             <label class="label">#{msg.patrolInspectionOwnerName}</label>
             <p:autoComplete id="patrolInspectionOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['patrolInspectionOwnerName']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('patrolInspectionOwnerName')}"
-                            forceSelection="true" var="t"
+                            forceSelection="true" var="t" scrollHeight="300"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('patrolInspectionOwnerName')}" process="@this" update="@(.patrolInspectionOwnerName)" />
@@ -181,7 +181,7 @@
         <h:panelGroup >
             <label class="label">#{msg.measuringOwnerName}</label>
             <p:autoComplete id="measuringOwner" value="#{assetInfoBulkEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('measuringOwner')}"
-                            forceSelection="true" var="t"
+                            forceSelection="true" var="t" scrollHeight="300"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
@@ -201,7 +201,7 @@
         <h:panelGroup >
             <label class="label">#{msg.measuringOwnerName}</label>
             <p:autoComplete id="measuringOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('measuringOwnerName')}"
-                            forceSelection="true" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                            forceSelection="true" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}" scrollHeight="300">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this"/>
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this" />
                 <p:column>
@@ -290,7 +290,7 @@
             <label class="label">#{msg.clinicalOwnerName}</label>
 
             <p:autoComplete id="clinicalOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['clinicalOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('clinicalOwnerName')}"
-                            forceSelection="true" var="t"
+                            forceSelection="true" var="t" scrollHeight="300"
                             itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeClinicalOwnerList}" class="SiteUIDChange clinicalDeptNameChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />
                 <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />

@@ -198,41 +198,40 @@ public class AdjustmentTransferApplication implements Serializable {
 
 
 
-
-
     @Column(name = "application_pending_approval_uid")
     private String applicationPendingApprovalUid; //申请待审批处理人
     @Column(name = "application_pending_approval_date")
     private Date applicationPendingApprovalDate;//申请待审批处理时间
 
-
-
+    @Column(name = "application_actual_approval_uid")
+    private String applicationActualApprovalUid; //申请实际审批人
     @Column(name = "pending_delivery_uid")
     private String pendingDeliveryUid; //待交付处理人
     @Column(name = "pending_delivery_date")
     private Date pendingDeliveryDate;//待交付处理时间
 
     @Column(name = "delivery_uid")
-    private String deliveryUid; //交付处理人
+    private String deliveryUid; //实际交付处理人
     @Column(name = "delivery_date")
-    private Date deliveryDate;//交付处理时间
+    private Date deliveryDate;//实际交付处理时间
 
     @Column(name = "return_uid")
     private String returnUid; //退回处理人
     @Column(name = "return_date")
     private Date returnDate;//退回时间
-
+    @Column(name = "return_pending_uid")
+    private String returnPendingUid; //退回待处理人
     @Column(name = "return_reason")
     private String returnReason;//退回原因
 
 
     @Column(name = "return_approval_uid")
-    private String returnApprovalUid; //退回处理人
+    private String returnApprovalUid; //退回审核处理人
     @Column(name = "return_approval_date")
-    private Date returnApprovalDate;//退回时间
+    private Date returnApprovalDate;//退回审核时间
 
     @Column(name = "return_approval_result")
-    private Integer returnApprovalResult;//退回原因 1 审批通过  2 审批拒绝
+    private Integer returnApprovalResult;//退回审核原因 1 审批通过  2 审批拒绝
 
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
@@ -752,6 +751,21 @@ public class AdjustmentTransferApplication implements Serializable {
     }
 
 
+    public String getApplicationActualApprovalUid() {
+        return applicationActualApprovalUid;
+    }
+
+    public void setApplicationActualApprovalUid(String applicationActualApprovalUid) {
+        this.applicationActualApprovalUid = applicationActualApprovalUid;
+    }
+
+    public String getReturnPendingUid() {
+        return returnPendingUid;
+    }
+
+    public void setReturnPendingUid(String returnPendingUid) {
+        this.returnPendingUid = returnPendingUid;
+    }
 
     @Override
     public int hashCode() {

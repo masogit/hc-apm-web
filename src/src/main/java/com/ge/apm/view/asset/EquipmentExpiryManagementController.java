@@ -7,6 +7,7 @@ import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -147,8 +148,46 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         if (pageRequest.getSort() == null) {
             pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), new Sort(Sort.Direction.DESC, "lastModifiedDate"));
         }
+        Date now = DateUtil.beginOfDay(DateUtil.now()).toDate();
+        Date over = DateUtil.offsetDay(now, 180).toDate();
+        if (hasFilterOnField("overrunState")) {
+            SearchFilter searchFilter = searchFilters.stream().filter(item -> "overrunState".equals(item.fieldName)).findFirst().orElse(null);
+            int overrunState = Integer.parseInt(searchFilter.value.toString());
+            switch (overrunState) {
+                case 1:
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.LT, now, "1*"));
+                    break;
+                case 2:
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.GT, now, "1*"));
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.LTE, over, "1*"));
+                    break;
+                case 3:
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.GT, over, "1*"));
+                    break;
+                case 4:
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.IsNull, null, "1*"));
+                    break;
+                default:
+                    break;
+            }
+            searchFilters.remove(searchFilter);
+        }
         Page<AssetInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = page.getContent();
+        for (AssetInfo assetInfo : currentPageAssets) {
+            if (ObjectUtil.isEmpty(assetInfo.getAssetLifecycleDeadline())) {
+                assetInfo.setOverrunState("4");
+            } else {
+                Date assetLifecycleDeadline = DateUtil.beginOfDay(assetInfo.getAssetLifecycleDeadline()).toDate();
+                if (assetLifecycleDeadline.after(over)) {
+                    assetInfo.setOverrunState("3");
+                } else if (assetLifecycleDeadline.before(over) && assetLifecycleDeadline.after(now)) {
+                    assetInfo.setOverrunState("2");
+                } else {
+                    assetInfo.setOverrunState("1");
+                }
+            }
+        }
         addMisingClinicalDeptOrg(currentPageAssets);
         Set<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedInAndTenantUid(encodes, user.getTenantUID());

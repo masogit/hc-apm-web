@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.util.StringUtils;
+import webapp.framework.web.WebUtil;
 
 @WebFilter(filterName = "SessionTimeoutFilter", urlPatterns = "/*")
 public class SessionTimeoutFilter implements Filter {
@@ -33,8 +34,10 @@ public class SessionTimeoutFilter implements Filter {
     private static final String resources = "javax.faces.resource";
     private static final String sso_login = "api/a1sso";
 
+    private PassLoginUtil passLoginUtil;
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        passLoginUtil = WebUtil.getBean(PassLoginUtil.class);
     }
 
     @Override
@@ -70,6 +73,16 @@ public class SessionTimeoutFilter implements Filter {
                     return;
                 }
                 boolean notLogin = isNotLogin(httpServletRequest);
+                String token = request.getParameter("token");
+                String mobile = request.getParameter("mobile");
+                if(notLogin && !StringUtils.isEmpty(token) && !StringUtils.isEmpty(mobile)){
+                    passLoginUtil.handler(httpServletRequest,httpServletResponse);
+                    httpServletRequest.getSession().setAttribute("PHONE_SMSCODE_VALID",true);
+                    String requestURI = httpServletRequest.getRequestURI();
+                    requestURI = requestURI.replaceAll("%23","#");
+                    httpServletResponse.sendRedirect(requestURI);
+                    return;
+                }
                 boolean notPhoneLogin = isNotPhoneLogin(httpServletRequest);
                 String requestPath = httpServletRequest.getRequestURI();
                 if(!notLogin && notPhoneLogin && !requestPath.contains(phoneValidPage)){

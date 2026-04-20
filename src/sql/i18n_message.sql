@@ -6284,3 +6284,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- YHAAO-26808 资产新增epc码
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','epc','EPC码','EPC',NULL, -1);
+
+-- YHAAO-27676 新增资产超限状态
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','overrunState','超限状态','overrun state',NULL,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('overrunState','1','已超限','ledger',NULL, -1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('overrunState','2','即将超限','convert',NULL ,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('overrunState','3','正常','arrival',NULL, -1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('overrunState','4','-','returned',NULL, -1);

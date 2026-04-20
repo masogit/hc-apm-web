@@ -124,58 +124,62 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     private void processNode() {
         process=new ArrayList<>();
         Set<String> condition = new HashSet<>();
-        condition.add(selected.getApplicationPendingApprovalUid());
-        condition.add(selected.getPendingDeliveryUid());
+
+        condition.addAll(Arrays.asList(selected.getApplicationPendingApprovalUid().split(",")));
+        if(selected.getPendingDeliveryUid()!=null){
+            condition.addAll(Arrays.asList(selected.getPendingDeliveryUid().split(",")));
+        }
+        if(selected.getReturnPendingUid()!=null){
+            condition.addAll(Arrays.asList(selected.getReturnPendingUid().split(",")));
+        }
         condition.add(selected.getReturnUid());
         condition.add(selected.getUpdatedBy());
         condition.add(selected.getReturnApprovalUid());
         Set<String> collect1 = condition.stream().filter(i -> i != null).collect(Collectors.toSet());
         List<UserAccount> userAccounts = userDao.findByUidIn(collect1);
         Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
-        addNode("待审批",collect.get(selected.getApplicationPendingApprovalUid()),selected.getApplicationPendingApprovalDate());
+        UserAccount system = new UserAccount();
+        system.setName("System");
+        collect.put("System",system);
+        addNode("待审批",selected.getApplicationPendingApprovalUid(),selected.getApplicationPendingApprovalDate(),collect);
         if(selected.getStatus()==2){
-            addNode("审批未通过",collect.get(selected.getUpdatedBy()),selected.getUpdateTime());
+            addNode("审批未通过",(selected.getUpdatedBy()),selected.getUpdateTime(),collect);
             return;
         }
 
         if(selected.getPendingDeliveryUid()!=null){
-            addNode("待交付",collect.get(selected.getPendingDeliveryUid()),selected.getPendingDeliveryDate());
+            addNode("待交付",(selected.getPendingDeliveryUid()),selected.getPendingDeliveryDate(),collect);
         }
-
-        if(selected.getDeliveryUid()!=null){
-            addNode("已交付",collect.get(selected.getDeliveryUid()),selected.getDeliveryDate());
+        if(selected.getStatus()==5){
+            addNode("待调剂关单","System",selected.getPendingDeliveryDate(),collect);
         }
-
-        if(selected.getReturnUid()!=null){
-            addNode("退回待审批",collect.get(selected.getReturnUid()),selected.getReturnDate());
-        }
-
-        if(selected.getStatus()==8){
-            addNode("已退回",collect.get(selected.getReturnApprovalUid()),selected.getReturnApprovalDate());
-            return;
-        }
-        if(selected.getStatus()==9){
-            addNode("退回审批不通过",collect.get(selected.getReturnApprovalUid()),selected.getReturnApprovalDate());
+        if(selected.getReturnPendingUid()!=null){
+            addNode("待退回审批及关单",(selected.getReturnPendingUid()),selected.getReturnDate(),collect);
         }
 
         if(selected.getStatus()==6){
-            addNode("已完成",collect.get(selected.getUpdatedBy()),selected.getUpdateTime());
+            addNode("已完成","System",selected.getUpdateTime(),collect);
             return;
         }
         if(selected.getStatus()==3){
-            addNode("已取消",collect.get(selected.getUpdatedBy()),selected.getUpdateTime());
+            addNode("已取消",(selected.getUpdatedBy()),selected.getUpdateTime(),collect);
         }
     }
 
-
-    private void addNode(String nodeName,UserAccount operator, Date operatorTime){
-        String name = "";
-        if(operator != null){
-            name = operator.getName();
-        };
+    private void addNode(String nodeName,String  operator, Date operatorTime, Map<String, UserAccount> userAccountMap){
+        StringBuilder name = new StringBuilder();
+        if (operator != null) {
+            for (String s : operator.split(",")) {
+                UserAccount userAccount = userAccountMap.get(s);
+                name.append(userAccount.getName()).append(",");
+            }
+            if (name.length() > 0) {
+                name.setLength(name.length() - 1);
+            }
+        }
         AdjustmentTransferNodeProcess processNode=new AdjustmentTransferNodeProcess();
         processNode.setNodeName(nodeName);
-        processNode.setOperator(name);
+        processNode.setOperator(name.toString());
         processNode.setOperatorTime(operatorTime);
         process.add(processNode);
     }
@@ -341,9 +345,13 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         selected.setStatus(4);
         selected.setUpdateTime(new Date());
         selected.setUpdatedBy(currentUserAccount.getUid());
-        selected.setPendingDeliveryUid(currentUserAccount.getUid());
+        List<String> uids = adjustmentTransferService.getAdjustmentTransferApproval(selected,true,false);
+
+        String join = String.join(",", uids);
+        selected.setPendingDeliveryUid(join);
         selected.setPendingDeliveryDate(new Date());
 
+        selected.setApplicationActualApprovalUid(currentUserAccount.getUid());
 
         selected.setHandlerSignature(signatureId);
         dao.save(selected);
@@ -421,7 +429,10 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         selected.setUpdatedBy(currentUserAccount.getUid());
         selected.setReturnDate(new Date());
         selected.setReturnUid(currentUserAccount.getUid());
-
+        List<UserAccount> approvalUser = adjustmentTransferService.getApprovalUser(currentUserAccount.getTenantUID(), Arrays.asList(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE));
+        List<String> uids = approvalUser.stream().map(UserAccount::getUid).collect(Collectors.toList());
+        String join = String.join(",", uids);
+        selected.setReturnPendingUid(join);
         dao.save(selected);
     }
 

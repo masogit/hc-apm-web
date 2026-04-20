@@ -133,7 +133,7 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
                 OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
                 selectedSiteList.add(orgInfo.getUid());
             }
-            searchFilters.add(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, selectedSiteList));
+            this.updateSearchFilter(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, selectedSiteList));
         }else {
             this.removeFilterOnField("stockSiteUid");
         }
