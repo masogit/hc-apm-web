@@ -1996,7 +1996,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         woService.checkIn(checkInWorkOrder);
     }
 
-    public void repairWorkOrder() {
+    public void repairWorkOrder(String type) {
         boolean valid = true;
         ConfigItemValue configItemValue = configItemMapper.findByKey("enableCheckInTime", selectedWorkOrder.getSiteUID());
         if (ObjectUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue.getValue()) && ObjectUtil.isEmpty(selectedWorkOrder.getCheckinTime())) {
@@ -2090,16 +2090,26 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
 
-        if (!valid) {
-            return;
-        }
-        assigneeId =ua1.getId().toString();
-
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
+        if(StrUtil.isEmpty(type)){
+            ConfigItemValue configItemValue2 = configItemMapper.findByKey("workOrderShowPartFlag", selectedWorkOrder.getSiteUID());
+            if (ObjectUtil.isNotEmpty(configItemValue2) && "true".equals(configItemValue2.getValue()) && CollectionUtils.isEmpty(accessoryList)) {
+                RequestContext.getCurrentInstance().addCallbackParam("detailFlag", true);
+                valid = false;
+            }
+        }
+
+
+        if (!valid) {
+            return;
+        }
+        assigneeId =ua1.getId().toString();
+
+
 
         if (selectedWorkOrder.getEntryType() == 1) {
             workHoursList = workHoursList.stream()
