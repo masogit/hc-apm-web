@@ -224,6 +224,7 @@
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup >
+                        <div style="display:flex; align-items:center; flex-wrap:wrap;">
                         <p:selectManyCheckbox  value="#{adjustmentTransferApplicationDetailController.attachments}" style="width: 700px"  disabled="true"   >
 
                             <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentBorrowAttachmentType')}"
@@ -231,21 +232,18 @@
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             <p:ajax event="change" process="@this" update="@form"/>
                         </p:selectManyCheckbox>
+
+                        <p:inputText  rendered="#{adjustmentTransferApplicationDetailController.attachments.contains('other')}"
+                                      value="#{adjustmentTransferApplicationDetailController.selected.attachmentsOtherDescription}" readonly="true"
+                                      style=" margin-left: 5px;" required="true"  placeholder="附件材料其他描述"
+                                      requiredMessage="请选择'其他'时需填写详细说明">
+                            <p:ajax/>
+                        </p:inputText>
+                        </div>
                     </h:panelGroup>
                 </p:panelGrid>
 
-                <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
-                             >
-                    <h:panelGroup  rendered="#{adjustmentTransferApplicationDetailController.attachments.contains('other')}" >
-                        <label class="label">附件材料其他描述</label>
-                        <p:inputText
-                                value="#{adjustmentTransferApplicationDetailController.selected.attachmentsOtherDescription}" readonly="true"
-                                style="width: 95%;" required="true"
-                                requiredMessage="请选择'其他'时需填写详细说明">
-                            <p:ajax/>
-                        </p:inputText>
-                    </h:panelGroup>
-                </p:panelGrid>
+
 
                 <h:panelGroup>
                     <!--                        <p:commandButton value="批量删除文件" class="bathDeleteAttach" update=":adjustmentApplicationForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{adjustmentApplicationDetailController.bathDeleteAttach}" disabled="#{!adjustmentApplicationDetailController.isChecked()}">-->

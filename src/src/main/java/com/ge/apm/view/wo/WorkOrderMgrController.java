@@ -420,8 +420,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             ConfigItemValue displayModeCasePriorityValue = configItemValueRepository.findFirstByKeyAndSiteUid("displayModeCasePriority", loginUser.getSiteUID());
             displayModeCasePriority = Optional.ofNullable(displayModeCasePriorityValue).map(ConfigItemValue::getValue).orElse("key");
 
-            ConfigItemValue autoDispatchAllowClaimByAssigneeValue = configItemValueRepository.findFirstByKeyAndSiteUid("autoDispatchAllowClaimByAssignee", loginUser.getSiteUID());
-            autoDispatchAllowClaimByAssignee = Optional.ofNullable(autoDispatchAllowClaimByAssigneeValue).map(ConfigItemValue::getValue).map("true"::equalsIgnoreCase).orElse(false);
+            String autoDispatchAllowClaimByAssigneeValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID(),"autoDispatchAllowClaimByAssignee");
+            autoDispatchAllowClaimByAssignee= Boolean.TRUE.toString().equalsIgnoreCase(autoDispatchAllowClaimByAssigneeValue);
             selectedBatchMap = new HashMap<>();
             currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
             enableAuditGroupConfiguration();
@@ -912,9 +912,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID2", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("assetInfo.ownerConfig.woOwnerUID3", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*3+8*"));
                 }
                 List<Integer> tagGroupAssets = getTagGroupAssets();

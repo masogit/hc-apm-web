@@ -32,10 +32,10 @@
                         <f:facet name="filter">
                             <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{dataEntryController.filterEntryType}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('HisEntryType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <f:selectItems value="#{dataEntryController.hisEntryTypes}" var="item" itemLabel="#{item.value}" itemValue="#{item.label}"/>
                             </p:selectOneMenu>
                         </f:facet>
-                        <h:outputText value="#{fieldMsg.fieldValue('HisEntryType',item.entryType)}"/>
+                        <h:outputText value="#{item.entryTypeZh}"/>
 
                     </p:column>
 

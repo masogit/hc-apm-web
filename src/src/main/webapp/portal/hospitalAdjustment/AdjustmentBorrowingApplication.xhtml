@@ -9,7 +9,7 @@
 
 <ui:composition>
     <p:dialog id="adjustmentBorrowingDlg" widgetVar="adjustmentBorrowingDlg" modal="true" resizable="true"
-              draggable="true" header="调剂借用设备申请" appendTo="@(body)" width="60%">
+              draggable="true" header="调剂借用设备申请" appendTo="@(body)" width="75%">
         <h:form id="transferForm" style="height:660px; overflow: auto;">
             <p:fieldset legend="调入单位信息">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -228,8 +228,9 @@
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset legend="附件材料清单" style="margin-bottom:20px">
-                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" id="borrowattachments">
                     <h:panelGroup >
+                        <div style="display:flex; align-items:center; flex-wrap:wrap;">
                         <p:selectManyCheckbox  value="#{idleEquipmentStockDetailController.attachments}" style="width: 700px"    >
 
                             <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentBorrowAttachmentType')}"
@@ -237,23 +238,20 @@
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 <!--                            <p:ajax event="change" process="@this" update="attachmentsOtherDescription"/>-->
 
-                            <p:ajax event="change" process="@this" update="transferForm:attachmentsOtherDescription"/>
+                            <p:ajax event="change" process="@this" update="transferForm:borrowattachments"/>
                         </p:selectManyCheckbox>
+
+                        <p:inputText   rendered="#{idleEquipmentStockDetailController.attachments.contains('other')}"
+                                       value="#{idleEquipmentStockDetailController.application.attachmentsOtherDescription}"
+                                       style=" margin-left: 5px;" required="true"   placeholder="附件材料其他描述"
+                                       requiredMessage="请选择'其他'时需填写详细说明">
+                            <p:ajax/>
+                        </p:inputText>
+                        </div>
                     </h:panelGroup>
                 </p:panelGrid>
 
-                <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group" id="attachmentsOtherDescription"
-                           >
-                    <h:panelGroup    rendered="#{idleEquipmentStockDetailController.attachments.contains('other')}">
-                        <label class="label">附件材料其他描述</label>
-                        <p:inputText
-                                value="#{idleEquipmentStockDetailController.application.attachmentsOtherDescription}"
-                                style="width: 95%;" required="true"
-                                requiredMessage="请选择'其他'时需填写详细说明">
-                            <p:ajax/>
-                        </p:inputText>
-                    </h:panelGroup>
-                </p:panelGrid>
+
 
 
                 <h:panelGroup>
