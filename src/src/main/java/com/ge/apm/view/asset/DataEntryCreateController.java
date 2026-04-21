@@ -336,7 +336,8 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
                     String key = map.get("key");
                     String value = map.get("value");
                     DataEntry dataEntry = new DataEntry();
-                    dataEntry.setEntryType(key);
+                    dataEntry.setEntryType(value);
+                    dataEntry.setEntryTypeZh(key);
                     assetDataEntrys.add(dataEntry);
                 }
                 userSiteOrgTreeComponentController.setSelectedOrg(null);
