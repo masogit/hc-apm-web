@@ -406,7 +406,7 @@
                 <h:panelGroup id="display" >
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
-                            <p:selectOneMenu id="functionGroup" value="#{adjustmentApplicationCreateController.attachmentType}" autoWidth="false" style="width: 100%">
+                            <p:selectOneMenu id="functionGroup" value="#{adjustmentApplicationCreateController.attachmentType}" autoWidth="false" style="width: 100%" required="true" requiredMessage="请选择附件类型">
                                 <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{adjustmentApplicationCreateController.attachmentsList()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}" />
@@ -428,7 +428,7 @@
 
                     </p:panelGrid>
                     <h:panelGroup>
-                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{adjustmentApplicationCreateController.finishUpload()}" disabled="#{empty adjustmentApplicationCreateController.uploadedFileObjects}" value="#{msg.Confirm}"
+                        <p:commandButton id="saveButton" immediate="true" validateClient="true" actionListener="#{adjustmentApplicationCreateController.finishUpload()}" disabled="#{empty adjustmentApplicationCreateController.uploadedFileObjects}" value="#{msg.Confirm}"
                                          update=":adjustmentApplicationForm:AttachList :uploadDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{contractInfoEditController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadDialog').hide()"/>
                     </h:panelGroup>
