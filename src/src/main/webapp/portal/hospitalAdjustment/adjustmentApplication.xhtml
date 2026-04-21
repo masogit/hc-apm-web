@@ -129,9 +129,9 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">累计使用年限</label>
+                                <label class="label">累计使用年限<span style="color:red">*</span></label>
                                 <div style="display: flex; align-items: center;">
-                                    <p:inputNumber id="usedYears" minValue="0" decimalPlaces="0" maxValue="999"
+                                    <p:inputNumber id="usedYears" minValue="0" decimalPlaces="0" maxValue="999" required="true" requiredMessage="累计使用年限必填"
                                                    value="#{adjustmentApplicationCreateController.selected.usedYears}" validatorMessage="累计使用年限必须在 0 到 999 之间"
                                                  >
                                         <p:ajax/>
@@ -142,17 +142,17 @@
                                 </div>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">折旧期限 (规定)</label>
+                                <label class="label">折旧期限 (规定)<span style="color:red">*</span></label>
                                 <p:inputNumber minValue="0" maxValue="99" decimalPlaces="1"
                                                value="#{adjustmentApplicationCreateController.selected.depreciationPeriodYears}"
-                                               requiredMessage="折旧期限 #{msg.ValidationRequire}" style="width: 95%">
+                                              required="true"  requiredMessage="折旧期限 #{msg.ValidationRequire}" style="width: 95%">
                                     <p:ajax/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">是否超折旧期限<span style="color:red">*</span></label>
                                 <p:selectOneRadio
-                                        value="#{adjustmentApplicationCreateController.selected.overDepreciation}" rendered="true" requiredMessage="是否超折旧期限必填">
+                                        value="#{adjustmentApplicationCreateController.selected.overDepreciation}" required="true" requiredMessage="是否超折旧期限必填">
                                     <f:selectItem itemLabel="是" itemValue="true"/>
                                     <f:selectItem itemLabel="否" itemValue="false"/>
                                     <p:ajax event="change" process="@this" update="@form"/>
@@ -185,7 +185,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">维修记录摘要 (近2年)</label>
-                                <p:inputText
+                                <p:inputText   required="true" requiredMessage="维修记录摘要必填"
                                         value="#{adjustmentApplicationCreateController.selected.maintenanceSummary}"
                                         style="width: 95%;">
                                     <p:ajax/>
@@ -196,7 +196,7 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">购置凭证编号</label>
-                                <p:inputText value="#{adjustmentApplicationCreateController.selected.purchaseVoucherNo}"
+                                <p:inputText value="#{adjustmentApplicationCreateController.selected.purchaseVoucherNo}"    required="true" requiredMessage="购置凭证编号必填"
                                              style="width: 95%;">
                                     <p:ajax/>
                                 </p:inputText>
@@ -275,13 +275,13 @@
                             <h:panelGroup>
                                 <label class="label">预计闲置期限</label>
                                 <div style="display: flex; align-items: center;">
-                                    <p:inputNumber id="expectedIdleYears" minValue="0" decimalPlaces="0" maxValue="999"
+                                    <p:inputNumber id="expectedIdleYears" minValue="0" decimalPlaces="0" maxValue="999" required="true" requiredMessage="预计闲置期限年必填"
                                                    value="#{adjustmentApplicationCreateController.selected.expectedIdleYears}"  validatorMessage="闲置年数必须在 0 到 999 之间">
                                         <p:ajax/>
                                         <f:validateLongRange minimum="0" maximum="999" />
                                     </p:inputNumber>
                                     年
-                                    <p:inputNumber id="expectedIdleMonths" minValue="0" max="11" decimalPlaces="0"
+                                    <p:inputNumber id="expectedIdleMonths" minValue="0" max="11" decimalPlaces="0"  required="true" requiredMessage="预计闲置期限年月必填"
                                                    value="#{adjustmentApplicationCreateController.selected.expectedIdleMonths}"  validatorMessage="闲置月数必须在 0 到 11 之间"
                                                 >
                                         <p:ajax/>
