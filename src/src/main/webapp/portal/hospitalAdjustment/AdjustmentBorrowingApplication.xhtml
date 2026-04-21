@@ -123,8 +123,8 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">预计使用时限：</label>
-                        <p:inputNumber value="#{idleEquipmentStockDetailController.application.estimatedUsageYears}" decimalPlaces="1" >
+                        <label class="label">预计使用时限<span style="color:red">*</span>：</label>
+                        <p:inputNumber value="#{idleEquipmentStockDetailController.application.estimatedUsageYears}" decimalPlaces="1"  required="true" requiredMessage="预计使用时限必填">
                             <p:ajax/>
                         </p:inputNumber>
                         <h:outputText value=" 年"/>
