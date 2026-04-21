@@ -104,10 +104,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private String itemValue = "WorkOrderListColumn_0";
     Map<String, Boolean> fieldRenderedMap = new HashMap<>();
     @Getter@Setter
-    private SelectItemDto selectItemDto;
+    private SelectItemDto selectItemDto=new SelectItemDto(null,null);
     @Getter@Setter
     private List<String> deleteEnumKey=new ArrayList<>();
-
+    @Getter@Setter
+    private String editEnumKey;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ConfigItemRepository.class);
@@ -907,6 +908,22 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         }
     }
 
+
+    public void costTypeEdit(ConfigItem configItem) {
+        if (configItem == null) {
+            return;
+        }
+
+        List<Map<String, String>> enumList = configItem.getEnumList();
+
+        enumList.removeIf(map -> {
+            String value = map.get("value");
+            return selectItemDto.getValue().equals(value);
+        });
+        configItem.setEnumList(enumList);
+        costTypeAdd(configItem);
+    }
+
     public List<Map<String, String>> costTypeDeleteBefore(ConfigItem configItem) {
         if(configItem==null){
             return null;
@@ -915,6 +932,20 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         String validation = configItem.getValidation();
         List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
         return getDifference(enumList, mapList, "key");
+
+    }
+
+    public void editSelectedEnum(ConfigItem configItem) {
+        if(StringUtils.isBlank(editEnumKey)){
+            return;
+        }
+        List<Map<String, String>> enumList = configItem.getEnumList();
+        for (Map<String, String> map : enumList) {
+            String value = map.get("value");
+            if(value.equals(editEnumKey)){
+                selectItemDto=new SelectItemDto(map.get("key"),map.get("value"));
+            }
+        }
 
     }
 }

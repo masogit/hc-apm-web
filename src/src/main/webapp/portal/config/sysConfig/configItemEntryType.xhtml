@@ -58,6 +58,53 @@
             </h:form>
         </p:dialog>
 
+        <p:dialog id="costTypeEditDlg" widgetVar="costTypeEditDlg" modal="true" resizable="true" draggable="true"
+                  width="30%" height="400px" header="删除成本类型">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                <h:panelGroup>
+                    <label class="label">成本类型</label>
+                    <p:selectOneMenu value="#{systemConfigItemController.editEnumKey}" showCheckbox="true" style="width: 95%;">
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems
+                                value="#{systemConfigItemController.costTypeDeleteBefore(systemConfigItemController.configItemMap.get('costType'))}"
+                                var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                        <p:ajax listener="#{systemConfigItemController.editSelectedEnum(systemConfigItemController.configItemMap.get('costType'))}"
+                             update="selectedEditEnum1 selectedEditEnum2" />
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <p:panelGrid id="selectedEditEnum">
+                    <h:panelGroup id="selectedEditEnum2">
+                        <label class="label">成本类型key</label>
+                        <p:inputText value="#{systemConfigItemController.selectItemDto.value}" disabled="true"
+                                     style="width: 40%">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                    <h:panelGroup id="selectedEditEnum1">
+                        <label class="label">成本类型value</label>
+
+
+                        <p:inputText value="#{systemConfigItemController.selectItemDto.label}"
+                                     style="width: 40%">
+                            <p:ajax/>
+                        </p:inputText>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <h:panelGroup>
+                    <p:commandButton
+                            actionListener="#{systemConfigItemController.costTypeEdit(systemConfigItemController.configItemMap.get('costType'))}"
+                            value="#{msg.Edit}" icon="ui-icon-check" update=":configItemForm"/>
+                    <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                     onclick="PF('costTypeDeleteDlg').hide()" update=":configItemForm"/>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+
+        </p:dialog>
+
 
     </ui:composition>
 
