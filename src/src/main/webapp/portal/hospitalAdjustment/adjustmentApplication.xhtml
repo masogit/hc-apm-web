@@ -296,6 +296,7 @@
                     <p:fieldset legend="附件材料清单"   >
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
+                            <div style="display:flex; align-items:center; flex-wrap:wrap;">
                             <p:selectManyCheckbox  value="#{adjustmentApplicationCreateController.attachments}" style="width: 700px"    >
 
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentAttachmentType')}"
@@ -303,21 +304,22 @@
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 <p:ajax event="change" process="@this" update="@form"/>
                             </p:selectManyCheckbox>
+                            <p:inputText  rendered="#{adjustmentApplicationCreateController.attachments.contains('other')}"
+                                          value="#{adjustmentApplicationCreateController.selected.attachmentsOtherDescription}"
+                                          required="true"  placeholder="附件材料其他描述"
+                                          requiredMessage="请选择'其他'时需填写详细说明"  style=" margin-left: 5px;">
+                                <p:ajax/>
+                            </p:inputText>
+
+
+                            </div>
                         </h:panelGroup>
+
+
+
                         </p:panelGrid>
 
-                        <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
-                                     rendered="#{adjustmentApplicationCreateController.attachments.contains('other')}">
-                            <h:panelGroup>
-                                <label class="label">附件材料其他描述</label>
-                                <p:inputText
-                                        value="#{adjustmentApplicationCreateController.selected.attachmentsOtherDescription}"
-                                        style="width: 95%;" required="true"
-                                        requiredMessage="请选择'其他'时需填写详细说明">
-                                    <p:ajax/>
-                                </p:inputText>
-                            </h:panelGroup>
-                        </p:panelGrid>
+
                     <h:panelGroup>
                         <p:commandButton  value="批量删除文件"  validateClient="false" immediate="true" class="bathDeleteAttach" update=":adjustmentApplicationForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{adjustmentApplicationCreateController.bathDeleteAttach}" disabled="#{!adjustmentApplicationCreateController.isChecked()}">
                             <p:confirm header="批量删除文件"  message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>
