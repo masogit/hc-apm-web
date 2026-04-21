@@ -266,39 +266,38 @@
                                                 </h:panelGroup>
                                                 <h:panelGroup style="width:100%;float: left;">
                                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                    <p:commandButton rendered="#{assetInfoEditController.isLoginUser(fileitem.createdBy) or userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_REMOVE')}" actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                     </p:commandButton>
                                                 </h:panelGroup>
                                             </h:panelGrid>
-
-
-                                            <!--<p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8;" title="识别"
-                                                             onclick="PF('nameplateRecognitionDlg').show()"  update="nameplateRecognitionForm" actionListener="#{assetInfoEditController.nameplatePhotoPreview(fileitem.objectStorageId)}" />-->
                                         </p:dataList>
                                         <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="500000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                            <p:commandButton rendered="#{assetInfoEditController.isLoginUser(fileitem.createdBy) or userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_REMOVE')}" actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
                                         <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <p:dataList id="manualList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                            <p:commandButton rendered="#{assetInfoEditController.isLoginUser(fileitem.createdBy) or userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_REMOVE')}" actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
                                         <p:fileUpload id="type3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="500000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                     <c:forEach items="#{assetInfoEditController.getAttachmentCategories()}" var="attachmentConfig">
@@ -306,11 +305,12 @@
                                             <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{attachmentConfig.label}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:commandButton rendered="#{assetInfoEditController.isLoginUser(fileitem.createdBy) or userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_REMOVE')}" actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
                                             <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                          rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                           multiple="true"  sizeLimit="500000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                     </c:forEach>
@@ -318,11 +318,12 @@
                                         <p:dataList id="acklList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,4)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="acklList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                            <p:commandButton rendered="#{assetInfoEditController.isLoginUser(fileitem.createdBy) or userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_REMOVE')}" actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="acklList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
                                         <p:fileUpload id="type4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="500000000"  update="acklList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
