@@ -680,9 +680,9 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
         for (AssetInfo tempAssetInfo : repeatAssets) {
             List<V2_BlobObject> v2BlobObjectList = dao.findByBoUuid(tempAssetInfo.getUid());
-            for(V2_BlobObject v2BlobObject : v2BlobObjectList){
+            /*for(V2_BlobObject v2BlobObject : v2BlobObjectList){
                 dao.delete(v2BlobObject.getId());
-            }
+            }*/
             for(V2_BlobObject batchBlobObject : repeatBlobObjectSet){
                 V2_BlobObject tempBlobObject = new V2_BlobObject();
                 tempBlobObject.setBoId(tempAssetInfo.getId());
