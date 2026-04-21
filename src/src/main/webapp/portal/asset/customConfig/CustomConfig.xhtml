@@ -439,7 +439,9 @@
 
                     <h:panelGroup >
                         <p:commandButton value="#{msg.Onekey}#{msg.Save}" icon="ui-icon-check" action="#{customConfigController.saveChange()}" validateClient="true" update=":customConfigForm :growl" style="float:left"/>
-                        <p:commandButton value="#{msg.Onekey}#{msg.Delete}" icon="ui-icon-check" action="#{customConfigController.deleteConfig()}" validateClient="true" update=":customConfigForm :growl" style="float:left"/>
+                        <p:commandButton value="#{msg.Onekey}#{msg.Delete}" icon="ui-icon-check" action="#{customConfigController.deleteConfig()}" validateClient="true" update=":customConfigForm :growl" style="float:left">
+                            <p:confirm header="#{msg.DeleteConformation}" message="是否确认删除当前配置并使用上级组织机构的自定义配置？" icon="ui-icon-warning"/>
+                        </p:commandButton>
                     </h:panelGroup>
 
                 </h:form>
