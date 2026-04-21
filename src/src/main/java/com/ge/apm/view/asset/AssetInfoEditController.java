@@ -2788,4 +2788,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         equipmentNameplate = null;
 
     }
+
+    public boolean isLoginUser(String userUid) {
+        return loginUser.getUid().equals(userUid);
+    }
 }

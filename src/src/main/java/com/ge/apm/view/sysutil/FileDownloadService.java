@@ -82,6 +82,14 @@ public class FileDownloadService {
         }
     }
 
+    public List<FileInfoResult> getNotByteFileInfoForEhome(Collection<String> fileIds) {
+        try {
+            return msService.getNotByteFiles(fileIds);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public void downloadFile(String fileId) {
         StreamedContent file = getFile(fileId);
         exportFile(file.getStream(), file.getName());

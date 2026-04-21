@@ -27,7 +27,7 @@
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">医共体所属类别</label>
+                                <label class="label">医共体所属类别<span style="color:red">*</span></label>
                                 <p:selectOneRadio id="status"
                                                   value="#{adjustmentApplicationCreateController.selected.medicalConsortiumType}"
                                                   required="true"
@@ -77,7 +77,7 @@
                         <p:panelGrid columns="4" layout="grid"  styleClass="ui-panelgrid-blank form-group">
 
                             <h:panelGroup>
-                                <label class="label">#{msg.assetName}*</label>
+                                <label class="label">#{msg.assetName}<span style="color:red">*</span></label>
                                 <p:inputText id="assetName" readonly="true"
                                              value="#{adjustmentApplicationCreateController.selectedAsset.name}"
                                              placeholder="#{msg.noAssetSelected}" required="true"
@@ -150,9 +150,9 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">是否超折旧期限</label>
+                                <label class="label">是否超折旧期限<span style="color:red">*</span></label>
                                 <p:selectOneRadio
-                                        value="#{adjustmentApplicationCreateController.selected.overDepreciation}">
+                                        value="#{adjustmentApplicationCreateController.selected.overDepreciation}" rendered="true" requiredMessage="是否超折旧期限必填">
                                     <f:selectItem itemLabel="是" itemValue="true"/>
                                     <f:selectItem itemLabel="否" itemValue="false"/>
                                     <p:ajax event="change" process="@this" update="@form"/>
@@ -163,8 +163,8 @@
                         <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
                                      rendered="#{adjustmentApplicationCreateController.selected.overDepreciation == true}">
                             <h:panelGroup>
-                                <label class="label">超期仍具备使用价值依据</label>
-                                <p:inputText
+                                <label class="label">超期仍具备使用价值依据<span style="color:red">*</span></label>
+                                <p:inputText required="true" requiredMessage="超期仍具备使用价值依据必填"
                                         value="#{adjustmentApplicationCreateController.selected.overDepreciationReason}"
                                         style="width: 95%;">
                                     <p:ajax/>
@@ -174,8 +174,8 @@
 
                         <p:panelGrid columns="2" layout="grid"  styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">设备现状</label>
-                                <p:selectOneRadio value="#{adjustmentApplicationCreateController.selected.deviceStatus}"
+                                <label class="label">设备现状<span style="color:red">*</span></label>
+                                <p:selectOneRadio value="#{adjustmentApplicationCreateController.selected.deviceStatus}" required="true" requiredMessage="设备现状必填"
                                 >
                                     <f:selectItem itemLabel="性能完好" itemValue="PERFECT"/>
                                     <f:selectItem itemLabel="可修复后正常使用" itemValue="REPAIRABLE"/>
@@ -202,16 +202,16 @@
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">设备产权性质</label>
+                                <label class="label">设备产权性质<span style="color:red">*</span></label>
                                 <div style="display:flex; align-items:center; flex-wrap:wrap;">
-                                    <p:selectOneRadio
+                                    <p:selectOneRadio required="true" requiredMessage="设备产权性质必填"
                                             value="#{adjustmentApplicationCreateController.selected.propertyNature}"
                                     >
                                         <f:selectItem itemLabel="国有资产" itemValue="STATE_OWNED"/>
                                         <f:selectItem itemLabel="其他" itemValue="OTHER"/>
                                         <p:ajax event="change" process="@this" update="@form"/>
                                     </p:selectOneRadio>
-                                    <p:inputText
+                                    <p:inputText required="true" requiredMessage="设备产权性质请说明必填"
                                             rendered="#{adjustmentApplicationCreateController.selected.propertyNature == 'OTHER'}"
                                             value="#{adjustmentApplicationCreateController.selected.propertyNatureDesc}"
                                             placeholder="请说明" style="width: 100px; margin-left: 5px;">
@@ -220,15 +220,15 @@
                                 </div>
                             </h:panelGroup>
                             <h:panelGroup colspan="2">
-                                <label class="label">是否存在权利瑕疵</label>
+                                <label class="label">是否存在权利瑕疵<span style="color:red">*</span></label>
                                 <div style="display:flex; align-items:center; flex-wrap:wrap;">
-                                    <p:selectOneRadio
+                                    <p:selectOneRadio required="true" requiredMessage="是否存在权利瑕疵必填"
                                             value="#{adjustmentApplicationCreateController.selected.hasRightsDefect}">
                                         <f:selectItem itemLabel="无" itemValue="false"/>
                                         <f:selectItem itemLabel="有" itemValue="true"/>
                                         <p:ajax event="change" process="@this" update="@form"/>
                                     </p:selectOneRadio>
-                                    <p:inputText
+                                    <p:inputText required="true" requiredMessage="注明抵押、查封等 必填"
                                             rendered="#{adjustmentApplicationCreateController.selected.hasRightsDefect == true}"
                                             value="#{adjustmentApplicationCreateController.selected.rightsDefectDescription}"
                                             placeholder="注明抵押、查封等" style="width: 120px; margin-left: 5px;">
@@ -243,7 +243,7 @@
                     <p:fieldset legend="设置闲置原因" style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid"  styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup colspan="4">
-                                <label class="label">闲置原因</label>
+                                <label class="label">闲置原因<span style="color:red">*</span></label>
                                 <p:selectOneRadio
                                                   value="#{adjustmentApplicationCreateController.selected.idleReasons}"
                                                   required="true"
@@ -261,7 +261,7 @@
                         <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
                                      rendered="#{adjustmentApplicationCreateController.selected.idleReasons != null and adjustmentApplicationCreateController.selected.idleReasons.contains('OTHER')}">
                             <h:panelGroup>
-                                <label class="label">其他原因详细说明</label>
+                                <label class="label">其他原因详细说明<span style="color:red">*</span></label>
                                 <p:inputText
                                         value="#{adjustmentApplicationCreateController.selected.otherReasonDescription}"
                                         style="width: 95%;" required="true"
@@ -296,6 +296,7 @@
                     <p:fieldset legend="附件材料清单"   >
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
+                            <div style="display:flex; align-items:center; flex-wrap:wrap;">
                             <p:selectManyCheckbox  value="#{adjustmentApplicationCreateController.attachments}" style="width: 700px"    >
 
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentAttachmentType')}"
@@ -303,21 +304,22 @@
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 <p:ajax event="change" process="@this" update="@form"/>
                             </p:selectManyCheckbox>
+                            <p:inputText  rendered="#{adjustmentApplicationCreateController.attachments.contains('other')}"
+                                          value="#{adjustmentApplicationCreateController.selected.attachmentsOtherDescription}"
+                                          required="true"  placeholder="附件材料其他描述"
+                                          requiredMessage="请选择'其他'时需填写详细说明"  style=" margin-left: 5px;">
+                                <p:ajax/>
+                            </p:inputText>
+
+
+                            </div>
                         </h:panelGroup>
+
+
+
                         </p:panelGrid>
 
-                        <p:panelGrid columns="1" layout="grid"  styleClass="ui-panelgrid-blank form-group"
-                                     rendered="#{adjustmentApplicationCreateController.attachments.contains('other')}">
-                            <h:panelGroup>
-                                <label class="label">附件材料其他描述</label>
-                                <p:inputText
-                                        value="#{adjustmentApplicationCreateController.selected.attachmentsOtherDescription}"
-                                        style="width: 95%;" required="true"
-                                        requiredMessage="请选择'其他'时需填写详细说明">
-                                    <p:ajax/>
-                                </p:inputText>
-                            </h:panelGroup>
-                        </p:panelGrid>
+
                     <h:panelGroup>
                         <p:commandButton  value="批量删除文件"  validateClient="false" immediate="true" class="bathDeleteAttach" update=":adjustmentApplicationForm:AttachList @(.selectCheckBox) @(.selectCheckBoxHeader) @(.bathDeleteAttach) @(.bathDownloadAttach)" actionListener="#{adjustmentApplicationCreateController.bathDeleteAttach}" disabled="#{!adjustmentApplicationCreateController.isChecked()}">
                             <p:confirm header="批量删除文件"  message="您确认要删除选中的文件吗？" icon="ui-icon-warning"/>

@@ -326,10 +326,18 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
 //                    assetDataEntrys.add(dataEntry);
 //                }
                 List<Map<String, String>> costTypeList = getCostType();
-                List<String> costTypes = costTypeList.stream().map(i -> i.get("value")).collect(Collectors.toList());
-                for (String  costType : costTypes) {
+//                List<String> costTypes = costTypeList.stream().map(i -> i.get("value")).collect(Collectors.toList());
+//                for (String  costType : costTypes) {
+//                    DataEntry dataEntry = new DataEntry();
+//                    dataEntry.setEntryType(costType);
+//                    assetDataEntrys.add(dataEntry);
+//                }
+                for (Map<String, String> map : costTypeList) {
+                    String key = map.get("key");
+                    String value = map.get("value");
                     DataEntry dataEntry = new DataEntry();
-                    dataEntry.setEntryType(costType);
+                    dataEntry.setEntryType(value);
+                    dataEntry.setEntryTypeZh(key);
                     assetDataEntrys.add(dataEntry);
                 }
                 userSiteOrgTreeComponentController.setSelectedOrg(null);

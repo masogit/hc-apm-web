@@ -45,7 +45,7 @@
                     <c:forEach items="#{dataEntryCreateController.assetDataEntrys}" var="dataentry">
 
                         <h:panelGroup>
-                            <label style="color: #212121">#{fieldMsg.fieldValue('HisEntryType',dataentry.entryType)}</label>
+                            <label style="color: #212121">#{dataentry.entryTypeZh}</label>
                         </h:panelGroup>
                         <h:panelGroup>
 

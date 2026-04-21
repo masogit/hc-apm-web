@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.apm.domain.his.HisAssetGroup;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -107,7 +108,9 @@ public class DataEntry implements Serializable {
     @JoinColumn(name = "last_modified_by",referencedColumnName = "uid", insertable = false,updatable = false)
     private UserAccount lastModifiedUserAccount;
 
-
+    @Transient
+    @TableField(exist = false)
+    private String entryTypeZh;
     @Override
     public int hashCode() {
         Integer hash = 0;

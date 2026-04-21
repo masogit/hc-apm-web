@@ -33,6 +33,10 @@ public class ConfigItemValue implements Serializable {
     @Type(type = "text")
     private String value;
 
+    @Column(name = "custom_value")
+    @Type(type = "text")
+    private String customValue;    //院区自定义添加类型 枚举 等
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUid;
 
