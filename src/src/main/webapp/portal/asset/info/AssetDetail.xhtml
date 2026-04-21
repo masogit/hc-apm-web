@@ -34,7 +34,8 @@
                     <p:tab title="#{msg.BasicInfo}">
                         <p:accordionPanel id="accordion" multiple="false" >
                             <p:tab title="#{msg.BasicInfo}">
-                                <div class="ui-g">
+                                <h:form id="AssetInfoDetailForm1">
+<!--                                <div class="ui-g">-->
                                     <div class="ui-g-8 ui-g-nopad">
                                         <p:panelGrid id="basicPanel" columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
                                             <c:forEach items="#{assetInfoDetailController.customConfig.assetsDetailpageBasicFields}" var="fieldItem" >
@@ -43,19 +44,25 @@
                                         </p:panelGrid>
                                     </div>
                                     <div class="ui-g-4">
-                                        <div class="container-fluid" style="height: 400px; overflow: auto;">
-                                            <div class="row" id="picDiv">
-                                                <c:forEach items="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" >
-                                                    <div>
-                                                        <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
-                                                             src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
-                                                             style="opacity:0; width:1px; height:1px" />
-                                                    </div>
-                                                </c:forEach>
+                                        <h:panelGroup id="pict">
+                                            <div class="container-fluid" style="height: 400px; overflow: auto;">
+                                                <div class="row" id="assetPagePicDiv">
+                                                    <c:forEach items="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" >
+                                                        <div>
+                                                            <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                                 src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                                 style="opacity:0; width:1px; height:1px"/>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                                <script>
+                                                    new Viewer(document.getElementById('assetPagePicDiv'), {inline: true});
+                                                </script>
                                             </div>
-                                        </div>
+                                        </h:panelGroup>
                                     </div>
-                                </div>
+<!--                                </div>-->
+                                </h:form>
                             </p:tab>
                         </p:accordionPanel>
                         <p:accordionPanel id="accordion2">
@@ -153,12 +160,43 @@
                             </p:panel>
                             <p:tabView>
                                 <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
-                                    <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                    <c:choose>
+                                        <c:when test="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}">
+                                                <p:dataList id="pictureList" value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                                    <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"  >
+                                                        <h:panelGroup style="float:left;">
+                                                            <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                                        </h:panelGroup>
+                                                        <h:panelGroup style="width:100%;float: left;">
+                                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                            <p:commandButton rendered="#{assetInfoDetailController.isLoginUser(fileitem.createdBy) or userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_REMOVE')}" actionListener="#{assetInfoDetailController.removeAttachmentById(fileitem.id)}" update="assetDetail pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                                            </p:commandButton>
+                                                        </h:panelGroup>
+                                                    </h:panelGrid>
+                                                </p:dataList>
+                                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoDetailController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                              multiple="true"  sizeLimit="500000000"  update="assetDetail pictureList"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                                <div class="ui-g">
+                                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2" class="ui-g-3"/>
+                                                    <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()" class="ui-g-2"/>
+                                                </div>
+                                            </p:dataList>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <!--<p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                                         <div class="ui-g">
                                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2" class="ui-g-3"/>
                                             <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()" class="ui-g-2"/>
+                                            <p:commandLink value="#{msg.Delete}" style="margin-right: 5px;" update="assetDetail" rendered="#{assetInfoDetailController.isLoginUser(fileitem.createdBy) or userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_REMOVE')}" process="@this" actionListener="#{assetInfoDetailController.removeAttachmentById(fileitem.id)}" class="ui-g-2"/>
+                                            <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
+                                                          fileUploadListener="#{assetInfoDetailController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                          multiple="true"  sizeLimit="500000000"  update="assetDetail"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                         </div>
-                                    </p:dataList>
+                                    </p:dataList>-->
                                 </p:tab>
                                 <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
                                     <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">

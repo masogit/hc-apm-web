@@ -25,6 +25,7 @@ import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
@@ -69,6 +70,7 @@ public class AssetInfoDetailController {
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private UserAccountRepository userAccountRepository;
     private AssetInfoService assetInfoService;
+    private BlobFileService blobService;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -90,6 +92,7 @@ public class AssetInfoDetailController {
     private AssetTypeGroup selectedAssetTypeGroup;
     @Getter
     private boolean countyArea = false;
+    private UserAccount loginUser;
 
     private UserContextService userContextService;
 
@@ -124,6 +127,8 @@ public class AssetInfoDetailController {
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+        loginUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = Boolean.parseBoolean(terminateStr);
@@ -294,6 +299,38 @@ public class AssetInfoDetailController {
             attachements = blobDao.findBySearchFilter(sfs);
         }
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        try {
+            String fileName = event.getFile().getFileName();
+            V2_BlobObject blobObject = blobService.uploadFile(event);
+            if (null != blobObject) {
+                String type = event.getComponent().getId();
+                type = type.substring(type.indexOf("type") + 4);
+                attachements.add(blobObject);
+                blobObject.setBoId(selected.getId());
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+                blobObject.setBoSubType(type);
+                blobObject.setBoUuid(selected.getUid());
+                blobService.saveBlobObject(blobObject);
+                WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+            } else {
+                WebUtil.addErrorMessage("fail to upload file");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+
+    public boolean isLoginUser(String userUid) {
+        return loginUser.getUid().equals(userUid);
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
