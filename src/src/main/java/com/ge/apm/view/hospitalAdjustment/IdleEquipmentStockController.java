@@ -2,6 +2,7 @@ package com.ge.apm.view.hospitalAdjustment;
 
 import com.ge.apm.dao.IdleEquipmentApplicationRepository;
 import com.ge.apm.dao.IdleEquipmentStockRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -26,6 +27,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -59,8 +61,8 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
 
     private OrgTreeController orgTreeController;
 
-    @Getter @Setter
-    private TreeNode[] selectedAccessOrgNodes;
+
+    private TreeNode[] selectedAccessOrgNodes = new TreeNode[0];
 
     private List<OrgInfo> clinicalDeptList;
 
@@ -84,6 +86,7 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
 
     private OrgInfoTreeService orgInfoTreeService;
 
+    private   OrgInfoRepository orgInfoDao;
     @Getter
     @Setter
     private Map<String,Object> filterObject;
@@ -94,13 +97,21 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
         currentUserAccount = UserContextService.getCurrentUserAccount();
 
         orgTreeController = WebUtil.getBean(OrgTreeController.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 
         uaaService = WebUtil.getBean(UaaService.class);
         cacheService = WebUtil.getBean(ConfigCacheService.class);
-        selectSite = cacheService.findOrgByUid(currentUserAccount.getSiteUID());
 
-        orgList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid());
+        Set<String> functionList = UserContextService.getCurrentUserFunction();
+        if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
+            orgList = orgInfoDao.getOrgInfosByParentId(currentUserAccount.getInstitutionUID());
+            selectSite = cacheService.findOrgByUid(currentUserAccount.getInstitutionUID());
 
+        }else{
+            orgList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid());
+            selectSite = cacheService.findOrgByUid(currentUserAccount.getSiteUID());
+
+        }
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         loadClinicalDeptList();
         filterObject=new HashMap<>();
@@ -207,7 +218,17 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
     private void loadClinicalDeptList() {
         try {
             clinicalDeptList = Collections.emptyList();
-            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+
+
+            List<OrgInfo> deptList =new ArrayList<>();
+
+            Set<String> functionList = UserContextService.getCurrentUserFunction();
+            if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
+                deptList= uaaService.getBySiteUidDeptList(currentUserAccount.getInstitutionUID());
+            }else{
+                deptList = uaaService.getAllAccessibleClinicalDeptList();
+            }
+
             if (!CollectionUtils.isEmpty(deptList)) {
                 clinicalDeptList = deptList.stream()
                         .filter(item ->
@@ -348,6 +369,12 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
         }
     }
 
+    public TreeNode[] getSelectedAccessOrgNodes() {
+        return selectedAccessOrgNodes;
+    }
 
+    public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
+        this.selectedAccessOrgNodes = selectedAccessOrgNodes;
+    }
 
 }

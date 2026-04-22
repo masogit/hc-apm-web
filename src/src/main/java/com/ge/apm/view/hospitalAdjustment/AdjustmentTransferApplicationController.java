@@ -97,6 +97,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
 
     private String fileterOrgName;
     private OrgInfoTreeService orgInfoTreeService;
+    private   OrgInfoRepository orgInfoDao;
     @Override
     protected void init() {
         adjustmentTransferApplicationRepository = WebUtil.getBean(AdjustmentTransferApplicationRepository.class);
@@ -107,7 +108,18 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
         orgTreeController = WebUtil.getBean(OrgTreeController.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
-        orgList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid());
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+
+        Set<String> functionList = UserContextService.getCurrentUserFunction();
+        if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
+            orgList = orgInfoDao.getOrgInfosByParentId(currentUserAccount.getInstitutionUID());
+            selectSite = cacheService.findOrgByUid(currentUserAccount.getInstitutionUID());
+
+        }else{
+            orgList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid());
+            selectSite = cacheService.findOrgByUid(currentUserAccount.getSiteUID());
+
+        }
         filterObject = new HashMap<>();
         loadClinicalDeptList();
     }
@@ -228,7 +240,17 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
     private void loadClinicalDeptList() {
         try {
             clinicalDeptList = Collections.emptyList();
-            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+
+
+            List<OrgInfo> deptList =new ArrayList<>();
+
+            Set<String> functionList = UserContextService.getCurrentUserFunction();
+            if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
+                deptList= uaaService.getBySiteUidDeptList(currentUserAccount.getInstitutionUID());
+            }else{
+                deptList = uaaService.getAllAccessibleClinicalDeptList();
+            }
+
             if (!CollectionUtils.isEmpty(deptList)) {
                 clinicalDeptList = deptList.stream()
                         .filter(item ->

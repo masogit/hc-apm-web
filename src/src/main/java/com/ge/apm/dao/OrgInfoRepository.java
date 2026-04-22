@@ -368,4 +368,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     List<OrgInfo> findByIdIn(Collection<Integer> ids);
 
+
+    @Query("select t from OrgInfo t where   t.institutionUID=?1  and t.orgType=4 ")
+    public List<OrgInfo> getInstitutionUIDAndOrgType(String institutionUID);
+
 }
