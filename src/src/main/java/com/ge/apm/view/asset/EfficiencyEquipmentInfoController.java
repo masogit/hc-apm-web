@@ -15,7 +15,6 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -146,6 +145,14 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Getter
     @Setter
     private BigDecimal positiveRate;
+
+    @Getter
+    @Setter
+    private BigDecimal expectedAnnualIncome;
+
+    @Getter
+    @Setter
+    private Integer expectedCheckNumberPeople;
 
     @Getter
     @Setter
@@ -483,12 +490,28 @@ protected boolean numberField(String fieldName, String filterVal) {
                 case "clinicalDeptName":
                     param.put("clinicalDeptName", searchFilter.value);
                     break;
+                case "checkNumberPeople":
+                    try {
+                        double num = Double.parseDouble(searchFilter.value.toString());
+                        String pararName;
+                        if (searchFilter.operator.name().equals("GTE")) {
+                            pararName= fieldName+"GTE";
+                            param.put(pararName, num);
+                        } else {
+                            pararName=fieldName+"LTE";
+                            param.put(pararName, num);
+                        }
+                    } catch (Exception e) {
+                        logger.error("his设备绩效检查人次数值区间搜索数值转换异常 e:",e);
+                    }
+                    break;
                 case "cost":
                 case "income":
                 case "profits":
                 case "profitsRate":
                 case "positiveRate":
                 case "purchasePrice":
+                case "expectedAnnualIncome":
                     try {
                         double num = Double.parseDouble(searchFilter.value.toString());
                         String pararName;
@@ -724,31 +747,29 @@ protected boolean numberField(String fieldName, String filterVal) {
     public void  editBatch1(){
         this.positiveRate=null;
         this.displayName=null;
+        this.expectedAnnualIncome=null;
+        this.expectedCheckNumberPeople=null;
     }
     public void  editBatch(){
-        if(positiveRate!=null){
-            if(positiveRate.compareTo(BigDecimal.valueOf(100))>0){
-                this.positiveRate=null;
+        if (positiveRate != null) {
+            if (positiveRate.compareTo(BigDecimal.valueOf(100)) > 0) {
+                this.positiveRate = null;
                 WebUtil.addErrorMessage("阳性率不能大于100");
                 return;
             }
         }
         Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-        int count;
-        if(positiveRate!=null){
-             count=efficiencyEquipmentInfoRepository.updateBatch(assetUids,positiveRate,displayName);
-        }else{
-             count=efficiencyEquipmentInfoRepository.updateBatchDisplayName(assetUids,displayName);
-        }
-
-        if(count>0){
+        int count = efficiencyEquipmentInfoRepository.updateBatchSmart(assetUids, positiveRate, displayName, expectedAnnualIncome, expectedCheckNumberPeople);
+        if (count > 0) {
             WebUtil.addErrorMessage("批量修改成功");
-        }else{
+        } else {
             WebUtil.addErrorMessage("批量修改失败");
         }
         this.selectedMap = new HashMap<>();
-        this.positiveRate=null;
-        this.displayName=null;
+        this.positiveRate = null;
+        this.displayName = null;
+        expectedAnnualIncome = null;
+        expectedCheckNumberPeople = null;
     }
 
 

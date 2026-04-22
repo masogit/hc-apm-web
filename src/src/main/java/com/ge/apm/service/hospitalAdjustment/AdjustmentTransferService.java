@@ -238,7 +238,7 @@ public class AdjustmentTransferService {
         stringMap.put("content", "设备调剂申请已通过，请确认信息后线下交接");
         stringMap.put("date", DateUtil.formatDateTime(new Date()));
 
-        List<String> byIdsAndHospitalUID = getAdjustmentTransferApproval(adjustmentTransferApplication,true,false);
+        List<String> byIdsAndHospitalUID = getAdjustmentTransferApproval(adjustmentTransferApplication,true,true);
         wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE,byIdsAndHospitalUID,null);
     }
 

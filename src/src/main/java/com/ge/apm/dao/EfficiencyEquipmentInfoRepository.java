@@ -10,11 +10,47 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 public interface EfficiencyEquipmentInfoRepository extends GenericRepositoryUUID<EfficiencyEquipmentInfo> {
+
     @Transactional
     @Modifying
-    @Query(value="update  efficiency_equipment_info set positive_rate=?2 , display_name=?3 where asset_uid in ?1",nativeQuery = true)
-    int updateBatch(Set<String> assetUids, BigDecimal positiveRate,String displayName);
+    @Query(value = "update efficiency_equipment_info set positive_rate=?2, display_name=?3 where asset_uid in ?1", nativeQuery = true)
+    int updateBatchBase(Set<String> assetUids, BigDecimal positiveRate, String displayName);
 
+    @Transactional
+    @Modifying
+    @Query(value = "update efficiency_equipment_info set positive_rate=?2, display_name=?3, expected_annual_income=?4 where asset_uid in ?1", nativeQuery = true)
+    int updateBatchWithIncome(Set<String> assetUids, BigDecimal positiveRate, String displayName, BigDecimal expectedAnnualIncome);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update efficiency_equipment_info set positive_rate=?2, display_name=?3, expected_check_number_people=?4 where asset_uid in ?1", nativeQuery = true)
+    int updateBatchWithPeople(Set<String> assetUids, BigDecimal positiveRate, String displayName, Integer expectedCheckNumberPeople);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update efficiency_equipment_info set positive_rate=?2, display_name=?3, expected_annual_income=?4, expected_check_number_people=?5 where asset_uid in ?1", nativeQuery = true)
+    int updateBatchWithIncomeAndPeople(Set<String> assetUids,
+                                       BigDecimal positiveRate,
+                                       String displayName,
+                                       BigDecimal expectedAnnualIncome,
+                                       Integer expectedCheckNumberPeople);
+
+    @Transactional
+    default int updateBatchSmart(Set<String> assetUids,
+                                 BigDecimal positiveRate,
+                                 String displayName,
+                                 BigDecimal expectedAnnualIncome,
+                                 Integer expectedCheckNumberPeople) {
+        if (expectedAnnualIncome != null && expectedCheckNumberPeople != null) {
+            return updateBatchWithIncomeAndPeople(assetUids, positiveRate, displayName, expectedAnnualIncome, expectedCheckNumberPeople);
+        } else if (expectedAnnualIncome != null) {
+            return updateBatchWithIncome(assetUids, positiveRate, displayName, expectedAnnualIncome);
+        } else if (expectedCheckNumberPeople != null) {
+            return updateBatchWithPeople(assetUids, positiveRate, displayName, expectedCheckNumberPeople);
+        } else {
+            return updateBatchBase(assetUids, positiveRate, displayName);
+        }
+    }
 
     @Transactional
     @Modifying

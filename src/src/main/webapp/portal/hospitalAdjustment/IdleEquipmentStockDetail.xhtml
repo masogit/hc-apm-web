@@ -44,7 +44,19 @@
         <ui:include src="AdjustmentBorrowingApplication.xhtml"/>
 
         <script>
-
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#AssetContractEditForm\\:AttachList\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
 
         </script>
     </ui:define>
