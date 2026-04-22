@@ -161,6 +161,7 @@ public class AssetInstallationReportService {
         }
         reportData.put("location_name", locationName);//安置地点
         reportData.put("fixasset_ack_date", ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus()) ? arrivalListItem.getFixassetAckDate() : "");//验收日期
+        reportData.put("arrival_date", arrivalListItem.getArrivalList().getArrivalDate());//到货时间
         return reportData;
     }
 
@@ -254,6 +255,7 @@ public class AssetInstallationReportService {
         reportData.put("fixasset_ack_date", ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus()) ? arrivalListItem.getFixassetAckDate() : "");//验收日期
         reportData.put("approval_no", arrivalList.getApprovalNo());//批文号
         reportData.put("site_name", orgInfoDao.findByUid(arrivalList.getSiteUID()));//院区
+        reportData.put("arrival_date", arrivalListItem.getArrivalList().getArrivalDate());//到货时间
         return reportData;
     }
 
