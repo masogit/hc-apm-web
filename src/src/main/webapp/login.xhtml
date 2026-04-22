@@ -167,6 +167,8 @@
                     var token = "#{userContextService.getAccessToken()}";
                     localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
                     localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
+                    localStorage.setItem("lscache-authhc-apm-token", token || '#'); // # for Large screen token
+                    localStorage.setItem("lscache-authhc-apm-token-expireAt", Date.now() + 8640000);
                     window.location.href = redirectUrl;
                 }
             }

@@ -19,7 +19,7 @@
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
                             <label class="label">展示名称<span style="color:red">*</span></label>
-                            <p:inputText minValue="0" decimalPlaces="1" id="displayName" value="#{efficiencyEquipmentInfoController.displayName}">
+                            <p:inputText minValue="0" required="true" decimalPlaces="1" id="displayName" value="#{efficiencyEquipmentInfoController.displayName}">
                                 <p:ajax />
                             </p:inputText>
                         </h:panelGroup>
@@ -28,9 +28,23 @@
                         <h:panelGroup>
                         <label class="label">阳性率(%)<span style="color:red">*</span></label>
                         <p:inputNumber minValue="0" decimalPlaces="1" id="positiveRate" value="#{efficiencyEquipmentInfoController.positiveRate}"
-                                       requiredMessage="阳性率必填" >
+                                     required="true"  requiredMessage="阳性率必填" >
                             <p:ajax />
                         </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预期检查人次</label>
+                            <p:inputNumber minValue="0" decimalPlaces="0" id="checkNumberPeople" value="#{efficiencyEquipmentInfoController.expectedCheckNumberPeople}"
+                                          >
+                                <p:ajax />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预期年收入(万元)</label>
+                            <p:inputNumber minValue="0" decimalPlaces="1" id="expectedAnnualIncome" value="#{efficiencyEquipmentInfoController.expectedAnnualIncome}"
+                            >
+                                <p:ajax />
+                            </p:inputNumber>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>

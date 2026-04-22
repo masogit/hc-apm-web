@@ -344,8 +344,12 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
         uploadedFileObjects.add(blobService.uploadFile(event.getFile()));
     }
     public void finishUpload() {
+        if(StringUtils.isBlank(attachmentType)){
+            WebUtil.addErrorMessage("请选择附件类型");
+            return;
+        }
         uploadedFileObjects.stream().forEach(item -> {
-            item.setBoSubType(Strings.isNullOrEmpty(attachmentType) ? ContractInfo.AttachmentType.Other.toString() : attachmentType);
+            item.setBoSubType(attachmentType);
             item.setBoType(V2_BlobObject.BO_TYPE_HospitalAdjustmentContract);
         });
         attachements.addAll(uploadedFileObjects);

@@ -286,6 +286,15 @@ public class OrgTreeController {
         return uaaService.getClinicalDeptListBySiteUID(siteUID);
     }
 
+    public void filterDeptOrgTree(){
+//        List<OrgInfo> deptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid());
+//        deptOrgTree = buildTree(deptList.stream().distinct().filter(item -> Strings.isNullOrEmpty("") || item.getTenantUID().equals("")
+//                || item.getInstitutionUID().equals("") || item.getHospitalUID().equals("") || item.getSiteUID().equals("")).collect(Collectors.toList()));
+//        deptOrgTree.setRowKey("");
+//        selectedDeptOrgNode = null;
+//        expandedByOrgType(deptOrgTree, 4);
+        uaaService.filterTreeNode(deptOrgTree, treeNodeNameFilter, -1, -1);
+    }
     public TreeNode getDeptOrgTree(String siteUid) {
         if (null == deptOrgTree || !siteUid.equals(deptOrgTree.getRowKey())) {
             List<OrgInfo> deptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid());

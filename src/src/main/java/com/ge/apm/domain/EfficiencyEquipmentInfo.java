@@ -1,7 +1,6 @@
 package com.ge.apm.domain;
 
 
-import com.baomidou.mybatisplus.annotations.TableField;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -87,11 +86,15 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @Column(name = "display_name")
     private String displayName;
 
+    @Column(name = "expected_annual_income")
+    private BigDecimal expectedAnnualIncome;
+
+    @Column(name = "expected_check_number_people")
+    private Integer expectedCheckNumberPeople;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private AssetInfo assetInfo;
-
 
     @Transient
     private String makerShortName;
@@ -111,6 +114,22 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
     @Transient
     private Date purchaseDate;
+
+    public BigDecimal getExpectedAnnualIncome() {
+        return expectedAnnualIncome;
+    }
+
+    public void setExpectedAnnualIncome(BigDecimal expectedAnnualIncome) {
+        this.expectedAnnualIncome = expectedAnnualIncome;
+    }
+
+    public Integer getExpectedCheckNumberPeople() {
+        return expectedCheckNumberPeople;
+    }
+
+    public void setExpectedCheckNumberPeople(Integer expectedCheckNumberPeople) {
+        this.expectedCheckNumberPeople = expectedCheckNumberPeople;
+    }
 
     public String getFinancingNum() {
         return financingNum;
