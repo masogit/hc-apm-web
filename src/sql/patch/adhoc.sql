@@ -9,12 +9,12 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 
 
 --YHAAO-27142
-update config_item set value_type = 9, default_value = '{"rendered":false,"required":"false","requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'workOrderShowTravelTime';
-update config_item_value set value = '{"rendered":false,"required":"false","requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'workOrderShowTravelTime' and value = 'false';
-update config_item_value set value = '{"rendered":true,"required":"false","requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'workOrderShowTravelTime' and value = 'true';
+update config_item set value_type = 9, default_value = '{"rendered":false,"required":false,"requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'workOrderShowTravelTime';
+update config_item_value set value = '{"rendered":false,"required":false,"requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'workOrderShowTravelTime' and value = 'false';
+update config_item_value set value = '{"rendered":true,"required":false,"requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'workOrderShowTravelTime' and value = 'true';
 
-update config_item set value_type = 9, default_value = '{"rendered":false,"required":"false","requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'pmOrderShowTravelTime';
-update config_item_value set value = '{"rendered":false,"required":"false","requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'pmOrderShowTravelTime' and value = 'false';
-update config_item_value set value = '{"rendered":true,"required":"false","requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'pmOrderShowTravelTime' and value = 'true';
+update config_item set value_type = 9, default_value = '{"rendered":false,"required":false,"requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'pmOrderShowTravelTime';
+update config_item_value set value = '{"rendered":false,"required":false,"requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'pmOrderShowTravelTime' and value = 'false';
+update config_item_value set value = '{"rendered":true,"required":false,"requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'pmOrderShowTravelTime' and value = 'true';
 
 
