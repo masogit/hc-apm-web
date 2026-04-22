@@ -1813,5 +1813,11 @@ public class UaaService {
         return directChildren;
     }
 
+    public List<OrgInfo> getBySiteUidDeptList(String siteUid){
+
+
+       return orgInfoDao.getInstitutionUIDAndOrgType(siteUid);
+    }
+
 
 }
