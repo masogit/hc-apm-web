@@ -909,9 +909,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 //                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
 
                 if(autoDispatchAllowClaimByAssignee){
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
+                    searchFilters.add(new SearchFilter("orderSnatchingPerson.userUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
                     searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*3+8*"));
                 }
                 List<Integer> tagGroupAssets = getTagGroupAssets();

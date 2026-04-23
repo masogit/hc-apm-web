@@ -31,7 +31,7 @@ public class BySearchFilterSpecification {
                         Class clazz = expression.getJavaType();
                         if(clazz.equals(Set.class)){
                             SetJoin setJoin = root.joinSet(names[0],JoinType.LEFT);
-                            query.distinct(true);
+//                            query.distinct(true);
                             expression = setJoin.get(names[1]);
                         }else {
                             for (int i = 1; i < names.length; i++) {
