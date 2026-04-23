@@ -7,6 +7,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.domain.dto.SelectItemDto;
+import com.ge.apm.service.asset.DataEntryService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.PmOrderPreCreateService;
@@ -87,6 +88,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     private V2_PmOrderRepository v2PmOrderRepository;
 
+    private DataEntryService dataEntryService;
     private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
     private List<OrgInfo> deptList;
 
@@ -122,6 +124,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         pmOrderPreCreateService = WebUtil.getBean(PmOrderPreCreateService.class);
         v2PmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         srApi = WebUtil.getBean(PmOrderRequestApiService.class);
+        dataEntryService = WebUtil.getBean(DataEntryService.class);
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
         loadClinicalDept();
         loadAssetStaff();
@@ -886,7 +889,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         stringStringHashMap.put("value",selectItemDto.getValue());
         enumList.add(stringStringHashMap);
         configItem.setEnumList(enumList);
-
+        saveConfig(configItem);
     }
 
     public void costTypeAddBefore() {
@@ -905,6 +908,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 return value != null && deleteEnumKey.contains(value);
             });
             configItem.setEnumList(enumList);
+            saveConfig(configItem);
+            dataEntryService.deleteByCostType(deleteEnumKey,selectSite.getUid());
         }
     }
 
