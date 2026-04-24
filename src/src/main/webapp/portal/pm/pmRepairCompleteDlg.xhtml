@@ -208,11 +208,11 @@
                             </p:dataTable>
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'pmOrderShowTravelTime').rendered}">
-                            <label class="label">#{msg.travelTime}#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'pmOrderShowTravelTime').required ? '*' : ''}</label>
+                        <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(v2PmOrderController.currentUserOrgInfo, 'pmOrderShowTravelTime').rendered}">
+                            <label class="label">#{msg.travelTime}#{systemConfigItemController.getFieldColumn(v2PmOrderController.currentUserOrgInfo, 'pmOrderShowTravelTime').required ? '*' : ''}</label>
                             <p:inputNumber id="travel_time"  minValue="0" maxValue="999"  decimalPlaces="2" value="#{v2PmOrderController.selectedPmOrder.travelTime}"
-                                           required="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'pmOrderShowTravelTime').required}"
-                                           requiredMessage="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'pmOrderShowTravelTime').requiredMessage}">
+                                           required="#{systemConfigItemController.getFieldColumn(v2PmOrderController.currentUserOrgInfo, 'pmOrderShowTravelTime').required}"
+                                           requiredMessage="#{systemConfigItemController.getFieldColumn(v2PmOrderController.currentUserOrgInfo, 'pmOrderShowTravelTime').requiredMessage}">
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
