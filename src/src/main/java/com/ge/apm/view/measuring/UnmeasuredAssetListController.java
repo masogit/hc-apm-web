@@ -1,5 +1,6 @@
 package com.ge.apm.view.measuring;
 
+import com.ge.apm.view.uaa.OrgTreeController;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
@@ -49,6 +50,8 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
     private OrgInfoTreeService orgInfoTreeService;
     private AssetInfoMapper assetInfoMapper;
 
+    private OrgTreeController orgTreeController;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -57,6 +60,7 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         currentUser = UserContextService.getCurrentUserAccount();
         customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.MEASURE_INFO);
         assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
+        orgTreeController = WebUtil.getBean(OrgTreeController.class);
         this.selectedMap = MapUtil.newHashMap();
         this.searchFilters = new ArrayList<>();
         queryIndex = 0;
@@ -172,6 +176,14 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         } else {
             filterOrg = null;
         }
+    }
+
+    public void changeIndex(Integer queryIndex){
+        this.queryIndex = queryIndex;
+        filterOrg = null;
+        orgTreeController.setTreeNodeNameFilter(null);
+        orgTreeController.filterDeptOrgTree();
+
     }
 
 }
