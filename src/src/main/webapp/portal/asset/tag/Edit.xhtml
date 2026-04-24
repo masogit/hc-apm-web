@@ -60,6 +60,77 @@
                         <label class="label">#{msg.assetName}</label>
                         <p:inputText id="assetName" value="#{assetTagController.assetName}" maxlength="100"/>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{ not empty assetTagController.spareList}">
+                        <label class="label">#{msg.Other002}</label>
+                        <p:selectOneMenu id="Other" value="#{assetTagController.spareField}">
+                            <p:ajax   update="AssetTagSearchForm:spareSearch" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{assetTagController.spareList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="spareSearch">
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare01'}">
+                            <label class="label">#{msg.spare01}</label>
+                            <p:selectOneMenu id="spare01" value="#{assetTagController.queryAsset.spare01}" requiredMessage="#{msg.spare01} #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('spare01')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare02'}">
+                            <label class="label">#{msg.spare02}</label>
+                            <p:selectOneMenu id="spare02" value="#{assetTagController.queryAsset.spare02}" requiredMessage="#{msg.spare02} #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('spare02')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare03'}">
+                            <label class="label">#{msg.spare03}</label>
+                            <p:selectOneMenu id="spare03" value="#{assetTagController.queryAsset.spare03}" requiredMessage="#{msg.spare03} #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('spare03')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare04'}">
+                            <label class="label">#{msg.spare04}</label>
+                            <p:selectOneMenu id="spare04" value="#{assetTagController.queryAsset.spare04}" requiredMessage="#{msg.spare04} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('spare04')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare05'}">
+                            <label class="label">#{msg.spare05}</label>
+                            <p:selectOneMenu id="spare05" value="#{assetTagController.queryAsset.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('spare05')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare06'}">
+                            <label class="label">#{msg.spare06}</label>
+                            <p:inputText id="spare06" value="#{assetTagController.queryAsset.spare06}" >
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare07'}">
+                            <label class="label">#{msg.spare07}</label>
+                            <p:inputText id="spare07" value="#{assetTagController.queryAsset.spare07}" >
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare08'}">
+                            <label class="label">#{msg.spare08}</label>
+                            <p:inputText id="spare08" value="#{assetTagController.queryAsset.spare08}" >
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare09'}">
+                            <label class="label">#{msg.spare09}</label>
+                            <p:inputText id="spare09" value="#{assetTagController.queryAsset.spare09}" >
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetTagController.spareField eq 'spare10'}">
+                            <label class="label">#{msg.spare10}</label>
+                            <p:inputText id="spare010" value="#{assetTagController.queryAsset.spare10}" >
+                            </p:inputText>
+                        </h:panelGroup>
+
+                    </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
 
