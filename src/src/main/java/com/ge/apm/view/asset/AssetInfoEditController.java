@@ -39,6 +39,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.joda.time.DateTime;
@@ -50,14 +51,12 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sun.misc.BASE64Decoder;
 import webapp.framework.util.TimeUtil;
@@ -1004,6 +1003,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void handleFileUpload(FileUploadEvent event) {
         try {
             String fileName = event.getFile().getFileName();
+            List<String> videoExtensions = ListUtil.newArrayList("mp4", "MP4");
+            if (videoExtensions.contains(FilenameUtils.getExtension(fileName))) {
+                List<V2_BlobObject> type3 = getAttachList(selected.getUid(), "3");
+                long count = type3.stream().filter(b -> ListUtil.newArrayList("mp4", "MP4").contains(FilenameUtils.getExtension(b.getObjectName()))).count();
+                if (count >= 3) {
+                    WebUtil.addErrorMessage("视频上传数量已达上限");
+                    return;
+                }
+            }
             logger.info("AssetInfoEditController handleFileUpload fileName start:" + fileName);
             V2_BlobObject blobObject = blobService.uploadFile(event);
             logger.info("AssetInfoEditController handleFileUpload fileName end:" + fileName);

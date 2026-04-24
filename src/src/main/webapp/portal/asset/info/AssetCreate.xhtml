@@ -274,7 +274,7 @@
                                         </p:dataList>
                                         <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
-                                                      multiple="true"  sizeLimit="500000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                                      multiple="true"  sizeLimit="30000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -286,7 +286,7 @@
                                         </p:dataList>
                                         <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
-                                                      multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                                      multiple="true"  sizeLimit="30000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <p:dataList id="manualList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -298,7 +298,7 @@
                                         </p:dataList>
                                         <p:fileUpload id="type3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx|mp4|MP4)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
-                                                      multiple="true"  sizeLimit="500000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                                      multiple="true"  sizeLimit="30000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                     <c:forEach items="#{assetInfoEditController.getAttachmentCategories()}" var="attachmentConfig">
                                         <h:panelGroup>
@@ -311,7 +311,7 @@
                                             </p:dataList>
                                             <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                           rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
-                                                          multiple="true"  sizeLimit="500000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                                          multiple="true"  sizeLimit="30000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                     </c:forEach>
                                     <h:panelGroup >
@@ -324,7 +324,7 @@
                                         </p:dataList>
                                         <p:fileUpload id="type4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPTX|PPT|ppt|pptx)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
-                                                      multiple="true"  sizeLimit="500000000"  update="acklList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                                      multiple="true"  sizeLimit="30000000"  update="acklList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
                             </p:fieldset>
