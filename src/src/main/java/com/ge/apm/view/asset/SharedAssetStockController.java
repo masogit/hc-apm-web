@@ -9,10 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -27,10 +24,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SharedAssetReqDetailRepository;
-import com.ge.apm.dao.SharedAssetRequestRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.RequestType;
 import org.apache.commons.collections.map.HashedMap;
@@ -72,17 +66,17 @@ import webapp.framework.web.mvc.MyCRUDController;
 public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
 
     private static final Logger logger = LoggerFactory.getLogger(SharedAssetStockController.class);
-    @Autowired
     private OrgInfoRepository orgInfoRepository;
     @Getter
     @Setter
     private String searchCriteria;
 
 //    private UserAccount user;
-    @Autowired
     private AssetInfoRepository assetInfoRepository;
-    @Autowired
+
     private SharedAssetRequestRepository sharedAssetRequestRepository;
+
+    private UserAccountRepository userAccountRepository;
 
     @Getter
     @Setter
@@ -106,6 +100,14 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     @Setter
     private StreamedContent exportPdf;
 
+    @Getter
+    @Setter
+    private UserAccount borrowerUser;
+
+    @Getter
+    @Setter
+    private OrgInfo borrowrOrgInfo;
+
 //    public SharedAssetStockController(UserAccount user) {
 //        this.user = user;
 //    }
@@ -125,6 +127,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
         assetInfoRepository= WebUtil.getBean(AssetInfoRepository.class);
         sharedAssetRequestRepository=WebUtil.getBean(SharedAssetRequestRepository.class);
+        userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
     }
 
     @Override
@@ -233,6 +236,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(sharedAssetReqDetail.getBorrowId());
         sharedAssetRequest.setClinicalDeptUid(orgInfo.getUid());
         sharedAssetRequest.setClinicalDeptName(this.leaseDeptName);
+        if(borrowerUser != null){
+            sharedAssetRequest.setApplicant(borrowerUser.getLoginName());
+            sharedAssetRequest.setAccepterNumber(borrowerUser.getTelephone());
+        }
         sharedAssetRequestRepository.save(sharedAssetRequest);
     }
     public void forceReturnAsset() {
@@ -258,6 +265,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
                 leaseDeptName = "";
             }
         }
+        autoCompleteBorrowerName("");
     }
 
     public List<String> autoCompleteDeptName(String query) {
@@ -270,6 +278,20 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         return res.stream().map(item -> item.getName())
             .distinct()
             .collect(Collectors.toList());
+    }
+    public void onBorrowerName() {
+//        System.out.println(borrowerUser);
+    }
+    public List<UserAccount>  autoCompleteBorrowerName(String query) {
+        OrgInfo orgInfo = orgInfoRepository.findByNameAndSiteUID(this.leaseDeptName, selected.getSiteUID());
+        if(orgInfo != null){
+            List<UserAccount> byClinicalDept = userAccountRepository.getByClinicalDept(Arrays.asList(orgInfo.getUid()));
+            List<UserAccount> res = byClinicalDept.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                    || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+            borrowerUser = null;
+            return res;
+        }
+      return new ArrayList<>();
     }
 
     public Boolean isLogPatientInfoEnabled() {

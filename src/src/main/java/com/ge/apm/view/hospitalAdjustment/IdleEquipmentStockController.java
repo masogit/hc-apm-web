@@ -137,6 +137,9 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
 //            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
 //        }
 //
+
+        this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.NE,4));
+
         this.updateSearchFilter(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,currentUserAccount.getTenantUID()));
         Set<String> functionList = UserContextService.getCurrentUserFunction();
         if (!functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) && !functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK_INSTITUTION.name())) {

@@ -1,10 +1,14 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigAssetField;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.AssetTagService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -17,12 +21,15 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +44,8 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     I18nMessageRepository i18nDao = null;
     TenantInfoRepository tenantInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
+
+    CustomConfigService ccService;
 
     private DualListModel<BiomedGroup> availableBiomedGroup;
     private List<BiomedGroup> sourceBiomedGroup;
@@ -72,6 +81,12 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
     private String assetName;
 
+    private List<I18nMessage> spareList;
+
+    private String spareField;
+
+    private CustomConfigObject customConfigObject;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetTagRepository.class);
@@ -82,6 +97,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
 
@@ -114,6 +130,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
         initOrgTree();
         this.loadClinicalDept();
+        initSpareList();
 
     }
 
@@ -191,7 +208,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
             }else{
                 queryAsset.setName(null);
             }
-            sourceAssets = assetTagService.getAssetList(queryAsset);
+            sourceAssets = assetTagService.getAssetList(queryAsset,this::add);
 
             sourceAssets = new ArrayList(sourceAssets);
             sourceAssets.removeAll(targetAssets);
@@ -200,6 +217,21 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
             sourceAssets = new ArrayList<>();
         }
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+    }
+    public void add(List<SearchFilter> searchFilters){
+        try {
+            if(StringUtils.isEmpty(spareField) ) return;
+            Class<? extends AssetInfo> aClass = AssetInfo.class;
+            Field declaredField = aClass.getDeclaredField(spareField);
+            declaredField.setAccessible(true);
+            Object o = declaredField.get(queryAsset);
+            if(!StringUtils.isEmpty(o)){
+                searchFilters.add(new SearchFilter(spareField, SearchFilter.Operator.EQ,o));
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+//            throw new RuntimeException(e);
+            logger.error(e.getMessage(),e);
+        }
     }
 
     public void onAssetsTransfer(TransferEvent event) {
@@ -313,7 +345,28 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
             return "";
         }
     }
-
+    private void initSpareList(){
+        String[] spareKey = {"spare01","spare02","spare03","spare04","spare05","spare06","spare07","spare08","spare09","spare10"};
+        List<String> spareKeyList = Arrays.asList(spareKey);
+        String siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+        CustomConfig customConfig = ccService.getCustomConfigBySite(siteUID);
+        if (null == customConfig) {
+            customConfigObject = ccService.getCurrentCustomConfig(siteUID);
+        } else {
+            customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
+        }
+        Map<String, CustomConfigAssetField> assetFields = customConfigObject.getAssetFields();
+        spareKeyList= spareKeyList.stream().filter(item -> assetFields.containsKey(item)).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(spareKeyList)){
+            spareList = spareKeyList.stream().map(item -> {
+                String message = WebUtil.getMessage(item);
+                I18nMessage i18nMessage = new I18nMessage();
+                i18nMessage.setMsgKey(item);
+                i18nMessage.setValueZh(message);
+                return i18nMessage;
+            }).collect(Collectors.toList());
+        }
+    }
     private void loadClinicalDept(){
         if(null == selectedOrg){
             clinicalDeptList = Collections.EMPTY_LIST;
@@ -488,5 +541,21 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
     public void setAssetName(String assetName) {
         this.assetName = assetName;
+    }
+
+    public List<I18nMessage> getSpareList() {
+        return spareList;
+    }
+
+    public void setSpareList(List<I18nMessage> spareList) {
+        this.spareList = spareList;
+    }
+
+    public String getSpareField() {
+        return spareField;
+    }
+
+    public void setSpareField(String spareField) {
+        this.spareField = spareField;
     }
 }
