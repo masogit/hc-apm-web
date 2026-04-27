@@ -18,3 +18,34 @@ update config_item_value set value = '{"rendered":false,"required":false,"requir
 update config_item_value set value = '{"rendered":true,"required":false,"requiredMessage":"路途工时为必输项, 不能为空！"}' where key = 'pmOrderShowTravelTime' and value = 'true';
 
 
+-- 27913
+CREATE EXTENSION IF NOT EXISTS dblink;
+
+DROP VIEW IF EXISTS public.ib_asset_info_dblink;
+
+CREATE OR REPLACE VIEW public.ib_asset_info_dblink AS
+SELECT
+    t.name,
+    t.depart_num,
+    t.serial_num,
+    t.system_id,
+    t.qr_code
+FROM dblink(
+             'host=postgresql-ib port=5432 dbname=d1a541455c3a386b1a08a02e424c24123 user=u47a56f164b643fcf751f1881edb2581d password=p38acd39e83c4a4cc2b3c8b3ea3bea11f'::text,
+             'SELECT
+			 t.name,
+             t.depart_num ,
+             t.serial_num,
+             t.system_id,
+             t.qr_code
+                 FROM asset_info t
+        WHERE t.is_deleted = false
+          AND t.is_valid = true
+		  and t.ib_status = 1
+    '::text) AS t(
+            name varchar,
+            depart_num varchar,
+            serial_num varchar,
+            system_id varchar,
+            qr_code varchar
+    );
