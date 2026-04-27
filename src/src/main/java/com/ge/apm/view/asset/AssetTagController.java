@@ -347,18 +347,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     }
     private void initSpareList(){
         String[] spareKey = {"spare01","spare02","spare03","spare04","spare05","spare06","spare07","spare08","spare09","spare10"};
-        List<SearchFilter> searchFilterList = new ArrayList<>();
-        searchFilterList.add(new SearchFilter("msgKey", SearchFilter.Operator.IN,Arrays.asList(spareKey)));
-        searchFilterList.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,"customI18n"));
-        searchFilterList.add(new SearchFilter("siteId", SearchFilter.Operator.EQ,UserContextService.getSiteId()));
-        spareList = i18nDao.findBySearchFilter(searchFilterList);
-        if(CollectionUtils.isEmpty(spareList)){
-            searchFilterList.clear();
-            searchFilterList.add(new SearchFilter("msgKey", SearchFilter.Operator.IN,Arrays.asList(spareKey)));
-            searchFilterList.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,"customI18n"));
-            searchFilterList.add(new SearchFilter("siteId", SearchFilter.Operator.EQ,-1));
-            spareList = i18nDao.findBySearchFilter(searchFilterList);
-        }
+        List<String> spareKeyList = Arrays.asList(spareKey);
         String siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
         CustomConfig customConfig = ccService.getCustomConfigBySite(siteUID);
         if (null == customConfig) {
@@ -367,7 +356,16 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
         }
         Map<String, CustomConfigAssetField> assetFields = customConfigObject.getAssetFields();
-        spareList = spareList.stream().filter(item->assetFields.containsKey(item.getMsgKey())).collect(Collectors.toList());
+        spareKeyList= spareKeyList.stream().filter(item -> assetFields.containsKey(item)).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(spareKeyList)){
+            spareList = spareKeyList.stream().map(item -> {
+                String message = WebUtil.getMessage(item);
+                I18nMessage i18nMessage = new I18nMessage();
+                i18nMessage.setMsgKey(item);
+                i18nMessage.setValueZh(message);
+                return i18nMessage;
+            }).collect(Collectors.toList());
+        }
     }
     private void loadClinicalDept(){
         if(null == selectedOrg){
