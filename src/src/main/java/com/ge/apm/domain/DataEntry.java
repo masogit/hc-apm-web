@@ -91,6 +91,9 @@ public class DataEntry implements Serializable {
     @Column(name = "created_name", nullable = true, length = 50)
     private String createdName;
 
+    @Column(name = "business_data_source_id")
+    private String businessDataSourceId;  //新增字段 方便之后处理业务数据重复录入   维修工单费等。。。。
+
     @ManyToOne(fetch = FetchType.EAGER)
     @NotFound(action= NotFoundAction.IGNORE)
     @JoinColumn(name = "asset_group_uid",referencedColumnName = "uuid", insertable = false,updatable = false)

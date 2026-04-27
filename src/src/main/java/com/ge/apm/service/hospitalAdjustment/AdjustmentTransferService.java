@@ -61,6 +61,9 @@ public class AdjustmentTransferService {
     private BlobFileService blobFileService;
 
     @Autowired
+    private IdleEquipmentApplicationRepository idleEquipmentApplicationRepository;
+
+    @Autowired
     private MqUtils mqUtils;
     @Transactional
     public void cancel(AdjustmentTransferApplication selected, UserAccount currentUserAccount){
@@ -158,6 +161,11 @@ public class AdjustmentTransferService {
         dao.save(selected);
 
 
+        IdleEquipmentApplication idleEquipmentApplication = idleEquipmentApplicationRepository.findByUid(idleEquipmentStock.getApplicationUid());
+        idleEquipmentApplication.setStatus(4);
+        idleEquipmentApplication.setLastModifiedDate(new Date());
+        idleEquipmentApplication.setLastModifiedBy(currentUserAccount.getUid());
+        idleEquipmentApplicationRepository.save(idleEquipmentApplication);
         MqContext mqContext = new MqContext();
         mqContext.setClassName("AdjustmentTransferService");
         mqContext.setServiceName("hc-apm-web");

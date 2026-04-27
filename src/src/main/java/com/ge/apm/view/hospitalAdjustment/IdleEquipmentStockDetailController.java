@@ -50,8 +50,11 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionListener;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -178,9 +181,26 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
             WebUtil.addWarnMessage("调剂设备不可借用,状态异常");
             return;
         }
+
+        if(CollectionUtils.isNotEmpty(attachments)){
+            for (String attachment : attachments) {
+                boolean b = attachements.stream().anyMatch(ite -> ite.getBoSubType().equals(attachment));
+                if(!b){
+                    WebUtil.addWarnMessage("附件材料清单："+WebUtil.getFieldValueMessage("HospitalAdjustmentBorrowAttachmentType", attachment)+"没上传");
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("check", false);
+                    return ;
+
+                }
+            }
+        }
+
         if(filterDeptOrg==null){
             WebUtil.addWarnMessage("借用科室不能为空");
-            return;
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("check", false);
+            return ;
+
         }
         selected.setBorrowDeptUid(filterDeptOrg.getUid());
         application.setAttachments(JSON.toJSONString(attachments));
@@ -204,6 +224,9 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
                 });
             }
             WebUtil.addSuccessMessage("调剂设备借用申请完成");
+
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("check", true);
         }catch (Exception e){
             log.error("调剂设备借用申请异常 e:",e);
             WebUtil.addSuccessMessage("调剂设备借用申请异常");

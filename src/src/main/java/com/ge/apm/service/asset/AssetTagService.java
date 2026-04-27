@@ -14,6 +14,7 @@ import webapp.framework.dao.SearchFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Created by 212605082 on 2017/5/15.
@@ -65,8 +66,10 @@ public class AssetTagService {
 
         return tempTargetBiomedGroup;
     }
-
     public List<AssetInfo> getAssetList(AssetInfo queryAsset) {
+        return  getAssetList(queryAsset,null);
+    }
+    public List<AssetInfo> getAssetList(AssetInfo queryAsset, Consumer<List<SearchFilter>> consumer) {
 
         if(queryAsset.getTenantUID() != null || queryAsset.getInstitutionUID() != null || queryAsset.getHospitalUID() != null || queryAsset.getSiteUID() != null) {
             List<SearchFilter> assetFilters = new ArrayList<>();
@@ -104,6 +107,9 @@ public class AssetTagService {
             }
             if (null != queryAsset.getMeasuringItemCategory()) {
                 assetFilters.add(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, queryAsset.getMeasuringItemCategory()));
+            }
+            if(consumer != null){
+                consumer.accept(assetFilters);
             }
             //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
             Pageable pageable = new PageRequest(0, 50000);
