@@ -96,7 +96,7 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
         ConfigItem configItem = configItemRepository.findByDefaultValueForKey("costType");
         List<Map<String, String>> mapList = JSON.parseObject(configItem.getValidation(), new TypeReference<List<Map<String,String>>>(){});
         ConfigItemValue costType = configItemValueRepository.findFirstByKeyAndSiteUid("costType", user.getSiteUID());
-        if(StringUtils.isNotBlank(costType.getCustomValue())){
+        if( costType!=null &&      StringUtils.isNotBlank(costType.getCustomValue())){
             List<Map<String, String>>   customMap = JSON.parseObject(costType.getCustomValue(), new TypeReference<List<Map<String,String>>>(){});
             mapList.addAll(customMap);
         }
