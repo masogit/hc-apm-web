@@ -31,7 +31,7 @@ SELECT
     t.system_id,
     t.qr_code
 FROM dblink(
-             'host=postgresql-ib port=5432 dbname=d1a541455c3a386b1a08a02e424c24123 user=u47a56f164b643fcf751f1881edb2581d password=p38acd39e83c4a4cc2b3c8b3ea3bea11f'::text,
+             'host=postgresql-ib port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d'::text,
              'SELECT
 			 t.name,
              t.depart_num ,
