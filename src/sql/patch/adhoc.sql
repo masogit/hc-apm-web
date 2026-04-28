@@ -52,3 +52,5 @@ FROM dblink(
 
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '报修是否影响当天日常检查', 'repairAffectsDailyInspection', '报修是否影响当天日常检查', 'f','t',3 where not exists(select * from config_item where key = 'repairAffectsDailyInspection');
 
+
+UPDATE data_entry de SET created_name = ua.name FROM user_account ua WHERE de.operation_user_uid = ua.uid;
