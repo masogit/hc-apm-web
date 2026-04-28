@@ -222,7 +222,6 @@ public class DataEntryCreateController extends GenericCRUDUUIDController<DataEnt
     public void save() {
         sharedEntryAmount();
         if(selected.getUid()==null){
-            selected.setCreatedBy(user.getUid());
             selected.setCreatedName(user.getName());
             selected.setCreatedDate(new Date());
             selected.setTenantUid(user.getTenantUID());
