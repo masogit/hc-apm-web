@@ -877,15 +877,18 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         if(StringUtils.isBlank(selectItemDto.getLabel())  || StringUtils.isBlank(selectItemDto.getValue())){
 
             WebUtil.addWarnMessage("成本类型的key和value必填");
+            return;
         }
         List<Map<String, String>> enumList = configItem.getEnumList();
 
         for (Map<String, String> map : enumList) {
              if(map.containsKey(selectItemDto.getLabel())){
                  WebUtil.addWarnMessage("成本类型的key已存在");
+                 return;
              }
             if(map.containsValue(selectItemDto.getValue())){
                 WebUtil.addWarnMessage("成本类型的value已存在");
+                return;
             }
         }
         HashMap<String, String> stringStringHashMap = new HashMap<>();
