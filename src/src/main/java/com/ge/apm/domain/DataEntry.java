@@ -85,8 +85,6 @@ public class DataEntry implements Serializable {
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 
-    @Column(name = "created_by", nullable = true, length = 50)
-    private String createdBy;
 
     @Column(name = "created_name", nullable = true, length = 50)
     private String createdName;
