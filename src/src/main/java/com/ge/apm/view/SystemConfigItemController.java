@@ -379,14 +379,14 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     multiSelectedMap.put(configItem.getKey(), getMultiEum(configItem));
                 }
                 if (9 == configItem.getValueType()) {
+                    configItem.setFieldColumnDto(JSON.parseObject(configItem.getDefaultValue(), FieldColumnDto.class));
+                }
+                if (10 == configItem.getValueType()){
                     String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectSite.getSiteUID(),
                             selectSite.getHospitalUID(),
                             selectSite.getInstitutionUID(),
                             selectSite.getTenantUID(), configItem.getKey());
-                    configItem.setFieldColumnDto(JSON.parseObject(value, FieldColumnDto.class));
-                }
-                if (10 == configItem.getValueType()){
-                    configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
+                    configItem.setFieldColumnDtoList(JSON.parseArray(value, FieldColumnDto.class));
                     fieldRenderedMap = new HashMap<>();
                     for (FieldColumnDto dto : configItem.getFieldColumnDtoList()) {
                         String key = configItem.getKey() + "_" + dto.getField();
