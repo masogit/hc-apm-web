@@ -85,6 +85,8 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
     private String spareField;
 
+    private String spareFieldValue;
+
     private CustomConfigObject customConfigObject;
 
     @Override
@@ -196,7 +198,8 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     }
 
     public void getQueryAssetsList() {
-        if (selectedOrg != null && selectedOrg.getOrgLevel() != null && (filterDeptOrg != null || queryAsset.getAssetGroup() != null || queryAsset.getFunctionType() != null || this.assetName != null)) {
+        getSpareFieldString();
+        if (selectedOrg != null && selectedOrg.getOrgLevel() != null && (spareFieldValue != null || filterDeptOrg != null || queryAsset.getAssetGroup() != null || queryAsset.getFunctionType() != null || this.assetName != null)) {
 
             if(filterDeptOrg != null){
                 queryAsset.setClinicalDeptId(filterDeptOrg.getId());
@@ -219,17 +222,22 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
     }
     public void add(List<SearchFilter> searchFilters){
-        try {
-            if(StringUtils.isEmpty(spareField) ) return;
-            Class<? extends AssetInfo> aClass = AssetInfo.class;
-            Field declaredField = aClass.getDeclaredField(spareField);
-            declaredField.setAccessible(true);
-            Object o = declaredField.get(queryAsset);
-            if(!StringUtils.isEmpty(o)){
-                searchFilters.add(new SearchFilter(spareField, SearchFilter.Operator.EQ,o));
+            if(!StringUtils.isEmpty(spareFieldValue)){
+                searchFilters.add(new SearchFilter(spareField, SearchFilter.Operator.EQ,spareFieldValue));
             }
+        spareFieldValue = null;
+    }
+    public void getSpareFieldString(){
+        try {
+        if(StringUtils.isEmpty(spareField) ) return;
+        Class<? extends AssetInfo> aClass = AssetInfo.class;
+        Field declaredField = aClass.getDeclaredField(spareField);
+        declaredField.setAccessible(true);
+        Object o = declaredField.get(queryAsset);
+        spareFieldValue =(String) o;
         } catch (NoSuchFieldException | IllegalAccessException e) {
 //            throw new RuntimeException(e);
+            spareFieldValue = null;
             logger.error(e.getMessage(),e);
         }
     }

@@ -380,9 +380,9 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').rendered}">
                             <label class="label">#{msg.travelTime}#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').required ? '*' : ''}</label>
-                            <p:inputNumber minValue="0" maxValue="999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.travelTime}" required="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').required}"
+                            <p:inputNumber id="travelTime" minValue="0" maxValue="999"  decimalPlaces="2" value="#{workOrderMgrController.selectedWorkOrder.travelTime}" required="false"
                                            requiredMessage="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'workOrderShowTravelTime').requiredMessage}" >
-                                <p:ajax />
+                                <p:ajax process="@this" />
                             </p:inputNumber>
                         </h:panelGroup>
                             <h:panelGroup id="addContractor" styleClass="#{workOrderMgrController.showEnableEngineersWriteRepairOutside()?'':'display-none'}">
@@ -497,6 +497,10 @@
             }
             if (args.manHours_input) {
                 $('#woTab\\:repairCompleteDialogForm\\:manHours_input').addClass("ui-state-error");
+                valid = false;
+            }
+            if (args.travelTime) {
+                $('#woTab\\:repairCompleteDialogForm\\:travelTime').addClass("ui-state-error");
                 valid = false;
             }
             if (args.pat_problems) {
