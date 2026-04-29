@@ -1804,6 +1804,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
         // 用户可见资产分类
