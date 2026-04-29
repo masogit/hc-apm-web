@@ -223,7 +223,13 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     }
     public void add(List<SearchFilter> searchFilters){
             if(!StringUtils.isEmpty(spareFieldValue)){
-                searchFilters.add(new SearchFilter(spareField, SearchFilter.Operator.EQ,spareFieldValue));
+                List<String> list = Arrays.asList("spare06", "spare07", "spare08", "spare09", "spare10");
+                if(list.contains(spareField)){
+                    searchFilters.add(new SearchFilter(spareField, SearchFilter.Operator.LIKE,spareFieldValue));
+                }else{
+                    searchFilters.add(new SearchFilter(spareField, SearchFilter.Operator.EQ,spareFieldValue));
+                }
+
             }
         spareFieldValue = null;
     }
@@ -402,9 +408,11 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         filterDeptOrg = null;
         assetName = null;
 
-        queryAsset.setClinicalDeptId(null);
-        queryAsset.setAssetGroup(null);
-        queryAsset.setFunctionType(null);
+//        queryAsset.setClinicalDeptId(null);
+//        queryAsset.setAssetGroup(null);
+//        queryAsset.setFunctionType(null);
+        spareField = null;
+        queryAsset = new AssetInfo();
     }
 
     public Integer getSiteId() {
