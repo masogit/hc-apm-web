@@ -25,8 +25,8 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('costType').name.concat('(').concat(systemConfigItemController.configItemMap.get('costType').key).concat(')')}</label>
                 <p:commandLink value="#{msg.Add}" actionListener="#{systemConfigItemController.costTypeAddBefore()}"  oncomplete="PF('costTypeAddDlg').show()" update="configItemForm"/>
-                <p:commandLink value="#{msg.Delete}"   oncomplete="PF('costTypeDeleteDlg').show()" update="configItemForm"  style="padding:10px"/>
-                <p:commandLink value="#{msg.Edit}"   oncomplete="PF('costTypeEditDlg').show()" update="configItemForm"  />
+                <p:commandLink value="#{msg.Delete}"   oncomplete="PF('costTypeDeleteDlg').show()" update="configItemForm "  style="padding:10px"/>
+                <p:commandLink value="#{msg.Edit}" actionListener="#{systemConfigItemController.costTypeEditBefore()}"  oncomplete="PF('costTypeEditDlg').show()" update="configItemForm costTypeEditDlg"  />
 
                 <p:selectManyMenu value="#{systemConfigItemController.multiSelectedMap.costType}" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 95%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('costType').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}" itemDisabled="#{item.get('value') eq 'MaintenanceFee'}"/>

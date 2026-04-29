@@ -882,12 +882,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         List<Map<String, String>> enumList = configItem.getEnumList();
 
         for (Map<String, String> map : enumList) {
-             if(map.containsKey(selectItemDto.getLabel())){
-                 WebUtil.addWarnMessage("成本类型的key已存在");
+             if(map.get("key").equals(selectItemDto.getLabel())){
+                 WebUtil.addWarnMessage("成本类型的value已存在");
                  return;
              }
-            if(map.containsValue(selectItemDto.getValue())){
-                WebUtil.addWarnMessage("成本类型的value已存在");
+            if(map.get("value").equals(selectItemDto.getValue())){
+                WebUtil.addWarnMessage("成本类型的key已存在");
                 return;
             }
         }
@@ -897,12 +897,17 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         enumList.add(stringStringHashMap);
         configItem.setEnumList(enumList);
         saveConfig(configItem);
+        selectItemDto=new SelectItemDto(null,null);
     }
 
     public void costTypeAddBefore() {
         selectItemDto=new SelectItemDto(null,null);
     }
+    public void costTypeEditBefore() {
+        editEnumKey=null;
+        selectItemDto=new SelectItemDto(null,null);
 
+    }
     public void costTypeDelete(ConfigItem configItem) {
         if(configItem==null){
             return ;
@@ -930,8 +935,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
         enumList.removeIf(map -> {
             String value = map.get("value");
-            return selectItemDto.getValue().equals(value);
+            return editEnumKey!=null &&  editEnumKey.equals(value);
         });
+        selectItemDto.setValue(editEnumKey);
         configItem.setEnumList(enumList);
         costTypeAdd(configItem);
     }
