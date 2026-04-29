@@ -2026,6 +2026,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             valid = false;
         };
 
+
         WorkflowConfig woc = configService.findConfigBySite(loginUser.getSiteUID());
         /*hourRequired=  woc.getHourRequired();*/
         if(null!=woc) {
@@ -2059,6 +2060,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
+        //路途工时
+        String workOrderShowTravelTime = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserOrgInfo.getSiteUID(), currentUserOrgInfo.getHospitalUID(), currentUserOrgInfo.getInstitutionUID(), currentUserOrgInfo.getTenantUID(), "workOrderShowTravelTime");
+        if(StrUtil.isNotEmpty(workOrderShowTravelTime)){
+            FieldColumnDto fieldColumnDto = JSON.parseObject(workOrderShowTravelTime, FieldColumnDto.class);
+            if(fieldColumnDto.getRequired()){
+                if(selectedWorkOrder.getTravelTime() == null){
+                    WebUtil.addErrorMessage(fieldColumnDto.getRequiredMessage());
+                    RequestContext.getCurrentInstance().addCallbackParam("travelTime", true);
+                    valid = false;
+                }
+            }
+        }
+
 
         //判断如果工单分类必填
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserOrgInfo.getSiteUID(), currentUserOrgInfo.getHospitalUID(), currentUserOrgInfo.getInstitutionUID(), currentUserOrgInfo.getTenantUID(), "showWorkOrderType");
