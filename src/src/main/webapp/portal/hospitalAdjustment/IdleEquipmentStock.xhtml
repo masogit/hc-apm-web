@@ -109,7 +109,7 @@
 
                         <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">
                             <f:facet name="filter">
-                                <p:selectOneMenu  onchange="PF('datalist').filter()"   value="#{idleEquipmentStockController.filterAssetGroup}" >
+                                <p:selectOneMenu  onchange="PF('datalist').filter()"     value="#{idleEquipmentStockController.filterAssetGroup}" filter="true" filterMatchMode="contains" filterNormalize="true" style="width: 70px"  >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -117,6 +117,23 @@
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>
                         </p:column>
 
+<!--                        <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetInfo.assetGroup}" filterBy="#{item.assetInfo.assetGroup}" filterMatchMode="EQ">-->
+<!--                            <f:facet name="filter">-->
+<!--                                &lt;!&ndash; 替换为 p:autoComplete &ndash;&gt;-->
+<!--                                <p:autoComplete appendTo="@(Body)"-->
+<!--                                        value="#{idleEquipmentStockController.filterAssetGroup}"-->
+<!--                                        completeMethod="#{idleEquipmentStockController.completeAssetGroup}"-->
+<!--                                        dropdown="true"  size="5"-->
+<!--                                        forceSelection="true"   scrollHeight="300"-->
+
+<!--                                        placeholder="#{msg.SelectOneMessage}">-->
+
+<!--                                    <p:ajax event="itemSelect" listener="#{idleEquipmentStockController.onAssetGroupNameFilterChange}" process="@this"  update=":AssetDetailListForm:datalist"  />-->
+
+<!--                                </p:autoComplete>-->
+<!--                            </f:facet>-->
+<!--                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>-->
+<!--                        </p:column>-->
                         <p:column headerText="#{msg.hospitalId}" sortBy="#{item.stockSiteUid}"   filterBy="#{item.stockSiteUid}" filterMatchMode="EQ"  >
                             <f:facet name="filter" >
                                 <p:autoComplete id="btnOrg1" widgetVar="varBtnOrg1"  value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
@@ -126,7 +143,7 @@
                         <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.stockDeptUid}"
                                   filterMatchMode="EQ"  width="100" >
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{idleEquipmentStockController.fileterOrgName}" >
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{idleEquipmentStockController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" style="width: 70px"   >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{idleEquipmentStockController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
@@ -162,8 +179,14 @@
                             </f:facet>
                             <h:outputText value="#{idleEquipmentStockController.statusName(item.status)}"/>
                         </p:column>
-                        <p:column headerText="借用医院"  >
-
+                        <p:column headerText="借用医院" filterBy="#{item.borrowHospitalUid}"
+                                  filterMatchMode="EQ"  width="100" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{idleEquipmentStockController.filterBorrowHospitalName}"  filter="true" filterMatchMode="contains" filterNormalize="true" style="width: 70px"   >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{idleEquipmentStockController.borrowHospitalList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{idleEquipmentStockController.getSiteOrgName(item.borrowHospitalUid)}"/>
                         </p:column>
 

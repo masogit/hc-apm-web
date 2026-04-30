@@ -62,7 +62,7 @@ public class IdleEquipmentStock implements Serializable {
     @Column(name = "created_by", nullable = true, length = 50)
     private String  createdBy;
 
-    @LastModifiedDate
+
     @Column(name = "created_date", nullable = true)
     private Date createdDate;
     @LastModifiedDate
