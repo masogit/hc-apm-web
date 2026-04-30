@@ -36,6 +36,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.el.MethodExpression;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -98,6 +99,18 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
     private String fileterOrgName;
     private OrgInfoTreeService orgInfoTreeService;
     private   OrgInfoRepository orgInfoDao;
+
+
+    @Getter
+    @Setter
+    private String filterBorrowHospitalName;
+    @Getter
+    @Setter
+    private List<OrgInfo> borrowHospitalList;
+
+    @Getter
+    @Setter
+    private List<OrgInfo> borrowClinicalDeptList;
     @Override
     protected void init() {
         adjustmentTransferApplicationRepository = WebUtil.getBean(AdjustmentTransferApplicationRepository.class);
@@ -122,6 +135,14 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
         }
         filterObject = new HashMap<>();
         loadClinicalDeptList();
+        if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
+            borrowClinicalDeptList= uaaService.getBySiteUidDeptList(currentUserAccount.getInstitutionUID());
+        }else{
+            borrowClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList();
+        }
+
+        borrowHospitalList = orgList.stream().filter(ite->ite.getOrgType() == 2).collect(Collectors.toList());
+
     }
 
     @Override
@@ -143,42 +164,28 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
 
         List<String> selectedSiteList = ListUtil.newArrayList();
         if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
-
             for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
                 OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
                 selectedSiteList.add(orgInfo.getUid());
             }
-            this.updateSearchFilter(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, selectedSiteList));
-        }else {
-            this.removeFilterOnField("stockSiteUid");
         }
         this.updateSearchFilter(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID()));
         if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())) {
 
             if (buttonType == 1) {
-                if(org.apache.commons.collections.CollectionUtils.isNotEmpty(selectedSiteList)){
-                    List<String> intersection = selectedSiteList.stream()
-                            .filter(visibleScope::contains)
-                            .collect(Collectors.toList());
-
-                    this.updateSearchFilter(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, intersection, "1*2+"));
-                    this.updateSearchFilter(new SearchFilter("stockDeptUid", SearchFilter.Operator.IN, intersection, "1*2+"));
-                }else{
-                    this.updateSearchFilter(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, visibleScope, "1*2+"));
-                    this.updateSearchFilter(new SearchFilter("stockDeptUid", SearchFilter.Operator.IN, visibleScope, "1*2+"));
-                }
-
+                this.updateSearchFilter(new SearchFilter("stockHospitalUid", SearchFilter.Operator.EQ,currentUserAccount.getHospitalUID()));
                 this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.EQ, 6));
-//                this.removeFilterOnField("borrowSiteUid");
-//                this.removeFilterOnField("borrowDeptUid");
             } else {
-                this.updateSearchFilter(new SearchFilter("borrowSiteUid", SearchFilter.Operator.IN, visibleScope, "1*2+"));
-                this.updateSearchFilter(new SearchFilter("borrowDeptUid", SearchFilter.Operator.IN, visibleScope, "1*2+"));
-//                this.removeFilterOnField("stockSiteUid");
-//                this.removeFilterOnField("stockDeptUid");
-//                this.removeFilterOnField("status");
+                this.updateSearchFilter(new SearchFilter("borrowHospitalUid", SearchFilter.Operator.EQ, currentUserAccount.getHospitalUID()));
             }
+
         }
+        if (ObjectUtil.isNotEmpty(selectedSiteList)) {
+            this.updateSearchFilter(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, selectedSiteList));
+        }else {
+            this.removeFilterOnField("stockSiteUid");
+        }
+
         Page<AdjustmentTransferApplication> bySearchFilter = adjustmentTransferApplicationRepository.findBySearchFilter(searchFilters, pageRequest);
         return bySearchFilter;
 
@@ -189,6 +196,16 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
     public  void buttonTypeChange(int  buttonType){
         searchFilters = new ArrayList<>();
         this.buttonType=buttonType;
+        if(buttonType==2){
+            borrowHospitalList=new ArrayList<>();
+            OrgInfo orgByUid = cacheService.findOrgByUid(currentUserAccount.getHospitalUID());
+            borrowHospitalList.add(orgByUid);
+            borrowClinicalDeptList= borrowClinicalDeptList.stream().filter(ite -> ite.getHospitalUID().equals(currentUserAccount.getHospitalUID())).collect(Collectors.toList());
+        }else{
+            borrowHospitalList = orgList.stream().filter(ite->ite.getOrgType() == 2).collect(Collectors.toList());
+            borrowClinicalDeptList= uaaService.getBySiteUidDeptList(currentUserAccount.getInstitutionUID());
+
+        }
     }
 
     public void onSelectAsset() throws IOException {
@@ -440,5 +457,30 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
 
     public void setFileterOrgName(String fileterOrgName) {
         this.fileterOrgName = fileterOrgName;
+    }
+
+    public void selectedBorrowHospital() {
+        Set<String> functionList = UserContextService.getCurrentUserFunction();
+
+        if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
+            borrowClinicalDeptList= uaaService.getBySiteUidDeptList(currentUserAccount.getInstitutionUID());
+        }else{
+            borrowClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList();
+        }
+        if(StringUtils.isNotEmpty(filterBorrowHospitalName)){
+            borrowClinicalDeptList= borrowClinicalDeptList.stream().filter(ite -> ite.getHospitalUID().equals(filterBorrowHospitalName)).collect(Collectors.toList());
+        }else{
+            if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
+                if(buttonType==2){
+                    borrowClinicalDeptList= borrowClinicalDeptList.stream().filter(ite -> ite.getHospitalUID().equals(currentUserAccount.getHospitalUID())).collect(Collectors.toList());
+
+                }else{
+                    borrowClinicalDeptList= uaaService.getBySiteUidDeptList(currentUserAccount.getInstitutionUID());
+
+                }
+            }else{
+                borrowClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList();
+            }
+        }
     }
 }
