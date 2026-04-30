@@ -190,7 +190,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         IdleEquipmentStock idleEquipmentStock = selected.getIdleEquipmentStock();
 
         adjustmentApplicationDetailController.initDteail(idleEquipmentStock.getApplicationUid());
-
+        adjustmentApplicationDetailController.setFieldsetName("调出单位信息");
     }
 
 

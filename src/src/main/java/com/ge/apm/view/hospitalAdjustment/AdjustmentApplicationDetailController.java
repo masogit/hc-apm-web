@@ -82,6 +82,9 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
     @Setter
     private List<String> attachments=new ArrayList<>();
     private StreamedContent exportFile;
+    @Getter
+    @Setter
+    private String fieldsetName;
     @Override
     protected GenericRepositoryUUID<IdleEquipmentApplication> getDAO() {
         return dao;

@@ -10,7 +10,7 @@
         <h:form id="adjustmentApplicationForm" >
 
             <!-- 1. 申报单位信息 -->
-            <p:fieldset legend="申报单位信息" id="assetList">
+            <p:fieldset legend="#{adjustmentApplicationDetailController.fieldsetName}" id="assetList">
                 <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">单位名称</label>
@@ -37,14 +37,14 @@
                     <h:panelGroup>
                         <label class="label">联系人</label>
                         <p:inputText value="#{adjustmentApplicationDetailController.selected.contactPerson}" readonly="true"
-                                     style="width: 95%">
+                                     >
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">联系电话</label>
                         <p:inputText value="#{adjustmentApplicationDetailController.selected.contactNumber}" readonly="true"
-                                     style="width: 95%">
+                                     >
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
@@ -82,7 +82,7 @@
                         <label class="label">设备型号/规格</label>
                         <p:inputText id="modelSpec" readonly="true"
                                      value="#{adjustmentApplicationDetailController.selectedAsset.functionType}"
-                                     style="width: 95%">
+                                     >
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
@@ -90,7 +90,7 @@
                         <label class="label">#{msg.manufacture}</label>
                         <p:inputText id="manufacture" readonly="true"
                                      value="#{adjustmentApplicationDetailController.selectedAsset.manufacture}"
-                                     style="width: 95%">
+                                  >
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
@@ -113,7 +113,7 @@
                         <label class="label">#{msg.purchasePrice} (元)</label>
                         <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" readonly="true"
                                        value="#{adjustmentApplicationDetailController.selectedAsset.purchasePrice}"
-                                       style="width: 95%">
+                                       >
                             <p:ajax/>
                         </p:inputNumber>
                     </h:panelGroup>
@@ -138,7 +138,7 @@
                         <label class="label">折旧期限 (规定)</label>
                         <p:inputNumber minValue="0" maxValue="99" decimalPlaces="1" readonly="true"
                                        value="#{adjustmentApplicationDetailController.selected.depreciationPeriodYears}"
-                                       requiredMessage="折旧期限 #{msg.ValidationRequire}" style="width: 95%">
+                                       requiredMessage="折旧期限 #{msg.ValidationRequire}" >
                             <p:ajax/>
                         </p:inputNumber>
                     </h:panelGroup>
@@ -178,11 +178,11 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">维修记录摘要 (近2年)</label>
-                        <p:inputText
+                        <p:inputTextarea
                                 value="#{adjustmentApplicationDetailController.selected.maintenanceSummary}" readonly="true"
-                                style="width: 95%;">
+                               >
                             <p:ajax/>
-                        </p:inputText>
+                        </p:inputTextarea>
                     </h:panelGroup>
                 </p:panelGrid>
 
@@ -190,7 +190,7 @@
                     <h:panelGroup>
                         <label class="label">购置凭证编号</label>
                         <p:inputText value="#{adjustmentApplicationDetailController.selected.purchaseVoucherNo}" readonly="true"
-                                     style="width: 95%;">
+                        >
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
