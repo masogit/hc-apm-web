@@ -2104,8 +2104,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         if(StrUtil.isEmpty(type)){
-            ConfigItemValue configItemValue2 = configItemMapper.findByKey("workOrderShowPartFlag", selectedWorkOrder.getSiteUID());
-            if (ObjectUtil.isNotEmpty(configItemValue2) && "true".equals(configItemValue2.getValue()) && CollectionUtils.isEmpty(accessoryList)) {
+            String workOrderShowPartFlag = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserOrgInfo.getSiteUID(), currentUserOrgInfo.getHospitalUID(), currentUserOrgInfo.getInstitutionUID(), currentUserOrgInfo.getTenantUID(), "workOrderShowPartFlag");
+            if (ObjectUtil.isNotEmpty(workOrderShowPartFlag) && "true".equals(workOrderShowPartFlag) && CollectionUtils.isEmpty(accessoryList)) {
                 RequestContext.getCurrentInstance().addCallbackParam("detailFlag", true);
                 valid = false;
             }
