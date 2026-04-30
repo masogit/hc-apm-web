@@ -66,7 +66,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
     private List<OrgInfo> orgList;
     @Getter
     @Setter
-    private int buttonType = 1;  //1借出工单   2  借入工单
+    private int buttonType = 2;  //1借出工单   2  借入工单
     @Getter
     @Setter
     private String filterAssetGroup;
