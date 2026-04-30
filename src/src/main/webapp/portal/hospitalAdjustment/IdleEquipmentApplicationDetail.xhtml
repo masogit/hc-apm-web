@@ -44,14 +44,14 @@
                             <h:panelGroup>
                                 <label class="label">联系人</label>
                                 <p:inputText value="#{adjustmentApplicationDetailController.selected.contactPerson}" readonly="true"
-                                             style="width: 95%">
+                                          >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">联系电话</label>
                                 <p:inputText value="#{adjustmentApplicationDetailController.selected.contactNumber}" readonly="true"
-                                             style="width: 95%">
+                                         >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -93,7 +93,7 @@
                                 <label class="label">设备型号/规格</label>
                                 <p:inputText id="modelSpec" readonly="true"
                                              value="#{adjustmentApplicationDetailController.selectedAsset.functionType}"
-                                             style="width: 95%">
+                                            >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -101,7 +101,7 @@
                                 <label class="label">#{msg.manufacture}</label>
                                 <p:inputText id="manufacture" readonly="true"
                                              value="#{adjustmentApplicationDetailController.selectedAsset.manufacture}"
-                                             style="width: 95%">
+                                            >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -124,7 +124,7 @@
                                 <label class="label">#{msg.purchasePrice} (元)</label>
                                 <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" readonly="true"
                                                value="#{adjustmentApplicationDetailController.selectedAsset.purchasePrice}"
-                                               style="width: 95%">
+                                               >
                                     <p:ajax/>
                                 </p:inputNumber>
                             </h:panelGroup>
@@ -189,11 +189,9 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">维修记录摘要 (近2年)</label>
-                                <p:inputText
-                                        value="#{adjustmentApplicationDetailController.selected.maintenanceSummary}" readonly="true"
-                                        style="width: 95%;">
+                                <p:inputTextarea value="#{adjustmentApplicationDetailController.selected.maintenanceSummary}" readonly="true">
                                     <p:ajax/>
-                                </p:inputText>
+                                </p:inputTextarea>
                             </h:panelGroup>
                         </p:panelGrid>
 
@@ -201,7 +199,7 @@
                             <h:panelGroup>
                                 <label class="label">购置凭证编号</label>
                                 <p:inputText value="#{adjustmentApplicationDetailController.selected.purchaseVoucherNo}" readonly="true"
-                                             style="width: 95%;">
+                                           >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -268,7 +266,7 @@
                                 <label class="label">其他原因详细说明</label>
                                 <p:inputText readonly="true"
                                         value="#{adjustmentApplicationDetailController.selected.otherReasonDescription}"
-                                        style="width: 95%;" required="true"
+                                         required="true"
                                         requiredMessage="请选择'其他'时需填写详细说明">
                                     <p:ajax/>
                                 </p:inputText>

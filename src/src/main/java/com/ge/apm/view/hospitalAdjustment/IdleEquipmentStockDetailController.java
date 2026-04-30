@@ -149,6 +149,7 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
 
     public void initStock(){
         adjustmentApplicationDetailController.initDteail(selected.getApplicationUid());
+        adjustmentApplicationDetailController.setFieldsetName("所属单位信息");
     }
 
 

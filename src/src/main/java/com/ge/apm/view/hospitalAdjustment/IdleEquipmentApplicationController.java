@@ -8,6 +8,7 @@ import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -136,6 +137,11 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
             this.updateSearchFilter(new SearchFilter("stockSiteUid", SearchFilter.Operator.IN, selectedSiteList));
         }else {
             this.removeFilterOnField("stockSiteUid");
+        }
+
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(clinicalDeptOrgUidSet)){
+            this.updateSearchFilter(new SearchFilter("stockDeptUid", SearchFilter.Operator.IN, clinicalDeptOrgUidSet));
+
         }
 
 
@@ -290,6 +296,18 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
             return org.getName();
         }
         return null;
+    }
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {

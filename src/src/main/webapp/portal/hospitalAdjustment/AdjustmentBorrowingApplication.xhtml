@@ -16,7 +16,7 @@
                     <h:panelGroup>
                         <label class="label">单位名称</label>
                         <p:inputText value="#{idleEquipmentStockDetailController.application.unitName}"
-                                     style="width:95%">
+                                     >
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
@@ -74,7 +74,7 @@
                                     pattern="#{userContextService.timeFormat()}"
                                     value="#{idleEquipmentStockDetailController.application.applicationDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true"
-                                    navigator="true" mask="true" style="width: 95%">
+                                    navigator="true" mask="true" >
                             <p:ajax event="dateSelect"/>
                         </p:calendar>
                     </h:panelGroup>
