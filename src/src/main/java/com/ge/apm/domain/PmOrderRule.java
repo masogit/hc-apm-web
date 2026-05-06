@@ -91,18 +91,7 @@ public class PmOrderRule implements Serializable{
     
     @Column(name = "level")
     private Integer level;//规则级别
-
-    @Column(name = "rule_score")
-    private String ruleScore;
-
-    public String getRuleScore() {
-        return ruleScore;
-    }
-
-    public void setRuleScore(String ruleScore) {
-        this.ruleScore = ruleScore;
-    }
-
+    
     public Integer getLevel() {
 		return level;
 	}
