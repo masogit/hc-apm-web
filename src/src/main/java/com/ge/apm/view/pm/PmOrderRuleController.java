@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.PmOrderPreCreateService;
@@ -16,6 +17,8 @@ import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
@@ -56,6 +59,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private TableDefinitionRepository templateDao;
     private List<PmOrderRuleCheckList> checkItemLists;
     private PmOrderRuleCheckList pmRuleCheckItem;
+    private ConfigItemService configItemService;
 
     // for report template
     private UploadedFile uploadedFile;
@@ -91,6 +95,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private PmOrderPreCreateService pmOrderPreCreateService;
     private Integer periodOld;//保养周期
     private String periodUnitOld;//保养周期单位
+    @Setter@Getter
+    private String modifyScore = "";
+
+    @Setter@Getter
+    private String pmRuleShowScoreFlag;
+
     @Override
     protected void init() {
         filterBySite = false;
@@ -104,6 +114,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
         configService = WebUtil.getBean(ConfigService.class);
+        configItemService = WebUtil.getBean(ConfigItemService.class);
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
@@ -121,6 +132,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         this.selectedMap = new HashMap<>();
         this.currentPageAssets = new ArrayList<>();
         initOrgTree();
+        pmRuleShowScoreFlag = configItemService.getConfigItemByKeyToString("pmRuleShowScoreFlag", user);
     }
 
     public boolean getPmRule(){
@@ -861,6 +873,20 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         dao.deleteById(deleteUids);
         this.selectedMap.clear();
     }
+
+    public void batchModify(){
+        Map<String, Boolean> map = this.selectedMap;
+        List<String> deleteUids = Lists.newArrayList();
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (Boolean.FALSE.equals(entry.getValue())) {
+                continue;
+            }
+            PmOrderRule rule = dao.findByUid(entry.getKey());
+            rule.setRuleScore(modifyScore);
+            dao.save(rule);
+        }
+    }
+
 
     public boolean isChecked() {
         return selectedMap.containsValue(true);
