@@ -85,6 +85,11 @@ public class SystemEventAuditAopAspect {
         return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.NURSE_SITE_MAINTAIN_CONFIG_ITEM.getBoType());
     }
 
+    @Around("execution(* com.ge.apm.dao.PmOrderRuleRepository.delete(..)) || execution(* com.ge.apm.dao.PmOrderRuleRepository.save(..))")
+    public Object pmOrderRuleSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
+        return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.PM_ORDER_RULE.getBoType());
+    }
+
 //    @Around("execution(* com.ge.apm.dao.SharedAssetRequestRepository.save(..))")
     public Object sharedAssetRequestSystemEventAopPointcutAround(ProceedingJoinPoint pjp) throws Throwable {
         return repositorySystemEventAopPointcutAround(pjp, AuditBoTypeEnum.SHARED_ASSET_REQUEST.getBoType());
