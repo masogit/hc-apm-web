@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+<ui:composition>
+        <h:outputScript>
+            var url = window.location.href;
+            var redirectUrl;
+            if(url.includes('?')){
+            const queryString = url.split('?')[1];
+            const params = new URLSearchParams(queryString);
+            redirectUrl = params.get('redirect');
+            }
+            //  before redirect set token
+            var token = "#{userContextService.getAccessToken()}";
+            localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
+            localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
+            localStorage.setItem("lscache-authhc-apm-token", token || '#'); // # for Large screen token
+            localStorage.setItem("lscache-authhc-apm-token-expireAt", Date.now() + 8640000);
+            window.location.href = redirectUrl;
+        </h:outputScript>
+
+</ui:composition>
+</html>

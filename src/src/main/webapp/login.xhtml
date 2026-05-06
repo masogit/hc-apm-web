@@ -169,7 +169,7 @@
                     localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
                     localStorage.setItem("lscache-authhc-apm-token", token || '#'); // # for Large screen token
                     localStorage.setItem("lscache-authhc-apm-token-expireAt", Date.now() + 8640000);
-                    window.location.href = redirectUrl;
+                    window.location.href = "/geapm/portal/redirect.xhtml?redirect="+redirectUrl;
                 }
             }
             window.onload = function() {
