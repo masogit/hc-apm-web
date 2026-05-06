@@ -149,17 +149,6 @@ public interface AuditHandler {
                 }
 
                 break;
-            case "pm_order_rule":
-                if ("delete".equals(operation)) {
-                    systemEventAuditEnum = SystemEventAuditEnum.PM_ORDER_RULE_DELETE;
-                } else {
-                    if (uid != null) {
-                        systemEventAuditEnum = SystemEventAuditEnum.PM_ORDER_RULE_UPDATE;
-                    } else {
-                        systemEventAuditEnum = SystemEventAuditEnum.PM_ORDER_RULE_CREATE;
-                    }
-                }
-                break;
             default:
 
                 break;
