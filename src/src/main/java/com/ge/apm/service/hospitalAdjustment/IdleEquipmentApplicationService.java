@@ -113,7 +113,7 @@ public class IdleEquipmentApplicationService {
         params.put("repairable", "REPAIRABLE".equals(idleEquipmentApplication.getDeviceStatus())  ? checked : unchecked);
         params.put("still_usable","STILL_USABLE".equals(idleEquipmentApplication.getDeviceStatus()) ? checked : unchecked);
         params.put("maintenance_summary",idleEquipmentApplication.getMaintenanceSummary());
-        params.put("purchase_voucher_no",idleEquipmentApplication.getMaintenanceSummary());
+        params.put("purchase_voucher_no",idleEquipmentApplication.getPurchaseVoucherNo());
         params.put("state_owned", "STATE_OWNED".equals(idleEquipmentApplication.getPropertyNature()) ? checked : unchecked);
         params.put("other", "OTHER".equals(idleEquipmentApplication.getPropertyNature())  ? checked : unchecked);
         params.put("property_nature_desc",idleEquipmentApplication.getPropertyNatureDesc());
