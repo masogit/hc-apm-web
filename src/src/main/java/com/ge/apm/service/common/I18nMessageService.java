@@ -176,7 +176,7 @@ public class I18nMessageService {
 
 
     public void collectSpare01InExstingList(I18nMessage i18nMessage, List<I18nMessage> spare01List, Set<I18nMessage> spare01SetOutput) {
-        Set<I18nMessage> collect = spare01List.stream().filter(item -> item.getMsgKey().startsWith(i18nMessage.getMsgKey()) ).collect(Collectors.toSet());
+        Set<I18nMessage> collect = spare01List.stream().filter(item -> item.getMsgKey().equals(i18nMessage.getMsgKey()) ).collect(Collectors.toSet());
         spare01SetOutput.addAll(collect);
 
     }
