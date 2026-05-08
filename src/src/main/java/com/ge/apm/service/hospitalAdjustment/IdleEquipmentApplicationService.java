@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -139,20 +140,20 @@ public class IdleEquipmentApplicationService {
         params.put("audit_result_reason",idleEquipmentApplication.getAuditResultReason());
 
         List<String> strings = JSON.parseArray(idleEquipmentApplication.getAttachments(), String.class);
-        if(CollectionUtils.isNotEmpty(strings)){
-            params.put("ContractInvoice", strings.contains("ContractInvoice")? checked : unchecked);
-            params.put("MaintenanceRecord", strings.contains("MaintenanceRecord")? checked : unchecked);
-            params.put("InspectionReport", strings.contains("InspectionReport")? checked : unchecked);
-            params.put("PhysicalPhoto", strings.contains("PhysicalPhoto")? checked : unchecked);
-            params.put("attachment_other", strings.contains("other")? checked : unchecked);
-            if(strings.contains("other")){
-                params.put("attachments_other_description", idleEquipmentApplication.getAttachmentsOtherDescription());
-
-            }
+        if(strings==null){
+            strings=new ArrayList<>();
 
         }
 
+        params.put("ContractInvoice", strings.contains("ContractInvoice")? checked : unchecked);
+        params.put("MaintenanceRecord", strings.contains("MaintenanceRecord")? checked : unchecked);
+        params.put("InspectionReport", strings.contains("InspectionReport")? checked : unchecked);
+        params.put("PhysicalPhoto", strings.contains("PhysicalPhoto")? checked : unchecked);
+        params.put("attachment_other", strings.contains("other")? checked : unchecked);
+        if(strings.contains("other")){
+            params.put("attachments_other_description", idleEquipmentApplication.getAttachmentsOtherDescription());
 
+        }
 
         if(idleEquipmentApplication.getAuditSignature()!=null){
             byte[] handlerSignature = getSignatureBytes(idleEquipmentApplication.getAuditSignature());
