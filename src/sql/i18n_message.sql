@@ -6301,8 +6301,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','ContractInvoice','购置合同/发票复印件','ContractInvoice',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','MaintenanceRecord','维修记录原件及复印件','MaintenanceRecord',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','InspectionReport','设备检测报告','InspectionReport',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','InspectionReport','设备检测报告/保养记录','InspectionReport',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','PhysicalPhoto','实物图片','PhysicalPhoto',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','LoanAgreement','借用协议','LoanAgreement',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentAttachmentType','other','其他','other',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','DemandDocument','需求论证报告','DemandDocument',NULL,-1);

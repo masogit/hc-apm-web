@@ -297,10 +297,10 @@
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
                             <div style="display:flex; align-items:center; flex-wrap:wrap;">
-                            <p:selectManyCheckbox  value="#{adjustmentApplicationCreateController.attachments}" style="width: 700px"    >
+                            <p:selectManyCheckbox  value="#{adjustmentApplicationCreateController.attachments}" style="width: 900px"    >
 
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentAttachmentType')}"
-                                               var="item"
+                                               var="item"   itemDisabled="#{item.msgKey eq 'ContractInvoice' or item.msgKey eq 'InspectionReport' or item.msgKey eq 'PhysicalPhoto'        }"
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 <p:ajax event="change" process="@this" update="@form"/>
                             </p:selectManyCheckbox>

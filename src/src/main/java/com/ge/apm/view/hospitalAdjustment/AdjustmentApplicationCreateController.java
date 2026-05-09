@@ -99,6 +99,7 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
                 logger.error("医院院间调剂申请异常 error: ",e);
             }
             attachements=new ArrayList<>();
+            attachments.addAll(Arrays.asList("ContractInvoice","InspectionReport","PhysicalPhoto"));
             selected.setApplicationDate(new Date());
 
             OrgInfo orgInfo = orgInfoRepository.findByUid(currentUserAccount.getSiteUID());
