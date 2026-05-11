@@ -33,14 +33,14 @@
                 <p:panelGrid columns="1"  layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                     <h:panelGroup>
-                        <label class="label">成本类型key</label>
+                        <label class="label">成本类型key<span style="color:red">*</span></label>
                         <p:inputText value="#{systemConfigItemController.selectItemDto.value}"
                                      style="width: 40%">
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">成本类型value</label>
+                        <label class="label">成本类型value<span style="color:red">*</span></label>
 
 
                         <p:inputText value="#{systemConfigItemController.selectItemDto.label}"
