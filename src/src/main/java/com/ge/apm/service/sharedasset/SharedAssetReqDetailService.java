@@ -122,16 +122,13 @@ public class SharedAssetReqDetailService {
         }
         searchFilterList.add(new SearchFilter("id", SearchFilter.Operator.IN,ids));
         List<SharedAssetRequest> sharedAssetRequests = sharedDao.findBySearchFilter(searchFilterList);
-        searchFilterList.clear();
-        searchFilterList.add(new SearchFilter("sharedId", SearchFilter.Operator.IN,ids));
-        List<SharedAssetReqType> sharedAssetReqTypes = apdDao.findBySearchFilter(searchFilterList);
 
         dao.delete(detail);
         searchFilterList.clear();
         searchFilterList.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,ids));
         List<SharedAssetReqDetail> sharedAssetReqDetails = dao.findBySearchFilter(searchFilterList);
         if(CollectionUtils.isEmpty(sharedAssetReqDetails)){
-            apdDao.delete(sharedAssetReqTypes);
+            apdDao.deleteByInSharedId(ids);
             sharedDao.delete(sharedAssetRequests);
         }
         String clinicalDeptUID = assetInfo.getClinicalDeptUID();
