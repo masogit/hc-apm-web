@@ -157,7 +157,9 @@
                         <p:column headerText="#{msg.lifecycle}" sortBy="#{item.lifecycle}"
                                   filterBy="#{item.lifecycle}" filterMatchMode="EQ">
                             <h:outputText
-                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                                    value="#{item.lifecycle == null ? null : item.lifecycle / 12}">
+                                <f:convertNumber minFractionDigits="1" maxFractionDigits="1" />
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.overrunState}" filterBy="#{item.overrunState}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('overrunState', item.overrunState)}"/>
