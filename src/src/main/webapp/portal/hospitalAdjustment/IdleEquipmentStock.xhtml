@@ -82,7 +82,7 @@
                                  selectionMode="single" scrollable="false"
                                  selection="#{idleEquipmentStockController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.lastModifiedDate}"      rowKey="#{item.uid}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"      rowKey="#{item.uid}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
