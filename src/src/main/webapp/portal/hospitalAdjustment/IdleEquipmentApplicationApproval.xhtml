@@ -421,12 +421,16 @@
                                     <p:inputText value="#{adjustmentApplicationDetailController.selected.registrationNumber}"
                                                  placeholder="登记编号"  required="true" requiredMessage="登记编号必填"
                                                  style="width:150px;"
-                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == true}"/>
+                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == true}">
+                                        <p:ajax/>
+                                    </p:inputText>
 
                                     <p:inputText value="#{adjustmentApplicationDetailController.selected.auditResultReason}"
                                                  placeholder="说明理由"  required="true" requiredMessage="说明理由必填"
                                                  style="width:200px;"
-                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == false}"/>
+                                                 rendered="#{adjustmentApplicationDetailController.selected.auditResult == false}">
+                                        <p:ajax/>
+                                    </p:inputText>
                                 </div>
                             </h:panelGroup>
                             <h:panelGroup>
