@@ -112,7 +112,7 @@
                                             pattern="#{userContextService.timeFormat()}"
                                             value="#{adjustmentApplicationDetailController.selectedAsset.purchaseDate}"
                                             showOn="button" readonlyInput="false" showButtonPanel="true"
-                                            navigator="true" mask="true" style="width: 95%" disabled="true">
+                                            navigator="true" mask="true"  disabled="true">
                                     <p:ajax event="dateSelect"/>
                                 </p:calendar>
                             </h:panelGroup>
@@ -171,7 +171,7 @@
                                 <label class="label">超期仍具备使用价值依据</label>
                                 <p:inputText readonly="true"
                                         value="#{adjustmentApplicationDetailController.selected.overDepreciationReason}"
-                                        style="width: 95%;">
+                                        style="width: 90%;">
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -190,7 +190,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">维修记录摘要 (近2年)</label>
-                                <p:inputTextarea value="#{adjustmentApplicationDetailController.selected.maintenanceSummary}" readonly="true" style="width:500px">
+                                <p:inputTextarea value="#{adjustmentApplicationDetailController.selected.maintenanceSummary}" readonly="true" style="width: 80%" >
                                     <p:ajax/>
                                 </p:inputTextarea>
                             </h:panelGroup>
