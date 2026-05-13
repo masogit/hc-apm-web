@@ -3008,6 +3008,19 @@ public class AssetInfo implements ChineseName, Serializable {
         this.nurseLocation = nurseLocation;
     }
 
+    public AssetInfo(Integer id, String name, String uid, String departNum, String serialNum, String functionType, String clinicalDeptName, String clinicalDeptUID, String nurseLocation, String qrCode) {
+        this.id = id;
+        this.name = name;
+        this.uid = uid;
+        this.departNum = departNum;
+        this.serialNum = serialNum;
+        this.functionType = functionType;
+        this.clinicalDeptName = clinicalDeptName;
+        this.clinicalDeptUID = clinicalDeptUID;
+        this.nurseLocation = nurseLocation;
+        this.qrCode = qrCode;
+    }
+
     public Map<String, Object> buildLeaseReqHeader() {
         Map<String, Object> reqHeader = new HashMap<>();
         reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());

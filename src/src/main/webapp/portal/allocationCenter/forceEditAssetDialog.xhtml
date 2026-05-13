@@ -20,7 +20,7 @@
                                 <p:ajax process="@this" listener="#{sharedAssetStockController.onLeaseDeptNameChange}"  event="itemSelect" update="@(.borrowerUserChange)" />
                             </p:autoComplete>
                         </h:panelGroup>
-                       <h:panelGroup>
+                       <h:panelGroup  rendered="#{userContextService.checkRole('SharedAssetMgmt')}">
                            <label class="label">借用人*</label>
                            <p:autoComplete id="borrowerUser" widgetVar="borrowerUserWidget" dropdown="true" value="#{sharedAssetStockController.borrowerUser}"
                                            required="true" requiredMessage="借用人 #{msg.ValidationRequire}"
@@ -28,6 +28,11 @@
                                            completeMethod="#{sharedAssetStockController.autoCompleteBorrowerName}" converter="userAccountConverter">
                                <p:ajax process="@this"  event="itemSelect" />
                            </p:autoComplete>
+                       </h:panelGroup>
+                       <h:panelGroup rendered="#{!userContextService.checkRole('SharedAssetMgmt')}">
+                           <label class="label">借用人*</label>
+                           <p:inputText value="#{sharedAssetStockController.borrowerUser.name}" readonly="true"
+                                        required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费开始时间*</label>

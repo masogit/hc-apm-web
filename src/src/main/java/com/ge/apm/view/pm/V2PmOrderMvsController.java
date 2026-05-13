@@ -623,7 +623,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         attachListEhomeImg = new ArrayList<>();
         attachListEhomeFile = new ArrayList<>();
         accessoryList = getWorkOrderDetail(selected.getId());
-        picList = blobDao.fetchBlobObjectNotType(selected.getId(), "PmOrderEHome");
+        picList = blobDao.fetchBlobObjectNotType(selected.getId(), Arrays.asList(new String[]{"PmOrderEHome", "SignatureEHome"}).stream().collect(Collectors.toSet()));
         attachListEhome = blobDao.findByBoUuidAndBoType(selected.getId(),"PmOrderEHome");
         if(!org.springframework.util.CollectionUtils.isEmpty(attachListEhome)){
             Set<String> objectIds = attachListEhome.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
