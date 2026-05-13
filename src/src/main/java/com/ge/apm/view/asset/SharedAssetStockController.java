@@ -27,6 +27,7 @@ import javax.xml.transform.stream.StreamSource;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.RequestType;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fop.apps.FOUserAgent;
@@ -58,6 +59,7 @@ import com.thoughtworks.xstream.mapper.DefaultMapper;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
 
@@ -176,6 +178,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
             reqDetail.setLeaseRequest(leaseRequest);
         }
         asset.setSharedAssetReqDetail(reqDetail);
+        boolean b = UserContextService.checkRole("SharedAssetMgmt");
+        if(!b){
+            borrowerUser = UserContextService.getCurrentUserAccount();
+        }
         super.setSelected(asset);
     }
 
@@ -289,6 +295,11 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
             List<UserAccount> res = byClinicalDept.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                     || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
             borrowerUser = null;
+            if(CollectionUtils.isEmpty(res)){
+                UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+                res = new ArrayList<>();
+                res.add(currentUserAccount);
+            }
             return res;
         }
       return new ArrayList<>();
