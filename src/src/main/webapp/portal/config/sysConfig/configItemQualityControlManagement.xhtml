@@ -7,13 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('QualityControlManagementScreeningConditions').name.concat('(').concat(systemConfigItemController.configItemMap.get('QualityControlManagementScreeningConditions').key).concat(')')}</label>
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('QualityControlManagementScreeningConditions').showValue}" style="width: 95%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('QualityControlManagementScreeningConditions').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('QualityControlManagementScreeningConditions').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
