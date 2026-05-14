@@ -20,6 +20,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 
@@ -69,15 +70,15 @@ public class ElasticService extends MicroServiceInvoker {
         return jsonPage;
     }
 
-    public Page<Object> searchHistory(List<SearchFilter> searchFilters, String token, int pageNum, int pageSize, String esIndex){
+    public Page<Object> searchHistory(List<SearchFilter> searchFilters, String token, int pageNum, int pageSize, String esIndex, String sortField, String sortValue){
         try {
             Map<String, Object> map = MapUtil.newHashMap(4);
             map.put("list", searchFilters);
             map.put("pageNum", pageNum);
             map.put("pageSize", pageSize);
             map.put("esIndex", esIndex);
-            map.put("sortField","created_date");
-            map.put("sortValue","DESC");
+            map.put("sortField", StringUtils.hasText(sortField)?sortField:"created_date");
+            map.put("sortValue", StringUtils.hasText(sortValue)?sortValue:"DESC");
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
             String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
             ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
