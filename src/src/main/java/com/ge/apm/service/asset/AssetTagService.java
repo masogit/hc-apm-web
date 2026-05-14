@@ -108,6 +108,9 @@ public class AssetTagService {
             if (null != queryAsset.getMeasuringItemCategory()) {
                 assetFilters.add(new SearchFilter("measuringItemCategory", SearchFilter.Operator.EQ, queryAsset.getMeasuringItemCategory()));
             }
+            if (null != queryAsset.getRepairForm()) {
+                assetFilters.add(new SearchFilter("repairForm", SearchFilter.Operator.EQ, queryAsset.getRepairForm()));
+            }
             if(consumer != null){
                 consumer.accept(assetFilters);
             }

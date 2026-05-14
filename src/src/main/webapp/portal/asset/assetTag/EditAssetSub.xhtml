@@ -26,7 +26,7 @@
                 >
                     <f:selectItems value="#{assetSubscriberController.tenantUserList}"
                                    var="u"
-                                   itemLabel="#{u.name}"
+                                   itemLabel="#{assetSubscriberController.getUserName(u)}"
                                    itemValue="#{u.id}" />
                     <p:ajax event="change" listener="#{assetSubscriberController.onSubscribeUsersChange}"/>
                 </p:selectCheckboxMenu>
@@ -49,7 +49,7 @@
                 </p:fieldset>
 
                 <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" legend="#{msg.EquipmentSelection}">
-                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup  >
                         <!--设备分类-->
                         <label class ="label">#{msg.assetGroup}</label>
@@ -92,6 +92,14 @@
                                 <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="datalist" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.repairForm}</label>
+                            <p:selectOneMenu id="repairForm" value="#{assetSubscriberController.queryAsset1.repairForm}">
+                                <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="datalist" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                 </p:panelGrid>
