@@ -64,7 +64,7 @@ public class WorkOrderESHistoryController extends GenericCRUDUUIDController<Work
 
     @Override
     protected Page<WorkOrderESHistory> loadData(PageRequest pageRequest) {
-        Page<Object> result = elasticService.searchHistory(searchFilters,accessToken,pageRequest.getPageNumber(),pageRequest.getPageSize(),WORK_ORDER_HISTORY_INDEX);
+        Page<Object> result = elasticService.searchHistory(searchFilters,accessToken,pageRequest.getPageNumber(),pageRequest.getPageSize(),WORK_ORDER_HISTORY_INDEX, null, null);
         List<Object> content = result.getContent();
         if(CollectionUtils.isEmpty(content)){
             return new PageImpl<WorkOrderESHistory>(new ArrayList<>());

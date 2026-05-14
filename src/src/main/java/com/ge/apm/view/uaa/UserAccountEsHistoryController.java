@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDController;
@@ -51,8 +52,12 @@ public class UserAccountEsHistoryController extends GenericCRUDController<UserAc
     @Override
     protected Page<UserAccountHistory> loadData(PageRequest pageRequest) {
         setSearchFilter();
+        String orderBy = null;
+        if (pageRequest.getSort() != null) {
+            orderBy = pageRequest.getSort().getOrderFor("createdDate").getDirection().name();
+        }
         Page<Object> pgData = elasticService.searchHistory(searchFilters, UserContextService.getAccessToken(),
-                pageRequest.getPageNumber(), pageRequest.getPageSize(), ApmEsIndex.USER_HISTORY.getValue());
+                pageRequest.getPageNumber(), pageRequest.getPageSize(), ApmEsIndex.USER_HISTORY.getValue(), null, orderBy);
         List<UserAccountHistory> list = ListUtil.newArrayList();
         for (Object obj : pgData.getContent()) {
             UserAccountHistory userAccountHistory = JSON.parseObject(obj.toString(), UserAccountHistory.class);

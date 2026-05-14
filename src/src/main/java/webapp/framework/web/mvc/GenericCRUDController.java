@@ -158,26 +158,31 @@ public abstract class GenericCRUDController<E> implements Serializable {
             if(filterValue==null) continue;
             
             if(isDateTimeField(fieldName)){
+                String[] values;
                 // support lte & gte for datetime field
-                String[] values = filterValue.toString().split(" ");
-                if(values.length==1 && "EQ".equals(filterMatchModes.get(fieldName))){
-                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[0]);
-                    if(filterValue!=null){
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime)filterValue).toDate()));
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime)filterValue).toDate()));
-                        continue;
+                if (filterValue.toString().contains("~")) {
+                    values = filterValue.toString().split("~");
+                    searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, (TimeUtil.fromString("yyyy/MM/dd", values[0])).toDate()));
+                    searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, (TimeUtil.fromString("yyyy/MM/dd", values[1])).toDate()));
+                    continue;
+                } else {
+                    values = filterValue.toString().split(" ");
+                    if(values.length==1 && "EQ".equals(filterMatchModes.get(fieldName))){
+
+                        if(filterValue!=null){
+
+                        }
                     }
-                }
-                if(values.length>0){
-                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[0]);
-                    if(filterValue!=null)
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime)filterValue).toDate()));
-                }
-                
-                if(values.length>1){
-                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[2]);
-                    if(filterValue!=null)
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime)filterValue).toDate()));
+                    if(values.length>0){
+                        filterValue = TimeUtil.fromString("yyyy-MM-dd", values[0]);
+                        if(filterValue!=null)
+                            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime)filterValue).toDate()));
+                    }
+                    if(values.length>1){
+                        filterValue = TimeUtil.fromString("yyyy-MM-dd", values[2]);
+                        if(filterValue!=null)
+                            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime)filterValue).toDate()));
+                    }
                 }
                 continue;
             }
