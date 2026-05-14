@@ -9,27 +9,106 @@
 
     <ui:composition >
 
-
-        <h:form id="departmentDetailForm"   >
-            <h:panelGroup rendered="#{not empty departmentSecondmentController.selected and not departmentSecondmentController.selected.enableSimple}">
-                <div class="card">
-                    <p:dataTable var="node" value="#{departmentSecondmentController.process}">
-                        <p:column headerText="节点名称">
-                            <h:outputText value="#{node.nodeName}" />
-                        </p:column>
-
-                        <p:column headerText="确认人">
-                            <h:outputText value="#{node.operator}" />
-                        </p:column>
-
-                        <p:column headerText="时间">
-                            <h:outputText value="#{node.operatorTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+        <div class="ui-g-12 card">
+            <h:form id="departmentDetailForm"  >
+                <p:fieldset legend="工单详情" rendered="#{not empty departmentSecondmentController.selected}">
+                <p:fieldset >
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup >
+                            <label class="label">设备名称</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.assetName}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">设备编号</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.assetDeptNum}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">序列号</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.assetSerialNum}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">二维码</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.assetQrCode}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">借出科室</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.outDeptName}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">借出人</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.lenderName}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">借用科室</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.inDeptName}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">借用人</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.borrowerName}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">借出时间</label>
+                            <h:outputText value="#{departmentSecondmentController.selected.borrowedAt}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
                             </h:outputText>
-                        </p:column>
-                    </p:dataTable>
-                </div>
-            </h:panelGroup>
-        </h:form>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">归还受理人</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.receiverName}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">归还人</label>
+                            <p:outputLabel value="#{departmentSecondmentController.selected.returnerName}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">归还时间</label>
+                            <h:outputText value="#{departmentSecondmentController.selected.returnAt}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
+                            </h:outputText>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">借用时长</label>
+                            <h:outputText value="#{departmentSecondmentController.selected.duration}">
+                                <f:convertNumber pattern="0.00"/>
+                            </h:outputText>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                </p:fieldset>
+                <p:fieldset legend="附件">
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{departmentSecondmentController.selected.attachments}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:ajax  event="click" update=":previewedDlg" oncomplete="PF('previewedDlg').show()" listener="#{preViewerBean.onServerEvent(v2PmOrderController,fileitem.objectStorageId)}"/>
+                                <img src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}" style="width:100px; height:80px;margin: 0px 5px 0px 5px;"/>
+                            </h:panelGrid>
+                            <p:commandLink validateClient="false" immediate="true" process="@this" value="#{fileitem.objectName}" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" ajax="false"  styleClass="p-mr-2"/><br/>
+                        </p:panel>
+                    </p:dataGrid>
+                    </p:fieldset>
+                <p:fieldset legend="节点">
+                <h:panelGroup rendered="#{not empty departmentSecondmentController.selected and not departmentSecondmentController.selected.enableSimple}">
+                    <div class="card">
+                        <p:dataTable var="node" value="#{departmentSecondmentController.process}">
+                            <p:column headerText="节点名称">
+                                <h:outputText value="#{node.nodeName}" />
+                            </p:column>
+
+                            <p:column headerText="确认人">
+                                <h:outputText value="#{node.operator}" />
+                            </p:column>
+
+                            <p:column headerText="时间">
+                                <h:outputText value="#{node.operatorTime}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </h:panelGroup>
+                </p:fieldset>
+                </p:fieldset>
+            </h:form>
+        </div>
     </ui:composition>
 </html>
