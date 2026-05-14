@@ -23,6 +23,8 @@ public class AssetWorkOrder {
     private String assetGroupName;
     //所属科室
     private String clinicalDeptUID;
+    //所属院区名称
+    private String siteName;
     //所属科室名称
     private String clinicalDeptName;
     //二维码
@@ -118,6 +120,14 @@ public class AssetWorkOrder {
 
     public void setAssetGroupName(String assetGroupName) {
         this.assetGroupName = assetGroupName;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 
     public String getClinicalDeptName() {

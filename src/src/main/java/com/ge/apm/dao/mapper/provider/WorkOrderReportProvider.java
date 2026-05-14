@@ -539,7 +539,8 @@ public class WorkOrderReportProvider {
                 "ai.function_type as functionType,ai.clinical_dept_uid as clinicalDeptUID,ai.asset_group as assetGroup,ai.qr_code as qrCode, " +
                 "count(wo.id) as workOrderCount, " +
                 "(SELECT im.value_zh FROM i18n_message im WHERE concat(ai.asset_group,'') = im.msg_key and im.msg_type='assetGroup' and im.site_id in (select max(im1.site_id) from i18n_message im1 where im1.msg_type='assetGroup' and (im1.site_id=-1 or im1.site_id=ai.site_id))) as assetGroupName, " +
-                "(SELECT oi.name FROM org_info oi WHERE ai.clinical_dept_uid = oi.uid) as clinicalDeptName " +
+                "(SELECT oi.name FROM org_info oi WHERE ai.clinical_dept_uid = oi.uid) as clinicalDeptName, " +
+                "(SELECT oi.name FROM org_info oi WHERE ai.site_uid = oi.uid) as siteName " +
                 "FROM asset_info ai, v2_work_order wo " +
                 "WHERE ai.id=wo.asset_id ");
 
