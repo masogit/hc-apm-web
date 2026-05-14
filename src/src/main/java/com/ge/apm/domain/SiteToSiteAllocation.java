@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "site_to_site_allocation")
@@ -127,6 +128,12 @@ public class SiteToSiteAllocation implements Serializable {
     @Transient
     @JsonProperty
     private Boolean enableSimple;
+
+
+    @Transient
+    @JsonProperty
+    private List <V2_BlobObject> attachments;
+
     public String getId() {
         return id;
     }
@@ -525,5 +532,13 @@ public class SiteToSiteAllocation implements Serializable {
 
     public void setEnableSimple(Boolean enableSimple) {
         this.enableSimple = enableSimple;
+    }
+
+    public List<V2_BlobObject> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<V2_BlobObject> attachments) {
+        this.attachments = attachments;
     }
 }
