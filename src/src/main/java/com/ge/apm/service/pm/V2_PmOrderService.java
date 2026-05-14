@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.pm;
 
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.WorkOrderStatus;
@@ -13,6 +14,8 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -96,6 +99,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     private PmOrderRuleCheckListRepository pmckLstDao;
     @Autowired
     private V2_PmOrderStepRepository pmOrderStepRepository;
+    @Autowired
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     @PostConstruct
     public void initialize(){
@@ -1010,5 +1015,15 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
     }
 
+    public void postProcessorExcel(){
+        try{
+            SystemEventAuditEnum eventAuditEnum = SystemEventAuditEnum.TABLE_DOWNLOAD_MAINTAIN;
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, null, Boolean.TRUE, "", AuditBoTypeEnum.TABLE_DOWNLOAD.getBoType(), "页面表格");
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
 }
 

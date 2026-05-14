@@ -5,10 +5,7 @@
  */
 package com.ge.apm.view.wo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.*;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
@@ -348,8 +345,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<AssetTypeGroup> assetTypeGroupList;
     @Setter @Getter
     private Map<String, AssetTypeGroup> assetTypeGroupMap;
-    @Setter @Getter
-    private Integer approvalStatus;
 
     @Override
     protected void init() {
@@ -1051,18 +1046,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     } else {
                         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
                     }
-                }
-            }
-
-            if(approvalStatus!=null){
-                if(approvalStatus==1){
-                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ,"0", "1*"));
-                }
-                if(approvalStatus==2){
-                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ,"1", "1*"));
-                }
-                if(approvalStatus==3){
-                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.IN,Arrays.asList("2","3","4"), "1*"));
                 }
             }
             this.selected = null;
@@ -4628,6 +4611,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             default:
                 return null;
         }
+    }
+    public void postProcessorExcel(Object obj){
+        woService.postProcessorExcel();
     }
 }
 

@@ -171,7 +171,7 @@
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType==1}" >
-                            <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export"/>
+                            <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export" postProcessor="#{measureAssetListController.postProcessorExcel}" />
                         </p:commandButton>
 
                         <p:commandButton  rendered="#{measureAssetListController.matchType==2}"  title="导出无台账计量数据" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{measureAssetListController.exportExcel}" update=":growl"

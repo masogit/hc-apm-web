@@ -113,7 +113,7 @@
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export"/>
+                            <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export"  postProcessor="#{measureAssetListController.postProcessorExcel}" />
                         </p:commandButton>
                         <p:commandButton id="downloadAllId" title="#{msg.DownloadFile}" icon="ui-icon-file-download" ajax="false"
                                          actionListener="#{measureAssetListController.downloadSelectedFile()}" update=":growl">

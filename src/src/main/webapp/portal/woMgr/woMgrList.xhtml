@@ -373,7 +373,7 @@
 
                     <p:commandButton id="manHoursManageButton" value="#{msg.workHourManagement}" actionListener="#{workOrderMgrController.prepareMoreManHoursView}" update="woTab:moreManHoursDialogForm" disabled="#{empty workOrderMgrController.selected or !(workOrderMgrController.queryIndex gt 3 and workOrderMgrController.queryIndex lt 8)}" oncomplete="PF('moreManHoursDialog').show()" rendered="#{userContextService.countyArea}"/>
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                        <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
+                        <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export" postProcessor="#{workOrderMgrController.postProcessorExcel}"/>
                     </p:commandButton>
                 </f:facet>
             </p:dataTable>

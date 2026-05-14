@@ -457,6 +457,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         template.writePm(pmOrderList,queryIndex);
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
+        pmOrderService.postProcessorExcel();
     }
 
     private List<V2_PmOrder> getExportList() {
