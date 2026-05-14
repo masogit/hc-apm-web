@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="下载记录信息"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="listForm">
+                <p:dataTable id="datalist" value="#{systemEventAuditTableController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+                             selection="#{systemEventAuditTableController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="rowSelect" />
+                    <p:ajax event="filter" listener="#{systemEventAuditTableController.onFilter}" />
+                    <p:column headerText="表格类型" sortBy="#{item.systemEventKey}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.systemEventKey}" />
+                    </p:column>
+                    <p:column headerText="表格名称" sortBy="#{item.eventData}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.eventData}" />
+                    </p:column>
+                    <p:column headerText="下载人" sortBy="#{item.operatorUid}" >
+                        <h:outputText value="#{systemEventAuditTableController.getUserName(item.operatorUid)}" />
+                    </p:column>
+                    <p:column headerText="下载时间" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" />
+                        </f:facet>
+                        <h:outputText value="#{item.createdDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+                <p:overlayPanel  widgetVar="panelFilterCreatedDate" for=":listForm:datalist:filterCreatedDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="cal1" />
+                        <p:calendar id="cal1" widgetVar="varCreatedDateFrom" effect="fold"
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                        <p:outputLabel for="cal2"/>
+                        <p:calendar id="cal2" widgetVar="varCreatedDateTo" effect="fold"
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="PF('panelFilterCreatedDate').hide();setDateFilter('varDataList', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

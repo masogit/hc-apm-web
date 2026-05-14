@@ -16,6 +16,7 @@ import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.llm.ApplicationType;
 import com.ge.healthcare.cn.common.llm.Result;
@@ -1341,5 +1342,16 @@ public class MeasuringService {
 
     public void setProgress(int progress) {
         this.progress = progress;
+    }
+
+
+    public void postProcessorExcel(SystemEventAuditEnum eventAuditEnum, String eventData){
+        try{
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, null, Boolean.TRUE, "", AuditBoTypeEnum.TABLE_DOWNLOAD.getBoType(), eventData);
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

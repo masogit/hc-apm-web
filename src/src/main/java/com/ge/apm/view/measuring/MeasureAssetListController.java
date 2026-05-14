@@ -776,6 +776,17 @@ public void treeSearchCondition(){
 
     }
 
+    public void postProcessorExcel(Object obj){
+        SystemEventAuditEnum eventAuditEnum = SystemEventAuditEnum.TABLE_DOWNLOAD_MEASURE;
+        String eventData = "";
+        if(scrapped){
+            eventData = "计量结果【报废】页面表格";
+        }else {
+            eventData = "计量结果【所有】页面表格";
+        }
+        measuringService.postProcessorExcel(eventAuditEnum, eventData);
+    }
+
 
     public StreamedContent getExcelFile() {
         return excelFile;
