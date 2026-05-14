@@ -205,6 +205,14 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
                 if(10 == configItem.getValueType()){
                     configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
+                    List<FieldColumnDto> showValueList = JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class);
+                    List<FieldColumnDto> defaultValueList = JSON.parseArray(configItem.getDefaultValue(), FieldColumnDto.class);
+                    Set<String> existingFields = showValueList.stream().map(FieldColumnDto::getField).collect(Collectors.toSet());
+                    List<FieldColumnDto> newFields = defaultValueList.stream().filter(dto -> !existingFields.contains(dto.getField())).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(newFields)) {
+                        showValueList.addAll(newFields);
+                        configItem.setFieldColumnDtoList(showValueList);
+                    }
                 }
             }
         }
