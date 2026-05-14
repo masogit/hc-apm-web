@@ -7,13 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('vendorLoginUrl').name.concat('(').concat(systemConfigItemController.configItemMap.get('vendorLoginUrl').key).concat(')')}</label>
                 <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('vendorLoginUrl').showValue}"
                                  rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
                     <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('vendorLoginUrl').validation}" pattern="#{systemConfigItemController.configItemMap.get('vendorLoginUrl').validation}"/>
                 </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('vendorLoginUrl').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -25,6 +29,10 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('contractExpirationReminderDays').name.concat('(').concat(systemConfigItemController.configItemMap.get('contractExpirationReminderDays').key).concat(')')}</label>
                 <p:inputNumber value="#{systemConfigItemController.configItemMap.get('contractExpirationReminderDays').showValue}" style="width: 95%;"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('contractExpirationReminderDays').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -41,6 +49,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableAssetGroupAssetTypeGroupAssociation').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableAssetGroupAssetTypeGroupAssociation'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableAssetGroupAssetTypeGroupAssociation'))}" update="configItemForm" style="padding:10px"
@@ -55,6 +67,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableDeviceReplication').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableDeviceReplication'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableDeviceReplication'))}" update="configItemForm" style="padding:10px"
@@ -67,6 +83,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('showMasterEquipment').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -94,6 +114,10 @@
                 <p:selectManyMenu value="#{systemConfigItemController.multiSelectedMap.contractBlobRequired}" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 100%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('contractBlobRequired').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectManyMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('contractBlobRequired').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -138,6 +162,10 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('contractSigningDate').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('contractSigningDate'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('contractSigningDate'))}" update="configItemForm" style="padding:10px"
@@ -172,6 +200,10 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('contractMaintenancePeriod').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -210,6 +242,10 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('contractDeliveryTime').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('contractDeliveryTime'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('contractDeliveryTime'))}" update="configItemForm" style="padding:10px"
@@ -246,6 +282,10 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('contractDeliveryLocation').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('contractDeliveryLocation'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('contractDeliveryLocation'))}" update="configItemForm" style="padding:10px"
@@ -258,6 +298,10 @@
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('setEngineerScansToPage').showValue}" style="width: 50%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('setEngineerScansToPage').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('setEngineerScansToPage').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>

@@ -7,13 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('systemHead').name.concat('(').concat(systemConfigItemController.configItemMap.get('systemHead').key).concat(')')}</label>
                 <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('systemHead').showValue}"
                                  rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
                     <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('systemHead').validation}" pattern="#{systemConfigItemController.configItemMap.get('systemHead').validation}"/>
                 </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('systemHead').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -27,6 +31,10 @@
                 <img src="#{systemConfigItemController.configItemMap.get('systemLogo').showValue}" style="width:60px; height:50px;margin: 0px 5px 0px 5px;"/>
                 <p:fileUpload id="type1" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{systemConfigItemController.uploadImg}" mode="advanced" dragDropSupport="false" style="width:50%"
                               multiple="true"  sizeLimit="500000000" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" update="configItemForm"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('systemLogo').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -43,6 +51,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('displayExternalWorkOrder').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('displayExternalWorkOrder'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('displayExternalWorkOrder'))}" update="configItemForm" style="padding:10px"
@@ -55,6 +67,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('displayRemoteWorkOrder').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -71,6 +87,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('synchronizeWorkOrder').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('synchronizeWorkOrder'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('synchronizeWorkOrder'))}" update="configItemForm" style="padding:10px"
@@ -83,6 +103,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('showLocationNameFlag').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -100,11 +124,16 @@
                 <p:commandButton icon="ui-icon-refresh" actionListener="#{systemConfigItemController.siteToSiteAutoAck(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment'))}" rendered="#{'true'.equalsIgnoreCase(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').showValue)}" value="自动处理历史未完成工单" style="position: relative;left: 20%;bottom: 42%" />
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('enableSimpleDepartmentSecondment').configItemValue == null}"/>
             </h:panelGroup>
+
             <h:panelGroup>
                 <label class="label">报废流程</label>
                 <p:fieldset>
@@ -128,6 +157,10 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('assetScrap').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfigScrap(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfigScrip(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'))}" update="configItemForm" style="padding:10px"
@@ -140,6 +173,10 @@
                                  rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
                     <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('homepageAverageResponseTimeMaxDays').validation}" pattern="#{systemConfigItemController.configItemMap.get('homepageAverageResponseTimeMaxDays').validation}"/>
                 </p:inputNumber>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('homepageAverageResponseTimeMaxDays').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -156,6 +193,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('showHomepageAverageResponseTime').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('showHomepageAverageResponseTime'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showHomepageAverageResponseTime'))}" update="configItemForm" style="padding:10px"
@@ -170,6 +211,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableDeptSecondmentAdjustReturnTime').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableDeptSecondmentAdjustReturnTime'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableDeptSecondmentAdjustReturnTime'))}" update="configItemForm" style="padding:10px"
@@ -182,6 +227,10 @@
                                  rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
                     <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('HospitalAreaClassification').validation}" pattern="#{systemConfigItemController.configItemMap.get('HospitalAreaClassification').validation}"/>
                 </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('HospitalAreaClassification').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>

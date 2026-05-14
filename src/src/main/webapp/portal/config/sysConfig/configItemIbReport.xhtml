@@ -7,13 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('ibReportUrl').name.concat('(').concat(systemConfigItemController.configItemMap.get('ibReportUrl').key).concat(')')}</label>
                 <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('ibReportUrl').showValue}"
                                  rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
                     <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('ibReportUrl').validation}" pattern="#{systemConfigItemController.configItemMap.get('ibReportUrl').validation}"/>
                 </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('ibReportUrl').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
