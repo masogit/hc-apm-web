@@ -23,10 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class UserAccountExportService {
@@ -105,11 +103,13 @@ public class UserAccountExportService {
 		List<Map<String, Object>> listMapResult = new ArrayList<>();
 		List<OrgInfo> orgInfoTenantAll = tenantOrgInfoAll();
 		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All(orgInfoTenantAll);
+		List<SysRole> sysRoleList = getTenantSysRole();
 		List<CustomRole> customRoleList = getTenantCustomRole();
 		if (listUserAccount != null && !listUserAccount.isEmpty()) {
 			listUserAccount=listUserAccount.stream().filter(item->!Boolean.TRUE.equals(item.getIsDeleted())).collect(Collectors.toList());
 			setListOrgInfo(listUserAccount,orgInfoTenantAll);
-			Map<Integer, List<UserRole>> userCustomList = getUserCustomList(listUserAccount);
+			Map<Integer, List<UserRole>> userSysRoleList = getUserRoleList(listUserAccount, 0);
+			Map<Integer, List<UserRole>> userCustomList = getUserRoleList(listUserAccount, 1);
 			for (UserAccount tempUser : listUserAccount) {
 				Map<String, Object> tempMap = new HashMap<>();
 				setDepartNames(tempMap, tempUser,orgInfos);
@@ -129,7 +129,9 @@ public class UserAccountExportService {
 				tempMap.put(HEADER_ISACTIVE, Boolean.TRUE.equals(tempUser.getIsActive()) ? "是" : "否");
 				tempMap.put(HEADER_ISLOCKED, Boolean.TRUE.equals(tempUser.getIsLocked()) ? "是" : "否");
 				tempMap.put(HEADER_ISDISABLE, Boolean.TRUE.equals(tempUser.getIsDisable()) ? "是" : "否");
-				tempMap.put(HEADER_ROLENAME, getUserRoleNames(userCustomList,customRoleList,tempUser));
+                String userSysRoleNames = getUserSysRoleNames(userSysRoleList, sysRoleList, tempUser);
+                String userCustomRoleNames = getUserCustomRoleNames(userCustomList, customRoleList, tempUser);
+                tempMap.put(HEADER_ROLENAME, (userSysRoleNames + " " + userCustomRoleNames).trim());
 				tempMap.put(HEADER_POSITION, convertPositionIdToLabel(tempUser.getPosition()));
 				tempMap.put(HEADER_TAGS, joinTags(tempUser));
 				tempMap.put(HEADER_ACCESSSCOPE, getOrgInfoName(tempUser.getListOrgInfo()));
@@ -142,11 +144,29 @@ public class UserAccountExportService {
 		}
 		return listMapResult;
 	}
-	private String  getUserRoleNames(Map<Integer, List<UserRole>> userCustomList,List<CustomRole> customRoleList,UserAccount tempUser){
-		String userRoleNames = tempUser.getUserRoleNames();
-		if(StringUtils.isEmpty(userRoleNames)){
-			userRoleNames = "";
-		}
+
+    public String getUserSysRoleNames(Map<Integer, List<UserRole>> userSysRoleList, List<SysRole> sysRoleList, UserAccount account) {
+        String userRoleNames = "";
+
+        if(userSysRoleList == null){
+            return userRoleNames;
+        }
+        List<UserRole> userRoleList = userSysRoleList.get(account.getId());
+        if (CollectionUtils.isNotEmpty(userRoleList)) {
+            List<Integer> collect = userRoleList.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+            List<String> sysRoleName = sysRoleList.stream().filter(item -> collect.contains(item.getId())).map(SysRole::getRoleDesc).collect(Collectors.toList());
+
+            if (CollectionUtils.isNotEmpty(sysRoleName)) {
+                userRoleNames += String.join(" ", sysRoleName);
+            }
+        }
+
+        return userRoleNames;
+    }
+
+	private String getUserCustomRoleNames(Map<Integer, List<UserRole>> userCustomList, List<CustomRole> customRoleList, UserAccount tempUser){
+		String userRoleNames = "";
+
 		if(userCustomList == null){
 			return userRoleNames;
 		}
@@ -160,17 +180,20 @@ public class UserAccountExportService {
 		}
 		return userRoleNames;
 	}
-	private Map<Integer, List<UserRole>> getUserCustomList(List<UserAccount> listUserAccount){
+	private Map<Integer, List<UserRole>> getUserRoleList(List<UserAccount> listUserAccount, Integer roleType){
 		if(CollectionUtils.isEmpty(listUserAccount)) return null;
 		List<Integer> ids = listUserAccount.stream().map(UserAccount::getId).collect(Collectors.toList());
 		List<SearchFilter> searchFilters = new ArrayList<>();
 		searchFilters.add(new SearchFilter("userId", SearchFilter.Operator.IN,ids));
-		searchFilters.add(new SearchFilter("roleType", SearchFilter.Operator.EQ,1));
+		searchFilters.add(new SearchFilter("roleType", SearchFilter.Operator.EQ,roleType));
 		List<UserRole> userRoleList = userRoleRepository.findBySearchFilter(searchFilters);
 		if(CollectionUtils.isEmpty(userRoleList)) return null;
 		Map<Integer, List<UserRole>> collect = userRoleList.stream().collect(Collectors.groupingBy(UserRole::getUserId));
 		return collect;
 	}
+    private List<SysRole> getTenantSysRole(){
+        return  sysRoleRepository.find();
+    }
 	private List<CustomRole> getTenantCustomRole(){
 		String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
 		return  customRoleRepository.findByTenantUID(tenantUID);
