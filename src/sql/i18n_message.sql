@@ -4578,6 +4578,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','userModifyRecord','用户修改记录','user modify record',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetModifyRecord','资产修改记录','asset modify record',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginHistoryRecord','登录历史记录','login record',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','queryDownloadRecord','查看下载记录','query download record',NULL,-1);
 
 -- '日志审计-登录历史记录'页面的字段
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginName','登录姓名','login name',NULL,-1);

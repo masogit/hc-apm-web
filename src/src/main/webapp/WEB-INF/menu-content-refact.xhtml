@@ -345,6 +345,7 @@
                            <p:menuitem fragment="item002" id="item002" value="#{msg.assetModifyRecord}" outcome="/portal/historyInfo/assetList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_ASSET')}"/>
                            <p:menuitem fragment="item003" id="item003" value="#{msg.loginHistoryRecord}" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_LOGIN')}"/>
                            <p:menuitem fragment="item004" id="item004" value="#{msg.userModifyRecord}" outcome="/portal/historyInfo/userEsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_ES')}"/>
+                           <p:menuitem fragment="item004" id="item004" value="#{msg.queryDownloadRecord}" outcome="/portal/sysyemEventAudit/tableList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_TABLE')}"/>
                        </p:submenu>
                    </c:when>
                    <!--<c:when test="#{item eq 'DEVICEDATAPREVIEW'}">
