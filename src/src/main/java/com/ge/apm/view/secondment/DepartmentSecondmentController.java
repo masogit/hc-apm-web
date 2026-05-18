@@ -1,12 +1,14 @@
 package com.ge.apm.view.secondment;
 
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SiteToSiteAllocationRepository;
 import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.*;
-import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SiteToSiteAllocation;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.ConfigItemService;
-import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
@@ -16,14 +18,11 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.event.SelectEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -31,8 +30,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -51,6 +50,8 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
     private Boolean enableSimple = Boolean.FALSE;
     private SharedAssetService sharedAssetService;
     private OrgInfoRepository orgInfoRepository;
+
+    private BlobObjectRepository blobObjectRepository;
     @Override
     protected SiteToSiteAllocationRepository getDAO() {
         return dao;
@@ -64,6 +65,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         configItemService=WebUtil.getBean(ConfigItemService.class);
         sharedAssetService=WebUtil.getBean(SharedAssetService.class);
         orgInfoRepository=WebUtil.getBean(OrgInfoRepository.class);
+        blobObjectRepository=WebUtil.getBean(BlobObjectRepository.class);
         enableSimple = configItemService.getConfigItemByKey(key,UserContextService.getCurrentUserAccount());
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -73,7 +75,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
     @Override
     protected Page<SiteToSiteAllocation> loadData(PageRequest pageRequest) {
         //        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
-        setUserSearchFilters();
+//        setUserSearchFilters();
         if(oneSearchStr != null){
             this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("assetDeptNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
@@ -171,11 +173,12 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
 
 
     public void onRowSelect(SelectEvent event){
-        System.out.println(event);
         process=new ArrayList<>();
         SiteToSiteAllocation target = selected;
         List<String> strings = conditionList(target);
         List<UserAccount> userAccounts = userAccountRepository.findByUidIn(strings);
+        List<V2_BlobObject> siteAttachments = blobObjectRepository.findByBoUuid(target.getId());
+        target.setAttachments(siteAttachments);
         Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
         UserAccount userAccount = new UserAccount();
         userAccount.setName("系统确认");
