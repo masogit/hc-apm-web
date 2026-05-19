@@ -6,108 +6,139 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:apm="http://www.ge.com/tags/apm">
-    <p:dialog class="coworkerDlg" style="overflow-y: auto" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="1000"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.nameplateRecognition}">
+    <p:dialog class="coworkerDlg" style="overflow-y: auto" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="1500"  resizable="true" draggable="true" appendTo="@(body)" header="识别照片内容">
         <p:ajax event="close"  update="previewedDlg" oncomplete="PF('previewedDlg').hide()" />
-            <h:form id="nameplateRecognitionForm">
-                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                    <h:panelGroup >
-                        <p:fieldset legend="识别结果" style="margin: 0px;">
-                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                <h:panelGroup>
-                                    <label class="label">#{msg.name}</label>
-                                    <p:inputText  value="#{assetInfoEditController.equipmentNameplate.device_name}" ></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">当前#{msg.name}</label>
-                                    <p:inputText  value="#{assetInfoEditController.selected.name}" readonly="true"></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.pattern}</label>
-                                    <p:inputText  value="#{assetInfoEditController.equipmentNameplate.pattern}" ></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">当前#{msg.pattern}</label>
-                                    <p:inputText  value="#{assetInfoEditController.selected.functionType}" readonly="true"></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.serialNum}</label>
-                                    <p:inputText  value="#{assetInfoEditController.equipmentNameplate.serial_num}" ></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">当前#{msg.serialNum}</label>
-                                    <p:inputText  value="#{assetInfoEditController.selected.serialNum}" readonly="true"></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.manufacture}</label>
-                                    <p:inputText  value="#{assetInfoEditController.equipmentNameplate.manufactory}" ></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">当前#{msg.manufacture}</label>
-                                    <p:inputText  value="#{assetInfoEditController.selected.manufacture}" readonly="true"></p:inputText>
-                                </h:panelGroup>
-                                <!--                <h:panelGroup>-->
-                                <!--                    <label class="label">#{msg.power}</label>-->
-                                <!--                    <p:inputText id="serialNum4" value="#{assetInfoEditController.equipmentNameplate.power}" ></p:inputText>-->
-                                <!--                </h:panelGroup>-->
-                                <!--                <h:panelGroup>-->
-                                <!--                    <label class="label">当前#{msg.power}</label>-->
-                                <!--                    <p:inputText id="serialNum4Old" value="#{assetInfoEditController.equipmentNameplate.power}" readonly="true"></p:inputText>-->
-                                <!--                </h:panelGroup>-->
-                                <h:panelGroup>
-                                    <label class="label">#{msg.registrationNo}</label>
-                                    <p:inputText  value="#{assetInfoEditController.equipmentNameplate.registry_num}" ></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">当前#{msg.registrationNo}</label>
-                                    <p:inputText  value="#{assetInfoEditController.selected.registrationNo}" readonly="true"></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.lifecycle}</label>
-                                    <p:inputText  value="#{assetInfoEditController.equipmentNameplate.using_year}" ></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">当前#{msg.lifecycle}</label>
-                                    <p:inputText  value="#{assetInfoEditController.selected.lifecycleInYear}" readonly="true"></p:inputText>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.manufactDate}</label>
-                                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.equipmentNameplate.factory_date}" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.manufactDate}</label>
-                                    <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" />
-                                </h:panelGroup>
-                                <p:commandButton class="my-button" value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" oncomplete="PF('nameplateRecognitionDlg').hide();" validateClient="true" update="tab:AssetInfoEditForm @(.manufacturerChange)" style="float:left" />
-                                <p:commandButton class="my-button"  value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
+        <h:form id="nameplateRecognitionForm">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup >
+                    <p:fieldset legend="识别结果" style="margin: 0px;">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{'false' eq userContextService.getConfigItemValue('EnableTestFunction')}">
+                            <h:panelGroup>
+                                <label class="label">#{msg.name}</label>
+                                <p:inputText  value="#{assetInfoEditController.equipmentNameplate.device_name}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.name}</label>
+                                <p:inputText  value="#{assetInfoEditController.selected.name}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['device_name']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.pattern}</label>
+                                <p:inputText  value="#{assetInfoEditController.equipmentNameplate.pattern}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.pattern}</label>
+                                <p:inputText  value="#{assetInfoEditController.selected.functionType}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['pattern']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.serialNum}</label>
+                                <p:inputText  value="#{assetInfoEditController.equipmentNameplate.serial_num}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.serialNum}</label>
+                                <p:inputText  value="#{assetInfoEditController.selected.serialNum}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['serial_num']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufacture}</label>
+                                <p:inputText  value="#{assetInfoEditController.equipmentNameplate.manufactory}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.manufacture}</label>
+                                <p:inputText  value="#{assetInfoEditController.selected.manufacture}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['manufactory']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <!--                <h:panelGroup>-->
+                            <!--                    <label class="label">#{msg.power}</label>-->
+                            <!--                    <p:inputText id="serialNum4" value="#{assetInfoEditController.equipmentNameplate.power}" ></p:inputText>-->
+                            <!--                </h:panelGroup>-->
+                            <!--                <h:panelGroup>-->
+                            <!--                    <label class="label">当前#{msg.power}</label>-->
+                            <!--                    <p:inputText id="serialNum4Old" value="#{assetInfoEditController.equipmentNameplate.power}" readonly="true"></p:inputText>-->
+                            <!--                </h:panelGroup>-->
+                            <h:panelGroup>
+                                <label class="label">#{msg.registrationNo}</label>
+                                <p:inputText  value="#{assetInfoEditController.equipmentNameplate.registry_num}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.registrationNo}</label>
+                                <p:inputText  value="#{assetInfoEditController.selected.registrationNo}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['registry_num']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.lifecycle}</label>
+                                <p:inputText  value="#{assetInfoEditController.equipmentNameplate.using_year}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.lifecycle}</label>
+                                <p:inputText  value="#{assetInfoEditController.selected.lifecycleInYear}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['using_year']}"  class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufactDate}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.equipmentNameplate.factory_date}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufactDate}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['factory_date']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <p:commandButton class="my-button" value="应用" icon="ui-icon-check" action="#{assetInfoEditController.applyResult()}" onclick="PF('nameplateRecognitionDlg').hide()" validateClient="true" update="tab:AssetInfoEditForm @(.manufacturerChange)" style="float:left" />
+                            <p:commandButton class="my-button"  value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
 
-                            </p:panelGrid>
-                        </p:fieldset>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:fieldset legend="#{msg.nameplateRecognition}" style="height:540px;overflow-y: auto;margin: 0px;">
-                            <!--<p:graphicImage value="#{fileDownloadService.getFile(assetInfoEditController.selectedFileItemId)}"  stream="false" >
-                            </p:graphicImage>-->
-                            <div class="container-fluid" style="height: 460px; overflow: auto;">
-                                <div class="row" id="assetPagePicDiv2">
-                                    <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
-                                        <div>
-                                            <img data-original="#{fileDownloadService.getImgBase64(assetInfoEditController.selectedFileItemId)}"
-                                                 src="#{fileDownloadService.getImgBase64(assetInfoEditController.selectedFileItemId)}"
-                                                 style="opacity:0; width:1px; height:1px"/>
-                                        </div>
-                                    </c:forEach>
-                                </div>
-                                <script>
-                                    new Viewer(document.getElementById('assetPagePicDiv2'), {inline: true});
-                                </script>
+                        </p:panelGrid>
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{'true' eq userContextService.getConfigItemValue('EnableTestFunction')}">
+                            <c:forEach items="#{assetInfoEditController.result.entrySet().toArray()}" var="entry">
+                                <h:panelGroup>
+                                    <label class="label">#{entry.key}</label>
+                                    <p:inputText  value="#{entry.value}" ></p:inputText>
+                                </h:panelGroup>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:fieldset legend="识别照片内容" style="height:540px;overflow-y: auto;margin: 0px;">
+                        <!--<p:graphicImage value="#{fileDownloadService.getFile(assetInfoEditController.selectedFileItemId)}"  stream="false" >
+                        </p:graphicImage>-->
+                        <div class="container-fluid" style="height: 460px; overflow: auto;">
+                            <div class="row" id="assetPagePicDiv2">
+                                <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
+                                    <div>
+                                        <img data-original="#{fileDownloadService.getImgBase64(assetInfoEditController.selectedFileItemId)}"
+                                             src="#{fileDownloadService.getImgBase64(assetInfoEditController.selectedFileItemId)}"
+                                             style="opacity:0; width:1px; height:1px"/>
+                                    </div>
+                                </c:forEach>
                             </div>
+                            <script>
+                                new Viewer(document.getElementById('assetPagePicDiv2'), {inline: true});
+                            </script>
+                        </div>
 
-                            <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8; margin-top: 2px;margin-bottom: 2px;" value="识别"
-                                             onclick="disableAction(true,'#cccccc')"  update="nameplateRecognitionForm" actionListener="#{assetInfoEditController.plateRecognition(assetInfoEditController.selectedFileItemId)}"/>
-                        </p:fieldset>
-                    </h:panelGroup>
-                </p:panelGrid>
-            </h:form>
+                        <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8; margin-top: 2px;margin-bottom: 2px;" value="识别" rendered="#{'false' eq userContextService.getConfigItemValue('EnableTestFunction')}"
+                                         onclick="disableAction(true,'#cccccc')"  update="nameplateRecognitionForm" actionListener="#{assetInfoEditController.plateRecognition(assetInfoEditController.selectedFileItemId)}"/>
+                        <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8; margin-top: 2px;margin-bottom: 2px;" value="识别" rendered="#{'true' eq userContextService.getConfigItemValue('EnableTestFunction')}"
+                                         onclick="disableAction(true,'#cccccc')"  update="nameplateRecognitionForm" actionListener="#{assetInfoEditController.plateRecognitionImage(assetInfoEditController.selectedFileItemId)}"/>
+                    </p:fieldset>
+                </h:panelGroup>
+            </p:panelGrid>
+        </h:form>
         <ui:include src="/portal/preview/view.xhtml" />
     </p:dialog>
     <h:outputScript>
