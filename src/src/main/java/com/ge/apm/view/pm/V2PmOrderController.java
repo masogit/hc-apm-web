@@ -1120,6 +1120,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void doExportMaintenanceReport() {
         maintenanceReport = null;
         try {
+            if(!pmReportService.checkDownloadPDF(selectedMap)){
+                return;
+            }
             maintenanceReport = pmReportService.generate(selectedMap, isInsulate, loginUser);
         } catch (BusinessException e) {
             logger.error("downLoad pm_word BusinessException ",e);
