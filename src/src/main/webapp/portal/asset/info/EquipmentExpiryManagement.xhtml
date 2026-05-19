@@ -183,7 +183,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="batchSetUseYearButton" icon="fa fa-cogs" class="btnEdit" title="#{msg.batchEditUsageYear}" update="batchEditBeforeForm" actionListener="#{equipmentExpiryManagementController.batchEditUsageDateBefore()}" disabled="#{!equipmentExpiryManagementController.isChecked()}" oncomplete="PF('batchEditBeforeDialog').show()"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="AquipmentExpiry_export"/>
+                                <p:dataExporter type="xls" target="datalist" fileName="AquipmentExpiry_export" postProcessor="#{equipmentExpiryManagementController.postProcessorExcel}" />
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>

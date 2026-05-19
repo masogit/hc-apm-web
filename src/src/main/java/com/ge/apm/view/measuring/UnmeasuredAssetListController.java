@@ -1,6 +1,8 @@
 package com.ge.apm.view.measuring;
 
+import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.view.uaa.OrgTreeController;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
@@ -51,12 +53,15 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
     private AssetInfoMapper assetInfoMapper;
 
     private OrgTreeController orgTreeController;
+    private MeasuringService measuringService;
+
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        measuringService = WebUtil.getBean(MeasuringService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.MEASURE_INFO);
         assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
@@ -184,6 +189,11 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         orgTreeController.setTreeNodeNameFilter(null);
         orgTreeController.filterDeptOrgTree();
 
+    }
+
+    public void postProcessorExcel(Object obj){
+        SystemEventAuditEnum eventAuditEnum = SystemEventAuditEnum.TABLE_DOWNLOAD_MEASURE;
+        measuringService.postProcessorExcel(eventAuditEnum, "未检计量页面表格");
     }
 
 }

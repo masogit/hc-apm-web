@@ -1,3 +1,14 @@
+-- YHAAO-27960 配置项-临床助手“查询天数”，改名为“有问题工单查询时间范围”
+UPDATE config_item SET name = '有问题工单查询时间范围' WHERE key = 'setQueryNumberDays' AND name != '有问题工单查询时间范围';
+
+-- YHAAO-27876 维修中列表-存在备件审核中的工单在列表中增加标识
+update config_item  set  default_value='[{"label":"设备名称","field":"assetName","required":true,"rendered":true},{"label":"制造商序列号","field":"manufacturerSerialNumber","required":true,"rendered":true},{"label":"设备编号（院方）","field":"departNum","required":true,"rendered":true},{"label":"设备型号","field":"functionType","required":false,"rendered":true},{"label":"所属院区","field":"hospitalId","required":true,"rendered":true},{"label":"所属科室","field":"clinicalDeptName","required":false,"rendered":true},{"label":"报修单号","field":"srNum","required":true,"rendered":true},{"label":"安装位置","field":"locationName","required":false,"rendered":true},{"label":"报修人","field":"requestorName","required":false,"rendered":true},{"label":"维修人","field":"requireName","required":false,"rendered":true},{"label":"报修时间","field":"requestTime","required":true,"rendered":true},{"label":"当前步骤","field":"currentStep","required":true,"rendered":true},{"label":"工单类型","field":"intExtType","required":false,"rendered":true},{"label":"故障现象","field":"requestReason","required":false,"rendered":true},{"label":"主子工单","field":"mainSub","required":false,"rendered":true},{"label":"资产分类","field":"assetType","required":false,"rendered":true},{"label":"备件状态","field":"approvalStatus","required":false,"rendered":false}]'  where   key like  'WorkOrderListColumn%';
+
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '开启测试功能', 'EnableTestFunction', '开启测试功能', 'f','t',3 where not exists(select * from config_item where key = 'EnableTestFunction');
+
+--YHAAO-27869
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '保养规则是否显示评分字段', 'pmRuleShowScoreFlag', '保养规则是否显示评分字段', 'f','t',3 where not exists(select * from config_item where key = 'pmRuleShowScoreFlag');
+
 -- YHAAO-28014 web端时间记录配置
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 13, 'true', '是否显示维修记录', 'showRepairRecordTable', '是否显示维修记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showRepairRecordTable');

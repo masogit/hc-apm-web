@@ -5,10 +5,7 @@
  */
 package com.ge.apm.view.wo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.*;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
@@ -4601,5 +4598,22 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
 
+    public String approvalStatusName(String approvalStatus) {
+        switch (approvalStatus){
+            case "0":
+                return "无备件";
+            case "1":
+                return "备件审批中";
+            case "2":
+            case "3":
+            case "4":
+                return "备件审批完成";
+            default:
+                return null;
+        }
+    }
+    public void postProcessorExcel(Object obj){
+        woService.postProcessorExcel();
+    }
 }
 

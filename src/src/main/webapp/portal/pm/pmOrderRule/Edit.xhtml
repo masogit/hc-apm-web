@@ -109,6 +109,12 @@
                                 <p:ajax listener="#{pmOrderRuleController.changeruleLevelTip()}" update=":PmOrderRuleEditForm:tipChange" />
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.pmRuleShowScoreFlag eq 'true'}">
+                            <label class ="label">#{msg.feedbackRating}</label>
+                            <p:inputNumber minValue="0" maxValue="100"  decimalPlaces="1" value="#{pmOrderRuleController.selected.ruleScore}" >
+                                <p:ajax />
+                            </p:inputNumber>
+                        </h:panelGroup>
                     </p:panelGrid>
                     
                    <p:panelGrid id="report" columns="4"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="#{pmOrderRuleController.selected != null}">

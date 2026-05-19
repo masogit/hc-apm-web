@@ -5,6 +5,8 @@
  */
 package com.ge.apm.service.wo;
 
+import com.alibaba.fastjson.JSONArray;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
@@ -12,6 +14,8 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
@@ -88,6 +92,8 @@ public class V2_WorkOrderService {
     private WorkOrderManHoursDetailRepository workOrderManHoursDetailRepository;
     @Autowired
     private BlobFileService blobService;
+    @Autowired
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
 
     public V2_WorkOrder getWorkOrderById(String woId) {
@@ -821,4 +827,17 @@ public class V2_WorkOrderService {
         messageTipBuilder.append("请确认是否需要下载？");
         return messageTipBuilder.toString();
     }
+
+
+    public void postProcessorExcel(){
+        try{
+            SystemEventAuditEnum eventAuditEnum = SystemEventAuditEnum.TABLE_DOWNLOAD_WORK_ORDER;
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, null, Boolean.TRUE, "", AuditBoTypeEnum.TABLE_DOWNLOAD.getBoType(), "页面表格");
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }catch (Exception e){
+            logger.error("postProcessorExcel error:",e);
+        }
+
+    }
+
 }

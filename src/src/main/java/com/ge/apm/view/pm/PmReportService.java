@@ -50,6 +50,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -566,6 +567,20 @@ public class PmReportService {
             }
         }
         return content;
+    }
+
+    public boolean checkDownloadPDF(Map<String, Boolean> pmOrders){
+        AtomicBoolean r = new AtomicBoolean(true);
+        pmOrders.forEach((id, selected) -> {
+            if (selected) {
+                V2_PmOrder pmOrder = pmOrderService.findById(id);
+                if (!pmOrder.getCurrentStepName().equals("已关单")) {
+                    WebUtil.addErrorMessage(pmOrder.getPmNum().concat(" 保养记录未关单！"));
+                    r.set(false);
+                }
+            }
+        });
+        return r.get();
     }
 
     public DefaultStreamedContent generate(Map<String, Boolean> pmOrders, Boolean isInsulate, UserAccount user) throws IOException {
