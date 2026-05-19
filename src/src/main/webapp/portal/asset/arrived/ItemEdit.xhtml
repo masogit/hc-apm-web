@@ -551,7 +551,6 @@
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                            <p:outputLabel value="#{fileitem.compressObjectId}"/>
                                         </h:panelGroup>
                                         <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
                                             <p:ajax event="click" listener="#{assetInstallationController.nameplatePhotoPreview(fileitem.objectStorageId)}" update="nameplateRecognitionForm" oncomplete="PF('nameplateRecognitionDlg').show()" />
