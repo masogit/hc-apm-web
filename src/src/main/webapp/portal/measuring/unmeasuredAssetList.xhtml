@@ -109,7 +109,7 @@
 
                     <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalist_unmeasuredAsset" fileName="UnmeasuredAsset_export"/>
+                            <p:dataExporter type="xls" target="datalist_unmeasuredAsset" fileName="UnmeasuredAsset_export" postProcessor="#{unmeasuredAssetListController.postProcessorExcel}" />
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>

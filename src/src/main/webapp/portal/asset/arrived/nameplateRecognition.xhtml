@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:apm="http://www.ge.com/tags/apm">
+    <p:dialog class="coworkerDlg" style="overflow-y: auto" id="nameplateRecognition" widgetVar="nameplateRecognitionDlg" modal="true" width="1500"  resizable="true" draggable="true" appendTo="@(body)" header="识别照片内容">
+        <p:ajax event="close"  update="previewedDlg" oncomplete="PF('previewedDlg').hide()" />
+        <h:form id="nameplateRecognitionForm">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup >
+                    <p:fieldset legend="识别结果" style="margin: 0px;">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{'false' eq userContextService.getConfigItemValue('EnableTestFunction')}">
+                            <h:panelGroup>
+                                <label class="label">#{msg.name}</label>
+                                <p:inputText  value="#{assetInstallationController.equipmentNameplate.device_name}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.name}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.arrivalList.assetName}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInstallationController.useValue['device_name']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.pattern}</label>
+                                <p:inputText  value="#{assetInstallationController.equipmentNameplate.pattern}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.pattern}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.arrivalList.functionType}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInstallationController.useValue['pattern']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.serialNum}</label>
+                                <p:inputText  value="#{assetInstallationController.equipmentNameplate.serial_num}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.serialNum}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.serialNum}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInstallationController.useValue['serial_num']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufacture}</label>
+                                <p:inputText  value="#{assetInstallationController.equipmentNameplate.manufactory}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.manufacture}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.arrivalList.manufacture}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInstallationController.useValue['manufactory']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <!--                <h:panelGroup>-->
+                            <!--                    <label class="label">#{msg.power}</label>-->
+                            <!--                    <p:inputText id="serialNum4" value="#{assetInstallationController.equipmentNameplate.power}" ></p:inputText>-->
+                            <!--                </h:panelGroup>-->
+                            <!--                <h:panelGroup>-->
+                            <!--                    <label class="label">当前#{msg.power}</label>-->
+                            <!--                    <p:inputText id="serialNum4Old" value="#{assetInstallationController.equipmentNameplate.power}" readonly="true"></p:inputText>-->
+                            <!--                </h:panelGroup>-->
+                            <h:panelGroup>
+                                <label class="label">#{msg.registrationNo}</label>
+                                <p:inputText  value="#{assetInstallationController.equipmentNameplate.registry_num}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.registrationNo}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.registrationNo}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInstallationController.useValue['registry_num']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.lifecycle}</label>
+                                <p:inputText  value="#{assetInstallationController.equipmentNameplate.using_year}" ></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">当前#{msg.lifecycle}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.lifecycleInYear}" readonly="true"></p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInstallationController.useValue['using_year']}"  class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufactDate}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInstallationController.equipmentNameplate.factory_date}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufactDate}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInstallationController.arrivalListItem.manufactDate}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['factory_date']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                            </h:panelGroup>
+                            <p:commandButton class="my-button" value="应用" icon="ui-icon-check" action="#{assetInstallationController.applyResult()}" onclick="PF('nameplateRecognitionDlg').hide()" validateClient="true" update="ItemEditDlgForm" style="float:left" />
+                            <p:commandButton class="my-button"  value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
+
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:fieldset legend="识别照片内容" style="height:540px;overflow-y: auto;margin: 0px;">
+                        <!--<p:graphicImage value="#{fileDownloadService.getFile(assetInfoEditController.selectedFileItemId)}"  stream="false" >
+                        </p:graphicImage>-->
+                        <div class="container-fluid" style="height: 460px; overflow: auto;">
+                            <div class="row" id="assetPagePicDiv2">
+                                    <div>
+                                        <img data-original="#{fileDownloadService.getImgBase64(assetInstallationController.selectedFileItemId)}"
+                                             src="#{fileDownloadService.getImgBase64(assetInstallationController.selectedFileItemId)}"
+                                             style="opacity:0; width:1px; height:1px"/>
+                                    </div>
+                            </div>
+                            <script>
+                                new Viewer(document.getElementById('assetPagePicDiv2'), {inline: true});
+                            </script>
+                        </div>
+
+                        <p:commandButton process="@this" icon="ui-icon ui-icon-wifi-tethering" class="my-button" style="zoom:0.8; margin-top: 2px;margin-bottom: 2px;" value="识别"
+                                         onclick="disableAction(true,'#cccccc')"  update="nameplateRecognitionForm" actionListener="#{assetInstallationController.plateRecognition(assetInstallationController.selectedFileItemId)}"/>
+
+                    </p:fieldset>
+                </h:panelGroup>
+            </p:panelGrid>
+        </h:form>
+    </p:dialog>
+    <h:outputScript>
+        function disableAction(disabledFlag,color){
+            // 选中所有目标元素
+            const buttons = document.querySelectorAll('.my-button');
+            // 遍历并禁用
+            buttons.forEach(button => {
+                button.classList.add('is-disabled'); // 添加视觉禁用类
+                button.disabled = disabledFlag;              // 真正禁用功能
+                //button.style.backgroundColor='#cccccc'
+                button.style.backgroundColor=color
+            });
+        }
+        function bringToFront(widgetVar) {
+            var dialog = PF(widgetVar).jq;
+            // 获取当前最大 z-index
+            var maxZ = Math.max.apply(null,
+                    $.map($('body > .ui-dialog'), function(e) {
+                        return parseInt($(e).css('z-index')) || 0;
+                    })
+            );
+            dialog.css('z-index', maxZ + 1);
+            // 同时提升遮罩层（modal overlay）
+            $('.ui-widget-overlay').last().css('z-index', 1000);
+        }
+    </h:outputScript>
+
+</ui:composition>
+        <!--</html>-->

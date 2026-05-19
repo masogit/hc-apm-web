@@ -885,6 +885,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         insertCrossSiteColumns(exportFields);
         export1(exportFields);
+        assetInfoService.postProcessorExcel();
     }
 
     private void insertCrossSiteColumns(List<String> exportFields) {

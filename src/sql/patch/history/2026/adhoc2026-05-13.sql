@@ -43,11 +43,11 @@ FROM dblink(
           AND t.is_valid = true
 		  and t.ib_status = 1
     '::text) AS t(
-                               name varchar,
-                               depart_num varchar,
-                               serial_num varchar,
-                               system_id varchar,
-                               qr_code varchar
+            name varchar,
+            depart_num varchar,
+            serial_num varchar,
+            system_id varchar,
+            qr_code varchar
     );
 
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 8, 'false', '报修是否影响当天日常检查', 'repairAffectsDailyInspection', '报修是否影响当天日常检查', 'f','t',3 where not exists(select * from config_item where key = 'repairAffectsDailyInspection');

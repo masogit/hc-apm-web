@@ -457,6 +457,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         template.writePm(pmOrderList,queryIndex);
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
+        pmOrderService.postProcessorExcel();
     }
 
     private List<V2_PmOrder> getExportList() {
@@ -1119,6 +1120,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void doExportMaintenanceReport() {
         maintenanceReport = null;
         try {
+            if(!pmReportService.checkDownloadPDF(selectedMap)){
+                return;
+            }
             maintenanceReport = pmReportService.generate(selectedMap, isInsulate, loginUser);
         } catch (BusinessException e) {
             logger.error("downLoad pm_word BusinessException ",e);

@@ -8,13 +8,14 @@
 
     <ui:composition>
         <p:fieldset legend="维修工作台">
-            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
                     <p:selectOneMenu value="#{systemConfigItemController.itemValue}" style="width: 50%;">
-                        <p:ajax update="dataTableGroup"  listener="#{systemConfigItemController.selectedConfigItemChange()}"/>
+                        <p:ajax update="dataTableGroup descriptionGroup" listener="#{systemConfigItemController.selectedConfigItemChange()}"/>
                         <f:selectItems value="#{systemConfigItemController.getWorkOrderListType()}" var="item" itemLabel="#{item.name}" itemValue="#{item.key}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
+                <h:panelGroup></h:panelGroup>
                 <h:panelGroup></h:panelGroup>
                 <h:panelGroup id="dataTableGroup">
                     <label class="label">#{systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).name.concat('(').concat(systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).key).concat(')')}</label>
@@ -37,6 +38,10 @@
                         </p:column>
                     </p:dataTable>
                 </h:panelGroup>
+                <h:panelGroup id="descriptionGroup">
+                    <label class="label">#{msg.ConfigItemDesc}</label>
+                    <p:inputTextarea value="#{systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue).description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+                </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.Operation}</label>
                     <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get(systemConfigItemController.itemValue))}" update="configItemForm" />
@@ -47,7 +52,7 @@
             </p:panelGrid>
         </p:fieldset>
         <p:fieldset legend="设备综合效益分析">
-            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
                     <label class="label">#{systemConfigItemController.configItemMap.get("EfficiencyEquipmentColumn").name.concat('(').concat(systemConfigItemController.configItemMap.get("EfficiencyEquipmentColumn").key).concat(')')}</label>
                     <p:dataTable id="EfficiencyEquipmentColumn" var='item' value="#{systemConfigItemController.configItemMap.get('EfficiencyEquipmentColumn').fieldColumnDtoList}" draggableRows="true">
@@ -68,6 +73,10 @@
 
                         </p:column>
                     </p:dataTable>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.ConfigItemDesc}</label>
+                    <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('EfficiencyEquipmentColumn').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.Operation}</label>

@@ -5,8 +5,11 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.mapper.ContractInfoMapper;
 import com.ge.apm.domain.*;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -17,6 +20,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -39,6 +43,8 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class AssetInfoService {
 
+
+    SystemEventAuditAopAspect systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
     AssetInfoRepository assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
     SysAuthGroupRepository authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
@@ -285,5 +291,16 @@ public class AssetInfoService {
                 asset.setWarrantyStatus("不确定");
             }
         }
+    }
+
+    public void postProcessorExcel(){
+        try{
+            SystemEventAuditEnum eventAuditEnum = SystemEventAuditEnum.TABLE_DOWNLOAD_ASSET;
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, null, Boolean.TRUE, "", AuditBoTypeEnum.TABLE_DOWNLOAD.getBoType(), "AssetInfo_export");
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

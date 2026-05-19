@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -58,6 +59,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private AssetInfoRepository assetInfoRepository;
 	private OrgInfo selectedOrg;
 	private AssetTagService assetTagService;
+	private ConfigCacheService cacheService;
 
 	UserContextService userContextService;
 	MessageSubscriberRepository dao;
@@ -128,6 +130,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	protected void init() {
 		this.selectedMap = new HashMap();
 		assetTagService = WebUtil.getBean(AssetTagService.class);
+		cacheService = WebUtil.getBean(ConfigCacheService.class);
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		dao= WebUtil.getBean(MessageSubscriberRepository.class);
@@ -856,6 +859,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			selectedAssetsed2.remove(asset);
 		}
 		allSelected2=selectAssetInfos.stream().allMatch(item->Optional.ofNullable(selectedAssetUidTable2.get(item.getUid())).orElse(Boolean.FALSE));
+	}
+
+	public String getUserName(UserAccount userAccount) {
+		return cacheService.findOrgByUid(userAccount.getOrgInfoUID()).getName().concat("-").concat(userAccount.getName());
 	}
 
 	public List<UserAccount> getTenantUserList() {
