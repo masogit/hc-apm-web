@@ -346,6 +346,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Setter @Getter
     private Map<String, AssetTypeGroup> assetTypeGroupMap;
 
+    @Setter @Getter
+    private Integer approvalStatus;
+
     @Override
     protected void init() {
         try {
@@ -1048,6 +1051,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     }
                 }
             }
+
+            if(approvalStatus!=null){
+                if(approvalStatus==1){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ,"0", "1*"));
+                }
+                if(approvalStatus==2){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.IN,Arrays.asList("1","5"), "1*"));
+                }
+                if(approvalStatus==3){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.IN,Arrays.asList("2","3","4"), "1*"));
+                }
+            }
+
             this.selected = null;
             String value = null;
             boolean isId= false;
@@ -4603,6 +4619,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             case "0":
                 return "无备件";
             case "1":
+            case "5":
                 return "备件审批中";
             case "2":
             case "3":
