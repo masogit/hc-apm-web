@@ -96,7 +96,7 @@
                                 <p:calendar timeZone="#{userContextService.getTimeZone()}" readonly="true" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInstallationController.arrivalListItem.manufactDate}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:selectBooleanButton value="#{assetInfoEditController.useValue['factory_date']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
+                                <p:selectBooleanButton value="#{assetInstallationController.useValue['factory_date']}" class="my-button"  onLabel="铭牌" offLabel="原值" style="width:6rem"/>
                             </h:panelGroup>
                             <p:commandButton class="my-button" value="应用" icon="ui-icon-check" action="#{assetInstallationController.applyResult()}" onclick="PF('nameplateRecognitionDlg').hide()" validateClient="true" update="ItemEditDlgForm" style="float:left" />
                             <p:commandButton class="my-button"  value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="PF('nameplateRecognitionDlg').hide()" />
