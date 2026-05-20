@@ -30,6 +30,7 @@ import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.pdf.PDFConversion;
 import com.ge.healthcare.cn.common.pdf.PDFConversionUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.render.DynamicColumnTableRenderPolicy;
 import com.ge.healthcare.cn.common.utils.render.PmPartsPictureTableRenderPolicy;
 import com.google.common.base.Strings;
 import org.apache.commons.collections4.CollectionUtils;
@@ -811,7 +812,10 @@ public class PmReportService {
         bindings.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1));
         bindings.put(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(),  new PmPartsPictureTableRenderPolicy(1));
-        return  WordExportServiceUtil.generate(datas, IOUtils.toByteArray(rawTemplate), bindings);
+
+        Map<Character, RenderPolicy> plugins = new HashMap<>();
+        plugins.put('&',new DynamicColumnTableRenderPolicy(datas));
+        return  WordExportServiceUtil.generate(datas, IOUtils.toByteArray(rawTemplate), bindings,plugins);
     }
 
     public List<V2_WorkOrder_Detail> getAccessoryList(List<V2_WorkOrder_Detail> accessoryList) {

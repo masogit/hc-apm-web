@@ -14,6 +14,7 @@ import com.ge.apm.service.WordExportServiceUtil;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import com.ge.healthcare.cn.common.utils.render.KeepPlaceholderRenderPolicy;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -218,7 +219,9 @@ public class PmOrderReportTemplateService {
 //        template.write(out);
 //        return new ByteArrayInputStream(out.toByteArray());
         Map<String, RenderPolicy> bindings = new HashMap<>();
-        byte[] generate = WordExportServiceUtil.generate(builder.build().data(), IOUtils.toByteArray(stream), bindings);
+        Map<Character, RenderPolicy> plugins = new HashMap<>();
+        plugins.put('&',new KeepPlaceholderRenderPolicy());
+        byte[] generate = WordExportServiceUtil.generate(builder.build().data(), IOUtils.toByteArray(stream), bindings,plugins);
         return new ByteArrayInputStream(generate);
     }
 
