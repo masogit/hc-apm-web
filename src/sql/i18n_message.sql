@@ -2153,8 +2153,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'InternalWorkorder', '内部工单', 'Internal Workorder', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExternalWorkorder', '外部工单', 'External Workorder', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExternalRemoteWorkorder', '外部远程工单', 'External Remote Workorder', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExternalWorkorder', 'GE外部工单', 'External Workorder', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExternalRemoteWorkorder', 'GE外部远程工单', 'External Remote Workorder', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ToBeDone', '待办', 'To be done', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RequestForRepair', '报修', 'Request for Repair', NULL, '-1');
