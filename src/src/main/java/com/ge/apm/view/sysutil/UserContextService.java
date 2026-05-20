@@ -1432,6 +1432,11 @@ public class UserContextService implements Serializable {
         String displayRemoteWorkOrder = getConfigItemValue("displayRemoteWorkOrder");
         return Boolean.TRUE.toString().equalsIgnoreCase(displayRemoteWorkOrder);
     }
+
+    public boolean enableDisplayByKey(String key){
+        String display = getConfigItemValue(key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(display);
+    }
         /**
          *  通过key获取指定的配置
          * @param key

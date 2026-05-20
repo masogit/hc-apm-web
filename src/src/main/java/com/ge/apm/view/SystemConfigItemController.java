@@ -149,7 +149,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(17,"IB报表链接");
         categoryMap.put(18,"列表字段配置");
         categoryMap.put(19,"质控管理");
-
+        categoryMap.put(20,"事件记录配置");
 
     }
 
@@ -973,5 +973,34 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             }
         }
 
+    }
+
+    public List<String> getEventRecordConfigKeys() {
+        return Arrays.asList(
+                "showRepairRecordTable",
+                "showMaintainanceRecordTable",
+                "showInventoryRecordTable",
+                "showExternalMaintenanceRecordTable",
+                "showExternalRepairRecordTable",
+                "showOnSiteMaintenanceRecordTable",
+                "showDailyInspectionRecordTable",
+                "showOperationRecordTable",
+                "showMetrologyMonitorTable",
+                "showAdverseEventRecordTable",
+                "showApprovalWorkflowTable",
+                "showModifyRecordTable",
+                "showMobileRepairRecordTable",
+                "showMobileMaintainanceRecordTable",
+                "showMobileInventoryRecordTable",
+                "showMobileExternalMaintenanceRecordTable",
+                "showMobileExternalRepairRecordTable",
+                "showMobileOnSiteMaintenanceRecordTable",
+                "showMobileDailyInspectionRecordTable",
+                "showMobileOperationRecordTable",
+                "showMobileMetrologyMonitorTable",
+                "showMobileAdverseEventRecordTable",
+                "showMobileApprovalWorkflowTable",
+                "showMobileModifyRecordTable"
+        );
     }
 }
