@@ -992,15 +992,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 "showMobileRepairRecordTable",
                 "showMobileMaintainanceRecordTable",
                 "showMobileInventoryRecordTable",
-                "showMobileExternalMaintenanceRecordTable",
-                "showMobileExternalRepairRecordTable",
-                "showMobileOnSiteMaintenanceRecordTable",
                 "showMobileDailyInspectionRecordTable",
                 "showMobileOperationRecordTable",
                 "showMobileMetrologyMonitorTable",
                 "showMobileAdverseEventRecordTable",
-                "showMobileApprovalWorkflowTable",
-                "showMobileModifyRecordTable"
+                "showMobileScrapRecordTable"
         );
     }
 }
