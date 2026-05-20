@@ -689,6 +689,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
 
         finishInstallHandle(itemList);
+        arrivalListDao.save(arrivalList);
         if(isApproved()){
             for (ArrivalListItem listItem : itemList) {
                 extracted(listItem);
@@ -772,6 +773,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     public void updateItem() {
         if (saveItem()) {
+            arrivalListDao.save(arrivalList);
             WebUtil.addSuccessMessage("修改成功");
         }
     }
