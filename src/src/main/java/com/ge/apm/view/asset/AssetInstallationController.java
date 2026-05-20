@@ -393,7 +393,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     }
 
     public String finishInstall() {
-        arrivalListDao.save(arrivalList);//由于更新了院区，所以要重新保存一下，供定时任务获取
+        arrivalListDao.save(arrivalListItem.getArrivalList());//由于更新了院区，所以要重新保存一下，供定时任务获取
         boolean isValidate = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
@@ -688,8 +688,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             return "";
         }
 
+        arrivalListDao.save(arrivalListItem.getArrivalList());
         finishInstallHandle(itemList);
-        arrivalListDao.save(arrivalList);
         if(isApproved()){
             for (ArrivalListItem listItem : itemList) {
                 extracted(listItem);
@@ -772,8 +772,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     }
 
     public void updateItem() {
+        arrivalListDao.save(arrivalListItem.getArrivalList());
         if (saveItem()) {
-            arrivalListDao.save(arrivalList);
             WebUtil.addSuccessMessage("修改成功");
         }
     }
@@ -1424,15 +1424,16 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     public void applyResult(){
 //        3.点击应用按钮后，名称、规格型号、制造商、注册证号、使用年限，保存到设备信息里的同时更新到到货清单中。
 //        4.点击应用按钮后，制造商序列号和出厂日期保存到设备信息里。
+        ArrivalListItem arrivalListItem = this.getArrivalListItem();
         String deviceName = equipmentNameplate.getDevice_name();
         if(StringUtils.isNotEmpty(deviceName) && useValue.get("device_name")){
-            arrivalList.setAssetName(deviceName);
+            arrivalListItem.getArrivalList().setAssetName(deviceName);
             arrivalListItem.setAliasName(deviceName);
         }
 
         String financingNum = equipmentNameplate.getPattern();
         if(StringUtils.isNotEmpty(financingNum) && useValue.get("pattern")){
-            arrivalList.setFunctionType(financingNum);
+            arrivalListItem.getArrivalList().setFunctionType(financingNum);
             arrivalListItem.setFunctionType(deviceName);
         }
 
@@ -1456,8 +1457,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 supplier =  newSupplier;
                 WebUtil.addSuccessMessage("制造商创建成功");
             }
-            arrivalList.setManufacture(supplier.getName());
-            arrivalList.setManufactureId(supplier.getId().toString());
+            arrivalListItem.getArrivalList().setManufacture(supplier.getName());
+            arrivalListItem.getArrivalList().setManufactureId(supplier.getId().toString());
         }
 
         String registryNum = equipmentNameplate.getRegistry_num();
