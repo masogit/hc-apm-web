@@ -281,7 +281,7 @@
                                 </p:panelGrid>
                             </p:fieldset>
 
-                            <p:panel header="#{msg.MaintainanceRecord}" style="margin-bottom:20px;" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                            <p:panel header="#{msg.MaintainanceRecord}" style="margin-bottom:20px;" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both') and userContextService.enableDisplayByKey('showRepairRecordTable')}">
                                 <f:facet name="actions">
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
@@ -336,7 +336,7 @@
                                 </p:dataTable>
                             </p:panel>
 
-                            <p:panel header="#{msg.InternalMaintenanceRecord}" style="margin-bottom:20px; width: 100%" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                            <p:panel header="#{msg.InternalMaintenanceRecord}" style="margin-bottom:20px; width: 100%" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both') and userContextService.enableDisplayByKey('showMaintainanceRecordTable')}">
                                 <f:facet name="actions">
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
@@ -376,7 +376,7 @@
                                     </p:column>
                                 </p:dataTable>
                             </p:panel>
-                            <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="盘点记录" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' )}">
+                            <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="盘点记录" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' ) and userContextService.enableDisplayByKey('showInventoryRecordTable')}">
                                 <f:facet name="actions">
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/inventory/inventoryOrderDetailAssetInfoMainAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                 </f:facet>
@@ -417,9 +417,11 @@
                                     </p:column>
                                 </p:dataTable>
                             </p:panel>
+<!--
                             <h:panelGroup style="display: flex; flex-wrap: wrap; gap: 0.5rem; width: 100%" layout="grid" styleClass="ui-panelgrid-blank">
+-->
 
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.ExternalMaintenanceRecord}4566" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.ExternalMaintenanceRecord}4566" rendered="#{(assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' ) and userContextService.enableDisplayByKey('showExternalMaintenanceRecordTable')}">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;queryTab=pmOrderListRemote&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -435,7 +437,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.ExternalMaintenanceRecord2}" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.ExternalMaintenanceRecord2}" rendered="#{(assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both') and userContextService.enableDisplayByKey('showExternalRepairRecordTable') }">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;queryTab=outWorkOrder&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -451,7 +453,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.OnSiteMaintenanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.OnSiteMaintenanceRecord}" rendered="#{(assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both')  and userContextService.enableDisplayByKey('showOnSiteMaintenanceRecordTable')}">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;queryTab=pmOrderListOut&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -467,7 +469,7 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.DailyInspectionRecord}" >
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.DailyInspectionRecord}" rendered="#{userContextService.enableDisplayByKey('showDailyInspectionRecordTable')}" >
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/maintainMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                         <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl nurseSiteMaintainForm" onclick="PF('nurseSiteMaintainDialog').show()"/>
@@ -565,7 +567,7 @@
                                     </c:otherwise>
                                 </c:choose>
 
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.MetrologyMonitor}" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both') and userContextService.enableDisplayByKey('showMetrologyMonitorTable')}">
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/measuring/measuringResultMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     </f:facet>
@@ -590,7 +592,7 @@
                                     </p:dataTable >
                                 </p:panel>
 
-                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.AdverseEventRecords}" >
+                                <p:panel style="flex: 1 1 calc(50% - 0.5rem); min-width: 300px; margin-bottom:20px;" header="#{msg.AdverseEventRecords}" rendered="#{userContextService.enableDisplayByKey('showAdverseEventRecordTable')}"   >
                                     <f:facet name="actions">
                                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" />
                                     </f:facet>
@@ -634,9 +636,11 @@
                                         </p:column>
                                     </p:dataTable>
                                 </p:panel>
+<!--
                             </h:panelGroup>
+-->
                         </h:form>
-                        <p:panel  id="approvale"
+                        <p:panel  id="approvale" rendered="#{userContextService.enableDisplayByKey('showApprovalWorkflowTable')}"
                                   header="#{msg.ApprovalWorkflow}"
                                   toggleable="true" toggleSpeed="500"
                                   widgetVar="approvale" style="margin-bottom:20px;">
@@ -644,7 +648,7 @@
                         </p:panel>
 
 
-                        <p:panel id="modifyRecordList"
+                        <p:panel id="modifyRecordList" rendered="#{userContextService.enableDisplayByKey('showModifyRecordTable')}"
                                  header="#{msg.ModifyRecord}"
                                  toggleable="true" toggleSpeed="500"
                                  collapsed="#{inspectionServiceController.detailAssetChangeHistoryList.size() > 0 ? false : true}" widgetVar="panel"
