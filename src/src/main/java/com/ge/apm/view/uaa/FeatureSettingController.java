@@ -16,6 +16,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.*;
+import com.ge.healthcare.cn.common.url.UrlUtil;
 import com.ge.healthcare.cn.common.utils.menu.MenuAnalysis;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -522,24 +523,20 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         if (StringUtils.isEmpty(hospitalUID)) {
             link = "";
         }
-        String siteDomain = obtainSiteDomain();
 
-        link = siteDomain + "/geapm/portal/activeFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
-    }
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        // 获取 HttpServletRequest 对象
+        HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
+        // 获取当前项目的请求地址
+        String requestURL = request.getRequestURL().toString().replace("/admin/uaa/siteInfo/FeatureSetting.xhtml", "");
 
-    private String obtainSiteDomain() {
-        String siteDomain = configItemService.getConfigItemByKeyToString("siteDomain", UserContextService.getCurrentUserAccount());
+        // 获取网站协议
+        String siteProtocol = configItemService.getConfigItemByKeyToString("siteProtocol", UserContextService.getCurrentUserAccount());
 
-        if (StringUtils.hasText(siteDomain)) {
-            siteDomain = siteDomain.trim();
-        } else {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            // 获取 HttpServletRequest 对象
-            HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
-            // 获取当前项目的请求地址
-            siteDomain = request.getRequestURL().toString().replace("/admin/uaa/siteInfo/FeatureSetting.xhtml", "");
+        if (StringUtils.hasText(siteProtocol)) {
+            requestURL = UrlUtil.replaceProtocol(requestURL, siteProtocol);
         }
-        return siteDomain;
-    }
 
+        link = requestURL + "/portal/activeFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
+    }
 }
