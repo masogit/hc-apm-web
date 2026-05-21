@@ -69,3 +69,8 @@ select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端报废鉴定记录', 'showMobileScrapRecordTable', '是否显示移动端报废鉴定记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileModifyRecordTable');
+
+-- YHAAO-28022
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+    select replace(uuid_generate_v4()::text,'-',''), 13, 'https://hcapm.gehealthcloud.cn', '网站域名', 'siteDomain', '网站域名', 'f', 't', 1
+    where not exists(select 1 from config_item where key = 'siteDomain');
