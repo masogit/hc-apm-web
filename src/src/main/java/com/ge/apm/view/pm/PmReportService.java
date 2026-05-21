@@ -576,7 +576,7 @@ public class PmReportService {
             if (selected) {
                 V2_PmOrder pmOrder = pmOrderService.findById(id);
                 if (!pmOrder.getCurrentStepName().equals("已关单")) {
-                    WebUtil.addErrorMessage(pmOrder.getPmNum().concat(" 保养记录未关单！"));
+                    //WebUtil.addErrorMessage(pmOrder.getPmNum().concat(" 保养记录未关单！"));
                     r.set(false);
                 }
             }
