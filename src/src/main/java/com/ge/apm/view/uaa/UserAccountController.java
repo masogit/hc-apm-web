@@ -563,7 +563,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (filterFilter == null)
             return dao.findAll(pageable);
         else {
-            Specification<UserAccount> spec = BySearchFilterSpecificationExtend.bySearchFilter(filterFilter, UserAccount.class,true);
+            Specification<UserAccount> spec = BySearchFilterSpecificationExtend.bySearchFilter(filterFilter, UserAccount.class,true, true);
             return dao.findAll(spec, pageable);
         }
     }
@@ -1814,7 +1814,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if(filterFilter == null){
             return (List<UserAccount>) dao.findAll();
         }else{
-            Specification<UserAccount> spec = BySearchFilterSpecificationExtend.bySearchFilter(filterFilter, UserAccount.class,true);
+            Specification<UserAccount> spec = BySearchFilterSpecificationExtend.bySearchFilter(filterFilter, UserAccount.class,true, true);
             return dao.findAll(spec);
         }
 

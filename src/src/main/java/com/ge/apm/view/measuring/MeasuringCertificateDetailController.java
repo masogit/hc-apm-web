@@ -199,7 +199,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 Matcher matcher = compile.matcher(value);
                 if(matcher.find()){
                     String group = matcher.group(1);
-                    data.put(key,group);
+                    if(StringUtils.hasText(group)){
+                        data.put(key,group);
+                    }
+
                 }
             }
             LOGGER.info("data:{}",data);

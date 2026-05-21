@@ -105,7 +105,7 @@
                                  selectionMode="single" scrollable="false"
                                  selection="#{idleEquipmentApplicationController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.lastModifiedDate}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
                                  rowKey="#{item.uid}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -189,23 +189,29 @@
                         <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.stockDeptUid}"
                                   filterMatchMode="EQ" width="100">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('datalist').filter()"
-                                                 value="#{idleEquipmentApplicationController.fileterOrgName}">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" style="width: 80px"
+                                                 value="#{idleEquipmentApplicationController.fileterOrgName}" filter="true" filterMatchMode="contains" filterNormalize="true"  >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
                                                   noSelectionOption="true"/>
                                     <f:selectItems value="#{idleEquipmentApplicationController.clinicalDeptList}"
                                                    var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
+
+<!--                                <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" appendTo="@(Body)"-->
+<!--                                                scrollHeight="300"  forceSelection="true" completeMethod="#{idleEquipmentApplicationController.autoCompleteDeptName}" size="5">-->
+<!--                                    <p:ajax event="itemSelect" listener="#{idleEquipmentApplicationController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetDetailListForm:datalist"  />-->
+<!--                                    <p:ajax process="@this" listener="#{idleEquipmentApplicationController.onClinicalDeptNameFilterChange}" update=":AssetDetailListForm:datalist"  />-->
+<!--                                </p:autoComplete>-->
                             </f:facet>
                             <h:outputText
                                     value="#{idleEquipmentApplicationController.getSiteOrgName(item.stockDeptUid)}"/>
                         </p:column>
-                        <c:if test="#{columnItem eq 'manufacture'}">
-                            <p:column headerText="#{msg.manufacture}" sortBy="#{item.assetInfo.manufacture}"
+
+                        <p:column headerText="#{msg.manufacture}" sortBy="#{item.assetInfo.manufacture}"
                                       filterBy="#{item.assetInfo.manufacture}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.assetInfo.manufacture}"/>
-                            </p:column>
-                        </c:if>
+                            <h:outputText value="#{item.assetInfo.manufacture}"/>
+                        </p:column>
+
 
                         <p:column headerText="#{msg.makerShortName}" sortBy="#{item.assetInfo.makerShortName}"
                                   filterBy="#{item.assetInfo.makerShortName}" filterMatchMode="LIKE">
@@ -227,13 +233,16 @@
                                                  converter="javax.faces.Integer">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
                                                   noSelectionOption="true"/>
-                                    <f:selectItem itemLabel="暂存中" itemValue="1"
-                                                  itemDisabled="#{userContextService.hasAnyRole('InstitutionAdjustmentAdmin')}"/>
+                                    <c:if test="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')}">
+                                        <f:selectItem itemLabel="暂存中" itemValue="1"/>
+                                    </c:if>
+
                                     <f:selectItem itemLabel="待审批" itemValue="2"/>
                                     <f:selectItem itemLabel="已通过" itemValue="3"/>
                                     <f:selectItem itemLabel="已退回" itemValue="4"/>
-                                    <f:selectItem itemLabel="已取消" itemValue="5"
-                                                  itemDisabled="#{userContextService.hasAnyRole('InstitutionAdjustmentAdmin')}"/>
+                                    <c:if test="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')}">
+                                        <f:selectItem itemLabel="已取消" itemValue="5"/>
+                                    </c:if>
 
                                 </p:selectOneMenu>
                             </f:facet>

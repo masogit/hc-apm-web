@@ -99,6 +99,7 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
                 logger.error("医院院间调剂申请异常 error: ",e);
             }
             attachements=new ArrayList<>();
+            attachments.addAll(Arrays.asList("ContractInvoice","InspectionReport","PhysicalPhoto"));
             selected.setApplicationDate(new Date());
 
             OrgInfo orgInfo = orgInfoRepository.findByUid(currentUserAccount.getSiteUID());
@@ -222,6 +223,16 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
     public String  submit (){
         if(!ckeck()){
             return "";
+        }
+
+        if(CollectionUtils.isNotEmpty(attachments)){
+            for (String attachment : attachments) {
+                boolean b = attachements.stream().anyMatch(ite -> ite.getBoSubType().equals(attachment));
+                if(!b){
+                    WebUtil.addWarnMessage("附件材料清单："+WebUtil.getFieldValueMessage("HospitalAdjustmentAttachmentType", attachment)+"没上传");
+                    return "";
+                }
+            }
         }
         selected.setStatus(2);
         String hospitalAdjustmentApp = workFlowService.getOrderNumber("HOSPITAL_ADJUSTMENT_APP"+currentUserAccount.getTenantUID());

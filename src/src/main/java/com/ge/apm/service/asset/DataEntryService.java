@@ -9,6 +9,8 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class DataEntryService {
+    private static final Logger log = LoggerFactory.getLogger(DataEntryService.class);
 
     @Autowired
     private DataEntryRepository dataEntryRepository;
@@ -244,6 +247,7 @@ public class DataEntryService {
         dataEntry.setAssetUid(selectAsset.getUid());
         dataEntry.setClinicalDeptUid(selectAsset.getClinicalDeptUID());
         dataEntry.setOperationUserUid(user.getUid());
+        dataEntry.setCreatedName(user.getName());
         dataEntry.setCreatedDate(new Date());
         dataEntry.setLastModifiedBy(user.getUid());
         dataEntry.setLastModifiedDate(new Date());
@@ -373,5 +377,15 @@ public class DataEntryService {
 
     public DataEntry getByDataEntryUid(String uid){
         return dataEntryRepository.findById(uid);
+    }
+
+    @Transactional
+    public void deleteByCostType(List<String> deleteEnumKey,String siteUid) {
+        log.info("deleteByCostType 配置项删除自定义成本类型开始删除his数据录入 siteUid:{},deleteEnumKey:{}",siteUid,JSON.toJSONString(deleteEnumKey));
+        List<DataEntry> dataEntrys = dataEntryRepository.findBySiteUidAndEntryTypeIn(siteUid, deleteEnumKey);
+        for (DataEntry dataEntry : dataEntrys) {
+            deleteDataEntry(dataEntry);
+
+        }
     }
 }

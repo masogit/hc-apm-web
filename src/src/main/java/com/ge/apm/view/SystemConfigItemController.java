@@ -6,6 +6,8 @@ import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.FieldColumnDto;
+import com.ge.apm.domain.dto.SelectItemDto;
+import com.ge.apm.service.asset.DataEntryService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.PmOrderPreCreateService;
@@ -86,6 +88,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     private V2_PmOrderRepository v2PmOrderRepository;
 
+    private DataEntryService dataEntryService;
     private Map<String, Object> selectedObjectMap = MapUtil.newHashMap();
     private List<OrgInfo> deptList;
 
@@ -102,7 +105,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     @Getter@Setter
     private String itemValue = "WorkOrderListColumn_0";
     Map<String, Boolean> fieldRenderedMap = new HashMap<>();
-
+    @Getter@Setter
+    private SelectItemDto selectItemDto=new SelectItemDto(null,null);
+    @Getter@Setter
+    private List<String> deleteEnumKey=new ArrayList<>();
+    @Getter@Setter
+    private String editEnumKey;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ConfigItemRepository.class);
@@ -116,6 +124,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         pmOrderPreCreateService = WebUtil.getBean(PmOrderPreCreateService.class);
         v2PmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         srApi = WebUtil.getBean(PmOrderRequestApiService.class);
+        dataEntryService = WebUtil.getBean(DataEntryService.class);
         selectSite = orgInfoRepository.getByUid(user.getSiteUID());
         loadClinicalDept();
         loadAssetStaff();
@@ -179,6 +188,16 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                         && StringUtils.isNotEmpty(configItem.getValidation())){
                     String validation = configItem.getValidation();
                     List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
+
+
+                    if(value!=null){
+                        String customValue = value.getCustomValue();
+                        if(StringUtils.isNotEmpty(customValue)){
+                            List<Map<String, String>> customValueMap = JSON.parseObject(customValue, new TypeReference<List<Map<String,String>>>(){});
+                            mapList.addAll(customValueMap);
+                        }
+                    }
+
                     configItem.setEnumList(mapList);
                 }
                 if (9 == configItem.getValueType()) {
@@ -363,7 +382,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getDefaultValue(), FieldColumnDto.class));
                 }
                 if (10 == configItem.getValueType()){
-                    configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
+                    String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectSite.getSiteUID(),
+                            selectSite.getHospitalUID(),
+                            selectSite.getInstitutionUID(),
+                            selectSite.getTenantUID(), configItem.getKey());
+                    configItem.setFieldColumnDtoList(JSON.parseArray(value, FieldColumnDto.class));
                     fieldRenderedMap = new HashMap<>();
                     for (FieldColumnDto dto : configItem.getFieldColumnDtoList()) {
                         String key = configItem.getKey() + "_" + dto.getField();
@@ -480,6 +503,15 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                             }
                         }
                     }
+                    String validation = configItem.getValidation();
+                    List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
+                    List<Map<String, String>> keyMap = getDifference(enumList, mapList, "key");
+                    if(CollectionUtils.isNotEmpty(keyMap)){
+                        String jsonString = JSON.toJSONString(keyMap);
+                        configItemValue.setCustomValue(jsonString);
+                    }else{
+                        configItemValue.setCustomValue(null);
+                    }
                     configItemValue.setValue(JSON.toJSONString(maps));
                 }
             } else if (9 == this.selected.getValueType()) {
@@ -493,6 +525,18 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             this.selected.setConfigItemValue(configItemValue);
         }
         WebUtil.addErrorMessage("保存成功！");
+    }
+
+
+    public static List<Map<String, String>> getDifference(List<Map<String, String>> list1, List<Map<String, String>> list2, String keyName) {
+
+        Set<String> list2Keys = list2.stream()
+                .map(m -> m.get(keyName))
+                .collect(Collectors.toSet());
+
+        return list1.stream()
+                .filter(m -> !list2Keys.contains(m.get(keyName)))
+                .collect(Collectors.toList());
     }
     public boolean regularCheck(){
         if(selected == null) return Boolean.FALSE;
@@ -827,5 +871,99 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public void setDatePatternSelect(List<String> datePatternSelect) {
         this.datePatternSelect = datePatternSelect;
+    }
+
+    public void costTypeAdd(ConfigItem configItem) {
+        if(StringUtils.isBlank(selectItemDto.getLabel())  || StringUtils.isBlank(selectItemDto.getValue())){
+
+            WebUtil.addWarnMessage("成本类型的key和value必填");
+            return;
+        }
+        List<Map<String, String>> enumList = configItem.getEnumList();
+
+        for (Map<String, String> map : enumList) {
+             if(map.get("key").equals(selectItemDto.getLabel())){
+                 WebUtil.addWarnMessage("成本类型的value已存在");
+                 return;
+             }
+            if(map.get("value").equals(selectItemDto.getValue())){
+                WebUtil.addWarnMessage("成本类型的key已存在");
+                return;
+            }
+        }
+        HashMap<String, String> stringStringHashMap = new HashMap<>();
+        stringStringHashMap.put("key",selectItemDto.getLabel());
+        stringStringHashMap.put("value",selectItemDto.getValue());
+        enumList.add(stringStringHashMap);
+        configItem.setEnumList(enumList);
+        saveConfig(configItem);
+        selectItemDto=new SelectItemDto(null,null);
+    }
+
+    public void costTypeAddBefore() {
+        selectItemDto=new SelectItemDto(null,null);
+    }
+    public void costTypeEditBefore() {
+        editEnumKey=null;
+        selectItemDto=new SelectItemDto(null,null);
+
+    }
+    public void costTypeDelete(ConfigItem configItem) {
+        if(configItem==null){
+            return ;
+        }
+        if(CollectionUtils.isNotEmpty(deleteEnumKey)){
+            List<Map<String, String>> enumList = configItem.getEnumList();
+
+            enumList.removeIf(map -> {
+                String value = map.get("value");
+                return value != null && deleteEnumKey.contains(value);
+            });
+            configItem.setEnumList(enumList);
+            saveConfig(configItem);
+            dataEntryService.deleteByCostType(deleteEnumKey,selectSite.getUid());
+        }
+    }
+
+
+    public void costTypeEdit(ConfigItem configItem) {
+        if (configItem == null) {
+            return;
+        }
+
+        List<Map<String, String>> enumList = configItem.getEnumList();
+
+        enumList.removeIf(map -> {
+            String value = map.get("value");
+            return editEnumKey!=null &&  editEnumKey.equals(value);
+        });
+        selectItemDto.setValue(editEnumKey);
+        configItem.setEnumList(enumList);
+        costTypeAdd(configItem);
+    }
+
+    public List<Map<String, String>> costTypeDeleteBefore(ConfigItem configItem) {
+        if(configItem==null){
+            return null;
+        }
+        List<Map<String, String>> enumList = configItem.getEnumList();
+        String validation = configItem.getValidation();
+        List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
+        return getDifference(enumList, mapList, "key");
+
+    }
+
+    public void editSelectedEnum(ConfigItem configItem) {
+        if(StringUtils.isBlank(editEnumKey)){
+            return;
+        }
+        List<Map<String, String>> enumList = configItem.getEnumList();
+        for (Map<String, String> map : enumList) {
+            String value = map.get("value");
+            if(value.equals(editEnumKey)){
+                selectItemDto=new SelectItemDto(map.get("key"),map.get("value"));
+            }
+        }
+
     }
 }

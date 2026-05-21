@@ -4,10 +4,13 @@
  * and open the template in the editor.
  */
 package com.ge.apm.dao;
+
+import com.ge.apm.domain.SharedAssetReqType;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
-import com.ge.apm.domain.SharedAssetReqType;
 
 import java.util.List;
 
@@ -27,4 +30,8 @@ public interface SharedAssetReqTypeRepository extends GenericRepositoryUUID<Shar
     @Query("select o from SharedAssetReqType o  where o.sharedId = :sharedId and o.sharedAssetTypeId = :sharedAssetTypeId")
     public SharedAssetReqType findByIdSharedIdandSharedAssetTypeId(@Param("sharedId") String sharedId, @Param("sharedAssetTypeId") String sharedAssetTypeId);
 
+    @Modifying
+    @Transactional
+    @Query(value = "delete from shared_asset_req_type where shared_id in ?1 ",nativeQuery = true)
+    public void deleteByInSharedId(List<String> ids);
 }

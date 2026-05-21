@@ -61,6 +61,9 @@ public class AdjustmentTransferService {
     private BlobFileService blobFileService;
 
     @Autowired
+    private IdleEquipmentApplicationRepository idleEquipmentApplicationRepository;
+
+    @Autowired
     private MqUtils mqUtils;
     @Transactional
     public void cancel(AdjustmentTransferApplication selected, UserAccount currentUserAccount){
@@ -158,6 +161,11 @@ public class AdjustmentTransferService {
         dao.save(selected);
 
 
+        IdleEquipmentApplication idleEquipmentApplication = idleEquipmentApplicationRepository.findByUid(idleEquipmentStock.getApplicationUid());
+        idleEquipmentApplication.setStatus(4);
+        idleEquipmentApplication.setLastModifiedDate(new Date());
+        idleEquipmentApplication.setLastModifiedBy(currentUserAccount.getUid());
+        idleEquipmentApplicationRepository.save(idleEquipmentApplication);
         MqContext mqContext = new MqContext();
         mqContext.setClassName("AdjustmentTransferService");
         mqContext.setServiceName("hc-apm-web");
@@ -374,16 +382,17 @@ public class AdjustmentTransferService {
 
 
         List<String> strings = JSON.parseArray(adjustmentTransferApplication.getAttachments(), String.class);
-        if(CollectionUtils.isNotEmpty(strings)){
-            params.put("DemandDocument", strings.contains("DemandDocument")? checked : unchecked);
-            params.put("SitePowerProof", strings.contains("SitePowerProof")? checked : unchecked);
-            params.put("OperatorQualification", strings.contains("OperatorQualification")? checked : unchecked);
-            params.put("other", strings.contains("other")? checked : unchecked);
-            if(strings.contains("other")){
-                params.put("attachments_other_description", adjustmentTransferApplication.getAttachmentsOtherDescription());
-            }
-        }
+        if(strings==null){
+            strings=new ArrayList<>();
 
+        }
+        params.put("DemandDocument", strings.contains("DemandDocument")? checked : unchecked);
+        params.put("SitePowerProof", strings.contains("SitePowerProof")? checked : unchecked);
+        params.put("OperatorQualification", strings.contains("OperatorQualification")? checked : unchecked);
+        params.put("other", strings.contains("other")? checked : unchecked);
+        if(strings.contains("other")){
+            params.put("attachments_other_description", adjustmentTransferApplication.getAttachmentsOtherDescription());
+        }
 
         return params;
     }

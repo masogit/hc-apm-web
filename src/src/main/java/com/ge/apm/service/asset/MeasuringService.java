@@ -971,10 +971,12 @@ public class MeasuringService {
                     detail.setDepartment(CellType.NUMERIC.equals(row.getCell(header.get("CLINICAL_DEPT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CLINICAL_DEPT_CELL")).getNumericCellValue()) : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
-                    detail.setAssetSN(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue());
+                    String assetSn = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue();
+                    detail.setAssetSN(org.apache.commons.lang3.StringUtils.trimToNull(assetSn));
                 }
                 if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
-                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
+                    String financeNo = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue();
+                    detail.setFinanceNo(org.apache.commons.lang3.StringUtils.trimToNull(financeNo));
                 }
                 if(row.getCell(header.get("ITEM_CELL")) != null){
                     detail.setCheckItem(CellType.NUMERIC.equals(row.getCell(header.get("ITEM_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ITEM_CELL")).getNumericCellValue()) : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
@@ -986,7 +988,8 @@ public class MeasuringService {
                     detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("QR_CODE_CELL")) != null) {
-                    detail.setQrCode(CellType.NUMERIC.equals(row.getCell(header.get("QR_CODE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("QR_CODE_CELL")).getNumericCellValue()) : row.getCell(header.get("QR_CODE_CELL")).getStringCellValue());
+                    String qrCode = CellType.NUMERIC.equals(row.getCell(header.get("QR_CODE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("QR_CODE_CELL")).getNumericCellValue()) : row.getCell(header.get("QR_CODE_CELL")).getStringCellValue();
+                    detail.setQrCode(org.apache.commons.lang3.StringUtils.trimToNull(qrCode));
                 }
                 detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
                 int status = 3;

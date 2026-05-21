@@ -7,10 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import webapp.framework.dao.SearchFilter;
 
 import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -18,11 +15,12 @@ import java.util.stream.Collectors;
  */
 public class BySearchFilterSpecificationExtend {
 
-    public static <T> Specification<T> bySearchFilter(final Collection<SearchFilter> filters, final Class<T> entityClazz,boolean distinct) {
+    public static <T> Specification<T> bySearchFilter(final Collection<SearchFilter> filters, final Class<T> entityClazz,boolean distinct, boolean useCacheJoin) {
         return new Specification<T>() {
             @Override
             public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
                 if (!filters.isEmpty()) {
+                    Map<String, Join> cachedJoin = new HashMap<>();
 
                     List<Tuple2<String, Predicate>> predicates = new ArrayList<>();
                     for (SearchFilter filter : filters) {
@@ -37,7 +35,12 @@ public class BySearchFilterSpecificationExtend {
                         }else {
                             for (int i = 1; i < names.length; i++) {
                                 if (i == 1 && expression instanceof PluralAttributePath) {
-                                    expression = root.join(names[0]);
+                                    if (useCacheJoin) {
+                                        // 复用JOIN，从缓存中获取，如果不存在则创建并放入缓存
+                                        expression = cachedJoin.computeIfAbsent(names[0], k -> root.join(names[0]));
+                                    } else {
+                                        expression = root.join(names[0]);
+                                    }
                                 }
                                 expression = expression.get(names[i]);
                             }

@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "v2_work_order")
@@ -69,6 +70,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private AssetInfo assetInfo;
 
 
+
+    @JoinColumn(name = "order_id", referencedColumnName = "id", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
+    @NotFound(action = NotFoundAction.IGNORE)
+    @OneToMany(fetch = FetchType.LAZY)
+    private Set<OrderSnatchingPerson> orderSnatchingPerson;
     @Basic(optional = false)
     @NotNull
     @Column(name = "current_person_id")
@@ -1143,5 +1149,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setDiagnosticProcess(String diagnosticProcess) {
         this.diagnosticProcess = diagnosticProcess;
+    }
+
+    public Set<OrderSnatchingPerson> getOrderSnatchingPerson() {
+        return orderSnatchingPerson;
+    }
+
+    public void setOrderSnatchingPerson(Set<OrderSnatchingPerson> orderSnatchingPerson) {
+        this.orderSnatchingPerson = orderSnatchingPerson;
     }
 }

@@ -24,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import webapp.framework.context.WrappedRequest;
 import webapp.framework.util.SessionCache;
 
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -114,6 +116,7 @@ public class AuditLoginController {
             request.getSession().setAttribute("PHONE_SMSCODE_VALID",true);
             request.getSession().setMaxInactiveInterval(60*60*24*30);//1月
             response.setHeader("JSESSIONID",request.getSession().getId());
+            request.getSession().setAttribute("userContextService",null);
             SessionCache.putSession(request.getSession());
         }
         return responseEntity;

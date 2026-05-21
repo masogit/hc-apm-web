@@ -14,6 +14,7 @@
 					<table border="1">
 						<tr>
 							<th width="100px"><label class="label">名称</label></th>
+							<th width="100px"><label class="label">二维码</label></th>
 							<th width="100px"><label class="label">设备编号</label></th>
 							<th width="100px"><label class="label">制造商序列号</label></th>
 							<th width="100px"><label class="label">设备型号</label></th>
@@ -31,6 +32,7 @@
 						<p:repeat value="#{maintainItemController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item2">
 							<tr>
 								<td><h:outputText value="#{item2.assetInfo.name}" /></td>
+								<td><h:outputText value="#{item2.assetInfo.qrCode}" /></td>
 								<td><h:outputText value="#{item2.assetInfo.departNum}" /></td>
 								<td><h:outputText value="#{item2.assetInfo.serialNum}" /></td>
 								<td><h:outputText value="#{item2.assetInfo.functionType}" /></td>

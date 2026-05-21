@@ -5,6 +5,7 @@ import com.ge.apm.dao.IdleEquipmentStockRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -90,6 +91,27 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
     @Getter
     @Setter
     private Map<String,Object> filterObject;
+
+
+
+
+    private I18nMessageService i18nMessageService;
+
+    @Getter
+    @Setter
+    private List<I18nMessage> assetGroup;
+    @Getter
+    @Setter
+    private Set<String> assetGroupSelect;
+
+    @Getter
+    @Setter
+    private String filterBorrowHospitalName;
+    @Getter
+    @Setter
+    private List<OrgInfo> borrowHospitalList;
+
+
     @Override
     protected void init() {
         idleEquipmentStockRepository = WebUtil.getBean(IdleEquipmentStockRepository.class);
@@ -101,6 +123,7 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
 
         uaaService = WebUtil.getBean(UaaService.class);
         cacheService = WebUtil.getBean(ConfigCacheService.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
 
         Set<String> functionList = UserContextService.getCurrentUserFunction();
         if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
@@ -115,6 +138,8 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         loadClinicalDeptList();
         filterObject=new HashMap<>();
+        assetGroup= i18nMessageService.getByMsgType("assetGroup");
+        borrowHospitalList = orgList.stream().filter(ite->ite.getOrgType() == 2).collect(Collectors.toList());
     }
 
     @Override
@@ -137,6 +162,9 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
 //            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
 //        }
 //
+
+        this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.NE,4));
+
         this.updateSearchFilter(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,currentUserAccount.getTenantUID()));
         Set<String> functionList = UserContextService.getCurrentUserFunction();
         if (!functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) && !functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK_INSTITUTION.name())) {
@@ -159,6 +187,10 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
         }
 
 
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(assetGroupSelect)){
+            this.updateSearchFilter(new SearchFilter("assetInfo.assetGroup", SearchFilter.Operator.IN, assetGroupSelect));
+        }
+
 
         Page<IdleEquipmentStock> bySearchFilter = idleEquipmentStockRepository.findBySearchFilter(searchFilters, pageRequest);
         return bySearchFilter;
@@ -166,7 +198,37 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
     }
 
 
+    public List<String> completeAssetGroup(String query) {
+        // 1. 获取所有可能的资产组列表
+        List<String> allGroups = assetGroup.stream()
+                .map(item -> item.getValue()) // 假设 msgKey 是你要匹配的值
+                .collect(Collectors.toList());
 
+        // 2. 执行模糊过滤 (不区分大小写)
+        return allGroups.stream()
+                .filter(group -> group.toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public void onAssetGroupNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetGroup = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetGroup) && !assetGroup.stream().anyMatch(item -> filterAssetGroup.equals(item.getValue()))) {
+            filterAssetGroup = null;
+        }
+
+        if (filterAssetGroup != null) {
+            List<I18nMessage> orgInfosMatchingByName = this.assetGroup.stream().filter(item -> item.getValue().equals(filterAssetGroup)).collect(Collectors.toList());
+
+
+            assetGroupSelect = orgInfosMatchingByName.stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
+        } else {
+            assetGroupSelect = Collections.emptySet();
+        }
+    }
     public void onSelectAsset() throws IOException {
         if (null == selected) {
             return;

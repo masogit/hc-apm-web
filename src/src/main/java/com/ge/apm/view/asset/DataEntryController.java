@@ -1,12 +1,15 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.DataEntryRepository;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.ge.apm.dao.*;
 
-import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
-import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
+import com.ge.apm.domain.ConfigItem;
+import com.ge.apm.domain.ConfigItemValue;
 import com.ge.apm.domain.DataEntry;
 
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
 import com.ge.apm.service.asset.DataEntryService;
@@ -15,6 +18,7 @@ import com.ge.apm.view.his.HisAssetGroupEditController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,6 +54,9 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
 
     private DataEntryService dataEntryService;
 
+    private ConfigItemRepository configItemRepository;
+    private ConfigItemValueRepository configItemValueRepository;
+
     public int type=1;
 
     @Getter
@@ -59,6 +66,9 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
     @Getter
     @Setter
     public Map<String, Object> selectedObject;
+    @Getter
+    @Setter
+    private List<SelectItemDto> hisEntryTypes;
     @Override
     protected GenericRepositoryUUID<DataEntry> getDAO() {
         return null;
@@ -73,10 +83,30 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
         hisAssetGroupAssetMatchDao = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
         hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
         dataEntryCreateController = WebUtil.getBean(DataEntryCreateController.class);
+        configItemRepository = WebUtil.getBean(ConfigItemRepository.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 
         user = UserContextService.getCurrentUserAccount();
         uaaService = WebUtil.getBean(UaaService.class);
         this.selectedObject = new HashMap<>();
+        loadHisEntryType();
+    }
+
+    private void loadHisEntryType() {
+        ConfigItem configItem = configItemRepository.findByDefaultValueForKey("costType");
+        List<Map<String, String>> mapList = JSON.parseObject(configItem.getValidation(), new TypeReference<List<Map<String,String>>>(){});
+        ConfigItemValue costType = configItemValueRepository.findFirstByKeyAndSiteUid("costType", user.getSiteUID());
+        if( costType!=null &&      StringUtils.isNotBlank(costType.getCustomValue())){
+            List<Map<String, String>>   customMap = JSON.parseObject(costType.getCustomValue(), new TypeReference<List<Map<String,String>>>(){});
+            mapList.addAll(customMap);
+        }
+
+        hisEntryTypes=new ArrayList<>();
+        for (Map<String, String> map : mapList) {
+            SelectItemDto selectItemDto = new SelectItemDto( map.get("value"),map.get("key"));
+            hisEntryTypes.add(selectItemDto);
+        }
+
     }
 
     @Override
@@ -101,6 +131,11 @@ public class DataEntryController extends GenericCRUDUUIDController<DataEntry> im
             this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
         Page<DataEntry> page = dataEntryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+        Map<String, String> collect = hisEntryTypes.stream().collect(Collectors.toMap(SelectItemDto::getLabel, SelectItemDto::getValue));
+        for (DataEntry dataEntry : page.getContent()) {
+            dataEntry.setEntryTypeZh(collect.get(dataEntry.getEntryType()));
+        }
+
         return page;
     }
 

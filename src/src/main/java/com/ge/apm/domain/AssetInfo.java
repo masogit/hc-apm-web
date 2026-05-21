@@ -1109,7 +1109,6 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     @TableField(exist = false)
     private SelectItemDto assetClassification32Dto;
-
     @Transient
     @TableField(exist = false)
     private String category1;
@@ -1119,28 +1118,25 @@ public class AssetInfo implements ChineseName, Serializable {
     @Transient
     @TableField(exist = false)
     private String category3;
-
     @Transient
     @TableField(exist = false)
     private String categoryRadio;
-
     @Transient
     @TableField(exist = false)
     private boolean editing = false;
     @Transient
     @TableField(exist = false)
     private BigDecimal scaleAssessment;
-
     @Transient
     @TableField(exist = false)
     private String measuringAlertStatus;
-
-
     @Transient
     private String createType;
-
     @Transient
     private String existFileFlag;
+    @Transient
+    @Getter @Setter
+    private String overrunState;
 
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
@@ -3010,6 +3006,19 @@ public class AssetInfo implements ChineseName, Serializable {
         this.clinicalDeptName = clinicalDeptName;
         this.clinicalDeptUID = clinicalDeptUID;
         this.nurseLocation = nurseLocation;
+    }
+
+    public AssetInfo(Integer id, String name, String uid, String departNum, String serialNum, String functionType, String clinicalDeptName, String clinicalDeptUID, String nurseLocation, String qrCode) {
+        this.id = id;
+        this.name = name;
+        this.uid = uid;
+        this.departNum = departNum;
+        this.serialNum = serialNum;
+        this.functionType = functionType;
+        this.clinicalDeptName = clinicalDeptName;
+        this.clinicalDeptUID = clinicalDeptUID;
+        this.nurseLocation = nurseLocation;
+        this.qrCode = qrCode;
     }
 
     public Map<String, Object> buildLeaseReqHeader() {

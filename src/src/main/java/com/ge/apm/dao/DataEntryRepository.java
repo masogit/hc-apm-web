@@ -21,4 +21,8 @@ public interface DataEntryRepository  extends GenericRepositoryUUID<DataEntry> {
 
 
     List<DataEntry> findByUidIn(Set<String> dataEntryUids);
+
+
+    @Query(value = "select * from data_entry   where site_uid=?1 and entry_type in ?2       ", nativeQuery = true)
+    List<DataEntry> findBySiteUidAndEntryTypeIn(String siteUid, List<String> entryTypes);
 }

@@ -85,7 +85,7 @@
                                  selectionMode="single" scrollable="false"
                                  selection="#{adjustmentTransferApplicationController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.updateTime}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createTime}"
                                  rowKey="#{item.uid}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -167,9 +167,9 @@
                         </p:column>
 
                         <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.stockDeptUid}"
-                                  filterMatchMode="EQ"  width="100" >
+                                  filterMatchMode="EQ"  width="100"  >
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{adjustmentTransferApplicationController.fileterOrgName}" >
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{adjustmentTransferApplicationController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" style="width: 70px"  >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{adjustmentTransferApplicationController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
@@ -193,18 +193,31 @@
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.idleEquipmentStock.assetInfo.qrCode}"/>
                         </p:column>
+                        <p:column headerText="借入医院" filterBy="#{item.borrowHospitalUid}" filterMatchMode="EQ"  width="100" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{adjustmentTransferApplicationController.filterBorrowHospitalName}"  filter="true" filterMatchMode="contains" filterNormalize="true" style="width: 70px"   >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{adjustmentTransferApplicationController.borrowHospitalList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
+                                    <p:ajax  listener="#{adjustmentTransferApplicationController.selectedBorrowHospital()}" update="AssetDetailListForm" />
 
-
-                        <p:column headerText="借入医院" sortBy="#{item.borrowHospitalUid}">
-                            <h:outputText
-                                    value="#{adjustmentTransferApplicationController.getSiteOrgName(item.borrowHospitalUid)}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{adjustmentTransferApplicationController.getSiteOrgName(item.borrowHospitalUid)}"/>
                         </p:column>
 
-                        <p:column headerText="借入科室"
-                               >
-                            <h:outputText
-                                    value="#{adjustmentTransferApplicationController.getSiteOrgName(item.borrowDeptUid)}"/>
+
+                        <p:column headerText="借入科室"  filterBy="#{item.borrowDeptUid}"
+                                  filterMatchMode="EQ"  width="100" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{adjustmentTransferApplicationController.filterBorrowHospitalName}"  filter="true" filterMatchMode="contains" filterNormalize="true" style="width: 70px"   >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{adjustmentTransferApplicationController.borrowClinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{adjustmentTransferApplicationController.getSiteOrgName(item.borrowDeptUid)}"/>
                         </p:column>
+
+
 
                         <p:column headerText="申请状态"  sortBy="#{item.status}"
                                   filterBy="#{item.status}" filterMatchMode="EQ">

@@ -7,20 +7,33 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="forceEditAssetDialog" widgetVar="forceEditAssetDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="补录">
+        <p:dialog id="forceEditAssetDialog" widgetVar="forceEditAssetDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="补录">
             <h:form id="forceEditAssetDialogForm" >
                 <h:panelGroup id="display1">
-                   <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                   <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">借用科室*</label>
-                            <p:autoComplete dropdown="true" value="#{sharedAssetStockController.leaseDeptName}"
+                            <p:autoComplete id="leaseDeptName"  dropdown="true" value="#{sharedAssetStockController.leaseDeptName}"
                                             required="true" requiredMessage="借用科室 #{msg.ValidationRequire}"
                                             scrollHeight="300"  forceSelection="true" size="8"
                                             completeMethod="#{sharedAssetStockController.autoCompleteDeptName}">
-                                <p:ajax process="@this" listener="#{sharedAssetStockController.onLeaseDeptNameChange}" event="itemSelect"/>
-                                <p:ajax process="@this" listener="#{sharedAssetStockController.onLeaseDeptNameChange}"/>
+                                <p:ajax process="@this" listener="#{sharedAssetStockController.onLeaseDeptNameChange}"  event="itemSelect" update="@(.borrowerUserChange)" />
                             </p:autoComplete>
                         </h:panelGroup>
+                       <h:panelGroup  rendered="#{userContextService.checkRole('SharedAssetMgmt')}">
+                           <label class="label">借用人*</label>
+                           <p:autoComplete id="borrowerUser" widgetVar="borrowerUserWidget" dropdown="true" value="#{sharedAssetStockController.borrowerUser}"
+                                           required="true" requiredMessage="借用人 #{msg.ValidationRequire}"
+                                           scrollHeight="300"  forceSelection="true" size="8" var="t" itemLabel="#{t.name}" itemValue="#{t}" class="borrowerUserChange"
+                                           completeMethod="#{sharedAssetStockController.autoCompleteBorrowerName}" converter="userAccountConverter">
+                               <p:ajax process="@this"  event="itemSelect" />
+                           </p:autoComplete>
+                       </h:panelGroup>
+                       <h:panelGroup rendered="#{!userContextService.checkRole('SharedAssetMgmt')}">
+                           <label class="label">借用人*</label>
+                           <p:inputText value="#{sharedAssetStockController.borrowerUser.name}" readonly="true"
+                                        required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
+                       </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计费开始时间*</label>
                             <p:calendar timeZone="GMT+8"
@@ -40,7 +53,7 @@
                         <p:commandButton validateClient="true"
                                          actionListener="#{sharedAssetStockController.forceEditAssets()}"
                                          value="确认"
-                                         update="sharedAssetListForm:datalist"
+                                         update="sharedAssetListForm:datalist :growl"
                                          icon="ui-icon-check"
                                          oncomplete="handleSubmit(args, 'forceEditAssetDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('forceEditAssetDialog').hide()"/>

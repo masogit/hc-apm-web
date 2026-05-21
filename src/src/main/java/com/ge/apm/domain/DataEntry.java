@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.apm.domain.his.HisAssetGroup;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -84,6 +85,13 @@ public class DataEntry implements Serializable {
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 
+
+    @Column(name = "created_name", nullable = true, length = 50)
+    private String createdName;
+
+    @Column(name = "business_data_source_id")
+    private String businessDataSourceId;  //新增字段 方便之后处理业务数据重复录入   维修工单费等。。。。
+
     @ManyToOne(fetch = FetchType.EAGER)
     @NotFound(action= NotFoundAction.IGNORE)
     @JoinColumn(name = "asset_group_uid",referencedColumnName = "uuid", insertable = false,updatable = false)
@@ -101,7 +109,9 @@ public class DataEntry implements Serializable {
     @JoinColumn(name = "last_modified_by",referencedColumnName = "uid", insertable = false,updatable = false)
     private UserAccount lastModifiedUserAccount;
 
-
+    @Transient
+    @TableField(exist = false)
+    private String entryTypeZh;
     @Override
     public int hashCode() {
         Integer hash = 0;

@@ -313,8 +313,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     boolean showLocationNameFlag;
     @Getter @Setter
     boolean enableSignNeedScanQrCode;
-    @Getter
-    private boolean workOrderShowTravelTime=false;
+
     private boolean autoDispatchAllowClaimByAssignee = false;
     @Getter @Setter
     private OrgInfo currentUserOrgInfo;
@@ -439,7 +438,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 viewIng = true;
                 onSelectWorkOrder();
                 String workOrderShowTravelTimeStr = configItemValueRepository.findByKeyAndSiteForUseParent(selected.getAssetInfo().getSiteUID(),selected.getAssetInfo().getHospitalUID(), selected.getAssetInfo().getInstitutionUID(), selected.getAssetInfo().getTenantUID(), "workOrderShowTravelTime");
-                workOrderShowTravelTime = StrUtil.isNotEmpty(workOrderShowTravelTimeStr) && "true".equals(workOrderShowTravelTimeStr);
+                //workOrderShowTravelTime = StrUtil.isNotEmpty(workOrderShowTravelTimeStr) && "true".equals(workOrderShowTravelTimeStr);
             } else {
                 if (!Strings.isNullOrEmpty(queryAssetUID_href)) {
                     queryAssetUid = queryAssetUID_href;
@@ -909,12 +908,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 //                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+9*"));
 //                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
 
-                if(autoDispatchAllowClaimByAssignee){
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, loginUser.getId(), "1*3+8*5+owner*6+"));
-                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*3+8*"));
-                }
+                searchFilters.add(new SearchFilter("orderSnatchingPerson.userUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*3+8*5+owner*6+"));
+                searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*3+8*"));
+
                 List<Integer> tagGroupAssets = getTagGroupAssets();
                 if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
@@ -1737,7 +1733,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
         workHoursConfig();
         String workOrderShowTravelTimeStr = configItemValueRepository.findByKeyAndSiteForUseParent(selectedWorkOrder.getAssetInfo().getSiteUID(),selectedWorkOrder.getAssetInfo().getHospitalUID(), selectedWorkOrder.getAssetInfo().getInstitutionUID(), selectedWorkOrder.getAssetInfo().getTenantUID(), "workOrderShowTravelTime");
-        workOrderShowTravelTime = StrUtil.isNotEmpty(workOrderShowTravelTimeStr) && "true".equals(workOrderShowTravelTimeStr);
+        //workOrderShowTravelTime = StrUtil.isNotEmpty(workOrderShowTravelTimeStr) && "true".equals(workOrderShowTravelTimeStr);
     }
 
     private void workHoursConfig() {
@@ -1994,7 +1990,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         woService.checkIn(checkInWorkOrder);
     }
 
-    public void repairWorkOrder() {
+    public void repairWorkOrder(String type) {
         boolean valid = true;
         ConfigItemValue configItemValue = configItemMapper.findByKey("enableCheckInTime", selectedWorkOrder.getSiteUID());
         if (ObjectUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue.getValue()) && ObjectUtil.isEmpty(selectedWorkOrder.getCheckinTime())) {
@@ -2030,6 +2026,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             valid = false;
         };
 
+
         WorkflowConfig woc = configService.findConfigBySite(loginUser.getSiteUID());
         /*hourRequired=  woc.getHourRequired();*/
         if(null!=woc) {
@@ -2063,6 +2060,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
+        //路途工时
+        String workOrderShowTravelTime = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserOrgInfo.getSiteUID(), currentUserOrgInfo.getHospitalUID(), currentUserOrgInfo.getInstitutionUID(), currentUserOrgInfo.getTenantUID(), "workOrderShowTravelTime");
+        if(StrUtil.isNotEmpty(workOrderShowTravelTime)){
+            FieldColumnDto fieldColumnDto = JSON.parseObject(workOrderShowTravelTime, FieldColumnDto.class);
+            if(fieldColumnDto.getRequired()){
+                if(selectedWorkOrder.getTravelTime() == null){
+                    WebUtil.addErrorMessage(fieldColumnDto.getRequiredMessage());
+                    RequestContext.getCurrentInstance().addCallbackParam("travelTime", true);
+                    valid = false;
+                }
+            }
+        }
+
 
         //判断如果工单分类必填
         String value = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserOrgInfo.getSiteUID(), currentUserOrgInfo.getHospitalUID(), currentUserOrgInfo.getInstitutionUID(), currentUserOrgInfo.getTenantUID(), "showWorkOrderType");
@@ -2088,16 +2098,26 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
         }
 
-        if (!valid) {
-            return;
-        }
-        assigneeId =ua1.getId().toString();
-
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
+        if(StrUtil.isEmpty(type)){
+            String workOrderShowPartFlag = configItemValueRepository.findByKeyAndSiteForUseParent(currentUserOrgInfo.getSiteUID(), currentUserOrgInfo.getHospitalUID(), currentUserOrgInfo.getInstitutionUID(), currentUserOrgInfo.getTenantUID(), "workOrderShowPartFlag");
+            if (ObjectUtil.isNotEmpty(workOrderShowPartFlag) && "true".equals(workOrderShowPartFlag) && CollectionUtils.isEmpty(accessoryList)) {
+                RequestContext.getCurrentInstance().addCallbackParam("detailFlag", true);
+                valid = false;
+            }
+        }
+
+
+        if (!valid) {
+            return;
+        }
+        assigneeId =ua1.getId().toString();
+
+
 
         if (selectedWorkOrder.getEntryType() == 1) {
             workHoursList = workHoursList.stream()

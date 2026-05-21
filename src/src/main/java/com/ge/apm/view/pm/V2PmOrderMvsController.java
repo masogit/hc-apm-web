@@ -3,6 +3,7 @@ package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.MvsPmOrderMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
@@ -622,43 +623,42 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         attachListEhomeImg = new ArrayList<>();
         attachListEhomeFile = new ArrayList<>();
         accessoryList = getWorkOrderDetail(selected.getId());
-        picList = blobDao.findByBoUuid(selected.getId());
+        picList = blobDao.fetchBlobObjectNotType(selected.getId(), Arrays.asList(new String[]{"PmOrderEHome", "SignatureEHome"}).stream().collect(Collectors.toSet()));
         attachListEhome = blobDao.findByBoUuidAndBoType(selected.getId(),"PmOrderEHome");
         if(!org.springframework.util.CollectionUtils.isEmpty(attachListEhome)){
-            //Set<String> objectIds = attachListEhome.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
-            //List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(objectIds);
+            Set<String> objectIds = attachListEhome.stream().map(V2_BlobObject::getObjectStorageId).collect(Collectors.toSet());
+            List<FileInfoResult> fileInfoResults = fileDownloadService.getNotByteFileInfoForEhome(objectIds);
             List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif");
-            if (attachListEhome == null) {
-                attachListEhome = new ArrayList<>();
+            if (fileInfoResults == null) {
+                fileInfoResults = new ArrayList<>();
             }
-            List<V2_BlobObject> imageFiles = attachListEhome.stream()
+            List<FileInfoResult> imageFiles = fileInfoResults.stream()
                     .filter(result -> result != null && result.getObjectName() != null)
                     .filter(result -> imageExtensions.stream()
                             .anyMatch(ext -> result.getObjectName().toLowerCase().endsWith(ext)))
                     .collect(Collectors.toList());
             if(!org.springframework.util.CollectionUtils.isEmpty(imageFiles)){
                 attachListEhomeImg = imageFiles.stream()
-                        .filter(result -> result.getObjectStorageId() != null)
+                        .filter(result -> result.getObjectId() != null)
                         .map(result -> {
                             V2_BlobObject blobObject = new V2_BlobObject();
-                            blobObject.setObjectStorageId(result.getObjectStorageId());
+                            blobObject.setObjectStorageId(result.getObjectId());
                             blobObject.setObjectName(result.getObjectName());
-                            blobObject.setBoType("IMG");
                             return blobObject;
                         })
                         .collect(Collectors.toList());
             }
-            List<V2_BlobObject> otherFiles = attachListEhome.stream()
+            List<FileInfoResult> otherFiles = fileInfoResults.stream()
                     .filter(result -> result != null && result.getObjectName() != null)
                     .filter(result -> imageExtensions.stream()
                             .noneMatch(ext -> result.getObjectName().toLowerCase().endsWith(ext)))
                     .collect(Collectors.toList());
             if(!org.springframework.util.CollectionUtils.isEmpty(otherFiles)){
                 attachListEhomeFile = otherFiles.stream()
-                        .filter(result -> result.getObjectStorageId() != null)
+                        .filter(result -> result.getObjectId() != null)
                         .map(result -> {
                             V2_BlobObject blobObject = new V2_BlobObject();
-                            blobObject.setObjectStorageId(result.getObjectStorageId());
+                            blobObject.setObjectStorageId(result.getObjectId());
                             blobObject.setObjectName(result.getObjectName());
                             return blobObject;
                         })

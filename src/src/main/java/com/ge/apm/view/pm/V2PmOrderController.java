@@ -132,7 +132,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //选定科室过滤
     @Setter @Getter
     private String filterClinicalDeptOrg;
-
+    @Getter @Setter
+    private OrgInfo currentUserOrgInfo;
     @Setter @Getter
     private Boolean periodShow;
     @Setter @Getter
@@ -172,6 +173,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private ExternalTempUserRepository externalTempUserDao;
     private ConfigItemValueRepository configItemValueRepository;
     private AssetInfoRepository assetInfoRepository;
+    private OrgInfoRepository orgDao;
 
     List<String> ruleStrList;
     @Setter @Getter
@@ -1802,7 +1804,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         externalTempUserDao = WebUtil.getBean(ExternalTempUserRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
+        currentUserOrgInfo = orgDao.findByUid(loginUser.getSiteUID());
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
         orgList = new ArrayList<>();

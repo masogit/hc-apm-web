@@ -9,14 +9,14 @@
 
 <ui:composition>
     <p:dialog id="adjustmentBorrowingDlg" widgetVar="adjustmentBorrowingDlg" modal="true" resizable="true"
-              draggable="true" header="调剂借用设备申请" appendTo="@(body)" width="75%">
-        <h:form id="transferForm" style="height:660px; overflow: auto;">
+              draggable="true" header="调剂借用设备申请" appendTo="@(body)" width="75%"   height="700px">
+        <h:form id="transferForm">
             <p:fieldset legend="调入单位信息">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">单位名称</label>
                         <p:inputText value="#{idleEquipmentStockDetailController.application.unitName}"
-                                     style="width:95%">
+                                     >
                             <p:ajax/>
                         </p:inputText>
                     </h:panelGroup>
@@ -74,7 +74,7 @@
                                     pattern="#{userContextService.timeFormat()}"
                                     value="#{idleEquipmentStockDetailController.application.applicationDate}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true"
-                                    navigator="true" mask="true" style="width: 95%">
+                                    navigator="true" mask="true" >
                             <p:ajax event="dateSelect"/>
                         </p:calendar>
                     </h:panelGroup>
@@ -302,9 +302,9 @@
 
                 </h:panelGroup>
             </p:fieldset>
-
+<!--            oncomplete="handleApplyForBorrowingSubmit(xhr, status, args)-->
             <p:commandButton value="提交申请" actionListener="#{idleEquipmentStockDetailController.applyForBorrowing}"
-                             update=":stockDetailForm"  oncomplete="handleSubmit(args, 'adjustmentBorrowingDlg'); "
+                             update=":stockDetailForm adjustmentBorrowingDlg"  oncomplete="handleApplyForBorrowingSubmit(args, 'adjustmentBorrowingDlg'); "
                              icon="ui-icon-check" style="margin-left: 10px;"/>
 
             <p:commandButton immediate="true" value="取消"   icon="ui-icon-cancel"
@@ -346,5 +346,22 @@
             </h:panelGroup>
         </h:form>
     </p:dialog>
+
+    <script type="text/javascript">
+
+
+        function handleApplyForBorrowingSubmit(args,dlg) {
+            var check = args.check;
+            console.log("check:"+check)
+            if(check===true){
+                PF(dlg).hide();
+            }else{
+                PF(dlg).show();
+            }
+
+
+
+        }
+    </script>
 </ui:composition>
 </html>

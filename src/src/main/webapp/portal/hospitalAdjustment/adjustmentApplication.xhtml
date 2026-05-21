@@ -44,14 +44,14 @@
                             <h:panelGroup>
                                 <label class="label">联系人</label>
                                 <p:inputText value="#{adjustmentApplicationCreateController.selected.contactPerson}"
-                                             style="width: 95%">
+                                         >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">联系电话</label>
                                 <p:inputText value="#{adjustmentApplicationCreateController.selected.contactNumber}"
-                                             style="width: 95%">
+                                            >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -93,7 +93,7 @@
                                 <label class="label">设备型号/规格</label>
                                 <p:inputText id="modelSpec" readonly="true"
                                              value="#{adjustmentApplicationCreateController.selectedAsset.functionType}"
-                                             style="width: 95%">
+                                             >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -101,7 +101,7 @@
                                 <label class="label">#{msg.manufacture}</label>
                                 <p:inputText id="manufacture" readonly="true"
                                              value="#{adjustmentApplicationCreateController.selectedAsset.manufacture}"
-                                             style="width: 95%">
+                                           >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -112,7 +112,7 @@
                                             pattern="#{userContextService.timeFormat()}"
                                             value="#{adjustmentApplicationCreateController.selectedAsset.purchaseDate}"
                                             showOn="button" readonlyInput="false" showButtonPanel="true"
-                                            navigator="true" mask="true" style="width: 95%">
+                                            navigator="true" mask="true" >
                                     <p:ajax event="dateSelect"/>
                                 </p:calendar>
                             </h:panelGroup>
@@ -124,7 +124,7 @@
                                 <label class="label">#{msg.purchasePrice} (元)</label>
                                 <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice"  readonly="true"
                                                value="#{adjustmentApplicationCreateController.selectedAsset.purchasePrice}"
-                                               style="width: 95%">
+                                              >
                                     <p:ajax/>
                                 </p:inputNumber>
                             </h:panelGroup>
@@ -145,9 +145,10 @@
                                 <label class="label">折旧期限 (规定)<span style="color:red">*</span></label>
                                 <p:inputNumber minValue="0" maxValue="99" decimalPlaces="1"
                                                value="#{adjustmentApplicationCreateController.selected.depreciationPeriodYears}"
-                                              required="true"  requiredMessage="折旧期限 #{msg.ValidationRequire}" style="width: 95%">
+                                              required="true"  requiredMessage="折旧期限 #{msg.ValidationRequire}" >
                                     <p:ajax/>
                                 </p:inputNumber>
+                                <span style="margin-right: 10px;">年</span>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">是否超折旧期限<span style="color:red">*</span></label>
@@ -166,7 +167,7 @@
                                 <label class="label">超期仍具备使用价值依据<span style="color:red">*</span></label>
                                 <p:inputText required="true" requiredMessage="超期仍具备使用价值依据必填"
                                         value="#{adjustmentApplicationCreateController.selected.overDepreciationReason}"
-                                        style="width: 95%;">
+                                             style="width: 90%">
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -184,20 +185,19 @@
                                 </p:selectOneRadio>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">维修记录摘要 (近2年)</label>
-                                <p:inputText   required="true" requiredMessage="维修记录摘要必填"
-                                        value="#{adjustmentApplicationCreateController.selected.maintenanceSummary}"
-                                        style="width: 95%;">
+                                <label class="label">维修记录摘要 (近2年)<span style="color:red">*</span></label>
+                                <p:inputTextarea required="true" requiredMessage="维修记录摘要必填"  value="#{adjustmentApplicationCreateController.selected.maintenanceSummary}" maxlength="1000"  style="width: 80%" >
+
                                     <p:ajax/>
-                                </p:inputText>
+                                </p:inputTextarea>
                             </h:panelGroup>
                         </p:panelGrid>
 
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">购置凭证编号</label>
+                                <label class="label">购置凭证编号<span style="color:red">*</span></label>
                                 <p:inputText value="#{adjustmentApplicationCreateController.selected.purchaseVoucherNo}"    required="true" requiredMessage="购置凭证编号必填"
-                                             style="width: 95%;">
+                                            >
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
@@ -273,7 +273,7 @@
 
                         <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">预计闲置期限</label>
+                                <label class="label">预计闲置期限<span style="color:red">*</span></label>
                                 <div style="display: flex; align-items: center;">
                                     <p:inputNumber id="expectedIdleYears" minValue="0" decimalPlaces="0" maxValue="999" required="true" requiredMessage="预计闲置期限年必填"
                                                    value="#{adjustmentApplicationCreateController.selected.expectedIdleYears}"  validatorMessage="闲置年数必须在 0 到 999 之间">
@@ -297,10 +297,10 @@
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
                             <div style="display:flex; align-items:center; flex-wrap:wrap;">
-                            <p:selectManyCheckbox  value="#{adjustmentApplicationCreateController.attachments}" style="width: 700px"    >
+                            <p:selectManyCheckbox  value="#{adjustmentApplicationCreateController.attachments}" style="width: 900px"    >
 
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('HospitalAdjustmentAttachmentType')}"
-                                               var="item"
+                                               var="item"   itemDisabled="#{item.msgKey eq 'ContractInvoice' or item.msgKey eq 'InspectionReport' or item.msgKey eq 'PhysicalPhoto'        }"
                                                itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 <p:ajax event="change" process="@this" update="@form"/>
                             </p:selectManyCheckbox>
