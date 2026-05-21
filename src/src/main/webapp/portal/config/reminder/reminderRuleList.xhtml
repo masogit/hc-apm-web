@@ -23,8 +23,8 @@
 								<p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
 								<p:scrollPanel style="height:300px;border: 0" mode="native">
 									<p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{reminderRuleController.selectedOrgNodes}" var="node" selectionMode="checkbox" dynamic="true">
-										<p:ajax process="@this" event="select"  update=":reminderRuleListForm :searchForm" />
-										<p:ajax process="@this" event="unselect"  update=":reminderRuleListForm :searchForm" />
+										<p:ajax process="@this" event="select"  update=":reminderRuleListForm" />
+										<p:ajax process="@this" event="unselect"  update=":reminderRuleListForm" />
 
 										<p:ajax process="@this" event="expand"/>
 										<p:ajax process="@this" event="collapse"/>
@@ -36,8 +36,6 @@
 								</p:scrollPanel>
 							</p:overlayPanel>
 						</h:panelGroup>
-
-
 					</h:panelGrid>
 				</h:form>
 
