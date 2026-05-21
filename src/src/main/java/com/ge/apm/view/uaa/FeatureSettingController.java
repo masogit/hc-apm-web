@@ -3,9 +3,13 @@ package com.ge.apm.view.uaa;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.*;
+import com.ge.apm.dao.AdminCustomActiveRepository;
+import com.ge.apm.dao.AdminFeatureActiveRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -41,6 +45,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
     private ConfigCacheService configCacheService;
     private AdminFeatureActiveRepository featureActiveRepository;
     private AdminCustomActiveRepository customActiveRepository;
+    private ConfigItemService configItemService;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
     @Getter
@@ -124,6 +129,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         dao = WebUtil.getBean(TenantInfoRepository.class);
         userService = WebUtil.getBean(UserCommonService.class);
         customActiveRepository = WebUtil.getBean(AdminCustomActiveRepository.class);
+        configItemService = WebUtil.getBean(ConfigItemService.class);
         String tenantUid = "";
         String encodeStr = WebUtil.getRequestParameter("str");
         if (encodeStr != null) {
@@ -516,14 +522,24 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         if (StringUtils.isEmpty(hospitalUID)) {
             link = "";
         }
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        // 获取 HttpServletRequest 对象
-        HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
-        // 获取当前项目的请求地址
-        String requestURL = request.getRequestURL().toString().replace("/admin/uaa/siteInfo/FeatureSetting.xhtml", "");
+        String siteDomain = obtainSiteDomain();
 
-        link = requestURL + "/portal/activeFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
+        link = siteDomain + "/geapm/portal/activeFeature.xhtml?str=" + UrlParamUtil.encodeUrlQueryString("hospitalUID=" + hospitalUID);
+    }
 
+    private String obtainSiteDomain() {
+        String siteDomain = configItemService.getConfigItemByKeyToString("siteDomain", UserContextService.getCurrentUserAccount());
+
+        if (StringUtils.hasText(siteDomain)) {
+            siteDomain = siteDomain.trim();
+        } else {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            // 获取 HttpServletRequest 对象
+            HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
+            // 获取当前项目的请求地址
+            siteDomain = request.getRequestURL().toString().replace("/admin/uaa/siteInfo/FeatureSetting.xhtml", "");
+        }
+        return siteDomain;
     }
 
 }

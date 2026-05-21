@@ -44,6 +44,20 @@
             </h:panelGroup>
 
             <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('siteDomain').name.concat('(').concat(systemConfigItemController.configItemMap.get('siteDomain').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('siteDomain').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('siteDomain').validation}" pattern="#{systemConfigItemController.configItemMap.get('siteDomain').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('siteDomain'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('siteDomain'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('siteDomain').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('displayExternalWorkOrder').name.concat('(').concat(systemConfigItemController.configItemMap.get('displayExternalWorkOrder').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('displayExternalWorkOrder').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
