@@ -17,6 +17,8 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
@@ -34,9 +36,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +72,10 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private String type;
     private boolean canSave = true;
 
+    @Getter
+    @Setter
+    private TreeNode[] selectedOrgNodes;
+
     @Override
     protected ReminderRuleRepository getDAO() {
         return dao;
@@ -97,10 +101,19 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     protected Page<ReminderRule> loadData(PageRequest pageRequest) {
         searchFilters = ObjectUtil.isEmpty(searchFilters) ? ListUtil.toList() : searchFilters;
         List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        if (ObjectUtil.isNotEmpty(selectedOrgNodes)) {
+            List<String> selectedSiteList = ListUtil.newArrayList();
+            for (TreeNode selectedAccessOrgNode : selectedOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+                selectedSiteList.add(orgInfo.getUid());
+            }
+            orgUidList=selectedSiteList;
+        }
+        this.updateSearchFilter(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
         List<ReminderRule> resultList = dao.findBySearchFilter(searchFilters);
 
         for (ReminderRule reminderRule : resultList) {
@@ -408,6 +421,17 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             selected.setWechatParam(JSON.parseObject(msgStr, WechatParam.class));
         }
     }
+
+
+//    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+//        this.searchFilters.clear();
+////        loadSiteList();
+//
+//        setTreeNodes(event.getTreeNode(), true);
+//
+//    }
+//    private List<OrgInfo> siteList;
+
 
     public List<OrgInfo> getHospitalList(String orgLevel) {
         return orgInfoService.getHospitalList(orgLevel);
