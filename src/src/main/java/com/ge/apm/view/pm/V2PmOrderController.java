@@ -1121,6 +1121,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         maintenanceReport = null;
         try {
             if(!pmReportService.checkDownloadPDF(selectedMap)){
+                WebUtil.addErrorMessage("含有非已关单工单，不支持下载!");
                 return;
             }
             maintenanceReport = pmReportService.generate(selectedMap, isInsulate, loginUser);
