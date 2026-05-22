@@ -120,4 +120,7 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
     List<AssetInfo> queryAssetInfo(HashMap<String, Object> params);
 
+
+	List<AssetInfo> selectUnMeasureResult(Pagination pagination, @Param("ew") Wrapper<AssetInfo> wrapper);
+
 }

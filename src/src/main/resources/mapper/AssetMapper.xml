@@ -586,6 +586,12 @@
         </where>
 
     </select>
+    <select id="selectUnMeasureResult" resultType="com.ge.apm.domain.AssetInfo">
+
+        SELECT ai.*
+        FROM asset_info ai
+        <where>${ew.sqlSegment}</where>
+    </select>
 
 
 </mapper>

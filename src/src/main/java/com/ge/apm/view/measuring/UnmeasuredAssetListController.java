@@ -1,5 +1,8 @@
 package com.ge.apm.view.measuring;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.view.uaa.OrgTreeController;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
@@ -16,6 +19,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -23,10 +27,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -78,6 +79,15 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
+        Wrapper<AssetInfo> wrapper = getSearchFiltersConvert();
+        List<AssetInfo> assetInfos = assetInfoMapper.selectUnMeasureResult(pagination, wrapper);
+//        return dao.findBySearchFilter(searchFilters, pageRequest);
+        return new PageImpl<>(assetInfos, pageRequest, pagination.getTotal());
+    }
+
+    private Wrapper<AssetInfo> getSearchFiltersConvert() {
+        Wrapper<AssetInfo> wrapper = new EntityWrapper<>();
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
@@ -86,29 +96,55 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         if (!this.hasFilterOnField("siteUID")) {
             UserAccount user = UserContextService.getCurrentUserAccount();
             List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            wrapper.andNew().in("tenant_uid",orgUidList)
+                       .or().in("institution_uid",orgUidList)
+                       .or().in("hospital_uid",orgUidList)
+                       .or().in("site_uid",orgUidList)
+                       .or().in("clinical_dept_uid",orgUidList)
+                       .or().in("asset_dept_uid",orgUidList);
+        }else{
+            Optional<SearchFilter> siteUID = getFilterOnField("siteUID");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().eq("site_uid",searchFilter.value);
         }
 
         if (!this.hasFilterOnField("status")) {
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
+//            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
+            wrapper.and().ne("status",4);
+        }else{
+            Optional<SearchFilter> siteUID = getFilterOnField("status");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().eq("status",searchFilter.value);
         }
 
         if (!this.hasFilterOnField("isValid")) {
-            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE, "1*"));
+//            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE, "1*"));
+            wrapper.and().eq("is_valid",Boolean.TRUE);
+        }else{
+            Optional<SearchFilter> siteUID = getFilterOnField("isValid");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().eq("is_valid",searchFilter.value);
         }
 
         if (!this.hasFilterOnField("isDeleted")) {
-            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE, "1*"));
+//            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE, "1*"));
+            wrapper.and().eq("is_deleted",Boolean.FALSE);
+        }else{
+            Optional<SearchFilter> siteUID = getFilterOnField("isDeleted");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().eq("is_deleted",searchFilter.value);
         }
 
         if (!this.hasFilterOnField("measureGrade")) {
-            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
-            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+//            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+//            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+            wrapper.andNew().ne("measure_grade",4).or().isNull("measure_grade");
         } else {
             boolean hasNullMeasureGrade = false;
             Integer measureGradeValue = null;
@@ -126,20 +162,24 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
             //判断计量等级过滤条件是否为空
             if (hasNullMeasureGrade) {
                 this.removeFilterOnField("measureGrade");
-                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
-                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+//                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+//                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+                wrapper.andNew().ne("measure_grade",4).or().isNull("measure_grade");
             } else {
-                this.updateSearchFilter(new SearchFilter("measureGrade", SearchFilter.Operator.EQ, measureGradeValue, "1*"));
+//                this.updateSearchFilter(new SearchFilter("measureGrade", SearchFilter.Operator.EQ, measureGradeValue, "1*"));
+                wrapper.and().eq("measure_grade",measureGradeValue);
             }
         }
 
         if (null != filterOrg) {
             if (selectedNode.isLeaf()) {
-                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filterOrg.getUid(), "1*"));
+//                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filterOrg.getUid(), "1*"));
+                wrapper.and().eq("clinical_dept_uid",filterOrg.getUid());
             } else {
                 List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
                 List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
+//                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
+                wrapper.and().in("clinical_dept_uid",clinicalUids);
             }
 
         } else {
@@ -153,18 +193,21 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         this.removeFilterOnField("nextMeteringDate");
         switch (queryIndex) {
             case 0:
-                this.updateSearchFilter(new SearchFilter("lastMeteringDate", SearchFilter.Operator.IsNull, null, "1*"));
+//                this.updateSearchFilter(new SearchFilter("lastMeteringDate", SearchFilter.Operator.IsNull, null, "1*"));
+                wrapper.and().notExists("SELECT 1 FROM measuring_certificate_detail WHERE measuring_certificate_detail.asset_uid = ai.uid");
                 break;
             case 1:
-                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.LT, new Date(), "1*"));
+//                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.LT, new Date(), "1*"));
+                wrapper.and().lt("next_metering_date", new Date());
                 break;
             case 2:
-                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.GTE, new Date(), "1*"));
+//                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.GTE, new Date(), "1*"));
+                wrapper.and().ge("next_metering_date", new Date());
                 break;
             default:
                 break;
         }
-        return dao.findBySearchFilter(searchFilters, pageRequest);
+        return wrapper;
     }
 
     @Override
