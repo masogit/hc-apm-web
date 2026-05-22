@@ -149,7 +149,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	}
 
 	public String getOrgName(String uid) {
-		return cacheService.findOrgByUid(uid).getName();
+		return Optional.ofNullable(cacheService.findOrgByUid(uid)).map(OrgInfo::getName).orElse(null);
 	}
 
 	@Override

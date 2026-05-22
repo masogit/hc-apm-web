@@ -161,7 +161,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	}
 
 	public String getOrgName(String uid) {
-		return cacheService.findOrgByUid(uid).getName();
+		return Optional.ofNullable(cacheService.findOrgByUid(uid)).map(OrgInfo::getName).orElse(null);
 	}
 
 	@Override
