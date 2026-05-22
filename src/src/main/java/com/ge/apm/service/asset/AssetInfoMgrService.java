@@ -245,13 +245,46 @@ public class AssetInfoMgrService {
     public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid) {
         return supplierDao.findSupplierByTenantUID(tenantUid);
     }
+
+
+    public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid,String name,int size) {
+        if(StringUtils.isNotBlank(name)){
+            return supplierDao.findSupplierByTenantUIDAndName(tenantUid,name,size);
+
+        }else{
+            return supplierDao.findSupplierByTenantUID(tenantUid,size);
+
+        }
+    }
     public List<Supplier> getOnlyMaintainListBySiteUid(String tenantUid) {
         return supplierDao.findMaintainByTenantUID(tenantUid);
+    }
+
+
+    public List<Supplier> getOnlyMaintainListBySiteUid(String tenantUid,String name,int size) {
+        if(StringUtils.isNotBlank(name)){
+            return supplierDao.findMaintainByTenantUID(tenantUid,name,size);
+
+        }else{
+            return supplierDao.findMaintainByTenantUID(tenantUid,size);
+
+        }
     }
     public List<Supplier> getOnlyManuListBySiteUid(String tenantUid) {
         return supplierDao.findManuByTenantUID(tenantUid);
     }
 
+
+    public List<Supplier> getOnlyManuListBySiteUid(String tenantUid,String name,int size) {
+
+        if(StringUtils.isNotBlank(name)){
+            return supplierDao.findManuByTenantUID(tenantUid,name,size);
+
+        }else{
+            return supplierDao.findManuByTenantUID(tenantUid,size);
+
+        }
+    }
 
     public AssetInfo getAssetInfoByUid(String assetUid) {
         return assetDao.findByUid(assetUid);
