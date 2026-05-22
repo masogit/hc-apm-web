@@ -8,9 +8,9 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -77,6 +77,8 @@ public class UserContextService implements Serializable {
     private OrgInfo selectSiteSchedule;
     private List<OrgInfo> child = new ArrayList<>();
     private Map<String, Boolean> enableBtnByKey = new HashMap<>();
+
+    private Map<String,Integer> pageSizeCache = new HashMap<>();
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -1646,4 +1648,17 @@ public class UserContextService implements Serializable {
     public void setSelectSiteSchedule(OrgInfo selectSiteSchedule) {
         this.selectSiteSchedule = selectSiteSchedule;
     }
+
+    public int getPageSizeCache(String key) {
+        return pageSizeCache.computeIfAbsent(key,key1->20);
+    }
+
+    public static void setPageSizeCache(String key,Integer pageSize){
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        bean.pageSizeCache.put(key,pageSize);
+    }
+
+
+
+
 }

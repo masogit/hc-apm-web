@@ -134,7 +134,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     @Override
     protected Page<ArrivalListItem> loadData(PageRequest pageRequest) {
-
+        UserContextService.setPageSizeCache("arrivalItemsList.xhtml",pageRequest.getPageSize());
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
