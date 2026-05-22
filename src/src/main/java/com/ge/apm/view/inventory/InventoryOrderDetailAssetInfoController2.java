@@ -196,7 +196,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	}
 
     public String getOrgName(String uid) {
-        return cacheService.findOrgByUid(uid).getName();
+        return Optional.ofNullable(cacheService.findOrgByUid(uid)).map(OrgInfo::getName).orElse(null);
     }
 
     public String  getUserName(String loginName){
