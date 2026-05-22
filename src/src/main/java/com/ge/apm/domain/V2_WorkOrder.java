@@ -219,7 +219,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     /**
      * 补充维修工单 approvalStatus 字段含义
-     * 0 初始化工单(新建工单审核状态), 1 待审核, 2 审核同意, 3 审核不同意, 4 审批部分同意
+     * 0 初始化工单(新建工单审核状态), 1 待审核, 2 审核同意, 3 审核不同意, 4 审批部分同意   6有备件未提交
      */
     @Column(name = "approval_status")
     private String approvalStatus;
