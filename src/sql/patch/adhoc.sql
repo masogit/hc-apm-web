@@ -14,7 +14,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示维修记录', 'showRepairRecordTable', 'WEB端是否显示维修记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showRepairRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示内部保养记录', 'showMaintainanceRecordTable', 'WEB端是否显示内部保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMaintainanceRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示保养记录', 'showMaintainanceRecordTable', 'WEB端是否显示保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMaintainanceRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示盘点记录', 'showInventoryRecordTable', 'WEB端是否显示盘点记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showInventoryRecordTable');
@@ -47,28 +47,28 @@ insert into public.config_item (uid, category, default_value, description, key, 
 select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示设备修改记录', 'showModifyRecordTable', 'WEB端是否显示设备修改记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showModifyRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端维修记录', 'showMobileRepairRecordTable', '是否显示移动端维修记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileRepairRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示维修记录', 'showMobileRepairRecordTable', '移动端是否显示维修记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileRepairRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端内部保养记录', 'showMobileMaintainanceRecordTable', '是否显示移动端内部保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileMaintainanceRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示保养记录', 'showMobileMaintainanceRecordTable', '移动端是否显示保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileMaintainanceRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端盘点记录', 'showMobileInventoryRecordTable', '是否显示移动端盘点记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileInventoryRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示盘点记录', 'showMobileInventoryRecordTable', '移动端是否显示盘点记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileInventoryRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端日常检查记录', 'showMobileDailyInspectionRecordTable', '是否显示移动端日常检查记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileDailyInspectionRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示日常检查记录', 'showMobileDailyInspectionRecordTable', '移动端是否显示日常检查记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileDailyInspectionRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端开关机记录', 'showMobileOperationRecordTable', '是否显示移动端开关机记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileOperationRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示开关机记录', 'showMobileOperationRecordTable', '移动端是否显示开关机记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileOperationRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端计量监控记录', 'showMobileMetrologyMonitorTable', '是否显示移动端计量监控记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileMetrologyMonitorTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示计量监控记录', 'showMobileMetrologyMonitorTable', '移动端是否显示计量监控记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileMetrologyMonitorTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端不良事件记录', 'showMobileAdverseEventRecordTable', '是否显示移动端不良事件记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileAdverseEventRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示不良事件记录', 'showMobileAdverseEventRecordTable', '移动端是否显示不良事件记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileAdverseEventRecordTable');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动端报废鉴定记录', 'showMobileScrapRecordTable', '是否显示移动端报废鉴定记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileModifyRecordTable');
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示报废鉴定记录', 'showMobileScrapRecordTable', '移动端是否显示报废鉴定记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileModifyRecordTable');
 
 -- YHAAO-28022
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
