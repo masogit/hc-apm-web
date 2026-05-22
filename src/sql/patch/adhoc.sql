@@ -74,3 +74,6 @@ select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '是否显示移动
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
     select replace(uuid_generate_v4()::text,'-',''), 13, 'https', '网站协议', 'siteProtocol', '网站协议', 't', 't', 1
     where not exists(select 1 from config_item where key = 'siteProtocol');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 12, false, '盘点是否显示使用科室', 'InventoryDisplayAssetDept', '盘点是否显示使用科室', 'f', 't', 1 where not exists(select * from config_item where key = 'InventoryDisplayAssetDept');
