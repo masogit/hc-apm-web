@@ -59,9 +59,15 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
     @Getter @Setter
     private Set<String> clinicalDeptOrgUidSet;
     @Getter @Setter
+    private String filterAssetDeptOrg;
+    @Getter @Setter
+    private Set<String> assetDeptOrgUidSet;
+    @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
     @Getter @Setter
     private Boolean inventoryDisplayRepairOwner = Boolean.FALSE;
+    @Getter @Setter
+    private Boolean inventoryDisplayAssetDept = Boolean.FALSE;
 
 	@Override
 	protected void init() {
@@ -76,6 +82,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
         inventoryDisplayRepairOwner = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayRepairOwner")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
+        inventoryDisplayAssetDept = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayAssetDept")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
         loadClinicalDeptList();
 	}
 
@@ -111,6 +118,9 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         }
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
             param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
+        }
+        if (ObjectUtil.isNotEmpty(assetDeptOrgUidSet)) {
+            param.put("assetDeptOrgUidSet", assetDeptOrgUidSet);
         }
         inventoryOrderService.covQueryCondition(searchFilters, param);
         Long count = inventoryOrderMapper.findNoneOrderCount(param);
@@ -171,6 +181,27 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
+    }
+
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
+        }
+
+        if (filterAssetDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
+        }
+
     }
 
 	public List<String> getListClinicalDeptName() {
