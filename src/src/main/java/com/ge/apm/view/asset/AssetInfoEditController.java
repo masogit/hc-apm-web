@@ -185,15 +185,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AssetTagsRepository assetTagsDao;
     private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
     SysAuthGroupRepository authGroupDao;
-    @Getter
-    @Setter
-    private List<Supplier> supplierList = Collections.emptyList();
-    @Getter
-    @Setter
-    private List<Supplier> manuList = Collections.emptyList();
-    @Getter
-    @Setter
-    private List<Supplier> mantainList = Collections.emptyList();
+//    @Getter
+//    @Setter
+//    private List<Supplier> supplierList = Collections.emptyList();
+//    @Getter
+//    @Setter
+//    private List<Supplier> manuList = Collections.emptyList();
+//    @Getter
+//    @Setter
+//    private List<Supplier> mantainList = Collections.emptyList();
     private List<UserAccount> clinicalOwnerList;
     private List<V2_BlobObject> attachements;
     private ConfigService configService;
@@ -533,9 +533,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         customConfig = ccService.getCurrentCustomConfig(loginUser.getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
-        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
-        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
+//        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
+//        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
+//        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
         //新增时不显示创建人
         if ("Create".equalsIgnoreCase(actionName)) {
             if (readableFieldsList.contains("createdBy")) {
@@ -1777,18 +1777,24 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public List<Supplier> autoCompleteSupplier(String query) {
         //重新获取一下供应商
-        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
-        return autoCompleteService.autoCompleteVendor(query, supplierList);
+//        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
+//        return autoCompleteService.autoCompleteVendor(query, supplierList);
+
+        return   aimService.getOnlySuplierListBySiteUid(selected.getTenantUID(),query,1000);
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
-        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
-        return autoCompleteService.autoCompleteManufacture(query, manuList);
+//        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
+//        return autoCompleteService.autoCompleteManufacture(query, manuList);
+
+        return   aimService.getOnlyManuListBySiteUid(selected.getTenantUID(),query,1000);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
-        return autoCompleteService.autoCompleteMaintainer(query, mantainList);
+//        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
+//        return autoCompleteService.autoCompleteMaintainer(query, mantainList);
+
+        return  aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID(),query,1000);
     }
     public String selectCreatedBy(String loginName){
         UserAccount user = userDao.getByLoginName(loginName);
@@ -2092,21 +2098,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
-        if (newSupplier.getManufacturerT()) {
-            if (manuList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
-                manuList.add(newSupplier);
-            }
-        }
-        if (newSupplier.getSupplierT()) {
-            if (supplierList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
-                supplierList.add(newSupplier);
-            }
-        }
-        if (newSupplier.getMaintainerT()) {
-            if (mantainList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
-                mantainList.add(newSupplier);
-            }
-        }
+//        if (newSupplier.getManufacturerT()) {
+//            if (manuList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+//                manuList.add(newSupplier);
+//            }
+//        }
+//        if (newSupplier.getSupplierT()) {
+//            if (supplierList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+//                supplierList.add(newSupplier);
+//            }
+//        }
+//        if (newSupplier.getMaintainerT()) {
+//            if (mantainList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+//                mantainList.add(newSupplier);
+//            }
+//        }
         changeSelect(createTpye);
     }
 
@@ -2779,11 +2785,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         String manufactory = equipmentNameplate.getManufactory();
         if(StringUtils.isNotEmpty(manufactory) && useValue.get("manufactory")){
-            List<Supplier> suppliers = autoCompleteManufacture("");
-            Optional<Supplier> first = suppliers.stream().filter(item -> manufactory.equalsIgnoreCase(item.getName())).findFirst();
+//            List<Supplier> suppliers = autoCompleteManufacture("");
+//            Optional<Supplier> first = suppliers.stream().filter(item -> manufactory.equalsIgnoreCase(item.getName())).findFirst();
+
+            List<Supplier> byTenantUIDAndNameAndManufacturerT = supplierDao.findByTenantUIDAndNameAndManufacturerT(selected.getTenantUID(), manufactory, Boolean.TRUE);
+
+
             Supplier supplier = null;
-            if(first.isPresent()){
-                supplier = first.get();
+            if(CollectionUtils.isNotEmpty(byTenantUIDAndNameAndManufacturerT)){
+                supplier = byTenantUIDAndNameAndManufacturerT.get(0);
             }else{
                 newSupplier = new Supplier();
                 newSupplier.setName(manufactory);
