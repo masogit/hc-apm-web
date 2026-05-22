@@ -10,7 +10,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.service.utils.ParentAssetComparator;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ge.apm.domain.AssetInfo;
@@ -25,6 +28,9 @@ import com.google.common.base.Strings;
  */
 @Component
 public class AutoCompleteService {
+
+    @Autowired
+    private SupplierRepository supplierDao;
 
     
     public List<Supplier> autoCompleteVendor(String query,List<Supplier> supplierList) {
@@ -89,5 +95,42 @@ public class AutoCompleteService {
     	Collections.reverse(res);
     	return res;
     }
+
+
+    public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid,String name,int size) {
+        if(StringUtils.isNotBlank(name)){
+            return supplierDao.findSupplierByTenantUIDAndNameAndStatus(tenantUid,name,size);
+
+        }else{
+            return supplierDao.findSupplierByTenantUIDAndStatus(tenantUid,size);
+
+        }
+    }
+
+
+
+    public List<Supplier> getOnlyMaintainListBySiteUid(String tenantUid,String name,int size) {
+        if(StringUtils.isNotBlank(name)){
+            return supplierDao.findMaintainByTenantUID(tenantUid,name,size);
+
+        }else{
+            return supplierDao.findMaintainByTenantUID(tenantUid,size);
+
+        }
+    }
+
+
+
+    public List<Supplier> getOnlyManuListBySiteUid(String tenantUid,String name,int size) {
+
+        if(StringUtils.isNotBlank(name)){
+            return supplierDao.findManuByTenantUID(tenantUid,name,size);
+
+        }else{
+            return supplierDao.findManuByTenantUID(tenantUid,size);
+
+        }
+    }
+
 
 }
