@@ -22,26 +22,33 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true " ,nativeQuery = true)
     List<Supplier> findSupplierByTenantUID(String tenantUid);
 
-    @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true  and  name like %?2% limit ?3 " ,nativeQuery = true)
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true  and  name like %?2%  order by  name_py_code  asc   limit ?3 " ,nativeQuery = true)
     List<Supplier> findSupplierByTenantUIDAndName(String tenantUid,String name,int size);
-    @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true limit ?2 " ,nativeQuery = true)
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true order by  name_py_code  asc  limit ?2 " ,nativeQuery = true)
     List<Supplier> findSupplierByTenantUID(String tenantUid,int size);
+
+
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true   and (status is null or status ='Enable')  and  name like %?2%  order by  name_py_code  asc  limit ?3 " ,nativeQuery = true)
+    List<Supplier> findSupplierByTenantUIDAndNameAndStatus(String tenantUid,String name,int size);
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true and (status is null or status ='Enable') order by  name_py_code  asc   limit ?2 " ,nativeQuery = true)
+    List<Supplier> findSupplierByTenantUIDAndStatus(String tenantUid,int size);
+
 
     @Query(value= "select su.* from supplier su where tenant_uid=?1 and manufacturer_t is true " ,nativeQuery = true)
     List<Supplier> findManuByTenantUID(String tenantUid);
 
-    @Query(value= "select su.* from supplier su where tenant_uid=?1 and manufacturer_t is true   and  name like %?2% limit ?3     " ,nativeQuery = true)
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and manufacturer_t is true   and  name like %?2%   order by  name_py_code  asc  limit ?3     " ,nativeQuery = true)
     List<Supplier> findManuByTenantUID(String tenantUid,String name,int size);
-    @Query(value= "select su.* from supplier su where tenant_uid=?1 and manufacturer_t is true limit ?2 " ,nativeQuery = true)
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and manufacturer_t is true  order by  name_py_code  asc  limit ?2 " ,nativeQuery = true)
     List<Supplier> findManuByTenantUID(String tenantUid,int size);
 
     @Query(value= "select su.* from supplier su where tenant_uid=?1 and maintainer_t is true " ,nativeQuery = true)
     List<Supplier> findMaintainByTenantUID(String tenantUid);
 
-    @Query(value= "select su.* from supplier su where tenant_uid=?1 and maintainer_t is true   and  name like %?2% limit ?3 " ,nativeQuery = true)
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and maintainer_t is true   and  name like %?2%  order by  name_py_code  asc  limit ?3 " ,nativeQuery = true)
     List<Supplier> findMaintainByTenantUID(String tenantUid,String name,int size);
 
-    @Query(value= "select su.* from supplier su where tenant_uid=?1 and maintainer_t is true limit ?2 " ,nativeQuery = true)
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and maintainer_t is true order by  name_py_code  asc   limit ?2 " ,nativeQuery = true)
     List<Supplier> findMaintainByTenantUID(String tenantUid,int size);
 
     public Supplier getBySiteIdAndName(int siteId, String name);
