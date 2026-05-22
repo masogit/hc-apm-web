@@ -94,9 +94,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private BlobFileService blobService;
 
     SupplierRepository supplierDao = null;
-    List<Supplier> suppliersList;
-    List<Supplier> manueList;
-    List<Supplier> maintainerList;
+//    List<Supplier> suppliersList;
+//    List<Supplier> manueList;
+//    List<Supplier> maintainerList;
     private boolean needInstorageCheck;
     private AutoCompleteService autoCompleteService;
 
@@ -229,9 +229,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
 
         customConfig = ccService.getCurrentCustomConfig(currentUser.getSiteUID());
-        suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
-        maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
-        manueList=aiService.getOnlyManuListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
+//        suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
+//        maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
+//        manueList=aiService.getOnlyManuListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
 
         needInstorageCheck = userContextService.needInstorageCheck();
     }
@@ -753,15 +753,22 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public List<Supplier> autoCompleteVendor(String query) {
-        return autoCompleteService.autoCompleteVendor(query, suppliersList);
+//        return autoCompleteService.autoCompleteVendor(query, suppliersList);
+
+        return   autoCompleteService.getOnlySuplierListBySiteUid(currentUser.getTenantUID(),query,1000);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-        return autoCompleteService.autoCompleteMaintainer(query, maintainerList);
+//        return autoCompleteService.autoCompleteMaintainer(query, maintainerList);
+
+        return   autoCompleteService.getOnlyMaintainListBySiteUid(currentUser.getTenantUID(),query,1000);
+
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
-        return autoCompleteService.autoCompleteManufacture(query, manueList);
+//        return autoCompleteService.autoCompleteManufacture(query, manueList);
+        return   autoCompleteService.getOnlyManuListBySiteUid(currentUser.getTenantUID(),query,1000);
+
     }
 
     public void onSupplierChange() {
@@ -1183,21 +1190,21 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             this.newSupplier.setCreatedDate(new Date());
             this.newSupplier.setCreatedBy(loginUser.getName());
         }
-        if (newSupplier.getManufacturerT()) {
-            if (manueList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
-                manueList.add(newSupplier);
-            }
-        }
-        if (newSupplier.getSupplierT()) {
-            if (suppliersList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
-                suppliersList.add(newSupplier);
-            }
-        }
-        if (newSupplier.getMaintainerT()) {
-            if (maintainerList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
-                maintainerList.add(newSupplier);
-            }
-        }
+//        if (newSupplier.getManufacturerT()) {
+//            if (manueList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+//                manueList.add(newSupplier);
+//            }
+//        }
+//        if (newSupplier.getSupplierT()) {
+//            if (suppliersList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+//                suppliersList.add(newSupplier);
+//            }
+//        }
+//        if (newSupplier.getMaintainerT()) {
+//            if (maintainerList.stream().filter(v -> v.getName().equals(newSupplier.getName())).collect(Collectors.toList()).size() < 1) {
+//                maintainerList.add(newSupplier);
+//            }
+//        }
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
     }
