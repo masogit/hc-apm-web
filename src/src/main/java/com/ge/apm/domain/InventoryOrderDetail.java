@@ -138,6 +138,10 @@ public class InventoryOrderDetail implements Serializable {
     @Transient
     private String inventoryCheckListItems;
 
+    @ExcelProperty(value = "使用科室",index = 11)
+    @Transient
+    private String assetDeptName;
+
     @ExcelProperty(value = "已解决",index = 12)
     @Transient
     private String isSolved;
@@ -298,6 +302,14 @@ public class InventoryOrderDetail implements Serializable {
 
     public void setInventoryCheckListItems(String inventoryCheckListItems) {
         this.inventoryCheckListItems = inventoryCheckListItems;
+    }
+
+    public String getAssetDeptName() {
+        return assetDeptName;
+    }
+
+    public void setAssetDeptName(String assetDeptName) {
+        this.assetDeptName = assetDeptName;
     }
 
     public String getIsSolved() {
