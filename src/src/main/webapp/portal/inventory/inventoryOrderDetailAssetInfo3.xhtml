@@ -14,7 +14,7 @@
         <p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}">
             <h:outputText value="#{item.qrCode}" />
         </p:column>
-        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
+        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.orgName}" filterMatchMode="EQ">
             <f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;" filter="true" filterMatchMode="contains">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -22,6 +22,15 @@
                 </p:selectOneMenu>
             </f:facet>
             <h:outputText value="#{item.orgName}" />
+        </p:column>
+        <p:column headerText="#{msg.assetDeptName}" filterBy="" filterMatchMode="EQ" rendered="#{inventoryOrderDetailAssetInfoController3.inventoryDisplayAssetDept}">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;" filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{inventoryOrderDetailAssetInfoController3.deptList}" var="org" itemLabel="#{org.name}" itemValue="#{org.uid}"/>
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="" />
         </p:column>
         <p:column headerText="#{msg.feedbackComment}" filterBy="#{item.comment}" filterMatchMode="LIKE">
             <h:outputText value="#{item.comment}" />
