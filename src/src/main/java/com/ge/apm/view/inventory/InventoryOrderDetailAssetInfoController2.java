@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -48,6 +49,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
     private UaaService uaaService;
     private InventoryOrderService inventoryOrderService;
     private AssetInfoRepository assetInfoRepository;
+    private ConfigCacheService cacheService;
 	private String orderId;
     private Boolean isFinished = true;
 	private List<String> listClinicalDeptName;
@@ -55,6 +57,8 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
     private List<String> listAccessClinical;
     private ConfigItemValueRepository configItemValueRepository;
     private OrgInfoTreeService orgInfoTreeService;
+    @Getter @Setter
+    private List<OrgInfo> deptList;
     @Getter @Setter
     private String filterClinicalDeptOrg;
     @Getter @Setter
@@ -65,6 +69,8 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
     private Boolean enableInventoryMethod = Boolean.FALSE;
     @Getter @Setter
     private Boolean inventoryDisplayRepairOwner = Boolean.FALSE;
+    @Getter @Setter
+    private Boolean inventoryDisplayAssetDept = Boolean.FALSE;
 
 	@Override
 	protected void init() {
@@ -76,9 +82,11 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        cacheService = WebUtil.getBean(ConfigCacheService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         enableInventoryMethod = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "enableInventoryMethod")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
         inventoryDisplayRepairOwner = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayRepairOwner")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
+        inventoryDisplayAssetDept = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayAssetDept")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
 
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
@@ -88,6 +96,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         }else {
             listClinicalDeptName=inventoryOrderService.getInventoryClinicalDeptUID(orderId,true,0);
         }
+        deptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).filter(item -> listClinicalDeptName.contains(item.getName())).collect(Collectors.toList());
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
         loadClinicalDeptList();
     }
@@ -185,6 +194,11 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 		//after
 		return pageAssetInfo;
 	}
+
+    public String getOrgName(String uid) {
+        return cacheService.findOrgByUid(uid).getName();
+    }
+
     public String  getUserName(String loginName){
         if( null == loginName){
             return null;

@@ -21,7 +21,7 @@
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.arrivalDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rows="#{userContextService.getPageSizeCache('arrivalList.xhtml')}" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="rowSelect" update="createButton deleteButton  viewButton exportPdfButton saveAsButton exportDocButton exportReportButton" />
                         <p:ajax event="filter" listener="#{assetArrivedListController.onFilter}" update="createButton deleteButton " />

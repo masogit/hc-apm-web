@@ -5,6 +5,7 @@ import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -48,6 +49,8 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
     private UaaService uaaService;
     private InventoryOrderService inventoryOrderService;
 	private AssetInfoRepository assetInfoRepository;
+	private ConfigCacheService cacheService;
+
 	private String orderId;
 	private Boolean isFinished = true;
 	private List<String> listClinicalDeptName;
@@ -56,6 +59,8 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	private String encodeAssetStr;
 	private OrgInfoTreeService orgInfoTreeService;
 	@Getter @Setter
+	private List<OrgInfo> deptList;
+	@Getter @Setter
 	private String filterClinicalDeptOrg;
 	@Getter @Setter
 	private Set<String> clinicalDeptOrgUidSet;
@@ -63,6 +68,8 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	private List<OrgInfo> clinicalDeptList;
 	@Getter @Setter
 	private Boolean inventoryDisplayRepairOwner = Boolean.FALSE;
+	@Getter @Setter
+	private Boolean inventoryDisplayAssetDept = Boolean.FALSE;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -71,9 +78,11 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+		cacheService = WebUtil.getBean(ConfigCacheService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		inventoryDisplayRepairOwner = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayRepairOwner")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
+		inventoryDisplayAssetDept = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayAssetDept")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
 		isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
@@ -82,6 +91,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
         }else {
             listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
         }
+		deptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).filter(item -> listClinicalDeptName.contains(item.getName())).collect(Collectors.toList());
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		loadClinicalDeptList();
 	}
@@ -136,6 +146,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		}
 		bathFilters = searchFilters;
 		return dao.findBySearchFilter(searchFilters,pageRequest);
+	}
+
+	public String getOrgName(String uid) {
+		return cacheService.findOrgByUid(uid).getName();
 	}
 
 	@Override
