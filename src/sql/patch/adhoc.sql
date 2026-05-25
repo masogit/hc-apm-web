@@ -77,3 +77,5 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 12, false, '盘点是否显示使用科室', 'InventoryDisplayAssetDept', '盘点是否显示使用科室', 'f', 't', 1 where not exists(select * from config_item where key = 'InventoryDisplayAssetDept');
+
+INSERT INTO PUBLIC.config_item( uid, category, default_value, description, KEY, NAME, super_admin_edit, user_parent_config, value_type) SELECT REPLACE ( uuid_generate_v4 () :: TEXT, '-', '' ), 4, null, '报修入口 URL', 'RepairRequestUrl', '报修入口 URL', 'f', 't', 1 WHERE NOT EXISTS ( SELECT 1 FROM config_item WHERE KEY = 'RepairRequestUrl' );
