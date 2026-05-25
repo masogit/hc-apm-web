@@ -22,12 +22,12 @@
                     <p:ajax event="rowSelect" />
                     <p:ajax event="filter" listener="#{systemEventAuditTableController.onFilter}" />
                     <p:column headerText="表格类型" sortBy="#{item.systemEventKey}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.systemEventKey}" />
+                        <h:outputText value="#{systemEventAuditTableController.getEventDataName(item.systemEventKey)}" />
                     </p:column>
-                    <p:column headerText="表格名称" sortBy="#{item.eventData}" filterMatchMode="LIKE">
+                    <p:column headerText="表格名称" filterBy="#{item.eventData}" sortBy="#{item.eventData}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.eventData}" />
                     </p:column>
-                    <p:column headerText="下载人" sortBy="#{item.operatorUid}" >
+                    <p:column headerText="下载人" filterBy="#{item.operatorUid}" sortBy="#{item.operatorUid}" filterMatchMode="LIKE">
                         <h:outputText value="#{systemEventAuditTableController.getUserName(item.operatorUid)}" />
                     </p:column>
                     <p:column headerText="下载时间" filterBy="#{item.createdDate}" filterMatchMode="GTE">
