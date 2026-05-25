@@ -24,7 +24,7 @@
     </style>
 
     <div class="ui-g-12 card">
-        <h:form rendered="#{(supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION') )  or( supplierController.activeVender() and userContextService.accessContainsFunctionMenu('ASSET_VENDER') )}">
+        <h:form rendered="#{(supplierController.activeSupplier()  and userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_APPLICATION') )  }">
             <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="#{msg.InvitationQRCode}" title="#{msg.InvitationQRCode}" update="supplierTab:supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
         </h:form>
         <h:form rendered="#{supplierController.activeVender()}">
