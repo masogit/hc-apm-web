@@ -25,6 +25,15 @@
 			</f:facet>
 			<h:outputText value="#{userContextService.hasCurrentTenantName('') ? item.clinicalDept.name : item.assetInfo.clinicalDeptName}" />
 		</p:column>
+		<p:column headerText="#{msg.assetDeptName}" filterBy="#{item.assetInfo.assetDeptUID}" filterMatchMode="EQ" rendered="#{inventoryOrderDetailAssetInfoIssueController.inventoryDisplayAssetDept}">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataList4').filter()" autoWidth="false" style="max-width: 150px;" filter="true" filterMatchMode="contains">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{inventoryOrderDetailAssetInfoIssueController.deptList}" var="org" itemLabel="#{org.name}" itemValue="#{org.uid}"/>
+				</p:selectOneMenu>
+			</f:facet>
+			<h:outputText value="#{inventoryOrderDetailAssetInfoIssueController.getOrgName(item.assetInfo.assetDeptUID)}" />
+		</p:column>
 		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.qrCode}">
 			<h:outputText value="#{item.assetInfo.qrCode}" />
 		</p:column>

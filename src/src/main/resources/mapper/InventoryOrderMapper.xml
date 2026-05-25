@@ -78,6 +78,12 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="assetDeptOrgUidSet != null and assetDeptOrgUidSet.size > 0">
+                AND t.assetDeptUid IN
+                <foreach item="item" collection="assetDeptOrgUidSet" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+            </if>
         </where>
     </sql>
 
@@ -90,6 +96,8 @@
                 ai.name,
                 ai.clinical_dept_uid clinicalDeptUid,
                 ai.clinical_dept_name clinicalDeptName,
+                oi.name assetDeptName,
+                ai.asset_dept_uid assetDeptUid,
                 ai.qr_code qrCode,
                 ai.depart_num departNum,
                 ai.function_type functionType,
@@ -116,6 +124,7 @@
                 LEFT JOIN inventory_issue ii ON ai.id = ii.asset_id AND ii.is_last is true
                 LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id AND iod.is_last is true
                 left join user_account u on u.login_name=iod.last_modified_by
+                left join org_info oi on ai.asset_dept_uid = oi.uid
             WHERE
                 ai.is_checked = TRUE
                 AND ai.is_deleted = FALSE
@@ -274,8 +283,8 @@
 
     <sql id="noneOrderCondition">
         (
-        SELECT ai.id,ai.uid,ai.name,ai.clinical_dept_uid clinicalDeptUid,ai.clinical_dept_name clinicalDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName, ai.asset_owner_name assetOwnerName
-        FROM asset_info ai LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id
+        SELECT ai.id,ai.uid,ai.name,ai.clinical_dept_uid clinicalDeptUid,ai.clinical_dept_name clinicalDeptName,ai.asset_dept_uid assetDeptUid,oi.name assetDeptName,ai.qr_code qrCode,ai.depart_num departNum,ai.function_type functionType,ai.financing_num financingNum,ai.status,ai.location_name locationName, ai.asset_owner_name assetOwnerName
+        FROM asset_info ai LEFT JOIN inventory_order_detail iod ON ai.id = iod.asset_id LEFT JOIN org_info oi ON ai.asset_dept_uid = oi.uid
         <if test="orderIdList != null and orderIdList.size > 0">
             AND iod.inventory_order_id IN
             <foreach item="item" collection="orderIdList" separator="," open="(" close=")" index="">

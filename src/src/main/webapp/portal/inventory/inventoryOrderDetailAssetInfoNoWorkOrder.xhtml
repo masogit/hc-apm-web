@@ -27,6 +27,17 @@
 			</f:facet>
 			<h:outputText value="#{item.clinicalDeptName}" />
 		</p:column>
+		<p:column headerText="#{msg.assetDeptName}" rendered="#{inventoryOrderDetailAssetInfoNoWorkOrderController.inventoryDisplayAssetDept}">
+			<f:facet name="header">
+				<h:outputText value="#{msg.assetDeptName}"/><br/>
+				<p:autoComplete dropdown="true" value="#{inventoryOrderDetailAssetInfoNoWorkOrderController.filterAssetDeptOrg}" appendTo="@(Body)"
+								scrollHeight="300"  forceSelection="true" completeMethod="#{inventoryOrderDetailAssetInfoNoWorkOrderController.autoCompleteDeptName}" size="5">
+					<p:ajax event="itemSelect" listener="#{inventoryOrderDetailAssetInfoNoWorkOrderController.onAssetDeptNameFilterChange}" process="@this" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoListNoWorkOrderForm:datalistNoWorkOrder"/>
+					<p:ajax process="@this" listener="#{inventoryOrderDetailAssetInfoNoWorkOrderController.onAssetDeptNameFilterChange}" update=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoListNoWorkOrderForm:datalistNoWorkOrder"/>
+				</p:autoComplete>
+			</f:facet>
+			<h:outputText value="#{item.assetDeptName}" />
+		</p:column>
 		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}">
 			<h:outputText value="#{item.qrCode}" />
 		</p:column>

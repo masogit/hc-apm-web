@@ -657,6 +657,22 @@
             </h:panelGroup>
 
 
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('RepairRequestUrl').name.concat('(').concat(systemConfigItemController.configItemMap.get('RepairRequestUrl').key).concat(')')}</label>
+                <p:inputText value="#{systemConfigItemController.configItemMap.get('RepairRequestUrl').showValue}" style="width: 95%;"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('RepairRequestUrl').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('RepairRequestUrl'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('RepairRequestUrl'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('RepairRequestUrl').configItemValue == null}"/>
+            </h:panelGroup>
+
+
         </p:panelGrid>
     </ui:composition>
 
