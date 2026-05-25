@@ -1062,6 +1062,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 if(approvalStatus==3){
                     updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.IN,Arrays.asList("2","3","4"), "1*"));
                 }
+                if(approvalStatus==4){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ,"6", "1*"));
+                }
             }
 
             this.selected = null;
@@ -4625,9 +4628,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             case "3":
             case "4":
                 return "备件审批完成";
+
+            case "6":
+                return "未提交";
             default:
                 return null;
         }
+    }
+    public boolean repairRequestUrl(){
+        ConfigItemValue repairRequestUrlConfig = configItemValueRepository.findFirstByKeyAndSiteUid("RepairRequestUrl", loginUser.getSiteUID());
+        return repairRequestUrlConfig.getValue() != null;
     }
     public void postProcessorExcel(Object obj){
         woService.postProcessorExcel();
