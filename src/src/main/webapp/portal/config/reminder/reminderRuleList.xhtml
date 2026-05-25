@@ -22,7 +22,7 @@
 								<p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
 								<p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
 								<p:scrollPanel style="height:300px;border: 0" mode="native">
-									<p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{reminderRuleController.selectedOrgNodes}" var="node" selectionMode="checkbox" dynamic="true">
+									<p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{reminderRuleController.selectedOrgNodes}" var="node" selectionMode="checkbox" dynamic="true"   propagateSelectionUp="#{orgTreeController.propagateSelectionUp}"  >
 										<p:ajax process="@this" event="select"  update=":reminderRuleListForm" />
 										<p:ajax process="@this" event="unselect"  update=":reminderRuleListForm" />
 
