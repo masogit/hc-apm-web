@@ -637,7 +637,7 @@ public class UserAccount implements ChineseName, Serializable {
 			return roleNames;
 		}
 		for (UserRole userRole : userRoleList) {
-			roleNames = roleNames + userRole.getRole().getRoleDesc() + " ";
+			roleNames = roleNames + Optional.ofNullable(userRole.getRole()).map(SysRole::getRoleDesc).orElse("") + " ";
 		}
 		return roleNames;
 	}
