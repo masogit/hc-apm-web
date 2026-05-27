@@ -174,12 +174,12 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         if (null != filterOrg) {
             if (selectedNode.isLeaf()) {
 //                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filterOrg.getUid(), "1*"));
-                wrapper.and().eq("clinical_dept_uid",filterOrg.getUid());
+                wrapper.andNew().eq("clinical_dept_uid",filterOrg.getUid());
             } else {
                 List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
                 List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 //                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
-                wrapper.and().in("clinical_dept_uid",clinicalUids);
+                wrapper.andNew().in("clinical_dept_uid",clinicalUids);
             }
 
         } else {
@@ -188,24 +188,82 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
             }
         }
 
-        // 删除计量条件
-        this.removeFilterOnField("lastMeteringDate");
-        this.removeFilterOnField("nextMeteringDate");
+
         switch (queryIndex) {
             case 0:
+                // 删除计量条件
+                this.removeFilterOnField("lastMeteringDate");
+                this.removeFilterOnField("nextMeteringDate");
 //                this.updateSearchFilter(new SearchFilter("lastMeteringDate", SearchFilter.Operator.IsNull, null, "1*"));
-                wrapper.and().notExists("SELECT 1 FROM measuring_certificate_detail WHERE measuring_certificate_detail.asset_uid = ai.uid");
+                wrapper.andNew().notExists("SELECT 1 FROM measuring_certificate_detail WHERE measuring_certificate_detail.asset_uid = ai.uid");
                 break;
             case 1:
 //                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.LT, new Date(), "1*"));
-                wrapper.and().lt("next_metering_date", new Date());
+                wrapper.andNew().lt("next_metering_date", new Date());
                 break;
             case 2:
 //                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.GTE, new Date(), "1*"));
-                wrapper.and().ge("next_metering_date", new Date());
+                wrapper.andNew().ge("next_metering_date", new Date());
                 break;
             default:
                 break;
+        }
+        if(this.hasFilterOnField("name")){
+            Optional<SearchFilter> siteUID = getFilterOnField("name");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().like("name",(String) searchFilter.value);
+        }
+        if(this.hasFilterOnField("serialNum")){
+            Optional<SearchFilter> siteUID = getFilterOnField("serialNum");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().like("serial_num",(String) searchFilter.value);
+        }
+        if(this.hasFilterOnField("financingNum")){
+            Optional<SearchFilter> siteUID = getFilterOnField("financingNum");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().like("financing_num",(String) searchFilter.value);
+        }
+        if(this.hasFilterOnField("functionType")){
+            Optional<SearchFilter> siteUID = getFilterOnField("functionType");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().like("function_type",(String) searchFilter.value);
+        }
+        if(this.hasFilterOnField("assetGroup")){
+            Optional<SearchFilter> siteUID = getFilterOnField("assetGroup");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().eq("asset_group",Integer.valueOf((String) searchFilter.value));
+        }
+        if(this.hasFilterOnField("measureGrade")){
+            Optional<SearchFilter> siteUID = getFilterOnField("measureGrade");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().eq("measure_grade",Integer.valueOf((String) searchFilter.value));
+        }
+        if(this.hasFilterOnField("measuringItemCategory")){
+            Optional<SearchFilter> siteUID = getFilterOnField("measuringItemCategory");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().eq("measuring_item_category",Integer.valueOf((String) searchFilter.value));
+        }
+        if(this.hasFilterOnField("nextMeteringDate")){
+            for (SearchFilter searchFilter : searchFilters) {
+                if(!searchFilter.fieldName.equals("nextMeteringDate")) continue;
+                if(searchFilter.operator == SearchFilter.Operator.GTE){
+                    wrapper.and().ge("next_metering_date",searchFilter.value);
+                }
+                if(searchFilter.operator == SearchFilter.Operator.LTE){
+                    wrapper.and().le("next_metering_date", searchFilter.value);
+                }
+            }
+        }
+        if(this.hasFilterOnField("lastMeteringDate")){
+            for (SearchFilter searchFilter : searchFilters) {
+                if(!searchFilter.fieldName.equals("lastMeteringDate")) continue;
+                if(searchFilter.operator == SearchFilter.Operator.GTE){
+                    wrapper.and().ge("last_metering_date", searchFilter.value);
+                }
+                if(searchFilter.operator == SearchFilter.Operator.LTE){
+                    wrapper.and().le("last_metering_date", searchFilter.value);
+                }
+            }
         }
         return wrapper;
     }
