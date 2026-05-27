@@ -29,8 +29,8 @@
                     </h:panelGrid>
                 <h:panelGrid id="buttonSet" columns="3" cellpadding="5">
                     <p:commandButton value="从未计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3" actionListener="#{unmeasuredAssetListController.changeIndex(0)}" disabled="#{unmeasuredAssetListController.queryIndex==0}"/>
-                    <p:commandButton value="逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3" actionListener="#{unmeasuredAssetListController.changeIndex(1)}" disabled="#{unmeasuredAssetListController.queryIndex==1}"/>
-                    <p:commandButton value="未逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3" actionListener="#{unmeasuredAssetListController.changeIndex(2)}" disabled="#{unmeasuredAssetListController.queryIndex==2}"/>
+                    <p:commandButton value="逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(1)}" disabled="#{unmeasuredAssetListController.queryIndex==1}"/>
+                    <p:commandButton value="未逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(2)}" disabled="#{unmeasuredAssetListController.queryIndex==2}"/>
                 </h:panelGrid>
 
                 <p:dataTable id="datalist_unmeasuredAsset" value="#{unmeasuredAssetListController.lazyModel}" var="item" widgetVar="varDataList_unmeasuredAsset"
@@ -131,25 +131,25 @@
                 </p:scrollPanel>
             </p:overlayPanel>
 
-            <p:overlayPanel widgetVar="panelFilterNextMeteringDate" for=":measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:filterNextMeteringDate" dismissable="false">
+            <p:overlayPanel  id="idPanelFilterNextMeteringDate" widgetVar="panelFilterNextMeteringDate" for=":measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:filterNextMeteringDate" dismissable="false">
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>
                     <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_NextMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                     <p:outputLabel value="#{msg.To}"/>
                     <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_NextMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                 </h:panelGrid>
-                <p:commandButton onclick="setDateFilter('varDataList_measuringAsset','varFilterNextMeteringDate','varStartTimeFrom_NextMeteringDate','varStartTimeTo_NextMeteringDate'); PF('panelFilterNextMeteringDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="setDateFilter('varDataList_unmeasuredAsset','varFilterNextMeteringDate','varStartTimeFrom_NextMeteringDate','varStartTimeTo_NextMeteringDate'); PF('panelFilterNextMeteringDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                 <p:commandButton onclick="PF('panelFilterNextMeteringDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
             </p:overlayPanel>
 
-            <p:overlayPanel widgetVar="panelFilterLastMeteringDate" for=":measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:filterLastMeteringDate" dismissable="false">
+            <p:overlayPanel id="idPanelFilterLastMeteringDate" widgetVar="panelFilterLastMeteringDate" for=":measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:filterLastMeteringDate" dismissable="false">
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>
                     <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_LastMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                     <p:outputLabel value="#{msg.To}"/>
                     <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_LastMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
                 </h:panelGrid>
-                <p:commandButton onclick="setDateFilter('varDataList_measuringAsset','varFilterLastMeteringDate','varStartTimeFrom_LastMeteringDate','varStartTimeTo_LastMeteringDate'); PF('panelFilterLastMeteringDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="setDateFilter('varDataList_unmeasuredAsset','varFilterLastMeteringDate','varStartTimeFrom_LastMeteringDate','varStartTimeTo_LastMeteringDate'); PF('panelFilterLastMeteringDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                 <p:commandButton onclick="PF('panelFilterLastMeteringDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
             </p:overlayPanel>
         </div>
