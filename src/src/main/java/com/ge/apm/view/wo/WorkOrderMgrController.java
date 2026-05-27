@@ -4636,8 +4636,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
     public boolean repairRequestUrl(){
-        ConfigItemValue repairRequestUrlConfig = configItemValueRepository.findFirstByKeyAndSiteUid("RepairRequestUrl", loginUser.getSiteUID());
-        return repairRequestUrlConfig.getValue() != null;
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "RepairRequestUrl");
+        return value != null;
     }
     public void postProcessorExcel(Object obj){
         woService.postProcessorExcel();

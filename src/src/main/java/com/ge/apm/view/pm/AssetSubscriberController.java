@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import com.ge.apm.dao.mapper.UserOrgInfoMapper;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.apm.dao.*;
@@ -60,6 +61,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private OrgInfo selectedOrg;
 	private AssetTagService assetTagService;
 	private ConfigCacheService cacheService;
+	private UserOrgInfoMapper userOrgInfoMapper;
 
 	UserContextService userContextService;
 	MessageSubscriberRepository dao;
@@ -139,6 +141,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 //		targetAssets = new ArrayList<>();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
+		userOrgInfoMapper = WebUtil.getBean(UserOrgInfoMapper.class);
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 		tenantUserList = tenantUserList.stream().distinct().collect(toList());
 		tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
@@ -502,13 +505,20 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			List<MessageSubscriber> toCreate = new ArrayList<>();
 			List<MessageSubscriber> toUpdate = new ArrayList<>();
 
+			List<UserOrgInfo> userOrgList = userOrgInfoMapper.findByUserIds(userIds);
+			Map<Integer, List<UserOrgInfo>> userOrgMap = userOrgList.stream().collect(Collectors.groupingBy(UserOrgInfo::getUserId));
 			for (Integer userId : userIds) {
 				// 查出该 userId 在这些 assetId 上已存在的订阅
 				List<MessageSubscriber> existingList = dao.getMsgListByAssetIdAndUserId(assetIdList, userId);
 				Map<Integer, MessageSubscriber> existingByAssetId = existingList.stream()
 						.collect(Collectors.toMap(MessageSubscriber::getAssetId, x -> x, (a, b) -> a));
-
+				List<UserOrgInfo> userOrgInfos = userOrgMap.get(userId);
+				List<String> orgUidList = userOrgInfos.stream().map(UserOrgInfo::getOrgUid).collect(toList());
 				for (AssetInfo assetInfo : assets) {
+					List<String> assetOrgUidList = ListUtil.newArrayList(assetInfo.getClinicalDeptUID(), assetInfo.getSiteUID(), assetInfo.getHospitalUID(), assetInfo.getInstitutionUID(), assetInfo.getTenantUID());
+					if (Collections.disjoint(orgUidList, assetOrgUidList)) {
+						continue;
+					}
 					MessageSubscriber exist = existingByAssetId.get(assetInfo.getId());
 					if (exist != null) {
 						// ③ 同一人同一设备：关注项取合集（OR 合并）

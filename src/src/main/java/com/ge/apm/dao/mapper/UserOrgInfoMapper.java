@@ -63,4 +63,13 @@ public interface UserOrgInfoMapper {
 			") select * from cte_org")
 	List<OrgInfo> findAccessUidByUserUidsAndOrgInfoUid(@Param("userUid") String userUid, @Param("orgInfoUid") String orgInfoUid);
 
+	@Select({
+			"<script>" +
+					"select uo.*, ua.id userId from user_org uo, user_account ua where uo.user_uid = ua.uid and ua.id in " +
+					"<foreach item = 'item' index = 'index' collection = 'userIds' open='(' separator=',' close=')'>" +
+					"#{item}" +
+					"</foreach>"+
+					"</script>"})
+	List<UserOrgInfo> findByUserIds(@Param("userIds") List<Integer> userIds);
+
 }
