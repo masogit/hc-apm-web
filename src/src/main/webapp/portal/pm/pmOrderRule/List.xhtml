@@ -134,7 +134,7 @@
                         <p:commandButton title="#{msg.exportToXLS}"  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="PmOrderRule_export"/>
                         </p:commandButton>
-                        <p:commandButton  icon="fa fa-cogs" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchModify}"  update=":pmBatchModifyForm"   oncomplete="PF('pmBatchModifyDialog').show()">
+                        <p:commandButton  icon="fa fa-cogs" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchModify}"  update=":pmBatchModifyForm"   oncomplete="PF('pmBatchModifyDialog').show()"  rendered="#{pmOrderRuleController.pmRuleShowScoreFlag eq 'true'}">
                         </p:commandButton>
                         <ui:fragment >
                             <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"
