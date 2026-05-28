@@ -649,7 +649,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setPmRuleName(rule.getName());
 			model.setPeriod(rule.getPeriod());
 			model.setPeriodUnit(rule.getPeriodUnit());
-			models.add(model);
+            model.setRuleScore(rule.getRuleScore());
+            models.add(model);
 		}else {
 			for (AssetInfo ai : targetAssets) {
 				if(ai.getClinicalDeptId() == null) {
