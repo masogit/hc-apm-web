@@ -28,6 +28,7 @@
                                    var="roleItem"
                                    itemLabel="#{roleItem.roleDesc}"
                                    itemValue="#{roleItem.index}"/>
+                    <p:ajax event="change" listener="#{assetSubscriberController.onSubscribeUsersChange}"/>
                 </p:selectCheckboxMenu>
                 <!-- 定义远程命令：用于在面板关闭时刷新 userList -->
                 <p:remoteCommand
