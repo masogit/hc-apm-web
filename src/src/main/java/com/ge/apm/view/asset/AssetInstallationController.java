@@ -1434,7 +1434,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         String financingNum = equipmentNameplate.getPattern();
         if(StringUtils.isNotEmpty(financingNum) && useValue.get("pattern")){
             arrivalListItem.getArrivalList().setFunctionType(financingNum);
-            arrivalListItem.setFunctionType(deviceName);
+            arrivalListItem.setFunctionType(financingNum);
         }
 
         String serialNum = equipmentNameplate.getSerial_num();
