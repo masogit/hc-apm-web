@@ -437,10 +437,9 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 //                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
 //                return;
 //            }
-
             int maxRowNum = HisEquipmentDataSourceImportService.EXCEL_CONTRACT_HEADER_ROW + 30000;
             if(doc.exceedMaxRowNum(HisEquipmentDataSourceImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+                WebUtil.addErrorMessage(WebUtil.getMessage("导入Excel中数据行数最多30000条，请分批导入"));
                 return;
             }
             importMapList = hisEquipmentDataSourceImportService.getMapFromTemplate(doc);
