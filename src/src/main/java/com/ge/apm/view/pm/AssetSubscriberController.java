@@ -794,6 +794,12 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 	}
 
+	public void onSubscribeRoleChange() {
+		if (ObjectUtil.isNotEmpty(subscribeRoleIndexList)) {
+			selectRoleName = roleListVO.stream().filter(role -> subscribeRoleIndexList.contains(role.getIndex())).map(SysRoleVO::getRoleDesc).collect(Collectors.joining(","));
+		}
+	}
+
 	private boolean b(Boolean v) {
 		return Boolean.TRUE.equals(v);
 	}

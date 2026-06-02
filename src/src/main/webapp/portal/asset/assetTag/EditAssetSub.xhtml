@@ -23,13 +23,13 @@
                         filterMatchMode="contains"
                         panelStyle="width:280px" style="width:80%;height: 40px"
                         scrollHeight="260"
-                        onHide="refreshRoleListRC()" updateLabel="true"
+                        onHide="refreshRoleListRC()"
                 >
                     <f:selectItems value="#{assetSubscriberController.roleListVO}"
                                    var="roleItem"
                                    itemLabel="#{roleItem.roleDesc}"
                                    itemValue="#{roleItem.index}"/>
-                    <p:ajax event="change" listener="#{assetSubscriberController.onSubscribeUsersChange}"/>
+                    <p:ajax event="change" listener="#{assetSubscriberController.onSubscribeRoleChange}"/>
                 </p:selectCheckboxMenu>
                 <!-- 定义远程命令：用于在面板关闭时刷新 userList -->
                 <p:remoteCommand
