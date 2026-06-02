@@ -59,7 +59,7 @@
                                         </p:panelGrid>
                                     </div>
                                     <div style="float: left;margin: 30px -80px 0px -450px">
-                                        <p:commandButton validateClient="true" value="检索"
+                                        <p:commandButton  widgetVar="exportBtnWidget" validateClient="true" value="检索"
                                                          update="IouListForm:datalist"/>
                                     </div>
 
@@ -78,7 +78,7 @@
                                                  expandableRowGroups="true"
                                                  rowsPerPageTemplate="20,50,100,500">
 
-                                        <p:ajax event="filter" listener="#{hisEquipmentDataSourceController.onFilter}"/>
+                                        <p:ajax event="filter" listener="#{hisEquipmentDataSourceController.onFilter}"  oncomplete="PF('exportBtnWidget').jq.click()"/>
 <!--                                        <p:column headerText="编号" sortBy="#{item.id}" filterBy="#{item.id}"-->
 <!--                                                  filterMatchMode="LIKE">-->
 <!--                                            <h:outputText value="#{item.id}"/>-->
