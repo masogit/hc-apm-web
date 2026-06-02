@@ -120,4 +120,6 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
     List<Map<String, String>> findNameByLoginNames(@Param("loginNames") Set<String> loginNames);
 
     List<UserAccountHistory> selectHistoryList(Pagination pagination, @Param("ew") Wrapper<UserAccountHistory> wrapper);
+
+    List<UserAccount> selectUserAndRoleList(String tenantUid);
 }
