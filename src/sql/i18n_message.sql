@@ -838,8 +838,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetFunctionType','6855','6855口腔科设备及器具','6855 Stomatological Equipment and Instruments',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetFunctionType','6856','6856病房护理设备及器具','6856 Ward Care Equipment and Instruments',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','innerPm','内部保养','inner pm orders',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'outerPm', '外部保养', 'outer pm orders', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'outerRemotePm', '外部远程保养', 'outer remote pm orders', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'outerPm', 'GE外部保养', 'GE outer pm orders', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'outerRemotePm', 'GE外部远程保养', 'GE outer remote pm orders', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetFunctionType','6857','6857消毒和灭菌设备及器具','6857 Disinfection and Sterilization Equipment and Instruments',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetFunctionType','6858','6858医用冷疗、低温、冷藏设备及器具','6858 Medical Cold Therapy, Low Temperature and Refrigeration Equipment and Instruments',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetFunctionType','6863','6863口腔科材料','6863 Dental Materials',NULL,-1);
