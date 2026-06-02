@@ -5,6 +5,7 @@ package com.ge.apm.domain;
  */
 public class SysRoleVO {
     private Integer id;
+    private Integer index;
     private String name;
     private String roleDesc;
     private Boolean isDisable = false;
@@ -33,6 +34,14 @@ public class SysRoleVO {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
     public String getName() {

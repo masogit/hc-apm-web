@@ -11,6 +11,32 @@
     <p:dialog class="acl1" id="AssetSubscribEditDlg" height="550" width="1300" widgetVar="AssetSubscribEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSubscriberController.CRUDActionName} #{msg.EquipmentFocus}">
         <h:form id="AssetSubscribEditForm">
             <h:panelGroup>
+                <label class="label">#{msg.roleId}</label>
+                <p:selectCheckboxMenu
+                        id = "roleList"
+                        rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}"
+                        value="#{assetSubscriberController.subscribeRoleIndexList}"
+                        label="#{assetSubscriberController.selectRoleName}"
+                        filter="true"
+                        converter="javax.faces.Integer"
+                        filterMatchMode="contains"
+                        panelStyle="width:280px" style="width:15%;height: 40px"
+                        scrollHeight="260"
+                        onHide="refreshUserListRC()" updateLabel="true"
+                >
+                    <f:selectItems value="#{assetSubscriberController.roleListVO}"
+                                   var="roleItem"
+                                   itemLabel="#{roleItem.roleDesc}"
+                                   itemValue="#{roleItem.index}"/>
+                </p:selectCheckboxMenu>
+                <!-- 定义远程命令：用于在面板关闭时刷新 userList -->
+                <p:remoteCommand
+                        name="refreshUserListRC"
+                        update="roleList userList"
+                        process="@this"
+                        global="false" />
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.subscriber}</label>
                 <p:selectCheckboxMenu
                         id = "userList"
