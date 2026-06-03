@@ -75,7 +75,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
     @Override
     protected Page<SiteToSiteAllocation> loadData(PageRequest pageRequest) {
         //        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
-//        setUserSearchFilters();
+        setUserSearchFilters();
         if(oneSearchStr != null){
             this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("assetDeptNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
