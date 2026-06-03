@@ -33,6 +33,7 @@
         <result property="ackSignature" column="ack_signature"/>
         <result property="parentWoId" column="parent_wo_id"/>
         <result property="mainSub" column="main_sub"/>
+        <result property="issueType" column="issue_type"/>
 
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>

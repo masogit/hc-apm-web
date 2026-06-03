@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.PmOrderMapper">
+    <sql id="queryCondition">
+        <if test="ruleLevel != null">
+            and t.rule_level = CAST(#{ruleLevel, jdbcType=INTEGER} AS INTEGER)
+        </if>
+        <if test="currentStepId != null">
+            and t.current_step_id = #{currentStepId}
+        </if>
+        <if test="orderId != null">
+            and t.id = #{orderId}
+        </if>
+        <if test="isFinished != null">
+            and t.is_finished = #{isFinished}
+        </if>
+        <if test="currentStepName != null and currentStepName.length > 0">
+            and t.current_step_name IN
+            <foreach item="item" index="index" collection="currentStepName" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="pmType != null">
+            and t.pm_type = #{pmType}
+        </if>
+        <if test="pmNum != null">
+            and t.pm_num like concat('%', #{pmNum}, '%')
+        </if>
+        <if test="status != null">
+            and t.status = #{status}
+        </if>
+        <if test="planTimeGTE != null">
+            and t.plan_time &gt;= #{planTimeGTE}
+        </if>
+        <if test="planTimeLTE != null">
+            and t.plan_time &lt;= #{planTimeLTE}
+        </if>
+        <if test="endTimeGTE != null">
+            and t.end_time &gt;= #{endTimeGTE}
+        </if>
+        <if test="endTimeLTE != null">
+            and t.end_time &lt;= #{endTimeLTE}
+        </if>
+        <if test="queryAssetUid != null">
+            and a.uid = #{queryAssetUid}
+        </if>
+        <if test="assetInfoSiteUID != null">
+            and a.site_uid = #{assetInfoSiteUID}
+        </if>
+        <if test="pmIdList != null and pmIdList.length > 0">
+            and t.id IN
+            <foreach item="item" index="index" collection="pmIdList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assetInfoClinicalDeptUID != null and assetInfoClinicalDeptUID.length > 0">
+            and a.clinical_dept_uid IN
+            <foreach item="item" index="index" collection="assetInfoClinicalDeptUID" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="userUid != null">
+            AND uo.user_uid = #{userUid}
+        </if>
+        <if test="tenantUid != null">
+            AND a.tenant_uid = #{tenantUid}
+        </if>
+        <if test="assetName != null">
+            AND a.name like CONCAT('%', #{assetName}, '%')
+        </if>
+        <if test="assetSerialNum != null">
+            AND a.serial_num like CONCAT('%', #{assetSerialNum}, '%')
+        </if>
+        <if test="departNum != null">
+            AND a.depart_num like CONCAT('%', #{departNum}, '%')
+        </if>
+        <if test="assetInfoAssetType != null and assetInfoAssetType.length > 0">
+            and a.asset_type IN
+            <foreach item="item" index="index" collection="assetInfoAssetType" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="functionType != null">
+            AND a.function_type  like CONCAT('%', #{functionType}, '%')
+        </if>
+        <if test="mainSub != null">
+            AND t.main_sub = #{mainSub}
+        </if>
+        <if test="ruleName != null">
+            AND t.rule_name like CONCAT('%', #{ruleName}, '%')
+        </if>
+        <if test="period != null">
+            AND t.period = #{period}
+        </if>
+        <if test="periodUnit != null">
+            AND t.period_unit = #{periodUnit}
+        </if>
+        <if test="creatorName != null">
+            AND t.creator_name like CONCAT('%', #{creatorName}, '%')
+        </if>
+        <if test="ownerName != null">
+            AND t.owner_name like CONCAT('%', #{ownerName}, '%')
+        </if>
+        <if test="currentStepName1 != null">
+            AND t.current_step_name like CONCAT('%', #{currentStepName1}, '%')
+        </if>
+        <if test="intExtType != null">
+            AND t.int_ext_type = #{intExtType}
+        </if>
+    </sql>
+
+    <sql id="queryColumn">
+        t.id,
+            t.ack_signature,
+        t.dispatch_mode,
+        t.current_step_id,
+        t.current_person_id,
+        t.current_person_name,
+        t.total_man_hour,
+        t.man_hours,
+        t.total_price,
+        t.rule_name,
+        t.period,
+        t.period_unit,
+        t.creator_name,
+        t.pm_num,
+        CASE
+        WHEN t.current_step_name = '进行中' THEN '已计划'
+        ELSE t.current_step_name
+        END AS current_step_name,
+        t.int_ext_type,
+        t.plan_time,
+        t.end_time,
+        t.pm_type,
+        t.rule_level,
+        t.owner_name,
+        t.parent_wo_id,
+        t.main_sub,
+        a.name AS asset_name,
+        a.serial_num as asset_serial_num,
+        a.depart_num as asset_depart_num,
+        a.function_type as asset_function_type,
+        a.site_uid as asset_site_uid,
+        a.clinical_dept_name as asset_clinical_dept_name,
+        a.clinical_dept_uid as asset_clinical_dept_uid,
+        a.clinical_dept_id as asset_clinical_dept_id,
+        a.location_name as asset_location_name,
+        a.mvs_equip as asset_mvs_equip,
+        a.id as asset_id,
+        a.status as asset_status,
+        a.uid AS asset_uid,
+        a.asset_group AS asset_group,
+        oi.name as site_name
+    </sql>
+
+    <select id="queryPmOrderList" resultMap="com.ge.apm.dao.mapper.MvsPmOrderMapper.v2_PmOrderMap">
+        with insite_pm_order as (
+            select
+            'Insite'::text as issue_type,
+            <include refid="queryColumn"></include>
+            from v2_pm_order t
+            LEFT JOIN asset_info a ON t.asset_id = a.id
+            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
+            LEFT join org_info oi on a.site_uid=oi.uid
+        where  a.uid is not null AND a.is_valid AND NOT a.is_deleted
+            <include refid="queryCondition"></include>
+        ),
+        mvs_pm_order as (
+            select
+            'MVS'::text as issue_type,
+            <include refid="queryColumn"></include>
+            from  v2_pm_order t
+            left join mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
+            left join asset_info a ON m1.ib_uid = a.uid
+            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
+            LEFT join org_info oi on a.site_uid=oi.uid
+            WHERE   a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
+            <include refid="queryCondition"></include>
+        ),
+        unified_work_order as (
+            select * from insite_pm_order
+            UNION ALL
+            select * from mvs_pm_order
+        )
+        select *
+        from unified_work_order
+        ORDER BY plan_time DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{pageSize} OFFSET #{offset}
+        </if>
+
+
+    </select>
+
+
+    <select id="queryPmOrderCount" resultType="long">
+        with insite_pm_order as (
+            select
+            <include refid="queryColumn"></include>
+            from v2_pm_order t
+            LEFT JOIN asset_info a ON t.asset_id = a.id
+            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
+        LEFT join org_info oi on a.site_uid=oi.uid
+            where  a.uid is not null AND a.is_valid AND NOT a.is_deleted
+            <include refid="queryCondition"></include>
+        ),
+        mvs_pm_order as (
+            select
+            <include refid="queryColumn"></include>
+            from  v2_pm_order t
+            left join mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
+            left join asset_info a ON m1.ib_uid = a.uid
+            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid)
+        LEFT join org_info oi on a.site_uid=oi.uid
+            WHERE   a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
+            <include refid="queryCondition"></include>
+        )
+        select count(*)
+        from (
+            select id from insite_pm_order
+            UNION ALL
+            select id from mvs_pm_order
+        ) t
+    </select>
+
+</mapper>

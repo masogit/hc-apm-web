@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.V2_WorkOrderMapper">
+    <sql id="queryCondition">
+        <if test="srNum != null">
+            and r.sr_Num like concat('%', #{srNum}, '%')
+        </if>
+        <if test="currentStepId != null and currentStepId.length > 0">
+            and w.current_step_id IN
+            <foreach item="item" index="index" collection="currentStepId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="casePriority != null">
+            and r.case_priority = CAST(#{casePriority, jdbcType=INTEGER} AS INTEGER)
+        </if>
+        <if test="status != null">
+            and w.status = #{status}
+        </if>
+        <if test="mainSub != null">
+            and w.main_sub  = #{mainSub}
+        </if>
+        <if test="queryAssetUid != null">
+            and a.uid = #{queryAssetUid}
+        </if>
+        <if test="assetInfoSiteUID != null">
+            and a.site_uid = #{assetInfoSiteUID}
+        </if>
+        <if test="assetInfoClinicalDeptUID != null and assetInfoClinicalDeptUID.length > 0">
+            and a.clinical_dept_uid IN
+            <foreach item="item" index="index" collection="assetInfoClinicalDeptUID" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="userUid != null">
+            AND uo.user_uid = #{userUid}
+        </if>
+        <if test="tenantUid != null">
+            AND a.tenant_uid = #{tenantUid}
+        </if>
+        <if test="assetName != null">
+            AND a.name like CONCAT('%', #{assetName}, '%')
+        </if>
+        <if test="locationName != null">
+            AND a.location_name like CONCAT('%', #{locationName}, '%')
+        </if>
+         <if test="clinicalDeptName != null">
+            AND a.clinical_dept_name = #{clinicalDeptName}
+        </if>
+        <if test="assetSerialNum != null">
+            AND a.serial_num like CONCAT('%', #{assetSerialNum}, '%')
+        </if>
+        <if test="departNum != null">
+            AND a.depart_num like CONCAT('%', #{departNum}, '%')
+        </if>
+        <if test="assetInfoAssetType != null and assetInfoAssetType.length > 0">
+            and a.asset_type IN
+            <foreach item="item" index="index" collection="assetInfoAssetType" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="functionType != null">
+            AND a.function_type  like CONCAT('%', #{functionType}, '%')
+        </if>
+        <if test="intExtType != null">
+            and w.int_ext_type = #{intExtType}::numeric
+        </if>
+        <if test="requestTimeGTE != null">
+            and r.request_time >= #{requestTimeGTE}
+        </if>
+        <if test="requestTimeLTE != null">
+            and r.request_time <![CDATA[<]]>= #{requestTimeLTE}
+        </if>
+        <if test="siteUidList != null">
+            and (w.site_uid IN
+            <foreach item="item" index="index" collection="siteUidList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            or w.hospital_uid IN
+            <foreach item="item" index="index" collection="siteUidList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            or w.institution_uid IN
+            <foreach item="item" index="index" collection="siteUidList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </sql>
+    <sql id="queryColumn">
+        w.id,
+        w.dispatch_mode,
+        w.current_step_id,
+        w.sr_id,
+            w.site_uid,
+	w.hospital_id ,
+	w.institution_uid ,
+	w.tenant_uid ,
+        w.site_id,
+        w.hospital_id,
+        w.current_person_id,
+        w.current_person_name,
+        w.current_step_name,
+        w.total_man_hour,
+        w.total_price,
+        w.status,
+        w.int_ext_type,
+        w.parent_wo_id,
+        w.main_sub,
+        w.ack_signature,
+        a.name AS asset_name,
+        a.serial_num as asset_serial_num,
+        a.depart_num as asset_depart_num,
+        a.function_type as asset_function_type,
+        a.site_uid as asset_site_uid,
+        a.clinical_dept_name as asset_clinical_dept_name,
+        a.clinical_dept_uid as asset_clinical_dept_uid,
+        a.location_name as asset_location_name,
+        a.mvs_equip as asset_mvs_equip,
+        a.id as asset_id,
+        a.status as asset_status,
+        r.sr_num as sr_sr_num,
+        r.from_dept_uid as sr_from_dept_uid,
+        r.requestor_name as sr_requestor_name,
+        r.request_time as sr_request_time,
+        r.request_reason as sr_request_reason,
+        r.case_priority as sr_case_priority,
+        r.asset_location as sr_asset_location,
+        r.confirmed_down_time as sr_confirmed_down_time,
+        r.confirmed_up_time as sr_confirmed_up_time,
+        r.equipment_taker as sr_equipment_taker,
+        r.take_time as sr_take_time,
+        r.cancel_person as sr_cancel_person,
+        r.cancel_reason as sr_cancel_reason,
+        r.customer_name as sr_customer_name,
+        r.customer_tel as sr_customer_tel,
+        r.customer_position as sr_customer_position,
+        r.status as sr_status,
+        r.sr_repair_source as sr_repair_source,
+        a.uid AS asset_uid
+    </sql>
+
+    <select id="queryWorkOrderList" resultMap="com.ge.apm.dao.mapper.MvsWorkOrderMapper.v2_WorkOrderMap">
+        with insite_work_order as (
+            select
+                'Insite'::text as issue_type,
+                <include refid="queryColumn"></include>
+            from v2_work_order w
+                     LEFT JOIN asset_info a ON w.asset_id = a.id
+                     LEFT JOIN v2_service_request r ON w.sr_id = r.id
+                     left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
+            where  a.uid is not null AND a.is_valid AND NOT a.is_deleted
+            <include refid="queryCondition"></include>
+        ),
+        mvs_work_order as (
+            select
+            'MVS'::text as issue_type,
+            <include refid="queryColumn"></include>
+            from  v2_work_order w
+            left join v2_service_request r on w.sr_id = r.ID
+            left join mvs_ib_mapping m1 ON w.asset_uid = m1.mvs_ib_uid or w.asset_uid=m1.e_home_ib_uid
+            left join asset_info a ON m1.ib_uid = a.uid
+            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
+            WHERE   a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
+            <include refid="queryCondition"></include>
+        ),
+        unified_work_order as (
+            select * from insite_work_order
+            UNION ALL
+            select * from mvs_work_order
+        )
+        select *
+        from unified_work_order
+        ORDER BY sr_request_time DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{pageSize} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="queryWorkOrderCount" resultType="long">
+        with insite_work_order as (
+            select w.id
+            from v2_work_order w
+            LEFT JOIN asset_info a ON w.asset_id = a.id
+            LEFT JOIN v2_service_request r ON w.sr_id = r.id
+            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
+            where a.uid is not null AND a.is_valid AND NOT a.is_deleted 
+            <include refid="queryCondition"></include>
+        ),
+        mvs_work_order as (
+            select w.id
+            FROM v2_work_order w
+            left join v2_service_request r on w.sr_id = r.ID
+            left join mvs_ib_mapping m1 ON w.asset_uid = m1.mvs_ib_uid or w.asset_uid=m1.e_home_ib_uid
+            left join asset_info a ON m1.ib_uid = a.uid
+            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
+            WHERE a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
+            <include refid="queryCondition"></include>
+        )
+        select count(*)
+        from (
+            select id from insite_work_order
+            UNION ALL
+            select id from mvs_work_order
+        ) t
+    </select>
+
+</mapper>
