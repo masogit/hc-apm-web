@@ -819,12 +819,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             throw e;
         }
     }
+    @Getter @Setter
+    private String viewId="";
 
     //tab切换
     public void onTabChange(TabChangeEvent event) {
         FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
         tabTitle = msg.getDetail();
         queryIndex = 0;
+        selected = null;
     }
 
     public void updateQueryIndex(int query){
@@ -1332,6 +1335,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         initExternalTempUser();
     }
 
+    public void onSelectOrderByUnified(SelectEvent event) throws IOException {
+        selected = (V2_WorkOrder) event.getObject();
+        onSelectOrder(null);//查询出的字段不全
+    }
+
     public void onSelectOrder(String selectedId) throws IOException {
         if (ObjectUtil.isNotEmpty(selectedId)) {
             List<V2_WorkOrder> orders = dao.findBySrId(selectedId);
@@ -1721,7 +1729,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 currentStatus = 1;
             }
         }
-
+        selectedWorkOrder.setRepairResult("1");
         //获取当前工单的所属流程配置
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
@@ -2014,11 +2022,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             RequestContext.getCurrentInstance().addCallbackParam("checkin_time", true);
             valid = false;
         }
-        if (confirmedUpDate ==
-                null) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
-            valid = false;
+        if (confirmedUpDate == null) {
+            if("1".equals(selectedWorkOrder.getRepairResult()) || "2".equals(selectedWorkOrder.getRepairResult()) || "3".equals(selectedWorkOrder.getRepairResult())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
+                valid = false;
+            }
         }else if(this.confirmedUpDate.getTime() < selectedWorkOrder.getAcceptStepStartTime().getTime()){
             // 恢复时间不能小于接单时间
             WebUtil.addErrorMessage(WebUtil.getMessage("RepairRecoveryTimeCheck"));
@@ -4642,5 +4651,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void postProcessorExcel(Object obj){
         woService.postProcessorExcel();
     }
+
+    public void clearSelectedWorkOrder() {
+        selected = null;
+    }
+
 }
 

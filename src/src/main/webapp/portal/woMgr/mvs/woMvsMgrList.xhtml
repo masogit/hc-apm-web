@@ -164,7 +164,9 @@
             </p:dataTable>
         </h:form>
         <!-- 确认对话框 -->
-        <ui:include src="woMvsMgrView.xhtml"/>
+        <c:if test="#{ v2PmOrderController.tabTitle eq 'MVS保养'}">
+            <ui:include src="woMvsMgrView.xhtml"/>
+        </c:if>
         <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
                          message="#{workOrderMgrMvsController.messageTip}"
                          header="确认下载"

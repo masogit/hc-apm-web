@@ -318,6 +318,17 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Fetch(FetchMode.SUBSELECT)
     private List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails;
 
+    @Transient
+    private String issueType;
+
+    public String getIssueType() {
+        return issueType;
+    }
+
+    public void setIssueType(String issueType) {
+        this.issueType = issueType;
+    }
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
         return totalPriceToBigDecimal;

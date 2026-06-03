@@ -238,7 +238,10 @@
                 </c:otherwise>
             </c:choose>
         </p:dialog>
-        <ui:include src="pmMvsOrderView.xhtml"/>
+
+        <c:if test="#{ workOrderMgrController.tabTitle eq 'MVS工单'}">
+            <ui:include src="pmMvsOrderView.xhtml"/>
+        </c:if>
     </div>
 </ui:composition>
 </html>

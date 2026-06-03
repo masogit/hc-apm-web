@@ -7,6 +7,10 @@
         <result property="dispatchMode" column="dispatch_mode"/>
         <result property="currentStepId" column="current_step_id"/>
         <result property="srId" column="sr_id"/>
+        <result property="siteUID" column="site_uid"/>
+        <result property="hospitalUID" column="hospital_id"/>
+        <result property="institutionUID" column="institution_uid"/>
+        <result property="tenantUID" column="tenant_uid"/>
         <result property="siteId" column="site_id"/>
         <result property="hospitalId" column="hospital_id"/>
         <result property="assetId" column="asset_id"/>
@@ -20,6 +24,7 @@
         <result property="parentWoId" column="parent_wo_id"/>
         <result property="mainSub" column="main_sub"/>
         <result property="ackSignature" column="ack_signature"/>
+        <result property="issueType" column="issue_type"/>
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>
             <result property="name" column="asset_name"/>

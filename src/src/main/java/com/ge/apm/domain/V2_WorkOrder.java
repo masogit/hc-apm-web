@@ -368,6 +368,16 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private Integer repairPersonId;
     @Transient
     private ExternalTempUser externalTempUser;
+    @Transient
+    private String issueType;
+
+    public String getIssueType() {
+        return issueType;
+    }
+
+    public void setIssueType(String issueType) {
+        this.issueType = issueType;
+    }
 
     public Integer getCoworkerEntryType() {
         return coworkerEntryType;

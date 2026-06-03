@@ -604,6 +604,16 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
+
+    public void onSelectOrderRedirectByUnified(SelectEvent event) throws IOException {
+        selected = (V2_WorkOrder) event.getObject();
+        onSelectOrderRedirect();
+    }
+
+    public void onSelectWorkOrderByUnified(SelectEvent event) {
+        selected = (V2_WorkOrder) event.getObject();
+        onSelectWorkOrder();
+    }
     public void onSelectWorkOrder() {
         attachListEhmeFile = new ArrayList<>();
         attachListEhmeImg = new ArrayList<>();

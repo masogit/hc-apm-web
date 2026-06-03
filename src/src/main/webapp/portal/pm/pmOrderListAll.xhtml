@@ -15,18 +15,22 @@
 
             <div class="ui-g-12 ">
                 <p:tabView class="ui-g-12" id="pmTab" dynamic="true" cache="false" activeIndex="#{pmOrderTabController.queryTab}" binding="#{pmOrderTabController.tabView}">
-                    <p:ajax event="tabChange" listener="#{v2PmOrderController.onTabChange}"/>
+                    <p:ajax event="tabChange" listener="#{v2PmOrderController.onTabChange}" update = "pmTab"/>
                     <p:tab class="ui-g-12" title="#{msg.innerPm}" id="pmOrderList" rendered="#{not (userContextService.isIBTenant())}">
                         <ui:include src="pmOrderList.xhtml"/>
                     </p:tab>
                     <p:tab class="ui-g-12" title="MVS保养" id="mvsOrderList" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
                         <ui:include src="mvs/pmMvsOrderList.xhtml"/>
                     </p:tab>
+
                     <p:tab class="ui-g-12" title="#{msg.outerPm}" id="pmOrderListOut" rendered="#{userContextService.enableDisplayExternalWorkOrder() and userContextService.accessContainsFunctionMenu('MAINTAIN_EXORDER_VIEW')}">
                         <ui:include src="pmOrderListOut.xhtml"/>
                     </p:tab>
                     <p:tab class="ui-g-12" title="#{msg.outerRemotePm}"  id="pmOrderListRemote" rendered="#{userContextService.enableDisplayRemoteWorkOrder() and userContextService.accessContainsFunctionMenu('MAINTAIN_REMOTE_ORDER_VIEW')}">
                         <ui:include src="pmOrderListRemote.xhtml"/>
+                    </p:tab>
+                    <p:tab class="ui-g-12" title="全部保养" id="unifiedOrderList" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                        <ui:include src="pmOrderUnifiedList.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>
