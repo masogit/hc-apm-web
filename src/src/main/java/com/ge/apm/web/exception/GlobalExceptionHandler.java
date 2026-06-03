@@ -52,6 +52,7 @@ public class GlobalExceptionHandler extends ExceptionHandlerWrapper {
                 if (throwable instanceof SystemException) {
                     detail = throwable.getMessage();
                 }
+                logger.error(detail, throwable);
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, detail);
                 fc.addMessage(null, msg);
             } catch (Exception e) {
