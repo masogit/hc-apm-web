@@ -20,15 +20,7 @@
 
 
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
-                        <label class="label">#{msg.recoveryTime}*</label>
-                        <p:calendar timeZone="GMT+8" id="confirmedUpDate" pattern="yyyy/MM/dd HH:mm:ss" mask="true"
-                                    value="#{workOrderMgrController.confirmedUpDate}" showOn="button"
-                                    showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"
-                                    required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
-                            <p:ajax event="dateSelect"/>
-                        </p:calendar>
-                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.caseType}*</label>
                         <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
@@ -41,19 +33,18 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </c:otherwise>
                             </c:choose>
-                            <p:ajax event="change" process="@this"/>
+                            <p:ajax event="change" process="@this" />
                         </p:selectOneMenu>
                     </h:panelGroup>
 
                     <h:panelGroup>
                         <label class="label">#{msg.RepairResult}*</label>
                         <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="#{msg.RepairResult} #{msg.ValidationRequire}">
-                            <p:ajax listener="#{workOrderMgrController.repairResultSet()}" update="@(.x0)"/>
+                            <p:ajax listener="#{workOrderMgrController.repairResultSet()}" update="@(.x0) woTab:repairCompleteDialogForm:recoveryTimeGroup"/>
 
                             <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
 
                     <h:panelGroup>
                         <label class="label">#{msg.MaintenanceSubStatus}</label>
@@ -62,6 +53,22 @@
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('subStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="recoveryTimeGroup" >
+                        <h:panelGroup rendered="#{not empty workOrderMgrController.selectedWorkOrder.repairResult and (
+                            workOrderMgrController.selectedWorkOrder.repairResult == '1' or
+                            workOrderMgrController.selectedWorkOrder.repairResult == '5' or
+                            workOrderMgrController.selectedWorkOrder.repairResult == '6'
+                    )}">
+                            <label class="label">#{msg.recoveryTime}*</label>
+                            <p:calendar timeZone="GMT+8" id="confirmedUpDate" pattern="yyyy/MM/dd HH:mm:ss" mask="true"
+                                        value="#{workOrderMgrController.confirmedUpDate}" showOn="button"
+                                        showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"
+                                        required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </h:panelGroup>
+
                     </h:panelGroup>
                 </p:panelGrid>
 
