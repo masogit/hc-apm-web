@@ -17,10 +17,11 @@
                         id = "roleList"
                         rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}"
                         value="#{assetSubscriberController.subscribeRoleIndexList}"
-                        filter="true" multiple="true"
+                        label="#{assetSubscriberController.selectRoleName}"
+                        filter="true"
                         converter="javax.faces.Integer"
                         filterMatchMode="contains"
-                        panelStyle="width:280px" style="width:80%"
+                        panelStyle="width:280px" style="width:80%;height: 100%"
                         scrollHeight="260"
                         onHide="refreshRoleListRC()"
                 >
@@ -43,10 +44,11 @@
                         id = "userList"
                         rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}"
                         value="#{assetSubscriberController.subscribeUserIds}"
-                        filter="true" multiple="true"
+                        label="#{assetSubscriberController.selectUserName}"
+                        filter="true"
                         converter="javax.faces.Integer"
                         filterMatchMode="contains"
-                        panelStyle="width:400px" style="width:80%"
+                        panelStyle="width:400px" style="width:80%;height: 100%"
                         scrollHeight="260"
                         onHide="refreshUserListRC()"
                 >
@@ -64,6 +66,7 @@
                         global="false" />
             </h:panelGroup>
             </p:panelGrid>
+            <br/>
             <h:panelGroup id="display" rendered="#{assetSubscriberController.selected != null}">
                 <p:fieldset legend="#{msg.SelectedEquipment}" rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Edit)}" >
                     <h:panelGroup>
