@@ -399,6 +399,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		selectUserName = null;
 		selectRoleName = null;
 		subscribeUserIds = new ArrayList<>();
+		subscribeRoleIndexList = new ArrayList<>();
 	}
 	@Override
 	protected Page<MessageSubscriber> loadData(PageRequest pageRequest) {
