@@ -397,6 +397,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		isReceiveTimeoutMsg=true;
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
 		selectUserName = null;
+		selectRoleName = null;
 		subscribeUserIds = new ArrayList<>();
 	}
 	@Override
@@ -797,6 +798,8 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public void onSubscribeRoleChange() {
 		if (ObjectUtil.isNotEmpty(subscribeRoleIndexList)) {
 			selectRoleName = roleListVO.stream().filter(role -> subscribeRoleIndexList.contains(role.getIndex())).map(SysRoleVO::getRoleDesc).collect(Collectors.joining(","));
+		} else {
+			selectRoleName = null;
 		}
 	}
 
