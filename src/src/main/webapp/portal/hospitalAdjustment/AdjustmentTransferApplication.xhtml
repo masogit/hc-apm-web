@@ -98,30 +98,20 @@
                                 onstart="prepareAssetViewWindow();"
                                 oncomplete="openAssetViewWindow(xhr, status, args)"/>
 
-                        <p:ajax event="filter" listener="#{adjustmentTransferApplicationController.onFilter}"/>
+                        <p:ajax event="filter" listener="#{adjustmentTransferApplicationController.onFilter}" oncomplete="updateSelectAllCheckBox();"  />
 
-<!--                        <p:column headerText="#{msg.Actions}" exportable="false" width="60" id="operatorColumn"-->
-<!--                                  rendered="#{userContextService.hasAnyRole('HospitalAdjustmentAdmin')}">-->
-<!--                            <h:panelGroup>-->
-<!--                                <p:link target="_new" title="#{msg.Edit}"-->
-<!--                                        outcome="#{adjustmentTransferApplicationController.getEditPage(item.uid)}"-->
-<!--                                        disabled="#{item.status!=1}">-->
-<!--                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>-->
-<!--                                </p:link>-->
-<!--                                <p:commandLink id="deleteButton" title="#{msg.Delete}" update="datalist"-->
-<!--                                               disabled="#{item.status==3}"-->
-<!--                                               actionListener="#{adjustmentTransferApplicationController.deleteIdleApplication(item)}">-->
-<!--                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>-->
-<!--                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"-->
-<!--                                               icon="ui-icon-warning"/>-->
-<!--                                </p:commandLink>-->
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
-<!--                                <p:link target="_new1" title="复制"-->
-<!--                                        outcome="#{adjustmentTransferApplicationController.getCopyPage(item.uid)}">-->
-<!--                                    <p:graphicImage value="/images/icons/copyy.png" style="width: 30px; height: 30px;"/>-->
-<!--                                </p:link>-->
-<!--                            </h:panelGroup>-->
-<!--                        </p:column>-->
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{adjustmentTransferApplicationController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{adjustmentTransferApplicationController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetDetailListForm:datalist:exportButton" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
                         <p:column headerText="申请编号" sortBy="#{item.applicationNumber}"
                                   filterBy="#{item.applicationNumber}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.applicationNumber}"/>
@@ -273,6 +263,17 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                             </h:outputText>
                         </p:column>
+
+                        <f:facet name="{Toolbar}">
+
+
+                            <p:commandButton id="exportButton" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-arrow-1-s" title="导出报告" actionListener="#{adjustmentTransferApplicationController.export()}"  ajax="false"  disabled="#{not adjustmentTransferApplicationController.isChecked()}">
+
+                                <p:fileDownload value="#{adjustmentTransferApplicationController.streamedContent}"/>
+
+                            </p:commandButton>
+
+                        </f:facet>
                     </p:dataTable>
 <!--                    <p:overlayPanel widgetVar="panelFilterPurchaseDate"-->
 <!--                                    for="AssetDetailListForm:datalist:filterPurchaseDate" dismissable="false">-->
@@ -306,6 +307,20 @@
 
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#AssetDetailListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
             }
         </script>
     </ui:define>
