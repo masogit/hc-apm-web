@@ -143,9 +143,21 @@
                                         <label class="label">#{msg.arrivalListContractPrice}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
                                         <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.isReadOnly()}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.arrivalListAgent}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                    <h:panelGroup id="selectAgent">
+                                        <h:panelGroup rendered="#{assetArrivedListEditController.agentSelect}">
+                                            <label class="label">#{msg.arrivalListAgent}</label>
+                                            <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"
+                                                            scrollHeight="300" forceSelection="true" completeMethod="#{assetArrivedListEditController.autoCompleteAgent}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter">
+                                                <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onAgentChange}"/>
+                                                <p:ajax listener="#{assetArrivedListEditController.onAgentChange}"/>
+                                            </p:autoComplete>
+                                            <p:commandLink value="输入" process="@this" actionListener="#{assetArrivedListEditController.agentSwitch(false)}" update="selectAgent"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup id="inputAgent" rendered="#{!assetArrivedListEditController.agentSelect}">
+                                            <label class="label">#{msg.arrivalListAgent}</label>
+                                            <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                            <p:commandLink value="选择" process="@this" actionListener="#{assetArrivedListEditController.agentSwitch(true)}" update="selectAgent"/>
+                                        </h:panelGroup>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                         <label class="label">#{msg.vendor}</label>
@@ -163,7 +175,6 @@
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
-                                        <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">供应商责任人</label>
@@ -874,7 +885,7 @@
                                     <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedListEditController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                                     </p:commandLink>
-                                    <p:commandLink  actionListener="#{assetArrivedListEditController.saveEasyItem()}"  action="#{assetArrivedListEditController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
+                                    <p:commandLink  action="#{assetArrivedListEditController.saveAndGetInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
                                 </p:column>
 
                                 <f:facet name="{Toolbar}">
