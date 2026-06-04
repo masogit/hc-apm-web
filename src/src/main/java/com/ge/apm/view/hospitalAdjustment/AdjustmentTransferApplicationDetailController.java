@@ -491,11 +491,11 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         if(pendingDeliveryDate==null){
             return false;
         }
-        return isWithin7Days(pendingDeliveryDate);
+        return isBeyondConfiguredReturnTime(pendingDeliveryDate);
     }
 
 
-    public  boolean isWithin7Days(Date targetDate) {
+    public  boolean isBeyondConfiguredReturnTime(Date targetDate) {
         LocalDate targetLocalDate = targetDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
@@ -508,7 +508,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         int hospitalAdjustmentReturnTime = Integer.parseInt(configItemByKeyToString);
 
 
-        return daysDiff <= hospitalAdjustmentReturnTime;
+        return daysDiff >= hospitalAdjustmentReturnTime;
     }
 
     public void download()   {
