@@ -175,6 +175,9 @@ public class MeasuringCertificateDetail implements Serializable {
     @Transient
     private List<V2_BlobObject> measuringAttachList;
 
+    @Transient
+    private String uploadUserName;
+
     public String getId() {
         return id;
     }
@@ -487,6 +490,13 @@ public class MeasuringCertificateDetail implements Serializable {
         this.measuringAttachList = measuringAttachList;
     }
 
+    public String getUploadUserName() {
+        return uploadUserName;
+    }
+
+    public void setUploadUserName(String uploadUserName) {
+        this.uploadUserName = uploadUserName;
+    }
 
     public String getStatusName() {
         return statusName;
