@@ -137,6 +137,10 @@ public class ArrivalList implements Serializable {
     @Column(name = "agent")
     private String agent;
 
+    @Size(max = 64)
+    @Column(name = "agent_uid")
+    private String agentUid;
+
     //设备分类编码
     @Size(max = 64)
     @Column(name = "class_code")
@@ -396,6 +400,14 @@ public class ArrivalList implements Serializable {
 
     public void setAgent(String agent) {
         this.agent = agent;
+    }
+
+    public String getAgentUid() {
+        return agentUid;
+    }
+
+    public void setAgentUid(String agentUid) {
+        this.agentUid = agentUid;
     }
 
     public String getClassCode() {

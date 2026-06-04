@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.hospitalAdjustment.AdjustmentTransferService;
 import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.view.secondment.DepartmentSecondmentProcess;
@@ -82,6 +83,9 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     @Setter
     private List<String> attachments=new ArrayList<>();
     private StreamedContent exportFile;
+
+    private ConfigItemService configItemService;
+    private final String hospitalAdjustmentReturnTimeKey="hospitalAdjustmentReturnTime";
     @Override
     protected GenericRepositoryUUID<AdjustmentTransferApplication> getDAO() {
         return dao;
@@ -100,6 +104,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        configItemService = WebUtil.getBean(ConfigItemService.class);
 
         currentUserAccount = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -482,21 +487,28 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         if(selected.getStatus()!=5){
             return false;
         }
-        Date pendingDeliveryDate = selected.getPendingDeliveryDate();
+        Date pendingDeliveryDate = selected.getDeliveryDate();
         if(pendingDeliveryDate==null){
             return false;
         }
-        return isWithin7Days(pendingDeliveryDate);
+        return isBeyondConfiguredReturnTime(pendingDeliveryDate);
     }
 
 
-    public static boolean isWithin7Days(Date targetDate) {
+    public  boolean isBeyondConfiguredReturnTime(Date targetDate) {
         LocalDate targetLocalDate = targetDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
         LocalDate currentLocalDate = LocalDate.now();
         long daysDiff = Math.abs(ChronoUnit.DAYS.between(targetLocalDate, currentLocalDate));
-        return daysDiff <= 7;
+
+
+        String configItemByKeyToString = configItemService.getConfigItemByKeyToString(hospitalAdjustmentReturnTimeKey, currentUserAccount);
+
+        int hospitalAdjustmentReturnTime = Integer.parseInt(configItemByKeyToString);
+
+
+        return daysDiff >= hospitalAdjustmentReturnTime;
     }
 
     public void download()   {

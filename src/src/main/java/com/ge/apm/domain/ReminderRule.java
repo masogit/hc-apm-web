@@ -34,6 +34,7 @@ public class ReminderRule implements Serializable {
     public static final String WORK_ORDER_MSG = "{'first':'{orderNum}维修工单逾期提醒','keyword1':'您有维修工单超过{timeout}小时仍未完成，请尽快处理。'}";
     public static final String PM_ORDER_MSG = "{'first':'{orderNum}保养工单逾期提醒','keyword1':'您有保养工单超过{timeout}小时仍未完成，请尽快处理。'}";
     public static final String PM_ORDER_TO_DO_TASK_MSG = "{'first':'保养待办任务提醒','keyword1':'资产保养content单数'}";
+    public static final String ARRIVAL_INSTALL_EXPIRATION_MSG = "{'first':'安装入库逾期提醒','keyword1':'{assetName}设备已到货{dayNum}天未完成安装，请及时处理。'}";
 
     @Id
     @GeneratedValue(generator = "uuid")
