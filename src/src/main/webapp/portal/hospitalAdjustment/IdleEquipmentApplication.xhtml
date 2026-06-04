@@ -117,7 +117,19 @@
                                 onstart="prepareAssetViewWindow();"
                                 oncomplete="openAssetViewWindow(xhr, status, args)"/>
 
-                        <p:ajax event="filter" listener="#{idleEquipmentApplicationController.onFilter}"/>
+                        <p:ajax event="filter" listener="#{idleEquipmentApplicationController.onFilter}" oncomplete="updateSelectAllCheckBox();" />
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{idleEquipmentApplicationController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{idleEquipmentApplicationController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetDetailListForm:datalist:exportButton" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
 
                         <p:column headerText="#{msg.Actions}" exportable="false" width="80" id="operatorColumn"
                                   rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')}">
@@ -277,6 +289,11 @@
                                              action="#{urlEncryptController.encodeUrlParam('adjustmentApplication.xhtml?actionName=Create')}"
                                              rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_APPLICATION')}"/>
 
+                            <p:commandButton id="exportButton" class="btn btn-sm btn-gray batch-terminated" icon="ui-icon-arrow-1-s" title="导出报告" actionListener="#{idleEquipmentApplicationController.export()}"  ajax="false"  disabled="#{not idleEquipmentApplicationController.isChecked()}">
+
+                                <p:fileDownload value="#{idleEquipmentApplicationController.streamedContent}"/>
+
+                            </p:commandButton>
 
                         </f:facet>
                     </p:dataTable>
@@ -312,6 +329,20 @@
 
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#AssetDetailListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
             }
         </script>
     </ui:define>

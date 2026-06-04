@@ -1,11 +1,9 @@
 package com.ge.apm.view.hospitalAdjustment;
 
 import com.ge.apm.dao.IdleEquipmentApplicationRepository;
-import com.ge.apm.domain.IdleEquipmentApplication;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserRole;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.hospitalAdjustment.IdleEquipmentApplicationService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -27,6 +25,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +96,16 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
     @Setter
     private Map<String, Object> filterObject;
 
+
+
+    @Getter
+    @Setter
+    private Map<String, Boolean> selectedMap;
+    private List<IdleEquipmentApplication> currentPageIdleEquipmentApplications;
+
+    private IdleEquipmentApplicationService idleEquipmentApplicationService;
+
+    private StreamedContent streamedContent;
     @Override
     protected void init() {
         idleEquipmentApplicationRepository = WebUtil.getBean(IdleEquipmentApplicationRepository.class);
@@ -107,6 +116,7 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
 
         uaaService = WebUtil.getBean(UaaService.class);
         cacheService = WebUtil.getBean(ConfigCacheService.class);
+        idleEquipmentApplicationService = WebUtil.getBean(IdleEquipmentApplicationService.class);
         selectSite = cacheService.findOrgByUid(currentUserAccount.getSiteUID());
 
         orgList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid());
@@ -114,6 +124,7 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         loadClinicalDeptList();
         filterObject = new HashMap<>();
+        this.selectedMap = new HashMap();
     }
 
     @Override
@@ -185,6 +196,8 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
         }
 
         Page<IdleEquipmentApplication> bySearchFilter = idleEquipmentApplicationRepository.findBySearchFilter(searchFilters, pageRequest);
+
+        currentPageIdleEquipmentApplications = bySearchFilter.getContent();
         return bySearchFilter;
 
     }
@@ -443,5 +456,38 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
 
     public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
         this.selectedAccessOrgNodes = selectedAccessOrgNodes;
+    }
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPageIdleEquipmentApplications.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        for (IdleEquipmentApplication item : currentPageIdleEquipmentApplications) {
+            selectedMap.put(item.getUid(), !isSelectedAll);
+        }
+    }
+
+    public void export() {
+        streamedContent = null;
+        try {
+            List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+             streamedContent = idleEquipmentApplicationService.exportZip(assetUids);
+             WebUtil.addSuccessMessage("闲置设备申请表导出完成");
+
+        }catch (Exception e){
+            log.error("闲置设备申请表导出异常 e:", e);
+            WebUtil.addErrorMessage("闲置设备申请表导出失败");
+
+        }
+
+    }
+
+    public boolean isChecked() {
+        return selectedMap.containsValue(true);
+    }
+    public StreamedContent getStreamedContent() {
+        return streamedContent;
+    }
+
+    public void setStreamedContent(StreamedContent streamedContent) {
+        this.streamedContent = streamedContent;
     }
 }
