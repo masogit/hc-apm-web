@@ -35,6 +35,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     List<UserAccount> getByHospitalId(int hospitalId);
 
+    @Query(value = "SELECT * FROM user_account where (tenant_uid = ?1 or institution_uid = ?1 or hospital_uid = ?1 or site_uid = ?1) and (is_disable = false or is_disable is null) and (is_deleted = false or is_deleted is null) and name like concat('%', ?2, '%')  ",nativeQuery = true)
+    List<UserAccount> getBySiteUIDAndNameLike(String siteUid, String name);
+
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     @Query("select u from UserAccount u, UserRole r where u.hospitalId=?1 and u.id=r.userId and r.roleId=3")
     List<UserAccount> getUsersWithAssetStaffRole(int hospitalId);
@@ -108,7 +111,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     //获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
     @Query(value= "select * from user_account u join user_role r on u.id=r.user_id  left join sys_role sr on sr.id = r.role_Id  where u.id > 0 and  (sr.name !='Guest' or sr.name !='ClinicalStaff' or sr.name !='ActivationPerson') and tenant_uid=?1 and (u.is_disable =false or u.is_disable is null )   and (u.is_deleted =false or u.is_deleted is null )   ",nativeQuery=true)
     public List<UserAccount> getByTenantUID(String tenantUID);
-    
+
     public List<UserAccount> getByOrgInfoUID(String orgUID);
 
     @Query(value= "select * from user_account u join user_role r on u.id = r.user_id left join sys_role sr on sr.id = r.role_Id where u.org_uid = ?1 and sr.name = ?2 and (u.is_disable = false or u.is_disable is null) and (u.is_deleted = false or u.is_deleted is null )",nativeQuery=true)

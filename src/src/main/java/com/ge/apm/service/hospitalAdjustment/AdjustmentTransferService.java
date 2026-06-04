@@ -20,6 +20,7 @@ import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.deepoove.poi.data.style.Style;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 @Service
@@ -410,4 +414,37 @@ public class AdjustmentTransferService {
     }
 
 
+    public StreamedContent exportZip(List<String> selectedIds ) throws IOException {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        byte[] byteArray = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.HOSPITAL_ADJUSTMENT_APPLICATION, user);
+
+        List<AdjustmentTransferApplication> adjustmentTransferApplications =  dao.findByUids(selectedIds);
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+             ZipOutputStream zout = new ZipOutputStream(out)) {
+            adjustmentTransferApplications.forEach(item -> {
+
+                try {
+                    HashMap<String, Object> map = buildDatas(item);
+                    byte[] bytes = WordExportServiceUtil.generate(map, byteArray, null);
+                    if (bytes != null && !Arrays.equals(bytes, new byte[0])) {
+                        String name ="调剂设备申请报表-"+item.getApplicationNumber()+".docx";
+                        zout.putNextEntry(new ZipEntry(name));
+                        IOUtils.write(bytes, zout);
+                        zout.closeEntry();
+
+                    }
+                } catch (Exception e) {
+                    log.error("调剂设备申请表导出异常 申请编号：{}：e",item.getApplicationNumber(), e);
+                }
+
+
+            });
+            zout.finish();
+            return new ApmStreamedContent(new ByteArrayInputStream(out.toByteArray()), "application/zip", "调剂设备申请报表.zip");
+        } catch (Exception e) {
+            log.error("调剂设备申请表导出异常 e:", e);
+            return null;
+        }
+    }
 }

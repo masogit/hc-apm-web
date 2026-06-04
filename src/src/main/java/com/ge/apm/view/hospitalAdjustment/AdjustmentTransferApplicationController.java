@@ -5,6 +5,7 @@ import com.ge.apm.dao.IdleEquipmentApplicationRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.hospitalAdjustment.AdjustmentTransferService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -23,6 +24,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,6 +113,17 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
     @Getter
     @Setter
     private List<OrgInfo> borrowClinicalDeptList;
+
+
+
+    @Getter
+    @Setter
+    private Map<String, Boolean> selectedMap;
+    private List<AdjustmentTransferApplication> currentPageAdjustmentTransferApplications;
+
+    private AdjustmentTransferService adjustmentTransferService;
+
+    private StreamedContent streamedContent;
     @Override
     protected void init() {
         adjustmentTransferApplicationRepository = WebUtil.getBean(AdjustmentTransferApplicationRepository.class);
@@ -122,6 +135,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        adjustmentTransferService = WebUtil.getBean(AdjustmentTransferService.class);
 
         Set<String> functionList = UserContextService.getCurrentUserFunction();
         if (functionList.contains(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_STOCK.name()) ) {
@@ -142,7 +156,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
         }
 
         borrowHospitalList = orgList.stream().filter(ite->ite.getOrgType() == 2).collect(Collectors.toList());
-
+        this.selectedMap = new HashMap();
     }
 
     @Override
@@ -187,6 +201,8 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
         }
 
         Page<AdjustmentTransferApplication> bySearchFilter = adjustmentTransferApplicationRepository.findBySearchFilter(searchFilters, pageRequest);
+        currentPageAdjustmentTransferApplications = bySearchFilter.getContent();
+
         return bySearchFilter;
 
     }
@@ -482,5 +498,40 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
                 borrowClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList();
             }
         }
+    }
+
+
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPageAdjustmentTransferApplications.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        for (AdjustmentTransferApplication item : currentPageAdjustmentTransferApplications) {
+            selectedMap.put(item.getUid(), !isSelectedAll);
+        }
+    }
+
+    public void export() {
+        streamedContent = null;
+        try {
+            List<String> uids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+            streamedContent = adjustmentTransferService.exportZip(uids);
+            WebUtil.addSuccessMessage("调剂设备申请表导出完成");
+
+        }catch (Exception e){
+            log.error("调剂设备申请表导出异常 e:", e);
+            WebUtil.addErrorMessage("调剂设备申请表导出失败");
+
+        }
+
+    }
+
+    public boolean isChecked() {
+        return selectedMap.containsValue(true);
+    }
+    public StreamedContent getStreamedContent() {
+        return streamedContent;
+    }
+
+    public void setStreamedContent(StreamedContent streamedContent) {
+        this.streamedContent = streamedContent;
     }
 }

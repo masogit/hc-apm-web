@@ -451,6 +451,11 @@ public class UserContextService implements Serializable {
         return userAccount;
     }
 
+    public UserAccount getUserByUid (String uid) {
+        UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
+        return dao.getByUid(uid);
+    }
+
     public void setAssetTypeGroup() {
         if (apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
             userAccount.setEnableAssetTypeGroup(true);
