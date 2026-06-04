@@ -164,7 +164,7 @@
             </p:dataTable>
         </h:form>
         <!-- 确认对话框 -->
-        <c:if test="#{ v2PmOrderController.tabTitle eq 'MVS保养'}">
+        <c:if test="#{ workOrderMgrController.tabTitle eq 'MVS工单'}">
             <ui:include src="woMvsMgrView.xhtml"/>
         </c:if>
         <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
