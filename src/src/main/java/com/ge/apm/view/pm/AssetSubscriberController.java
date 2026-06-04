@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserOrgInfoMapper;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -57,6 +58,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private Map<Integer, Boolean> selectedMap;
 	private UserAccount currentUser;
 	private UserAccountRepository userAccountRepository;
+	private UserAccountMapper userAccountMapper;
 	private List<UserAccount> tenantUserList;
 	private List<SysRoleVO> roleListVO;
 	private Map<Integer, SysRoleVO> roleVoMap;
@@ -144,15 +146,17 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		currentUser = UserContextService.getCurrentUserAccount();
 		dao= WebUtil.getBean(MessageSubscriberRepository.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 //		targetAssets = new ArrayList<>();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		userOrgInfoMapper = WebUtil.getBean(UserOrgInfoMapper.class);
-		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
-		tenantUserList = tenantUserList.stream().distinct().collect(toList());
-		tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
-		tenantUserList.sort(new PinYinComparatorByName());
+//		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
+//		tenantUserList = tenantUserList.stream().distinct().collect(toList());
+//		tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
+//		tenantUserList.sort(new PinYinComparatorByName());
+		tenantUserList = userAccountMapper.selectUserAndRoleList(currentUser.getTenantUID());
 		uaaService = WebUtil.getBean(UaaService.class);
 		roleListVO = uaaService.getSysRoleVO(currentUser.getTenantUID());
 		Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(currentUser.getTenantUID());
@@ -393,7 +397,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		isReceiveTimeoutMsg=true;
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
 		selectUserName = null;
+		selectRoleName = null;
 		subscribeUserIds = new ArrayList<>();
+		subscribeRoleIndexList = new ArrayList<>();
 	}
 	@Override
 	protected Page<MessageSubscriber> loadData(PageRequest pageRequest) {
@@ -790,6 +796,14 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 	}
 
+	public void onSubscribeRoleChange() {
+		if (ObjectUtil.isNotEmpty(subscribeRoleIndexList)) {
+			selectRoleName = roleListVO.stream().filter(role -> subscribeRoleIndexList.contains(role.getIndex())).map(SysRoleVO::getRoleDesc).collect(Collectors.joining(","));
+		} else {
+			selectRoleName = null;
+		}
+	}
+
 	private boolean b(Boolean v) {
 		return Boolean.TRUE.equals(v);
 	}
@@ -903,7 +917,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 					}
 				}
 			}
-			return userAccountList;
+			return userAccountList.stream().distinct().collect(toList());
 		}
 		return tenantUserList;
 	}

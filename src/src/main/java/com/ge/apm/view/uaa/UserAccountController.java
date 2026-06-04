@@ -481,6 +481,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             nameValue = ((String) nameValue).toLowerCase();
             searchFilterList.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameValue, "1*2*3+"));
         }
+        Boolean isDisable = false;
+        for (SearchFilter searchFilter : searchFilterList) {
+            if ("isDisable".equals(searchFilter.fieldName)) {
+                isDisable = (Boolean) searchFilter.value;
+                break;
+            }
+        }
+        searchFilterList.removeIf(e -> e.fieldName.equals("isDisable"));
+        searchFilterList.add(new SearchFilter("isDisable", SearchFilter.Operator.EQ, isDisable, "1*3+"));
+        if (!isDisable) {
+            searchFilterList.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull, null, "1*3+"));
+        }
+        searchFilterList.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*4+"));
+        searchFilterList.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull, null, "1*4+"));
     }
     private void itAdminFilter(){
         if (selectedOrg == null) {
@@ -533,20 +547,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
         generateListSearchFilter();
-        Boolean isDisable = false;
-        for (SearchFilter searchFilter : searchFilterList) {
-            if ("isDisable".equals(searchFilter.fieldName)) {
-                isDisable = (Boolean) searchFilter.value;
-                break;
-            }
-        }
-        searchFilterList.removeIf(e -> e.fieldName.equals("isDisable"));
-        searchFilterList.add(new SearchFilter("isDisable", SearchFilter.Operator.EQ, isDisable, "1*3+"));
-        if (!isDisable) {
-            searchFilterList.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull, null, "1*3+"));
-        }
-        searchFilterList.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*4+"));
-        searchFilterList.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull, null, "1*4+"));
+
         if (ObjectUtil.isNotEmpty(assetTypeUserUidSet)) {
             searchFilterList.add(new SearchFilter("uid", SearchFilter.Operator.IN, assetTypeUserUidSet, "1*"));
         }
