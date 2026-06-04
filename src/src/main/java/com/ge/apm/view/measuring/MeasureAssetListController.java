@@ -142,7 +142,13 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private SystemTemplateService systemTemplateService;
 
+    private UserAccountRepository userAccountDao;
+
     private StreamedContent excelFile;
+
+    @Getter
+    private Boolean measuringDateWarningEnabled = false;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -165,6 +171,13 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         measureAssetMapper = WebUtil.getBean(MeasureAssetMapper.class);
         WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
         measurementRepairVisible = woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair();
+
+        // 获取计量结果日期预警配置项
+        ConfigItemValue configItemValue = configItemMapper.findByKey("measuringDateWarning", currentUser.getSiteUID());
+        if (configItemValue != null && "true".equalsIgnoreCase(configItemValue.getValue())) {
+            measuringDateWarningEnabled = true;
+        }
+
         String enCodeParameters = WebUtil.getRequestParameter("str");
         queryAssetUID = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
         this.selectedMap = MapUtil.newHashMap();
@@ -174,6 +187,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        userAccountDao = WebUtil.getBean(UserAccountRepository.class);
 
         org = orgDao.findById(currentUser.getOrgInfoId());
 
@@ -211,6 +225,21 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 i++;
             }
         }
+
+        // 如果启用了计量日期预警，则对数据进行校验
+        if (measuringDateWarningEnabled) {
+            for (AssetInfo asset : currentPageAssets) {
+                String warningMsg = asset.validateMeasuringDates();
+                if (warningMsg != null) {
+                    asset.setHasDateWarning(true);
+                    asset.setDateWarningMessage(warningMsg);
+                } else {
+                    asset.setHasDateWarning(false);
+                    asset.setDateWarningMessage("");
+                }
+            }
+        }
+
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
     }
 
@@ -763,7 +792,17 @@ public void treeSearchCondition(){
 
             Map<String, String> measuringStatusMap  = messages.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValueZh, (value1, value2) -> value1));
 
-            list.forEach(item->item.setStatusName(measuringStatusMap.get(item.getStatus().toString())));
+            // 设置检定结论名称和上传人姓名
+            list.forEach(item->{
+                item.setStatusName(measuringStatusMap.get(item.getStatus().toString()));
+                // 根据 created_by 查询上传人姓名
+                if (item.getCreatedBy() != null) {
+                    UserAccount uploadUser = userAccountDao.findByLoginName(item.getCreatedBy());
+                    if (uploadUser != null) {
+                        item.setUploadUserName(uploadUser.getName());
+                    }
+                }
+            });
 
             byte[] bytes = EasyExcelExportUtil.exportExcel(stream, list, new HashMap<>());
 

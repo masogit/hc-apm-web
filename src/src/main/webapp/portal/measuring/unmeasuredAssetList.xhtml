@@ -12,6 +12,10 @@
                 background-color: #fca752!important;
                 color: #000000!important;
             }
+            .measuringExpiredSoon30 {
+                background-color: #FF8C00!important;
+                color: #000000!important;
+            }
             .btn+.btn { margin-left: 0 }
             .ui-column-resizer:before {content: none!important;}
             th{font-size: 12px!important;}
@@ -22,14 +26,15 @@
 
             <h:form id="unmeasuredAssetListForm" rendered="#{unmeasuredAssetListController.customRoleAuth.authSearch}">
                     <h:panelGrid id="expiredSoon" columns="2" style="float: right" rendered="#{unmeasuredAssetListController.queryIndex eq 2}">
+                        <div >#{msg.Legend}：</div>
                         <h:panelGroup style="float: right">
-                            <span >#{msg.Legend}：</span>
-                            <span class="measuringExpiredSoon">计量即将到期</span>
+                            <div class="measuringExpiredSoon">90天内计量即将到期</div>
+                            <div class="measuringExpiredSoon30">30天内计量即将到期</div>
                         </h:panelGroup>
                     </h:panelGrid>
                 <h:panelGrid id="buttonSet" columns="3" cellpadding="5">
                     <p:commandButton value="从未计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3" actionListener="#{unmeasuredAssetListController.changeIndex(0)}" disabled="#{unmeasuredAssetListController.queryIndex==0}"/>
-                    <p:commandButton value="逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(1)}" disabled="#{unmeasuredAssetListController.queryIndex==1}"/>
+                    <p:commandButton style="background-color: red" value="逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(1)}" disabled="#{unmeasuredAssetListController.queryIndex==1}"/>
                     <p:commandButton value="未逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(2)}" disabled="#{unmeasuredAssetListController.queryIndex==2}"/>
                 </h:panelGrid>
 

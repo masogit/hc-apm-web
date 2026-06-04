@@ -1,0 +1,81 @@
+-- YHAAO-27960 配置项-临床助手“查询天数”，改名为“有问题工单查询时间范围”
+UPDATE config_item SET name = '有问题工单查询时间范围' WHERE key = 'setQueryNumberDays' AND name != '有问题工单查询时间范围';
+
+-- YHAAO-27876 维修中列表-存在备件审核中的工单在列表中增加标识
+update config_item  set  default_value='[{"label":"设备名称","field":"assetName","required":true,"rendered":true},{"label":"制造商序列号","field":"manufacturerSerialNumber","required":true,"rendered":true},{"label":"设备编号（院方）","field":"departNum","required":true,"rendered":true},{"label":"设备型号","field":"functionType","required":false,"rendered":true},{"label":"所属院区","field":"hospitalId","required":true,"rendered":true},{"label":"所属科室","field":"clinicalDeptName","required":false,"rendered":true},{"label":"报修单号","field":"srNum","required":true,"rendered":true},{"label":"安装位置","field":"locationName","required":false,"rendered":true},{"label":"报修人","field":"requestorName","required":false,"rendered":true},{"label":"维修人","field":"requireName","required":false,"rendered":true},{"label":"报修时间","field":"requestTime","required":true,"rendered":true},{"label":"当前步骤","field":"currentStep","required":true,"rendered":true},{"label":"工单类型","field":"intExtType","required":false,"rendered":true},{"label":"故障现象","field":"requestReason","required":false,"rendered":true},{"label":"主子工单","field":"mainSub","required":false,"rendered":true},{"label":"资产分类","field":"assetType","required":false,"rendered":true},{"label":"备件状态","field":"approvalStatus","required":false,"rendered":false}]'  where   key like  'WorkOrderListColumn%';
+
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '开启测试功能', 'EnableTestFunction', '开启测试功能', 'f','t',3 where not exists(select * from config_item where key = 'EnableTestFunction');
+
+--YHAAO-27869
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, 'false', '保养规则是否显示评分字段', 'pmRuleShowScoreFlag', '保养规则是否显示评分字段', 'f','t',3 where not exists(select * from config_item where key = 'pmRuleShowScoreFlag');
+
+-- YHAAO-28014 web端时间记录配置
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示维修记录', 'showRepairRecordTable', 'WEB端是否显示维修记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showRepairRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示保养记录', 'showMaintainanceRecordTable', 'WEB端是否显示保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMaintainanceRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示盘点记录', 'showInventoryRecordTable', 'WEB端是否显示盘点记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showInventoryRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示外部保养记录', 'showExternalMaintenanceRecordTable', 'WEB端是否显示外部保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showExternalMaintenanceRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示外部维修记录', 'showExternalRepairRecordTable', 'WEB端是否显示外部维修记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showExternalRepairRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示现场保养记录', 'showOnSiteMaintenanceRecordTable', 'WEB端是否显示现场保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showOnSiteMaintenanceRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示日常检查记录', 'showDailyInspectionRecordTable', 'WEB端是否显示日常检查记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showDailyInspectionRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示开关机记录', 'showOperationRecordTable', 'WEB端是否显示开关机记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showOperationRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示计量监控记录', 'showMetrologyMonitorTable', 'WEB端是否显示计量监控记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMetrologyMonitorTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示不良事件记录', 'showAdverseEventRecordTable', 'WEB端是否显示不良事件记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showAdverseEventRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示设备流程记录', 'showApprovalWorkflowTable', 'WEB端是否显示设备流程记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showApprovalWorkflowTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', 'WEB端是否显示设备修改记录', 'showModifyRecordTable', 'WEB端是否显示设备修改记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showModifyRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示维修记录', 'showMobileRepairRecordTable', '移动端是否显示维修记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileRepairRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示保养记录', 'showMobileMaintainanceRecordTable', '移动端是否显示保养记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileMaintainanceRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示盘点记录', 'showMobileInventoryRecordTable', '移动端是否显示盘点记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileInventoryRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示日常检查记录', 'showMobileDailyInspectionRecordTable', '移动端是否显示日常检查记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileDailyInspectionRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示开关机记录', 'showMobileOperationRecordTable', '移动端是否显示开关机记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileOperationRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示计量监控记录', 'showMobileMetrologyMonitorTable', '移动端是否显示计量监控记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileMetrologyMonitorTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示不良事件记录', 'showMobileAdverseEventRecordTable', '移动端是否显示不良事件记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileAdverseEventRecordTable');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 20, 'true', '移动端是否显示报废鉴定记录', 'showMobileScrapRecordTable', '移动端是否显示报废鉴定记录', 'f','t',3 where not exists(select 1 from config_item where key = 'showMobileModifyRecordTable');
+
+-- YHAAO-28022
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+    select replace(uuid_generate_v4()::text,'-',''), 13, 'https', '网站协议', 'siteProtocol', '网站协议', 't', 't', 1
+    where not exists(select 1 from config_item where key = 'siteProtocol');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 12, false, '盘点是否显示使用科室', 'InventoryDisplayAssetDept', '盘点是否显示使用科室', 'f', 't', 1 where not exists(select * from config_item where key = 'InventoryDisplayAssetDept');
+
+INSERT INTO PUBLIC.config_item( uid, category, default_value, description, KEY, NAME, super_admin_edit, user_parent_config, value_type) SELECT REPLACE ( uuid_generate_v4 () :: TEXT, '-', '' ), 4, null, '报修入口 URL', 'RepairRequestUrl', '报修入口 URL', 'f', 't', 1 WHERE NOT EXISTS ( SELECT 1 FROM config_item WHERE KEY = 'RepairRequestUrl' );

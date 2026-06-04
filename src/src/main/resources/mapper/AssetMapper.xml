@@ -34,6 +34,7 @@
         <result column="make_short_name" property="makerShortName"/>
         <result column="manufacture" property="manufacture"/>
         <result column="asset_classification32" property="assetClassification32"/>
+        <result column="upload_user_name" property="uploadUserName"/>
     </resultMap>
 
     <select id="selectMeasureResult" resultMap="assetBean">
@@ -57,9 +58,12 @@
         mcd.check_date,
         mcd.check_person,
         mcd.id as bo_uuid,
+        mcd.created_by as upload_user_id,
+        ua.name as upload_user_name,
         case when o.cu is not null then '是' else '否' end as exist_file_flag
         FROM asset_info ai
         INNER JOIN measuring_certificate_detail mcd ON mcd.asset_uid = ai.uid
+        LEFT JOIN user_account ua ON mcd.created_by = ua.uid
         left  join (select count(*) cu, bo_uuid from v2_blob_object where bo_type = 'Measuring' group by bo_uuid) o on o.bo_uuid = mcd.id
         <where>${ew.sqlSegment}</where>
     </select>
@@ -82,8 +86,11 @@
         mcd.check_person,
         mcd.department  department,
         mcd.id as bo_uuid,
+        mcd.created_by as upload_user_id,
+        ua.name as upload_user_name,
         case when o.cu is not null then '是' else '否' end as exist_file_flag
         FROM  measuring_certificate_detail mcd
+        LEFT JOIN user_account ua ON mcd.created_by = ua.uid
         left  join (select count(*) cu, bo_uuid from v2_blob_object where bo_type = 'Measuring' group by bo_uuid) o on o.bo_uuid = mcd.id
         <where>${ew.sqlSegment}</where>
     </select>

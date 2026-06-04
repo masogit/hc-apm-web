@@ -7,6 +7,14 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
+        <h:outputStylesheet>
+            .warning-row {
+                background-color: #fff3cd !important;
+            }
+            .warning-row:hover {
+                background-color: #ffeeba !important;
+            }
+        </h:outputStylesheet>
         <div class="ui-g-12 card">
             <h:form id="measuringAssetListForm" rendered="#{measureAssetListController.customRoleAuth.authSearch}">
 
@@ -23,7 +31,8 @@
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="20,50,100,500">
+                             rowsPerPageTemplate="20,50,100,500"
+                             rowStyleClass="#{measureAssetListController.measuringDateWarningEnabled and item.hasDateWarning ? 'warning-row' : ''}">
 
                     <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm "/>
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
@@ -133,11 +142,14 @@
                     <p:column headerText="检测人" filterBy="#{item.checkPerson}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.checkPerson}"/>
                     </p:column>
+                    <p:column headerText="上传人" filterBy="#{item.uploadUserName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.uploadUserName}"/>
+                    </p:column>
                     <p:column headerText="计量日期" sortBy="#{item.checkDate}" filterBy="#{item.checkDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterCheckDate" widgetVar="varFilterCheckDate" />
                         </f:facet>
-                        <h:outputText value="#{item.checkDate}">
+                        <h:outputText value="#{item.checkDate}" title="#{item.dateWarningMessage}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
@@ -145,7 +157,7 @@
                         <f:facet name="filter">
                             <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>
-                        <h:outputText value="#{item.nextMeteringDate}">
+                        <h:outputText value="#{item.nextMeteringDate}" title="#{item.dateWarningMessage}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
