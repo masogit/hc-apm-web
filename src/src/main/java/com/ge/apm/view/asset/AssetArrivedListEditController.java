@@ -24,16 +24,16 @@ import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
+import org.primefaces.model.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.GenericDataTableModel;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -132,6 +132,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private  QrCodeLibRepository qrCodeLibRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private MasterDataService masterDataService;
+
+    protected LazyDataModel lazyModelArrivalItemList;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListRepository.class);
@@ -226,6 +228,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, easyInstallItem.getMedicalApparatusClassification());
             prepareEdit();
+            initLazyModelArrivalItemList();
         }
 
         customConfig = ccService.getCurrentCustomConfig(currentUser.getSiteUID());
@@ -236,9 +239,35 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         needInstorageCheck = userContextService.needInstorageCheck();
     }
 
+    public void  initLazyModelArrivalItemList(){
+
+        lazyModelArrivalItemList = new GenericDataTableModel<ArrivalListItem>() {
+            @Override
+            protected List<ArrivalListItem> load(PageRequest pageRequest) {
+                int pageSize = pageRequest.getPageSize();
+                int pageNumber = pageRequest.getPageNumber();
+                int pageSizeCache = userContextService.getPageSizeCache("arrivalListEdit.xhtml.itemList");
+                if(pageSizeCache != pageSize){
+                    UserContextService.setPageSizeCache("arrivalListEdit.xhtml.itemList",pageRequest.getPageSize());
+                }
+                int size = arrivalItemList.size();
+                this.setRowCount(size);
+                int fromIndex = pageSize * pageNumber;
+                int toIndex = fromIndex + pageSize;
+                List<ArrivalListItem> listObject = arrivalItemList.subList(fromIndex,toIndex <= size? toIndex:size);;
+                return listObject;
+            }
+        };
+    }
+
     @Override
     protected ArrivalListRepository getDAO() {
         return dao;
+    }
+
+    @Override
+    protected Page<ArrivalList> loadData(PageRequest pageRequest) {
+        return super.loadData(pageRequest);
     }
 
     @Override
@@ -1465,5 +1494,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setSelectItemDto(SelectItemDto selectItemDto) {
         this.selectItemDto = selectItemDto;
+    }
+
+    public LazyDataModel getLazyModelArrivalItemList() {
+        return lazyModelArrivalItemList;
+    }
+
+    public void setLazyModelArrivalItemList(LazyDataModel lazyModelArrivalItemList) {
+        this.lazyModelArrivalItemList = lazyModelArrivalItemList;
     }
 }

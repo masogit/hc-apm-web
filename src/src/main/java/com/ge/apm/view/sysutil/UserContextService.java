@@ -1658,7 +1658,10 @@ public class UserContextService implements Serializable {
         bean.pageSizeCache.put(key,pageSize);
     }
 
-
+    public static void clearPageSizeCache(String key){
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        bean.pageSizeCache.remove(key);
+    }
 
 
 }
