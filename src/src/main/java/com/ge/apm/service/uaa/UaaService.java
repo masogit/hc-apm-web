@@ -918,6 +918,11 @@ public class UaaService {
         return root;
     }
 
+    public List<UserAccount> getUserList(String siteUid, String name){
+        UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        return userAccountDao.getBySiteUIDAndNameLike(siteUid, name);
+    }
+
     public List<UserAccount> getUserList(int hospitalId){
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         return userAccountDao.getByHospitalId(hospitalId);
