@@ -97,7 +97,7 @@ public class FieldValueMessageController implements Serializable {
         if (msgList.isEmpty() && institutionId != -1) {
             msgList = doGetFieldValueList(fieldName, -1);
         }
-        msgList = msgList.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).collect(Collectors.toList());
+        //msgList = msgList.stream().sorted(Comparator.comparing(I18nMessage::getMsgKey)).collect(Collectors.toList());
 
         return msgList;
     }
@@ -117,8 +117,10 @@ public class FieldValueMessageController implements Serializable {
                 msgList.add(item.getValue());
             }
         }
+        msgList.sort(Comparator.comparing(I18nMessage::getOrderBy, Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(I18nMessage::getMsgKey));
 
-        Collections.sort(msgList);
+//        Collections.sort(msgList);
 
         return msgList;
     }
