@@ -1115,6 +1115,10 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         return false;
     }
 
+    public void clearSelectedWorkOrder() {
+        selected = null;
+    }
+
     public String getDisplayModeCasePriority() {
         return displayModeCasePriority;
     }

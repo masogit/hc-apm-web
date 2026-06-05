@@ -89,7 +89,7 @@
                     <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.serviceRequest.srNum}"/>
                     </p:column>
-                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.requestTime}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="LIKE">
                     <f:facet name="filter">
                         <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{workOrderUnifiedController.applyTimeFormatTime}"/>
                     </f:facet>
