@@ -71,15 +71,14 @@
                         <p:dataTable id="i18nDatalist"  class="datalist" value="#{i18nTypeManageController.selected.i18nMessageList}" var="item" widgetVar="varI18nDataList"
                              selectionMode="single" selection="#{i18nTypeManageController.selectedI18n}"
                              paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                             sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             sortMode="single" sortOrder="ascending" sortBy="#{item.orderBy}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="5" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="5,10" clientCache="false"
                              lazy="false" rowKey="#{item.msgKey}">
 
-                            <p:ajax event="rowSelect" update="editBtn deleteBtn" />
-
+                            <p:ajax event="rowSelect" update="editBtn deleteBtn up down" />
                             <p:column headerText="#{msg.ConfigItemKey}">
                                 <h:outputText value="#{item.msgKey}"/>
                             </p:column>
@@ -101,6 +100,8 @@
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
                                     <p:dataExporter type="xls" target="i18nTypeForm:i18nDatalist" fileName="#{i18nTypeManageController.selected.msgType}"/>
                                 </p:commandButton>
+                                <p:commandButton id="up" icon="ui-icon ui-icon-arrow-upward" actionListener="#{i18nTypeManageController.up()}" class="btn btn-sm btn-gray" title="上移" update="i18nDatalist :growl" disabled="#{empty i18nTypeManageController.selectedI18n}"/>
+                                <p:commandButton id="down" icon="ui-icon ui-icon-arrow-downward" actionListener="#{i18nTypeManageController.down()}" class="btn btn-sm btn-gray" title="下移" update="i18nDatalist :growl" disabled="#{empty i18nTypeManageController.selectedI18n}"/>
                             </f:facet>
                         </p:dataTable>
                     </h:panelGroup>
