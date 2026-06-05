@@ -4271,4 +4271,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return TimeUtil.now();
     }
 
+    public void clearSelected() {
+        selected = null;
+    }
 }
