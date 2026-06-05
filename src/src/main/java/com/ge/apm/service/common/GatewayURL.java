@@ -229,6 +229,8 @@ public enum GatewayURL {
     CLEAN_ORG_CACHE("/api/apm/configCache/cleanOrgInfoCache/{uid}"),
     CLEAN_TENANT_CACHE("/api/apm/configCache/cleanTenantCache/{uid}"),
     CLEAN_CACHE_NAMES("/api/apm/configCache/cleanCacheNames"),
+
+    CLEAN_I18N_MESSAGE_CACHE_BY_SITE_ID("/hcapmmasterdataservice/api/apm/masterData/i8nMessages/clearI18nMessageCacheBySiteId"),
     // OCR action
     OCR_IMAGE("/hcapmgateway/api/apm/ocr/recognition/readImageToObject"),
     OCR_DOCUMENT("/hcapmgateway/api/apm/ocr/recognition/readFileToObject"),
