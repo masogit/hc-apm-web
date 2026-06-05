@@ -1146,6 +1146,10 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         return steps;
     }
 
+    public void clearSelected() {
+        selected = null;
+    }
+
     public List<V2_BlobObject> getAttachListEhome() {
         return attachListEhome;
     }

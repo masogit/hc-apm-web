@@ -190,16 +190,16 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
         for (SearchFilter searchFilter : searchFilters) {
             String fieldName = searchFilter.fieldName;
             switch (fieldName) {
-                case "assetName":
+                case "assetInfo.name":
                     params.put("assetName", searchFilter.value);
                     break;
-                case "serialNum":
+                case "assetInfo.serialNum":
                     params.put("assetSerialNum", searchFilter.value);
                     break;
-                case "departNum":
+                case "assetInfo.departNum":
                     params.put("departNum", searchFilter.value);
                     break;
-                case "functionType":
+                case "assetInfo.functionType":
                     params.put("functionType", searchFilter.value);
                     break;
                 case "srNum":
@@ -220,7 +220,7 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
                 case "intExtType":
                     params.put("intExtType", searchFilter.value);
                     break;
-                case "requestTime":
+                case "serviceRequest.requestTime":
                     if(searchFilter.value != null){
                         if(searchFilter.operator.equals(SearchFilter.Operator.GTE)){
                             params.put("requestTimeGTE", searchFilter.value);
@@ -483,7 +483,7 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
         selected = (V2_WorkOrder) event.getObject();
         //先清空
         workOrderMgrController.clearSelectedWorkOrder();
-        workOrderMgrMvsController.setSelected(null);
+        workOrderMgrMvsController.clearSelectedWorkOrder();
         if("Insite".equals(selected.getIssueType())){
             workOrderMgrController.setSelected( selected);
             workOrderMgrController.onSelectOrderByUnified(event);
@@ -492,6 +492,7 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
             workOrderMgrMvsController.onSelectWorkOrder();
         }
     }
+
 
 
 }

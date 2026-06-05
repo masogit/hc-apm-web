@@ -217,7 +217,7 @@ public class V2PmOrderUnifiedController extends GenericCRUDUUIDController<V2_PmO
                     params.put("ownerName", searchFilter.value);
                     break;
                 case "currentStepName":
-                    params.put("currentStepName1", "已计划".equals(searchFilter.value) ? "进行中" : searchFilter.value);
+                    params.put("currentStepName1", searchFilter.value);
                     break;
                 case "intExtType":
                     params.put("intExtType", Integer.valueOf(searchFilter.value.toString()));
@@ -367,8 +367,8 @@ public class V2PmOrderUnifiedController extends GenericCRUDUUIDController<V2_PmO
     public void onSelectOrderByUnifiedForCurrent(SelectEvent event){
 
         selected = (V2_PmOrder) event.getObject();
-        v2PmOrderController.setSelected(null);
-        v2PmOrderMvsController.setSelected(null);
+        v2PmOrderController.clearSelected();
+        v2PmOrderMvsController.clearSelected();
         if("Insite".equals(selected.getIssueType())){
             v2PmOrderController.setSelected( selected);
             v2PmOrderController.onSelectPmOrder();
