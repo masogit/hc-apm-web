@@ -350,6 +350,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         i18nMessageList.sort((o1, o2) -> o1.getOrderBy().compareTo(o2.getOrderBy()));
         WebUtil.addSuccessMessage("排序更新成功");
         resetCache();
+        configCacheService.clearI18nMessageCacheBySiteId(selectedI18n.getSiteId());
     }
     public void sortInit(List<I18nMessage> i18nMessageList){
         for (int i = i18nMessageList.size() - 1; i >= 0; i--) {
@@ -380,6 +381,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         i18nMessageList.sort((o1, o2) -> o1.getOrderBy().compareTo(o2.getOrderBy()));
         WebUtil.addSuccessMessage("排序更新成功");
         resetCache();
+        configCacheService.clearI18nMessageCacheBySiteId(selectedI18n.getSiteId());
     }
 
     public TenantInfo getSelectTenant() {
