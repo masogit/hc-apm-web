@@ -113,6 +113,10 @@ public class ConfigCacheService {
         remoteService.asynRemoteCall(GatewayURL.CLEAN_CACHE_NAMES, HttpMethod.POST,new HashMap<>(),(url)->url);
     }
 
+    public void clearI18nMessageCacheBySiteId(Integer siteId){
+        remoteService.asynRemoteCall(GatewayURL.CLEAN_I18N_MESSAGE_CACHE_BY_SITE_ID, HttpMethod.GET,new HashMap<>(),(url)->url+="?siteId="+siteId);
+    }
+
     @PostConstruct
     public void initTenantInfo(){
         initialActiveFeature();

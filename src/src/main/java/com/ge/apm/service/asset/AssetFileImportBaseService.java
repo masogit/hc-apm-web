@@ -750,6 +750,39 @@ public class AssetFileImportBaseService {
             AssetRow.addErrMessage(importData, "错误: 设备编号重复");
             return null;
         }
+        // 处理日期字段更新规则
+        if (dbAsset != null) {
+            // 规则1: 上次保养日期、上次计量日期、上次巡检日期 - 如果输入值比现有值小则不更新
+            if (importData.getLastPmDate() != null && dbAsset.getLastPmDate() != null) {
+                if (importData.getLastPmDate().compareTo(dbAsset.getLastPmDate()) < 0) {
+                    newAsset.setLastPmDate(dbAsset.getLastPmDate()); // 保持原值
+                }
+            }
+
+            if (importData.getLastMeteringDate() != null && dbAsset.getLastMeteringDate() != null) {
+                if (importData.getLastMeteringDate().compareTo(dbAsset.getLastMeteringDate()) < 0) {
+                    newAsset.setLastMeteringDate(dbAsset.getLastMeteringDate()); // 保持原值
+                }
+            }
+
+            if (importData.getLastQaDate() != null && dbAsset.getLastQaDate() != null) {
+                if (importData.getLastQaDate().compareTo(dbAsset.getLastQaDate()) < 0) {
+                    newAsset.setLastQaDate(dbAsset.getLastQaDate()); // 保持原值
+                }
+            }
+
+            // 规则2: 创建日期 - 如果资产已有创建日期则不允许修改
+            if (dbAsset.getCreatedDate() != null) {
+                newAsset.setCreatedDate(dbAsset.getCreatedDate()); // 保持原值
+            } else {
+                newAsset.setCreatedDate(new Date()); // 使用当前日期
+            }
+        } else {
+            // 对于新资产，如果没有设置创建日期，则使用当前日期
+            if (newAsset.getCreatedDate() == null) {
+                newAsset.setCreatedDate(new Date());
+            }
+        }
 
         String clinicalDeptName = newAsset.getClinicalDeptName();
         String siteUID = siteOrg.getSiteUID();
