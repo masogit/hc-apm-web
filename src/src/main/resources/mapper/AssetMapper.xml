@@ -110,7 +110,8 @@
             al.modify_time AS terminateOperationDate,
             al.modify_by AS terminateOperation,
             ai.make_short_name as makerShortName,
-            wo.id AS workOrderId
+            wo.id AS workOrderId,
+            sc.business_number AS assetScrapId
         FROM
             asset_info ai
         LEFT JOIN (
@@ -127,6 +128,7 @@
                 v2_work_order
             WHERE tenant_uid = #{tenantUid} AND status = 1
         ) wo ON ai.id = wo.asset_id AND wo.row_number = 1
+        left join  asset_scrap sc on ai.asset_scrap_id = sc.id
         <include refid="queryCondition"/>
         <if test="orderBy!=null">
            ${orderBy}
@@ -150,6 +152,7 @@
                 v2_work_order
             WHERE tenant_uid = #{tenantUid} AND status = 1
         ) wo ON ai.id = wo.asset_id AND wo.row_number = 1
+        left join  asset_scrap sc on ai.asset_scrap_id = sc.id
         <include refid="queryCondition"/>
 
     </select>
@@ -544,6 +547,9 @@
                 OR ai.site_uid IN   #{selectSite}
                 OR ai.clinical_dept_uid IN  #{selectSite}
                 )
+            </if>
+            <if test="assetScrapId != null">
+              and  sc.business_number like concat('%',#{assetScrapId},'%')
             </if>
         </where>
     </sql>
