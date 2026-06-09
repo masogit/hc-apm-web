@@ -202,10 +202,10 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
                 case "assetInfo.functionType":
                     params.put("functionType", searchFilter.value);
                     break;
-                case "srNum":
+                case "serviceRequest.srNum":
                     params.put("srNum", searchFilter.value);
                     break;
-                case "casePriority":
+                case "serviceRequest.casePriority":
                     params.put("casePriority", searchFilter.value);
                     break;
                 case "siteUID":
@@ -231,6 +231,12 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
                     break;
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
+                    break;
+                case "serviceRequest.requestReason":
+                    params.put("requestReason", searchFilter.value);
+                    break;
+                case "currentStepName":
+                    params.put("currentStepName", searchFilter.value);
                     break;
                 default:
                     break;
@@ -262,7 +268,7 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
     }
 
     public boolean filters(String fieldName, String filterVal) {
-        if ("requestTime".equals(fieldName)) {
+        if ("serviceRequest.requestTime".equals(fieldName)) {
             processTimeFiled(filterVal, fieldName);
             return true;
         }

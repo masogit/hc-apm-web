@@ -86,7 +86,7 @@
                     </f:facet>
                     <h:outputText value="#{workOrderUnifiedController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                 </p:column>
-                    <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.serviceRequest.srNum}"/>
                     </p:column>
                 <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="LIKE">
@@ -99,9 +99,9 @@
                 </p:column>
                 <p:column headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                     <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderUnifiedController.stepFileter}"  rendered="#{workOrderUnifiedController.queryIndex eq 0 || workOrderUnifiedController.queryIndex eq 11}">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderUnifiedController.stepFileter}"  >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{workOrderUnifiedController.needTwoSubStatus?workOrderUnifiedController.getWoSteps('2,3,4,5,6,9,10,11'):workOrderUnifiedController.getWoSteps('2,3,4,5,6,9')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                            <f:selectItems value="#{workOrderMgrController.getWoSteps('2,3,4,5,6,9,10,11')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                         </p:selectOneMenu>
                     </f:facet>
                     <h:outputText value="#{item.currentStepName}" style="display: none"/>
