@@ -38,6 +38,7 @@ public interface MultiLevelApprovalMapper {
             "FROM multi_level_approval la\n" +
             "left join ApprovalAssets ai ON ai.laId = la.id\n" +
             "left join asset_info a on a.uid= ai.asset_uid   " +
+            "left join multi_level_approval_config config on config.id= la.workflow_config_approve_uid   " +
             "left join user_account applyUser on applyUser.uid = la.application_uid   " +
             "where 1=1 ${ew.sqlSegment}")
     List<MultiLevelApproval> loadData(Pagination pagination, @Param("ew") Wrapper wrapper,  @Param("tenantUid") String tenantUid);
