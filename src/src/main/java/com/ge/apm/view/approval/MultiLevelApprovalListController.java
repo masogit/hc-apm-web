@@ -130,9 +130,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
             if (orgType <= 1) uids.add(user.getHospitalUID());
             if (orgType <= 2) uids.add(user.getInstitutionUID());
             if (orgType <= 3) uids.add(user.getSiteUID());
-            wrapper.andNew().in("la.hier_org_uid", uids)
-                    .or()
-                    .in("config.hier_org_uid", uids);
+            wrapper.andNew().in("la.config_org_uid", uids);
         }
         WrapperSearchFilterUtils.convert(searchFilters, wrapper);
         List<MultiLevelApproval> list = multiLevelApprovalMapper.loadData(pagination, wrapper, user.getTenantUID());
