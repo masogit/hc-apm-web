@@ -112,7 +112,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				&& !f.name().startsWith("MAINTAIN_ORDER_TAKE")
 				&& !f.name().equals("MAINTAIN_ORDER_APPROVE")
 				&& !f.name().equals("MAINTAIN_ORDER_VIEW_CLOSED")
-				&& !f.name().equals("MULTILEVEL_APPROVE_APPROVE")
+//				&& !f.name().equals("MULTILEVEL_APPROVE_APPROVE")
 				&& !f.name().startsWith("AUDIT_CONFIG")
 				&& !f.name().startsWith("ASSET_LOCATION_")
 
