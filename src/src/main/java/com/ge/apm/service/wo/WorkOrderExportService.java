@@ -155,6 +155,13 @@ public class WorkOrderExportService {
             List<String> clinicalDeptUIDList = tempOrgSearchSet.stream().map(OrgInfo::getUid).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
+        if (v2WorkOrderReportDto.getAssetDept() != null) {
+            List<OrgInfo> orgSearchList = new ArrayList<>();
+            orgSearchList.add(v2WorkOrderReportDto.getAssetDept());
+            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, v2WorkOrderReportDto.getClinicalDeptList());
+            List<String> clinicalDeptUIDList = tempOrgSearchSet.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
+        }
         if (v2WorkOrderReportDto.getCurrentOwner() != null) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getCurrentOwner().getId()));
         }
@@ -424,6 +431,8 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("casePriority"), FieldValueMessageController.fieldValue("casePriority", workOrderExportPojo.getCasePriority().toString()));
             workOrderMap.put("main_sub", "sub".equals(workOrderExportPojo.getMainSub())?"子工单":"主工单");
             workOrderMap.put("related_order_number", Optional.of(srMap.get(workOrderExportPojo.getSrId()).size()-1).orElse(null));
+            workOrderMap.put(WebUtil.getMessage("UseDeptName_xlsx"), workOrderExportPojo.getUseDeptName());
+
             resultList.add(workOrderMap);
         }
         return resultList;

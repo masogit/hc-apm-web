@@ -17,6 +17,9 @@
         <if test="casePriority != null">
             and r.case_priority = CAST(#{casePriority, jdbcType=INTEGER} AS INTEGER)
         </if>
+        <if test="fromDeptUid != null">
+            and r.from_dept_uid = #{fromDeptUid}
+        </if>
         <if test="status != null">
             and w.status = #{status}
         </if>
@@ -125,6 +128,7 @@
         a.status as asset_status,
         r.sr_num as sr_sr_num,
         r.from_dept_uid as sr_from_dept_uid,
+        r.from_dept_name as sr_from_dept_name,
         r.requestor_name as sr_requestor_name,
         r.request_time as sr_request_time,
         r.request_reason as sr_request_reason,

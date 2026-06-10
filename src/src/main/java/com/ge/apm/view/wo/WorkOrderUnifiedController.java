@@ -208,6 +208,9 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
                 case "serviceRequest.casePriority":
                     params.put("casePriority", searchFilter.value);
                     break;
+                case "serviceRequest.fromDeptUid":
+                    params.put("fromDeptUid", searchFilter.value);
+                    break;
                 case "siteUID":
                     params.put("siteUID", searchFilter.value);
                     break;

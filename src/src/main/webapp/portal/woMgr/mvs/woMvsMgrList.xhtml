@@ -83,6 +83,17 @@
                     </f:facet>
                     <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                 </p:column>
+                <!-- 使用科室 -->
+                <p:column headerText="#{msg.AssetDepartment}" filterBy="#{item.serviceRequest.fromDeptName}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{workOrderMgrMvsController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.name}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.serviceRequest.fromDeptName}"/>
+                </p:column>
+
                 <p:column headerText="#{msg.locationName}" filterBy="#{item.mvsIbMapping.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{workOrderMgrMvsController.showLocationName()}">
                     <h:outputText value="#{item.assetInfo.locationName}"/>
                 </p:column>
