@@ -190,6 +190,7 @@ public class WorkOrderReportProvider {
                 "wo.work_order_type as workOrderType, " +
                 "wo.main_sub as mainSub, " +
                 "sr.case_priority as casePriority," +
+                "sr.from_dept_name as useDeptName," +
                 "ai.spare01,ai.spare02,ai.spare03,ai.spare04,ai.spare05,ai.spare06,ai.spare07,ai.spare08,ai.spare09,ai.spare10,sr.ib_status as ibStatus " +
                 "from v2_work_order wo " +
                 "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
@@ -262,6 +263,7 @@ public class WorkOrderReportProvider {
                 "wo.work_order_type as workOrderType, " +
                 "wo.main_sub as mainSub, " +
                 "sr.case_priority as casePriority," +
+                "sr.from_dept_name as useDeptName," +
                 "ai.spare01,ai.spare02,ai.spare03,ai.spare04,ai.spare05,ai.spare06,ai.spare07,ai.spare08,ai.spare09,ai.spare10,sr.ib_status as ibStatus " +
                 "from v2_work_order wo " +
                 "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
@@ -540,6 +542,7 @@ public class WorkOrderReportProvider {
                 "count(wo.id) as workOrderCount, " +
                 "(SELECT im.value_zh FROM i18n_message im WHERE concat(ai.asset_group,'') = im.msg_key and im.msg_type='assetGroup' and im.site_id in (select max(im1.site_id) from i18n_message im1 where im1.msg_type='assetGroup' and (im1.site_id=-1 or im1.site_id=ai.site_id))) as assetGroupName, " +
                 "(SELECT oi.name FROM org_info oi WHERE ai.clinical_dept_uid = oi.uid) as clinicalDeptName, " +
+                "(SELECT oi.name FROM org_info oi WHERE ai.asset_dept_uid = oi.uid) as fromDeptName, " +
                 "(SELECT oi.name FROM org_info oi WHERE ai.site_uid = oi.uid) as siteName " +
                 "FROM asset_info ai, v2_work_order wo " +
                 "WHERE ai.id=wo.asset_id ");
@@ -587,6 +590,13 @@ public class WorkOrderReportProvider {
                 }
                 str = str.substring(0, str.length() - 1);
                 sb.append(" and ai.asset_type in (" + str + ") ");
+            }else if (tempColumn.equals("fromDeptUID")) {
+                String str = "";
+                for (Object obj : (List<Object>) value) {
+                    str += "'" + obj + "',";
+                }
+                str = str.substring(0, str.length() - 1);
+                sb.append(" and ai.asset_dept_uid in (" + str + ") ");
             }
         }
 

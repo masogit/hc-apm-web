@@ -25,7 +25,7 @@
                                 selection="#{workOrderReportExportController.selectedNode}" var="node"
                                 selectionMode="single">
                             <p:ajax process="@this" event="select"
-                                    update=":woTab:exportDataForm:selectedOrgName :woTab:exportDataForm:clinicalDeptName"
+                                    update=":woTab:exportDataForm:selectedOrgName :woTab:exportDataForm:clinicalDeptName :woTab:exportDataForm:assetDeptName"
                                     listener="#{workOrderReportExportController.onSelectTreeNode}"
                                     oncomplete="PF('varPanelOrg').hide();"/>
                             <p:ajax process="@this" event="expand"/>
@@ -44,6 +44,18 @@
                 <label class="label">#{msg.clinicalDeptName}</label>
                 <p:autoComplete id="clinicalDeptName" dropdown="true"
                                 value="#{workOrderReportExportController.filterDeptOrg}"
+                                scrollHeight="300" forceSelection="true"
+                                completeMethod="#{workOrderReportExportController.autoCompleteDept}"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter"
+                                class="SiteUIDChange">
+                    <p:ajax event="itemSelect" listener="#{workOrderReportExportController.onClinicalDeptChange}"/>
+                    <p:ajax listener="#{workOrderReportExportController.onClinicalDeptChange}"/>
+                </p:autoComplete>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.assetDeptName}</label>
+                <p:autoComplete id="assetDeptName" dropdown="true"
+                                value="#{workOrderReportExportController.filterAssetDeptOrg}"
                                 scrollHeight="300" forceSelection="true"
                                 completeMethod="#{workOrderReportExportController.autoCompleteDept}"
                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter"

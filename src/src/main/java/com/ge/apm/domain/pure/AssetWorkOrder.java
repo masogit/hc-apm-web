@@ -34,6 +34,16 @@ public class AssetWorkOrder {
 
     private String linkUrl;
 
+    private String fromDeptName;
+
+    public String getFromDeptName() {
+        return fromDeptName;
+    }
+
+    public void setFromDeptName(String fromDeptName) {
+        this.fromDeptName = fromDeptName;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -227,6 +227,18 @@ public class WorkOrderExportPojo {
 
     private String  diagnosticProcess;
 
+    //使用科室 【来源工单】
+    private String useDeptName
+            ;
+
+    public String getUseDeptName() {
+        return useDeptName;
+    }
+
+    public void setUseDeptName(String useDeptName) {
+        this.useDeptName = useDeptName;
+    }
+
     public String getDiagnosticProcess() {
         return diagnosticProcess;
     }

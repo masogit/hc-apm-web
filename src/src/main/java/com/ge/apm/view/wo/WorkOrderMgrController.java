@@ -819,6 +819,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             throw e;
         }
     }
+
     @Getter @Setter
     private String viewId="";
 
@@ -4655,6 +4656,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void clearSelectedWorkOrder() {
         selected = null;
     }
+
+
 
 }
 

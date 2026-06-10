@@ -43,6 +43,7 @@
             <id property="id" column="sr_id"/>
             <result property="srNum" column="sr_sr_num"/>
             <result property="fromDeptUID" column="sr_from_dept_uid"/>
+            <result property="fromDeptName" column="sr_from_dept_name"/>
             <result property="requestorName" column="sr_requestor_name"/>
             <result property="requestTime" column="sr_request_time"/>
             <result property="requestReason" column="sr_request_reason"/>
