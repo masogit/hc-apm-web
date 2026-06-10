@@ -392,6 +392,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         multiLevelApproval.setCreatedBy(userAccount.getName());
                         multiLevelApproval.setTenantUID(userAccount.getTenantUID());
                         multiLevelApproval.setHierOrgUid(userAccount.getSiteUID());
+                        multiLevelApproval.setConfigOrgUid(multiLevelApprovalConfig.getHierOrgUid());
                         multiLevelApproval.setDigest(approvableTarget.getBusinessDigest());
                         setApplicationDepartment(approvableTarget,userAccount,multiLevelApproval);
                         MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(multiLevelApproval);
