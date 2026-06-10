@@ -40,7 +40,7 @@
                             <ui:include src="woMgrZkbOutRemoteList.xhtml"/>
                         </p:tab>
                     </c:if>
-                    <p:tab class="ui-g-12" title="全部工单" id="inWorkOrderAll"   >
+                    <p:tab class="ui-g-12" title="全部工单" id="inWorkOrderAll"  rendered="#{userContextService.isYiMaiYangGuangTenant()}" disabled="#{workOrderMgrController.viewIng}" >
                         <ui:include src="woMgrUnifiedList.xhtml"/>
                     </p:tab>
                 </p:tabView>
