@@ -136,12 +136,12 @@
                                    message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>
-                <p:column headerText="报废单号" rendered="#{assetInfoTerminatedListController.checkScrapConfit()}" >
+                <p:column headerText="报废单号" sortBy="#{item.assetScrapId}" filterBy="#{item.assetScrapId}" filterMatchMode="LIKE" rendered="#{assetInfoTerminatedListController.checkScrapConfit()}" >
 <!--
                     <h:commandLink ajax="false" target="_blank" action="#{assetInfoTerminatedListController.openNewWindowView(item.terminateBusinessNumber)}"  value="#{item.terminateBusinessNumber}" />
 -->
                     <a href="/geapm#{assetInfoTerminatedListController.getJmNewWindowView(item.terminateBusinessNumber)}" target="_Blank">
-                        <h:outputText value="#{item.terminateBusinessNumber}"/>
+                        <h:outputText value="#{item.assetScrapId}"/>
                     </a>
                 </p:column>
                 <c:forEach items="#{assetInfoTerminatedListController.customedColumns}" var="columnItem">
@@ -710,7 +710,7 @@
 
                 <p:column headerText="#{msg.terminateDate}" sortBy="#{item.terminateDate}" filterBy="#{item.terminateDate}" filterMatchMode="GTE">
                     <f:facet name="filter">
-                        <p:inputText id="filterTerminateDate" widgetVar="varFilterTerminateDate" value="#{assetInfoTerminatedListController.selectedObject['terminateDateFormatTime']}"/>
+                        <p:inputText id="filterTerminateDate" widgetVar="varFilterTerminateDate" value="#{assetInfoTerminatedListController.selectedObject['terminateDate']}"/>
                     </f:facet>
                     <h:outputText value="#{item.terminateDate}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>

@@ -231,7 +231,15 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         addMissingClinicalDeptOrg(currentPageAssets);
         return res;
     }
+    public boolean checkScrapConfit(){
+        String assetScrapValue = userContextService.getConfigItemValue("assetScrap");
+        String showAssetScrapNoValue = userContextService.getConfigItemValue("showAssetScrapNo");
+        if(Boolean.TRUE.toString().equals(assetScrapValue) && Boolean.TRUE.toString().equals(showAssetScrapNoValue)){
+            return true;
 
+        }
+        return false;
+    }
     private String buildOrderBy(Sort lastPageSort) {
         String sql=null;
         if(lastPageSort==null){
@@ -304,6 +312,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                     break;
                 case "proprietaryClass":
                     sql="order by ai.proprietary_class ";
+                    break;
+                case "assetScrapId":
+                    sql="order by sc.business_number ";
                     break;
                 default:
                     sql="order by "+ StringUtil.camelToSnakeOptimized(property)+" ";
