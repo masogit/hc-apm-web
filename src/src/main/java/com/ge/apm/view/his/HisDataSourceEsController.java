@@ -253,9 +253,12 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
         }
 
         String tenantUid = loginUser.getTenantUID();
+        String siteUid = selectedOrg != null ? selectedOrg.getSiteUID() : null;
 
         // 构建收费项目(sfxm)查找Map: key = "sfxmId|hosId"
-        List<HisEquipmentSfxm> sfxmList = hisEquipmentSfxmRepository.findByTenantUid(tenantUid);
+        List<HisEquipmentSfxm> sfxmList = siteUid != null
+                ? hisEquipmentSfxmRepository.findByTenantUidAndSiteUid(tenantUid, siteUid)
+                : hisEquipmentSfxmRepository.findByTenantUid(tenantUid);
         Map<String, HisEquipmentSfxm> sfxmMap = new HashMap<>();
         if (sfxmList != null) {
             for (HisEquipmentSfxm sfxm : sfxmList) {
@@ -265,7 +268,9 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
         }
 
         // 构建科室(hao)查找Map: key = "hisKsid|hosId"
-        List<HisAdministrativeOffices> haoList = hisAdministrativeOfficesRepository.findByTenantUid(tenantUid);
+        List<HisAdministrativeOffices> haoList = siteUid != null
+                ? hisAdministrativeOfficesRepository.findByTenantUidAndSiteUid(tenantUid, siteUid)
+                : hisAdministrativeOfficesRepository.findByTenantUid(tenantUid);
         Map<String, HisAdministrativeOffices> haoMap = new HashMap<>();
         if (haoList != null) {
             for (HisAdministrativeOffices hao : haoList) {
@@ -385,7 +390,11 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
     }
 
     private void loadExecDeptList() {
-        List<HisAdministrativeOffices> lists = hisAdministrativeOfficesRepository.findByTenantUid(loginUser.getTenantUID());
+        String tenantUid = loginUser.getTenantUID();
+        String siteUid = selectedOrg != null ? selectedOrg.getSiteUID() : null;
+        List<HisAdministrativeOffices> lists = siteUid != null
+                ? hisAdministrativeOfficesRepository.findByTenantUidAndSiteUid(tenantUid, siteUid)
+                : hisAdministrativeOfficesRepository.findByTenantUid(tenantUid);
         execDeptList = new ArrayList<>();
         for (HisAdministrativeOffices item : lists) {
             OrgInfo orgInfo = new OrgInfo();
@@ -393,11 +402,6 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
             orgInfo.setUid(item.getHisKsid());
             orgInfo.setSiteUID(item.getSiteUid());
             execDeptList.add(orgInfo);
-        }
-        if (selectedOrg != null) {
-            execDeptList = execDeptList.stream()
-                    .filter(item -> item.getSiteUID().equals(selectedOrg.getSiteUID()))
-                    .collect(Collectors.toList());
         }
     }
 
@@ -431,15 +435,13 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
     }
 
     private void loadSfxmList() {
-        sfxmList = hisEquipmentSfxmRepository.findByTenantUid(loginUser.getTenantUID());
+        String tenantUid = loginUser.getTenantUID();
+        String siteUid = selectedOrg != null ? selectedOrg.getSiteUID() : null;
+        sfxmList = siteUid != null
+                ? hisEquipmentSfxmRepository.findByTenantUidAndSiteUid(tenantUid, siteUid)
+                : hisEquipmentSfxmRepository.findByTenantUid(tenantUid);
         if (sfxmList == null) {
             sfxmList = new ArrayList<>();
-        }
-        if (selectedOrg != null) {
-            final String siteUid = selectedOrg.getSiteUID();
-            sfxmList = sfxmList.stream()
-                    .filter(item -> siteUid.equals(item.getSiteUid()))
-                    .collect(Collectors.toList());
         }
     }
 
