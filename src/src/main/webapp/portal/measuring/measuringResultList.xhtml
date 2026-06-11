@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+<ui:define name="content">
         <div class="ui-g-12 card">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="计量信息"/>
+            </div>
             <h:form id="measuringResultForm">
                 <p:fieldset legend="计量结果" rendered="#{not empty measureAssetListController.selected}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -76,7 +78,7 @@
                         </p:column>
                         <p:column headerText="上传文件" style="width: 140px">
                             <p:fileUpload id="measuringResultUploadFile" value="#{item.id}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{measureAssetListController.uploadMeasuringFile}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                          multiple="true" sizeLimit="100000000" update="measuringTab:measuringResultForm:datalist_measuringFileResult" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                          multiple="true" sizeLimit="100000000" update="measuringResultForm:datalist_measuringFileResult" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
@@ -104,7 +106,7 @@
                                 </p:column>
                                 <p:column headerText="附件列表" style="width: 400px">
                                     <p:dataList id="measuringFileList" value="#{measureAssetListController.getMeasuringAttachList(measuringResultItem.id)}" var="measuringFileItem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                        <p:commandLink value="#{measuringFileItem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(measuringFileItem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
+                                        <p:commandLink value="#{measuringFileItem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(measuringFileItem.objectStorageId)}" styleClass="p-mr-2"/>
                                         <p:commandButton icon="ui-icon-remove-red-eye" title="#{msg.preview}" rendered="#{measuringFileItem.showPreview()}" actionListener="#{preViewerBean.onServerEvent('', measuringFileItem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"/>
 <!--                                        <h:commandLink target="_blank" value="#{measuringFileItem.objectName}" action="#{measureAssetListController.getFileNewWindowUrl(measuringFileItem.objectStorageId)}" styleClass="p-mr-2" rendered="#{measuringFileItem.showPreview()}"/>&nbsp;&nbsp;-->
                                         <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(measuringFileItem.id)}" update="measuringFileList" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_INFO_EDIT')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
@@ -117,7 +119,7 @@
                     </p:panelGrid>
                 </p:fieldset>
             </h:form>
-<!--            <ui:include src="/portal/preview/view.xhtml" />-->
+            <ui:include src="/portal/preview/view.xhtml" />
         </div>
-    </ui:composition>
-</html>
+</ui:define>
+</ui:composition>

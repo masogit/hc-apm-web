@@ -7,3 +7,12 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 
 --YHAAO-28293
 update config_item  set  default_value='[{"label":"设备名称","field":"assetName","required":true,"rendered":true},{"label":"制造商序列号","field":"manufacturerSerialNumber","required":true,"rendered":true},{"label":"设备编号（院方）","field":"departNum","required":true,"rendered":true},{"label":"设备型号","field":"functionType","required":false,"rendered":true},{"label":"所属院区","field":"hospitalId","required":true,"rendered":true},{"label":"所属科室","field":"clinicalDeptName","required":false,"rendered":true},{"label":"使用科室","field":"fromDeptName","required":false,"rendered":false},{"label":"报修单号","field":"srNum","required":true,"rendered":true},{"label":"安装位置","field":"locationName","required":false,"rendered":true},{"label":"报修人","field":"requestorName","required":false,"rendered":true},{"label":"维修人","field":"requireName","required":false,"rendered":true},{"label":"报修时间","field":"requestTime","required":true,"rendered":true},{"label":"当前步骤","field":"currentStep","required":true,"rendered":true},{"label":"工单类型","field":"intExtType","required":false,"rendered":true},{"label":"故障现象","field":"requestReason","required":false,"rendered":true},{"label":"主子工单","field":"mainSub","required":false,"rendered":true},{"label":"资产分类","field":"assetType","required":false,"rendered":true},{"label":"备件状态","field":"approvalStatus","required":false,"rendered":false}]'  where   key like  'WorkOrderListColumn%';
+
+
+-- YHAAO-28062
+ALTER TABLE measuring_certificate_detail ADD COLUMN IF NOT EXISTS certificate_type INT DEFAULT NULL;
+
+-- 2. 新增 validity_months 字段 (有效期月数, 1-24)
+ALTER TABLE measuring_certificate_detail ADD COLUMN IF NOT EXISTS validity_months INT DEFAULT NULL;
+
+UPDATE measuring_certificate_detail SET certificate_type = 1;

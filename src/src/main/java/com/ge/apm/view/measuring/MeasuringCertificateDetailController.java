@@ -212,6 +212,11 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
     }
     public void setObject(JSONObject object){
         postProcessorJSON(object);
+        String certificateType = object.getString("certification_type");
+        if(certificateType != null){
+            this.selected.setCertificateType(Integer.valueOf(certificateType));
+        }
+
         String certificateNo = object.getString("certificateNo");
         if(certificateNo == null){
             certificateNo = object.getString("cetification_id");
