@@ -37,6 +37,12 @@ public interface HisEquipmentSfxmRepository extends GenericRepositoryUUID<HisEqu
     HisEquipmentSfxm findBySfxmIdAndHosId(String sfxmId, String hosId);
     HisEquipmentSfxm findBySfxmIdAndHosIdAndSiteUid(String sfxmId, String hosId,String siteUid);
 
+    @Query(value = "select * from his_equipment_sfxm where tenant_uid=?1", nativeQuery = true)
+    List<HisEquipmentSfxm> findByTenantUid(String tenantUid);
+
+    @Query(value = "select * from his_equipment_sfxm where tenant_uid=?1 and site_uid=?2", nativeQuery = true)
+    List<HisEquipmentSfxm> findByTenantUidAndSiteUid(String tenantUid, String siteUid);
+
 //    @Modifying
 //    @Transactional
 //    @Query(value = "update AssetInfo set nationalStandardCode=?1 where uid=?2")
