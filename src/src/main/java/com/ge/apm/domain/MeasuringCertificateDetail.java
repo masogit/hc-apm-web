@@ -153,7 +153,10 @@ public class MeasuringCertificateDetail implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-
+    @Column(name = "certificate_type")
+    private Integer certificateType;  //证书类型: 检定证书输出：1，校准证书输出：2，其他输出：-1
+    @Column(name = "validity_months")
+    private Integer validityMonths;  // 有效期（月）
     @Transient
     private Integer excelIdex;
 
@@ -394,6 +397,14 @@ public class MeasuringCertificateDetail implements Serializable {
         this.siteUID = siteUID;
     }
 
+    public Integer getCertificateType() {
+        return certificateType;
+    }
+
+    public void setCertificateType(Integer certificateType) {
+        this.certificateType = certificateType;
+    }
+
     public Integer getExcelIdex() {
         return excelIdex;
     }
@@ -504,6 +515,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public Integer getValidityMonths() {
+        return validityMonths;
+    }
+
+    public void setValidityMonths(Integer validityMonths) {
+        this.validityMonths = validityMonths;
     }
 
     @Override

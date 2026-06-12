@@ -17,6 +17,7 @@ import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.service.wo.WorkflowService;
@@ -53,6 +54,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
@@ -148,6 +150,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     @Getter
     private Boolean measuringDateWarningEnabled = false;
+    @Getter @Setter
+    private Integer validityMonths;
 
     @Override
     protected void init() {
@@ -193,6 +197,23 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
         TreeNode treeNodeSearch = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(currentUser.getSiteUID(), null);
         orgTreeSearch = initOrgTree(treeNodeSearch);
+        String encodeStr = WebUtil.getRequestParameter("str");
+        if(StringUtils.hasText(encodeStr)){
+            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+            String matchType = (String) UrlEncryptController.getValueFromMap(encodeStr, "matchType");
+            this.selected = dao.findByUid(selectedId);
+            if("1".equals(matchType)){
+                measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+            }else{
+                 String boUuid = (String) UrlEncryptController.getValueFromMap(encodeStr, "boUuid");
+                MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(boUuid);
+                if(byId!=null){
+                    measuringCertificateList=new ArrayList<>();
+                    measuringCertificateList.add(byId);
+                }
+            }
+        }
+
     }
 
     @Override
@@ -204,15 +225,16 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
 
-        if(matchType==1){
+        if(matchType==1 || matchType==2){
             Wrapper<AssetInfo> wrapper = convert();
             Sort sort = pageRequest.getSort();
             for (Sort.Order order : sort) {
                 Sort.Direction direction = order.getDirection();
                 String property = ZipUtil.camelToUnderline(order.getProperty());
-                String prefix = "check_date".equals(property) ? "mcd." : "ai.";
+                String prefix = "check_date".equals(property) || "validity_months".equals(property)? "mcd." : "ai.";
                 wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
             }
+            wrapper.and().ge("mcd.certificate_type",matchType);
             wrapper.orderBy("mcd.id");
             currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
         }else{
@@ -419,7 +441,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 wrapper.isNull("o.cu");
             }
         }
-        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag");
+        if(this.hasFilterOnField("validityMonths")){
+            Optional<SearchFilter> first = searchFilters.stream().filter(sf -> "validityMonths".equals(sf.fieldName)).findFirst();
+            if (first.isPresent()) {
+                wrapper.eq("mcd.validity_months", Integer.valueOf(first.get().value.toString()));
+            }
+
+        }
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths");
         List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
         WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
@@ -454,6 +483,34 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         WorkOrderMgrController.assetInfos = bathRepairAsset;
     }
 
+    public void setSelectedAssetsAndMeasuring(){
+        List<String> selectedBoUuids = selectedMap.keySet().stream().filter(assetUid -> Boolean.TRUE.equals(selectedMap.get(assetUid))).collect(Collectors.toList());
+        bathRepairAsset = currentPageAssets.stream().filter(asset -> selectedBoUuids.contains(asset.getBoUuid())).collect(Collectors.toList());
+
+    }
+
+    public void updateValidityMonths() {
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        List<String> collect = bathRepairAsset.stream().map(AssetInfo::getBoUuid).collect(Collectors.toList());
+        searchFilterList.add(new SearchFilter("id", SearchFilter.Operator.IN, collect));
+        List<MeasuringCertificateDetail> measuringCertificateDetail = measuringCertificateDetailDao.findBySearchFilter(searchFilterList);
+        measuringCertificateDetail.forEach(item->{
+            item.setValidityMonths(validityMonths);
+        });
+        measuringCertificateDetailDao.save(measuringCertificateDetail);
+        List<String> assetUids = bathRepairAsset.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+        List<AssetInfo> byUidIn = dao.findByUidIn(assetUids);
+        for (AssetInfo assetInfo : bathRepairAsset) {
+            Date checkDate = assetInfo.getCheckDate();
+            Date result = DateUtil.addMonth(checkDate, validityMonths);
+            Optional<AssetInfo> first = byUidIn.stream().filter(item -> assetInfo.getUid().equals(item.getUid())).findFirst();
+            if (first.isPresent()) {
+                first.get().setNextMeteringDate(result);
+            }
+        }
+        dao.save(byUidIn);
+    }
+
     public boolean judgeMeasurementRepair(){
         WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
         if (woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair()) {
@@ -477,15 +534,27 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectMeasureAsset(){
-        if(matchType==1){
-            measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
-        }else{
-            MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(this.selected.getBoUuid());
-            if(byId!=null){
-                measuringCertificateList=new ArrayList<>();
-                measuringCertificateList.add(byId);
-            }
+//        if(matchType==1){
+//            measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
+//        }else{
+//            MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(this.selected.getBoUuid());
+//            if(byId!=null){
+//                measuringCertificateList=new ArrayList<>();
+//                measuringCertificateList.add(byId);
+//            }
+//        }
+
+        if (null == selected) {
+            return;
         }
+
+        String url = "actionName=View&selectedid="
+                + selected.getUid()
+                +"&matchType="+matchType+"&boUuid="+selected.getBoUuid();
+        url = "measuringResultList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void uploadMeasuringFile(FileUploadEvent event) {

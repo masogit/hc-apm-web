@@ -422,6 +422,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             List<String> collect = relRuleAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
             List<SearchFilter> assetSearchFilters = new ArrayList<>();
             assetSearchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, collect));
+            assetSearchFilters.addAll(getOrgFilter(user.getSiteUID()));
+            assetSearchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+            assetSearchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            assetSearchFilters.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+            assetSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
             addFilterAssetTypeGroup(assetSearchFilters);
             List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
             List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos, relRuleAssets);
