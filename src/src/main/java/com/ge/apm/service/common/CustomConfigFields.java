@@ -149,6 +149,7 @@ public enum CustomConfigFields {
     usageCount(fieldName, "usageCount" ,Text),  //已使用次数
     ratingUsageCount(fieldName, "ratingUsageCount" ,Text),  //额定使用次数
     epc(fieldName, "epc" ,Text),  //epc码
+    estimatedRiskLevel(fieldName, "estimatedRiskLevel" ,Select),  //风险等级(预估)
 
 
     ;

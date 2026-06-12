@@ -329,6 +329,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         List<ApmAdminActiveFeature> features = Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
         features.add(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING);
         features.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED);
+        features.add(ApmAdminActiveFeature.DEVICE_RISK_ASSESSMENT);
         return features;
     }
 

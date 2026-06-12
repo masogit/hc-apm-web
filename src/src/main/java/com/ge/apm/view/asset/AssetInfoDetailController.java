@@ -20,6 +20,7 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
@@ -564,5 +565,11 @@ public class AssetInfoDetailController {
         } else {
             return "1";
         }
+    }
+
+    public String getEstimatedRiskLevelName(Integer code) {
+        if (code == null) return "";
+        RiskLevel level = RiskLevel.getByCode(code);
+        return level != null ? level.getName() : "";
     }
 }
