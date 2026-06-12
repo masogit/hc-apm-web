@@ -548,6 +548,7 @@ public class MeasuringService {
                         json.put("status",content.getString("conclusion"));
                         json.put("validDateTo",content.getString("valid_util"));
                         json.put("checkDate",content.getString("verify_date"));
+                        json.put("certificationType",content.getString("certification_type"));
                         MeasuringCertificateDetail measuringCertificateDetail = handleOcrResult(json, newFile,blobObjects);
                         if(measuringCertificateDetail == null) continue;
                         List<V2_BlobObject> measuringAttachList = measuringCertificateDetail.getMeasuringAttachList();
@@ -803,6 +804,7 @@ public class MeasuringService {
     }
     public void setObject(MeasuringCertificateDetail detail,JSONObject object){
         detail.setCertificateNo(object.getString("certificateNo"));
+        detail.setCertificateType(object.getInteger("certificateType"));
         detail.setAssetManufacturer(object.getString("assetManufacturer"));
         detail.setCheckPerson(object.getString("checkPerson"));
         detail.setAssetModel(object.getString("assetModel"));

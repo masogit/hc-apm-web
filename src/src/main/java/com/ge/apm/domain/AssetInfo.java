@@ -3528,6 +3528,29 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Transient
     @TableField(exist = false)
+    private String certificateType;
+
+    public String getCertificateType() {
+        return certificateType;
+    }
+
+    public void setCertificateType(String certificateType) {
+        this.certificateType = certificateType;
+    }
+    @Transient
+    @TableField(exist = false)
+    private Integer validityMonths;
+
+    public Integer getValidityMonths() {
+        return validityMonths;
+    }
+
+    public void setValidityMonths(Integer validityMonths) {
+        this.validityMonths = validityMonths;
+    }
+
+    @Transient
+    @TableField(exist = false)
     private Boolean hasDateWarning;
 
     @Transient
