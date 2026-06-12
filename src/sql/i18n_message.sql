@@ -6345,3 +6345,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','22','22月','22 months',NULL,-1,22);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','23','23月','23 months',NULL,-1,23);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','24','24月','24 months',NULL,-1,24);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','estimatedRiskLevel','预估风险等级','Estimated Risk Level',NULL,-1);

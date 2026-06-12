@@ -1136,7 +1136,16 @@ public class AssetInfo implements ChineseName, Serializable {
     private String existFileFlag;
     @Transient
     @Getter @Setter
-    private String overrunState;
+    private String overrunState;@Getter
+    @Setter
+    @Column(name = "estimated_risk_level")
+    private Integer estimatedRiskLevel; //风险等级
+
+    @Getter
+    @Setter
+    @Column(name = "estimated_risk_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date estimatedRiskDate; //预估风险评估日期
 
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {

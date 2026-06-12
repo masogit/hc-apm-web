@@ -475,6 +475,12 @@
             <p:inputText id="riskGrade" value="#{fieldMsg.fieldValue('riskGrade', assetInfoDetailController.selected.riskGrade)}" readonly="true" title="#{fieldMsg.fieldValue('riskGrade', assetInfoDetailController.selected.riskGrade)}"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'estimatedRiskLevel') and  userContextService.canRender('DEVICE_RISK_ASSESSMENT')}">
+        <h:panelGroup >
+            <label class="label">#{msg.estimatedRiskLevel}</label>
+            <p:inputText id="estimatedRiskLevel" value="#{assetInfoDetailController.getEstimatedRiskLevelName(assetInfoDetailController.selected.estimatedRiskLevel)}" readonly="true" title="#{assetInfoDetailController.getEstimatedRiskLevelName(assetInfoDetailController.selected.estimatedRiskLevel)}"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'emergencyEquipment')}">
         <h:panelGroup >
             <label class="label">#{msg.emergencyEquipment}</label>

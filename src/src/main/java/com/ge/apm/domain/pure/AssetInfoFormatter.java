@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -93,6 +94,12 @@ public class AssetInfoFormatter {
         String value = findMatchValue(assetInfo.getRiskGrade(), importService.riskGradeList);
 
         return value;
+    }
+
+    public String getEstimatedRiskLevelAsString() {
+        if (assetInfo.getEstimatedRiskLevel() == null) return null;
+        RiskLevel level = RiskLevel.getByCode(assetInfo.getEstimatedRiskLevel());
+        return level != null ? level.getName() : null;
     }
 
     public Integer getMeasureGrade() {
@@ -993,6 +1000,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetUsage"),this.getAssetUsageAsString());
         map.put(getMessage("capitalSource"), this.getCapitalSourceAsString());
         map.put(getMessage("riskGrade"), this.getRiskGradeAsString());
+        map.put(getMessage("estimatedRiskLevel"), this.getEstimatedRiskLevelAsString());
         map.put(getMessage("measureGrade"), this.getMeasureGradeAsString());
         map.put(getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
         map.put(getMessage("emergencyEquipment"),  this.getEmergencyEquipmentAsString());
@@ -1136,6 +1144,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetUsage"),this.getAssetUsageAsString());
         map.put(getMessage("capitalSource"), this.getCapitalSourceAsString());
         map.put(getMessage("riskGrade"), this.getRiskGradeAsString());
+        map.put(getMessage("estimatedRiskLevel"), this.getEstimatedRiskLevelAsString());
         map.put(getMessage("measureGrade"), this.getMeasureGradeAsString());
         map.put(getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
         map.put(getMessage("emergencyEquipment"),  this.getEmergencyEquipmentAsString());
