@@ -292,6 +292,7 @@
                        <p:submenu id="validityManage" label="效期管理" icon="fa fa-square-o fa-fw" rendered="#{userContextService.canRender('ASSET_DEVICE_OVERDUE') and (userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') or userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW'))}">
                            <p:menuitem fragment="um100" id="um100" value="#{msg.deviceExpiryManagement}" outcome="/portal/asset/info/EquipmentExpiryManagement.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') }"/>
                            <p:menuitem fragment="um097" id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
+                           <p:menuitem fragment="um097" id="um097" value="#{msg.deviceOverdue}2" outcome="/portal/nine.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
                        </p:submenu>
                    </c:when>
                    <!-- BI报表分析 -->
