@@ -234,9 +234,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, easyInstallItem.getMedicalApparatusClassification());
             prepareEdit();
-            initLazyModelArrivalItemList();
-        }
 
+        }
+        initLazyModelArrivalItemList();
         customConfig = ccService.getCurrentCustomConfig(currentUser.getSiteUID());
 //        suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
 //        maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -250,6 +250,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         lazyModelArrivalItemList = new GenericDataTableModel<ArrivalListItem>() {
             @Override
             protected List<ArrivalListItem> load(PageRequest pageRequest) {
+                if(CollectionUtils.isEmpty(arrivalItemList)) return null;
                 int pageSize = pageRequest.getPageSize();
                 int pageNumber = pageRequest.getPageNumber();
                 int pageSizeCache = userContextService.getPageSizeCache("arrivalListEdit.xhtml.itemList");
