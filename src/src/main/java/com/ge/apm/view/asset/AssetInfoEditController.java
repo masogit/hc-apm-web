@@ -31,6 +31,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -2838,5 +2839,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean isLoginUser(String userUid) {
         return loginUser.getUid().equals(userUid);
+    }
+
+    public RiskLevel[] getRiskLevels() {
+        return RiskLevel.values();
     }
 }

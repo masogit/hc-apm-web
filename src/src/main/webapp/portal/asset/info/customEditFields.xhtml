@@ -936,6 +936,19 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'estimatedRiskLevel') and  userContextService.canRender('DEVICE_RISK_ASSESSMENT')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.estimatedRiskLevel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['estimatedRiskLevel'].required? '*':''}</span></label>
+            <p:selectOneMenu id="estimatedRiskLevel" value="#{assetInfoEditController.selected.estimatedRiskLevel}"
+                             required="#{assetInfoEditController.customConfig.assetFields['estimatedRiskLevel'].required}"
+                             requiredMessage="#{msg.estimatedRiskLevel} #{msg.ValidationRequire}"
+                             disabled="true">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{assetInfoEditController.riskLevels}" var="level" itemLabel="#{level.name}" itemValue="#{level.code}"/>
+                <p:ajax event="change" process="@this"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'emergencyEquipment')}" >
         <h:panelGroup>
             <label class="label">#{msg.emergencyEquipment}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['emergencyEquipment'].required? '*':''}</span></label>
