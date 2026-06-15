@@ -95,4 +95,8 @@ public class RiskAssessmentRecord {
     /** 模型版本 */
     @Column(name = "model_version", length = 50)
     private String modelVersion;
+
+    /** 请求参数JSON */
+    @Column(name = "request_params", columnDefinition = "TEXT")
+    private String requestParams;
 }
