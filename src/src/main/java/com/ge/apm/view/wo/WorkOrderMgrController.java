@@ -4572,6 +4572,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return url;
     }
 
+    public String setDataLinkUrl(String assetUid){
+        if(StringUtils.isEmpty(assetUid)) return "";
+        AssetInfo assetInfo = assetDao.findByUid(assetUid);
+        return setDataLinkUrl(assetInfo.getName(), assetUid);
+    }
+
+
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
         loadClinicalDeptList();
