@@ -146,6 +146,9 @@ public class WorkOrderReportProvider {
                 "wo.sub_status as subStatus, " +
                 "ai.registration_no as registrationNo, "+
                 "ai.warranty_date as warrantyDate, "+
+                "ai.tube_install_date as tubeInstallDate, "+
+                "ai.total_exposure_count as totalExposureCount, "+
+                "ai.total_inspection_count as totalInspectionCount, "+
                 "ai.factory_warranty_date as factoryWarrantyDate, "+
                 "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
                 "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +
