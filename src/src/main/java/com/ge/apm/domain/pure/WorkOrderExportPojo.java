@@ -228,8 +228,37 @@ public class WorkOrderExportPojo {
     private String  diagnosticProcess;
 
     //使用科室 【来源工单】
-    private String useDeptName
-            ;
+    private String useDeptName;
+
+    private Date tubeInstallDate;
+
+    private Integer totalExposureCount;
+
+    private Integer totalInspectionCount;
+
+    public Date getTubeInstallDate() {
+        return tubeInstallDate;
+    }
+
+    public void setTubeInstallDate(Date tubeInstallDate) {
+        this.tubeInstallDate = tubeInstallDate;
+    }
+
+    public Integer getTotalExposureCount() {
+        return totalExposureCount;
+    }
+
+    public void setTotalExposureCount(Integer totalExposureCount) {
+        this.totalExposureCount = totalExposureCount;
+    }
+
+    public Integer getTotalInspectionCount() {
+        return totalInspectionCount;
+    }
+
+    public void setTotalInspectionCount(Integer totalInspectionCount) {
+        this.totalInspectionCount = totalInspectionCount;
+    }
 
     public String getUseDeptName() {
         return useDeptName;
