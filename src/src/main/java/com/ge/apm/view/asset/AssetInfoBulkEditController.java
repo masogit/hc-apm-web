@@ -1515,6 +1515,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         if (null != filter.getClinicalDeptOrg()) {
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filter.getClinicalDeptOrg().getUid()));
+        } else {
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptListAsFilter));
         }
 
         if (null != this.filter.getAssetGroup()) {
