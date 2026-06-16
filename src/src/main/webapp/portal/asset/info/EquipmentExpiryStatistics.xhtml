@@ -11,13 +11,16 @@
             <p:outputLabel class="pageTitle" value="设备效期数据概览"/>
         </div>
         <div class="ui-g-12 card">
-            <iframe id="chartFrame" src="/reports/device-expiry" width="100%" height="900"></iframe>
+            <iframe id="chartFrame" src="https://apm-acct-stg.gehealthcloud.cn/reports/device-expiry" width="100%" height="900"></iframe>
         </div>
         </div>
-        <!-- remoteCommand 调用后端获取跳转 URL -->
-        <p:remoteCommand name="getAssetDetailUrl"
-                         actionListener="#{workOrderMgrController.setDataLinkUrl(paramAssetUid)}"
-                         oncomplete="if(args &amp;&amp; args.url) { window.location.href = args.url; }" />
+        <h:form id="hiddenForm">
+            <!-- remoteCommand 调用后端获取跳转 URL -->
+            <p:remoteCommand name="getAssetDetailUrl"
+                             actionListener="#{workOrderMgrController.setDataLinkUrl(paramAssetUid)}"
+                             oncomplete="if(args &amp;&amp; args.url) { window.location.href = args.url; }" />
+        </h:form>
+
 
         <h:outputScript>
             window.addEventListener('message', function(event) {
