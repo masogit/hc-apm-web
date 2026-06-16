@@ -503,7 +503,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         long daysDiff = Math.abs(ChronoUnit.DAYS.between(targetLocalDate, currentLocalDate));
 
 
-        String configItemByKeyToString = configItemService.getConfigItemByKeyToString(hospitalAdjustmentReturnTimeKey, currentUserAccount);
+        String configItemByKeyToString = configItemService.getConfigItemByKeyToString(hospitalAdjustmentReturnTimeKey, currentUserAccount.getInstitutionUID(),currentUserAccount.getTenantUID());
 
         int hospitalAdjustmentReturnTime = Integer.parseInt(configItemByKeyToString);
 
