@@ -35,4 +35,9 @@ public class ConfigItemService {
     public String getConfigItemByKeyToString(String key, UserAccount loginUser) {
         return configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), key);
     }
+
+
+    public String getConfigItemByKeyToString(String key, String hospitalUID,String tenantUid) {
+        return configItemValueRepository.findByKeyAndSiteForUseParent(hospitalUID, tenantUid, key);
+    }
 }
