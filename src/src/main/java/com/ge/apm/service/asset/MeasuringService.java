@@ -900,6 +900,7 @@ public class MeasuringService {
                 detail.setInstitutionUID(selectedOrg.getInstitutionUID());
                 detail.setHospitalUID(selectedOrg.getHospitalUID());
                 detail.setSiteUID(selectedOrg.getSiteUID());
+                detail.setCertificateType(1);
 
                 if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
                     detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
