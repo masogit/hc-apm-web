@@ -17,7 +17,7 @@
         <h:form id="hiddenForm">
             <!-- remoteCommand 调用后端获取跳转 URL -->
             <p:remoteCommand name="getAssetDetailUrl"
-                             actionListener="#{workOrderMgrController.setDataLinkUrl(paramAssetUid)}"
+                             actionListener="#{workOrderMgrController.buildDataLinkUrl}"
                              oncomplete="if(args &amp;&amp; args.url) { window.location.href = args.url; }" />
         </h:form>
 
