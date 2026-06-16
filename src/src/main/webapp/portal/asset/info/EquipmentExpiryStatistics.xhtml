@@ -14,17 +14,22 @@
             <iframe id="chartFrame" src="/reports/device-expiry" width="100%" height="900"></iframe>
         </div>
         </div>
+        <!-- remoteCommand 调用后端获取跳转 URL -->
+        <p:remoteCommand name="getAssetDetailUrl"
+                         actionListener="#{workOrderMgrController.setDataLinkUrl(paramAssetUid)}"
+                         oncomplete="if(args &amp;&amp; args.url) { window.location.href = args.url; }" />
 
         <h:outputScript>
-            // 监听来自 iframe 的消息
             window.addEventListener('message', function(event) {
-                console.log(event);
                 const data = event.data;
                 if(data.type === 'deviceNameClick'){
-                    window.location.href = "#{workOrderMgrController.setDataLinkUrl(data.payload.uid)}";
+                    // 调用 remoteCommand，把 uid 传给后端
+                    console.log(data.payload.uid);
+                    console.log(data);
+
+                    getAssetDetailUrl([{name:'paramAssetUid', value: data.payload.uid}]);
                 }
             });
         </h:outputScript>
-
     </ui:define>
 </ui:composition>

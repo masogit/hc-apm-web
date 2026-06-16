@@ -4572,10 +4572,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return url;
     }
 
-    public String setDataLinkUrl(String assetUid){
-        if(StringUtils.isEmpty(assetUid)) return "";
-        AssetInfo assetInfo = assetDao.findByUid(assetUid);
-        return setDataLinkUrl(assetInfo.getName(), assetUid);
+    public void setDataLinkUrl(String assetUid){
+        String url = "";
+        if(StringUtils.isNotEmpty(assetUid)){
+            AssetInfo assetInfo = assetDao.findByUid(assetUid);
+            url = setDataLinkUrl(assetInfo.getName(), assetUid);
+        }
+        // 把 URL 通过回调参数传给前端
+        RequestContext.getCurrentInstance().addCallbackParam("url", url);
     }
 
 
