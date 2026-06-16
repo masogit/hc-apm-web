@@ -150,7 +150,9 @@ public enum CustomConfigFields {
     ratingUsageCount(fieldName, "ratingUsageCount" ,Text),  //额定使用次数
     epc(fieldName, "epc" ,Text),  //epc码
     estimatedRiskLevel(fieldName, "estimatedRiskLevel" ,Select),  //风险等级(预估)
-
+    tubeInstallDate(fieldName, "tubeInstallDate" ,Text),  //球管安装时间
+    totalExposureCount(fieldName, "totalExposureCount" ,Text),  //曝光总次数
+    totalInspectionCount(fieldName, "totalInspectionCount" ,Text),  //检查总人数
 
     ;
 
