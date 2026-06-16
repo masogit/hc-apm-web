@@ -5,6 +5,7 @@ package com.ge.apm.domain;
 import com.alibaba.druid.util.StringUtils;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.utils.ChineseName;
@@ -1104,6 +1105,19 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Column(name = "asset_classification32")
     private String assetClassification32;
+    @Getter
+    @Setter
+    @Column(name = "tube_install_date")
+    @Temporal(TemporalType.DATE)
+    private Date tubeInstallDate;          //球管安装时间
+    @Getter
+    @Setter
+    @Column(name = "total_exposure_count")
+    private Integer totalExposureCount;    //曝光总次数
+    @Getter
+    @Setter
+    @Column(name = "total_inspection_count")
+    private Integer totalInspectionCount;  //检查总人数
 
 
     @Transient

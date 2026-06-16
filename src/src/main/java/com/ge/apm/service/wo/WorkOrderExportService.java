@@ -390,6 +390,10 @@ public class WorkOrderExportService {
             workOrderMap.put("siebleNumber", workOrderExportPojo.getSiebleNumber());
             workOrderMap.put("callCenterNumber", workOrderExportPojo.getCallCenterNumber());
 
+            workOrderMap.put(WebUtil.getMessage("tubeInstallDate"), workOrderExportPojo.getTubeInstallDate());
+            workOrderMap.put(WebUtil.getMessage("totalExposureCount"), workOrderExportPojo.getTotalExposureCount());
+            workOrderMap.put(WebUtil.getMessage("totalInspectionCount"), workOrderExportPojo.getTotalInspectionCount());
+
             workOrderMap.put(WebUtil.getMessage("entryType"), FieldValueMessageController.fieldValue(I18N_HOUR_TYPE, workOrderExportPojo.getEntryType() == null ? "0" : workOrderExportPojo.getEntryType().toString()));
             workOrderMap.put(WebUtil.getMessage("workHourDetail"), workOrderExportPojo.getWorkHourDetail());
 
