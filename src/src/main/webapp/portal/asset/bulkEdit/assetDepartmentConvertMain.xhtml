@@ -11,7 +11,7 @@
             <div class="ui-g-12">
                 <p:tabView id="tab"  dynamic="true" cache="false" activeIndex="0">
                     <p:ajax event="tabChange" listener="#{assetInfoBulkEditController.onTabChange}" />
-                    <p:tab title="资产批量转科" id="#{assetInfoBulkEditController.tabIDAsSelectAssets}">
+                    <p:tab title="资产批量转科" id="#{assetInfoBulkEditController.tabIDAsSelectAssets}" disabled="#{!userContextService.accessContainsFunctionMenu('ASSET_INFO_BATCH_EDIT')}">
                         <ui:include src="assetBulkEditSite1.xhtml"/>
                     </p:tab>
                     <p:tab title="资产转科情况" rendered="true" >
