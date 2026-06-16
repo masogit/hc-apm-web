@@ -171,13 +171,13 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{msg.certificateType}" filterBy="#{item.certificateType}" filterMatchMode="EQ" >
-                        <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('certificateType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
-                                </p:selectOneMenu>
-                        </f:facet>
+                    <p:column headerText="#{msg.certificateType}" >
+<!--                        <f:facet name="filter">-->
+<!--                                <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">-->
+<!--                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
+<!--                                    <f:selectItems value="#{fieldMsg.getFieldValueList('certificateType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>-->
+<!--                                </p:selectOneMenu>-->
+<!--                        </f:facet>-->
                         <h:outputText value="#{fieldMsg.fieldValue('certificateType', item.certificateType)}"/>
                     </p:column>
                     <p:column width="110" headerText="是否上传附件" exportable="false"  filterBy="#{item.existFileFlag}" filterMatchMode="GTE" >

@@ -448,7 +448,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths");
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths","certificateType");
         List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
         WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
