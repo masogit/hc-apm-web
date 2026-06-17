@@ -64,7 +64,14 @@
 
                         <p:column headerText="#{msg.operationType}"
                                   filterBy="#{item.operationType}"
-                                  filterMatchMode="LIKE">
+                                  filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{userAccountEsHistoryController.historyActionList}" var="action"
+                                                   itemLabel="#{action.label}" itemValue="#{action.value}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{item.operationType}"/>
                         </p:column>
 
@@ -72,9 +79,9 @@
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.createdBy}"/>
                         </p:column>
-                        <p:column headerText="#{msg.modifiedTime}" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+                        <p:column headerText="#{msg.modifiedTime}" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}" filterMatchMode="GTE" >
                             <f:facet name="filter">
-                                <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" />
+                                <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" value="#{userAccountEsHistoryController.filterObject['purchaseDate']}" />
                             </f:facet>
                             <h:outputText value="#{item.createdDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
