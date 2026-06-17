@@ -18,7 +18,7 @@
             <!-- remoteCommand 调用后端获取跳转 URL -->
             <p:remoteCommand name="getAssetDetailUrl"
                              actionListener="#{workOrderMgrController.buildDataLinkUrl}"
-                             oncomplete="if(args &amp;&amp; args.url) { window.location.href = args.url; }" />
+                             oncomplete="if(args &amp;&amp; args.url) { window.open(args.url, '_blank', 'noopener,noreferrer'); }" />
         </h:form>
 
 
