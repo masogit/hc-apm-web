@@ -849,7 +849,7 @@ public class AssetImport implements Serializable {
     private String supplierNewUID;
 
     private Set<AssetTags> assetTags;
-    @ExcelProperty("assetTags")
+    @ExcelProperty("tags")
 
     private String tagStr;
 

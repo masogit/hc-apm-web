@@ -1018,7 +1018,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("networkingStatus"), this.getNetworkingStatusAsString());
         map.put(getMessage("capitalSource2"), this.getCapitalSource2AsString());
         map.put(getMessage("isWarrantyNotice"), this.getWarrantyAsString());
-        map.put(getMessage("assetTags"), this.joinTags(assetMap));
+        map.put(getMessage("tags"), this.joinTags(assetMap));
         map.put(getMessage("UCMID"), assetInfo.getUCMID());
 
         //fields not used by default
@@ -1162,7 +1162,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("networkingStatus"), this.getNetworkingStatusAsString());
         map.put(getMessage("capitalSource2"), this.getCapitalSource2AsString());
         map.put(getMessage("isWarrantyNotice"), this.getWarrantyAsString());
-        map.put(getMessage("assetTags"), this.joinTags(assetMap));
+        map.put(getMessage("tags"), this.joinTags(assetMap));
         map.put(getMessage("UCMID"), assetInfo.getUCMID());
 
         //fields not used by default

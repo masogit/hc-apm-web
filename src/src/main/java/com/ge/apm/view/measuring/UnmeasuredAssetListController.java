@@ -116,11 +116,11 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
 
         if (!this.hasFilterOnField("status")) {
 //            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
-            wrapper.and().ne("status",4);
+            wrapper.andNew().ne("status",4);
         }else{
             Optional<SearchFilter> siteUID = getFilterOnField("status");
             SearchFilter searchFilter = siteUID.get();
-            wrapper.and().eq("status",searchFilter.value);
+            wrapper.andNew().eq("status",searchFilter.value);
         }
 
         if (!this.hasFilterOnField("isValid")) {
