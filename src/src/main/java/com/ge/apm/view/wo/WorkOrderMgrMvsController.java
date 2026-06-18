@@ -498,6 +498,9 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
                     break;
+                case "assetLocation":
+                    params.put("serviceRequest.assetLocation", searchFilter.value);
+                    break;
                 default:
                     break;
             }

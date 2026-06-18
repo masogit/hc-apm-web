@@ -178,6 +178,9 @@
         <if test="functionType != null">
             AND a.function_type  like CONCAT('%', #{functionType}, '%')
         </if>
+        <if test="assetLocation != null">
+            AND vs.asset_location  like CONCAT('%', #{assetLocation}, '%')
+        </if>
 
         ORDER BY vs.request_time desc
     </select>

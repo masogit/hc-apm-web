@@ -193,7 +193,7 @@ public class WorkOrderReportProvider {
                 "wo.work_order_type as workOrderType, " +
                 "wo.main_sub as mainSub, " +
                 "sr.case_priority as casePriority," +
-                "sr.from_dept_name as useDeptName," +
+                "sr.asset_location as useDeptName," +
                 "ai.spare01,ai.spare02,ai.spare03,ai.spare04,ai.spare05,ai.spare06,ai.spare07,ai.spare08,ai.spare09,ai.spare10,sr.ib_status as ibStatus " +
                 "from v2_work_order wo " +
                 "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
@@ -433,6 +433,9 @@ public class WorkOrderReportProvider {
                     break;
                 case "srNum":
                     sb.append(" and sr.sr_num = '").append(value).append("'");
+                    break;
+                case "assetLocation" :
+                    sb.append(" and sr.asset_location = '").append(value).append("'");
                     break;
                 case "requestTime":
                     if (op.equals(SearchFilter.Operator.GTE)) {

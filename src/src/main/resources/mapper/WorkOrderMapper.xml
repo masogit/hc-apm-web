@@ -93,6 +93,9 @@
             </foreach>
             )
         </if>
+        <if test="assetLocation != null">
+            and r.asset_location  like CONCAT('%', #{assetLocation}, '%')
+        </if>
     </sql>
     <sql id="queryColumn">
         w.id,
