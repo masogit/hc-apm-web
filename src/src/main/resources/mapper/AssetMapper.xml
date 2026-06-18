@@ -56,7 +56,7 @@
         mcd.type measuring_type,
         mcd.check_company last_check_company,
         ai.last_metering_date,
-        mcd.valid_date_to next_metering_date,
+        ai.next_metering_date ,
         mcd.check_date,
         mcd.check_person,
         mcd.id as bo_uuid,

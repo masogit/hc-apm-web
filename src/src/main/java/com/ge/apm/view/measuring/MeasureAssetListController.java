@@ -509,6 +509,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
         }
         dao.save(byUidIn);
+        validityMonths = null;
     }
 
     public boolean judgeMeasurementRepair(){
