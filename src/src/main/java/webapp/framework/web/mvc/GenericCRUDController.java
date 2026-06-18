@@ -1,14 +1,12 @@
 package webapp.framework.web.mvc;
 
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
@@ -160,30 +158,13 @@ public abstract class GenericCRUDController<E> implements Serializable {
             if(isDateTimeField(fieldName)){
                 String[] values;
                 // support lte & gte for datetime field
-                if (filterValue.toString().contains("~")) {
                     values = filterValue.toString().split("~");
-                    searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, (TimeUtil.fromString("yyyy/MM/dd", values[0])).toDate()));
-                    searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, (TimeUtil.fromString("yyyy/MM/dd", values[1])).toDate()));
-                    continue;
-                } else {
-                    values = filterValue.toString().split(" ");
-                    if(values.length==1 && "EQ".equals(filterMatchModes.get(fieldName))){
-
-                        if(filterValue!=null){
-
-                        }
-                    }
                     if(values.length>0){
-                        filterValue = TimeUtil.fromString("yyyy-MM-dd", values[0]);
-                        if(filterValue!=null)
-                            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime)filterValue).toDate()));
+                        Optional.ofNullable(TimeUtil.fromString(values[0])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, var.toDate())));
                     }
                     if(values.length>1){
-                        filterValue = TimeUtil.fromString("yyyy-MM-dd", values[2]);
-                        if(filterValue!=null)
-                            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime)filterValue).toDate()));
+                        Optional.ofNullable(TimeUtil.fromString(values[1])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, TimeUtils.getDateFromStr(TimeUtils.getStrDate(var.toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss"))));
                     }
-                }
                 continue;
             }
 

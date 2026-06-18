@@ -603,7 +603,7 @@
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetTags')}" >
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'tags')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetTags}</label>
             <p:autoComplete id="tags" multiple="true" value="#{assetInfoDetailController.selected.tags}" readonly="true" disabled="true"
