@@ -222,7 +222,7 @@
 
             <ui:include src="AssetSelect.xhtml" />
             <p:dialog id="batchValidPeriodMonthsDlg" widgetVar="batchValidPeriodMonthsDialog" modal="true" resizable="true" draggable="true" width="1050"
-                      height="600" header="批量报修设备">
+                      height="600" header="批量修改有效期（月）">
                 <h:form id="BatchValidPeriodMonthsForm">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
@@ -253,7 +253,7 @@
 
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{measureAssetListController.updateValidityMonths()}"
-                                     value="确认" update="measuringTab:ServiceRequestCreateForm" icon="ui-icon-check"
+                                     value="确认" update="measuringTab:measuringAssetListForm:datalist_measuringAsset" icon="ui-icon-check"
                                       onclick="PF('batchValidPeriodMonthsDialog').hide()"/>
 
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
