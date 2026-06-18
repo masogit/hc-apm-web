@@ -87,14 +87,8 @@
                     <h:outputText value="#{workOrderUnifiedController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.assetDeptName}"  filterBy="#{item.serviceRequest.fromDeptUid}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{item.serviceRequest.fromDeptName}"/>
+                <p:column headerText="#{msg.assetDeptName}"  filterBy="#{item.serviceRequest.assetLocation}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <h:outputText value="#{item.serviceRequest.assetLocation}"/>
                 </p:column>
                     <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.serviceRequest.srNum}"/>

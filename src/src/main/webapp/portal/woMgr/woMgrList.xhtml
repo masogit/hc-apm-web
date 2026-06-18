@@ -178,14 +178,8 @@
                         </p:column>
                     </c:if>
                     <c:if test="#{fieldItem.rendered and fieldItem.field eq 'fromDeptName'}">-->
-                        <p:column headerText="#{msg.AssetDepartment}" filterBy="#{item.serviceRequest.fromDeptName}" filterMatchMode="LIKE" width="100"  rendered="#{!userContextService.hasCurrentTenantName('')}" >
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.name}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{item.serviceRequest.fromDeptName}"/>
+                        <p:column headerText="#{msg.AssetDepartment}" filterBy="#{item.serviceRequest.assetLocation}" filterMatchMode="LIKE" width="100"  rendered="#{!userContextService.hasCurrentTenantName('')}" >
+                            <h:outputText value="#{item.serviceRequest.assetLocation}"/>
                         </p:column>
                    </c:if>
                     <c:if test="#{fieldItem.rendered and fieldItem.field eq 'locationName'}">

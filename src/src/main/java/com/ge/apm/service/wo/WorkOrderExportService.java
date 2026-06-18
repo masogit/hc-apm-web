@@ -156,11 +156,7 @@ public class WorkOrderExportService {
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
         if (v2WorkOrderReportDto.getAssetDept() != null) {
-            List<OrgInfo> orgSearchList = new ArrayList<>();
-            orgSearchList.add(v2WorkOrderReportDto.getAssetDept());
-            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, v2WorkOrderReportDto.getClinicalDeptList());
-            List<String> clinicalDeptUIDList = tempOrgSearchSet.stream().map(OrgInfo::getUid).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
+            searchFilters.add(new SearchFilter("assetLocation", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getAssetDept().getName()));
         }
         if (v2WorkOrderReportDto.getCurrentOwner() != null) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getCurrentOwner().getId()));

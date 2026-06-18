@@ -241,6 +241,8 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
                 case "currentStepName":
                     params.put("currentStepName", searchFilter.value);
                     break;
+                case "serviceRequest.assetLocation":
+                    params.put("assetLocation", searchFilter.value);
                 default:
                     break;
             }
