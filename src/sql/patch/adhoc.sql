@@ -16,3 +16,6 @@ ALTER TABLE measuring_certificate_detail ADD COLUMN IF NOT EXISTS certificate_ty
 ALTER TABLE measuring_certificate_detail ADD COLUMN IF NOT EXISTS validity_months INT DEFAULT NULL;
 
 UPDATE measuring_certificate_detail SET certificate_type = 1;
+
+-- YHAAO-28554 修改 asset_tags 为 tags
+update custom_config set config = REPLACE(config, '"assetTags"', '"tags"') where config like '%"assetTags"%';

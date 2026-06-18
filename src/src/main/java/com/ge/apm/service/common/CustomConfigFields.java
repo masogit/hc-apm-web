@@ -106,7 +106,7 @@ public enum CustomConfigFields {
     orgPath(label, "orgPath" ,Text),  //所属单位
     assetLocation(label, "assetLocation" ,Text),  //当前位置
     UCMID(fieldName, "UCMID" ,Text),
-    assetTags(label, "assetTags" ,Text),  //标签
+    tags(label, "tags" ,TextArray),  //标签
     createdBy(fieldName, "createdBy" ,Text),  //创建人
     connectToInsite(label, "connectToInsite" ,Text),  //连通状态
     assetClass(customI18n, "assetClass" ,Text),  //管理分类
@@ -189,6 +189,7 @@ public enum CustomConfigFields {
     public enum DataType{
         Select,
         Text,
+        TextArray,
         Integer,
         Double,
         Boolean,

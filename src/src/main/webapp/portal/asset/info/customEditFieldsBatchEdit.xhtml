@@ -895,7 +895,7 @@
         </h:panelGroup>
     </c:if>
 
-    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetTags')}" >
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'tags')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetTags}</label>
             <p:autoComplete id="tags" multiple="true" value="#{assetInfoBulkEditController.selected.tags}" completeMethod="#{assetInfoBulkEditController.autoCompleteTags}"
