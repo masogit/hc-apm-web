@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -370,6 +372,37 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private ExternalTempUser externalTempUser;
     @Transient
     private String issueType;
+    @Column(name = "tube_install_date")
+    @Temporal(TemporalType.DATE)
+    private Date tubeInstallDate;          //球管安装时间
+    @Column(name = "total_exposure_count")
+    private Integer totalExposureCount;    //曝光总次数
+    @Column(name = "total_inspection_count")
+    private Integer totalInspectionCount;  //检查总人数
+
+    public Date getTubeInstallDate() {
+        return tubeInstallDate;
+    }
+
+    public void setTubeInstallDate(Date tubeInstallDate) {
+        this.tubeInstallDate = tubeInstallDate;
+    }
+
+    public Integer getTotalExposureCount() {
+        return totalExposureCount;
+    }
+
+    public void setTotalExposureCount(Integer totalExposureCount) {
+        this.totalExposureCount = totalExposureCount;
+    }
+
+    public Integer getTotalInspectionCount() {
+        return totalInspectionCount;
+    }
+
+    public void setTotalInspectionCount(Integer totalInspectionCount) {
+        this.totalInspectionCount = totalInspectionCount;
+    }
 
     public String getIssueType() {
         return issueType;
