@@ -511,7 +511,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
 
         int hospitalAdjustmentReturnTime = Integer.parseInt(configItemByKeyToString);
 
-        return daysDiff > hospitalAdjustmentReturnTime;
+        return daysDiff >= hospitalAdjustmentReturnTime;
     }
 
     public void download()   {
