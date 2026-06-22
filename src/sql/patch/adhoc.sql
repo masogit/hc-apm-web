@@ -19,3 +19,8 @@ UPDATE measuring_certificate_detail SET certificate_type = 1;
 
 -- YHAAO-28554 修改 asset_tags 为 tags
 update custom_config set config = REPLACE(config, '"assetTags"', '"tags"') where config like '%"assetTags"%';
+
+
+INSERT INTO public.config_item (uid, name, category, key, value_type, description, super_admin_edit, default_value, user_parent_config,validation)
+SELECT replace(uuid_generate_v4()::text,'-',''),'风险模型更新周期',1, 'RiskModelUpdateCycle',7,'风险模型更新周期',false,'QUARTERLY',true,'[{"key":"每月","value":"MONTHLY"},{"key":"每季度","value":"QUARTERLY"},{"key":"每年","value":"YEARLY"}]'
+    WHERE NOT EXISTS (SELECT 1 FROM public.config_item WHERE key = 'RiskModelUpdateCycle');
