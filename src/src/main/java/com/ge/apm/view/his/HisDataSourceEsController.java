@@ -36,6 +36,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -114,8 +115,8 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
         orgComponentController.registerController(this);
 
         hisRequestParamsDto = new HisRequestParamsDto();
-        hisRequestParamsDto.setEndDate(new Date());
-        hisRequestParamsDto.setStartDate(DateUtil.addMonth(new Date(), -3));
+        hisRequestParamsDto.setEndDate(setEndTime(new Date()));
+        hisRequestParamsDto.setStartDate(setStartTime(DateUtil.addMonth(new Date(), -3)));
 
         filterDeviceDeptCodeSet = new HashSet<>();
         filterDeviceDeptCodeInSet = new HashSet<>();
@@ -166,7 +167,7 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
             searchFilters.add(new SearchFilter("exec_time", SearchFilter.Operator.GTE, hisRequestParamsDto.getStartDate()));
         }
         if (hisRequestParamsDto.getEndDate() != null) {
-            searchFilters.add(new SearchFilter("exec_time", SearchFilter.Operator.LT, DateUtil.getDateAddOneDay(hisRequestParamsDto.getEndDate())));
+            searchFilters.add(new SearchFilter("exec_time", SearchFilter.Operator.LTE, hisRequestParamsDto.getEndDate()));
         }
 
         if (execDeptOrgUidSet != null && !execDeptOrgUidSet.isEmpty()) {
@@ -377,7 +378,7 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
         if (hisRequestParamsDto.getStartDate() != null) {
             if (hisRequestParamsDto.getEndDate() != null
                     && !hisRequestParamsDto.getEndDate().before(DateUtil.addMonth(hisRequestParamsDto.getStartDate(), 12))) {
-                hisRequestParamsDto.setEndDate(DateUtil.addMonth(hisRequestParamsDto.getStartDate(), 12));
+                hisRequestParamsDto.setEndDate(setEndTime(DateUtil.addMonth(hisRequestParamsDto.getStartDate(), 12)));
             }
         }
     }
@@ -498,5 +499,37 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
             loadExecDeptList();
             loadSfxmList();
         }
+    }
+
+    /**
+     * 将日期的时分秒设置为 00:00:00.000
+     */
+    private Date setStartTime(Date date) {
+        if (date == null) {
+            return null;
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    /**
+     * 将日期的时分秒设置为 23:59:59.999
+     */
+    private Date setEndTime(Date date) {
+        if (date == null) {
+            return null;
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        return cal.getTime();
     }
 }
