@@ -2024,7 +2024,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             valid = false;
         }
         if (confirmedUpDate == null) {
-            if("1".equals(selectedWorkOrder.getRepairResult()) || "2".equals(selectedWorkOrder.getRepairResult()) || "3".equals(selectedWorkOrder.getRepairResult())){
+            if("1".equals(selectedWorkOrder.getRepairResult()) || "5".equals(selectedWorkOrder.getRepairResult()) || "6".equals(selectedWorkOrder.getRepairResult())){
                 WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
                 RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
                 valid = false;
