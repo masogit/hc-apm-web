@@ -6,10 +6,12 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 template="/WEB-INF/template.xhtml">
 <ui:define name="content">
-        <div class="ui-g-12 card">
+
+        <div class="ui-g clearfix" id="header">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="计量信息"/>
             </div>
+            <div class="ui-g-12 card">
             <h:form id="measuringResultForm">
                 <p:fieldset legend="计量结果" rendered="#{not empty measureAssetListController.selected}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -119,6 +121,7 @@
                     </p:panelGrid>
                 </p:fieldset>
             </h:form>
+            </div>
             <ui:include src="/portal/preview/view.xhtml" />
         </div>
 </ui:define>
