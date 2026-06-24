@@ -202,6 +202,9 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             String matchType = (String) UrlEncryptController.getValueFromMap(encodeStr, "matchType");
             this.selected = dao.findByUid(selectedId);
+            if(this.selected == null){
+                this.selected = new AssetInfo();
+            }
             if("1".equals(matchType)){
                 measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
             }else{
