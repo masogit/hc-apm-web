@@ -156,7 +156,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
             addNode("待交付",(selected.getPendingDeliveryUid()),selected.getPendingDeliveryDate(),collect);
         }
         if(selected.getStatus()==5){
-            addNode("待调剂关单","System",selected.getPendingDeliveryDate(),collect);
+            addNode("待调剂关单","System",selected.getDeliveryDate(),collect);
         }
         if(selected.getReturnPendingUid()!=null){
             addNode("待退回审批及关单",(selected.getReturnPendingUid()),selected.getReturnDate(),collect);
