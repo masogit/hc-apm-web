@@ -17,45 +17,13 @@
     <p:dialog class="repairCompleteDialog" id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
         <h:form id="repairCompleteDialogForm" class="tform">
             <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
-
-
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-
-                    <h:panelGroup id="assetstatus">
-                        <label class="label">#{msg.status}</label>
-                        <p:selectOneRadio class="x0" id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
-                            <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
-                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
-                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="true"/>
-                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(2).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(2).msgKey}" />
-                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(3).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" itemDisabled="#{!assetInfoEditController.hasScrappedAuthority()}"/>
-                        </p:selectOneRadio>
-                    </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.RepairResult}*</label>
-                        <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="#{msg.RepairResult} #{msg.ValidationRequire}">
-                            <p:ajax listener="#{workOrderMgrController.repairResultSet()}" update="@(.x0) woTab:repairCompleteDialogForm:recoveryTimeGroup"/>
-
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        <label class="label">#{msg.intExtType}</label>
+                        <p:selectOneMenu value="#{workOrderMgrController.selectedWorkOrder.intExtType}" required="false" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType').subList(0,2)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneMenu>
-                    </h:panelGroup>
-
-                    <h:panelGroup id="recoveryTimeGroup" >
-                        <h:panelGroup rendered="#{not empty workOrderMgrController.selectedWorkOrder.repairResult and (
-                            workOrderMgrController.selectedWorkOrder.repairResult == '1' or
-                            workOrderMgrController.selectedWorkOrder.repairResult == '5' or
-                            workOrderMgrController.selectedWorkOrder.repairResult == '6'
-                    )}">
-                            <label class="label">#{msg.recoveryTime}*</label>
-                            <p:calendar timeZone="GMT+8" id="confirmedUpDate" pattern="yyyy/MM/dd HH:mm:ss" mask="true"
-                                        value="#{workOrderMgrController.confirmedUpDate}" showOn="button"
-                                        showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"
-                                        required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
-                                <p:ajax event="dateSelect"/>
-                            </p:calendar>
-                        </h:panelGroup>
-
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -75,40 +43,68 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
+                        <label class="label">#{msg.RepairResult}*</label>
+                        <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="#{msg.RepairResult} #{msg.ValidationRequire}">
+                            <p:ajax listener="#{workOrderMgrController.repairResultSet()}" update="@(.x0) woTab:repairCompleteDialogForm:recoveryTimeGroup"/>
+
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
                         <label class="label">#{msg.MaintenanceSubStatus}</label>
                         <p:selectOneMenu id="subStatus"  value="#{workOrderMgrController.selectedWorkOrder.subStatus}" required="false" requiredMessage="#{msg.MaintenanceSubStatus} #{msg.ValidationRequire}">
-                            <p:ajax   listener="#{workOrderMgrController.selectSubstatus()}" update="subStatusStartSubStatusTime"/>
+                            <p:ajax   listener="#{workOrderMgrController.selectSubstatus()}" update="subStatusStartSubStatusTimeStart subStatusStartSubStatusTimeEnd"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('subStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
-                </p:panelGrid>
-
-                <p:panelGrid  id="subStatusStartSubStatusTime" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
-                        <label class="label">#{msg.startTime}</label>
-                        <p:calendar timeZone="GMT+8" label="#{msg.StartTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
-                            <p:ajax event="dateSelect"/>
-                        </p:calendar>
+                    <h:panelGroup id="subStatusStartSubStatusTimeStart">
+                        <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
+                            <label class="label">#{msg.startTime}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.StartTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </h:panelGroup>
                     </h:panelGroup>
-                    <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
-                        <label class="label">#{msg.endTime}</label>
-                        <p:calendar timeZone="GMT+8" label="#{msg.EndTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
-                            <p:ajax event="dateSelect"/>
-                        </p:calendar>
+                    <h:panelGroup id="subStatusStartSubStatusTimeEnd">
+                        <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
+                            <label class="label">#{msg.endTime}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EndTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </h:panelGroup>
                     </h:panelGroup>
                 </p:panelGrid>
 
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
-                        <label class="label">#{msg.intExtType}</label>
-                        <p:selectOneMenu value="#{workOrderMgrController.selectedWorkOrder.intExtType}" required="false" >
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType').subList(0,2)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                        </p:selectOneMenu>
+                    <h:panelGroup id="assetstatus">
+                        <label class="label">#{msg.status}</label>
+                        <p:selectOneRadio class="x0" id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                            <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
+                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
+                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="true"/>
+                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(2).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(2).msgKey}" />
+                            <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(3).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" itemDisabled="#{!assetInfoEditController.hasScrappedAuthority()}"/>
+                        </p:selectOneRadio>
                     </h:panelGroup>
 
+                    <h:panelGroup id="recoveryTimeGroup" >
+                        <h:panelGroup rendered="#{not empty workOrderMgrController.selectedWorkOrder.repairResult and (
+                            workOrderMgrController.selectedWorkOrder.repairResult == '1' or
+                            workOrderMgrController.selectedWorkOrder.repairResult == '5' or
+                            workOrderMgrController.selectedWorkOrder.repairResult == '6'
+                    )}">
+                            <label class="label">#{msg.recoveryTime}*</label>
+                            <p:calendar timeZone="GMT+8" id="confirmedUpDate" pattern="yyyy/MM/dd HH:mm:ss" mask="true"
+                                        value="#{workOrderMgrController.confirmedUpDate}" showOn="button"
+                                        showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"
+                                        required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </h:panelGroup>
+
+                    </h:panelGroup>
 
                     <h:panelGroup rendered="#{systemConfigItemController.getFieldColumn(workOrderMgrController.currentUserOrgInfo, 'showWorkOrderType').rendered}">
                         <label class="label">

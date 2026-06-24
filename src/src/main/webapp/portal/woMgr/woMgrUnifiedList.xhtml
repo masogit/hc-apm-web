@@ -25,7 +25,7 @@
                 <p:ajax event="filter" listener="#{workOrderUnifiedController.onFilterWo}" update="datalist" oncomplete="updateSelectAllCheckBox();"/>
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 
-                <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
+                <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -41,16 +41,16 @@
                         </c:otherwise>
                     </c:choose>
                 </p:column>
-                <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.assetName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.name}"/>
                 </p:column>
-                <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.ManufacturerSerialNumber}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.serialNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.departNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.functionType}"/>
                 </p:column>
                <!-- <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
@@ -90,10 +90,10 @@
                 <p:column headerText="#{msg.assetDeptName}"  filterBy="#{item.serviceRequest.assetLocation}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.serviceRequest.assetLocation}"/>
                 </p:column>
-                    <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.serviceRequest.srNum}"/>
                     </p:column>
-                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="LIKE">
                     <f:facet name="filter">
                         <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{workOrderUnifiedController.applyTimeFormatTime}"/>
                     </f:facet>
@@ -101,7 +101,7 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                <p:column headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderUnifiedController.stepFileter}"  >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -111,7 +111,7 @@
                     <h:outputText value="#{item.currentStepName}" style="display: none"/>
                     <p:graphicImage  width="165" height="38" url="#{workOrderUnifiedController.getStepImg(item)}"/>
                 </p:column>
-                <p:column width="90" headerText="#{msg.intExtType}" sortBy="#{item.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="EQ">
+                <p:column width="90" headerText="#{msg.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="EQ">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -120,7 +120,7 @@
                     </f:facet>
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
-                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}"  filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
                     <h:outputText value="#{workOrderUnifiedController.getRequestReasonInShort(item.serviceRequest.requestReason)}" title="#{item.serviceRequest.requestReason}"/>
                 </p:column>
                 <p:column width="90" headerText="主子工单" rendered="#{!userContextService.isEnableBtnByKey('displayMainSubWorkOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
