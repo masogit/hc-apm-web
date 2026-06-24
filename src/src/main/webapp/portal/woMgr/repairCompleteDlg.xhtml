@@ -17,22 +17,8 @@
     <p:dialog class="repairCompleteDialog" id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
         <h:form id="repairCompleteDialogForm" class="tform">
             <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
-                        <label class="label">#{msg.caseType}*</label>
-                        <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <c:choose>
-                                <c:when test="#{userContextService.isCountyArea()}">
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('faultTypeCountyArea')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </c:when>
-                                <c:otherwise>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </c:otherwise>
-                            </c:choose>
-                            <p:ajax event="change" process="@this" />
-                        </p:selectOneMenu>
-                    </h:panelGroup>
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
                     <h:panelGroup>
                         <label class="label">#{msg.RepairResult}*</label>
                         <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="#{msg.RepairResult} #{msg.ValidationRequire}">
@@ -65,6 +51,21 @@
                                 <p:ajax event="dateSelect"/>
                             </p:calendar>
                         </h:panelGroup>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.caseType}*</label>
+                        <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <c:choose>
+                                <c:when test="#{userContextService.isCountyArea()}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('faultTypeCountyArea')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </c:when>
+                                <c:otherwise>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </c:otherwise>
+                            </c:choose>
+                            <p:ajax event="change" process="@this" />
+                        </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.intExtType}</label>
