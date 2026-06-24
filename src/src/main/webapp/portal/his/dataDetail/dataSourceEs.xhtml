@@ -116,8 +116,7 @@
                                                                 size="5" style="width: 90px">
                                                     <p:ajax event="itemSelect" listener="#{hisDataSourceEsController.onProjectNameFilterChange}"
                                                             process="@this" update="HisDataSourceTab:IouListForm:datalist"/>
-                                                    <p:ajax process="@this" listener="#{hisDataSourceEsController.onProjectNameFilterChange}"
-                                                            update="HisDataSourceTab:IouListForm:datalist"/>
+
                                                 </p:autoComplete>
                                             </f:facet>
                                             <h:outputText value="#{item.projectName}"/>
@@ -131,8 +130,7 @@
                                                                 size="5" style="width: 90px">
                                                     <p:ajax event="itemSelect" listener="#{hisDataSourceEsController.onSfxmLbFilterChange}"
                                                             process="@this" update="HisDataSourceTab:IouListForm:datalist"/>
-                                                    <p:ajax process="@this" listener="#{hisDataSourceEsController.onSfxmLbFilterChange}"
-                                                            update="HisDataSourceTab:IouListForm:datalist"/>
+
                                                 </p:autoComplete>
                                             </f:facet>
                                             <h:outputText value="#{item.sfxmLb}"/>
