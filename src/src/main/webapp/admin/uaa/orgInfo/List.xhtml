@@ -31,7 +31,7 @@
                     <div class="ui-g-12 ui-lg-4">
                         <div class="card" style="height:400px;">
                             <h:panelGroup>
-                                <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
+                                <p:inputText id="retrieval" value="#{orgInfoController.retrieval}" placeholder="标准名称/简称"/>
                                 <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{orgInfoController.filterNode()}" value="#{msg.Search2}"  update=":editForm:orgTree :editPanel :growl"/>
                             </h:panelGroup>
                             <p:commandButton id="btnSite" style="max-width:160px;" value="#{orgInfoController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>

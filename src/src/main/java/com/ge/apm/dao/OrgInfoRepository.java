@@ -226,6 +226,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select uid from org_info where name like concat('%',?1,'%') and org_type = 1 and site_id = ?2 limit 500", nativeQuery = true)
     List<String> findByInstitutionByNameLike(String name, Integer siteId);
 
+    @Query(value = "select uid from org_info where (name like concat('%',?1,'%') or  name_en like concat('%',?1,'%')) and org_type = 1 and site_id = ?2 limit 500", nativeQuery = true)
+    List<String> findByInstitutionByNameOrShortName(String name, Integer siteId);
+
     @Query(value = "with recursive cte_org as (\n" +
             "    select oi.*\n" +
             "    from org_info oi\n" +

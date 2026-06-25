@@ -982,6 +982,14 @@ public class UaaService {
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
+    public List<OrgInfo> getUserAccessibleSiteListWithCondition(String name, Integer siteId) {
+        List<String> institutions = orgInfoDao.findByInstitutionByNameOrShortName(name, siteId); //TODO: fetch by user accessible site list
+        //for accessible sites`
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
+
     //用户可以显示的医院列表(不包含科室)
     public List<OrgInfo> getUserAccessibleSiteList(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
