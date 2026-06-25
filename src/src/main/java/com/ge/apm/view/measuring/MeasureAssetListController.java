@@ -200,15 +200,18 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         String encodeStr = WebUtil.getRequestParameter("str");
         if(StringUtils.hasText(encodeStr)){
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-            String matchType = (String) UrlEncryptController.getValueFromMap(encodeStr, "matchType");
+            String matchTypeStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "matchType");
+            String boUuid = (String) UrlEncryptController.getValueFromMap(encodeStr, "boUuid");
+            matchType = Integer.valueOf(matchTypeStr);
             this.selected = dao.findByUid(selectedId);
             if(this.selected == null){
                 this.selected = new AssetInfo();
+                this.selected.setBoUuid(boUuid);
             }
-            if("1".equals(matchType)){
+            if(Integer.valueOf(1).equals(matchType)){
                 measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
             }else{
-                 String boUuid = (String) UrlEncryptController.getValueFromMap(encodeStr, "boUuid");
+
                 MeasuringCertificateDetail byId = measuringCertificateDetailDao.findById(boUuid);
                 if(byId!=null){
                     measuringCertificateList=new ArrayList<>();
