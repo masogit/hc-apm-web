@@ -92,6 +92,9 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     @Column(name = "expected_check_number_people")
     private Integer expectedCheckNumberPeople;
 
+    @Column(name = "dept_expected_payback_period")
+    private BigDecimal deptExpectedPaybackPeriod;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false,updatable = false)
     private AssetInfo assetInfo;
@@ -129,6 +132,14 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
     public void setExpectedCheckNumberPeople(Integer expectedCheckNumberPeople) {
         this.expectedCheckNumberPeople = expectedCheckNumberPeople;
+    }
+
+    public BigDecimal getDeptExpectedPaybackPeriod() {
+        return deptExpectedPaybackPeriod;
+    }
+
+    public void setDeptExpectedPaybackPeriod(BigDecimal deptExpectedPaybackPeriod) {
+        this.deptExpectedPaybackPeriod = deptExpectedPaybackPeriod;
     }
 
     public String getFinancingNum() {

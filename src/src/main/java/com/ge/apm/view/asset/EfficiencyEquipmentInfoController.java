@@ -156,6 +156,10 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     @Getter
     @Setter
+    private BigDecimal deptExpectedPaybackPeriod;
+
+    @Getter
+    @Setter
     private String displayName;
 
     private SystemTemplateService systemTemplateService;
@@ -749,8 +753,9 @@ protected boolean numberField(String fieldName, String filterVal) {
         this.displayName=null;
         this.expectedAnnualIncome=null;
         this.expectedCheckNumberPeople=null;
+        this.deptExpectedPaybackPeriod=null;
     }
-    public void  editBatch(){
+    public void editBatch() {
         if (positiveRate != null) {
             if (positiveRate.compareTo(BigDecimal.valueOf(100)) > 0) {
                 this.positiveRate = null;
@@ -759,7 +764,7 @@ protected boolean numberField(String fieldName, String filterVal) {
             }
         }
         Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-        int count = efficiencyEquipmentInfoRepository.updateBatchSmart(assetUids, positiveRate, displayName, expectedAnnualIncome, expectedCheckNumberPeople);
+        int count = efficiencyEquipmentMapper.updateBatchSmart(assetUids, positiveRate, displayName, expectedAnnualIncome, expectedCheckNumberPeople, deptExpectedPaybackPeriod);
         if (count > 0) {
             WebUtil.addErrorMessage("批量修改成功");
         } else {
@@ -770,6 +775,7 @@ protected boolean numberField(String fieldName, String filterVal) {
         this.displayName = null;
         expectedAnnualIncome = null;
         expectedCheckNumberPeople = null;
+        this.deptExpectedPaybackPeriod = null;
     }
 
 
