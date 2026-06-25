@@ -31,6 +31,9 @@ public class NurseSiteMaintainDataHistory {
     @Column(name="index")
     private Long index;
 
+    @Column(name = "is_skip")
+    private Boolean isSkip;
+
 
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
