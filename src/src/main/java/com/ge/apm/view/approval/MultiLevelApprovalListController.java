@@ -7,9 +7,11 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.mapper.MultiLevelApprovalMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -55,7 +57,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
     private UserAccountRepository userAccountRepository;
     private OrgInfoRepository orgInfoRepository;
-
+    private UaaService uaaService ;
     private I18nMessageRepository i18nDao;
     @Getter
     @Setter
@@ -81,6 +83,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         orgInfoRepository =  WebUtil.getBean(OrgInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         i18nDao =  WebUtil.getBean(I18nMessageRepository.class);
         getBusinessTypeMap();
     }
@@ -124,12 +127,8 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
            wrapper.andNew().eq("la.actual_approver_uid", user.getUid());
             wrapper.andNew().ne("la.approval_node_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
         }else  if (TAB_APPROVED_ALL.equals(currentTabId)) {
-            List<String> uids = new ArrayList<>();
-            int orgType = user.getOrgLevel();
-            if (orgType <= 0) uids.add(user.getTenantUID());
-            if (orgType <= 1) uids.add(user.getHospitalUID());
-            if (orgType <= 2) uids.add(user.getInstitutionUID());
-            if (orgType <= 3) uids.add(user.getSiteUID());
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+            List<String> uids = siteList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
             wrapper.andNew().in("la.config_org_uid", uids);
         }
         WrapperSearchFilterUtils.convert(searchFilters, wrapper);
