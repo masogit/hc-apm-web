@@ -167,7 +167,7 @@ public class HisDataSourceEsController extends GenericCRUDController<HisEquipmen
             searchFilters.add(new SearchFilter("exec_time", SearchFilter.Operator.GTE, hisRequestParamsDto.getStartDate()));
         }
         if (hisRequestParamsDto.getEndDate() != null) {
-            searchFilters.add(new SearchFilter("exec_time", SearchFilter.Operator.LTE, hisRequestParamsDto.getEndDate()));
+            searchFilters.add(new SearchFilter("exec_time", SearchFilter.Operator.LTE,setEndTime(hisRequestParamsDto.getEndDate())));
         }
 
         if (execDeptOrgUidSet != null && !execDeptOrgUidSet.isEmpty()) {

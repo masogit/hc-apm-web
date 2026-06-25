@@ -8,6 +8,13 @@
 <ui:composition>
 	<p:dialog id="maintainDlg" widgetVar="maintainDialog" header="检查详情" modal="true" resizable="true"  draggable="true" appendTo="@(body)" width="70%" >
 		<h:outputText rendered="#{empty maintainItemController.lazyModel}" value="工单详情后台生成中，请稍候刷新页面查看。"></h:outputText>
+		<style>
+			.inline-first-row > div:nth-child(1),
+			.inline-first-row > div:nth-child(2) {
+				display: inline-block !important;
+				vertical-align: middle;
+			}
+		</style>
 		<h:form id="maintainDlgTable" rendered="#{not empty maintainItemController.lazyModel}" >
 			<div class="ui-datatable ui-widget" style="overflow: visible; height: 480px;">
 				<div  style="padding-left: 10px; padding-right: 10px;">
@@ -45,12 +52,19 @@
 								<td><h:outputText value="#{maintainItemController.getUpdateByName(item2)}" /></td>
 								<p:repeat value="#{maintainItemController.nurseSiteMaintain.showLables}" var="item3">
 									<td style="width: 300px">
-										<h:panelGrid columns="1" layout="grid" styleClass="showcase-text-align-center" title="#{item3.description}">
+										<h:panelGroup style="display: flex; align-items: center;">
 <!--											<p:ajax event="dblclick" listener="#{maintainItemController.setSelectCheckItem(item3)}" update=":showDescription" oncomplete="PF('showDescription').show()" />-->
-											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}"  >
+											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}" disabled="#{item2.getDataValue(item3.name).isSkip}" >
 												<p:ajax  event="change" process="@this" update="maintainDlgTable" />
 											</p:triStateCheckbox>
-											<h:panelGroup rendered="#{not empty item3.fieldType}">
+											<p:selectBooleanCheckbox value="#{item2.getDataValue(item3.name).isSkip}" itemLabel="忽略"
+																		 disabled="#{!maintainItemController.dailyCheckIgnorable}"
+																		 title="#{maintainItemController.dailyCheckIgnorable ? '' : '未启用忽略功能'}"
+																		 style="margin-left:5px;">
+												<p:ajax event="change" process="@this" update="maintainDlgTable" />
+											</p:selectBooleanCheckbox>
+										</h:panelGroup>
+										<h:panelGroup rendered="#{not empty item3.fieldType and !item2.getDataValue(item3.name).isSkip}">
 													<label class="label"><span style="color:red;margin-left: -50px">#{item2.getDataValue(item3.name).required? '*':''}</span></label>
 												<p:inputText value="#{item2.getDataValue(item3.name).variableText}" placeholder="#{item3.defaultValue}"   rendered="#{item3.fieldType eq 'Text' }" >
 													<p:ajax   process="@this" update="maintainDlgTable" />
@@ -69,13 +83,13 @@
 														<p:ajax  event="dateSelect" process="@this" update="maintainDlgTable" />
 													</p:calendar>
 											</h:panelGroup>
-											<h:panelGroup rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2}">
+											<h:panelGroup rendered="#{item2.getDataValue(item3.name).checkValueWeb eq 2 and !item2.getDataValue(item3.name).isSkip}">
 												<label class="label"><span style="color:red;margin-left: -50px">#{'*'}</span></label>
 												<p:inputText value="#{item2.getDataValue(item3.name).errorText}"  placeholder="请输入异常说明" >
 													<p:ajax event="change" process="@this" update="maintainDlgTable" />
 												</p:inputText>
 											</h:panelGroup>
-										</h:panelGrid>
+										
 								  </td>
 								</p:repeat>
 								<td><h:panelGroup ><p:inputTextarea value="#{item2.comment}" maxlength="256"></p:inputTextarea></h:panelGroup></td>
