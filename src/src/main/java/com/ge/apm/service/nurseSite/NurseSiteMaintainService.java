@@ -417,6 +417,8 @@ public class NurseSiteMaintainService {
 				boolean isFinish = true;
 				List<NurseSiteMaintainData> listData = item.getListData();
 				for(NurseSiteMaintainData data : listData) {
+					// 忽略的检查项不算未检查
+					if(Boolean.TRUE.equals(data.getIsSkip())) continue;
 					if(data.getCheckValue()==null) isFinish = false;
 				}
 				item.setIsFinish(isFinish);
@@ -1054,13 +1056,18 @@ public class NurseSiteMaintainService {
 						String variableTextNew = nurseSiteMaintainDataNew.getVariableText();
 						Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue();
 						String variableTextOld = nurseSiteMaintainDataNew.getVariableText();
+						Boolean isSkipNew = nurseSiteMaintainDataNew.getIsSkip();
+						Boolean isSkipOld = nurseSiteMaintainDataOld.getIsSkip();
+						boolean isSkipChanged = !Objects.equals(isSkipNew, isSkipOld);
 						if((checkValueNew != null && !checkValueNew.equals(checkValueOld))
-								|| (StringUtils.isNotBlank(variableTextNew) && !variableTextNew.equals(variableTextOld))){
+								|| (StringUtils.isNotBlank(variableTextNew) && !variableTextNew.equals(variableTextOld))
+								|| isSkipChanged){
                             tempItem.setUpdateByUid(user.getUid());
 							tempItem.setUpdateDate(date);
                         }
 						if((checkValueOld != null && !checkValueOld.equals(checkValueNew))
-							   || (StringUtils.isNotBlank(variableTextOld) && !variableTextOld.equals(variableTextNew))){
+							   || (StringUtils.isNotBlank(variableTextOld) && !variableTextOld.equals(variableTextNew))
+							   || isSkipChanged){
 							tempItem.setUpdateByUid(user.getUid());
 							tempItem.setUpdateDate(date);
 						}
@@ -1070,8 +1077,14 @@ public class NurseSiteMaintainService {
             if(tempItem.getUpdateDate()!=null){
 				boolean delay=tempItem.getUpdateDate().after(sheculeDate)?true:false;
 				int nullNum=0;
+				int skipNum=0;
 				while (itData.hasNext()) {
 					NurseSiteMaintainData tempData = itData.next();
+					// 忽略的检查项不参与状态计算
+					if(Boolean.TRUE.equals(tempData.getIsSkip())){
+						skipNum++;
+						continue;
+					}
 					Boolean value = tempData.getCheckValue();
 					if (value == null) {
 						nullNum++;
@@ -1104,8 +1117,17 @@ public class NurseSiteMaintainService {
 						break;
 					}
 				}
+				int effectiveSize = listData.size() - skipNum;
 				if(nullNum > 0 && !(itemStatus ==3 || itemStatus ==8 )){
-					itemStatus=nullNum==listData.size()?0:4;
+					itemStatus=nullNum==effectiveSize?0:4;
+				}
+				// 如果所有检查项都被忽略，视为通过
+				if(effectiveSize == 0 && skipNum > 0){
+					if(hasComment){
+						itemStatus = delay ? 6 : 5;
+					} else {
+						itemStatus = delay ? 7 : 2;
+					}
 				}
 				tempItem.setStatus(itemStatus);
 
