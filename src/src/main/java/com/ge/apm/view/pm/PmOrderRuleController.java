@@ -2,6 +2,7 @@ package com.ge.apm.view.pm;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.FieldColumnDto;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.ConfigItemService;
@@ -15,6 +16,8 @@ import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -60,6 +63,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private List<PmOrderRuleCheckList> checkItemLists;
     private PmOrderRuleCheckList pmRuleCheckItem;
     private ConfigItemService configItemService;
+    private ConfigItemValueRepository configItemValueRepository;
 
     // for report template
     private UploadedFile uploadedFile;
@@ -115,6 +119,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
         configService = WebUtil.getBean(ConfigService.class);
         configItemService = WebUtil.getBean(ConfigItemService.class);
+        configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
@@ -650,6 +655,21 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             initCheckItemLists();
             ruleLevelTip ="";
             selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
+            // Set default work hours from pmEntryTypeSet config if not already set
+            if (selected.getDefaultWorkHours() == null) {
+                String value = configItemValueRepository.findByKeyAndSiteForUseParent(
+                        selected.getSiteUID(), selected.getHospitalUID(),
+                        selected.getInstitutionUID(), selected.getTenantUID(), "pmEntryTypeSet");
+                if (StrUtil.isNotEmpty(value)) {
+                    FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
+                    // entryType=1(工时段) or entryType=3(仅工时段), do not assign value
+                    if (fieldColumnDto != null && fieldColumnDto.getEntryType() != null
+                            && fieldColumnDto.getEntryType() != 1 && fieldColumnDto.getEntryType() != 3
+                            && fieldColumnDto.getHours() != null) {
+                        selected.setDefaultWorkHours(fieldColumnDto.getHours());
+                    }
+                }
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
