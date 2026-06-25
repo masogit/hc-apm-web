@@ -326,4 +326,13 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	public void setSelectCheckItem(NurseSiteMaintainConfigCheckItem selectCheckItem) {
 		this.selectCheckItem = selectCheckItem;
 	}
+
+	/**
+	 * 判断当前组织是否启用了 dailyCheckIgnorable 配置项（值为true表示启用）
+	 */
+	public boolean isDailyCheckIgnorable() {
+		UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+		String value = userContextService.getConfigItemValue("dailyCheckIgnorable");
+		return Boolean.TRUE.toString().equalsIgnoreCase(value);
+	}
 }
