@@ -95,6 +95,17 @@ public class PmOrderRule implements Serializable{
     @Column(name = "rule_score")
     private String ruleScore;
 
+    @Column(name = "default_work_hours")
+    private Double defaultWorkHours;
+
+    public Double getDefaultWorkHours() {
+        return defaultWorkHours;
+    }
+
+    public void setDefaultWorkHours(Double defaultWorkHours) {
+        this.defaultWorkHours = defaultWorkHours;
+    }
+
     public String getRuleScore() {
         return ruleScore;
     }

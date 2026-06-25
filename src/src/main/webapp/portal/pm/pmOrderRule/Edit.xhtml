@@ -115,6 +115,10 @@
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">默认工时</label>
+                            <p:inputNumber id="defaultWorkHours" value="#{pmOrderRuleController.selected.defaultWorkHours}" minValue="0" decimalPlaces="2" required="false"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     
                    <p:panelGrid id="report" columns="4"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="#{pmOrderRuleController.selected != null}">
