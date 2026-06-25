@@ -1,26 +1,2 @@
--- YHAAO-28074
-INSERT INTO public.config_item (uid, name, category, key, value_type, description, super_admin_edit, default_value, user_parent_config)SELECT replace(uuid_generate_v4()::text,'-',''),'计量结果日期预警',7, 'measuringDateWarning',3,'计量结果页是否显示日期校验预警（计量日期、有效期至为空或日期不合法时标黄提示）',false,'false',false WHERE NOT EXISTS (SELECT 1 FROM public.config_item WHERE key = 'measuringDateWarning');
-
--- YHAAO-28258
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 21, '7', '院区调剂退货时限（天）', 'hospitalAdjustmentReturnTime', '院区调剂退货时限（天）', 'f','t',2 where not exists(select * from config_item where key = 'hospitalAdjustmentReturnTime');
-
-
---YHAAO-28293
-update config_item  set  default_value='[{"label":"设备名称","field":"assetName","required":true,"rendered":true},{"label":"制造商序列号","field":"manufacturerSerialNumber","required":true,"rendered":true},{"label":"设备编号（院方）","field":"departNum","required":true,"rendered":true},{"label":"设备型号","field":"functionType","required":false,"rendered":true},{"label":"所属院区","field":"hospitalId","required":true,"rendered":true},{"label":"所属科室","field":"clinicalDeptName","required":false,"rendered":true},{"label":"使用科室","field":"fromDeptName","required":false,"rendered":false},{"label":"报修单号","field":"srNum","required":true,"rendered":true},{"label":"安装位置","field":"locationName","required":false,"rendered":true},{"label":"报修人","field":"requestorName","required":false,"rendered":true},{"label":"维修人","field":"requireName","required":false,"rendered":true},{"label":"报修时间","field":"requestTime","required":true,"rendered":true},{"label":"当前步骤","field":"currentStep","required":true,"rendered":true},{"label":"工单类型","field":"intExtType","required":false,"rendered":true},{"label":"故障现象","field":"requestReason","required":false,"rendered":true},{"label":"主子工单","field":"mainSub","required":false,"rendered":true},{"label":"资产分类","field":"assetType","required":false,"rendered":true},{"label":"备件状态","field":"approvalStatus","required":false,"rendered":false}]'  where   key like  'WorkOrderListColumn%';
-
-
--- YHAAO-28062
-ALTER TABLE measuring_certificate_detail ADD COLUMN IF NOT EXISTS certificate_type INT DEFAULT NULL;
-
--- 2. 新增 validity_months 字段 (有效期月数, 1-24)
-ALTER TABLE measuring_certificate_detail ADD COLUMN IF NOT EXISTS validity_months INT DEFAULT NULL;
-
-UPDATE measuring_certificate_detail SET certificate_type = 1;
-
--- YHAAO-28554 修改 asset_tags 为 tags
-update custom_config set config = REPLACE(config, '"assetTags"', '"tags"') where config like '%"assetTags"%';
-
-
-INSERT INTO public.config_item (uid, name, category, key, value_type, description, super_admin_edit, default_value, user_parent_config,validation)
-SELECT replace(uuid_generate_v4()::text,'-',''),'风险模型更新周期',1, 'RiskModelUpdateCycle',7,'风险模型更新周期',false,'QUARTERLY',true,'[{"key":"每月","value":"MONTHLY"},{"key":"每季度","value":"QUARTERLY"},{"key":"每年","value":"YEARLY"}]'
-    WHERE NOT EXISTS (SELECT 1 FROM public.config_item WHERE key = 'RiskModelUpdateCycle');
+-- YHAAO-28510增加工单上面显示球管信息
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修工单是否显示球管信息', 'workOrderShowTubeInstall', '维修工单是否显示球管信息', 'f','t',3 where not exists(select * from config_item where key = 'workOrderShowTubeInstall');
