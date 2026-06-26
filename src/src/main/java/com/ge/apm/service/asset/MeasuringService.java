@@ -548,7 +548,7 @@ public class MeasuringService {
                         json.put("status",content.getString("conclusion"));
                         json.put("validDateTo",content.getString("valid_util"));
                         json.put("checkDate",content.getString("verify_date"));
-                        json.put("certificationType",content.getString("certification_type"));
+                        json.put("certificateType",content.getString("certification_type"));
                         MeasuringCertificateDetail measuringCertificateDetail = handleOcrResult(json, newFile,blobObjects);
                         if(measuringCertificateDetail == null) continue;
                         List<V2_BlobObject> measuringAttachList = measuringCertificateDetail.getMeasuringAttachList();
