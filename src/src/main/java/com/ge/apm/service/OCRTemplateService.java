@@ -279,6 +279,8 @@ public class OCRTemplateService extends MicroServiceInvoker {
             BeanUtils.copyProperties(item,blobObject);
             blobObject.setId(null);
             blobObject.setBoUuid(uid);
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            blobObject.setCreatedDate(new Date());
             blobObjectRepository.save(blobObject);
             resultObject.add(blobObject);
         }
