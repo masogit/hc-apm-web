@@ -16,8 +16,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -892,6 +890,10 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     }
 
     public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(orgUidList)) {
+            param.put("orgUidList", orgUidList);
+        }
         for (SearchFilter searchFilter :searchFilters) {
             String fieldName = searchFilter.fieldName;
             switch (fieldName) {
