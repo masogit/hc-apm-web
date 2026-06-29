@@ -493,6 +493,9 @@ public class V2_WorkOrderService {
         }
         formData.setTravelTime(selectedWorkOrder.getTravelTime());
         formData.setDiagnosticProcess(selectedWorkOrder.getDiagnosticProcess());
+        formData.setTotalInspectionCount(selectedWorkOrder.getTotalInspectionCount());
+        formData.setTotalExposureCount(selectedWorkOrder.getTotalExposureCount());
+        formData.setTubeInstallDate(selectedWorkOrder.getTubeInstallDate());
         normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
