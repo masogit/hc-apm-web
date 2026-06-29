@@ -382,7 +382,7 @@
                                 <p:ajax process="@this" />
                             </p:inputNumber>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.isEnableBtnByKey('workOrderShowTubeInstall')}">
+                        <h:panelGroup rendered="#{userContextService.enableDisplayByKey('workOrderShowTubeInstall')}">
                             <label class="label">#{msg.tubeInstallDate}</label>
                             <p:calendar id="tubeInstallDate" timeZone="GMT+8" pattern="yyyy/MM/dd" mask="true"
                                         value="#{workOrderMgrController.selectedWorkOrder.tubeInstallDate}" showOn="button"
@@ -390,14 +390,14 @@
                                 <p:ajax process="@this" />
                             </p:calendar>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.isEnableBtnByKey('workOrderShowTubeInstall')}">
+                        <h:panelGroup rendered="#{userContextService.enableDisplayByKey('workOrderShowTubeInstall')}">
                             <label class="label">#{msg.totalExposureCount}</label>
                             <p:inputNumber id="totalExposureCount" minValue="0" maxValue="99999999" decimalPlaces="0"
                                            value="#{workOrderMgrController.selectedWorkOrder.totalExposureCount}">
                                 <p:ajax process="@this" />
                             </p:inputNumber>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.isEnableBtnByKey('workOrderShowTubeInstall')}">
+                        <h:panelGroup rendered="#{userContextService.enableDisplayByKey('workOrderShowTubeInstall')}">
                             <label class="label">#{msg.totalInspectionCount}</label>
                             <p:inputNumber id="totalInspectionCount" minValue="0" maxValue="99999999" decimalPlaces="0"
                                            value="#{workOrderMgrController.selectedWorkOrder.totalInspectionCount}">
