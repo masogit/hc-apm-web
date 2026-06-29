@@ -780,12 +780,16 @@ protected boolean numberField(String fieldName, String filterVal) {
 
 
     private void loadClinicalDeptList() {
-        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
-        if (null != selectSite) {
-            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
-                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
-        }
+//        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+//                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+//        if (null != selectSite) {
+//            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+//                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+//        }
+        String siteUid = selectSite == null ? user.getSiteUID() : selectSite.getSiteUID();
+
+        clinicalDeptList= efficiencyEquipmentMapper.getDeptList(user.getUid(),user.getTenantUID(),siteUid);
+
     }
 
     public List<String> autoCompleteDeptName(String query) {

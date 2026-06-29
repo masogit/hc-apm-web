@@ -1,6 +1,7 @@
 package com.ge.apm.dao.mapper;
 
 import com.ge.apm.domain.EfficiencyEquipmentInfo;
+import com.ge.apm.domain.OrgInfo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -46,4 +47,8 @@ public interface EfficiencyEquipmentMapper {
                              @Param("expectedAnnualIncome") BigDecimal expectedAnnualIncome,
                              @Param("expectedCheckNumberPeople") Integer expectedCheckNumberPeople,
                              @Param("deptExpectedPaybackPeriod") BigDecimal deptExpectedPaybackPeriod);
+
+
+        List<OrgInfo> getDeptList(@Param("userUID")String userUID, @Param("tenantUid")String tenantUid, @Param("siteUid") String siteUid);
+
 }
