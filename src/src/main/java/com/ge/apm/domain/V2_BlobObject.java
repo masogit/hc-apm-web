@@ -146,6 +146,8 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_SUB_TYPE_SAFETY_CERT = "SAFETY_CERT";           // 安全防护证书
     public static final String BO_SUB_TYPE_RECOMMENDATION = "RECOMMENDATION";     // 公司推荐函
 
+    public static final String BO_TYPE_ACQUISITION = "acquisition";
+
 
     @Id
     @GeneratedValue(generator = "uuid")

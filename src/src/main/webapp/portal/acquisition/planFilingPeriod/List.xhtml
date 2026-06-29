@@ -1,0 +1,108 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .zoom-06 {
+                zoom: 0.6;
+            }
+
+            .zoom-08 {
+                zoom: 0.8;
+            }
+
+            .wrap-text {
+                word-break: break-word;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+
+            .width-pct-100 {
+                min-width: 50% !important;
+                max-width: 100% !important;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="年度申购开启记录"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.AdvancedSearch}">
+                        <p:panelGrid id="searchPanel" columns="4" layout="grid"
+                                     styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">年份</label>
+                                <p:inputText id="dept" value="#{planFilingPeriodController.searchForm.year}"/>
+                            </h:panelGroup>
+                            <h:panelGroup style="display: flex;">
+                                <p:commandButton value="#{msg.Search}"
+                                                 actionListener="#{planFilingPeriodController.search}"
+                                                 update="formList"/>
+                                <p:commandButton value="#{msg.Reset}"
+                                                 actionListener="#{planFilingPeriodController.resetSearch}"
+                                                 update="searchForm formList"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:form>
+
+                <h:form id="formList">
+                    <p:dataTable id="datalist" value="#{planFilingPeriodController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{planFilingPeriodController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                 sortBy="#{item.year}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{planFilingPeriodController.onFilter}"
+                                update="createButton editButton deleteButton"/>
+
+                        <p:column headerText="年度">
+                            <h:outputText value="#{item.year}"/>
+                        </p:column>
+                        <p:column headerText="开启日期">
+                            <h:outputText value="#{item.startDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="终止申报日期">
+                            <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="操作人">
+                            <h:outputText value="#{item.operaterName}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{planFilingPeriodController.prepareCreate}" update=":planFilingPeriodEditForm"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{planFilingPeriodController.prepareEdit}" update=":planFilingPeriodEditForm" disabled="#{empty planFilingPeriodController.selected.id}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{planFilingPeriodController.delete}" update=":formList" disabled="#{empty planFilingPeriodController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="Purcahse_Budget_Config_Export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+
+                </h:form>
+
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>
