@@ -220,6 +220,17 @@
                             </h:outputText>
                         </p:column>
                     </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'srRepairSource'}">
+                        <p:column headerText="#{msg.repairSource}" sortBy="#{item.serviceRequest.srRepairSource}" filterBy="#{item.serviceRequest.srRepairSource}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('RepairSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.doGetFieldValue('RepairSource', item.serviceRequest.srRepairSource)}"/>
+                        </p:column>
+                    </c:if>
                     <c:if test="#{fieldItem.rendered and fieldItem.field eq 'currentStep'}">
 
                         <!--当前处理步骤 for 待办-->

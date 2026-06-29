@@ -162,7 +162,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void filterNode() {
         if (selectedTenant!=null&&selectedTenant.getId()==46) {
-            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithClinicalDept(loginUser.getUid(), retrieval, selectedTenant.getId());
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithCondition(retrieval, selectedTenant.getId());
             OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
             orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
