@@ -465,6 +465,16 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             isValidate = false;
         }
 
+        // 序列号重复校验
+        if (StringUtils.isNotEmpty(arrivalListItem.getSerialNum())) {
+            List<AssetInfo> existList = assetDao.findBySerialNumAndTenantUID(
+                    arrivalListItem.getSerialNum(), arrivalListItem.getArrivalList().getTenantUID());
+            if (!existList.isEmpty()) {
+                WebUtil.addErrorMessage("制造商序列号已存在，不允许重复建档");
+                isValidate = false;
+            }
+        }
+
         if (!isValidate) {
             return "";
         }
@@ -719,6 +729,21 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         StringBuilder message = new StringBuilder();
         for(ArrivalListItem arrivalListItem : itemList){
             if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+                // 序列号重复校验
+                if (StringUtils.isNotEmpty(arrivalListItem.getSerialNum())) {
+                    List<AssetInfo> existList = assetDao.findBySerialNumAndTenantUID(
+                            arrivalListItem.getSerialNum(), arrivalListItem.getArrivalList().getTenantUID());
+                    if (!existList.isEmpty()) {
+                        String name = arrivalListItem.getArrivalList().getName();
+                        String errMsg = "制造商序列号[" + arrivalListItem.getSerialNum() + "]已存在，不允许重复建档";
+                        if(message.toString().contains("到货单名称/编号："+name)){
+                            message.append("、").append(errMsg);
+                        }else{
+                            message.append("到货单名称/编号：").append(name).append(",").append(errMsg);
+                        } 
+                        continue;
+                    }
+                }
                 arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
                 aiService.saveOrUpdateItem(arrivalListItem);
                 arrivalListItem = itemDao.findById(arrivalListItem.getId());
@@ -810,6 +835,16 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
             if (Boolean.FALSE.equals(isvalidDeptNum._1)) {
                 WebUtil.addErrorMessage(isvalidDeptNum._2);
+                return false;
+            }
+        }
+
+        // 序列号重复校验
+        if (StringUtils.isNotEmpty(arrivalListItem.getSerialNum())) {
+            List<AssetInfo> existList = assetDao.findBySerialNumAndTenantUID(
+                    arrivalListItem.getSerialNum(), arrivalListItem.getArrivalList().getTenantUID());
+            if (!existList.isEmpty()) {
+                WebUtil.addErrorMessage("制造商序列号已存在，不允许重复建档");
                 return false;
             }
         }
