@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition>
+    <div class="ui-g-12 card">
+        <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+
+        <h:form id="currentListForm">
+            <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                <p:commandButton value="待审批" process="@this" update="datalist" action="Main.xhtml?faces-redirect=true&amp;query=0" disabled="#{acquisitionPlanAuditListController.queryIndex == 0}"/>
+                <p:commandButton value="我审批的" process="@this" update="datalist" action="Main.xhtml?faces-redirect=true&amp;query=1" disabled="#{acquisitionPlanAuditListController.queryIndex == 1}"/>
+                <p:commandButton value="全部" process="@this" update="datalist" action="Main.xhtml?faces-redirect=true&amp;query=2" disabled="#{acquisitionPlanAuditListController.queryIndex == 2}"/>
+            </h:panelGrid>
+            <p:dataTable id="datalist" value="#{acquisitionPlanAuditListController.lazyModel}" var="item"
+                         widgetVar="varDataList"
+                         selectionMode="single" selection="#{acquisitionPlanAuditListController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                         sortBy="#{item.applicationDate}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500">
+
+                <p:ajax event="rowSelect" listener="#{acquisitionPlanAuditListController.viewUrl(item.id)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)"/>
+                <p:ajax event="filter" listener="#{acquisitionPlanAuditListController.onFilter}"/>
+                <p:column headerText="申报单位">
+                    <h:outputText value="#{item.applicationHospitalName}"/>
+                </p:column>
+                <p:column headerText="申请年份">
+                    <h:outputText value="#{item.applicationYear}"/>
+                </p:column>
+                <p:column headerText="申请编号">
+                    <h:outputText value="#{item.applicationNo}"/>
+                </p:column>
+
+                <p:column headerText="申报科室">
+                    <h:outputText value="#{item.applicationDeptName}"/>
+                </p:column>
+                <p:column headerText="设备名称">
+                    <h:outputText value="#{item.assetName}"/>
+                </p:column>
+                <p:column headerText="申请类别">
+                    <h:outputText value="#{item.applicationType}"/>
+                </p:column>
+                <p:column headerText="计划采购数量" styleClass="zoom-08">
+                    <h:outputText value="#{item.applicationPlanCount}"/>
+                </p:column>
+                <p:column headerText="预算单价（万元）" styleClass="zoom-08">
+                    <h:outputText value="#{item.budgetUnitPrice}">
+                        <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="预算总价（万元）" styleClass="zoom-08">
+                    <h:outputText value="#{item.budgetTotalAmount}">
+                        <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="预计使用年限（年）" styleClass="zoom-08">
+                    <h:outputText value="#{item.estimatedServiceYears}"/>
+                </p:column>
+                <p:column headerText="工单状态">
+                    <h:outputText value="#{fieldMsg.fieldValue('AcquisitionApplicationStatus', item.applicationStatus)}"/>
+                </p:column>
+                <p:column headerText="申请人">
+                    <h:outputText value="#{item.applicationUserName}"/>
+                </p:column>
+                <p:column headerText="申请时间">
+                    <h:outputText value="#{item.applicationDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{acquisitionPlanAuditListController.queryIndex == 0}">
+                    <p:commandButton value="审批"  action="#{acquisitionPlanAuditListController.auditUrl(item.id)}"/>
+
+                </p:column>
+
+
+                 <f:facet name="{Toolbar}">
+
+                 </f:facet>
+            </p:dataTable>
+
+        </h:form>
+        <script>
+            var newWin;
+            function prepareOrderViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openOrderViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+        </script>
+
+    </div>
+</ui:composition>
+</html>

@@ -896,6 +896,21 @@
                                     <p:outputLabel></p:outputLabel>
                                 </p:panelGrid>
                             </p:fieldset>
+
+                            <p:fieldset id="acquistionPlan" legend="医疗设备购置计划管理">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <p:selectBooleanCheckbox
+                                            value="#{featureSettingController.tenantFeatureMap['ACQUISITION_PLAN']}"
+                                            itemLabel="医疗设备购置计划管理">
+                                        <p:ajax update="acquistionPlan"
+                                                listener="#{featureSettingController.featureChange('ACQUISITION_PLAN')}"/>
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel>医疗设备购置计划管理</p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                    <p:outputLabel></p:outputLabel>
+                                </p:panelGrid>
+                            </p:fieldset>
+
                         </p:tab>
                         <p:tab title="医院功能激活">
                             <p:fieldset id="activeFeature" legend="激活功能项">

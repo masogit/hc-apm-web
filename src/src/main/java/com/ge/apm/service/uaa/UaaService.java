@@ -1791,6 +1791,65 @@ public class UaaService {
         return tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
     }
 
+    /**
+     * 根据 ApmFunction 获取当前拥有该权限的所有用户
+     * 两条路径：
+     *   1. SysRole路径：ApmFunction.roleList → ApmSystemRole → SysRole → UserRole(roleType=0) → UserAccount
+     *   2. CustomRole路径：CustomRole.functionList 包含该 ApmFunction → UserRole(roleType=1) → UserAccount
+     *
+     * @param apmFunction 目标 ApmFunction 枚举值
+     * @param tenantUid   租户UID（用于限定 CustomRole 范围），传 null 则查全量
+     * @return 拥有该 ApmFunction 的有效用户列表（去重）
+     */
+    public List<UserAccount> getUsersByApmFunction(ApmFunction apmFunction, String tenantUid) {
+        UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
+        SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
+
+        Set<Integer> userIds = new HashSet<>();
+
+        // ── 路径 1：通过系统角色查找 ──
+        // ApmFunction.roleList 包含的是 ApmSystemRole 枚举，通过 name() 匹配 SysRole.name
+        List<String> sysRoleNames = apmFunction.getRoleList().stream()
+                .map(ApmSystemRole::name)
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(sysRoleNames)) {
+            List<SysRole> sysRoles = sysRoleDao.getByNameIn(sysRoleNames);
+            if (CollectionUtils.isNotEmpty(sysRoles)) {
+                List<Integer> sysRoleIds = sysRoles.stream()
+                        .map(SysRole::getId)
+                        .collect(Collectors.toList());
+                List<UserAccount> sysRoleUsers = userDao.findUsersBySysRoleIds(sysRoleIds);
+                sysRoleUsers.forEach(u -> userIds.add(u.getId()));
+            }
+        }
+
+        // ── 路径 2：通过自定义角色查找（CustomRole.functionList 是 JSON 数组，直接存 ApmFunction 名称）──
+        List<CustomRole> customRoles;
+        if (StringUtils.isNotEmpty(tenantUid)) {
+            customRoles = customRoleRepository.findByTenantUID(tenantUid);
+        } else {
+            customRoles = (List<CustomRole>) customRoleRepository.findAll();
+        }
+
+        List<Integer> matchedCustomRoleIds = customRoles.stream()
+                .filter(cr -> StringUtils.isNotEmpty(cr.getFunctionList())
+                        && cr.getFunctionList().contains(apmFunction.name()))
+                .map(CustomRole::getId)
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(matchedCustomRoleIds)) {
+            List<UserAccount> customRoleUsers = userDao.findUsersByCustomRoleIds(matchedCustomRoleIds);
+            customRoleUsers.forEach(u -> userIds.add(u.getId()));
+        }
+
+        if (userIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return userDao.getByIds(userIds);
+    }
+
     public List<OrgInfo> filterNoneAsset(List<String> orgUidList) {
         orgUidList = ObjectUtil.isEmpty(orgUidList) ? ListUtil.newArrayList("-1") : orgUidList;
         return orgInfoMapper.filterNoneAsset(orgUidList);

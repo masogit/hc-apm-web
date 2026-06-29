@@ -339,4 +339,16 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query(value= "select o.uid from user_account o where  o.id in ?1  and o.hospital_uid in ?2 ",nativeQuery=true)
     public List<String> getByIdsAndHospitalUID(List<Integer> setIds,List<String> hospitalUids);
+
+    /**
+     * 根据系统角色ID列表查找拥有这些角色的有效用户（roleType=0）
+     */
+    @Query("select distinct u from UserAccount u, UserRole r where u.id=r.userId and r.roleId in ?1 and r.roleType=0 and (u.isDisable=false or u.isDisable is null) and (u.isDeleted=false or u.isDeleted is null)")
+    List<UserAccount> findUsersBySysRoleIds(List<Integer> roleIds);
+
+    /**
+     * 根据自定义角色ID列表查找拥有这些角色的有效用户（roleType=1）
+     */
+    @Query("select distinct u from UserAccount u, UserRole r where u.id=r.userId and r.roleId in ?1 and r.roleType=1 and (u.isDisable=false or u.isDisable is null) and (u.isDeleted=false or u.isDeleted is null)")
+    List<UserAccount> findUsersByCustomRoleIds(List<Integer> customRoleIds);
 }
