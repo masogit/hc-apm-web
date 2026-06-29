@@ -155,19 +155,20 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         }
         Date now = DateUtil.beginOfDay(DateUtil.now()).toDate();
         Date over = DateUtil.offsetDay(now, 180).toDate();
+        Date tomorrow = DateUtil.offsetDay(now, 1).toDate(); // 关键：明天 00:00:00
         if (hasFilterOnField("overrunState")) {
             SearchFilter searchFilter = searchFilters.stream().filter(item -> "overrunState".equals(item.fieldName)).findFirst().orElse(null);
             int overrunState = Integer.parseInt(searchFilter.value.toString());
             switch (overrunState) {
                 case 1:
-                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.LT, now, "1*"));
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.LT, tomorrow, "1*"));
                     break;
                 case 2:
-                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.GT, now, "1*"));
-                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.LTE, over, "1*"));
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.GTE, tomorrow, "1*"));
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.LT, over, "1*"));
                     break;
                 case 3:
-                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.GT, over, "1*"));
+                    searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.GTE, over, "1*"));
                     break;
                 case 4:
                     searchFilters.add(new SearchFilter("assetLifecycleDeadline", SearchFilter.Operator.IsNull, null, "1*"));
