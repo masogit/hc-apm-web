@@ -11,7 +11,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.i18n.I18nTypeManageService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.FileUploadEvent;
@@ -22,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -118,7 +118,8 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("msgType", SearchFilter.Operator.EQ,msgType));
         searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.IN, Arrays.asList(-1,siteId)));
-        List<I18nMessage> i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters);
+        Sort sort = new Sort(Sort.Direction.ASC, "orderBy");
+        List<I18nMessage> i18nMessageList = i18nMessageRepository.findBySearchFilter(searchFilters,sort);
         Map<Integer, List<I18nMessage>> listMap = i18nMessageList.stream().collect(Collectors.groupingBy(I18nMessage::getSiteId));
         boolean defaultValue = true;
         boolean alone = false;
@@ -303,7 +304,7 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
                 });
             }
             selected.setI18nMessageList(dataList);
-            WebUtil.addErrorMessage("上传成功,列表已更新");
+            WebUtil.addSuccessMessage("上传成功,列表已更新");
         }catch (Exception e){
            e.printStackTrace();
             WebUtil.addErrorMessage("上传失败");
@@ -330,6 +331,58 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
         typeManageTenants = typeManageTenantRepository.findBySearchFilter(searchFilters);
     }
 
+    public void  up(){
+        I18nMessage selectedI18nForm = selectedI18n;
+        List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
+        int formIndex = i18nMessageList.indexOf(selectedI18nForm);
+        int toIndex = formIndex - 1;
+        if(toIndex < 0) return;
+        sortInit(i18nMessageList);
+        I18nMessage i18nMessageTo = i18nMessageList.get(toIndex);
+        Integer orderByForm = selectedI18nForm.getOrderBy();
+        Integer orderByTo = i18nMessageTo.getOrderBy();
+        if(orderByForm.equals(orderByTo)){
+            orderByTo--;
+        }
+        selectedI18nForm.setOrderBy(orderByTo);
+        i18nMessageTo.setOrderBy(orderByForm);
+        i18nMessageRepository.save(i18nMessageList);
+        i18nMessageList.sort((o1, o2) -> o1.getOrderBy().compareTo(o2.getOrderBy()));
+        WebUtil.addSuccessMessage("排序更新成功");
+        resetCache();
+        configCacheService.clearI18nMessageCacheBySiteId(selectedI18n.getSiteId());
+    }
+    public void sortInit(List<I18nMessage> i18nMessageList){
+        for (int i = i18nMessageList.size() - 1; i >= 0; i--) {
+            I18nMessage i18nMessage = i18nMessageList.get(i);
+            Integer orderBy = i18nMessage.getOrderBy();
+            if(!Integer.valueOf(i).equals(orderBy)){
+                i18nMessage.setOrderBy(i);
+             }
+        }
+
+    }
+    public void  down(){
+        I18nMessage selectedI18nForm = selectedI18n;
+        List<I18nMessage> i18nMessageList = selected.getI18nMessageList();
+        int formIndex = i18nMessageList.indexOf(selectedI18nForm);
+        int toIndex = formIndex + 1;
+        if(toIndex >= i18nMessageList.size()) return;
+        sortInit(i18nMessageList);
+        I18nMessage i18nMessageTo = i18nMessageList.get(toIndex);
+        Integer orderByForm = selectedI18nForm.getOrderBy();
+        Integer orderByTo = i18nMessageTo.getOrderBy();
+        if(orderByForm.equals(orderByTo)){
+            orderByTo++;
+        }
+        selectedI18nForm.setOrderBy(orderByTo);
+        i18nMessageTo.setOrderBy(orderByForm);
+        i18nMessageRepository.save(i18nMessageList);
+        i18nMessageList.sort((o1, o2) -> o1.getOrderBy().compareTo(o2.getOrderBy()));
+        WebUtil.addSuccessMessage("排序更新成功");
+        resetCache();
+        configCacheService.clearI18nMessageCacheBySiteId(selectedI18n.getSiteId());
+    }
 
     public TenantInfo getSelectTenant() {
         return selectTenant;

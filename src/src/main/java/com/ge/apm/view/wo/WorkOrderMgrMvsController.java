@@ -73,6 +73,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private V2_WorkOrderRepository dao;
     @Getter @Setter
     private String fileterOrgNameMVS;
+    @Getter @Setter
     private List<OrgInfo> clinicalDeptListMVS;
     private UserAccountRepository userDao;
     private V2_WorkOrderService woService;
@@ -81,6 +82,8 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
     private Integer queryIndex;
     private AssetFaultTypeService assetFaultTypeService;
     private List<AssetTypeGroup> assetTypeGroupList;
+    @Getter @Setter
+    private List<OrgInfo> clinicalDeptList;
 
     private String messageTip;
 
@@ -298,6 +301,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                 ix2.stream().forEach(
                         item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
                 getPageTypeFromConfig();
+                loadClinicalDeptList();
             }
 
         } catch (Exception e) {
@@ -494,6 +498,12 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                 case "mainSub":
                     params.put("mainSub", searchFilter.value);
                     break;
+                case "assetLocation":
+                    params.put("serviceRequest.assetLocation", searchFilter.value);
+                    break;
+                case "assetInfo.assetDeptUID":
+                    params.put("assetDeptUID", searchFilter.value);
+                    break;
                 default:
                     break;
             }
@@ -603,6 +613,16 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+    }
+
+    public void onSelectOrderRedirectByUnified(SelectEvent event) throws IOException {
+        selected = (V2_WorkOrder) event.getObject();
+        onSelectOrderRedirect();
+    }
+
+    public void onSelectWorkOrderByUnified(SelectEvent event) {
+        selected = (V2_WorkOrder) event.getObject();
+        onSelectWorkOrder();
     }
     public void onSelectWorkOrder() {
         attachListEhmeFile = new ArrayList<>();
@@ -1103,6 +1123,41 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
             return true;
         }
         return false;
+    }
+
+
+    private void loadClinicalDeptList() {
+        try {
+            clinicalDeptList = Collections.emptyList();
+            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+            if (!CollectionUtils.isEmpty(deptList)) {
+                clinicalDeptList = deptList.stream()
+                        .filter(item ->
+                        {
+                            if (item == null) {
+                                LOGGER.info("null");
+                            }
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
+                        .collect(Collectors.toList());
+            }
+
+            if (null != selectSite && !clinicalDeptList.isEmpty()) {
+                clinicalDeptList = clinicalDeptList.stream()
+                        .filter(item -> StringUtils.equals(item.getSiteUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getHospitalUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getInstitutionUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getTenantUID(), selectSite.getSiteUID()))
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            LOGGER.error("loadClinicalDeptList occur exception", e);
+            throw e;
+        }
+    }
+
+    public void clearSelectedWorkOrder() {
+        selected = null;
     }
 
     public String getDisplayModeCasePriority() {

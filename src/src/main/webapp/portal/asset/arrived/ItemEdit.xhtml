@@ -528,16 +528,16 @@
                     </p:fieldset>
 
                     <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" id="arrivalListItemAttachment">
-                        <p:remoteCommand id="getImgBase64"
-                             process="@this" immediate="true" partialSubmit="true" update="@this" global="false"
-                             name="getImgBase64" actionListener="#{fileDownloadService.getImgBase64ForReq()}"
-                             oncomplete="setOriginal(args)" />
+<!--                        <p:remoteCommand id="getImgBase64"-->
+<!--                             process="@this" immediate="true" partialSubmit="true" update="@this" global="false"-->
+<!--                             name="getImgBase64" actionListener="#{fileDownloadService.getImgBase64ForReq()}"-->
+<!--                             oncomplete="setOriginal(args)" />-->
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup >
                                 <p:dataList id="pictureList" value="#{assetInstallationController.getAttachList('asset')}"
                                     var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
                                     paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
-                                    <p:ajax event="page" oncomplete="loadPreImg()"/>
+<!--                                    <p:ajax event="page" oncomplete="loadPreImg()"/>-->
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                     <p:commandLink value="下载" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <h:panelGroup >
@@ -547,11 +547,13 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <p:ajax event="click" listener="#{assetInstallationController.nameplatePhotoPreview(fileitem.objectStorageId)}" update="nameplateRecognitionForm" oncomplete="PF('nameplateRecognitionDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                         </h:panelGroup>
                                         <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <p:ajax event="click" listener="#{assetInstallationController.nameplatePhotoPreview(fileitem.objectStorageId)}" update="nameplateRecognitionForm" oncomplete="PF('nameplateRecognitionDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="objectStorageId"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
@@ -578,11 +580,13 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.compressObjectId)}" update=":previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                         </h:panelGroup>
                                         <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="objectStorageId"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
@@ -609,11 +613,13 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                         </h:panelGroup>
                                         <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="objectStorageId"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
@@ -640,11 +646,13 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                         </h:panelGroup>
                                         <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                             <img id="#{fileitem.objectStorageId}" class="objectStorageId"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
@@ -673,11 +681,13 @@
                                         </h:panelGroup>
                                         <h:panelGroup rendered="#{ assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                             <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                                <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                                 <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                      src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                      style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                <p:ajax event="click" listener="#{preViewerBean.onServerEvent(assetInstallationController, fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" />
                                                 <img id="#{fileitem.objectStorageId}" class="objectStorageId"
                                                      src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                      style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
@@ -868,6 +878,8 @@
                     </h:panelGroup>
 
                 </h:form>
+                <ui:include src="/portal/preview/view.xhtml" />
+                <ui:include src="nameplateRecognition.xhtml" />
             </div>
             <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
                 <h:form id="qrCodeLibShowForm">

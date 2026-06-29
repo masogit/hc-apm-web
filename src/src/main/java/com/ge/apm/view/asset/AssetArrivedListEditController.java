@@ -24,16 +24,16 @@ import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
+import org.primefaces.model.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.GenericDataTableModel;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -61,6 +61,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private UaaService uaaService;
     private TreeNode orgTree;
 
+    private UserAccount agent;
     private Supplier supplier;
     private Supplier maitanance;
     private Supplier manufacture;
@@ -123,6 +124,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     @Getter
     @Setter
     private String newSupplierType;
+    @Getter @Setter
+    private Boolean agentSelect = Boolean.TRUE;
 
     private UserContextService userContextService;
     private TenantInfoRepository tenantInfoRepository;
@@ -132,6 +135,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private  QrCodeLibRepository qrCodeLibRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private MasterDataService masterDataService;
+
+    protected LazyDataModel lazyModelArrivalItemList;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListRepository.class);
@@ -208,6 +213,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 supplier = aiService.getSupplierById(selected.getSupplierId());
                 this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
             }
+            if (selected.getAgentUid() != null) {
+                agent = userContextService.getUserByUid(selected.getAgentUid());
+            }
             if (selected.getManufactureId() != null) {
                 manufacture = aiService.getSupplierById(Integer.parseInt(selected.getManufactureId()));
             }
@@ -226,8 +234,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, easyInstallItem.getMedicalApparatusClassification());
             prepareEdit();
-        }
 
+        }
+        initLazyModelArrivalItemList();
         customConfig = ccService.getCurrentCustomConfig(currentUser.getSiteUID());
 //        suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
 //        maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -236,9 +245,36 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         needInstorageCheck = userContextService.needInstorageCheck();
     }
 
+    public void  initLazyModelArrivalItemList(){
+
+        lazyModelArrivalItemList = new GenericDataTableModel<ArrivalListItem>() {
+            @Override
+            protected List<ArrivalListItem> load(PageRequest pageRequest) {
+                if(CollectionUtils.isEmpty(arrivalItemList)) return null;
+                int pageSize = pageRequest.getPageSize();
+                int pageNumber = pageRequest.getPageNumber();
+                int pageSizeCache = userContextService.getPageSizeCache("arrivalListEdit.xhtml.itemList");
+                if(pageSizeCache != pageSize){
+                    UserContextService.setPageSizeCache("arrivalListEdit.xhtml.itemList",pageRequest.getPageSize());
+                }
+                int size = arrivalItemList.size();
+                this.setRowCount(size);
+                int fromIndex = pageSize * pageNumber;
+                int toIndex = fromIndex + pageSize;
+                List<ArrivalListItem> listObject = arrivalItemList.subList(fromIndex,toIndex <= size? toIndex:size);;
+                return listObject;
+            }
+        };
+    }
+
     @Override
     protected ArrivalListRepository getDAO() {
         return dao;
+    }
+
+    @Override
+    protected Page<ArrivalList> loadData(PageRequest pageRequest) {
+        return super.loadData(pageRequest);
     }
 
     @Override
@@ -249,6 +285,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         //remove default value
 //        object.setProcessType(ArrivalList.ProcessType.Normal.toString());
         object.setAgent(user.getName());
+        object.setAgentUid(user.getUid());
+        agent = user;
         object.setArrivalDate(new Date());
         if(activeSupplier() && null == object.getBoxInstallationDate()) {
             object.setBoxInstallationDate(object.getArrivalDate());
@@ -588,12 +626,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 selected.setContractNum(srcList.getContractNum());
                 selected.setContractPrice(srcList.getContractPrice());
                 selected.setAgent(srcList.getAgent());
+                selected.setAgentUid(srcList.getAgentUid());
                 selected.setArrivalDate(srcList.getArrivalDate());
                 selected.setInvoiceNum(srcList.getInvoiceNum());
             }else{
                 selected.setContractNum("");
                 selected.setContractPrice(null);
                 selected.setAgent("");
+                selected.setAgentUid("");
                 selected.setArrivalDate(null);
                 selected.setInvoiceNum("");
                 selected.setProcessType(srcList.getProcessType());
@@ -758,6 +798,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         return   autoCompleteService.getOnlySuplierListBySiteUid(currentUser.getTenantUID(),query,1000);
     }
 
+    public List<UserAccount> autoCompleteAgent(String query) {
+        return uaaService.getUserList(selectedOrg.getSiteUID(), query);
+    }
+
     public List<Supplier> autoCompleteMaintainer(String query) {
 //        return autoCompleteService.autoCompleteMaintainer(query, maintainerList);
 
@@ -769,6 +813,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 //        return autoCompleteService.autoCompleteManufacture(query, manueList);
         return   autoCompleteService.getOnlyManuListBySiteUid(currentUser.getTenantUID(),query,1000);
 
+    }
+
+    public void onAgentChange() {
+        if (ObjectUtil.isNotEmpty(agent)) {
+            selected.setAgent(agent.getName());
+            selected.setAgentUid(agent.getUid());
+        }
     }
 
     public void onSupplierChange() {
@@ -840,6 +891,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 return;
             }
         }
+    }
+
+    public void agentSwitch(Boolean agentSelect) {
+        this.agentSelect = agentSelect;
+        this.selected.setAgentUid(null);
     }
 
     public void finishChoseContractItem() {
@@ -982,6 +1038,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setSelectedNode(TreeNode selectedNode) {
         this.selectedNode = selectedNode;
+    }
+
+    public UserAccount getAgent() {
+        return agent;
+    }
+
+    public void setAgent(UserAccount agent) {
+        this.agent = agent;
     }
 
     public Supplier getSupplier() {
@@ -1436,12 +1500,23 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         return UrlEncryptController.encodeUrlParam("ItemEdit?faces-redirect=true&src=".concat(srcPage).concat("&itemId=").concat(itemId));
     }
 
+    /**
+     * 合并 saveEasyItem + getInstallUrl，避免 actionListener 修改 arrivalItemList 后
+     * action 中 item.id 被 JSF DataTable 重新解析导致行数据错位的问题
+     */
+    public String saveAndGetInstallUrl(String itemId, String srcPage) {
+        // 先保存（saveEasyItem 内部已有 enableArrivalListRequired 校验）
+        saveEasyItem();
+        // saveEasyItem 可能因校验不通过而提前 return，但仍需允许跳转已存在的 item
+        // 生成跳转 URL（getInstallUrl 内部也有 enableArrivalListRequired 校验，会阻止跳转）
+        return getInstallUrl(itemId, srcPage);
+    }
+
     public boolean enableArrivalListRequired() {
         return Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("enableArrivalListRequired", currentUser.getSiteUID())).
                 map(ConfigItemValue::getValue).map(Boolean::parseBoolean).orElse(false);
     }
     private SelectItemDto selectItemDto;
-
 
     public  List<SelectItemDto>  autoAssetClassification32() {
         AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
@@ -1465,5 +1540,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setSelectItemDto(SelectItemDto selectItemDto) {
         this.selectItemDto = selectItemDto;
+    }
+
+    public LazyDataModel getLazyModelArrivalItemList() {
+        return lazyModelArrivalItemList;
+    }
+
+    public void setLazyModelArrivalItemList(LazyDataModel lazyModelArrivalItemList) {
+        this.lazyModelArrivalItemList = lazyModelArrivalItemList;
     }
 }

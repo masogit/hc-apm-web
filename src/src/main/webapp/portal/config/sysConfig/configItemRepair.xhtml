@@ -7,13 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('repairTypeDefaultValueConfiguration').name.concat('(').concat(systemConfigItemController.configItemMap.get('repairTypeDefaultValueConfiguration').key).concat(')')}</label>
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('repairTypeDefaultValueConfiguration').showValue}" style="width: 50%;">
                     <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('repairTypeDefaultValueConfiguration').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('repairTypeDefaultValueConfiguration').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -25,6 +29,10 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('autoAckDays').name.concat('(').concat(systemConfigItemController.configItemMap.get('autoAckDays').key).concat(')')}</label>
                 <p:inputNumber value="#{systemConfigItemController.configItemMap.get('autoAckDays').showValue}" style="width: 95%;"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('autoAckDays').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -41,6 +49,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('externalRepairOrderClose').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('externalRepairOrderClose'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('externalRepairOrderClose'))}" update="configItemForm" style="padding:10px"
@@ -53,6 +65,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableSignNeedScanQrCode').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -69,6 +85,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('autoAck').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('autoAck'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('autoAck'))}" update="configItemForm" style="padding:10px"
@@ -81,6 +101,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('autoClose').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -97,6 +121,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('closeWithoutParts').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('closeWithoutParts'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('closeWithoutParts'))}" update="configItemForm" style="padding:10px"
@@ -109,6 +137,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableShortCodeRepairSignature').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -125,6 +157,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableWorkOrderFeedbackBtn').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableWorkOrderFeedbackBtn'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableWorkOrderFeedbackBtn'))}" update="configItemForm" style="padding:10px"
@@ -137,6 +173,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableWorkOrderAckBtn').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -153,6 +193,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableWorkOrderReviewBtn').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableWorkOrderReviewBtn'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableWorkOrderReviewBtn'))}" update="configItemForm" style="padding:10px"
@@ -165,6 +209,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableCheckInTime').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -181,6 +229,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableAdverseEventSentinelMode').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableAdverseEventSentinelMode'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableAdverseEventSentinelMode'))}" update="configItemForm" style="padding:10px"
@@ -193,6 +245,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('displayMainSubWorkOrder').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -231,17 +287,26 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('showWorkOrderType').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('showWorkOrderType'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showWorkOrderType'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('showWorkOrderType').configItemValue == null}"/>
             </h:panelGroup>
+
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('WorkOrderExportType').name.concat('(').concat(systemConfigItemController.configItemMap.get('WorkOrderExportType').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('WorkOrderExportType').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="WORD" itemValue="WORD"/>
                     <f:selectItem itemLabel="PDF" itemValue="PDF"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('WorkOrderExportType').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -258,6 +323,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableMaintenanceContract').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableMaintenanceContract'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableMaintenanceContract'))}" update="configItemForm" style="padding:10px"
@@ -270,6 +339,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableMaintenanceDate').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -288,6 +361,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('repairEntryTypeSet').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('repairEntryTypeSet'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('repairEntryTypeSet'))}" update="configItemForm" style="padding:10px"
@@ -299,6 +376,10 @@
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('defaultRepairPerson').showValue}" style="width: 50%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('defaultRepairPerson').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('defaultRepairPerson').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -315,13 +396,15 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableEngineersWriteRepairOutside').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('enableEngineersWriteRepairOutside'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('enableEngineersWriteRepairOutside'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('enableEngineersWriteRepairOutside').configItemValue == null}"/>
             </h:panelGroup>
-
-
 
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').name.concat('(').concat(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').key).concat(')')}</label>
@@ -361,6 +444,10 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers'))}" update="configItemForm" style="padding:10px"
@@ -372,6 +459,10 @@
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('displayModeCasePriority').showValue}" style="width: 50%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('displayModeCasePriority').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('displayModeCasePriority').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -406,6 +497,10 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('workOrderShowTravelTime').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('workOrderShowTravelTime'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('workOrderShowTravelTime'))}" update="configItemForm" style="padding:10px"
@@ -421,6 +516,10 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('autoDispatchAllowClaimByAssignee').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('autoDispatchAllowClaimByAssignee'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('autoDispatchAllowClaimByAssignee'))}" update="configItemForm" style="padding:10px"
@@ -432,6 +531,10 @@
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').showValue}" style="width: 50%;">
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('WorkOrderDetailViewType').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -476,11 +579,16 @@
                 </p:fieldset>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('showDiagnosticProcess').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('showDiagnosticProcess'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('showDiagnosticProcess'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('showDiagnosticProcess').configItemValue == null}"/>
             </h:panelGroup>
+
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').name.concat('(').concat(systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').key).concat(')')}</label>
 
@@ -501,19 +609,27 @@
                     </p:dataTable>
                 </p:panelGrid>
             </h:panelGroup>
-
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('WorkOrderReportNameConfiguration').configItemValue == null}"/>
             </h:panelGroup>
+
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('enableCheckPartsPrice').name.concat('(').concat(systemConfigItemController.configItemMap.get('enableCheckPartsPrice').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('enableCheckPartsPrice').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('enableCheckPartsPrice').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -530,10 +646,30 @@
                 </p:selectOneRadio>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('workOrderShowPartFlag').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('workOrderShowPartFlag'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('workOrderShowPartFlag'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('workOrderShowPartFlag').configItemValue == null}"/>
+            </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('RepairRequestUrl').name.concat('(').concat(systemConfigItemController.configItemMap.get('RepairRequestUrl').key).concat(')')}</label>
+                <p:inputText value="#{systemConfigItemController.configItemMap.get('RepairRequestUrl').showValue}" style="width: 95%;"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('RepairRequestUrl').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('RepairRequestUrl'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('RepairRequestUrl'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('RepairRequestUrl').configItemValue == null}"/>
             </h:panelGroup>
 
 

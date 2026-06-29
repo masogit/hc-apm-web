@@ -1,5 +1,8 @@
 package com.ge.apm.view.pm;
 
+import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.dao.mapper.UserOrgInfoMapper;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -9,9 +12,12 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -54,10 +60,15 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private Map<Integer, Boolean> selectedMap;
 	private UserAccount currentUser;
 	private UserAccountRepository userAccountRepository;
+	private UserAccountMapper userAccountMapper;
 	private List<UserAccount> tenantUserList;
+	private List<SysRoleVO> roleListVO;
+	private Map<Integer, SysRoleVO> roleVoMap;
 	private AssetInfoRepository assetInfoRepository;
 	private OrgInfo selectedOrg;
 	private AssetTagService assetTagService;
+	private ConfigCacheService cacheService;
+	private UserOrgInfoMapper userOrgInfoMapper;
 
 	UserContextService userContextService;
 	MessageSubscriberRepository dao;
@@ -84,6 +95,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private TreeNode orgTree;
 	private TreeNode selectedNode;
 	private List<OrgInfo> clinicalDeptList;
+    @Getter @Setter
+	private List<OrgInfo> assetDeptList;
+    @Getter @Setter
+    private String filterAssetDeptOrg;
 
 	// 维修事件（紧急程度）列表页筛选：多选 1/2/3/4（不改动实体类）
 	@Getter
@@ -121,6 +136,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	@Getter @Setter
 	private String selectUserName;
 	@Getter @Setter
+	private List<Integer> subscribeRoleIndexList = new ArrayList<>();
+	@Getter @Setter
+	private String selectRoleName;
+	@Getter @Setter
 	private MessageSubscriber batch = new MessageSubscriber();
 
 
@@ -128,18 +147,31 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	protected void init() {
 		this.selectedMap = new HashMap();
 		assetTagService = WebUtil.getBean(AssetTagService.class);
+		cacheService = WebUtil.getBean(ConfigCacheService.class);
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		dao= WebUtil.getBean(MessageSubscriberRepository.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 //		targetAssets = new ArrayList<>();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
-		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
-		tenantUserList = tenantUserList.stream().distinct().collect(toList());
-		tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
-		tenantUserList.sort(new PinYinComparatorByName());
+		userOrgInfoMapper = WebUtil.getBean(UserOrgInfoMapper.class);
+//		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
+//		tenantUserList = tenantUserList.stream().distinct().collect(toList());
+//		tenantUserList = tenantUserList.parallelStream().sorted(Comparator.comparing(UserAccount::getName)).collect((toList()));
+//		tenantUserList.sort(new PinYinComparatorByName());
+		tenantUserList = userAccountMapper.selectUserAndRoleList(currentUser.getTenantUID());
+		uaaService = WebUtil.getBean(UaaService.class);
+		roleListVO = uaaService.getSysRoleVO(currentUser.getTenantUID());
+		Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(currentUser.getTenantUID());
+		Set<String> tenantCustomRoles = uaaService.getTenantCustomRoles(currentUser.getTenantUID()).stream().map(CustomRole::getName).collect(Collectors.toSet());
+		roleListVO = roleListVO.stream().filter(role -> tenantSysRoles.contains(role.getName()) || tenantCustomRoles.contains(role.getName())).collect(Collectors.toList());
+		for (int i = 1; i <= roleListVO.size(); i++) {
+			roleListVO.get(i - 1).setIndex(i);
+		}
+		roleVoMap = roleListVO.stream().collect(Collectors.toMap(SysRoleVO::getIndex, roleVo -> roleVo));
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoDao.findByUid(currentUser.getSiteUID()).getOrgType();
 		clinicalDeptList = new ArrayList<OrgInfo>();
@@ -161,6 +193,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		selectAsset=new HashSet<>();
 		initAssets();
         initOrgTree();
+        loadClinicalDeptList();
 	}
 
 	@Override
@@ -198,7 +231,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 //		availableAssets = new DualListModel<>(sourceAssets, targetAssets);
 	}
 	public void initOrgTree() {
-		uaaService = WebUtil.getBean(UaaService.class);
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
 //		TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
@@ -372,7 +404,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		isReceiveTimeoutMsg=true;
 		assetList = assetInfoRepository.getUserListByAsset(selected.getSubscribeUserId());
 		selectUserName = null;
+		selectRoleName = null;
 		subscribeUserIds = new ArrayList<>();
+		subscribeRoleIndexList = new ArrayList<>();
 	}
 	@Override
 	protected Page<MessageSubscriber> loadData(PageRequest pageRequest) {
@@ -499,13 +533,20 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			List<MessageSubscriber> toCreate = new ArrayList<>();
 			List<MessageSubscriber> toUpdate = new ArrayList<>();
 
+			List<UserOrgInfo> userOrgList = userOrgInfoMapper.findByUserIds(userIds);
+			Map<Integer, List<UserOrgInfo>> userOrgMap = userOrgList.stream().collect(Collectors.groupingBy(UserOrgInfo::getUserId));
 			for (Integer userId : userIds) {
 				// 查出该 userId 在这些 assetId 上已存在的订阅
 				List<MessageSubscriber> existingList = dao.getMsgListByAssetIdAndUserId(assetIdList, userId);
 				Map<Integer, MessageSubscriber> existingByAssetId = existingList.stream()
 						.collect(Collectors.toMap(MessageSubscriber::getAssetId, x -> x, (a, b) -> a));
-
+				List<UserOrgInfo> userOrgInfos = Optional.ofNullable(userOrgMap.get(userId)).orElse(ListUtil.empty());
+				List<String> orgUidList = userOrgInfos.stream().map(UserOrgInfo::getOrgUid).collect(toList());
 				for (AssetInfo assetInfo : assets) {
+					List<String> assetOrgUidList = ListUtil.newArrayList(assetInfo.getClinicalDeptUID(), assetInfo.getSiteUID(), assetInfo.getHospitalUID(), assetInfo.getInstitutionUID(), assetInfo.getTenantUID());
+					if (Collections.disjoint(orgUidList, assetOrgUidList)) {
+						continue;
+					}
 					MessageSubscriber exist = existingByAssetId.get(assetInfo.getId());
 					if (exist != null) {
 						// ③ 同一人同一设备：关注项取合集（OR 合并）
@@ -762,6 +803,14 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 	}
 
+	public void onSubscribeRoleChange() {
+		if (ObjectUtil.isNotEmpty(subscribeRoleIndexList)) {
+			selectRoleName = roleListVO.stream().filter(role -> subscribeRoleIndexList.contains(role.getIndex())).map(SysRoleVO::getRoleDesc).collect(Collectors.joining(","));
+		} else {
+			selectRoleName = null;
+		}
+	}
+
 	private boolean b(Boolean v) {
 		return Boolean.TRUE.equals(v);
 	}
@@ -858,11 +907,67 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		allSelected2=selectAssetInfos.stream().allMatch(item->Optional.ofNullable(selectedAssetUidTable2.get(item.getUid())).orElse(Boolean.FALSE));
 	}
 
+	public String getUserName(UserAccount userAccount) {
+		return cacheService.findOrgByUid(userAccount.getOrgInfoUID()).getName().concat("-").concat(userAccount.getName());
+	}
+
 	public List<UserAccount> getTenantUserList() {
+		if (ObjectUtil.isNotEmpty(subscribeRoleIndexList)) {
+			List<UserAccount> userAccountList = ListUtil.newArrayList();
+			for (Integer index : subscribeRoleIndexList) {
+				SysRoleVO sysRoleVO = roleVoMap.get(index);
+				for (UserAccount userAccount : tenantUserList) {
+					List<UserRole> userRoleList = userAccount.getUserRoleList();
+					long count = userRoleList.stream().filter(userRole -> userRole.getRoleId().equals(sysRoleVO.getId()) && userRole.getRoleType().equals(sysRoleVO.getRoleType())).count();
+					if (count > 0) {
+						userAccountList.add(userAccount);
+					}
+				}
+			}
+			return userAccountList.stream().distinct().collect(toList());
+		}
 		return tenantUserList;
 	}
+
+
+    private void loadClinicalDeptList() {
+        try {
+            assetDeptList = Collections.emptyList();
+            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+            if (!org.springframework.util.CollectionUtils.isEmpty(deptList)) {
+                assetDeptList = deptList.stream()
+                        .filter(item -> {
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public OrgInfo getOrgInfoByUid(String orgUid) {
+        return cacheService.findOrgByUid(orgUid);
+    }
+
 	public void setTenantUserList(List<UserAccount> tenantUserList) {
 		this.tenantUserList = tenantUserList;
+	}
+
+	public List<SysRoleVO> getRoleListVO() {
+		return roleListVO;
+	}
+
+	public void setRoleListVO(List<SysRoleVO> roleListVO) {
+		this.roleListVO = roleListVO;
+	}
+
+	public Map<Integer, SysRoleVO> getRoleVoMap() {
+		return roleVoMap;
+	}
+
+	public void setRoleVoMap(Map<Integer, SysRoleVO> roleVoMap) {
+		this.roleVoMap = roleVoMap;
 	}
 
 	public String getAssetName() {

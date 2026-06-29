@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
@@ -13,6 +14,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,10 +28,12 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -37,6 +41,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,6 +134,12 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     private ExportTerminatedAppraisalService exportTerminatedAppraisalService;
     private StreamedContent terminatedAppraisalFile;
     private SystemTemplateService systemTemplateService;
+
+    private AssetInfoMapper    assetInfoMapper;
+
+    private List<Field> fieldList = new ArrayList<>();
+
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -150,7 +162,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         exportTerminatedAppraisalService = WebUtil.getBean(ExportTerminatedAppraisalService.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
-
+        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
@@ -160,6 +172,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
+        fieldList = Arrays.stream(AssetInfo.class.getDeclaredFields()).collect(Collectors.toList());
     }
 
     private void loadCustomConfig() {
@@ -186,13 +199,27 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             lastPageSort = new Sort(new Sort.Order(Sort.Direction.DESC,"lastModifiedDate"));
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),lastPageSort);
         }
+        String orderBySql=buildOrderBy(lastPageSort);
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
         setUserSearchFilters();
+        HashMap<String, Object> param = new HashMap<>();
+        covQueryCondition(searchFilters, param);
+        param.put("page", pageRequest.getPageSize());
+        param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+        if(orderBySql!=null){
+            param.put("orderBy", orderBySql);
+
+        }
         selected = null;
-        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        param.put("tenantUid", user.getTenantUID());
+        List<AssetInfo> list= assetInfoMapper.toBeTerminatedList(param);
+        Long count= assetInfoMapper.toBeTerminatedListCount(param);
+        PageImpl<AssetInfo> res = new PageImpl<>(list, pageRequest, count);
         currentPageAssets = res.getContent();
+//        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+//        currentPageAssets = res.getContent();
 
         addMisingClinicalDeptOrg(currentPageAssets);
 
@@ -862,5 +889,218 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             logger.error("exportTerminatedAppraisalFile error:",e);
             WebUtil.addErrorMessage("Fail to download report");
         }
+    }
+
+    public void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        for (SearchFilter searchFilter :searchFilters) {
+            String fieldName = searchFilter.fieldName;
+            switch (fieldName) {
+                case "isDeleted":
+                    param.put("isDeleted", searchFilter.value);
+                    break;
+                case "isValid":
+                    param.put("isValid", searchFilter.value);
+                    break;
+                case "status":
+                    param.put("status", searchFilter.value);
+                    break;
+                case "siteUID":
+                    param.put("siteUid", searchFilter.value);
+                    break;
+                case "oneSearchStr":
+                    param.put("oneSearchStr", searchFilter.value);
+                    break;
+                case "assetDeptOrgUidSet":
+                    param.put("assetDeptOrgUidSet", searchFilter.value);
+                    break;
+                case "clinicalDeptOrgUidSet":
+                    param.put("clinicalDeptOrgUidSet", searchFilter.value);
+                    break;
+                case "selectSite":
+                    param.put("selectSite", searchFilter.value);
+                    break;
+                case "mvsEquip":
+                    param.put("mvsEquip", searchFilter.value);
+                    break;
+                case "qrCode":
+                    param.put("qrCode", searchFilter.value);
+                    break;
+                case "name":
+                    param.put("name", searchFilter.value);
+                    break;
+                case "assetGroup":
+                    param.put("assetGroup", searchFilter.value);
+                    break;
+                case "functionType":
+                    param.put("functionType", searchFilter.value);
+                    break;
+                case "financingNum":
+                    param.put("financingNum", searchFilter.value);
+                    break;
+                case "departNum":
+                    param.put("departNum", searchFilter.value);
+                    break;
+                case "makerShortName":
+                    param.put("makerShortName", searchFilter.value);
+                    break;
+                case "vendor":
+                    param.put("vendor", searchFilter.value);
+                    break;
+                case "usageStatus":
+                    param.put("usageStatus",Integer.parseInt(searchFilter.value.toString()));
+                    break;
+                case "terminationCause":
+                    param.put("terminationCause", searchFilter.value);
+                    break;
+                case "workOrderId":
+                    param.put("workOrderId", searchFilter.value);
+                    break;
+                case "terminateOperation":
+                    param.put("terminateOperation", searchFilter.value);
+                    break;
+                default:
+                    Optional<Field> firstField = fieldList.stream().filter(item -> item.getName().equalsIgnoreCase(fieldName)).findFirst();
+                    if(firstField.isPresent()){
+                        Field field = firstField.get();
+                        String name = field.getName();
+                        Class<?> type = field.getType();
+                        if(name.equals("warrantyDate")){
+                            String[] split = filterWarrantyDate.split("~");
+                            try {
+                                if(ObjectUtil.isNotEmpty(split[0])){
+                                    param.put(name, format.parse(split[0]));
+                                    param.put(name+"1", format.parse(split[1]));
+                                }else{
+                                    param.put(name, format.parse(split[1]));
+                                }
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }else if (type == Date.class){
+                            String filterDate =(String) selectedObject.get(name);
+                            String[] split = filterDate.split("~");
+                            try {
+                                if(ObjectUtil.isNotEmpty(split[0])){
+                                    param.put(name, format.parse(split[0]));
+                                    param.put(name+"1", format.parse(split[1]));
+                                }else{
+                                    param.put(name, format.parse(split[1]));
+                                }
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }else{
+                            param.put(name,  searchFilter.value);
+                        }
+
+                    }
+                    break;
+            }
+        }
+
+        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+            param.put("clinicalDeptOrgUidSet", clinicalDeptOrgUidSet);
+        }
+        if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
+            param.put("assetDeptOrgUidSet", assetDeptOrgUidSet);
+        }
+        if (null != selectSite) {
+            param.put("selectSite", selectSite.getUid());
+        }
+    }
+
+    private String buildOrderBy(Sort lastPageSort) {
+        String sql=null;
+        if(lastPageSort==null){
+            sql="order by al.create_time desc nulls last";
+        }else{
+            String property = lastPageSort.iterator().next().getProperty();
+            switch (property) {
+                case "namePyCode":
+                    sql="order by ai.name_py_code ";
+                    break;
+                case "functionType":
+                    sql="order by ai.function_type ";
+                    break;
+                case "serialNum":
+                    sql="order by ai.serial_num ";
+                    break;
+                case "departNum":
+                    sql="order by ai.depart_num ";
+                    break;
+                case "assetGroup":
+                    sql="order by ai.asset_group ";
+                    break;
+                case "assetGroupSecondary":
+                    sql="order by ai.asset_group_secondary ";
+                    break;
+                case "manufacture":
+                    sql="order by ai.manufacture ";
+                    break;
+                case "vendor":
+                    sql="order by ai.vendor ";
+                    break;
+                case "subjectProject":
+                    sql=" order by ai.subject_project ";
+                    break;
+                case "warrantyDate":
+                    sql="order by ai.warranty_date ";
+                    break;
+                case "createdDate":
+                    sql="order by ai.created_date ";
+                    break;
+                case "financingNum":
+                    sql="order by ai.financing_num ";
+                    break;
+                case "qrCode":
+                    sql="order by ai.qr_code ";
+                    break;
+                case "aliasName":
+                    sql="order by ai.alias_name ";
+                    break;
+                case "assetOwnerName":
+                    sql="order by ai.asset_owner_name ";
+                    break;
+                case "assetUsage":
+                    sql="order by ai.asset_usage ";
+                    break;
+                case "capitalSource":
+                    sql="order by ai.capital_source ";
+                    break;
+                case "capitalSource2":
+                    sql="order by ai.capital_source2 ";
+                    break;
+                case "emergencyEquipment":
+                    sql="order by ai.emergency_equipment ";
+                    break;
+                case "importEquipment":
+                    sql="order by ai.import_equipment ";
+                    break;
+                case "makerShortName":
+                    sql="order by ai.make_short_name ";
+                    break;
+                case "proprietaryClass":
+                    sql="order by ai.proprietary_class ";
+                    break;
+                case "assetScrapId":
+                    sql="order by sc.business_number ";
+                    break;
+                default:
+                    sql="order by "+ StringUtil.camelToSnakeOptimized(property)+" ";
+                    break;
+
+            }
+            if(sql!=null){
+                if("ASC".equalsIgnoreCase(lastPageSort.iterator().next().getDirection().name())){
+                    sql=sql+"asc";
+                }else{
+                    sql=sql+"desc";
+                }
+            }
+
+        }
+
+
+        return sql;
     }
 }

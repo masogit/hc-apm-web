@@ -16,13 +16,14 @@
             <div class="ui-g-12 ">
                 <p:tabView class="ui-g-12" id="woTab" dynamic="true" cache="false" activeIndex="#{workOrderTabController.queryTab}" >
 
-                   <p:ajax event="tabChange" listener="#{workOrderMgrController.onTabChange}"/>
+                   <p:ajax event="tabChange" listener="#{workOrderMgrController.onTabChange}" update="woTab"/>
                     <p:tab class="ui-g-12" title="#{msg.InternalWorkorder}" id="inWorkOrder" rendered="#{workOrderTabController.showInOrder and not userContextService.isZtbTenant()}" disabled="#{workOrderMgrController.viewIng}">
                         <ui:include src="woMgrList.xhtml"/>
                     </p:tab>
                     <p:tab class="ui-g-12" title="MVS工单" id="mvsWorkOrder" rendered="#{userContextService.isYiMaiYangGuangTenant()}" disabled="#{workOrderMgrController.viewIng}">
                         <ui:include src="mvs/woMvsMgrList.xhtml"/>
                     </p:tab>
+
                     <c:if test="#{!userContextService.isZkbAccount()}">
                         <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outWorkOrder" rendered="#{(userContextService.enableDisplayExternalWorkOrder() and userContextService.accessContainsFunctionMenu('REPAIR_EXORDER_VIEW'))}" disabled="#{workOrderMgrController.viewIng}">
                             <ui:include src="woMgrOutList.xhtml"/>
@@ -39,11 +40,14 @@
                             <ui:include src="woMgrZkbOutRemoteList.xhtml"/>
                         </p:tab>
                     </c:if>
-
+                    <p:tab class="ui-g-12" title="全部工单" id="inWorkOrderAll"  rendered="#{userContextService.isYiMaiYangGuangTenant()}" disabled="#{workOrderMgrController.viewIng}" >
+                        <ui:include src="woMgrUnifiedList.xhtml"/>
+                    </p:tab>
                 </p:tabView>
             </div>
         </div>
         <ui:include src="transferDialog.xhtml"/>
         <ui:include src="/portal/preview/view.xhtml"/>
+
     </ui:define>
 </ui:composition>

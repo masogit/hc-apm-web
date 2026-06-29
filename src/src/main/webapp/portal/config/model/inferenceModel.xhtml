@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="推理模型管理"/>
+                </div>
+                <h:form id="InferenceModelListForm">
+
+                    <h:panelGrid id="tenantSelector" columns="12" cellpadding="5" rendered="#{userContextService.hasRole('SuperAdmin')}">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{inferenceModelController.selectTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelSite" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
+                                <p:selectOneListbox value="#{inferenceModelController.selectTenantUid}" scrollHeight="500" style="border: none;" filter="true" filterMatchMode="contains">
+                                    <p:ajax process="@this" event="click" listener="#{inferenceModelController.changeSelectTenant}" update="InferenceModelListForm" oncomplete="PF('varPanelSite').hide();"/>
+                                    <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneListbox>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <p:dataTable id="datalist" value="#{inferenceModelController.lazyModel}" var="item"
+                                 widgetVar="datalist"
+                                 selectionMode="single" selection="#{inferenceModelController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.uid}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{inferenceModelController.onFilter}"/>
+
+                        <p:column headerText="模型ID" sortBy="#{item.storageId}" filterBy="#{item.storageId}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.storageId}"/>
+                        </p:column>
+
+                        <p:column headerText="模型类型" sortBy="#{item.type}" filterBy="#{item.type}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{inferenceModelController.filterType}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{inferenceModelController.modelTypeOptions}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{inferenceModelController.getModelTypeName(item.type)}"/>
+                        </p:column>
+
+                        <p:column headerText="版本" sortBy="#{item.version}" filterBy="#{item.version}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.version}"/>
+                        </p:column>
+
+                        <p:column headerText="文件名称" sortBy="#{item.fileName}" filterBy="#{item.fileName}" filterMatchMode="LIKE">
+                            <p:commandLink value="#{item.fileName}" ajax="false"
+                                           actionListener="#{inferenceModelController.downloadModel(item)}"
+                                           styleClass="p-mr-2"
+                                           rendered="#{not empty item.fileName}"/>
+                            <h:outputText value="-" rendered="#{empty item.fileName}"/>
+                        </p:column>
+
+                        <p:column headerText="上传人">
+                            <h:outputText value="#{item.uploadUserName}"/>
+                        </p:column>
+
+                        <p:column headerText="创建时间" sortBy="#{item.createTime}">
+                            <h:outputText value="#{item.createTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" timeZone="Asia/Shanghai"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="修改时间" sortBy="#{item.updateTime}">
+                            <h:outputText value="#{item.updateTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" timeZone="Asia/Shanghai"/>
+                            </h:outputText>
+                        </p:column>
+
+
+                        <p:column headerText="描述">
+                            <h:outputText value="#{item.description}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;" title="#{item.description}"/>
+                        </p:column>
+
+                        <p:column headerText="状态" sortBy="#{item.enabled}" filterBy="#{item.enabled}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('datalist').filter()" value="#{inferenceModelController.filterEnabled}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{inferenceModelController.enabledOptions}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <p:commandButton value="#{item.enabled ? '已启用' : '已禁用'}"
+                                             styleClass="#{item.enabled ? 'btn btn-sm btn-success' : 'btn btn-sm btn-gray'}"
+                                             actionListener="#{inferenceModelController.toggleEnabled(item)}"
+                                             update="InferenceModelListForm:datalist"
+                                             style="min-width:60px;"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" title="上传新模型"
+                                             actionListener="#{inferenceModelController.prepareCreate}"
+                                             process="@this" update=":InferenceModelAddDlg"
+                                             oncomplete="PF('InferenceModelAddDlg').show()"/>
+
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                             actionListener="#{inferenceModelController.prepareEdit()}"
+                                             update=":InferenceModelEditDlg" title="编辑模型信息"
+                                             oncomplete="PF('InferenceModelEditDlg').show()"
+                                             disabled="#{empty inferenceModelController.selected}"/>
+
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                             title="删除模型"
+                                             actionListener="#{inferenceModelController.deleteModel()}"
+                                             update="InferenceModelListForm"
+                                             disabled="#{empty inferenceModelController.selected}">
+                                <p:confirm header="确定删除该模型?" message="删除后文件将一并清除，确定删除该推理模型?" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+
+                <ui:include src="Add.xhtml"/>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

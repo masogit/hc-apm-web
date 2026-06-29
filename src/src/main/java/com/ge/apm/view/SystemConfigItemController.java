@@ -149,7 +149,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(17,"IB报表链接");
         categoryMap.put(18,"列表字段配置");
         categoryMap.put(19,"质控管理");
-
+        categoryMap.put(20,"事件记录配置");
+        categoryMap.put(21,"院区间调剂");
 
     }
 
@@ -205,6 +206,14 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }
                 if(10 == configItem.getValueType()){
                     configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
+                    List<FieldColumnDto> showValueList = JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class);
+                    List<FieldColumnDto> defaultValueList = JSON.parseArray(configItem.getDefaultValue(), FieldColumnDto.class);
+                    Set<String> existingFields = showValueList.stream().map(FieldColumnDto::getField).collect(Collectors.toSet());
+                    List<FieldColumnDto> newFields = defaultValueList.stream().filter(dto -> !existingFields.contains(dto.getField())).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(newFields)) {
+                        showValueList.addAll(newFields);
+                        configItem.setFieldColumnDtoList(showValueList);
+                    }
                 }
             }
         }
@@ -965,5 +974,30 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             }
         }
 
+    }
+
+    public List<String> getEventRecordConfigKeys() {
+        return Arrays.asList(
+                "showRepairRecordTable",
+                "showMaintainanceRecordTable",
+                "showInventoryRecordTable",
+                "showExternalMaintenanceRecordTable",
+                "showExternalRepairRecordTable",
+                "showOnSiteMaintenanceRecordTable",
+                "showDailyInspectionRecordTable",
+                "showOperationRecordTable",
+                "showMetrologyMonitorTable",
+                "showAdverseEventRecordTable",
+                "showApprovalWorkflowTable",
+                "showModifyRecordTable",
+                "showMobileRepairRecordTable",
+                "showMobileMaintainanceRecordTable",
+                "showMobileInventoryRecordTable",
+                "showMobileDailyInspectionRecordTable",
+                "showMobileOperationRecordTable",
+                "showMobileMetrologyMonitorTable",
+                "showMobileAdverseEventRecordTable",
+                "showMobileScrapRecordTable"
+        );
     }
 }

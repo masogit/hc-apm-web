@@ -189,6 +189,13 @@ public class OrgTreeController {
     }
 
     public void filterTreeNodeByName() {
+        if (StringUtils.isEmpty(treeNodeNameFilter)) {
+            propagateSelectionUp = true;
+        } else {
+            if (!siteOrgTree.getChildren().get(0).isSelected()) {
+                propagateSelectionUp = false;
+            }
+        }
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         if (uaaService.isIbSiteAdmin(currentUserAccount)) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid(), treeNodeNameFilter, currentUserAccount.getSiteId());

@@ -171,6 +171,7 @@ public class SupplierService {
                 save.setCity(supplier.getCity());
                 save.setAddress(supplier.getAddress());
                 save.setZipcode(supplier.getZipcode());
+                save.setVenderCompanyId(supplier.getVenderCompanyId());
                 supplier = save;
             }
         }

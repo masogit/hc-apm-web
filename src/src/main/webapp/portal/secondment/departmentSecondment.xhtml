@@ -83,7 +83,7 @@
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="归还受理人" filterBy="#{item.receiverName}" filterMatchMode="LIKE">
+                            <p:column headerText="接收人" filterBy="#{item.receiverName}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.receiverName}"/>
                             </p:column>
                             <p:column headerText="归还人" filterBy="#{item.returnerName}" filterMatchMode="LIKE">
@@ -117,6 +117,7 @@
                         </p:dataTable>
                     </h:form>
                     <ui:include src="departmentView.xhtml"/>
+                    <ui:include src="/portal/preview/view.xhtml"/>
                 </div>
             </div>
         </div>

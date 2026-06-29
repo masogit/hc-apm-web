@@ -3,6 +3,7 @@ package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -98,6 +99,12 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     private Integer filterRuleUID4Level = null;
     private String filterRuleUID4RuleUid = null;
     private Set<String> clinicalDeptOrgUidSet;
+
+    @Getter @Setter
+    private String filterSiteName;
+    private List<OrgInfo> siteList;
+    private Set<String> siteOrgUidSet;
+
     @Getter
     @Setter
     private StreamedContent excelFile;
@@ -117,6 +124,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     @Getter
     @Setter
     private Map<String, PmOrderRule> ruleMap;
+    private ConfigCacheService configCacheService;
 
     @Override
     protected void init() {
@@ -132,11 +140,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         ruleMap = new HashMap<>();
         this.selectedMap = new HashMap<>();
         this.currentPageAssets = new ArrayList<>();
         assetTypeGroupList = user.getAssetTypeGroupList();
         loadClinicalDeptList();
+        loadSiteList();
         WorkflowConfig workflowConfig = configService.findConfigBySite(user.getSiteUID());
         pmLevelFour = workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
@@ -174,6 +184,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         }
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
             searchFilterList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptOrgUidSet));
+        }
+        if (ObjectUtil.isNotEmpty(siteOrgUidSet)) {
+            searchFilterList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, siteOrgUidSet));
         }
         searchFilterList.addAll(searchFilters);
         setSearchFilter(searchFilterList);
@@ -232,6 +245,40 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+    }
+
+    private void loadSiteList() {
+        siteList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+    }
+
+    public List<String> autoCompleteSiteName(String query) {
+        if (siteList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.siteList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(OrgInfo::getName).distinct().collect(Collectors.toList());
+    }
+
+    public void onSiteNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterSiteName = (String) ((SelectEvent) event).getObject();
+        }
+        if (!Strings.isNullOrEmpty(filterSiteName) && !siteList.stream().anyMatch(item -> filterSiteName.equals(item.getName()))) {
+            filterSiteName = null;
+        }
+        if (filterSiteName != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.siteList.stream()
+                    .filter(item -> item.getName().equals(filterSiteName)).collect(Collectors.toList());
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, siteList);
+            siteOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            siteOrgUidSet = Collections.emptySet();
+        }
     }
 
     public List<String> autoLevelRulePMName(String query) {
@@ -422,6 +469,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             List<String> collect = relRuleAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
             List<SearchFilter> assetSearchFilters = new ArrayList<>();
             assetSearchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, collect));
+            assetSearchFilters.addAll(getOrgFilter(user.getSiteUID()));
+            assetSearchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+            assetSearchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            assetSearchFilters.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+            assetSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
             addFilterAssetTypeGroup(assetSearchFilters);
             List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
             List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos, relRuleAssets);
@@ -702,6 +754,14 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             rule = iterator.next();
         }
         return rule;
+    }
+
+    public String getSiteOrgName(String siteUID) {
+        OrgInfo org = configCacheService.findOrgByUid(siteUID);
+        if (org != null) {
+            return org.getName();
+        }
+        return null;
     }
 
     public Map<String, String> getDeleteRuleMap() {

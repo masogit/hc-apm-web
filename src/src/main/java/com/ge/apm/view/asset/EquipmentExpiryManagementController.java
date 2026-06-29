@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -7,6 +8,8 @@ import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
@@ -77,6 +80,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     private List<EquipmentExpiryManagement> equipmentExpiryManagements;
     @Getter @Setter
     private Boolean matchByFunctionType;
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     @Override
     protected void init() {
@@ -89,6 +93,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         equipmentExpiryManagementRepository = WebUtil.getBean(EquipmentExpiryManagementRepository.class);
+        systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         this.selectedMap = new HashMap();
         assetTypeGroupList = user.getAssetTypeGroupList();
@@ -451,6 +456,17 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
                 }
             }
         });
+    }
+
+    public void postProcessorExcel(Object obj){
+        try{
+            SystemEventAuditEnum eventAuditEnum = SystemEventAuditEnum.TABLE_DOWNLOAD_DEVICE_OVERDUE;
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, null, Boolean.TRUE, "", AuditBoTypeEnum.TABLE_DOWNLOAD.getBoType(), "超期统计excel表格");
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }catch (Exception e){
+            logger.error("postProcessorExcel error:",e);
+        }
+
     }
 
     public Map<Integer, Boolean> getSelectedMap() {

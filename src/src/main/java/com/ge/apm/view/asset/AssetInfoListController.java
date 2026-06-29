@@ -24,6 +24,7 @@ import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -885,6 +886,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         insertCrossSiteColumns(exportFields);
         export1(exportFields);
+        assetInfoService.postProcessorExcel();
     }
 
     private void insertCrossSiteColumns(List<String> exportFields) {
@@ -1109,6 +1111,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return org.getName();
         }
         return null;
+    }
+
+    public String getEstimatedRiskLevelName(Integer code) {
+        if (code == null) return "";
+        RiskLevel level = RiskLevel.getByCode(code);
+        return level != null ? level.getName() : "";
+    }
+
+    public String getRowStyleClass(String warrantyAlertStatus, Integer estimatedRiskLevel) {
+        // 优先级: 维保质保 > 风险等级高 > 风险等级中
+        if (StringUtils.isNotEmpty(warrantyAlertStatus)) {
+            return warrantyAlertStatus;
+        }
+        if (estimatedRiskLevel != null) {
+            RiskLevel level = RiskLevel.getByCode(estimatedRiskLevel);
+            if (level == RiskLevel.HIGH) return "riskLevelHigh";
+            if (level == RiskLevel.MEDIUM) return "riskLevelMedium";
+        }
+        return "";
     }
 
     public Date getVarWarrantyDateTo() {
@@ -1970,5 +1991,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setFilterSiteName(String filterSiteName) {
         this.filterSiteName = filterSiteName;
+    }
+
+    public RiskLevel[] getRiskLevels() {
+        return RiskLevel.values();
     }
 }

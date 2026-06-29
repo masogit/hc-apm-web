@@ -30,6 +30,7 @@ import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.pdf.PDFConversion;
 import com.ge.healthcare.cn.common.pdf.PDFConversionUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.render.DynamicColumnTableRenderPolicy;
 import com.ge.healthcare.cn.common.utils.render.PmPartsPictureTableRenderPolicy;
 import com.google.common.base.Strings;
 import org.apache.commons.collections4.CollectionUtils;
@@ -50,6 +51,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -568,6 +570,20 @@ public class PmReportService {
         return content;
     }
 
+    public boolean checkDownloadPDF(Map<String, Boolean> pmOrders){
+        AtomicBoolean r = new AtomicBoolean(true);
+        pmOrders.forEach((id, selected) -> {
+            if (selected) {
+                V2_PmOrder pmOrder = pmOrderService.findById(id);
+                if (!pmOrder.getCurrentStepName().equals("已关单")) {
+                    //WebUtil.addErrorMessage(pmOrder.getPmNum().concat(" 保养记录未关单！"));
+                    r.set(false);
+                }
+            }
+        });
+        return r.get();
+    }
+
     public DefaultStreamedContent generate(Map<String, Boolean> pmOrders, Boolean isInsulate, UserAccount user) throws IOException {
         if (!pmOrders.values().contains(true)) {
             throw new BusinessException("未选中保养记录");
@@ -796,7 +812,10 @@ public class PmReportService {
         bindings.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
         bindings.put(MaintenanceTemplate.Component.PM_PRE_PICTURE_TABLE.toString(),new PmPartsPictureTableRenderPolicy(1));
         bindings.put(MaintenanceTemplate.Component.PM_AFTER_PICTURE_TABLE.toString(),  new PmPartsPictureTableRenderPolicy(1));
-        return  WordExportServiceUtil.generate(datas, IOUtils.toByteArray(rawTemplate), bindings);
+
+        Map<Character, RenderPolicy> plugins = new HashMap<>();
+        plugins.put('&',new DynamicColumnTableRenderPolicy(datas));
+        return  WordExportServiceUtil.generate(datas, IOUtils.toByteArray(rawTemplate), bindings,plugins);
     }
 
     public List<V2_WorkOrder_Detail> getAccessoryList(List<V2_WorkOrder_Detail> accessoryList) {

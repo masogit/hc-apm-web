@@ -649,7 +649,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setPmRuleName(rule.getName());
 			model.setPeriod(rule.getPeriod());
 			model.setPeriodUnit(rule.getPeriodUnit());
-			models.add(model);
+            model.setRuleScore(rule.getRuleScore());
+            models.add(model);
 		}else {
 			for (AssetInfo ai : targetAssets) {
 				if(ai.getClinicalDeptId() == null) {
@@ -684,6 +685,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				model.setLevel(level);
 				model.setPlanTime(planTime == null ? new Date():planTime);
 				model.setPmRuleUid(rule.getUid());
+                model.setRuleScore(rule.getRuleScore());
 				models.add(model);
 			}
 			if (CollectionUtils.isEmpty(models)) {

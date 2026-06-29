@@ -7,13 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('batch_upload').name.concat('(').concat(systemConfigItemController.configItemMap.get('batch_upload').key).concat(')')}</label>
                 <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('batch_upload').showValue}" style="width: 15%;">
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('batch_upload').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -30,6 +34,10 @@
                 </p:inputTextarea>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('measurementCategory').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('measurementCategory'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('measurementCategory'))}" update="configItemForm" style="padding:10px"
@@ -43,6 +51,10 @@
                 </p:selectOneMenu>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('identifyPatterns').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('identifyPatterns'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('identifyPatterns'))}" update="configItemForm" style="padding:10px"
@@ -54,6 +66,10 @@
                 <p:inputNumber value="#{systemConfigItemController.configItemMap.get('measuringRemindDays').showValue}" style="width: 95%;" decimalPlaces="0"/>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('measuringRemindDays').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('measuringRemindDays'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('measuringRemindDays'))}" update="configItemForm" style="padding:10px"
@@ -63,6 +79,10 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('measuringReminderTimes').name.concat('(').concat(systemConfigItemController.configItemMap.get('measuringReminderTimes').key).concat(')')}</label>
                 <p:inputNumber value="#{systemConfigItemController.configItemMap.get('measuringReminderTimes').showValue}" style="width: 95%;" decimalPlaces="0"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('measuringReminderTimes').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -79,10 +99,32 @@
                 </p:inputTextarea>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('identifyPostProcessorRule').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('identifyPostProcessorRule'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('identifyPostProcessorRule'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('identifyPostProcessorRule').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('measuringDateWarning').name.concat('(').concat(systemConfigItemController.configItemMap.get('measuringDateWarning').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('measuringDateWarning').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('measuringDateWarning').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('measuringDateWarning'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('measuringDateWarning'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('measuringDateWarning').configItemValue == null}"/>
             </h:panelGroup>
         </p:panelGrid>
     </ui:composition>

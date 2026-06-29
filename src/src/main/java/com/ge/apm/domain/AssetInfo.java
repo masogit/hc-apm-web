@@ -5,6 +5,7 @@ package com.ge.apm.domain;
 import com.alibaba.druid.util.StringUtils;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.utils.ChineseName;
@@ -1104,6 +1105,19 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Column(name = "asset_classification32")
     private String assetClassification32;
+    @Getter
+    @Setter
+    @Column(name = "tube_install_date")
+    @Temporal(TemporalType.DATE)
+    private Date tubeInstallDate;          //球管安装时间
+    @Getter
+    @Setter
+    @Column(name = "total_exposure_count")
+    private Integer totalExposureCount;    //曝光总次数
+    @Getter
+    @Setter
+    @Column(name = "total_inspection_count")
+    private Integer totalInspectionCount;  //检查总人数
 
 
     @Transient
@@ -1136,14 +1150,25 @@ public class AssetInfo implements ChineseName, Serializable {
     private String existFileFlag;
     @Transient
     @Getter @Setter
-    private String overrunState;
+    private String overrunState;@Getter
+    @Setter
+    @Column(name = "estimated_risk_level")
+    private Integer estimatedRiskLevel; //风险等级
+
+    @Getter
+    @Setter
+    @Column(name = "estimated_risk_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date estimatedRiskDate; //预估风险评估日期
 
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
             DateTime dt = TimeUtil.toJodaDate(nextMeteringDate);
             if(dt.isBeforeNow()) {
                 measuringAlertStatus = "measuringExpired";
-            } else if(dt.minusDays(45).isBeforeNow()) {
+            } else if(dt.minusDays(30).isBeforeNow()) {
+                measuringAlertStatus = "measuringExpiredSoon30";
+            }else if(dt.minusDays(90).isBeforeNow()){
                 measuringAlertStatus = "measuringExpiredSoon";
             }
         }
@@ -3510,5 +3535,97 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setexistFileFlag(String existFileFlag) {
         this.existFileFlag = existFileFlag;
+    }
+
+    @Transient
+    @TableField(exist = false)
+    private String uploadUserName;
+
+    public String getUploadUserName() {
+        return uploadUserName;
+    }
+
+    public void setUploadUserName(String uploadUserName) {
+        this.uploadUserName = uploadUserName;
+    }
+
+    @Transient
+    @TableField(exist = false)
+    private String certificateType;
+
+    public String getCertificateType() {
+        return certificateType;
+    }
+
+    public void setCertificateType(String certificateType) {
+        this.certificateType = certificateType;
+    }
+    @Transient
+    @TableField(exist = false)
+    private Integer validityMonths;
+
+    public Integer getValidityMonths() {
+        return validityMonths;
+    }
+
+    public void setValidityMonths(Integer validityMonths) {
+        this.validityMonths = validityMonths;
+    }
+
+    @Transient
+    @TableField(exist = false)
+    private Boolean hasDateWarning;
+
+    @Transient
+    @TableField(exist = false)
+    private String dateWarningMessage;
+
+    public Boolean getHasDateWarning() {
+        return hasDateWarning;
+    }
+
+    public void setHasDateWarning(Boolean hasDateWarning) {
+        this.hasDateWarning = hasDateWarning;
+    }
+
+    public String getDateWarningMessage() {
+        return dateWarningMessage;
+    }
+
+    public void setDateWarningMessage(String dateWarningMessage) {
+        this.dateWarningMessage = dateWarningMessage;
+    }
+
+    /**
+     * 校验计量日期和下次计量日期
+     * 返回校验结果，如果有警告则返回警告信息
+     * @return 警告信息，如果没有警告则返回 null
+     */
+    public String validateMeasuringDates() {
+        StringBuilder warningMsg = new StringBuilder();
+        boolean hasWarning = false;
+
+        // 1. 如果计量日期或下次计量日期为空
+        if (checkDate == null && nextMeteringDate == null) {
+            warningMsg.append("计量日期和下次计量日期为空");
+            hasWarning = true;
+        } else if (checkDate == null) {
+            warningMsg.append("计量日期为空");
+            hasWarning = true;
+        } else if (nextMeteringDate == null) {
+            warningMsg.append("下次计量日期为空");
+            hasWarning = true;
+        }
+
+        // 2. 如果计量日期大于下次计量日期
+        if (checkDate != null && nextMeteringDate != null && checkDate.after(nextMeteringDate)) {
+            if (hasWarning) {
+                warningMsg.append("; ");
+            }
+            warningMsg.append("计量日期不能大于下次计量日期");
+            hasWarning = true;
+        }
+
+        return hasWarning ? warningMsg.toString() : null;
     }
 }

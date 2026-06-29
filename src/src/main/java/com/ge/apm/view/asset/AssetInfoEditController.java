@@ -31,6 +31,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -144,7 +145,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
 
     @Getter @Setter
-    private EquipmentNameplate equipmentNameplate;
+    private EquipmentNameplate equipmentNameplate = new EquipmentNameplate();
+
+    @Getter @Setter
+    private Map<String,String> result;
 
     private RestTemplate restTemplate;
 
@@ -153,6 +157,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public List<BuildManagement> getManagementList() {
         return managementList;
     }
+
+    @Getter @Setter
+    private Map<String,Boolean> useValue = new HashMap<>();
 
     private FileDownloadService fileDownloadService;
     public List<String> managementListString(String query) {
@@ -2738,27 +2745,53 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void  plateRecognitionImage(String objectId){
+        try {
+            String token = UserContextService.getAccessToken();
+            String gatewayURL = microServiceUtil.getGatewayURL(GatewayURL.IMAGE_CONTENT_EXTRACTION);
+            gatewayURL = gatewayURL.replace("{objectId}", objectId).concat("?assetUid=").concat(selected == null?"":selected.getUid()==null?"":selected.getUid());
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", token);
+            HttpEntity<Map> requestEntity = new HttpEntity<Map>(headers);
+            ResponseEntity<JSONObject> response = restTemplate.exchange(gatewayURL, HttpMethod.GET, requestEntity, JSONObject.class);
+            if(response.getStatusCode().is2xxSuccessful()){
+                JSONObject body = response.getBody();
+                JSONObject data = body.getJSONObject("data");
+                result = data.toJavaObject(Map.class);
+                WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition")+"完成");
+            }
+        } catch (Exception e) {
+            // 识别失败，请重新上传图片之类的
+            result = null;
+            logger.info(e.getLocalizedMessage(),e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition")+"识别失败，请重新上传图片");
+        }
+    }
+
     public void applyResult(){
         String deviceName = equipmentNameplate.getDevice_name();
-        if(StringUtils.isNotEmpty(deviceName)){
+        if(StringUtils.isNotEmpty(deviceName) && useValue.get("device_name")){
             this.selected.setName(deviceName);
         }
 
         String financingNum = equipmentNameplate.getPattern();
-        if(StringUtils.isNotEmpty(financingNum)){
+        if(StringUtils.isNotEmpty(financingNum) && useValue.get("pattern")){
             this.selected.setFunctionType(financingNum);
         }
 
         String serialNum = equipmentNameplate.getSerial_num();
-        if(StringUtils.isNotEmpty(serialNum)){
+        if(StringUtils.isNotEmpty(serialNum) && useValue.get("serial_num")){
             this.selected.setSerialNum(serialNum);
         }
 
         String manufactory = equipmentNameplate.getManufactory();
-        if(StringUtils.isNotEmpty(manufactory)){
+        if(StringUtils.isNotEmpty(manufactory) && useValue.get("manufactory")){
 //            List<Supplier> suppliers = autoCompleteManufacture("");
 //            Optional<Supplier> first = suppliers.stream().filter(item -> manufactory.equalsIgnoreCase(item.getName())).findFirst();
+
             List<Supplier> byTenantUIDAndNameAndManufacturerT = supplierDao.findByTenantUIDAndNameAndManufacturerT(selected.getTenantUID(), manufactory, Boolean.TRUE);
+
+
             Supplier supplier = null;
             if(CollectionUtils.isNotEmpty(byTenantUIDAndNameAndManufacturerT)){
                 supplier = byTenantUIDAndNameAndManufacturerT.get(0);
@@ -2778,12 +2811,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         String registryNum = equipmentNameplate.getRegistry_num();
-        if(StringUtils.isNotEmpty(registryNum)){
+        if(StringUtils.isNotEmpty(registryNum) && useValue.get("registry_num")){
             this.selected.setRegistrationNo(registryNum);
         }
 
         String usingYear = equipmentNameplate.getUsing_year();
-        if(StringUtils.isNotEmpty(usingYear)){
+        if(StringUtils.isNotEmpty(usingYear) && useValue.get("using_year")){
             try {
                 Pattern pattern = Pattern.compile("(?:\\d+\\.?\\d*|\\.\\d+)");
                 Matcher matcher = pattern.matcher(usingYear);
@@ -2797,7 +2830,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
         Date factoryDate = equipmentNameplate.getFactory_date();
-        if(factoryDate != null){
+        if(factoryDate != null && useValue.get("factory_date")){
             this.selected.setManufactDate(factoryDate);
         }
         equipmentNameplate = null;
@@ -2806,5 +2839,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean isLoginUser(String userUid) {
         return loginUser.getUid().equals(userUid);
+    }
+
+    public RiskLevel[] getRiskLevels() {
+        return RiskLevel.values();
     }
 }

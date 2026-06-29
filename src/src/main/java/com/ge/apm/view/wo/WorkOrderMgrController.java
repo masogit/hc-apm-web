@@ -5,10 +5,7 @@
  */
 package com.ge.apm.view.wo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.*;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ConfigItemMapper;
@@ -348,6 +345,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<AssetTypeGroup> assetTypeGroupList;
     @Setter @Getter
     private Map<String, AssetTypeGroup> assetTypeGroupMap;
+
+    @Setter @Getter
+    private Integer approvalStatus;
 
     @Override
     protected void init() {
@@ -820,11 +820,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
 
+    @Getter @Setter
+    private String viewId="";
+
     //tab切换
     public void onTabChange(TabChangeEvent event) {
         FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
         tabTitle = msg.getDetail();
         queryIndex = 0;
+        selected = null;
     }
 
     public void updateQueryIndex(int query){
@@ -1051,6 +1055,22 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     }
                 }
             }
+
+            if(approvalStatus!=null){
+                if(approvalStatus==1){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ,"0", "1*"));
+                }
+                if(approvalStatus==2){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.IN,Arrays.asList("1","5"), "1*"));
+                }
+                if(approvalStatus==3){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.IN,Arrays.asList("2","3","4"), "1*"));
+                }
+                if(approvalStatus==4){
+                    updateSearchFilter(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ,"6", "1*"));
+                }
+            }
+
             this.selected = null;
             String value = null;
             boolean isId= false;
@@ -1314,6 +1334,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         attachList = woService.getPicListBySrUid(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
         // 获取temp user信息
         initExternalTempUser();
+    }
+
+    public void onSelectOrderByUnified(SelectEvent event) throws IOException {
+        selected = (V2_WorkOrder) event.getObject();
+        onSelectOrder(null);//查询出的字段不全
     }
 
     public void onSelectOrder(String selectedId) throws IOException {
@@ -1705,7 +1730,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 currentStatus = 1;
             }
         }
-
+        selectedWorkOrder.setRepairResult("1");
         //获取当前工单的所属流程配置
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
@@ -1998,11 +2023,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             RequestContext.getCurrentInstance().addCallbackParam("checkin_time", true);
             valid = false;
         }
-        if (confirmedUpDate ==
-                null) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
-            valid = false;
+        if (confirmedUpDate == null) {
+            if("1".equals(selectedWorkOrder.getRepairResult()) || "5".equals(selectedWorkOrder.getRepairResult()) || "6".equals(selectedWorkOrder.getRepairResult())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
+                valid = false;
+            }
         }else if(this.confirmedUpDate.getTime() < selectedWorkOrder.getAcceptStepStartTime().getTime()){
             // 恢复时间不能小于接单时间
             WebUtil.addErrorMessage(WebUtil.getMessage("RepairRecoveryTimeCheck"));
@@ -4546,6 +4572,24 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return url;
     }
 
+
+
+    public void buildDataLinkUrl() {
+        String assetUid = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("paramAssetUid");
+
+        String url = "";
+        if (StringUtils.isNotEmpty(assetUid)) {
+            AssetInfo assetInfo = assetDao.findByUid(assetUid);
+            url = setDataLinkUrl(assetInfo.getName(), assetUid);
+        }
+
+        RequestContext.getCurrentInstance().addCallbackParam("url", url);
+    }
+
+
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
         loadClinicalDeptList();
@@ -4599,6 +4643,38 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             setTreeNodes(item, isSelected);
         }
     }
+
+
+    public String approvalStatusName(String approvalStatus) {
+        switch (approvalStatus){
+            case "0":
+                return "无备件";
+            case "1":
+            case "5":
+                return "备件审批中";
+            case "2":
+            case "3":
+            case "4":
+                return "备件审批完成";
+
+            case "6":
+                return "未提交";
+            default:
+                return null;
+        }
+    }
+    public boolean repairRequestUrl(){
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "RepairRequestUrl");
+        return value != null;
+    }
+    public void postProcessorExcel(Object obj){
+        woService.postProcessorExcel();
+    }
+
+    public void clearSelectedWorkOrder() {
+        selected = null;
+    }
+
 
 
 }

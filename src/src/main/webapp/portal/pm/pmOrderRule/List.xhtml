@@ -97,6 +97,9 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
+                    <p:column headerText="#{msg.feedbackRating}" rendered="#{pmOrderRuleController.pmRuleShowScoreFlag eq 'true'}">
+                        <h:outputText value="#{item.ruleScore}"/>
+                    </p:column>
                     <p:column headerText="#{msg.status}" sortBy="#{msg.status}" filterBy="#{msg.status}" filterMatchMode="EQ">
                     	    <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{pmOrderRuleController.filterPmRuleStatus}" >
@@ -131,6 +134,8 @@
                         <p:commandButton title="#{msg.exportToXLS}"  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="PmOrderRule_export"/>
                         </p:commandButton>
+                        <p:commandButton  icon="fa fa-cogs" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchModify}评分"  update=":pmBatchModifyForm"   oncomplete="PF('pmBatchModifyDialog').show()"  rendered="#{pmOrderRuleController.pmRuleShowScoreFlag eq 'true'}">
+                        </p:commandButton>
                         <ui:fragment >
                             <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"
                                              actionListener="#{pmOrderRuleController.batchDelete}" update=":PmOrderRuleListForm" disabled="#{not pmOrderRuleController.isChecked()}">
@@ -152,6 +157,23 @@
                 </h:form>
 
             </p:dialog>
+
+            <!--批量修改评分对话框-->
+            <p:dialog id="pmBatchModifyDialog" widgetVar="pmBatchModifyDialog" modal="true" width="400" height="150" resizable="true" draggable="true" header="批量修改评分">
+                <h:panelGroup>
+                    <h:form id="pmBatchModifyForm"  >
+                        <label class ="label">评分</label>
+                        <p:inputNumber minValue="0" maxValue="100"  decimalPlaces="1" value="#{pmOrderRuleController.modifyScore}" >
+                            <p:ajax />
+                        </p:inputNumber>
+                        <br></br><br></br>
+                        <h:panelGroup>
+                            <p:commandButton validateClient="true" update="PmOrderRuleListForm:datalist :growl" actionListener="#{pmOrderRuleController.batchModify()}" value="#{msg.Confirm}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmBatchModifyDialog');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('pmBatchModifyDialog').hide()"/>
+                        </h:panelGroup>
+                    </h:form>
+                </h:panelGroup>
+            </p:dialog >
             <script>
                 function preparePreview(index,formName) {
                     var $jasonText;

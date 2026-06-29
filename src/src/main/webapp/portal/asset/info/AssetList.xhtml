@@ -46,6 +46,14 @@
                 background-color: #f04134!important;
                 color: #000000!important;
             }
+            .riskLevelHigh {
+                background-color: #f04134!important;
+                color: #ffffff!important;
+            }
+            .riskLevelMedium {
+                background-color: #fca752!important;
+                color: #000000!important;
+            }
             .btn+.btn { margin-left: 0 }
             .ui-column-resizer:before {content: none!important;}
             th{font-size: 12px!important;}
@@ -160,7 +168,7 @@
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
                                  selectionMode="single" scrollable="false" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowStyleClass="#{item.warrantyAlertStatus}"
+                                 rowStyleClass="#{assetInfoListController.getRowStyleClass(item.warrantyAlertStatus, item.estimatedRiskLevel)}"
                                  rowKey="#{item.id}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -546,6 +554,17 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'estimatedRiskLevel' and  userContextService.canRender('DEVICE_RISK_ASSESSMENT')}">
+                                <p:column headerText="#{msg.estimatedRiskLevel}" sortBy="#{item.estimatedRiskLevel}" filterBy="#{item.estimatedRiskLevel}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{assetInfoListController.riskLevels}" var="level" itemLabel="#{level.name}" itemValue="#{level.code}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{assetInfoListController.getEstimatedRiskLevelName(item.estimatedRiskLevel)}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'emergencyEquipment'}">
                                 <p:column id="emergencyEquipment" headerText="#{msg.emergencyEquipment}" sortBy="#{item.emergencyEquipment}" filterBy="#{item.emergencyEquipment}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
@@ -876,7 +895,7 @@
                                     <h:outputText value="#{item.patrolInspectionOwnerTel}"/>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'assetTags'}">
+                            <c:if test="#{columnItem eq 'tags'}">
                                 <p:column headerText="#{msg.assetTags}" filterBy="#{item.assetTags.tag}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetTagsView}"/>
                                 </p:column>

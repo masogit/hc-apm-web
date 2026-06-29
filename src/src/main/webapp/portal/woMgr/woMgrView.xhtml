@@ -617,7 +617,7 @@
                         <p:inputTextarea  value="#{workOrderMgrController.newMessage}" cols="30" required="true" maxlength="255"/>
                     </h:panelGroup>
                 </p:panelGrid>
-                <p:commandButton  validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveMsg()}" value="#{msg.ok}"  icon="ui-icon-check" update=":woTab:woMgrDetailForm" oncomplete="PF('msgAddDlg').hide();"/>
+                <p:commandButton  validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveMsg()}" value="#{msg.ok}"  icon="ui-icon-check" update="woTab:woMgrDetailForm" oncomplete="PF('msgAddDlg').hide();"/>
                 <p:commandButton  validateClient="false" immediate="true"  value="#{msg.cancel}"  icon="ui-icon-check" oncomplete="PF('msgAddDlg').hide()"/>
             </h:form>
         </p:dialog>

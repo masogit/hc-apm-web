@@ -14,4 +14,9 @@ public class WordExportServiceUtil {
         return WordExportServiceUtils.generate(datas, templateBytes, bindings);
 
     }
+
+    public static byte[] generate(Map<String, Object> datas, byte[] templateBytes, Map<String, RenderPolicy> bindings,Map<Character, RenderPolicy> plugins) {
+        return WordExportServiceUtils.generate(datas, templateBytes, bindings,plugins);
+
+    }
 }

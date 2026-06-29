@@ -346,6 +346,7 @@ public class BudgetPersistService {
                 setApplicationDepartment(account,approval.get());
                 approval.get().setTenantUID(account.getTenantUID());
                 approval.get().setHierOrgUid(account.getSiteUID());
+                approval.get().setConfigOrgUid(approvalConfig.getHierOrgUid());
             });
         });
         return approval.get();

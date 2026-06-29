@@ -1,0 +1,206 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition>
+    <div class="ui-g-12 card">
+        <h:form id="woAllMgrListForm" >
+            <p:dataTable id="datalist" value="#{workOrderUnifiedController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{workOrderUnifiedController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500" >
+
+                <c:if test="#{workOrderUnifiedController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderUnifiedController.onSelectOrderByUnified}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{workOrderUnifiedController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{workOrderUnifiedController.onSelectOrderByUnifiedForCurrent}"  update=" woTab:woMgrDetailForm woTab:woMvsMgrDetailForm"/>
+                </c:if>
+
+                <p:ajax event="filter" listener="#{workOrderUnifiedController.onFilterWo}" update="datalist" oncomplete="updateSelectAllCheckBox();"/>
+                <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+
+                <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <c:choose>
+                        <c:when test="#{!userContextService.hasCurrentTenantName('')}">
+                            <h:outputText value="#{workOrderUnifiedController.displayModeCasePriority.equals('key')?item.serviceRequest.casePriority:fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
+                        </c:when>
+                        <c:otherwise>
+                            <h:outputText value="#{fieldMsg.fieldValue('casePriority',item.serviceRequest.casePriority)}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"></h:outputText>
+                        </c:otherwise>
+                    </c:choose>
+                </p:column>
+                <p:column headerText="#{msg.assetName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.ManufacturerSerialNumber}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.serialNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.departNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.functionType}"/>
+                </p:column>
+               <!-- <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
+                    <f:facet name="filter" >
+                        <p:autoComplete id="btnOrg2" value="请选择院区" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    </f:facet>
+                    <h:outputText value="#{workOrderUnifiedController.getSiteOrgName(item.siteUID)}"/>
+                </p:column>-->
+                <p:column id="hospitalId" headerText="#{msg.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderUnifiedController.siteUidFilter}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"   noSelectionOption="true"/>
+                            <f:selectItems value="#{workOrderUnifiedController.LoadSiteNameList()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{workOrderMgrMvsController.getSiteOrgName(item.assetInfo.siteUID)}"/>
+                </p:column>
+                <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{workOrderMgrController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                </p:column>
+                <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE" width="100" rendered="#{userContextService.hasCurrentTenantName('')}">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderUnifiedController.fileterOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{workOrderUnifiedController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{workOrderUnifiedController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.assetDeptName}"  filterBy="#{item.serviceRequest.assetLocation}" filterMatchMode="LIKE" width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <h:outputText value="#{item.serviceRequest.assetLocation}"/>
+                </p:column>
+                    <p:column headerText="#{msg.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.serviceRequest.srNum}"/>
+                    </p:column>
+                <p:column headerText="#{msg.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="LIKE">
+                    <f:facet name="filter">
+                        <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{workOrderUnifiedController.applyTimeFormatTime}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.serviceRequest.requestTime}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderUnifiedController.stepFileter}"  >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{workOrderMgrController.getWoSteps('2,3,4,5,6,9,10,11')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.currentStepName}" style="display: none"/>
+                    <p:graphicImage  width="165" height="38" url="#{workOrderUnifiedController.getStepImg(item)}"/>
+                </p:column>
+                <p:column width="90" headerText="#{msg.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType').subList(0,2)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                </p:column>
+                <p:column headerText="#{msg.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                    <h:outputText value="#{workOrderUnifiedController.getRequestReasonInShort(item.serviceRequest.requestReason)}" title="#{item.serviceRequest.requestReason}"/>
+                </p:column>
+                <p:column width="90" headerText="主子工单" rendered="#{!userContextService.isEnableBtnByKey('displayMainSubWorkOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                            <f:selectItem itemLabel="主工单" itemValue="main" />
+                            <f:selectItem itemLabel="子工单" itemValue="sub" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
+                </p:column>
+
+                <f:facet name="{Toolbar}">
+                    <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                        <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <c:if test="#{ workOrderMgrController.tabTitle eq '全部工单'}">
+            <ui:include src="woMgrView.xhtml"/>
+            <ui:include src="mvs/woMvsMgrView.xhtml"/>
+        </c:if>
+
+        <p:overlayPanel  widgetVar="panelFilterApplyTime" for="woTab:woAllMgrListForm:datalist:filterApplyTime" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel for="cal11" />
+                <p:calendar id="cal11" widgetVar="varApplyTimeFrom" effect="fold" value="#{workOrderUnifiedController.applyTimeFrom}"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                <p:outputLabel for="cal22"/>
+                <p:calendar id="cal22" widgetVar="varApplyTimeTo" effect="fold"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+            </h:panelGrid>
+            <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+    </div>
+
+
+    <script>
+        afterPageLoad = function () {
+
+
+            var isActive = "#{userContextService.isActive()}";
+            if(isActive == '1'){
+                PF('ActiveDlg').show();
+            }
+        }
+
+        var newWin;
+        function prepareOrderViewWindow() {
+            newWin = window.open('about:blank', '_blank');
+            newWin.document.body.innerHTML = '加载中...';
+        }
+        function openOrderViewWindow(xhr, status, args) {
+            newWin.location.href = args.url;
+        }
+        function updateSelectAllCheckBox() {
+            var checkboxlist = $(".selectCheckBox");
+            var selectAllstatus = true;
+            checkboxlist.each(function () {
+                selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+            });
+            $("#woAllMgrListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+            if (selectAllstatus) {
+                $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+            } else {
+                $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+            }
+        }
+
+        function handleCancelOrderSubmit(xhr, status, args) {
+            var approvalProcessIsComplete = args.approvalProcessIsComplete;
+            if (approvalProcessIsComplete === false) {
+            } else {
+                PF('cancelDialog').show();
+            }
+        }
+    </script>
+</ui:composition>
+</html>

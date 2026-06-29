@@ -7,13 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('investmentCalculationMethod').name.concat('(').concat(systemConfigItemController.configItemMap.get('investmentCalculationMethod').key).concat(')')}</label>
                 <p:selectOneMenu value="#{systemConfigItemController.configItemMap.get('investmentCalculationMethod').showValue}" style="width: 95%;">
                     <f:selectItem itemLabel="请选择" itemValue="#{null}"/>
                     <f:selectItems value="#{systemConfigItemController.configItemMap.get('investmentCalculationMethod').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                 </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('investmentCalculationMethod').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -33,6 +37,10 @@
                 </p:selectManyMenu>
             </h:panelGroup>
             <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('costType').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('costType'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('costType'))}" update="configItemForm" style="padding:10px"
@@ -42,6 +50,10 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('currentWorkingHours').name.concat('(').concat(systemConfigItemController.configItemMap.get('currentWorkingHours').key).concat(')')}</label>
                 <p:inputNumber value="#{systemConfigItemController.configItemMap.get('currentWorkingHours').showValue}" style="width: 95%;"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('currentWorkingHours').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
@@ -57,6 +69,10 @@
                     <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                     <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                 </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>

@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:his="http://www.ge.com/tags/his">
+    <ui:define name="preRenderView">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <style>
+            .export-btn-disabled {
+                opacity: 0.6;
+                cursor: not-allowed !important;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="#{msg.chargeDetailSource}"/>
+                </div>
+                <h:form id="HisOrgForm">
+                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                        <his:selectOrg update="@(form)"></his:selectOrg>
+                    </div>
+                </h:form>
+                <div class="ui-g-12 card ">
+                    <p:tabView id="HisDataSourceTab" class="tabs"  dynamic="true">
+                        <p:tab title="收费结果数据" id="showList">
+                            <div class="ui-g-12 card">
+                                <h:form id="IouListForm">
+                                    <div style="border:0px solid ;display:inline-block;width: 95%;float: left;">
+                                        <p:panelGrid columns="4" layout="grid"
+                                                     styleClass="ui-panelgrid-blank form-group">
+
+                                            <h:panelGroup>
+                                                <label class="label">执行开始时间</label>
+                                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                            locale="#{userContextService.getCalendarLocale()}"
+                                                            pattern="#{userContextService.timeFormat()}" id="startDate"
+                                                            value="#{hisDataSourceEsController.hisRequestParamsDto.startDate}"
+                                                            showOn="button" showButtonPanel="true" navigator="true"  required="true" requiredMessage="执行开始时间必填"
+                                                            mask="true">
+                                                    <p:ajax event="dateSelect" process="@this"  update="endDate" listener="#{hisDataSourceEsController.getEndDateChange()}"/>
+                                                </p:calendar>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <label class="label">执行结束时间</label>
+                                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                            locale="#{userContextService.getCalendarLocale()}"
+                                                            pattern="#{userContextService.timeFormat()}" id="endDate"
+                                                            value="#{hisDataSourceEsController.hisRequestParamsDto.endDate}"
+                                                            showOn="button" showButtonPanel="true" navigator="true"
+                                                            maxdate="#{hisDataSourceEsController.getMaxDate()}"   required="true" requiredMessage="执行结束时间必填"
+                                                            mask="true"/>
+                                            </h:panelGroup>
+
+                                        </p:panelGrid>
+                                    </div>
+                                    <div style="float: left;margin: 30px -80px 0px -450px">
+                                        <p:commandButton  widgetVar="exportBtnWidget" validateClient="true" value="检索"
+                                                         update="IouListForm:datalist"/>
+                                    </div>
+
+                                    <p:dataTable id="datalist" value="#{hisDataSourceEsController.lazyModel}"
+                                                 var="item"
+                                                 widgetVar="varDataList"
+                                                 selectionMode="single"
+                                                 selection="#{hisDataSourceEsController.selected}"
+                                                 lazy="true" paginator="true" paginatorPosition="both"
+                                                 paginatorAlwaysVisible="true"
+                                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                                 sortBy="#{item.execTime}"
+                                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                                 expandableRowGroups="true"
+                                                 rowsPerPageTemplate="20,50,100,500">
+
+                                        <p:ajax event="filter" listener="#{hisDataSourceEsController.onFilter}"/>
+<!--                                        <p:column headerText="编号" sortBy="#{item.id}" filterBy="#{item.id}"-->
+<!--                                                  filterMatchMode="LIKE">-->
+<!--                                            <h:outputText value="#{item.id}"/>-->
+<!--                                        </p:column>-->
+                                        <p:column headerText="所属机构">
+                                            <h:outputText value="#{item.orgCode}"/>
+                                        </p:column>
+                                        <p:column headerText="设备代码"
+                                                  filterBy="#{item.deviceCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.deviceCode}"/>
+                                        </p:column>
+                                        <p:column headerText="住院号或门诊"
+                                                  filterBy="#{item.patientRegistrationNum}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.patientRegistrationNum}"/>
+                                        </p:column>
+                                        <p:column headerText="申请单号"
+                                                  filterBy="#{item.prescriptionNum}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.prescriptionNum}"/>
+                                        </p:column>
+
+                                        <p:column headerText="收费项目代码"
+                                                  filterBy="#{item.deviceDeptCode}" filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.deviceDeptCode}"/>
+                                        </p:column>
+
+                                        <p:column headerText="收费项目名称"  style="width: 100px">
+                                            <f:facet name="header">
+                                                <h:outputText value="收费项目名称"/><br/>
+                                                <p:autoComplete dropdown="true" value="#{hisDataSourceEsController.filterProjectName}"
+                                                                appendTo="@(Body)" scrollHeight="300" forceSelection="true"
+                                                                completeMethod="#{hisDataSourceEsController.autoCompleteProjectName}"
+                                                                size="5" style="width: 90px">
+                                                    <p:ajax event="itemSelect" listener="#{hisDataSourceEsController.onProjectNameFilterChange}"
+                                                            process="@this" update="HisDataSourceTab:IouListForm:datalist"/>
+
+                                                </p:autoComplete>
+                                            </f:facet>
+                                            <h:outputText value="#{item.projectName}"/>
+                                        </p:column>
+                                        <p:column headerText="收费项目分类" style="width: 100px">
+                                            <f:facet name="header">
+                                                <h:outputText value="收费项目分类"/><br/>
+                                                <p:autoComplete dropdown="true" value="#{hisDataSourceEsController.filterSfxmLb}"
+                                                                appendTo="@(Body)" scrollHeight="300" forceSelection="true"
+                                                                completeMethod="#{hisDataSourceEsController.autoCompleteSfxmLb}"
+                                                                size="5" style="width: 90px">
+                                                    <p:ajax event="itemSelect" listener="#{hisDataSourceEsController.onSfxmLbFilterChange}"
+                                                            process="@this" update="HisDataSourceTab:IouListForm:datalist"/>
+
+                                                </p:autoComplete>
+                                            </f:facet>
+                                            <h:outputText value="#{item.sfxmLb}"/>
+                                        </p:column>
+
+                                        <p:column headerText="数量"
+                                                  filterBy="#{item.receiptNum}"
+                                                  filterMatchMode="GTE">
+                                            <h:outputText value="#{item.receiptNum}"/>
+                                        </p:column>
+                                        <p:column headerText="单位">
+                                            <h:outputText value="#{item.unit}"/>
+                                        </p:column>
+                                        <p:column headerText="金额"
+                                                  filterBy="#{item.totalAmount}"
+                                                  filterMatchMode="GTE">
+                                            <h:outputText value="#{item.totalAmount}"/>
+                                        </p:column>
+                                        <p:column headerText="执行科室" style="width: 120px">
+                                            <f:facet name="header">
+                                                <h:outputText value="执行科室"/><br/>
+                                                <p:autoComplete  dropdown="true" value="#{hisDataSourceEsController.filterExecDept}" appendTo="@(Body)"
+                                                                scrollHeight="300"  forceSelection="true" completeMethod="#{hisDataSourceEsController.autoCompleteDeptName}" size="5" style="width: 100px" >
+                                                    <p:ajax event="itemSelect" listener="#{hisDataSourceEsController.onClinicalDeptNameFilterChange}" process="@this"  update="HisDataSourceTab:IouListForm:datalist"/>
+                                                    <p:ajax process="@this" listener="#{hisDataSourceEsController.onClinicalDeptNameFilterChange}" update="HisDataSourceTab:IouListForm:datalist"/>
+                                                </p:autoComplete>
+                                            </f:facet>
+                                            <h:outputText value="#{item.execDept}" />
+                                        </p:column>
+                                        <p:column headerText="执行科室代码"
+                                                  filterBy="#{item.execDeptCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.execDeptCode}"/>
+                                        </p:column>
+                                        <p:column headerText="是否匹配"
+                                                  filterBy="#{item.isMatched}"
+                                                  filterMatchMode="EQ">
+                                            <f:facet name="filter">
+                                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                                    <f:converter converterId="javax.faces.Boolean" />
+                                                    <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                                </p:selectOneMenu>
+                                            </f:facet>
+                                            <h:outputText value="#{item.isMatched?msg.True2Yes:msg.False2No}"/>
+<!--                                            <h:outputText value="#{item.isMatched}"/>-->
+                                        </p:column>
+                                        <p:column headerText="执行时间" sortBy="#{item.execTime}">
+                                            <h:outputText value="#{item.execTime}">
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd HH:mm:ss"  />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="系统来源"
+                                                  filterBy="#{item.sourceCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.sourceCode}"/>
+                                        </p:column>
+                                        <!--                    <p:column headerText="是否匹配" sortBy="#{item.isMatched}" filterBy="#{item.isMatched}"-->
+                                        <!--                              filterMatchMode="EQ">-->
+                                        <!--                        <h:outputText value="#{item.isMatched}"/>-->
+                                        <!--                    </p:column>-->
+                                        <f:facet name="{Toolbar}">
+                                            <p:commandButton
+                                                    id="exportBtn"
+                                                    title="#{hisDataSourceEsController.datalistSize > 50000 ? '一次最多只能下载5万条数据' : '导出Excel'}"
+                                                    icon="ui-icon-arrowstop-1-s"
+                                                    class="btn btn-sm btn-gray #{hisDataSourceEsController.datalistSize > 50000 ? 'export-btn-disabled' : ''}"
+                                                    ajax="false"
+                                                    onclick="return #{hisDataSourceEsController.datalistSize lt 50000};"
+                                            >
+
+                                                <p:dataExporter
+                                                        type="xls"
+                                                        target="datalist"
+                                                        fileName="HisDataSourceEs_export"
+                                                        rendered="#{hisDataSourceEsController.datalistSize lt 50000}" />
+                                            </p:commandButton>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </h:form>
+                                <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true"
+                                          resizable="true" draggable="true" appendTo="@(body)" header="提示信息">
+                                </p:dialog>
+                            </div>
+
+                        </p:tab>
+
+                    </p:tabView>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

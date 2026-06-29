@@ -34,7 +34,7 @@
                 <c:choose>
                     <c:when test="#{!userContextService.hasCurrentTenantName('')}">
                         <p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==0}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" action="workOrderList.xhtml?faces-redirect=true&amp;query=0" />
-                        <p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CREATE')}" oncomplete="PF('createSRDialog').show()"/>
+                        <p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CREATE') and  !workOrderMgrController.repairRequestUrl()}" oncomplete="PF('createSRDialog').show()"/>
                         <p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"  disabled="#{workOrderMgrController.queryIndex==1}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}" onclick="onButtonChange()" action="workOrderList.xhtml?faces-redirect=true&amp;query=1" />
                         <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=10"  disabled="#{workOrderMgrController.queryIndex==10}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW') and userContextService.isEnableBtnByKey('enableWorkOrderReviewBtn')}"/>
                         <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=2"  disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}"/>
@@ -177,6 +177,11 @@
                             <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                         </p:column>
                     </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'fromDeptName'}">-->
+                        <p:column headerText="#{msg.AssetDepartment}" filterBy="#{item.serviceRequest.assetLocation}" filterMatchMode="LIKE" width="100"  rendered="#{!userContextService.hasCurrentTenantName('')}" >
+                            <h:outputText value="#{item.serviceRequest.assetLocation}"/>
+                        </p:column>
+                   </c:if>
                     <c:if test="#{fieldItem.rendered and fieldItem.field eq 'locationName'}">
                         <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{workOrderMgrController.showLocationNameFlag}">
                             <h:outputText value="#{item.assetInfo.locationName}"/>
@@ -294,6 +299,40 @@
                             <h:outputText value="#{workOrderMgrController.assetTypeGroupMap.get(item.assetInfo.assetType).displayName}"/>
                         </p:column>
                     </c:if>
+
+
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'approvalStatus'}">
+                        <p:column headerText="备件状态"  filterBy="#{item.approvalStatus}" filterMatchMode="LIKE" >
+
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  value="#{workOrderMgrController.approvalStatus}">
+                                    <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                    <f:selectItem itemLabel="无备件" itemValue="1" />
+                                    <f:selectItem itemLabel="备件审批中" itemValue="2" />
+                                    <f:selectItem itemLabel="备件审批完成" itemValue="3" />
+                                    <f:selectItem itemLabel="未提交" itemValue="4" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{workOrderMgrController.approvalStatusName(item.approvalStatus)}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'tubeInstallDate'}">
+                        <p:column headerText="#{msg.tubeInstallDate}" >
+                            <h:outputText value="#{item.assetInfo.tubeInstallDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'totalExposureCount'}">
+                        <p:column headerText="#{msg.totalExposureCount}" >
+                            <h:outputText value="#{item.assetInfo.totalExposureCount}"/>
+                        </p:column>
+                    </c:if>
+                    <c:if test="#{fieldItem.rendered and fieldItem.field eq 'totalInspectionCount'}">
+                        <p:column headerText="#{msg.totalInspectionCount}" >
+                            <h:outputText value="#{item.assetInfo.totalInspectionCount}"/>
+                        </p:column>
+                    </c:if>
                 </c:forEach>
 
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CANCEL')}" exportable="false">
@@ -357,12 +396,15 @@
 
                     <p:commandButton id="manHoursManageButton" value="#{msg.workHourManagement}" actionListener="#{workOrderMgrController.prepareMoreManHoursView}" update="woTab:moreManHoursDialogForm" disabled="#{empty workOrderMgrController.selected or !(workOrderMgrController.queryIndex gt 3 and workOrderMgrController.queryIndex lt 8)}" oncomplete="PF('moreManHoursDialog').show()" rendered="#{userContextService.countyArea}"/>
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                        <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
+                        <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export" postProcessor="#{workOrderMgrController.postProcessorExcel}"/>
                     </p:commandButton>
                 </f:facet>
             </p:dataTable>
         </h:form>
-        <ui:include src="woMgrView.xhtml"/>
+        <c:if test="#{empty workOrderMgrController.tabTitle or workOrderMgrController.tabTitle eq '内部工单'}">
+            <ui:include src="woMgrView.xhtml"/>
+        </c:if>
+
         <ui:include src="srCreate.xhtml"/>
         <ui:include src="takeOrderDialog.xhtml"/>
         <ui:include src="transferDialog.xhtml"/>

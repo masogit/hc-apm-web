@@ -1,8 +1,10 @@
 package com.ge.apm.web.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.faces.FacesException;
 import javax.faces.application.FacesMessage;
-import javax.faces.application.ViewHandler;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.FacesContext;
@@ -11,6 +13,7 @@ import javax.faces.event.ExceptionQueuedEventContext;
 import java.util.Iterator;
 
 public class GlobalExceptionHandler extends ExceptionHandlerWrapper {
+    private Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private ExceptionHandler wrapped;
 
     public GlobalExceptionHandler(ExceptionHandler exceptionHandler) {
@@ -49,9 +52,11 @@ public class GlobalExceptionHandler extends ExceptionHandlerWrapper {
                 if (throwable instanceof SystemException) {
                     detail = throwable.getMessage();
                 }
+                logger.error(detail, throwable);
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, detail);
                 fc.addMessage(null, msg);
             } catch (Exception e) {
+                logger.error(e.getMessage(), e);
                 e.printStackTrace();
             }
         }

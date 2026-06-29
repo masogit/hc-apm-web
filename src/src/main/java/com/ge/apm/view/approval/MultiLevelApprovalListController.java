@@ -47,6 +47,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     public static final String TAB_INITIATID_BY_ME = "TAB_INITIATID_BY_ME";
     public static final String TAB_PENDING_APPROVAL_BY_ME = "TAB_PENDING_APPROVAL_BY_ME";
     public static final String TAB_APPROVED_BY_ME = "TAB_APPROVED_BY_ME";
+    public static final String TAB_APPROVED_ALL = "TAB_APPROVED_ALL";
 
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private MultiLevelApprovalController multiLevelApprovalController;
@@ -111,6 +112,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         }else {
             wrapper.orderBy("la.approva_number", false);
         }
+        wrapper.andNew().eq("la.tenant_uid", user.getTenantUID());
 
         if (TAB_INITIATID_BY_ME.equals(currentTabId)) {
             wrapper.andNew().eq("la.initiate_approver_uid", user.getUid());
@@ -118,9 +120,17 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
             wrapper.andNew().eq("la.approval_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING).or().eq("la.approval_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
             wrapper.andNew().eq("la.approval_node_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
             wrapper.andNew().like("la.approval_uid", APPROVAL_SEPARATOR + user.getUid() + APPROVAL_SEPARATOR);
-        } else {//approved by me
+        } else  if (TAB_APPROVED_BY_ME.equals(currentTabId)) {//approved by me
            wrapper.andNew().eq("la.actual_approver_uid", user.getUid());
             wrapper.andNew().ne("la.approval_node_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+        }else  if (TAB_APPROVED_ALL.equals(currentTabId)) {
+            List<String> uids = new ArrayList<>();
+            int orgType = user.getOrgLevel();
+            if (orgType <= 0) uids.add(user.getTenantUID());
+            if (orgType <= 1) uids.add(user.getHospitalUID());
+            if (orgType <= 2) uids.add(user.getInstitutionUID());
+            if (orgType <= 3) uids.add(user.getSiteUID());
+            wrapper.andNew().in("la.config_org_uid", uids);
         }
         WrapperSearchFilterUtils.convert(searchFilters, wrapper);
         List<MultiLevelApproval> list = multiLevelApprovalMapper.loadData(pagination, wrapper, user.getTenantUID());
@@ -198,6 +208,10 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         return TAB_APPROVED_BY_ME.equals(currentTabId);
     }
 
+    public boolean isApprovedAll() {
+        return TAB_APPROVED_ALL.equals(currentTabId);
+    }
+
     public void initiateApprovalByMe() {
         currentTabId = TAB_INITIATID_BY_ME;
         switchTab();
@@ -212,6 +226,12 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         currentTabId = TAB_APPROVED_BY_ME;
         switchTab();
     }
+
+    public void approvedApprovalByALL() {
+        currentTabId = TAB_APPROVED_ALL;
+        switchTab();
+    }
+
 
     public void switchTab() {
         searchFilters = new ArrayList();

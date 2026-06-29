@@ -14,8 +14,17 @@ public class AssetRuleModel {
 	private String pmRuleUid;
 	private String pmRuleName;
 	private String uniqueUid;
+    private String ruleScore;
 
-	public Integer getMeasuringType() {
+    public String getRuleScore() {
+        return ruleScore;
+    }
+
+    public void setRuleScore(String ruleScore) {
+        this.ruleScore = ruleScore;
+    }
+
+    public Integer getMeasuringType() {
 		return measuringType;
 	}
 

@@ -16,6 +16,7 @@ import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.llm.ApplicationType;
 import com.ge.healthcare.cn.common.llm.Result;
@@ -547,6 +548,7 @@ public class MeasuringService {
                         json.put("status",content.getString("conclusion"));
                         json.put("validDateTo",content.getString("valid_util"));
                         json.put("checkDate",content.getString("verify_date"));
+                        json.put("certificationType",content.getString("certification_type"));
                         MeasuringCertificateDetail measuringCertificateDetail = handleOcrResult(json, newFile,blobObjects);
                         if(measuringCertificateDetail == null) continue;
                         List<V2_BlobObject> measuringAttachList = measuringCertificateDetail.getMeasuringAttachList();
@@ -802,6 +804,7 @@ public class MeasuringService {
     }
     public void setObject(MeasuringCertificateDetail detail,JSONObject object){
         detail.setCertificateNo(object.getString("certificateNo"));
+        detail.setCertificateType(object.getInteger("certificateType"));
         detail.setAssetManufacturer(object.getString("assetManufacturer"));
         detail.setCheckPerson(object.getString("checkPerson"));
         detail.setAssetModel(object.getString("assetModel"));
@@ -897,6 +900,7 @@ public class MeasuringService {
                 detail.setInstitutionUID(selectedOrg.getInstitutionUID());
                 detail.setHospitalUID(selectedOrg.getHospitalUID());
                 detail.setSiteUID(selectedOrg.getSiteUID());
+                detail.setCertificateType(1);
 
                 if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
                     detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
@@ -1341,5 +1345,16 @@ public class MeasuringService {
 
     public void setProgress(int progress) {
         this.progress = progress;
+    }
+
+
+    public void postProcessorExcel(SystemEventAuditEnum eventAuditEnum, String eventData){
+        try{
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, null, Boolean.TRUE, "", AuditBoTypeEnum.TABLE_DOWNLOAD.getBoType(), eventData);
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

@@ -291,7 +291,7 @@
                    <c:when test="#{item eq 'ASSET_DEVICE_OVERDUE'}">
                        <p:submenu id="validityManage" label="效期管理" icon="fa fa-square-o fa-fw" rendered="#{userContextService.canRender('ASSET_DEVICE_OVERDUE') and (userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') or userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW'))}">
                            <p:menuitem fragment="um100" id="um100" value="#{msg.deviceExpiryManagement}" outcome="/portal/asset/info/EquipmentExpiryManagement.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') }"/>
-                           <p:menuitem fragment="um097" id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
+                           <p:menuitem fragment="um097" id="um097" value="#{msg.overdueData}" outcome="/portal/asset/info/EquipmentExpiryStatistics.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
                        </p:submenu>
                    </c:when>
                    <!-- BI报表分析 -->
@@ -341,10 +341,11 @@
                    <c:when test="#{item eq 'LOG_AUDIT'}">
                        <!-- 日志审计 -->
                        <p:submenu id="um4001" label="#{msg.logView}" icon="fa fa-filter fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('LOG_')}">
-                           <p:menuitem fragment="item001" id="item001" value="#{msg.userModifyRecord}" outcome="/portal/historyInfo/userList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER')}"/>
+<!--                           <p:menuitem fragment="item001" id="item001" value="#{msg.userModifyRecord}" outcome="/portal/historyInfo/userList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER')}"/>-->
                            <p:menuitem fragment="item002" id="item002" value="#{msg.assetModifyRecord}" outcome="/portal/historyInfo/assetList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_ASSET')}"/>
                            <p:menuitem fragment="item003" id="item003" value="#{msg.loginHistoryRecord}" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_LOGIN')}"/>
-                           <p:menuitem fragment="item004" id="item004" value="#{msg.userModifyRecord}-ES" outcome="/portal/historyInfo/userEsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_ES')}"/>
+                           <p:menuitem fragment="item004" id="item004" value="#{msg.userModifyRecord}" outcome="/portal/historyInfo/userEsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_ES')}"/>
+                           <p:menuitem fragment="item004" id="item004" value="#{msg.queryDownloadRecord}" outcome="/portal/sysyemEventAudit/tableList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_TABLE')}"/>
                        </p:submenu>
                    </c:when>
                    <!--<c:when test="#{item eq 'DEVICEDATAPREVIEW'}">
@@ -424,6 +425,8 @@
                 <p:menuitem fragment="um5028" id="um5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_JMREPORT_EDIT')}"   />
                 <p:menuitem fragment="um5029" id="um5029" value="系统模板管理" outcome="/portal/config/template/systemTemplate.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>
 <!--                <p:menuitem id="um530" value="OCR模板管理" outcome="/portal/ocr/templateList.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>-->
+                <p:menuitem fragment="um5031" id="um5031" value="推理模型管理" outcome="/portal/config/model/inferenceModel.xhtml"   rendered="#{userContextService.hasAnyRoleByApmRoles('SuperAdmin')}"/>
+
             </p:submenu>
             <!-- IoT设备使用概览 -->
             <p:menuitem fragment="unattended" id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('IOT_DEVICE_OVERVIEW')}" outcome="/portal/iframe/dispensingCenter.xhtml"/>

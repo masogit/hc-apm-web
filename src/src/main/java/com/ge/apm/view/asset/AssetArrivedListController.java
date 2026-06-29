@@ -111,6 +111,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     @Override
     protected Page<ArrivalList> loadData(PageRequest pageRequest) {
+        UserContextService.setPageSizeCache("arrivalList.xhtml",pageRequest.getPageSize());
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
@@ -281,6 +282,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     public String createAction() {
+        UserContextService.clearPageSizeCache("arrivalListEdit.xhtml.itemList");
         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create");
     }
 
@@ -293,6 +295,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     public void editActionOpen() {
+        UserContextService.clearPageSizeCache("arrivalListEdit.xhtml.itemList");
         String url = "action=Edit&listId=" + selected.getId();
         url = "arrivalListEdit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         RequestContext requestContext = RequestContext.getCurrentInstance();

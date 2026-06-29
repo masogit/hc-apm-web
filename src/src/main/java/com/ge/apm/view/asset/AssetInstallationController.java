@@ -5,36 +5,35 @@
  */
 package com.ge.apm.view.asset;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.ValueChangeEvent;
-
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
-import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
+import com.google.common.base.Strings;
+import javaslang.Tuple2;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -45,23 +44,28 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-
-import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparator;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
-
-import javaslang.Tuple2;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -182,10 +186,25 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     @Getter
     @Setter
     private SelectItemDto selectItemDto;
+
+    @Getter @Setter
+    private EquipmentNameplate equipmentNameplate = new EquipmentNameplate();
+
+    @Getter @Setter
+    private Map<String,Boolean> useValue = new HashMap<>();
+
+    @Setter@Getter
+    private String selectedFileItemId;
+
+    public void nameplatePhotoPreview(String itemId){
+        selectedFileItemId = itemId;
+    }
     @Override
     protected GenericRepositoryUUID<ArrivalList> getDAO() {
         return arrivalListDao;
     }
+
+    private RestTemplate restTemplate;
 
     @Override
     @PostConstruct
@@ -230,6 +249,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         msService = WebUtil.getBean(MicroServiceUtil.class);
         masterDataService = WebUtil.getBean(MasterDataService.class);
+        restTemplate = WebUtil.getBean(RestTemplate.class);
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
             AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(assetTypeGroup, arrivalListItem.getTenantUid());
@@ -373,7 +393,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     }
 
     public String finishInstall() {
-        arrivalListDao.save(arrivalList);//由于更新了院区，所以要重新保存一下，供定时任务获取
+        arrivalListDao.save(arrivalListItem.getArrivalList());//由于更新了院区，所以要重新保存一下，供定时任务获取
         boolean isValidate = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
@@ -668,6 +688,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             return "";
         }
 
+        arrivalListDao.save(arrivalListItem.getArrivalList());
         finishInstallHandle(itemList);
         if(isApproved()){
             for (ArrivalListItem listItem : itemList) {
@@ -751,6 +772,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     }
 
     public void updateItem() {
+        arrivalListDao.save(arrivalListItem.getArrivalList());
         if (saveItem()) {
             WebUtil.addSuccessMessage("修改成功");
         }
@@ -1370,6 +1392,99 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetClassificationModel.setFactory(null);
 
         return    masterDataService.autoAssetClassification32(assetClassificationModel);
+
+    }
+
+    public void  plateRecognition(String objectId){
+        try {
+            String token = UserContextService.getAccessToken();
+            String gatewayURL = msService.getGatewayURL(GatewayURL.PLATE_RECOGNITION);
+            gatewayURL = gatewayURL.replace("{objectId}", objectId).concat("?assetUid=");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", token);
+            HttpEntity<Map> requestEntity = new HttpEntity<Map>(headers);
+            ResponseEntity<JSONObject> response = restTemplate.exchange(gatewayURL, HttpMethod.GET, requestEntity, JSONObject.class);
+            if(response.getStatusCode().is2xxSuccessful()){
+                JSONObject body = response.getBody();
+                JSONObject data = body.getJSONObject("data");
+                equipmentNameplate = data.toJavaObject(EquipmentNameplate.class);
+                WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition")+"完成");
+            }
+        } catch (Exception e) {
+            // 识别失败，请重新上传图片之类的
+            equipmentNameplate = new EquipmentNameplate();
+            logger.info(e.getLocalizedMessage(),e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition")+"识别失败，请重新上传图片");
+        }
+    }
+    public List<Supplier> autoCompleteManufacture(String query) {
+        List<Supplier> manuList = assetMgrService.getOnlyManuListBySiteUid(arrivalList.getTenantUID());
+        return autoCompleteService.autoCompleteManufacture(query, manuList);
+    }
+    public void applyResult(){
+//        3.点击应用按钮后，名称、规格型号、制造商、注册证号、使用年限，保存到设备信息里的同时更新到到货清单中。
+//        4.点击应用按钮后，制造商序列号和出厂日期保存到设备信息里。
+        ArrivalListItem arrivalListItem = this.getArrivalListItem();
+        String deviceName = equipmentNameplate.getDevice_name();
+        if(StringUtils.isNotEmpty(deviceName) && useValue.get("device_name")){
+            arrivalListItem.getArrivalList().setAssetName(deviceName);
+            arrivalListItem.setAliasName(deviceName);
+        }
+
+        String financingNum = equipmentNameplate.getPattern();
+        if(StringUtils.isNotEmpty(financingNum) && useValue.get("pattern")){
+            arrivalListItem.getArrivalList().setFunctionType(financingNum);
+            arrivalListItem.setFunctionType(financingNum);
+        }
+
+        String serialNum = equipmentNameplate.getSerial_num();
+        if(StringUtils.isNotEmpty(serialNum) && useValue.get("serial_num")){
+              arrivalListItem.setSerialNum(serialNum);
+        }
+
+        String manufactory = equipmentNameplate.getManufactory();
+        if(StringUtils.isNotEmpty(manufactory) && useValue.get("manufactory")){
+            List<Supplier> suppliers = autoCompleteManufacture("");
+            Optional<Supplier> first = suppliers.stream().filter(item -> manufactory.equalsIgnoreCase(item.getName())).findFirst();
+            Supplier supplier = null;
+            if(first.isPresent()){
+                supplier = first.get();
+            }else{
+                Supplier newSupplier = new Supplier();
+                newSupplier.setName(manufactory);
+                newSupplier.setManufacturerT(Boolean.TRUE);
+                supplierService.saveSupplier(newSupplier);
+                supplier =  newSupplier;
+                WebUtil.addSuccessMessage("制造商创建成功");
+            }
+            arrivalListItem.getArrivalList().setManufacture(supplier.getName());
+            arrivalListItem.getArrivalList().setManufactureId(supplier.getId().toString());
+        }
+
+        String registryNum = equipmentNameplate.getRegistry_num();
+        if(StringUtils.isNotEmpty(registryNum) && useValue.get("registry_num")){
+            arrivalListItem.setRegistrationNo(registryNum);
+        }
+
+        String usingYear = equipmentNameplate.getUsing_year();
+        if(StringUtils.isNotEmpty(usingYear) && useValue.get("using_year")){
+            try {
+                Pattern pattern = Pattern.compile("(?:\\d+\\.?\\d*|\\.\\d+)");
+                Matcher matcher = pattern.matcher(usingYear);
+                StringBuffer buffer = new StringBuffer();
+                while (matcher.find()){
+                    buffer.append(matcher.group());
+                }
+                arrivalListItem.setLifecycleInYear(Double.valueOf(buffer.toString()));
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Date factoryDate = equipmentNameplate.getFactory_date();
+        if(factoryDate != null && useValue.get("factory_date")){
+            arrivalListItem.setManufactDate(factoryDate);
+        }
+        equipmentNameplate = null;
 
     }
 }

@@ -34,6 +34,9 @@
         <result column="make_short_name" property="makerShortName"/>
         <result column="manufacture" property="manufacture"/>
         <result column="asset_classification32" property="assetClassification32"/>
+        <result column="upload_user_name" property="uploadUserName"/>
+        <result column="certificate_type" property="certificateType"/>
+        <result column="validity_months" property="validityMonths"/>
     </resultMap>
 
     <select id="selectMeasureResult" resultMap="assetBean">
@@ -53,13 +56,18 @@
         mcd.type measuring_type,
         mcd.check_company last_check_company,
         ai.last_metering_date,
-        mcd.valid_date_to next_metering_date,
+        ai.next_metering_date ,
         mcd.check_date,
         mcd.check_person,
         mcd.id as bo_uuid,
+        mcd.created_by as upload_user_id,
+        mcd.certificate_type,
+        mcd.validity_months,
+        ua.name as upload_user_name,
         case when o.cu is not null then '是' else '否' end as exist_file_flag
         FROM asset_info ai
         INNER JOIN measuring_certificate_detail mcd ON mcd.asset_uid = ai.uid
+        LEFT JOIN user_account ua ON mcd.created_by = ua.uid
         left  join (select count(*) cu, bo_uuid from v2_blob_object where bo_type = 'Measuring' group by bo_uuid) o on o.bo_uuid = mcd.id
         <where>${ew.sqlSegment}</where>
     </select>
@@ -81,8 +89,13 @@
         mcd.check_date,
         mcd.check_person,
         mcd.department  department,
-        mcd.id as bo_uuid
+        mcd.id as bo_uuid,
+        mcd.created_by as upload_user_id,
+        mcd.certificate_type,
+        ua.name as upload_user_name,
+        case when o.cu is not null then '是' else '否' end as exist_file_flag
         FROM  measuring_certificate_detail mcd
+        LEFT JOIN user_account ua ON mcd.created_by = ua.uid
         left  join (select count(*) cu, bo_uuid from v2_blob_object where bo_type = 'Measuring' group by bo_uuid) o on o.bo_uuid = mcd.id
         <where>${ew.sqlSegment}</where>
     </select>
@@ -102,7 +115,8 @@
             al.modify_time AS terminateOperationDate,
             al.modify_by AS terminateOperation,
             ai.make_short_name as makerShortName,
-            wo.id AS workOrderId
+            wo.id AS workOrderId,
+            sc.business_number AS assetScrapId
         FROM
             asset_info ai
         LEFT JOIN (
@@ -119,6 +133,7 @@
                 v2_work_order
             WHERE tenant_uid = #{tenantUid} AND status = 1
         ) wo ON ai.id = wo.asset_id AND wo.row_number = 1
+        left join  asset_scrap sc on ai.asset_scrap_id = sc.id
         <include refid="queryCondition"/>
         <if test="orderBy!=null">
            ${orderBy}
@@ -142,6 +157,7 @@
                 v2_work_order
             WHERE tenant_uid = #{tenantUid} AND status = 1
         ) wo ON ai.id = wo.asset_id AND wo.row_number = 1
+        left join  asset_scrap sc on ai.asset_scrap_id = sc.id
         <include refid="queryCondition"/>
 
     </select>
@@ -537,6 +553,9 @@
                 OR ai.clinical_dept_uid IN  #{selectSite}
                 )
             </if>
+            <if test="assetScrapId != null">
+              and  sc.business_number like concat('%',#{assetScrapId},'%')
+            </if>
         </where>
     </sql>
 
@@ -585,6 +604,12 @@
             </if>
         </where>
 
+    </select>
+    <select id="selectUnMeasureResult" resultType="com.ge.apm.domain.AssetInfo">
+
+        SELECT ai.*
+        FROM asset_info ai
+        <where>${ew.sqlSegment}</where>
     </select>
 
 

@@ -106,7 +106,7 @@ public enum CustomConfigFields {
     orgPath(label, "orgPath" ,Text),  //所属单位
     assetLocation(label, "assetLocation" ,Text),  //当前位置
     UCMID(fieldName, "UCMID" ,Text),
-    assetTags(label, "assetTags" ,Text),  //标签
+    tags(label, "tags" ,TextArray),  //标签
     createdBy(fieldName, "createdBy" ,Text),  //创建人
     connectToInsite(label, "connectToInsite" ,Text),  //连通状态
     assetClass(customI18n, "assetClass" ,Text),  //管理分类
@@ -149,7 +149,7 @@ public enum CustomConfigFields {
     usageCount(fieldName, "usageCount" ,Text),  //已使用次数
     ratingUsageCount(fieldName, "ratingUsageCount" ,Text),  //额定使用次数
     epc(fieldName, "epc" ,Text),  //epc码
-
+    estimatedRiskLevel(fieldName, "estimatedRiskLevel" ,Select),  //风险等级(预估)
 
     ;
 
@@ -186,6 +186,7 @@ public enum CustomConfigFields {
     public enum DataType{
         Select,
         Text,
+        TextArray,
         Integer,
         Double,
         Boolean,
