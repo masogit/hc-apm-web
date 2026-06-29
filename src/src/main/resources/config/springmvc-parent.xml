@@ -12,5 +12,5 @@
     <import resource="classpath*:config/applicationContext-rabbitmq.xml"/>
     <import resource="classpath*:config/applicationContext.xml"/>
     <import resource="classpath*:config/applicationContext-security-http.xml"/>
-    <import resource="classpath*:config/broker_context.xml"/>
+<!--    <import resource="classpath*:config/broker_context.xml"/>-->
 </beans>
