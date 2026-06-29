@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.wo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
@@ -604,6 +605,34 @@ class WorkOrderActionForm {
     String comName;
     Double travelTime;
     String  diagnosticProcess;
+
+    private Date tubeInstallDate; //球管安装时间
+    private Integer totalExposureCount; //总曝光次数
+    private Integer totalInspectionCount; //检查总人数
+
+    public Date getTubeInstallDate() {
+        return tubeInstallDate;
+    }
+
+    public void setTubeInstallDate(Date tubeInstallDate) {
+        this.tubeInstallDate = tubeInstallDate;
+    }
+
+    public Integer getTotalExposureCount() {
+        return totalExposureCount;
+    }
+
+    public void setTotalExposureCount(Integer totalExposureCount) {
+        this.totalExposureCount = totalExposureCount;
+    }
+
+    public Integer getTotalInspectionCount() {
+        return totalInspectionCount;
+    }
+
+    public void setTotalInspectionCount(Integer totalInspectionCount) {
+        this.totalInspectionCount = totalInspectionCount;
+    }
 
     public String getDiagnosticProcess() {
         return diagnosticProcess;
