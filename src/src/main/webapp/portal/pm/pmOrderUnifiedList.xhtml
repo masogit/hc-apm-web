@@ -24,7 +24,7 @@
                     <p:ajax event="rowSelect" listener="#{v2PmOrderUnifiedController.onSelectOrderByUnified}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
                 </c:if>
                <c:if test="#{v2PmOrderUnifiedController.pageType eq 'current'}">
-                    <p:ajax event="rowSelect" listener="#{v2PmOrderUnifiedController.onSelectOrderByUnifiedForCurrent}"  update=" pmTab:pmOrderDetailForm pmTab:pmMvsOrderDetailForm"/>
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderUnifiedController.onSelectOrderByUnifiedForCurrent}"  update=" pmTab:pmOrderUnifiedDetailForm pmTab:pmOrderMvsUnifiedDetailForm"/>
                 </c:if>
 
                 <p:column headerText="#{msg.assetName}"  filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
@@ -166,10 +166,8 @@
             </p:dataTable>
         </h:form>
 
-        <c:if test="#{v2PmOrderController.tabTitle eq '全部保养'}">
-            <ui:include src="pmOrderView.xhtml"/>
-            <ui:include src="mvs/pmMvsOrderView.xhtml"/>
-        </c:if>
+        <ui:include src="pmOrderUnifiedView.xhtml"/>
+        <ui:include src="pmOrderMvsUnifiedView.xhtml"/>
 
         <p:overlayPanel id="idUnifiedPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="pmTab:pmUnifiedListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
             <h:panelGrid columns="2">
