@@ -19,7 +19,7 @@
                     <p:ajax event="rowSelect" listener="#{workOrderUnifiedController.onSelectOrderByUnified}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
                 </c:if>
                 <c:if test="#{workOrderUnifiedController.pageType eq 'current'}">
-                    <p:ajax event="rowSelect" listener="#{workOrderUnifiedController.onSelectOrderByUnifiedForCurrent}"  update=" woTab:woMgrDetailForm woTab:woMvsMgrDetailForm"/>
+                    <p:ajax event="rowSelect" listener="#{workOrderUnifiedController.onSelectOrderByUnifiedForCurrent}"  update="woTab:woMgrUnifiedDetailForm woTab:woMgrMvsUnifiedDetailForm"/>
                 </c:if>
 
                 <p:ajax event="filter" listener="#{workOrderUnifiedController.onFilterWo}" update="datalist" oncomplete="updateSelectAllCheckBox();"/>
@@ -142,10 +142,8 @@
             </p:dataTable>
         </h:form>
 
-        <c:if test="#{ workOrderMgrController.tabTitle eq '全部工单'}">
-            <ui:include src="woMgrView.xhtml"/>
-            <ui:include src="mvs/woMvsMgrView.xhtml"/>
-        </c:if>
+        <ui:include src="woMgrUnifiedView.xhtml"/>
+        <ui:include src="woMgrMvsUnifiedView.xhtml"/>
 
         <p:overlayPanel  widgetVar="panelFilterApplyTime" for="woTab:woAllMgrListForm:datalist:filterApplyTime" dismissable="false">
             <h:panelGrid columns="2">
