@@ -40,4 +40,11 @@ public interface ConfigItemValueRepository extends GenericRepositoryUUID<ConfigI
             " LEFT JOIN config_item_value t5 ON t1.KEY = t5.KEY AND t5.site_uid = ?1" +
             " where t1.key = ?5 limit 1",nativeQuery = true)
     String findByKeyAndSiteForUseParent(String siteUid, String hospitalUID, String institutionUID, String tenantUID, String key);
+
+
+    @Query(value = "SELECT  coalesce(t3.value,t2.value,t1.default_value) as actualValue " +
+            " FROM config_item t1 LEFT JOIN config_item_value t2 ON t1.KEY = t2.KEY AND t2.site_uid = ?2" +
+            " LEFT JOIN config_item_value t3 ON t1.KEY = t3.KEY AND t3.site_uid = ?1 " +
+            " where t1.key = ?3 limit 1",nativeQuery = true)
+    String findByKeyAndSiteForUseParent( String institutionUID, String tenantUID, String key);
 }

@@ -329,6 +329,7 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         List<ApmAdminActiveFeature> features = Arrays.stream(ApmAdminActiveFeature.values()).filter(v -> featureList.contains(v.name())).collect(Collectors.toList());
         features.add(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING);
         features.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED);
+        features.add(ApmAdminActiveFeature.DEVICE_RISK_ASSESSMENT);
         return features;
     }
 
@@ -381,6 +382,16 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
             case "PARTS_APPLY":
                 if (tenantFeatureMap.get("PARTS_APPLY")) {
                     tenantFeatureMap.put("PARTS", false);
+                }
+                break;
+            case "QUALITY_CONTROL_RAD_BOARD":
+                if (tenantFeatureMap.get("QUALITY_CONTROL_RAD_BOARD")) {
+                    tenantFeatureMap.put("QUALITY_CONTROL_MANAGE", true);
+                }
+                break;
+            case "QUALITY_CONTROL_CALENDAR":
+                if (tenantFeatureMap.get("QUALITY_CONTROL_CALENDAR")) {
+                    tenantFeatureMap.put("QUALITY_CONTROL_MANAGE", true);
                 }
                 break;
         }

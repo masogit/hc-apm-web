@@ -672,7 +672,23 @@
                                disabled="#{systemConfigItemController.configItemMap.get('RepairRequestUrl').configItemValue == null}"/>
             </h:panelGroup>
 
-
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('workOrderShowTubeInstall').name.concat('(').concat(systemConfigItemController.configItemMap.get('workOrderShowTubeInstall').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('workOrderShowTubeInstall').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('workOrderShowTubeInstall').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('workOrderShowTubeInstall'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('workOrderShowTubeInstall'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('workOrderShowTubeInstall').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 

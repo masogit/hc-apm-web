@@ -28,6 +28,7 @@ public class V2WorkOrderReportDto implements Serializable {
     private Integer assetInfoId;
     private OrgInfo selectedOrg;
     private OrgInfo clinicalDept;
+    private OrgInfo assetDept;
     private UserAccount currentOwner;
     private List<Integer> statusList;
     private List<OrgInfo> clinicalDeptList;

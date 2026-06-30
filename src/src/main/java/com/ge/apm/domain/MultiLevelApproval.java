@@ -167,6 +167,13 @@ public class MultiLevelApproval implements Serializable {
     private String createdBy;
 
     /**
+     * 多级审批配置的院区uid
+     */
+    @Column(name = "config_org_uid", columnDefinition = "CHAR(32)")
+    private String configOrgUid;
+
+
+    /**
      * 组织id
      */
     @Column(name = "hier_org_uid", columnDefinition = "CHAR(32)")

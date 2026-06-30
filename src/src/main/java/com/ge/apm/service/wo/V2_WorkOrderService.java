@@ -493,6 +493,9 @@ public class V2_WorkOrderService {
         }
         formData.setTravelTime(selectedWorkOrder.getTravelTime());
         formData.setDiagnosticProcess(selectedWorkOrder.getDiagnosticProcess());
+        formData.setTotalInspectionCount(selectedWorkOrder.getTotalInspectionCount());
+        formData.setTotalExposureCount(selectedWorkOrder.getTotalExposureCount());
+        formData.setTubeInstallDate(selectedWorkOrder.getTubeInstallDate());
         normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "saveRepair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
@@ -536,7 +539,9 @@ public class V2_WorkOrderService {
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
-        formData.setConfirmedUpTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedUpTime));
+        if(confirmedUpTime != null){
+            formData.setConfirmedUpTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedUpTime));
+        }
         formData.setCaseType(selectedWorkOrder.getCaseType()==null?null:selectedWorkOrder.getCaseType().toString());
         formData.setAssetStatus(assetStatus.toString());
         formData.setStepDetail(accDetails);
@@ -561,6 +566,9 @@ public class V2_WorkOrderService {
             formData.setTel(externalTempUser.getTel());
         }
         formData.setTravelTime(selectedWorkOrder.getTravelTime());
+        formData.setTotalInspectionCount(selectedWorkOrder.getTotalInspectionCount());
+        formData.setTotalExposureCount(selectedWorkOrder.getTotalExposureCount());
+        formData.setTubeInstallDate(selectedWorkOrder.getTubeInstallDate());
         normalizeEntryType(formData);
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {

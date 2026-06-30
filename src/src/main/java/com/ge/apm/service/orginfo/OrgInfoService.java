@@ -545,7 +545,8 @@ public class OrgInfoService {
             }
 
             map.put("科室", orgInfo.getName());
-
+            map.put("楼号", orgInfo.getBuildingNum());
+            map.put("层数", orgInfo.getFloorNum());
         }
 
         map.put("UUID", orgInfo.getUid());

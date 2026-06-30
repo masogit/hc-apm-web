@@ -5,6 +5,9 @@
         <if test="srNum != null">
             and r.sr_Num like concat('%', #{srNum}, '%')
         </if>
+        <if test="requestReason != null" >
+            and r.request_reason like concat('%', #{requestReason}, '%')
+        </if>
         <if test="currentStepId != null and currentStepId.length > 0">
             and w.current_step_id IN
             <foreach item="item" index="index" collection="currentStepId" open="(" separator="," close=")">
@@ -13,6 +16,9 @@
         </if>
         <if test="casePriority != null">
             and r.case_priority = CAST(#{casePriority, jdbcType=INTEGER} AS INTEGER)
+        </if>
+        <if test="fromDeptUid != null">
+            and r.from_dept_uid = #{fromDeptUid}
         </if>
         <if test="status != null">
             and w.status = #{status}
@@ -32,9 +38,7 @@
                 #{item}
             </foreach>
         </if>
-        <if test="userUid != null">
-            AND uo.user_uid = #{userUid}
-        </if>
+        <!-- userUid 已移至外层 EXISTS 子查询,此处不再需要 -->
         <if test="tenantUid != null">
             AND a.tenant_uid = #{tenantUid}
         </if>
@@ -65,6 +69,9 @@
         <if test="intExtType != null">
             and w.int_ext_type = #{intExtType}::numeric
         </if>
+        <if test="currentStepName != null">
+            and w.current_step_name = #{currentStepName}
+        </if>
         <if test="requestTimeGTE != null">
             and r.request_time >= #{requestTimeGTE}
         </if>
@@ -85,6 +92,9 @@
                 #{item}
             </foreach>
             )
+        </if>
+        <if test="assetLocation != null">
+            and r.asset_location  like CONCAT('%', #{assetLocation}, '%')
         </if>
     </sql>
     <sql id="queryColumn">
@@ -121,6 +131,7 @@
         a.status as asset_status,
         r.sr_num as sr_sr_num,
         r.from_dept_uid as sr_from_dept_uid,
+        r.from_dept_name as sr_from_dept_name,
         r.requestor_name as sr_requestor_name,
         r.request_time as sr_request_time,
         r.request_reason as sr_request_reason,
@@ -140,37 +151,73 @@
         a.uid AS asset_uid
     </sql>
 
+    <!--
+        优化说明:
+        1. user_org LEFT JOIN → EXISTS 子查询: 消除一对多行膨胀(一个用户关联多个org导致工单重复)
+        2. LEFT JOIN asset_info + WHERE IS NOT NULL → INNER JOIN: 语义一致,优化器可更好规划
+        3. mvs_ib_mapping OR JOIN → UNION ALL 拆分: 消除OR条件,允许PostgreSQL使用Hash Join
+        4. 去除多余 unified_work_order CTE 包装层
+    -->
     <select id="queryWorkOrderList" resultMap="com.ge.apm.dao.mapper.MvsWorkOrderMapper.v2_WorkOrderMap">
         with insite_work_order as (
             select
                 'Insite'::text as issue_type,
                 <include refid="queryColumn"></include>
             from v2_work_order w
-                     LEFT JOIN asset_info a ON w.asset_id = a.id
+                     INNER JOIN asset_info a ON w.asset_id = a.id
                      LEFT JOIN v2_service_request r ON w.sr_id = r.id
-                     left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
-            where  a.uid is not null AND a.is_valid AND NOT a.is_deleted
+            where a.is_valid AND NOT a.is_deleted
             <include refid="queryCondition"></include>
+            <if test="userUid != null">
+                AND EXISTS (
+                    SELECT 1 FROM user_org uo
+                    WHERE uo.user_uid = #{userUid}
+                    AND uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid, r.from_dept_uid)
+                )
+            </if>
         ),
-        mvs_work_order as (
+        mvs_work_order_mvs as (
             select
             'MVS'::text as issue_type,
             <include refid="queryColumn"></include>
-            from  v2_work_order w
-            left join v2_service_request r on w.sr_id = r.ID
-            left join mvs_ib_mapping m1 ON w.asset_uid = m1.mvs_ib_uid or w.asset_uid=m1.e_home_ib_uid
-            left join asset_info a ON m1.ib_uid = a.uid
-            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
-            WHERE   a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
+            from v2_work_order w
+            INNER JOIN v2_service_request r ON w.sr_id = r.id
+            INNER JOIN mvs_ib_mapping m1 ON w.asset_uid = m1.mvs_ib_uid
+            INNER JOIN asset_info a ON m1.ib_uid = a.uid
+            where a.is_valid AND NOT a.is_deleted
             <include refid="queryCondition"></include>
+            <if test="userUid != null">
+                AND EXISTS (
+                    SELECT 1 FROM user_org uo
+                    WHERE uo.user_uid = #{userUid}
+                    AND uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid, r.from_dept_uid)
+                )
+            </if>
         ),
-        unified_work_order as (
-            select * from insite_work_order
-            UNION ALL
-            select * from mvs_work_order
+        mvs_work_order_ehome as (
+            select
+            'MVS'::text as issue_type,
+            <include refid="queryColumn"></include>
+            from v2_work_order w
+            INNER JOIN v2_service_request r ON w.sr_id = r.id
+            INNER JOIN mvs_ib_mapping m1 ON w.asset_uid = m1.e_home_ib_uid
+            INNER JOIN asset_info a ON m1.ib_uid = a.uid
+            where a.is_valid AND NOT a.is_deleted
+              AND (m1.mvs_ib_uid IS NULL OR m1.mvs_ib_uid != m1.e_home_ib_uid)
+            <include refid="queryCondition"></include>
+            <if test="userUid != null">
+                AND EXISTS (
+                    SELECT 1 FROM user_org uo
+                    WHERE uo.user_uid = #{userUid}
+                    AND uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid, r.from_dept_uid)
+                )
+            </if>
         )
-        select *
-        from unified_work_order
+        select * from insite_work_order
+        UNION ALL
+        select * from mvs_work_order_mvs
+        UNION ALL
+        select * from mvs_work_order_ehome
         ORDER BY sr_request_time DESC
         <if test="offset != null and pageSize != null">
             LIMIT #{pageSize} OFFSET #{offset}
@@ -181,27 +228,58 @@
         with insite_work_order as (
             select w.id
             from v2_work_order w
-            LEFT JOIN asset_info a ON w.asset_id = a.id
+            INNER JOIN asset_info a ON w.asset_id = a.id
             LEFT JOIN v2_service_request r ON w.sr_id = r.id
-            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
-            where a.uid is not null AND a.is_valid AND NOT a.is_deleted 
+            where a.is_valid AND NOT a.is_deleted
             <include refid="queryCondition"></include>
+            <if test="userUid != null">
+                AND EXISTS (
+                    SELECT 1 FROM user_org uo
+                    WHERE uo.user_uid = #{userUid}
+                    AND uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid, r.from_dept_uid)
+                )
+            </if>
         ),
-        mvs_work_order as (
+        mvs_work_order_mvs as (
             select w.id
             FROM v2_work_order w
-            left join v2_service_request r on w.sr_id = r.ID
-            left join mvs_ib_mapping m1 ON w.asset_uid = m1.mvs_ib_uid or w.asset_uid=m1.e_home_ib_uid
-            left join asset_info a ON m1.ib_uid = a.uid
-            left join user_org uo ON uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid,r.from_dept_uid)
-            WHERE a.uid is not null AND a.is_valid AND NOT a.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)
+            INNER JOIN v2_service_request r ON w.sr_id = r.id
+            INNER JOIN mvs_ib_mapping m1 ON w.asset_uid = m1.mvs_ib_uid
+            INNER JOIN asset_info a ON m1.ib_uid = a.uid
+            where a.is_valid AND NOT a.is_deleted
             <include refid="queryCondition"></include>
+            <if test="userUid != null">
+                AND EXISTS (
+                    SELECT 1 FROM user_org uo
+                    WHERE uo.user_uid = #{userUid}
+                    AND uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid, r.from_dept_uid)
+                )
+            </if>
+        ),
+        mvs_work_order_ehome as (
+            select w.id
+            FROM v2_work_order w
+            INNER JOIN v2_service_request r ON w.sr_id = r.id
+            INNER JOIN mvs_ib_mapping m1 ON w.asset_uid = m1.e_home_ib_uid
+            INNER JOIN asset_info a ON m1.ib_uid = a.uid
+            where a.is_valid AND NOT a.is_deleted
+              AND (m1.mvs_ib_uid IS NULL OR m1.mvs_ib_uid != m1.e_home_ib_uid)
+            <include refid="queryCondition"></include>
+            <if test="userUid != null">
+                AND EXISTS (
+                    SELECT 1 FROM user_org uo
+                    WHERE uo.user_uid = #{userUid}
+                    AND uo.org_uid IN (a.tenant_uid, a.institution_uid, a.hospital_uid, a.site_uid, a.clinical_dept_uid, r.from_dept_uid)
+                )
+            </if>
         )
         select count(*)
         from (
             select id from insite_work_order
             UNION ALL
-            select id from mvs_work_order
+            select id from mvs_work_order_mvs
+            UNION ALL
+            select id from mvs_work_order_ehome
         ) t
     </select>
 

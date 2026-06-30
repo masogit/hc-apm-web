@@ -30,7 +30,7 @@
                                                 value="#{assetWorkOrderController.orgTree}"
                                                 selection="#{assetWorkOrderController.selectedNode}" var="node"
                                                 selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":searchForm:selectedOrgName :searchForm:clinicalDeptName" listener="#{assetWorkOrderController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="select" update=":searchForm:selectedOrgName :searchForm:clinicalDeptName :searchForm:fromDeptName" listener="#{assetWorkOrderController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
@@ -52,15 +52,23 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
+                                <label class="label">#{msg.assetDeptName}</label>
+                                <p:autoComplete id="fromDeptName" dropdown="true" value="#{assetWorkOrderController.filterFromDeptOrg}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetWorkOrderController.autoCompleteDept}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                                </p:autoComplete>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
                                 <label class="label">#{msg.assetGroup}</label>
                                 <p:selectOneMenu id="assetGroup" value="#{assetWorkOrderController.filterAssetGroup}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                        </p:panelGrid>
-
-                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.RequestStartTime}</label>
                                 <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startDate" value="#{assetWorkOrderController.startDate}"
@@ -127,6 +135,9 @@
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptId}">
                             <h:outputText value="#{item.clinicalDeptName}" title="#{item.clinicalDeptName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.assetDeptName}">
+                            <h:outputText value="#{item.fromDeptName}" title="#{item.fromDeptName}" />
                         </p:column>
                         <p:column headerText="#{msg.QRCode}">
                             <h:outputText value="#{item.qrCode}" title="#{item.qrCode}" />

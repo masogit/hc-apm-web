@@ -291,7 +291,7 @@
                    <c:when test="#{item eq 'ASSET_DEVICE_OVERDUE'}">
                        <p:submenu id="validityManage" label="效期管理" icon="fa fa-square-o fa-fw" rendered="#{userContextService.canRender('ASSET_DEVICE_OVERDUE') and (userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') or userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW'))}">
                            <p:menuitem fragment="um100" id="um100" value="#{msg.deviceExpiryManagement}" outcome="/portal/asset/info/EquipmentExpiryManagement.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_EXPIRY_MANAGEMENT') }"/>
-                           <p:menuitem fragment="um097" id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
+                           <p:menuitem fragment="um097" id="um097" value="#{msg.overdueData}" outcome="/portal/asset/info/EquipmentExpiryStatistics.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
                        </p:submenu>
                    </c:when>
                    <!-- BI报表分析 -->
@@ -308,8 +308,8 @@
                    <c:when test="#{item eq 'QUALITY_CONTROL_MANAGE'}">
                        <p:submenu id="qualityDataView" label="#{msg.DeviceQualityControl}" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_') and userContextService.canRender('QUALITY_CONTROL_MANAGE')}">
                            <!-- 质控日历 -->
-                           <p:menuitem fragment="qualityControlCalendar" id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
-                           <p:menuitem fragment="qualityControlRadBoard" id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
+                           <p:menuitem fragment="qualityControlCalendar" id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
+                           <p:menuitem fragment="qualityControlRadBoard" id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_RAD_BOARD_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
                        </p:submenu>
                    </c:when>
 
@@ -403,6 +403,14 @@
                            <p:menuitem fragment="umadjustment001" id="umadjustment004" value="闲置设备入库受理"  outcome="/portal/hospitalAdjustment/IdleEquipmentApplication.xhtml"       rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ACCEPTANCE') }"/>
                            <p:menuitem fragment="umadjustment001" id="umadjustment005" value="闲置设备调剂受理"  outcome="/portal/hospitalAdjustment/AdjustmentTransferApplication.xhtml"       rendered="#{userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE') }"/>
 
+                       </p:submenu>
+                   </c:when>
+
+                   <c:when test="#{item eq 'ACQUISITION_PLAN'}">
+                       <p:submenu id="um7000" label="设备购置管理" icon="fa fa-folder-open fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_')}">
+                           <p:menuitem fragment="um7100" id="um7100" value="购置计划申报期" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_FILING_PERIOD_EDIT') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_FILING_PERIOD_VIEW')}" outcome="/portal/acquisition/planFilingPeriod/List.xhtml"/>
+                           <p:menuitem fragment="um7200" id="um7200" value="购置计划管理" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY_EDIT') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY_VIEW')}" outcome="/portal/acquisition/plan/List.xhtml"/>
+                           <p:menuitem fragment="um7300" id="um7200" value="购置计划管理" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_VIEW') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY')}" outcome="/portal/acquisition/audit/Main.xhtml"/>
                        </p:submenu>
                    </c:when>
                </c:choose>

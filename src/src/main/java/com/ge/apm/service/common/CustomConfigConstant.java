@@ -78,9 +78,9 @@ public class CustomConfigConstant {
                 "installDate", "factoryWarrantyDate", "warrantyDate", "terminateDate", "lastPmDate", "lastQaDate",
                 "lastMeteringDate", "lastInventoryDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
                 "locationCode", "locationName", "comments", "locationNotes","assetUsage", "capitalSource",
-                "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
+                "capitalSource2", "measureGrade", "riskGrade", "estimatedRiskLevel", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "status","isPm", "isFixed","isChecked", "assetValueCategory", "deviceStatus",
-                "warranty", "subjectProject", "proprietaryClass", "assetTags", "UCMID", "createdDate",
+                "warranty", "subjectProject", "proprietaryClass", "tags", "UCMID", "createdDate",
                 "createdBy","mainDirectory","secondDirectory","geDeviceType","UUID"
         );
     }

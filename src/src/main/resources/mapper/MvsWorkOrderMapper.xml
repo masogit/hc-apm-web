@@ -38,11 +38,13 @@
             <result property="mvsEquip" column="asset_mvs_equip"/>
             <result property="id" column="asset_id"/>
             <result property="status" column="asset_status"/>
+            <result property="assetDeptUID" column="asset_dept_uid"/>
         </association>
         <association property="serviceRequest" javaType="com.ge.apm.domain.V2_ServiceRequest">
             <id property="id" column="sr_id"/>
             <result property="srNum" column="sr_sr_num"/>
             <result property="fromDeptUID" column="sr_from_dept_uid"/>
+            <result property="fromDeptName" column="sr_from_dept_name"/>
             <result property="requestorName" column="sr_requestor_name"/>
             <result property="requestTime" column="sr_request_time"/>
             <result property="requestReason" column="sr_request_reason"/>
@@ -112,7 +114,7 @@
         vs.customer_position as sr_customer_position,
         vs.status as sr_status,
         vs.sr_repair_source as sr_repair_source,
-        a.uid AS asset_uid
+        a.uid AS asset_uid, a.asset_dept_uid as asset_dept_uid
         FROM v2_work_order t
         left join v2_service_request vs on t.sr_id = VS.ID
         left join mvs_ib_mapping m1 ON t.asset_uid = m1.mvs_ib_uid or t.asset_uid=m1.e_home_ib_uid
@@ -177,7 +179,12 @@
         <if test="functionType != null">
             AND a.function_type  like CONCAT('%', #{functionType}, '%')
         </if>
-
+        <if test="assetLocation != null">
+            AND vs.asset_location  like CONCAT('%', #{assetLocation}, '%')
+        </if>
+        <if test="assetDeptUID != null">
+            AND a.asset_dept_uid  = #{assetDeptUID}
+        </if>
         ORDER BY vs.request_time desc
     </select>
  </mapper>

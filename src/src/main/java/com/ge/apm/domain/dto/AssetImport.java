@@ -163,7 +163,7 @@ public class AssetImport implements Serializable {
     @ExcelProperty(value = "arriveDate", converter = AssetImportDateConvert.class)
     private Date arriveDate;//到货日期
 
-    @ExcelProperty(value = "StartUsingDate", converter = AssetImportDateConvert.class)
+    @ExcelProperty(value = "installDate", converter = AssetImportDateConvert.class)
     private Date installDate;//启用日期
 
     @ExcelProperty(value = "warrantyDate", converter = AssetImportDateConvert.class)
@@ -849,7 +849,7 @@ public class AssetImport implements Serializable {
     private String supplierNewUID;
 
     private Set<AssetTags> assetTags;
-    @ExcelProperty("assetTags")
+    @ExcelProperty("tags")
 
     private String tagStr;
 

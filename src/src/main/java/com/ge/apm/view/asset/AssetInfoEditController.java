@@ -31,6 +31,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -1078,6 +1079,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if(!checkDepartNumUnique()){
             WebUtil.addErrorMessage("设备编号已被占用");
             return "";
+        }
+        // 序列号重复校验（新增时）
+        if(selected.getId() == null && StringUtils.isNotEmpty(selected.getSerialNum())){
+            if(!checkSerialNumUnique()){
+                WebUtil.addErrorMessage("制造商序列号已存在，不允许重复建档");
+                return "";
+            }
         }
         if(!checkAssetScrap()){
             WebUtil.addErrorMessage("设备在报废流程中,不允许修改状态");
@@ -2273,6 +2281,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    /**
+     * 序列号重复校验（新增资产时），返回 false 表示序列号重复
+     */
+    private boolean checkSerialNumUnique() {
+        if (StringUtils.isEmpty(selected.getSerialNum())) {
+            return true;
+        }
+        List<AssetInfo> existList = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
+        return existList.isEmpty();
+    }
+
     public void requiredInput(String encoded, CustomConfigAssetField customConfigAssetField) {
         if (customConfigAssetField.isRequired() && BooleanUtils.isTrue(assetInfoRequireField.get(customConfigAssetField.getKey()))) {
             return;
@@ -2838,5 +2857,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean isLoginUser(String userUid) {
         return loginUser.getUid().equals(userUid);
+    }
+
+    public RiskLevel[] getRiskLevels() {
+        return RiskLevel.values();
     }
 }

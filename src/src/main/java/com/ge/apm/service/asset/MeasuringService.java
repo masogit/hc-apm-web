@@ -548,6 +548,7 @@ public class MeasuringService {
                         json.put("status",content.getString("conclusion"));
                         json.put("validDateTo",content.getString("valid_util"));
                         json.put("checkDate",content.getString("verify_date"));
+                        json.put("certificateType",content.getString("certification_type"));
                         MeasuringCertificateDetail measuringCertificateDetail = handleOcrResult(json, newFile,blobObjects);
                         if(measuringCertificateDetail == null) continue;
                         List<V2_BlobObject> measuringAttachList = measuringCertificateDetail.getMeasuringAttachList();
@@ -803,6 +804,7 @@ public class MeasuringService {
     }
     public void setObject(MeasuringCertificateDetail detail,JSONObject object){
         detail.setCertificateNo(object.getString("certificateNo"));
+        detail.setCertificateType(object.getInteger("certificateType"));
         detail.setAssetManufacturer(object.getString("assetManufacturer"));
         detail.setCheckPerson(object.getString("checkPerson"));
         detail.setAssetModel(object.getString("assetModel"));
@@ -898,6 +900,7 @@ public class MeasuringService {
                 detail.setInstitutionUID(selectedOrg.getInstitutionUID());
                 detail.setHospitalUID(selectedOrg.getHospitalUID());
                 detail.setSiteUID(selectedOrg.getSiteUID());
+                detail.setCertificateType(1);
 
                 if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
                     detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
