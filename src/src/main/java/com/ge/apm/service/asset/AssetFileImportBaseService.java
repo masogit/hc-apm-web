@@ -436,6 +436,14 @@ public class AssetFileImportBaseService {
             return null;
         }
 
+        // 序列号重复校验（仅警告，不阻止导入）
+        if (!StringUtils.isEmpty(newAsset.getSerialNum())) {
+            List<AssetInfo> serialDupList = assetDao.findBySerialNumAndTenantUID(newAsset.getSerialNum(), siteOrg.getTenantUID());
+            if (!serialDupList.isEmpty()) {
+                AssetRow.addErrMessage(item, "警告: 序列号重复");
+            }
+        }
+
         String clinicalDeptName = newAsset.getClinicalDeptName();
         if (StringUtils.isEmpty(clinicalDeptName)) {
             if (StringUtils.isEmpty(newAsset.getUid())) {
@@ -750,6 +758,15 @@ public class AssetFileImportBaseService {
             AssetRow.addErrMessage(importData, "错误: 设备编号重复");
             return null;
         }
+
+        // 序列号重复校验（仅警告，不阻止导入）
+        if (!StringUtils.isEmpty(newAsset.getSerialNum())) {
+            List<AssetInfo> serialDupList = assetDao.findBySerialNumAndTenantUID(newAsset.getSerialNum(), siteOrg.getTenantUID());
+            if (!serialDupList.isEmpty()) {
+                AssetRow.addErrMessage(importData, "警告: 序列号重复");
+            }
+        }
+
         // 处理日期字段更新规则
         if (dbAsset != null) {
             // 规则1: 上次保养日期、上次计量日期、上次巡检日期 - 如果输入值比现有值小则不更新
