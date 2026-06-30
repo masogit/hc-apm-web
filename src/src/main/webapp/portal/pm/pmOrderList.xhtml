@@ -291,9 +291,7 @@
             </p:dataTable>
         </h:form>
         <ui:include src="/portal/preview/view.xhtml"/>
-        <c:if test="#{v2PmOrderController.tabTitle eq '内部保养' or empty v2PmOrderController.tabTitle}">
-            <ui:include src="pmOrderView.xhtml"/>
-        </c:if>
+        <ui:include src="pmOrderView.xhtml"/>
         <ui:include src="pmRepairCompleteDlg.xhtml"/>
         <ui:include src="pmApproveDlg.xhtml"/>
         <ui:include src="pmMoreAccDialogPrice.xhtml"/>
