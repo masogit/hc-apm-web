@@ -40,7 +40,8 @@ public class WorkOrderUnifiedService {
      */
     public Page<V2_WorkOrder> findUnifiedWorkOrders(PageRequest pageRequest, Map<String, Object> filters) {
         try {
-
+            filters.put("pageSize", pageRequest.getPageSize());
+            filters.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
             List<V2_WorkOrder> pagedList =v2WorkOrderMapper.queryWorkOrderList( filters);
             long total = v2WorkOrderMapper.queryWorkOrderCount(filters);
 
