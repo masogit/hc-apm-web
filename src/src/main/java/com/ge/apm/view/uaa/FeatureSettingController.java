@@ -384,6 +384,16 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
                     tenantFeatureMap.put("PARTS", false);
                 }
                 break;
+            case "QUALITY_CONTROL_RAD_BOARD":
+                if (tenantFeatureMap.get("QUALITY_CONTROL_RAD_BOARD")) {
+                    tenantFeatureMap.put("QUALITY_CONTROL_MANAGE", true);
+                }
+                break;
+            case "QUALITY_CONTROL_CALENDAR":
+                if (tenantFeatureMap.get("QUALITY_CONTROL_CALENDAR")) {
+                    tenantFeatureMap.put("QUALITY_CONTROL_MANAGE", true);
+                }
+                break;
         }
 
         refreshModuleChecked();

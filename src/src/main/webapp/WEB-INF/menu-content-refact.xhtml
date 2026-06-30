@@ -308,8 +308,8 @@
                    <c:when test="#{item eq 'QUALITY_CONTROL_MANAGE'}">
                        <p:submenu id="qualityDataView" label="#{msg.DeviceQualityControl}" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_') and userContextService.canRender('QUALITY_CONTROL_MANAGE')}">
                            <!-- 质控日历 -->
-                           <p:menuitem fragment="qualityControlCalendar" id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
-                           <p:menuitem fragment="qualityControlRadBoard" id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_MANAGE_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
+                           <p:menuitem fragment="qualityControlCalendar" id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
+                           <p:menuitem fragment="qualityControlRadBoard" id="qualityControlRadBoard" value="#{msg.qualityControlRadBoard}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_RAD_BOARD_VIEW')}" url="/reports/RadQCBoard" target="_blank"/>
                        </p:submenu>
                    </c:when>
 
