@@ -14,10 +14,13 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,8 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
 import java.util.*;
@@ -76,6 +81,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private List<AssetInfo> assets4Maintain;
     
     private List<AssetInfo> assets5Maintain;
+
+    private LazyDataModel<AssetInfo> assets5MaintainModel;
 
     private Set<AssetInfo> selectedAssets;
 
@@ -135,6 +142,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         this.isSelectAll = Boolean.FALSE;
         i18nMessageList = FieldValueMessageController.getFieldValueList("assetGroup");
+        buildAssets5MaintainModel();
     }
 
     public void loadData4Create() {
@@ -152,6 +160,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.selectedAssets5.clear();
         this.assets4Maintain = null;
         this.assets5Maintain=new ArrayList<>();
+        buildAssets5MaintainModel();
         this.assetGroup = null;
         this.assetName = null;
         this.locationName = null;
@@ -204,6 +213,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets5Maintain = new ArrayList<>(this.selectedAssets);
         this.isAllSelectedAssetGroup = Boolean.FALSE;
         this.listCheckI18nMessage = new ArrayList<>();
+        buildAssets5MaintainModel();
     }
     public OrgInfo getOrgInfoByUid(String uid) {
         if (Strings.isNullOrEmpty(uid)) {
@@ -334,6 +344,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     		}
     	}
     	this.tiggerEvent();
+    	buildAssets5MaintainModel();
     }
 
     public void addAssetInfoPermit(){
@@ -355,6 +366,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssets5.clear();
         selectedAssetUids5.clear();
         this.tiggerEvent();
+        buildAssets5MaintainModel();
+        resetAssets5MaintainFilters();
     }
     
     public void clearAssetInfo(){
@@ -363,6 +376,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         selectedAssets5.clear();
         selectedAssetUids5.clear();
         this.tiggerEvent();
+        buildAssets5MaintainModel();
+        resetAssets5MaintainFilters();
     }
 
     public void removePermitAssetInfo(){
@@ -512,6 +527,113 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private void tiggerEvent() {
         if(this.callingController != null) {
             this.callingController.onServerEvent("change", assets5Maintain.stream().collect(Collectors.toList()));
+        }
+    }
+
+    private void buildAssets5MaintainModel() {
+        this.assets5MaintainModel = new LazyDataModel<AssetInfo>() {
+            private static final long serialVersionUID = 1L;
+            private List<AssetInfo> currentPageData = new ArrayList<>();
+
+            @Override
+            public List<AssetInfo> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+                List<AssetInfo> source = assets5Maintain;
+                if (source == null) {
+                    this.setRowCount(0);
+                    currentPageData = new ArrayList<>();
+                    return currentPageData;
+                }
+                // Apply column filters (contains match)
+                List<AssetInfo> filtered = source;
+                if (filters != null && !filters.isEmpty()) {
+                    filtered = source.stream().filter(asset -> {
+                        for (Map.Entry<String, Object> entry : filters.entrySet()) {
+                            String field = entry.getKey();
+                            Object filterValue = entry.getValue();
+                            if (filterValue == null || filterValue.toString().isEmpty()) continue;
+                            String fieldStr = resolveFilterField(asset, field);
+                            if (!matchesContains(fieldStr, filterValue.toString())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }).collect(Collectors.toList());
+                }
+                this.setRowCount(filtered.size());
+                int end = Math.min(first + pageSize, filtered.size());
+                if (first >= filtered.size()) {
+                    currentPageData = new ArrayList<>();
+                    return currentPageData;
+                }
+                currentPageData = new ArrayList<>(filtered.subList(first, end));
+                return currentPageData;
+            }
+
+            @Override
+            public String getRowKey(AssetInfo asset) {
+                return String.valueOf(asset.getId());
+            }
+
+            @Override
+            public AssetInfo getRowData(String rowKey) {
+                if (rowKey == null || currentPageData == null) return null;
+                for (AssetInfo asset : currentPageData) {
+                    if (rowKey.equals(String.valueOf(asset.getId()))) {
+                        return asset;
+                    }
+                }
+                // fallback: search in full list
+                if (assets5Maintain != null) {
+                    for (AssetInfo asset : assets5Maintain) {
+                        if (rowKey.equals(String.valueOf(asset.getId()))) {
+                            return asset;
+                        }
+                    }
+                }
+                return null;
+            }
+        };
+    }
+
+    private String resolveFilterField(AssetInfo asset, String field) {
+        try {
+            switch (field) {
+                case "name": return asset.getName() != null ? asset.getName() : "";
+                case "clinicalDeptName": return asset.getClinicalDeptName() != null ? asset.getClinicalDeptName() : "";
+                case "departNum": return asset.getDepartNum() != null ? asset.getDepartNum() : "";
+                case "serialNum": return asset.getSerialNum() != null ? asset.getSerialNum() : "";
+                case "qrCode": return asset.getQrCode() != null ? asset.getQrCode() : "";
+                default:
+                    if (field.contains("fieldMsg.fieldValue")) {
+                        Object val = asset.getAssetGroup();
+                        if (val == null) return "";
+                        String displayVal = FieldValueMessageController.fieldValue("assetGroup", String.valueOf(val));
+                        return displayVal != null ? displayVal : val.toString();
+                    }
+                    if (field.contains("getOrgInfoByUid")) {
+                        OrgInfo org = getOrgInfoByUid(asset.getAssetDeptUID());
+                        return org != null && org.getName() != null ? org.getName() : "";
+                    }
+                    return "";
+            }
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private boolean matchesContains(String fieldValue, String filterText) {
+        if (fieldValue == null || filterText == null) return true;
+        return fieldValue.toLowerCase().contains(filterText.toLowerCase());
+    }
+
+    private void resetAssets5MaintainFilters() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        String[] formIds = {"maintainConfigCreateForm", "maintainConfigEditForm"};
+        for (String formId : formIds) {
+            UIComponent comp = facesContext.getViewRoot().findComponent(formId + ":assets5maintain");
+            if (comp instanceof DataTable) {
+                ((DataTable) comp).reset();
+            }
         }
     }
 
