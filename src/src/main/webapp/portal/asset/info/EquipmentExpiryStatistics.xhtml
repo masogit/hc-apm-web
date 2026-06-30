@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="设备效期数据概览"/>
+        </div>
+        <div class="ui-g-12 card">
+            <iframe id="chartFrame" src="/reports/device-expiry" width="100%" height="900"></iframe>
+        </div>
+        </div>
+        <h:form id="hiddenForm">
+            <!-- remoteCommand 调用后端获取跳转 URL -->
+            <p:remoteCommand name="getAssetDetailUrl"
+                             actionListener="#{workOrderMgrController.buildDataLinkUrl}"
+                             oncomplete="if(args &amp;&amp; args.url) { window.open(args.url, '_blank', 'noopener,noreferrer'); }" />
+        </h:form>
+
+
+        <h:outputScript>
+            window.addEventListener('message', function(event) {
+                const data = event.data;
+                if(data.type === 'deviceNameClick'){
+                    // 调用 remoteCommand，把 uid 传给后端
+                    console.log(data.payload.uid);
+                    console.log(data);
+
+                    getAssetDetailUrl([{name:'paramAssetUid', value: data.payload.uid}]);
+                }
+            });
+        </h:outputScript>
+    </ui:define>
+</ui:composition>

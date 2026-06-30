@@ -1367,7 +1367,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         List<OrgInfo> orgInfoList;
         orgInfoList = orgDao.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID());
         filter.setSiteOrg(orgInfoList.get(0));
-        clinicalDeptListAsFilter = assetInfoService.getHierachyClinicalDeptList(filter.getSiteOrg().getUid());
+        clinicalDeptListAsFilter = uaaService.getOrgDeptList(filter.getSiteOrg().getUid(), loginUser.getUid());
         TreeNode siteTree = buildTree(orgInfoList);
         expandedByOrgType(siteTree, 2);
         rootNode.getChildren().addAll(siteTree.getChildren());
@@ -1416,7 +1416,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (null == filterSiteOrg) {
             clinicalDeptListAsFilter = Collections.emptyList();
         } else {
-            clinicalDeptListAsFilter = assetInfoService.getHierachyClinicalDeptList(filter.getSiteOrg().getUid());
+            clinicalDeptListAsFilter = uaaService.getOrgDeptList(filter.getSiteOrg().getUid(), loginUser.getUid());
         }
         logger.error("clinicalDeptListAsFilter size = {}", clinicalDeptListAsFilter.size());
     }
@@ -1515,6 +1515,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         if (null != filter.getClinicalDeptOrg()) {
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filter.getClinicalDeptOrg().getUid()));
+        } else {
+            if (CollectionUtils.isNotEmpty(clinicalDeptListAsFilter)) {
+                List<String> clinicalDeptUids = clinicalDeptListAsFilter.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUids));
+            }
         }
 
         if (null != this.filter.getAssetGroup()) {

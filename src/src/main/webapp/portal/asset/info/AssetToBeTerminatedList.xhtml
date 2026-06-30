@@ -91,6 +91,9 @@
                         <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>
+                <p:column headerText="报废单号" sortBy="#{item.assetScrapId}" filterBy="#{item.assetScrapId}" filterMatchMode="LIKE" rendered="#{assetInfoToBeTerminatedListController.checkScrapConfit()}">
+                    <h:outputText value="#{item.assetScrapId}"/>
+                </p:column>
                 <c:forEach items="#{assetInfoToBeTerminatedListController.customedColumns}" var="columnItem" >
                     <c:if test="#{columnItem eq 'name'}">
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">

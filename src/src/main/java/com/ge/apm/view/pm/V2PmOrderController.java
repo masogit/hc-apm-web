@@ -2609,14 +2609,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     if(selectedPmOrder.getEntryType() == null){
                         selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
                         if(fieldColumnDto.getEntryType()==0 || fieldColumnDto.getEntryType()==2){
-                            selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                            selectedPmOrder.setManHours(getManHoursFromRuleOrConfig());
                         }
                     }else{
                         if(fieldColumnDto.getEntryType()==2 || fieldColumnDto.getEntryType()==3){
                             selectedPmOrder.setEntryType(fieldColumnDto.getEntryType());
                         }
                         if((oldEntryType==1 || oldEntryType==3) &&  fieldColumnDto.getEntryType() ==2){
-                            selectedPmOrder.setManHours(fieldColumnDto.getHours());
+                            selectedPmOrder.setManHours(getManHoursFromRuleOrConfig());
                         }
                         if((oldEntryType==0 || oldEntryType==2) && fieldColumnDto.getEntryType() ==3){
                             selectedPmOrder.setManHours(null);
@@ -4148,17 +4148,38 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             selectedPmOrder.setManHours(null);
         }else if(entryType == 0){
             selectedPmOrder.setManHours(null);
-            String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectedPmOrder.getSiteUID(), selectedPmOrder.getHospitalUID(), selectedPmOrder.getInstitutionUID(), selectedPmOrder.getTenantUID(), "pmEntryTypeSet");
-            if(StrUtil.isNotEmpty(value)){
-                FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
-                if(fieldColumnDto != null){
-                    selectedPmOrder.setManHours(fieldColumnDto.getHours());
-                }
-            }
+            selectedPmOrder.setManHours(getManHoursFromRuleOrConfig());
 //            if(selectedPmOrder.getManHours() == null){
 //                selectedPmOrder.setManHours(0.1);
 //            }
         }
+    }
+
+    /**
+     * Get manHours from rule's defaultWorkHours first, fallback to config_item pmEntryTypeSet hours
+     */
+    private Double getManHoursFromRuleOrConfig() {
+        if (selectedPmOrder != null && StrUtil.isNotEmpty(selectedPmOrder.getPmRuleUid())) {
+            try {
+                PmOrderRule orderRule = pmOrderRuleRepository.findByUid(selectedPmOrder.getPmRuleUid());
+                if (orderRule != null && orderRule.getDefaultWorkHours() != null) {
+                    return orderRule.getDefaultWorkHours();
+                }
+            } catch (Exception e) {
+                logger.error("getManHoursFromRuleOrConfig error: ",e);
+                // fallback to config
+            }
+        }
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(
+                selectedPmOrder.getSiteUID(), selectedPmOrder.getHospitalUID(),
+                selectedPmOrder.getInstitutionUID(), selectedPmOrder.getTenantUID(), "pmEntryTypeSet");
+        if (StrUtil.isNotEmpty(value)) {
+            FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
+            if (fieldColumnDto != null) {
+                return fieldColumnDto.getHours();
+            }
+        }
+        return null;
     }
 
     public void updateCoworkerEntryType(Integer entryType) {

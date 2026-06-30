@@ -3343,6 +3343,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ReasonDescription_xlsx', '原因描述', 'ReasonDescription', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CurrentLocation_xlsx', '当前位置', 'CurrentLocation', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RequestStatus_xlsx', '报修状态', 'RequestStatus', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseDeptName_xlsx', '使用科室', 'UseDeptName', NULL, '-1');
+
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetName_xlsx', '资产名称', 'AssetName', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartName_xlsx', '备件名', 'PartName', NULL, '-1');
@@ -3605,6 +3607,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','other','其他','Other',NULL,-1);
 
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','tags','标签','Asset Tags',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetTags','标签','Asset Tags',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','userTags','标签','User Tags',NULL,-1);
 
@@ -5278,6 +5281,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- YHAAO-19547 设备超期
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceOverdue', '设备超限统计', 'device overdue', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'overdueData', '效期数据概览', 'overdue data', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetScrap', '设备报废', 'assetScrap', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetDepartmentConvert', '设备转科', 'assetDepartmentConvert', NULL, '-1');
@@ -6313,3 +6317,91 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','SitePowerProof','场地/电力证明材料','SitePowerProof',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','OperatorQualification','操作人员资质证明','OperatorQualification',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('HospitalAdjustmentBorrowAttachmentType','other','其他','other',NULL,-1);
+
+--YHAAO-28062
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('certificateType','1','检定证书','Certification certificate',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('certificateType','2','校准证书','Calibration certificate',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','1','1月','1 month',NULL,-1,1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','2','2月','2 months',NULL,-1,2);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','3','3月','3 months',NULL,-1,3);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','4','4月','4 months',NULL,-1,4);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','5','5月','5 months',NULL,-1,5);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','6','6月','6 months',NULL,-1,6);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','7','7月','7 months',NULL,-1,7);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','8','8月','8 months',NULL,-1,8);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','9','9月','9 months',NULL,-1,9);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','10','10月','10 months',NULL,-1,10);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','11','11月','11 months',NULL,-1,11);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','12','12月','12 months',NULL,-1,12);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','13','13月','13 months',NULL,-1,13);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','14','14月','14 months',NULL,-1,14);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','15','15月','15 months',NULL,-1,15);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','16','16月','16 months',NULL,-1,16);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','17','17月','17 months',NULL,-1,17);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','18','18月','18 months',NULL,-1,18);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','19','19月','19 months',NULL,-1,19);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','20','20月','20 months',NULL,-1,20);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','21','21月','21 months',NULL,-1,21);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','22','22月','22 months',NULL,-1,22);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','23','23月','23 months',NULL,-1,23);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','24','24月','24 months',NULL,-1,24);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','estimatedRiskLevel','预估风险等级','Estimated Risk Level',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','1','高风险','High Risk',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','2','中风险','Medium Risk',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','3','低风险','Low Risk',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','4','未知风险','Unknown Risk',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','tubeInstallDate','球管安装时间','Tube Installation Date',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','totalExposureCount','曝光总次数','Total Exposure Count',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','totalInspectionCount','检查总人数','Total Inspection Count',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','tubeInstallDate','球管安装时间','Tube Installation Date',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','totalExposureCount','曝光总次数','Total Exposure Count',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','totalInspectionCount','检查总人数','Total Inspection Count',NULL,-1);
+
+
+
+--医疗设备购置计划
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','acquisitionApplicationType','申请类别','Application Type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','acquisitionFundingSource','资金来源','funding source',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','acquisitionFundingImplemented','资金落实','funding implemented',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','medicalEquipmentLicense','甲乙类大型医疗设备及配置许可证','medical equipment license',NULL,-1);
+
+
+--医疗设备购置计划  申请类别
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionApplicationType','necessities','必需类','necessities',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionApplicationType','updates','更新类','updates',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionApplicationType','general','常规类','general',NULL,-1);
+--医疗设备购置计划  资金来源
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionFundingSource','fiscal','财政','fiscal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionFundingSource','self-owned','自有','self-owned',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionFundingSource','others ','其他','others',NULL,-1);
+--医疗设备购置计划  甲乙类大型医疗设备及配置许可证
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('medicalEquipmentLicense','CategoryA','甲类','Category A',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('medicalEquipmentLicense','CategoryB','乙类','Category B',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('medicalEquipmentLicense','None','无','None',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','','暂存中','TempSave',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','DrugCenterPending','待药管中心审批','DrugCenterPending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','WorkGroupPending','待调研工作组审批','WorkGroupPending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','BureauPartyPending','待局党委会审批','BureauPartyPending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Approved','审批通过','Approved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Rejected','审批不通过','Rejected',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Pending','待审批','Pending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Approved','审批通过','Approved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Rejected','审批不通过','Rejected',NULL,-1);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionResult','SelfReview','自行审定','SelfReview',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionResult','Approved','同意','Approved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionResult','Rejected','不同意','Rejected',NULL,-1);
+
+
+
+
+
+
+

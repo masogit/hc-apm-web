@@ -58,6 +58,7 @@ public class AssetWorkOrderController implements Serializable {
 
     private Integer filterAssetGroup;
     private OrgInfo filterDeptOrg;
+    private OrgInfo filterFromDeptOrg;
     private List<OrgInfo> clinicalDeptList;
     private String searchStr;
     private Date startDate;
@@ -86,7 +87,7 @@ public class AssetWorkOrderController implements Serializable {
     }
 
     public void loadData() {
-        assetWorkOrderList = assetWorkOrderService.loadAssetWorkOrderData(selectedOrg, filterDeptOrg, filterAssetGroup, searchStr, clinicalDeptList, startDate, endDate, assetTypeGroupEncodedSet);
+        assetWorkOrderList = assetWorkOrderService.loadAssetWorkOrderData(selectedOrg, filterDeptOrg, filterAssetGroup, searchStr, clinicalDeptList, startDate, endDate, assetTypeGroupEncodedSet,filterFromDeptOrg);
         setDataLinkUrl();
     }
     private void setDataLinkUrl(){
@@ -262,5 +263,13 @@ public class AssetWorkOrderController implements Serializable {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public OrgInfo getFilterFromDeptOrg() {
+        return filterFromDeptOrg;
+    }
+
+    public void setFilterFromDeptOrg(OrgInfo filterFromDeptOrg) {
+        this.filterFromDeptOrg = filterFromDeptOrg;
     }
 }

@@ -141,6 +141,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("related_order_number","related_order_number");
         COPY_KEY_MAPPING.put("case_priority", WebUtil.getMessage("casePriority"));
         COPY_KEY_MAPPING.put("travel_time", WebUtil.getMessage("travelTime"));
+        COPY_KEY_MAPPING.put("useDeptName", WebUtil.getMessage("UseDeptName_xlsx"));
     }
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {

@@ -27,14 +27,17 @@
                     <p:ajax event="rowSelect" listener="#{v2PmOrderUnifiedController.onSelectOrderByUnifiedForCurrent}"  update=" pmTab:pmOrderDetailForm pmTab:pmMvsOrderDetailForm"/>
                 </c:if>
 
-                <p:column headerText="#{msg.assetName}"  filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
+                <p:column headerText="#{msg.assetName}"  filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.name}"/>
                 </p:column>
-                <p:column headerText="#{msg.ManufacturerSerialNumber}"  filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
+                <p:column headerText="#{msg.ManufacturerSerialNumber}"  filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.serialNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.EquipmentIDHospital}"  filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.departNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.functionType}"/>
+                <p:column headerText="#{msg.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.functionType}"/>
                 </p:column>
                 <p:column headerText="#{msg.MeasurementGrade2}" filterBy="#{msg.ruleLevel}" filterMatchMode="EQ">
                     <f:facet name="filter">

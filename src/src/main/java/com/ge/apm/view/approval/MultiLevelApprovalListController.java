@@ -7,9 +7,11 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.mapper.MultiLevelApprovalMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.WrapperSearchFilterUtils;
 import com.ge.apm.service.utils.ZipUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -47,6 +49,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
     public static final String TAB_INITIATID_BY_ME = "TAB_INITIATID_BY_ME";
     public static final String TAB_PENDING_APPROVAL_BY_ME = "TAB_PENDING_APPROVAL_BY_ME";
     public static final String TAB_APPROVED_BY_ME = "TAB_APPROVED_BY_ME";
+    public static final String TAB_APPROVED_ALL = "TAB_APPROVED_ALL";
 
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private MultiLevelApprovalController multiLevelApprovalController;
@@ -54,7 +57,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
     private UserAccountRepository userAccountRepository;
     private OrgInfoRepository orgInfoRepository;
-
+    private UaaService uaaService ;
     private I18nMessageRepository i18nDao;
     @Getter
     @Setter
@@ -80,6 +83,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
 
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         orgInfoRepository =  WebUtil.getBean(OrgInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         i18nDao =  WebUtil.getBean(I18nMessageRepository.class);
         getBusinessTypeMap();
     }
@@ -111,6 +115,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         }else {
             wrapper.orderBy("la.approva_number", false);
         }
+        wrapper.andNew().eq("la.tenant_uid", user.getTenantUID());
 
         if (TAB_INITIATID_BY_ME.equals(currentTabId)) {
             wrapper.andNew().eq("la.initiate_approver_uid", user.getUid());
@@ -118,9 +123,13 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
             wrapper.andNew().eq("la.approval_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING).or().eq("la.approval_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
             wrapper.andNew().eq("la.approval_node_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
             wrapper.andNew().like("la.approval_uid", APPROVAL_SEPARATOR + user.getUid() + APPROVAL_SEPARATOR);
-        } else {//approved by me
+        } else  if (TAB_APPROVED_BY_ME.equals(currentTabId)) {//approved by me
            wrapper.andNew().eq("la.actual_approver_uid", user.getUid());
             wrapper.andNew().ne("la.approval_node_status", ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+        }else  if (TAB_APPROVED_ALL.equals(currentTabId)) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+            List<String> uids = siteList.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+            wrapper.andNew().in("la.config_org_uid", uids);
         }
         WrapperSearchFilterUtils.convert(searchFilters, wrapper);
         List<MultiLevelApproval> list = multiLevelApprovalMapper.loadData(pagination, wrapper, user.getTenantUID());
@@ -198,6 +207,10 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         return TAB_APPROVED_BY_ME.equals(currentTabId);
     }
 
+    public boolean isApprovedAll() {
+        return TAB_APPROVED_ALL.equals(currentTabId);
+    }
+
     public void initiateApprovalByMe() {
         currentTabId = TAB_INITIATID_BY_ME;
         switchTab();
@@ -212,6 +225,12 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
         currentTabId = TAB_APPROVED_BY_ME;
         switchTab();
     }
+
+    public void approvedApprovalByALL() {
+        currentTabId = TAB_APPROVED_ALL;
+        switchTab();
+    }
+
 
     public void switchTab() {
         searchFilters = new ArrayList();

@@ -570,5 +570,46 @@
 
     </select>
 
+    <update id="updateBatchSmart">
+        UPDATE efficiency_equipment_info
+        <set>
+            <if test="positiveRate != null">
+                positive_rate = #{positiveRate},
+            </if>
+            <if test="displayName != null">
+                display_name = #{displayName},
+            </if>
+            <if test="expectedAnnualIncome != null">
+                expected_annual_income = #{expectedAnnualIncome},
+            </if>
+            <if test="expectedCheckNumberPeople != null">
+                expected_check_number_people = #{expectedCheckNumberPeople},
+            </if>
+            <if test="deptExpectedPaybackPeriod != null">
+                dept_expected_payback_period = #{deptExpectedPaybackPeriod},
+            </if>
+        </set>
+        WHERE asset_uid IN
+        <foreach item="item" index="index" collection="assetUids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+
+    <select id="getDeptList" resultType="com.ge.apm.domain.OrgInfo">
+        with assets as (
+            SELECT
+                ai.uid, ai.tenant_uid, ai.institution_uid,ai.hospital_uid,ai.site_uid, ai.clinical_dept_uid
+            from asset_info ai
+                     JOIN user_org uo ON uo.org_uid IN (ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.clinical_dept_uid)
+            WHERE uo.user_uid = #{userUID} AND ai.is_valid AND NOT ai.is_deleted
+        )
+        select distinct oi.uid,oi.name,oi.short_name from  efficiency_equipment_info  eei left join assets ai on eei.asset_uid=ai.uid left join org_info  oi on ai.clinical_dept_uid=oi.uid
+        where ai.tenant_uid=#{tenantUid} and (ai.tenant_uid=#{siteUid}    or ai.institution_uid =#{siteUid} or ai.hospital_uid=#{siteUid}  or ai.site_uid=#{siteUid} or ai.clinical_dept_uid=#{siteUid} )
+
+
+
+    </select>
 
 </mapper>

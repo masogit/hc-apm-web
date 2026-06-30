@@ -2,10 +2,8 @@ package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.AssetLifecycleEventRepository;
 import com.ge.apm.dao.ConfigItemValueRepository;
-import com.ge.apm.domain.AssetLifecycleEvent;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.ServiceRequestReport;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.AssetLifecycleEventService;
@@ -14,6 +12,8 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StreamUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -57,21 +58,26 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	protected String descriptionStatusFilter;
 
 	protected String queryAssetUid;
+    private ConfigCacheService cacheService;
 
 	private ConfigItemValueRepository configItemValueRepository;
+    @Getter
+    @Setter
+    private List<OrgInfo> clinicalDeptList;
 
 	protected void init() {
 		uaaService = WebUtil.getBean(UaaService.class);
 		dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
 		configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
 		fileDownloadService = WebUtil.getBean(FileDownloadService.class);
+        cacheService = WebUtil.getBean(ConfigCacheService.class);
 		service = WebUtil.getBean(AssetLifecycleEventService.class);
 		this.filterBySite = false;
 		this.filterByHospital = false;
 		blnAllSelected = false;
 		setSelectedItems = new HashSet<AssetLifecycleEvent>();
 		tabStatus = 3;
-
+        loadClinicalDeptList();
 		String enCodeParameters = WebUtil.getRequestParameter("str");
 		if (!Strings.isNullOrEmpty(enCodeParameters)) {
 			queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
@@ -82,6 +88,10 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	protected GenericRepositoryUUID<AssetLifecycleEvent> getDAO() {
 		return dao;
 	}
+
+    public OrgInfo getOrgInfoByUid(String orgUid) {
+        return cacheService.findOrgByUid(orgUid);
+    }
 
 	public PageRequest addRequiredSortById(PageRequest pageRequest) {
 		Iterator<Sort.Order> orders = pageRequest.getSort()!=null ? pageRequest.getSort().iterator() : new ArrayList<Sort.Order>().iterator();
@@ -372,6 +382,38 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		}
 		return false;
 	}
+
+
+    private void loadClinicalDeptList() {
+        try {
+            clinicalDeptList = Collections.emptyList();
+            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+            if (!CollectionUtils.isEmpty(deptList)) {
+                clinicalDeptList = deptList.stream()
+                        .filter(item ->
+                        {
+                            if (item == null) {
+                                LOGGER.info("null");
+                            }
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
+                        .collect(Collectors.toList());
+            }
+
+            if (!clinicalDeptList.isEmpty()) {
+                UserAccount user = UserContextService.getCurrentUserAccount();
+                clinicalDeptList = clinicalDeptList.stream()
+                        .filter(item -> org.apache.commons.lang.StringUtils.equals(item.getSiteUID(), user.getSiteUID())
+                                || org.apache.commons.lang.StringUtils.equals(item.getHospitalUID(), user.getSiteUID())
+                                || org.apache.commons.lang.StringUtils.equals(item.getInstitutionUID(), user.getSiteUID())
+                                || org.apache.commons.lang.StringUtils.equals(item.getTenantUID(), user.getSiteUID()))
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            LOGGER.error("loadClinicalDeptList occur exception", e);
+            throw e;
+        }
+    }
 
 	public Set<AssetLifecycleEvent> getSetSelectedItems() {
 		return setSelectedItems;

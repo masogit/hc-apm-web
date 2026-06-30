@@ -819,6 +819,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             throw e;
         }
     }
+
     @Getter @Setter
     private String viewId="";
 
@@ -2023,7 +2024,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             valid = false;
         }
         if (confirmedUpDate == null) {
-            if("1".equals(selectedWorkOrder.getRepairResult()) || "2".equals(selectedWorkOrder.getRepairResult()) || "3".equals(selectedWorkOrder.getRepairResult())){
+            if("1".equals(selectedWorkOrder.getRepairResult()) || "5".equals(selectedWorkOrder.getRepairResult()) || "6".equals(selectedWorkOrder.getRepairResult())){
                 WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
                 RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
                 valid = false;
@@ -4571,6 +4572,24 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return url;
     }
 
+
+
+    public void buildDataLinkUrl() {
+        String assetUid = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("paramAssetUid");
+
+        String url = "";
+        if (StringUtils.isNotEmpty(assetUid)) {
+            AssetInfo assetInfo = assetDao.findByUid(assetUid);
+            url = setDataLinkUrl(assetInfo.getName(), assetUid);
+        }
+
+        RequestContext.getCurrentInstance().addCallbackParam("url", url);
+    }
+
+
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
         loadClinicalDeptList();
@@ -4655,6 +4674,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void clearSelectedWorkOrder() {
         selected = null;
     }
+
+
 
 }
 

@@ -102,6 +102,7 @@ public class WorkOrderReportExportController implements Serializable {
     private OrgInfo selectedOrg;
     
     private OrgInfo filterDeptOrg;
+    private OrgInfo filterAssetDeptOrg;
     private List<OrgInfo> clinicalDeptList;
     private UserAccount filterCurrentOwner;
     private List<UserAccount> currentOwnerList;
@@ -186,6 +187,7 @@ public class WorkOrderReportExportController implements Serializable {
             clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getSiteUID());
             if(null != filterDeptOrg && !filterDeptOrg.getSiteUID().equals(selectedOrg.getSiteUID()) ){
                 filterDeptOrg = null;
+                filterAssetDeptOrg = null;
             }
         }
     }
@@ -361,6 +363,7 @@ public class WorkOrderReportExportController implements Serializable {
             v2WorkOrderReportDto.setCurrentStepId(currentStepId);
             v2WorkOrderReportDto.setSelectedOrg(selectedOrg);
             v2WorkOrderReportDto.setClinicalDept(filterDeptOrg);
+            v2WorkOrderReportDto.setAssetDept(filterAssetDeptOrg);
             v2WorkOrderReportDto.setCurrentOwner(filterCurrentOwner);
             v2WorkOrderReportDto.setStatusList(getStatusList());
             v2WorkOrderReportDto.setClinicalDeptList(clinicalDeptList);
@@ -704,6 +707,14 @@ public class WorkOrderReportExportController implements Serializable {
 
     public void setFilterTotalPrice(String filterTotalPrice) {
         this.filterTotalPrice = filterTotalPrice;
+    }
+
+    public OrgInfo getFilterAssetDeptOrg() {
+        return filterAssetDeptOrg;
+    }
+
+    public void setFilterAssetDeptOrg(OrgInfo filterAssetDeptOrg) {
+        this.filterAssetDeptOrg = filterAssetDeptOrg;
     }
 
     public Boolean isConfigNeedTwoSubStatusByUser(UserAccount userAccount) {

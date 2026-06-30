@@ -936,6 +936,19 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'estimatedRiskLevel') and  userContextService.canRender('DEVICE_RISK_ASSESSMENT')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.estimatedRiskLevel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['estimatedRiskLevel'].required? '*':''}</span></label>
+            <p:selectOneMenu id="estimatedRiskLevel" value="#{assetInfoEditController.selected.estimatedRiskLevel}"
+                             required="#{assetInfoEditController.customConfig.assetFields['estimatedRiskLevel'].required}"
+                             requiredMessage="#{msg.estimatedRiskLevel} #{msg.ValidationRequire}"
+                             disabled="true">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{assetInfoEditController.riskLevels}" var="level" itemLabel="#{level.name}" itemValue="#{level.code}"/>
+                <p:ajax event="change" process="@this"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'emergencyEquipment')}" >
         <h:panelGroup>
             <label class="label">#{msg.emergencyEquipment}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['emergencyEquipment'].required? '*':''}</span></label>
@@ -1153,7 +1166,7 @@
         </h:panelGroup>
     </c:if>
 
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetTags')}" >
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'tags')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetTags}</label>
             <p:autoComplete id="tags" multiple="true" value="#{assetInfoEditController.selected.tags}" completeMethod="#{assetInfoEditController.autoCompleteTags}"
@@ -1264,7 +1277,7 @@
             <label class="label">#{msg.spare01}</label>
             <p:selectOneMenu id="spare01" value="#{assetInfoEditController.selected.spare01}" requiredMessage="#{msg.spare01} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare01')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('spare01')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare01')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
@@ -1274,7 +1287,7 @@
             <label class="label">#{msg.spare02}</label>
             <p:selectOneMenu id="spare02" value="#{assetInfoEditController.selected.spare02}" requiredMessage="#{msg.spare02} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare02')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('spare02')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare02')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
@@ -1284,7 +1297,7 @@
             <label class="label">#{msg.spare03}</label>
             <p:selectOneMenu id="spare03" value="#{assetInfoEditController.selected.spare03}" requiredMessage="#{msg.spare03} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare03')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('spare03')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare03')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
@@ -1294,7 +1307,7 @@
             <label class="label">#{msg.spare04}</label>
             <p:selectOneMenu id="spare04" value="#{assetInfoEditController.selected.spare04}" requiredMessage="#{msg.spare04} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare04')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('spare04')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare04')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>
@@ -1304,7 +1317,7 @@
             <label class="label">#{msg.spare05}</label>
             <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('spare05')}" var="item" itemLabel="#{item.msgKey} #{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('spare05')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
             </p:selectOneMenu>
         </h:panelGroup>

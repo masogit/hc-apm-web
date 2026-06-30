@@ -38,7 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -156,7 +156,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
             addNode("待交付",(selected.getPendingDeliveryUid()),selected.getPendingDeliveryDate(),collect);
         }
         if(selected.getStatus()==5){
-            addNode("待调剂关单","System",selected.getPendingDeliveryDate(),collect);
+            addNode("待调剂关单","System",selected.getDeliveryDate(),collect);
         }
         if(selected.getReturnPendingUid()!=null){
             addNode("待退回审批及关单",(selected.getReturnPendingUid()),selected.getReturnDate(),collect);
@@ -491,22 +491,25 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         if(pendingDeliveryDate==null){
             return false;
         }
-        return isBeyondConfiguredReturnTime(pendingDeliveryDate);
+        return !isBeyondConfiguredReturnTime(pendingDeliveryDate);
     }
 
 
-    public  boolean isBeyondConfiguredReturnTime(Date targetDate) {
-        LocalDate targetLocalDate = targetDate.toInstant()
+    public boolean isBeyondConfiguredReturnTime(Date targetDate) {
+        LocalDateTime targetDateTime = targetDate.toInstant()
                 .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        LocalDate currentLocalDate = LocalDate.now();
-        long daysDiff = Math.abs(ChronoUnit.DAYS.between(targetLocalDate, currentLocalDate));
+                .toLocalDateTime();
+        LocalDateTime currentDateTime = LocalDateTime.now();
 
+        if (!currentDateTime.isAfter(targetDateTime)) {
+            return false;
+        }
 
-        String configItemByKeyToString = configItemService.getConfigItemByKeyToString(hospitalAdjustmentReturnTimeKey, currentUserAccount);
+        long daysDiff = ChronoUnit.DAYS.between(targetDateTime, currentDateTime);
+
+        String configItemByKeyToString = configItemService.getConfigItemByKeyToString(hospitalAdjustmentReturnTimeKey, currentUserAccount.getInstitutionUID(), currentUserAccount.getTenantUID());
 
         int hospitalAdjustmentReturnTime = Integer.parseInt(configItemByKeyToString);
-
 
         return daysDiff >= hospitalAdjustmentReturnTime;
     }

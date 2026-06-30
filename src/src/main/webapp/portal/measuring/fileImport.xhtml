@@ -21,7 +21,7 @@
                                               dragDropSupport="false" multiple="false" auto="true"
                                               invalidFileMessage="只支持zip格式的文件"
                                               invalidSizeMessage="文件大小不得超过500M"
-                                              update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
+                                              update=":measuringTab:zipErrListForm, " sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
                                               label="从zip导入" cancelLabel="取消" uploadLabel="确认上传"/>
                                 <p:growl id="messages" showDetail="true"/>
                             </p:panelGrid>
@@ -43,7 +43,7 @@
                                               invalidFileMessage="只支持zip格式的文件"
                                               invalidSizeMessage="文件大小不得超过500M"
                                               onstart="PF('progressBarId').start()"
-                                              update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
+                                              update=":measuringTab:zipErrListForm, " sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
                                               label="从zip导入" />
                                 <p:progressBar class="customProgressBar" labelTemplate="{value}%" widgetVar="progressBarId" ajax="true" id="pb" value="#{measureFromZipController.progress}" interval="3000" />
 <!--                                <p:poll interval="2" update="pb" />-->

@@ -13,9 +13,11 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -93,6 +95,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	private TreeNode orgTree;
 	private TreeNode selectedNode;
 	private List<OrgInfo> clinicalDeptList;
+    @Getter @Setter
+	private List<OrgInfo> assetDeptList;
+    @Getter @Setter
+    private String filterAssetDeptOrg;
 
 	// 维修事件（紧急程度）列表页筛选：多选 1/2/3/4（不改动实体类）
 	@Getter
@@ -187,6 +193,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		selectAsset=new HashSet<>();
 		initAssets();
         initOrgTree();
+        loadClinicalDeptList();
 	}
 
 	@Override
@@ -921,6 +928,28 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 		return tenantUserList;
 	}
+
+
+    private void loadClinicalDeptList() {
+        try {
+            assetDeptList = Collections.emptyList();
+            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+            if (!org.springframework.util.CollectionUtils.isEmpty(deptList)) {
+                assetDeptList = deptList.stream()
+                        .filter(item -> {
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public OrgInfo getOrgInfoByUid(String orgUid) {
+        return cacheService.findOrgByUid(orgUid);
+    }
+
 	public void setTenantUserList(List<UserAccount> tenantUserList) {
 		this.tenantUserList = tenantUserList;
 	}

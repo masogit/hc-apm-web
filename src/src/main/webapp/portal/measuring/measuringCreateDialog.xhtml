@@ -120,6 +120,13 @@
                                 <label class="label">存档记录</label>
                                 <p:inputText  value="#{measuringCertificateDetailController.selected.fileNo}" />
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">证书类型</label>
+                                <p:selectOneMenu value="#{measuringCertificateDetailController.selected.certificateType}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('certificateType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>

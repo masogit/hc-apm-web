@@ -45,6 +45,16 @@
 					filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 				</p:column>
+
+                <p:column headerText="#{msg.assetDeptName}" sortBy="#{item.assetInfo.assetDeptUID}" filterBy="#{item.assetInfo.assetDeptUID}" filterMatchMode="LIKE">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varWoMgrOutDataList').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{assetLifecycleEvent3Controller.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.uid}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{assetLifecycleEvent3Controller.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}" />
+                </p:column>
 				<p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{assetLifecycleEvent3Controller.showLocationName()}">
 					<h:outputText value="#{item.assetInfo.locationName}"/>
 				</p:column>

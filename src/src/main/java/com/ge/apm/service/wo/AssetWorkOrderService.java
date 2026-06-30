@@ -40,7 +40,7 @@ public class AssetWorkOrderService {
     @Autowired
     UaaService uaaService;
 
-    public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList, Date starDate, Date endDate, Set<String> assetTypeGroupEncodedSet){
+    public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList, Date starDate, Date endDate, Set<String> assetTypeGroupEncodedSet,  OrgInfo filterFromDeptOrg ){
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         ZoneId zone = ZoneId.systemDefault();
@@ -67,6 +67,18 @@ public class AssetWorkOrderService {
         } else {
             List<String> allAccessibleClinicalDeptUids = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).map(orgInfo -> orgInfo.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, allAccessibleClinicalDeptUids));
+        }
+
+        if(filterFromDeptOrg !=null){
+            List<OrgInfo> orgSearchList = new ArrayList<>();
+            orgSearchList.add(filterFromDeptOrg);
+
+            Set<OrgInfo> tempOrgSearchSet = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgSearchList, clinicalDeptList);
+            List<String> clinicalDeptUIDList = new ArrayList<>();
+            for (OrgInfo oi : tempOrgSearchSet) {
+                clinicalDeptUIDList.add(oi.getUid());
+            }
+            searchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         }
 
         if(filterAssetGroup != null){

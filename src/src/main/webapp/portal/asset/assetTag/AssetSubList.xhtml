@@ -44,6 +44,16 @@
                     <p:column headerText="#{msg.clinicalDeptId}" filterMatchMode="LIKE" filterBy="#{item.assetInfo.clinicalDeptName}" sortBy="#{item.assetInfo.clinicalDeptName}">
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
                     </p:column>
+                    <p:column headerText="#{msg.assetDeptName}" filterMatchMode="LIKE" filterBy="#{item.assetInfo.assetDeptUID}" sortBy="#{item.assetInfo.assetDeptUID}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataListAsset').filter()" filter="true" filterMatchMode="contains" filterNormalize="true" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetSubscriberController.assetDeptList}" var="item" itemLabel="#{item}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+
+                        <h:outputText value="#{assetSubscriberController.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}" />
+                    </p:column>
 
                     <p:column headerText="#{msg.EquipmentID}" filterMatchMode="LIKE" filterBy="#{item.assetInfo.departNum}" sortBy="#{item.assetInfo.departNum}">
                         <h:outputText value="#{item.assetInfo.departNum}"/>

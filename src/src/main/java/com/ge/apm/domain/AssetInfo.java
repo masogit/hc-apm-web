@@ -5,6 +5,7 @@ package com.ge.apm.domain;
 import com.alibaba.druid.util.StringUtils;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.utils.ChineseName;
@@ -1104,6 +1105,19 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Column(name = "asset_classification32")
     private String assetClassification32;
+    @Getter
+    @Setter
+    @Column(name = "tube_install_date")
+    @Temporal(TemporalType.DATE)
+    private Date tubeInstallDate;          //球管安装时间
+    @Getter
+    @Setter
+    @Column(name = "total_exposure_count")
+    private Integer totalExposureCount;    //曝光总次数
+    @Getter
+    @Setter
+    @Column(name = "total_inspection_count")
+    private Integer totalInspectionCount;  //检查总人数
 
 
     @Transient
@@ -1136,7 +1150,16 @@ public class AssetInfo implements ChineseName, Serializable {
     private String existFileFlag;
     @Transient
     @Getter @Setter
-    private String overrunState;
+    private String overrunState;@Getter
+    @Setter
+    @Column(name = "estimated_risk_level")
+    private Integer estimatedRiskLevel; //风险等级
+
+    @Getter
+    @Setter
+    @Column(name = "estimated_risk_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date estimatedRiskDate; //预估风险评估日期
 
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
@@ -3524,6 +3547,29 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setUploadUserName(String uploadUserName) {
         this.uploadUserName = uploadUserName;
+    }
+
+    @Transient
+    @TableField(exist = false)
+    private String certificateType;
+
+    public String getCertificateType() {
+        return certificateType;
+    }
+
+    public void setCertificateType(String certificateType) {
+        this.certificateType = certificateType;
+    }
+    @Transient
+    @TableField(exist = false)
+    private Integer validityMonths;
+
+    public Integer getValidityMonths() {
+        return validityMonths;
+    }
+
+    public void setValidityMonths(Integer validityMonths) {
+        this.validityMonths = validityMonths;
     }
 
     @Transient

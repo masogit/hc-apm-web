@@ -137,6 +137,18 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
+                    <p:column headerText="#{msg.hospitalId}" style="width: 100px" >
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.hospitalId}"/><br/>
+                            <p:autoComplete style="width: 90px" dropdown="true" value="#{relRuleAssetManagerController.filterSiteName}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoCompleteSiteName}" size="5">
+                                <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onSiteNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist" />
+                                <p:ajax process="@this" listener="#{relRuleAssetManagerController.onSiteNameFilterChange}" update=":RelRuleAssetListForm:datalist" />
+                            </p:autoComplete>
+
+                        </f:facet>
+                        <h:outputText value="#{relRuleAssetManagerController.getSiteOrgName(item.assetInfo.siteUID)}"/>
+                    </p:column>
                     <p:column headerText="#{msg.clinicalDeptName}"   >
                         <f:facet name="header">
                             <h:outputText value="#{msg.clinicalDeptName}"/><br/>

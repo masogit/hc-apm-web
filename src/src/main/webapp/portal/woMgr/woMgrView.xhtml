@@ -318,6 +318,20 @@
                                         <label class="label">#{msg.repairType}</label>
                                         <p:outputLabel value="#{fieldMsg.fieldValue('repairType',woItem.repairType)}" />
                                     </h:panelGroup>
+                                    <h:panelGroup rendered="#{userContextService.enableDisplayByKey('workOrderShowTubeInstall')}">
+                                        <label class="label">#{msg.tubeInstallDate}</label>
+                                        <p:outputLabel value="#{woItem.tubeInstallDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        </p:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{userContextService.enableDisplayByKey('workOrderShowTubeInstall')}">
+                                        <label class="label">#{msg.totalExposureCount}</label>
+                                        <p:outputLabel value="#{woItem.totalExposureCount}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{userContextService.enableDisplayByKey('workOrderShowTubeInstall')}">
+                                        <label class="label">#{msg.totalInspectionCount}</label>
+                                        <p:outputLabel value="#{woItem.totalInspectionCount}" />
+                                    </h:panelGroup>
                                 </p:panelGrid>
                             </div>
                             <div class="ui-g-2">
