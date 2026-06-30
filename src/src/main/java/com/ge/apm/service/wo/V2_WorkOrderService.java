@@ -782,7 +782,7 @@ public class V2_WorkOrderService {
                 if (selected) {
                     try {
                         V2_WorkOrder workOrder = woDao.findById(id);
-                        List<V2_BlobObject> byBoUuid = blobDao.findByBoUuid(workOrder.getServiceRequest().getId());
+                        List<V2_BlobObject> byBoUuid = blobDao.findByBoUuid(workOrder.getId());
 //                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
 //                            byBoUuid = byBoUuid.stream()
 //                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
