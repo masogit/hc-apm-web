@@ -816,7 +816,7 @@ public class V2_WorkOrderService {
             if (workOrder == null || workOrder.getServiceRequest() == null || workOrder.getServiceRequest().getSrNum() == null) {
                 continue; // 跳过无效工单或服务请求
             }
-            List<V2_BlobObject> blobObjects = blobDao.findByBoUuid(workOrder.getServiceRequest().getId());
+            List<V2_BlobObject> blobObjects = blobDao.findByBoUuid(workOrder.getId());
             // 过滤掉包含 "-工单报告.pdf" 的对象
             List<V2_BlobObject> filteredBlobObjects = blobObjects != null
                     ? blobObjects.stream()
