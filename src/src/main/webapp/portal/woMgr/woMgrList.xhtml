@@ -401,9 +401,8 @@
                 </f:facet>
             </p:dataTable>
         </h:form>
-        <c:if test="#{empty workOrderMgrController.tabTitle or workOrderMgrController.tabTitle eq '内部工单'}">
-            <ui:include src="woMgrView.xhtml"/>
-        </c:if>
+        <ui:include src="woMgrView.xhtml"/>
+
 
         <ui:include src="srCreate.xhtml"/>
         <ui:include src="takeOrderDialog.xhtml"/>
