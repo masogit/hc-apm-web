@@ -126,6 +126,8 @@ public class V2PmOrderUnifiedController extends GenericCRUDUUIDController<V2_PmO
         Map<String, Object> params = initializeParams();
         // 处理搜索过滤器
         processSearchFilters(params);
+        params.put("pageSize", pageRequest.getPageSize());
+        params.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
         List<V2_PmOrder> v2PmOrderList = pmOrderMapper.queryPmOrderList(params);
         long totalCount = pmOrderMapper.queryPmOrderCount(params);
         result= new PageImpl<V2_PmOrder>(v2PmOrderList, pageRequest, totalCount);
