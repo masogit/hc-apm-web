@@ -683,6 +683,21 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         if(selected!=null){
             periodOld=selected.getPeriod();
             periodUnitOld=selected.getPeriodUnit();
+
+            if (selected.getDefaultWorkHours() == null) {
+                String value = configItemValueRepository.findByKeyAndSiteForUseParent(
+                        selected.getSiteUID(), selected.getHospitalUID(),
+                        selected.getInstitutionUID(), selected.getTenantUID(), "pmEntryTypeSet");
+                if (StrUtil.isNotEmpty(value)) {
+                    FieldColumnDto fieldColumnDto = JSON.parseObject(value, FieldColumnDto.class);
+                    // entryType=1(工时段) or entryType=3(仅工时段), do not assign value
+                    if (fieldColumnDto != null && fieldColumnDto.getEntryType() != null
+                            && fieldColumnDto.getEntryType() != 1 && fieldColumnDto.getEntryType() != 3
+                            && fieldColumnDto.getHours() != null) {
+                        selected.setDefaultWorkHours(fieldColumnDto.getHours());
+                    }
+                }
+            }
         }
     }
 
