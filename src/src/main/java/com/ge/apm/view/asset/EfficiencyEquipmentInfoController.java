@@ -116,7 +116,11 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Getter @Setter
     private String filterClinicalDeptOrg;
     @Getter @Setter
+    private String filterAssetDeptOrg;
+    @Getter @Setter
     private Set<String> clinicalDeptOrgUidSet;
+    @Getter @Setter
+    private Set<String> assetDeptOrgUidSet;
 
     private OrgInfoTreeService orgInfoTreeService;
     private AssetDepreciationMapper assetDepreciationMapper;
@@ -233,6 +237,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
             param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
+        }
+        if (ObjectUtil.isNotEmpty(assetDeptOrgUidSet)) {
+            param.put("assetDeptUids", assetDeptOrgUidSet);
         }
         param.put("startDate",startDate);
         param.put("endDate",endDate);
@@ -493,6 +500,9 @@ protected boolean numberField(String fieldName, String filterVal) {
 
                 case "clinicalDeptName":
                     param.put("clinicalDeptName", searchFilter.value);
+                    break;
+                case "assetDeptName":
+                    param.put("assetDeptName", searchFilter.value);
                     break;
                 case "checkNumberPeople":
                     try {
@@ -822,6 +832,27 @@ protected boolean numberField(String fieldName, String filterVal) {
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
+
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
+        }
+
+        if (filterAssetDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
         }
 
     }

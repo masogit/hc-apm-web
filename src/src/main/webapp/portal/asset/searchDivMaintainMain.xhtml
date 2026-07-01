@@ -38,6 +38,15 @@
 					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 				</p:selectOneMenu>
 			</h:panelGroup>
+			<h:panelGroup rendered="#{searchController.blnDepartOrg and userContextService.enableDisplayByKey('dailyCheckDeptFilter')}">
+				<label class="label">使用科室</label>
+				<p:selectOneMenu id="idCSAssetDeptInfo" value="#{searchController.selectedAssetDept}" disabled="false" converter="orgInfoColumnFilterConverter"
+					style="width:100%;" filter="true" filterMatchMode="contains">
+					<p:ajax listener="#{searchController.onAssetDeptChange()}"
+						update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.blnDepartOrgUpdate?searchController.updateViewIDs:''}" />
+					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+				</p:selectOneMenu>
+			</h:panelGroup>
 			<h:panelGroup rendered="#{searchController.blnAssetName}">
 				<label class="label">设备名称</label>
 				<p:inputText value="#{searchController.assetName}">

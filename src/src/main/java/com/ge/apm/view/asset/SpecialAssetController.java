@@ -82,10 +82,12 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
     private Map<String, AssetTypeGroup> currentPageAssetTypeGroupMap;
 
     private String filterClinicalDeptOrg;
+    private String filterAssetDeptOrg;
     private List<OrgInfo> clinicalDeptList;
 
     private OrgInfoTreeService orgInfoTreeService;
     private Set<String> clinicalDeptOrgUidSet;
+    private Set<String> assetDeptOrgUidSet;
 
 
     //复选的设备
@@ -161,6 +163,12 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetInfo.clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
+        if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*2+"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetInfo.assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*2+")).collect(Collectors.toList()));
+        }
+
         Page<SpecialAssetInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = page.getContent();
         addMisingClinicalDeptOrg(currentPageAssets);
@@ -210,7 +218,9 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
         }
         loadClinicalDeptList();
         filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
         clinicalDeptOrgUidSet = null;
+        assetDeptOrgUidSet = null;
         assetGroup = null;
         filterAssetStatus = null;
     }
@@ -402,6 +412,27 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
 
     }
 
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
+        }
+
+        if (filterAssetDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
+
 
 
     private void addMisingClinicalDeptOrg(List<SpecialAssetInfo> currentPageAssets) {
@@ -495,6 +526,22 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
 
     public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
         this.filterClinicalDeptOrg = filterClinicalDeptOrg;
+    }
+
+    public String getFilterAssetDeptOrg() {
+        return filterAssetDeptOrg;
+    }
+
+    public void setFilterAssetDeptOrg(String filterAssetDeptOrg) {
+        this.filterAssetDeptOrg = filterAssetDeptOrg;
+    }
+
+    public Set<String> getAssetDeptOrgUidSet() {
+        return assetDeptOrgUidSet;
+    }
+
+    public void setAssetDeptOrgUidSet(Set<String> assetDeptOrgUidSet) {
+        this.assetDeptOrgUidSet = assetDeptOrgUidSet;
     }
 }
 

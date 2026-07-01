@@ -97,6 +97,18 @@
                     </f:facet>
                     <h:outputText value="#{v2PmOrderMvsController.getOrgInfoByUid(item.assetInfo.clinicalDeptUID).name}"/>
                 </p:column>
+                <!--使用科室-->
+                <p:column headerText="#{msg.assetDeptName}"  width="100" rendered="#{userContextService.enableDisplayByKey('pmOrderDeptFilter')}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.assetDeptName}"/><br/>
+                        <p:autoComplete dropdown="true" value="#{v2PmOrderMvsController.fileterAssetDeptOrgNameMVS}" appendTo="@(Body)"
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderMvsController.autoCompleteDeptNameMVS}" size="5">
+                            <p:ajax event="itemSelect" listener="#{v2PmOrderMvsController.onAssetDeptNameFilterChangeMVS}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
+                            <p:ajax listener="#{v2PmOrderMvsController.onAssetDeptNameFilterChangeMVS}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
+                        </p:autoComplete>
+                    </f:facet>
+                    <h:outputText value="#{item.assetInfo.assetDeptName}"/>
+                </p:column>
                 <p:column headerText="#{msg.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderMvsController.showLocationName()}">
                     <h:outputText value="#{item.assetInfo.locationName}"/>
                 </p:column>

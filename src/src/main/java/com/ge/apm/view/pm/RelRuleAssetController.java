@@ -93,6 +93,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
+    private OrgInfo assetDeptOrgInfo;
     private boolean isYmyg = false;
     private OrgInfo userOrgInfo;
     private String zkbBatch;
@@ -393,6 +394,14 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             List<String> results = new ArrayList<>(clinicalUids);
             if(CollectionUtils.isNotEmpty(results)){
                 assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
+            }
+        }
+
+        if (assetDeptOrgInfo != null){
+            Set<String> assetDeptUids = orgInfoTreeService.collectChildClinicalDept(assetDeptOrgInfo.getUid());
+            List<String> results = new ArrayList<>(assetDeptUids);
+            if(CollectionUtils.isNotEmpty(results)){
+                assetFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN,results));
             }
         }
 
@@ -765,6 +774,14 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public void setClinicalOrgInfo(OrgInfo clinicalOrgInfo) {
         this.clinicalOrgInfo = clinicalOrgInfo;
+    }
+
+    public OrgInfo getAssetDeptOrgInfo() {
+        return assetDeptOrgInfo;
+    }
+
+    public void setAssetDeptOrgInfo(OrgInfo assetDeptOrgInfo) {
+        this.assetDeptOrgInfo = assetDeptOrgInfo;
     }
 
     public TreeNode[] getSelectedNode() {

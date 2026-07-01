@@ -77,6 +77,9 @@
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
+                    <p:column rendered="#{userContextService.enableDisplayByKey('measuringAssetDeptFilter')}" headerText="#{msg.assetDeptName}" filterBy="#{item.assetDeptName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetDeptName}"/>
+                    </p:column>
                     <p:column headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}"/>
                         <f:facet name="filter">

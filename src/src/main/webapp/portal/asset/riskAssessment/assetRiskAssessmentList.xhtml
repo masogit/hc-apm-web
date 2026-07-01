@@ -117,6 +117,17 @@
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
+                        <p:column headerText="#{msg.assetDeptName}" rendered="#{userContextService.enableDisplayByKey('assetRiskAssessmentDeptFilter')}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{assetRiskAssessmentController.filterAssetDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetRiskAssessmentController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{assetRiskAssessmentController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  " oncomplete="afterLoadRender()" />
+                                    <p:ajax process="@this" listener="#{assetRiskAssessmentController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  "  oncomplete="afterLoadRender()"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.assetDeptName}"/>
+                        </p:column>
                         <p:column  headerText="#{msg.riskAssessment}" sortBy="#{item.sumRiskScore}" filterBy="#{item.sumRiskScore}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.sumRiskScore}"/>
                         </p:column>

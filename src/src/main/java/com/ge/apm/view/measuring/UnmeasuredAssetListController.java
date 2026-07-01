@@ -15,6 +15,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
@@ -43,6 +45,9 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
     private Integer queryIndex;
     private Map<String, Boolean> selectedMap;
     private OrgInfo filterOrg;
+    @Getter
+    @Setter
+    private OrgInfo filterAssetDeptOrg;
     private UserAccount currentUser;
     private List<AssetInfo> currentPageAssets;
 
@@ -186,6 +191,10 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
             if (this.hasFilterOnField("clinicalDeptUID")) {
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
             }
+        }
+
+        if (null != filterAssetDeptOrg) {
+            wrapper.andNew().eq("asset_dept_uid", filterAssetDeptOrg.getUid());
         }
 
 

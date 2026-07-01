@@ -163,6 +163,12 @@
                 #{item}
             </foreach>
         </if>
+        <if test="assetInfoAssetDeptUID != null and assetInfoAssetDeptUID.length > 0">
+            and a.asset_dept_uid IN
+            <foreach item="item" index="index" collection="assetInfoAssetDeptUID" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         <if test="userUid != null">
             AND uo.user_uid = #{userUid}
         </if>

@@ -54,6 +54,13 @@
                     <f:selectItems value="#{maintainHistoryController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                 </p:selectOneMenu>
             </h:panelGroup>
+            <h:panelGroup rendered="#{userContextService.enableDisplayByKey('dailyCheckDeptFilter')}">
+                <label class="label">使用科室</label>
+                <p:selectOneMenu id="idCSHisAssetDeptInfo" value="#{maintainHistoryController.selectedAssetDept}" disabled="false" converter="orgInfoColumnFilterConverter"
+                                 style="width:100%;" filter="true" filterMatchMode="contains">
+                    <f:selectItems value="#{maintainHistoryController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                </p:selectOneMenu>
+            </h:panelGroup>
             <h:panelGroup>
                 <label class="label">日常检查名称</label>
                 <p:selectOneMenu id="configName" value="#{maintainHistoryController.selectedConfig}" disabled="false" converter="nurseSiteMaintainConfigConverter"

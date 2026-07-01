@@ -83,6 +83,17 @@
 
                        </h:panelGroup>
 
+                       <h:panelGroup rendered="#{userContextService.enableDisplayByKey('relRuleAssetDeptFilter')}">
+                           <label class ="label">#{msg.assetDeptName}</label>
+                           <p:autoComplete id="assetDeptName" value="#{relRuleAssetController.assetDeptOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                           forceSelection="true" completeMethod="#{relRuleAssetController.getClinicalDeptList}"
+                                           var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" >
+                               <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
+                               <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                           </p:autoComplete>
+
+                       </h:panelGroup>
+
                        <h:panelGroup >
 		                     <label class ="label">#{msg.assetName}</label>
 	                         <p:inputText  value="#{relRuleAssetController.queryAsset.name}"  required="false">
@@ -208,18 +219,21 @@
                        </h:panelGroup>
                    </p:panelGrid>
                     <p:pickList id="AssetsPickList" widgetVar="varPickList" value="#{relRuleAssetController.availableAssets}" var="item"
-                                itemValue="#{item}" itemLabel="#{item.name}-#{item.departNum}-#{item.serialNum}-#{item.clinicalDeptName}-#{item.functionType}" showCheckbox="false" responsive="true"
+                                itemValue="#{item}" itemLabel="#{item.name}-#{item.departNum}-#{item.serialNum}-#{item.clinicalDeptName}-#{item.assetDeptName}-#{item.functionType}" showCheckbox="false" responsive="true"
                                 showSourceFilter="true" showTargetFilter="true" converter="assetInfoConverter"
                                 requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}"
                                 filterMatchMode="contains">
                         <f:facet name="sourceCaption">
                             <p  style="padding-bottom:-200px">#{msg.EquipmentToBeSelected}
                                 <br/> <br/>
-                            <span style="width:20%;float: left">#{msg.name}</span>
-                            <span style="width:25%;float: left">#{msg.departNum}</span>
-                            <span style="width:20%;float: left">#{msg.serialNum}</span>
-                            <span style="width:15%;float: left">#{msg.clinicalDeptName}</span>
-                            <span style="width:20%;float: left">#{msg.functionType}</span>
+                            <span style="width:18%;float: left">#{msg.name}</span>
+                            <span style="width:20%;float: left">#{msg.departNum}</span>
+                            <span style="width:15%;float: left">#{msg.serialNum}</span>
+                            <span style="width:12%;float: left">#{msg.clinicalDeptName}</span>
+                            <h:panelGroup rendered="#{userContextService.enableDisplayByKey('relRuleAssetDeptFilter')}">
+                                <span style="width:12%;float: left">#{msg.assetDeptName}</span>
+                            </h:panelGroup>
+                            <span style="width:15%;float: left">#{msg.functionType}</span>
                                 <br/>
                             </p>
                         </f:facet>
@@ -227,11 +241,14 @@
 
                             <p  style="padding-bottom:-200px">#{msg.SelectedEquipment}
                                 <br/> <br/>
-                                <span style="width:20%;float: left">#{msg.name}</span>
-                                <span style="width:25%;float: left">#{msg.departNum}</span>
-                                <span style="width:20%;float: left">#{msg.serialNum}</span>
-                                <span style="width:15%;float: left">#{msg.clinicalDeptName}</span>
-                                <span style="width:20%;float: left">#{msg.functionType}</span>
+                                <span style="width:18%;float: left">#{msg.name}</span>
+                                <span style="width:20%;float: left">#{msg.departNum}</span>
+                                <span style="width:15%;float: left">#{msg.serialNum}</span>
+                                <span style="width:12%;float: left">#{msg.clinicalDeptName}</span>
+                                <h:panelGroup rendered="#{userContextService.enableDisplayByKey('relRuleAssetDeptFilter')}">
+                                    <span style="width:12%;float: left">#{msg.assetDeptName}</span>
+                                </h:panelGroup>
+                                <span style="width:15%;float: left">#{msg.functionType}</span>
                                 <br/>
                             </p>
                         </f:facet>
@@ -254,10 +271,13 @@
                         <!--<p:column style="float: left;width:20%;">
                             <h:outputText value="#{relRuleAssetController.getOrgName(item.siteUID)}" />
                         </p:column>-->
-                         <p:column style="width:15%;float: left ;">
+                         <p:column style="width:12%;float: left ;">
                             <h:outputText value="#{item.clinicalDeptName}" />
                         </p:column>
-                        <p:column style="width:20%;float: left ;">
+                         <p:column style="width:12%;float: left ;" rendered="#{userContextService.enableDisplayByKey('relRuleAssetDeptFilter')}">
+                            <h:outputText value="#{item.assetDeptName}" />
+                        </p:column>
+                        <p:column style="width:15%;float: left ;">
                             <h:outputText value="#{item.functionType}" />
                         </p:column>
                     </p:pickList>

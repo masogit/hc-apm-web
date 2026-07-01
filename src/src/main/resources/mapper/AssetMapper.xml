@@ -177,6 +177,9 @@
             <if test="clinicalDeptUid != null">
                 and ai.clinical_dept_uid = #{clinicalDeptUid}
             </if>
+            <if test="assetDeptUid != null">
+                and ai.asset_dept_uid = #{assetDeptUid}
+            </if>
             <if test="assetGroup != null">
                 and ai.asset_group = #{assetGroup}
             </if>
@@ -201,6 +204,9 @@
             </if>
             <if test="clinicalDeptUid != null">
                 and ai.clinical_dept_uid = #{clinicalDeptUid}
+            </if>
+            <if test="assetDeptUid != null">
+                and ai.asset_dept_uid = #{assetDeptUid}
             </if>
             <if test="assetGroup != null">
                 and ai.asset_group = #{assetGroup}
@@ -587,6 +593,9 @@
             and ai.site_uid=#{siteUid}
             <if test="clinicalDeptUid != null">
                 AND ai.clinical_dept_uid =#{clinicalDeptUid}
+            </if>
+            <if test="assetDeptUid != null">
+                AND ai.asset_dept_uid =#{assetDeptUid}
             </if>
             <if test="name != null">
                 AND ai.name like concat('%',#{name},'%')

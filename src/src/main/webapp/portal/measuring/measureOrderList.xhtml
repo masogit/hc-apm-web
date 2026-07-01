@@ -85,6 +85,18 @@
                             </f:facet>
                             <h:outputText value="#{v2MeasureController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                         </p:column>
+                        <!--使用科室-->
+                        <p:column headerText="#{msg.assetDeptName}"  width="100" rendered="#{userContextService.enableDisplayByKey('measureOrderDeptFilter')}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{v2MeasureController.fileterAssetDeptOrgName}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{v2MeasureController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{v2MeasureController.onAssetDeptNameFilterChange}" process="@this"  update="measureTab:measureOrderListForm:datalist"/>
+                                    <p:ajax listener="#{v2MeasureController.onAssetDeptNameFilterChange}" process="@this"  update="measureTab:measureOrderListForm:datalist"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.assetInfo.assetDeptName}"/>
+                        </p:column>
 
                         <p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.creatorName}"/>

@@ -254,6 +254,18 @@
                             <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
                         </p:column>
 
+                        <p:column headerText="#{msg.assetDeptName}" sortBy="#{item.assetInfo.assetDeptName}" rendered="#{userContextService.enableDisplayByKey('specialAssetDeptFilter')}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{specialAssetController.filterAssetDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{specialAssetController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{specialAssetController.onAssetDeptNameFilterChange}" process="@this"  update=":SpecialAssetInfoListForm:datalist" oncomplete="afterLoadRender()" />
+                                    <p:ajax process="@this" listener="#{specialAssetController.onAssetDeptNameFilterChange}" update=":SpecialAssetInfoListForm:datalist"  oncomplete="afterLoadRender()"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.assetInfo.assetDeptName}"/>
+                        </p:column>
+
                         <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}"
                                   filterBy="#{item.assetInfo.locationName}"
                                   filterMatchMode="LIKE">
