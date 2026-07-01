@@ -1412,6 +1412,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         filter.setSiteOrg(filterSiteOrg);
         filter.setClinicalDeptOrg(null);
+        filter.setAssetDeptOrg(null);
 
         if (null == filterSiteOrg) {
             clinicalDeptListAsFilter = Collections.emptyList();
@@ -1468,6 +1469,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (null != filter.getClinicalDeptOrg() && null != filter.getClinicalDeptOrg().getUid()) {
             param.put("clinicalDeptUid", filter.getClinicalDeptOrg().getUid());
         }
+        if (null != filter.getAssetDeptOrg() && null != filter.getAssetDeptOrg().getUid()) {
+            param.put("assetDeptUid", filter.getAssetDeptOrg().getUid());
+        }
         if (null != this.filter.getAssetGroup()) {
             param.put("assetGroup", filter.getAssetGroup());
         }
@@ -1520,6 +1524,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 List<String> clinicalDeptUids = clinicalDeptListAsFilter.stream().map(OrgInfo::getUid).collect(Collectors.toList());
                 searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUids));
             }
+        }
+
+        if (null != filter.getAssetDeptOrg()) {
+            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, filter.getAssetDeptOrg().getUid()));
         }
 
         if (null != this.filter.getAssetGroup()) {
@@ -1814,18 +1822,19 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             });
             notPass.clear();
         }
+
+        if (errFlag) {
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("errFlag", errFlag);
+            return;
+        }
+
         //临床助手检查进行中
         if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
             assetScrapService.processUnfinishedNurseSiteMaintain(UserContextService.getAccessToken(), unCheckedNursiteMaintainList.stream().map(AssetInfo::getUid).collect(Collectors.toList()), "transfer");
 //            nurseSiteMaintainService.processUnfinishedNurseSiteMaintain(unCheckedNursiteMaintainList, "已转科");
             toDeleteNurseMaintainSite = false;
             unCheckedNurseSite = false;
-        }
-
-        if (errFlag) {
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("errFlag", errFlag);
-            return;
         }
 
         try {
@@ -1887,6 +1896,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             param.put("assetUids", selectedAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
             param.put("inDeptUid", selected.getClinicalDeptOrg().getUid());
             param.put("inDeptName", selected.getClinicalDeptOrg().getName());
+            if (selected.getAssetDeptOrg() != null) {
+                param.put("assetDeptUid", selected.getAssetDeptOrg().getUid());
+                param.put("assetDeptName", selected.getAssetDeptOrg().getName());
+            }
             param.put("auditSignature", signatureId);
             param.put("applyReason", applyReason);
 

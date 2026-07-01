@@ -53,6 +53,9 @@
                     <if test="deptUid != null">
                         and nsm.clinical_dept_uid = #{deptUid}
                     </if>
+                    <if test="assetDeptUid != null">
+                        and exists (select 1 from nurse_site_maintain_item nsmi2 join asset_info ai2 on nsmi2.asset_uid = ai2.uid where nsmi2.parent_id = nsm.id and ai2.asset_dept_uid = #{assetDeptUid})
+                    </if>
                     <if test="configId != null">
                         and nsm.config_id = #{configId}
                     </if>
@@ -102,6 +105,9 @@
             </if>
             <if test="deptUid != null">
                 and ai.clinical_dept_uid = #{deptUid}
+            </if>
+            <if test="assetDeptUid != null">
+                and ai.asset_dept_uid = #{assetDeptUid}
             </if>
             <if test="configId != null">
                 and nsm.config_id = #{configId}

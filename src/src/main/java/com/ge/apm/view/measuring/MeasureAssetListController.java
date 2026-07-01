@@ -91,6 +91,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private Boolean measurementRepairVisible;
     private Map<String, Boolean> selectedMap;
     private OrgInfo filterOrg;
+    @Getter @Setter
+    private OrgInfo filterAssetDeptOrg;
     private UserAccount currentUser;
     private List<AssetInfo> currentPageAssets;
     private List<V2_BlobObject> resultAttachList;
@@ -407,6 +409,11 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
         }
         wrapper.andNew().in(ObjectUtil.isNotEmpty(clinicalUidList), "ai.clinical_dept_uid", clinicalUidList);
+        List<String> assetDeptUidList = Lists.newArrayList();
+        if(null != filterAssetDeptOrg){
+            assetDeptUidList = Lists.newArrayList(filterAssetDeptOrg.getUid());
+        }
+        wrapper.in(ObjectUtil.isNotEmpty(assetDeptUidList), "ai.asset_dept_uid", assetDeptUidList);
         if(this.hasFilterOnField("verificationConclusion")){
             Integer verificationConclusion = Integer.valueOf(searchFilters.stream().filter(sf -> "verificationConclusion".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("verificationConclusion", SearchFilter.Operator.EQ, 0)).value.toString());
             wrapper.eq("mcd.status", verificationConclusion);
