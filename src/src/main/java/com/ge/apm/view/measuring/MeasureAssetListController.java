@@ -208,7 +208,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 this.selected = new AssetInfo();
                 this.selected.setBoUuid(boUuid);
             }
-            if(Integer.valueOf(1).equals(matchType)){
+            if(Integer.valueOf(1).equals(matchType) || Integer.valueOf(2).equals(matchType)){
                 measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
             }else{
 
@@ -240,7 +240,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 String prefix = "check_date".equals(property) || "validity_months".equals(property)? "mcd." : "ai.";
                 wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
             }
-            wrapper.and().ge("mcd.certificate_type",matchType);
+            wrapper.and().eq("mcd.certificate_type",matchType);
             wrapper.orderBy("mcd.id");
             currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
         }else{
@@ -528,7 +528,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public List<MeasuringCertificateDetail> getMeasuringResult(){
         List<MeasuringCertificateDetail>  list=new ArrayList<>();
-        if(matchType==1){
+        if(matchType==1 || matchType==2){
             list= measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
 
         }else{

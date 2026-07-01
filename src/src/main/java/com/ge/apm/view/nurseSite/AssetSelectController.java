@@ -603,13 +603,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
                 case "departNum": return asset.getDepartNum() != null ? asset.getDepartNum() : "";
                 case "serialNum": return asset.getSerialNum() != null ? asset.getSerialNum() : "";
                 case "qrCode": return asset.getQrCode() != null ? asset.getQrCode() : "";
+                case "assetGroupName":
+                    String displayVal = FieldValueMessageController.fieldValue("assetGroup",asset.getAssetGroup()+"");
+                    return displayVal != null ? displayVal : "";
                 default:
-                    if (field.contains("fieldMsg.fieldValue")) {
-                        Object val = asset.getAssetGroup();
-                        if (val == null) return "";
-                        String displayVal = FieldValueMessageController.fieldValue("assetGroup", String.valueOf(val));
-                        return displayVal != null ? displayVal : val.toString();
-                    }
                     if (field.contains("getOrgInfoByUid")) {
                         OrgInfo org = getOrgInfoByUid(asset.getAssetDeptUID());
                         return org != null && org.getName() != null ? org.getName() : "";
