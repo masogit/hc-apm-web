@@ -710,6 +710,8 @@ public class MeasuringService {
                     measureDetail.setHospitalUID(item.getHospitalUID());
                     measureDetail.setInstitutionUID(item.getInstitutionUID());
                     measureDetail.setTenantUID(item.getTenantUID());
+                    measureDetail.setCreatedBy(currentUserAccount.getUid());
+                    measureDetail.setCreatedDate(new Date());
                     return measureDetail;
                 }).collect(Collectors.toList());
                 result = collect.get(0);
@@ -720,6 +722,8 @@ public class MeasuringService {
                 measureDetail.setHospitalUID(currentUserAccount.getHospitalUID());
                 measureDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
                 measureDetail.setTenantUID(currentUserAccount.getTenantUID());
+                measureDetail.setCreatedBy(currentUserAccount.getUid());
+                measureDetail.setCreatedDate(new Date());
                 result = measureDetail;
             }
 
