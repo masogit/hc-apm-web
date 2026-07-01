@@ -240,15 +240,17 @@
                             <p:fieldset legend="事发事件信息">
                                 <h:panelGroup>
                                     <label class="label">事件发生日期<span style="color:red">*</span></label>
-                                    <p:outputLabel value="#{adverseEventApproveController.selected.eventOccurredDate}" >
+                                   <!-- <p:outputLabel value="#{adverseEventApproveController.selected.eventOccurredDate}" >
                                         <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
-                                    </p:outputLabel>
+                                    </p:outputLabel>-->
+                                    <p:calendar timeZone="GMT+8"  id="eventOccurredDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.eventOccurredDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="事件发生日期不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">发现或获知日期<span style="color:red">*</span></label>
-                                    <p:outputLabel value="#{adverseEventApproveController.selected.eventDiscoverDate}" >
+                                   <!-- <p:outputLabel value="#{adverseEventApproveController.selected.eventDiscoverDate}" >
                                         <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
-                                    </p:outputLabel>
+                                    </p:outputLabel>-->
+                                    <p:calendar timeZone="GMT+8"  id="eventDiscoverDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.eventDiscoverDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="发现或获知日期不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                             </p:fieldset>
                             <p:fieldset legend="安全事件伤害信息" id="harmDegreeDecHi">
@@ -342,9 +344,14 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">出生日期</label>
-                                    <p:outputLabel value="#{adverseEventApproveController.selected.patientBornDate}" >
-                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
-                                    </p:outputLabel>
+                                    <c:if test="#{adverseEventApproveController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventApproveController.selected.patientBornDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventApproveController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8"  id="patientBornDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.patientBornDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    </c:if>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">年龄类型</label>
@@ -403,9 +410,14 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">器械使用日期<span style="color:red">*</span></label>
-                                    <p:outputLabel value="#{adverseEventApproveController.selected.deviceUsedDate}" >
-                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
-                                    </p:outputLabel>
+                                    <c:if test="#{adverseEventApproveController.readOnlyCreateForm}">
+                                        <p:outputLabel value="#{adverseEventApproveController.selected.deviceUsedDate}" >
+                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
+                                        </p:outputLabel>
+                                    </c:if>
+                                    <c:if test="#{!adverseEventApproveController.readOnlyCreateForm}">
+                                        <p:calendar timeZone="GMT+8" id="deviceUsedDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.deviceUsedDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="器械使用日期不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    </c:if>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">使用场所<span style="color:red">*</span></label>
