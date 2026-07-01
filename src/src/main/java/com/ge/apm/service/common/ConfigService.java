@@ -8,11 +8,9 @@ package com.ge.apm.service.common;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import webapp.framework.dao.SearchFilter;
+
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -38,6 +40,9 @@ public class ConfigService {
 
     @Autowired
     private ConfigCacheService cacheService;
+
+    @Autowired
+    private ConfigItemValueRepository configItemValueRepository;
 
     public WorkflowConfig findConfigBySite(String siteUid) {
         OrgInfo org = cacheService.findOrgByUid(siteUid);
@@ -124,4 +129,32 @@ public class ConfigService {
         }
         return false;
     }
+
+    @PostConstruct
+     public void initConfigItemValue(){
+        String key = "enableStockShow";
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        searchFilterList.add(new SearchFilter(key, SearchFilter.Operator.EQ,true));
+        List<WorkflowConfig> workflowConfigList = configDao.findBySearchFilter(searchFilterList);
+        List<ConfigItemValue> enableStockShow = configItemValueRepository.findByKey(key);
+        if(CollectionUtils.isEmpty(workflowConfigList))return;
+        List<ConfigItemValue> configItemValues = new ArrayList<>();
+        Map<String, ConfigItemValue> collect = enableStockShow.stream().collect(Collectors.toMap(item -> item.getSiteUid(), item -> item));
+         for (WorkflowConfig workflowConfig : workflowConfigList) {
+             String siteUid = workflowConfig.getSiteUID();
+             if (!collect.containsKey(siteUid)) {
+                 ConfigItemValue configItemValue = new ConfigItemValue();
+                 configItemValue.setKey(key);
+                 configItemValue.setValue(workflowConfig.getEnableStockShow().toString());
+                 configItemValue.setTenantUid(workflowConfig.getTenantUID());
+                 configItemValue.setInstitutionUid(workflowConfig.getInstitutionUID());
+                 configItemValue.setHospitalUid(workflowConfig.getHospitalUID());
+                 configItemValue.setSiteUid(workflowConfig.getSiteUID());
+                 configItemValues.add(configItemValue);
+             }
+         }
+         if(CollectionUtils.isEmpty(configItemValues)) return;
+         configItemValueRepository.save(configItemValues);
+
+     }
 }
