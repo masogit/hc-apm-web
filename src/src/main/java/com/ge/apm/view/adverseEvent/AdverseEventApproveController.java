@@ -142,8 +142,10 @@ public class AdverseEventApproveController extends AdverseEventBaseController{
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
             if (selected.getStatus() != null && (selected.getStatus() == 2 || selected.getStatus() == 3)) {
                 readOnlyEditForm = false;
+                readOnlyCreateForm = false;
             } else {
                 readOnlyEditForm = true;
+                readOnlyCreateForm = true;
             }
             //设备类型赋值
             assetType = selected.getDevicesClass() == null ? 1 : selected.getDevicesClass();
@@ -248,8 +250,10 @@ public class AdverseEventApproveController extends AdverseEventBaseController{
                 if (status == 2 || status == 3) {
                     //提交后页面设置为只读并隐藏设备查询列表
                     readOnlyEditForm = false;
+                    readOnlyCreateForm = false;
                 } else {
                     readOnlyEditForm = true;
+                    readOnlyCreateForm = true;
                 }
                 injuryPerformance.clear();
                 mechanicalFailure.clear();
