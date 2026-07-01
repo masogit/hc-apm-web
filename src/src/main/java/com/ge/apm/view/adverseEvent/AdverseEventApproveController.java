@@ -26,6 +26,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -374,6 +375,10 @@ public class AdverseEventApproveController extends AdverseEventBaseController{
         } else {
             filterClinicalDeptOrg = Collections.emptySet();
         }
+    }
+
+    public TreeNode getDeptOrgTree() {
+        return uaaService.getOrgAccessTreeByUser(UserContextService.getCurrentUserAccount());
     }
 
     public void removeTempHarmPerform(TempFileUtil file) {
