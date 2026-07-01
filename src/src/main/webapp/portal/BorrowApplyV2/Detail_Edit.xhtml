@@ -28,7 +28,7 @@
                             <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
                                            decimalPlaces="0" minValue="0"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.currentWorkflowConfig.enableStockShow}">
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.enableStockShow}">
                             <label class="label">库存</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.stock}" id="stock"/>
                         </h:panelGroup>

@@ -177,7 +177,7 @@
                 <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" filterBy="#{asset.name}" filterMatchMode="contains">
                     <h:outputText value="#{asset.name}"/>
                 </p:column>
-                <p:column headerText="设备分类" filterBy="#{fieldMsg.fieldValue('assetGroup',asset.assetGroup)}" filterMatchMode="contains">
+                <p:column headerText="设备分类" filterBy="#{asset.assetGroupName}" filterMatchMode="contains">
                     <h:outputText value="#{fieldMsg.fieldValue('assetGroup',asset.assetGroup)}"/>
                 </p:column>
                 <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{asset.clinicalDeptName}" filterMatchMode="contains">

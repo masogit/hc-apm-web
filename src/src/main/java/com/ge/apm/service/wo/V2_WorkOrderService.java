@@ -783,11 +783,18 @@ public class V2_WorkOrderService {
                     try {
                         V2_WorkOrder workOrder = woDao.findById(id);
                         List<V2_BlobObject> byBoUuid = blobDao.findByBoUuid(workOrder.getId());
+                        byBoUuid.addAll(blobDao.findByBoUuid(workOrder.getSrId()));
 //                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
 //                            byBoUuid = byBoUuid.stream()
 //                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
 //                                    .collect(Collectors.toList());
 //                        }
+                        if (CollectionUtils.isNotEmpty(byBoUuid)) {
+                            Set<String> seenStorageIds = new HashSet<>();
+                            byBoUuid = byBoUuid.stream()
+                                    .filter(item -> seenStorageIds.add(item.getObjectStorageId()))
+                                    .collect(Collectors.toList());
+                        }
                         for (V2_BlobObject v2BlobObject : byBoUuid) {
                             String vname = v2BlobObject.getObjectName();
                             zout.putNextEntry(new ZipEntry(vname));
@@ -817,10 +824,17 @@ public class V2_WorkOrderService {
                 continue; // 跳过无效工单或服务请求
             }
             List<V2_BlobObject> blobObjects = blobDao.findByBoUuid(workOrder.getId());
+            blobObjects.addAll(blobDao.findByBoUuid(workOrder.getServiceRequest().getId()));
+            if (CollectionUtils.isNotEmpty(blobObjects)) {
+                Set<String> seenStorageIds = new HashSet<>();
+                blobObjects = blobObjects.stream()
+                        .filter(item -> seenStorageIds.add(item.getObjectStorageId()))
+                        .collect(Collectors.toList());
+            }
             // 过滤掉包含 "-工单报告.pdf" 的对象
             List<V2_BlobObject> filteredBlobObjects = blobObjects != null
                     ? blobObjects.stream()
-                    .filter(item -> item.getObjectName().contains("-工单报告.pdf")).collect(Collectors.toList())
+                    .filter(item -> item.getObjectName().contains("-工单报告.pdf") || item.getObjectName().contains("-工单报告.docx")).collect(Collectors.toList())
                     : Collections.emptyList();
             // 如果过滤后列表为空，则添加 SR 编号到提示信息中
             if (CollectionUtils.isEmpty(filteredBlobObjects)) {
