@@ -2009,4 +2009,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         return displayAssetsNew;
     }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgDao.getByUid(uid);
+    }
 }

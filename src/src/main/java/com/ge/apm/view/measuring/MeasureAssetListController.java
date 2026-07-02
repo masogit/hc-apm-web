@@ -628,6 +628,11 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 //        }
     }
 
+    public void onAssetDeptFilter(NodeSelectEvent event) {
+        selectedNode = event.getTreeNode();
+        filterAssetDeptOrg = (OrgInfo) selectedNode.getData();
+    }
+
     public void onTabChange(TabChangeEvent event){
         String tabId = event.getTab().getId();
         if ("measuringAssetList".equals(tabId)){
@@ -916,6 +921,10 @@ public void treeSearchCondition(){
 
     public void setExcelFile(StreamedContent excelFile) {
         this.excelFile = excelFile;
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgDao.getByUid(uid);
     }
 
 }

@@ -107,7 +107,7 @@
                             <p:ajax listener="#{v2PmOrderMvsController.onAssetDeptNameFilterChangeMVS}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
                         </p:autoComplete>
                     </f:facet>
-                    <h:outputText value="#{item.assetInfo.assetDeptName}"/>
+                    <h:outputText value="#{v2PmOrderMvsController.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}"/>
                 </p:column>
                 <p:column headerText="#{msg.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderMvsController.showLocationName()}">
                     <h:outputText value="#{item.assetInfo.locationName}"/>

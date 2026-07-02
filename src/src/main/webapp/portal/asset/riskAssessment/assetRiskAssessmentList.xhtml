@@ -126,7 +126,7 @@
                                     <p:ajax process="@this" listener="#{assetRiskAssessmentController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  "  oncomplete="afterLoadRender()"/>
                                 </p:autoComplete>
                             </f:facet>
-                            <h:outputText value="#{item.assetDeptName}"/>
+                            <h:outputText value="#{assetRiskAssessmentController.getOrgInfoByUid(item.assetDeptUID).name}"/>
                         </p:column>
                         <p:column  headerText="#{msg.riskAssessment}" sortBy="#{item.sumRiskScore}" filterBy="#{item.sumRiskScore}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.sumRiskScore}"/>

@@ -961,4 +961,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     public void setZkbBatch(String zkbBatch) {
         this.zkbBatch = zkbBatch;
     }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgInfoRepository.getByUid(uid);
+    }
 }
