@@ -164,9 +164,9 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
         }
 
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*2+"));
+            this.updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetInfo.assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*2+")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetInfo.assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
         Page<SpecialAssetInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -416,11 +416,6 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
 
         if (event instanceof SelectEvent) {
             filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
-        }
-
-        if (clinicalDeptList == null || clinicalDeptList.isEmpty()) {
-            assetDeptOrgUidSet = Collections.emptySet();
-            return;
         }
 
         if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {

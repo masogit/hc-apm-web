@@ -17,7 +17,7 @@
 						<p:tree id="idCSTreeUser" class="tree" style="width:98%;border:0;" value="#{searchController.orgTree}" selection="#{searchController.selectedNode}"
 							var="node" selectionMode="single">
 							<p:ajax process="@this" event="select"
-								update="@parent:idCSSelectedOrgName,@parent:idCSAssetsPickList,@parent:idCSAssetSelect,@parent:idCSClinicalOrgInfo,#{searchController.blnOrgTreeUpdate?searchController.updateViewIDs:''}"
+								update="@parent:idCSSelectedOrgName,@parent:idCSAssetsPickList,@parent:idCSAssetSelect,@parent:idCSClinicalOrgInfo,@parent:idCSAssetDeptInfo,#{searchController.blnOrgTreeUpdate?searchController.updateViewIDs:''}"
 								listener="#{searchController.onSelectOrgFromTree}" oncomplete="PF('varCSPanelOrg').hide();" />
 							<p:ajax process="@this" event="expand" />
 							<p:ajax process="@this" event="collapse" />
