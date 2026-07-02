@@ -574,8 +574,9 @@ public class MeasuringService {
             }
 
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            LOGGER.error(e.getLocalizedMessage(),e.getMessage());
+
         }finally {
             if(newFile != null && newFile.exists()){
                 newFile.delete();
@@ -650,7 +651,8 @@ public class MeasuringService {
                 }
                 return  null;
             }).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            LOGGER.error(e.getLocalizedMessage(),e.getMessage());
             throw new RuntimeException(e);
         } finally {
             if(!CollectionUtils.isEmpty(files)){
@@ -755,7 +757,7 @@ public class MeasuringService {
             SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(result,(PropertyFilter)(o,n,v)->!n.equals("assetInfo")));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getLocalizedMessage(),e.getMessage());
             result.setCertificateNo(object.getString("certificateNo"));
             result.setErrorInfo(e.getMessage());
             result.setStatus(-1);
@@ -844,7 +846,7 @@ public class MeasuringService {
                 detail.setValidDateTo(validDateTo);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getLocalizedMessage(),e.getMessage());
         }
         try {
             String checkDateStr = "";
@@ -858,7 +860,7 @@ public class MeasuringService {
                 detail.setCheckDate(checkDate);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getLocalizedMessage(),e.getMessage());
         }
     }
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
