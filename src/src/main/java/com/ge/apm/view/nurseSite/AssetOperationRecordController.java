@@ -2,6 +2,7 @@ package com.ge.apm.view.nurseSite;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.AssetOperationRecordMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetOperationRecordService;
@@ -41,6 +42,7 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
     private String assetGroupFilter;
     private OrgInfo selectOrgInfo;
     private UaaService uaaService;
+    private OrgInfoRepository orgInfoDao;
     private UserAuth customRoleAuth;
     private boolean returnFlag = false;
     private boolean operationFlag = false;
@@ -59,6 +61,7 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
         searchController.updateData();
         AssetOperationRecordService service = WebUtil.getBean(AssetOperationRecordService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
         this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
         customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
@@ -262,7 +265,7 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
-        return service.fetchOrgInfoByUid(uid);
+        return orgInfoDao.getByUid(uid);
     }
 
 }
