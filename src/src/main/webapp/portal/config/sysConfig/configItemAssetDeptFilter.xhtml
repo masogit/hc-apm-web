@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('assetDepartmentConvertDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetDepartmentConvertDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('assetDepartmentConvertDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('assetDepartmentConvertDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('assetDepartmentConvertDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('assetDepartmentConvertDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('assetDepartmentConvertDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('assetRiskAssessmentDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetRiskAssessmentDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('assetRiskAssessmentDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('assetRiskAssessmentDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('assetRiskAssessmentDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('assetRiskAssessmentDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('assetRiskAssessmentDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('specialAssetDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('specialAssetDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('specialAssetDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('specialAssetDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('specialAssetDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('specialAssetDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('specialAssetDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('pmOrderDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('pmOrderDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('pmOrderDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('pmOrderDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('pmOrderDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('pmOrderDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('pmOrderDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('measureOrderDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('measureOrderDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('measureOrderDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('measureOrderDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('measureOrderDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('measureOrderDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('measureOrderDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('efficiencyEquipmentDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('efficiencyEquipmentDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('efficiencyEquipmentDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('efficiencyEquipmentDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('efficiencyEquipmentDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('efficiencyEquipmentDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('efficiencyEquipmentDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('measuringAssetDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('measuringAssetDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('measuringAssetDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('measuringAssetDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('measuringAssetDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('measuringAssetDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('measuringAssetDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('assetOptRecordDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetOptRecordDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('assetOptRecordDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('assetOptRecordDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('assetOptRecordDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('assetOptRecordDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('assetOptRecordDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('assetOptUnClosedRecordDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetOptUnClosedRecordDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('assetOptUnClosedRecordDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('assetOptUnClosedRecordDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('assetOptUnClosedRecordDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('assetOptUnClosedRecordDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('assetOptUnClosedRecordDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('relRuleAssetDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('relRuleAssetDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('relRuleAssetDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('relRuleAssetDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('relRuleAssetDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('relRuleAssetDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('relRuleAssetDeptFilter').configItemValue == null}"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{systemConfigItemController.configItemMap.get('dailyCheckDeptFilter').name.concat('(').concat(systemConfigItemController.configItemMap.get('dailyCheckDeptFilter').key).concat(')')}</label>
+<p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('dailyCheckDeptFilter').showValue}" style="width: 15%;">
+<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+</p:selectOneRadio>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.ConfigItemDesc}</label>
+<p:inputTextarea value="#{systemConfigItemController.configItemMap.get('dailyCheckDeptFilter').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+</h:panelGroup>
+<h:panelGroup>
+<label class="label">#{msg.Operation}</label>
+<p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('dailyCheckDeptFilter'))}" update="configItemForm" />
+<p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('dailyCheckDeptFilter'))}" update="configItemForm" style="padding:10px" disabled="#{systemConfigItemController.configItemMap.get('dailyCheckDeptFilter').configItemValue == null}"/>
+</h:panelGroup></p:panelGrid>
+</ui:composition>
+</html>

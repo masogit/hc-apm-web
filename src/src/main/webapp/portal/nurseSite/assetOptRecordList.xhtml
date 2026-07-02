@@ -41,6 +41,9 @@
 						<p:column headerText="所属科室" filterBy="#{item.assetInfoclinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfoclinicalDeptName}" />
 						</p:column>
+						<p:column headerText="使用科室" rendered="#{userContextService.enableDisplayByKey('assetOptRecordDeptFilter')}">
+							<h:outputText value="#{assetOptRecordController.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}" />
+						</p:column>
 						<p:column headerText="开机人" filterBy="#{item.createByName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.createByName}" />
 						</p:column>

@@ -75,6 +75,8 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
     private OrgInfoTreeService orgInfoTreeService;
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSet;
+    @Setter @Getter
+    private Set<String> assetDeptOrgUidSet;
     private ServiceRequestApiService serviceRequestApiService;
     private MeasureOrderRuleRepository measureOrderRuleRepository;
     private String token;
@@ -93,6 +95,8 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
     Boolean switchTmp= false;
     @Getter @Setter
     private String fileterOrgName;
+    @Getter @Setter
+    private String fileterAssetDeptOrgName;
     @Getter @Setter
     private Integer casePriority;
     private  String cancelInt;
@@ -1414,6 +1418,12 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
 
+            if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
+                this.updateSearchFilter(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));
+            } else {
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "assetInfo.assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            }
+
         if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -1551,6 +1561,25 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            fileterAssetDeptOrgName = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterAssetDeptOrgName.equals(item.getName()))) {
+            fileterAssetDeptOrgName = null;
+        }
+
+        if (fileterAssetDeptOrgName != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(fileterAssetDeptOrgName)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
         }
     }
     @Override

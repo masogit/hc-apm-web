@@ -70,6 +70,8 @@ public class MaintainExportController {
     List<OrgInfo> listOrgDept;
     OrgInfo selectedOrgDepart;
     @Getter @Setter
+    OrgInfo selectedAssetDept;
+    @Getter @Setter
     private String status;
     @Getter @Setter
     private NurseSiteMaintainConfig selectedConfig;
@@ -165,6 +167,9 @@ public class MaintainExportController {
             }
             if(this.selectedOrgDepart != null && this.selectedOrgDepart.getId() != -1){
                 param.put("deptUid", this.selectedOrgDepart.getUid());
+            }
+            if(this.selectedAssetDept != null && this.selectedAssetDept.getId() != -1){
+                param.put("assetDeptUid", this.selectedAssetDept.getUid());
             }
         }
 

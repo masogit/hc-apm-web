@@ -159,4 +159,8 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		return service.getAssetOptRecordList(assetUid);
 	}
 
+	public OrgInfo getOrgInfoByUid(String uid) {
+		return service.fetchOrgInfoByUid(uid);
+	}
+
 }
