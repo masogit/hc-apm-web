@@ -76,6 +76,10 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     @Getter
     @Setter
     private String filterClinicalDeptOrg;
+    //选定使用科室过滤
+    @Getter
+    @Setter
+    private String filterAssetDeptOrg;
     //选定过滤规则
     private Integer filterRuleLevel = null;
     @Getter
@@ -99,6 +103,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     private Integer filterRuleUID4Level = null;
     private String filterRuleUID4RuleUid = null;
     private Set<String> clinicalDeptOrgUidSet;
+    private Set<String> assetDeptOrgUidSet;
 
     @Getter @Setter
     private String filterSiteName;
@@ -184,6 +189,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         }
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
             searchFilterList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptOrgUidSet));
+        }
+        if (ObjectUtil.isNotEmpty(assetDeptOrgUidSet)) {
+            searchFilterList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, assetDeptOrgUidSet));
         }
         if (ObjectUtil.isNotEmpty(siteOrgUidSet)) {
             searchFilterList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, siteOrgUidSet));
@@ -408,6 +416,25 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && clinicalDeptList.stream().noneMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
+        }
+        if (filterAssetDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
         }
     }
 
@@ -762,6 +789,10 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             return org.getName();
         }
         return null;
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return configCacheService.findOrgByUid(uid);
     }
 
     public Map<String, String> getDeleteRuleMap() {

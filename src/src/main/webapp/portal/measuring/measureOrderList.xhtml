@@ -86,7 +86,7 @@
                             <h:outputText value="#{v2MeasureController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                         </p:column>
                         <!--使用科室-->
-                        <p:column headerText="#{msg.assetDeptName}"  width="100" rendered="#{userContextService.enableDisplayByKey('measureOrderDeptFilter')}">
+                        <p:column headerText="#{msg.assetDeptName}"  width="100">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.assetDeptName}"/><br/>
                                 <p:autoComplete dropdown="true" value="#{v2MeasureController.fileterAssetDeptOrgName}" appendTo="@(Body)"
