@@ -66,7 +66,30 @@
 
                             <h:panelGroup>
                                 <p:outputLabel class="label">规格<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText value="#{acquisitionPlanEditController.selected.specifications}" required="true" requiredMessage="规格 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
+                                <p:inputText id="specifications" value="#{acquisitionPlanEditController.selected.specifications}" required="true" requiredMessage="规格 不能为空！" disabled="true"><p:ajax /></p:inputText>
+                                <p:commandButton id="specificationsBtn" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
+                                <p:overlayPanel  id="specificationsEdit" widgetVar="varSpecificationsEdit" for="specificationsBtn"
+                                                 style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true"   >
+                                    <p:scrollPanel style="height:300px; border: 0" mode="native"  >
+                                        <p:inputText id="searchSpecifications" value="#{acquisitionPlanEditController.searchSpecifications}"  />
+                                        <p:commandButton process=":planFilingPeriodEditForm:accordionPanel:searchSpecifications @this" partialSubmit="true" icon="ui-icon-search" update="specificationsTreeEdit" actionListener="#{acquisitionPlanEditController.treeSearchSpecificationsCondition()}" value="检索"/>
+                                        <p:tree id="specificationsTreeEdit" value="#{acquisitionPlanEditController.orgTreeSpecifications}" var="node"
+                                                selectionMode="single" class="tree" style="width:98%; border:0"  showRoot="false"  >
+                                            <p:ajax process="@this" event="select"
+                                                    update="@parent:specifications "
+                                                    listener="#{acquisitionPlanEditController.onSelectSpecificationsTreeNode}"
+                                                    oncomplete="PF('varSpecificationsEdit').hide();" />
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="firstLevel" styleClass="treeNodeDisabled">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="secondLevel">
+                                                <h:outputText value="#{node.secondLevelCategory}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
                             </h:panelGroup>
 
                             <h:panelGroup>
@@ -80,6 +103,7 @@
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'updates'}">
                                 <p:outputLabel class="label">被更新设备<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" required="true" requiredMessage="被更新设备 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
+                                <p:commandButton class="popupIconButton" actionListener="#{acquisitionSelectAssetController.prepareDialogCallback(acquisitionPlanEditController, ':planFilingPeriodEditForm', acquisitionPlanEditController.selectedAssets)}" process="@this" icon="ui-icon-arrow-drop-down" update=":selectAssetDlg " oncomplete="PF('varSelectAssetDlg').show();"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">计划采购数量（台/套）<span style="color: red">*</span></p:outputLabel>
@@ -267,6 +291,7 @@
                                  action="#{acquisitionPlanEditController.backList}" />
             </h:form>
         </div>
+        <ui:include src="selectAssetList.xhtml"></ui:include>
     </ui:define>
 
 </ui:composition>

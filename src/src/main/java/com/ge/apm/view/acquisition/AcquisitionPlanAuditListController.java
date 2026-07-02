@@ -7,6 +7,7 @@ import com.ge.apm.domain.acquisition.AcquisitionPlan;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
@@ -25,6 +26,7 @@ import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @ManagedBean
 @ViewScoped
@@ -67,13 +69,27 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         }
 
         if(queryIndex == 0){
-            this.updateSearchFilter(new SearchFilter("pendAuditUid", SearchFilter.Operator.LIKE, loginUser.getUid(), "1*"));
+            /*this.updateSearchFilter(new SearchFilter("pendAuditUid", SearchFilter.Operator.LIKE, loginUser.getUid(), "1*"));*/
+            Set<String> userFunctions = UserContextService.getCurrentUserFunction();
+            List<String> statusList = new ArrayList<>();
+            if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER.name())) {
+                statusList.add(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name());
+            }
+            if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP.name())) {
+                statusList.add(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name());
+            }
+            if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY.name())) {
+                statusList.add(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
+            }
+            if (!statusList.isEmpty()) {
+                this.updateSearchFilter(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, statusList, "1*"));
+            }
         }else if(queryIndex == 1){
             this.updateSearchFilter(new SearchFilter("drugCenterUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
             this.updateSearchFilter(new SearchFilter("workGroupUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
             this.updateSearchFilter(new SearchFilter("bureauPartyUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
         }
-        return super.loadData(pageRequest);
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     //tab切换
