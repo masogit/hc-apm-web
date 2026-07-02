@@ -249,7 +249,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     }
 
     public DualListModel<AssetInfo> assetList() {
-        if (StringUtils.isEmpty(assetName) && StringUtils.isEmpty(functionType) && assetGroup == null && CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
+        if (StringUtils.isEmpty(assetName) && StringUtils.isEmpty(functionType) && assetGroup == null && CollectionUtils.isEmpty(clinicalDeptOrgUidSet) && CollectionUtils.isEmpty(assetDeptOrgUidSet)) {
             MessageUtil.outPutReturnFacesMessage("RiskAssessmentSearchRequire", FacesMessage.SEVERITY_INFO);
             return assets;
         }
