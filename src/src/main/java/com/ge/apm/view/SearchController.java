@@ -268,6 +268,7 @@ public class SearchController {
 		tempOrgInfo.setName("请选择...");
 		listOrgDept.add(0,tempOrgInfo);
 		selectedOrgDepart = null;
+		selectedAssetDept = null;
 	}
 
 	private void triggerEvent() {
