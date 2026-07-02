@@ -77,8 +77,12 @@
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                    <p:column rendered="#{userContextService.enableDisplayByKey('measuringAssetDeptFilter')}" headerText="#{msg.assetDeptName}" filterBy="#{item.assetDeptName}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetDeptName}"/>
+                    <p:column rendered="#{userContextService.enableDisplayByKey('measuringAssetDeptFilter')}" headerText="#{msg.assetDeptName}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.assetDeptName}"/><br/>
+                            <p:inputText id="assetDept"  value="#{unmeasuredAssetListController.filterAssetDeptOrg.name}"  readonly="true"/>
+                        </f:facet>
+                        <h:outputText value="#{measureAssetListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
                     </p:column>
                     <p:column headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}"/>
@@ -129,6 +133,22 @@
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="measuringTab:treeNodeNameFilter3 @this" update="measuringTab:orgTree1" actionListener="#{orgTreeController.filterDeptOrgTree()}" value="检索"/>
                     <p:tree id="orgTree1" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(UserContextService.getCurrentUserAccount().getSiteUID())}"  var="node" selectionMode="single" dynamic="false">
                         <p:ajax process="@this" event="select"  listener="#{unmeasuredAssetListController.onClinicalDeptFilter}" update="measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:clinicalDept measuringTab:idVarPanelDeptOrg3" oncomplete="PF('varDataList_unmeasuredAsset').filter();PF('varPanelDeptOrg3').hide();"/>
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+                        <p:treeNode type="org">
+                            <h:outputText value="#{node.shortName}"/>
+                        </p:treeNode>
+                        <p:treeNode type="hidden" rendered="false"/>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+
+            <p:overlayPanel id="idVarPanelAssetDeptOrg3" widgetVar="varPanelAssetDeptOrg3" for=":measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:assetDept" dismissable="true" style="text-align: left;">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:inputText id="treeNodeNameFilterAssetDept3" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="measuringTab:treeNodeNameFilterAssetDept3 @this" update="measuringTab:orgTreeAssetDept3" actionListener="#{orgTreeController.filterDeptOrgTree()}" value="检索"/>
+                    <p:tree id="orgTreeAssetDept3" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(UserContextService.getCurrentUserAccount().getSiteUID())}"  var="node" selectionMode="single" dynamic="false">
+                        <p:ajax process="@this" event="select"  listener="#{unmeasuredAssetListController.onAssetDeptFilter}" update="measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:assetDept measuringTab:idVarPanelAssetDeptOrg3" oncomplete="PF('varDataList_unmeasuredAsset').filter();PF('varPanelAssetDeptOrg3').hide();"/>
                         <p:ajax process="@this" event="expand"/>
                         <p:ajax process="@this" event="collapse"/>
                         <p:treeNode type="org">

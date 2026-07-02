@@ -142,14 +142,15 @@
                     <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                 </p:column>
                 <!--使用科室-->
-                <p:column headerText="#{msg.assetDeptName}" filterBy="#{item.assetInfo.assetDeptName}" filterMatchMode="EQ" width="100" rendered="#{userContextService.enableDisplayByKey('pmOrderDeptFilter')}">
+                <p:column headerText="#{msg.assetDeptName}" width="100" rendered="#{userContextService.enableDisplayByKey('pmOrderDeptFilter')}">
                     <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.fileterAssetDeptOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
+                        <p:selectOneMenu value="#{v2PmOrderController.fileterAssetDeptOrgName}"  filter="true" filterMatchMode="contains" filterNormalize="true" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{v2PmOrderController.clinicalDeptList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                            <p:ajax event="change" listener="#{v2PmOrderController.onAssetDeptNameFilterChange}" process="@this" update=":pmOrderListForm:datalist"/>
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText value="#{item.assetInfo.assetDeptName}"/>
+                    <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}"/>
                 </p:column>
                 <p:column headerText="#{msg.locationName}" sortBy="#{item.assetInfo.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderController.showLocationNameFlag}">
                     <h:outputText value="#{item.assetInfo.locationName}"/>

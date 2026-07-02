@@ -261,4 +261,8 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
         return list;
     }
 
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return service.fetchOrgInfoByUid(uid);
+    }
+
 }

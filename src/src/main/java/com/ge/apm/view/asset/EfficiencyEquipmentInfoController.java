@@ -81,6 +81,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     //选定的院区
     private OrgInfo selectSite;
+    private OrgInfoRepository orgInfoDao;
 
     private List<EfficiencyEquipmentInfo> currentPageAssets;
     @Getter
@@ -190,6 +191,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 
         hisEquipmentDataResultMapper = WebUtil.getBean(HisEquipmentDataResultMapper.class);
         assetCostAmountInfoMapper = WebUtil.getBean(AssetCostAmountInfoMapper.class);
@@ -855,5 +857,9 @@ protected boolean numberField(String fieldName, String filterVal) {
             assetDeptOrgUidSet = Collections.emptySet();
         }
 
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgInfoDao.getByUid(uid);
     }
 }

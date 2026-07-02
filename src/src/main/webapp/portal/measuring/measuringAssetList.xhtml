@@ -80,8 +80,12 @@
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                    <p:column rendered="#{measureAssetListController.matchType!=3 and userContextService.enableDisplayByKey('measuringAssetDeptFilter')}"   headerText="#{msg.assetDeptName}" filterBy="#{item.assetDeptName}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.assetDeptName}"/>
+                    <p:column rendered="#{measureAssetListController.matchType!=3 and userContextService.enableDisplayByKey('measuringAssetDeptFilter')}"   headerText="#{msg.assetDeptName}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.assetDeptName}"/><br/>
+                            <p:inputText id="assetDept"  value="#{measureAssetListController.filterAssetDeptOrg.name}"  readonly="true"/>
+                        </f:facet>
+                        <h:outputText value="#{measureAssetListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
                     </p:column>
                     <p:column rendered="#{measureAssetListController.matchType!=3}"   headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}"/>
@@ -331,7 +335,22 @@
                     </p:tree>
                 </p:scrollPanel>
             </p:overlayPanel>
-<!--            <ui:include src="measuringCreateDialog.xhtml" />-->
+
+            <p:overlayPanel id="idVarPanelAssetDeptOrg" widgetVar="varPanelAssetDeptOrg" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:assetDept" dismissable="true" style="text-align: left;">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:inputText id="treeNodeNameFilterAssetDept" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="measuringTab:treeNodeNameFilterAssetDept @this" update="measuringTab:orgTreeAssetDept" actionListener="#{orgTreeController.filterDeptOrgTree()}" value="检索"/>
+                    <p:tree id="orgTreeAssetDept" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(UserContextService.getCurrentUserAccount().getSiteUID())}"  var="node" selectionMode="single" dynamic="false">
+                        <p:ajax process="@this" event="select"  listener="#{measureAssetListController.onAssetDeptFilter}" update="measuringTab:measuringAssetListForm:datalist_measuringAsset:assetDept measuringTab:idVarPanelAssetDeptOrg" oncomplete="PF('varDataList_measuringAsset').filter();PF('varPanelAssetDeptOrg').hide();"/>
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+                        <p:treeNode type="org">
+                            <h:outputText value="#{node.shortName}"/>
+                        </p:treeNode>
+                        <p:treeNode type="hidden" rendered="false"/>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
             <script type="text/javascript">
                 var newWin;
                 function prepareAssetViewWindow1() {

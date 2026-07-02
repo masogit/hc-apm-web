@@ -418,6 +418,11 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
             filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
         }
 
+        if (clinicalDeptList == null || clinicalDeptList.isEmpty()) {
+            assetDeptOrgUidSet = Collections.emptySet();
+            return;
+        }
+
         if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
             filterAssetDeptOrg = null;
         }
@@ -542,6 +547,10 @@ public class SpecialAssetController extends GenericCRUDUUIDController<SpecialAss
 
     public void setAssetDeptOrgUidSet(Set<String> assetDeptOrgUidSet) {
         this.assetDeptOrgUidSet = assetDeptOrgUidSet;
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgDao.getByUid(uid);
     }
 }
 

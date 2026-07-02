@@ -601,4 +601,8 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     protected GenericRepository<AssetInfo> getDAO() {
         return assetInfoRepository;
     }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgInfoRepository.getByUid(uid);
+    }
 }
