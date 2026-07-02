@@ -101,4 +101,8 @@ public class AssetOptUnClosedRecordController extends GenericCRUDUUIDController<
     protected GenericRepositoryUUID<AssetOptRecord> getDAO() {
         return assetOptRecordRepository;
     }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return service.fetchOrgInfoByUid(uid);
+    }
 }

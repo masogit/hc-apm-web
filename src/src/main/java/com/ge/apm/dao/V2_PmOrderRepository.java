@@ -87,6 +87,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\t\torg_info\n" +
 			"\twhere\n" +
 			"\t\tuid = vpo.clinical_dept_id) as clinicalDeptName,\n" +
+			"\tai.asset_dept_name as assetDeptName,\n" +
 			"\tpor.\"name\" as pmRuleName,\n" +
 			"\tpor.\"period\" as pmRulePeriod,\n" +
 			"\tvpo.creator_name as creatorName,\n" +

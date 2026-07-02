@@ -78,6 +78,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     private OrgInfoTreeService orgInfoTreeService;
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSetMVS;
+    @Setter @Getter
+    private Set<String> assetDeptOrgUidSetMVS;
     private RelRuleAssetRepository relRuleAssetRepository;
     private List<UnstructuredDataCollection> unDataCollection;
     private UnstructuredDataCollectionRepository reportDao;
@@ -85,6 +87,8 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
      private ConfigItemValueRepository configItemValueRepository;
     @Getter @Setter
     private String fileterOrgNameMVS;
+    @Getter @Setter
+    private String fileterAssetDeptOrgNameMVS;
      private V2_PmOrderRepository dao;
     private V2_PmOrderService pmOrderService;
      private String assetUid;
@@ -581,6 +585,9 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         if (!org.springframework.util.CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
             params.put("assetInfoClinicalDeptUID", clinicalDeptOrgUidSetMVS.stream().toArray(String[]::new));
         }
+        if (!org.springframework.util.CollectionUtils.isEmpty(assetDeptOrgUidSetMVS)) {
+            params.put("assetInfoAssetDeptUID", assetDeptOrgUidSetMVS.stream().toArray(String[]::new));
+        }
         if (org.apache.commons.lang.StringUtils.isNotEmpty(siteUidFilterMVS)) {
             params.put("assetInfoSiteUID", siteUidFilterMVS);
         }
@@ -782,6 +789,25 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
             clinicalDeptOrgUidSetMVS = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSetMVS = Collections.emptySet();
+        }
+    }
+
+    public void onAssetDeptNameFilterChangeMVS(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            fileterAssetDeptOrgNameMVS = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgNameMVS) && !clinicalDeptListMVS.stream().anyMatch(item -> fileterAssetDeptOrgNameMVS.equals(item.getName()))) {
+            fileterAssetDeptOrgNameMVS = null;
+        }
+
+        if (fileterAssetDeptOrgNameMVS != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptListMVS.stream().filter(item -> item.getName().equals(fileterAssetDeptOrgNameMVS)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptListMVS);
+            assetDeptOrgUidSetMVS = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSetMVS = Collections.emptySet();
         }
     }
 

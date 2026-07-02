@@ -158,6 +158,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSetMVS;
     @Setter @Getter
+    private Set<String> assetDeptOrgUidSet;
+    @Setter @Getter
+    private Set<String> assetDeptOrgUidSetMVS;
+    @Setter @Getter
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
@@ -184,6 +188,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     Boolean switchTmp= false;
     @Getter @Setter
     private String fileterOrgName;
+    @Getter @Setter
+    private String fileterAssetDeptOrgName;
     @Getter @Setter
     private String fileterOrgNameMVS;
     @Getter @Setter
@@ -508,26 +514,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        cell6.setCellValue(WebUtil.getMessage("MaintenanceType"));
        Cell cell7 = headRow.createCell(7);
        cell7.setCellValue(WebUtil.getMessage("clinicalDeptId"));
-       Cell cell8 = headRow.createCell(8);
+       Cell cell7b = headRow.createCell(8);
+       cell7b.setCellValue(WebUtil.getMessage("assetDeptName"));
+       Cell cell8 = headRow.createCell(9);
        cell8.setCellValue(WebUtil.getMessage("PmOrderRule"));
-       Cell cell9 = headRow.createCell(9);
+       Cell cell9 = headRow.createCell(10);
        cell9.setCellValue(WebUtil.getMessage("MaintenancePeriod"));
-       Cell cell10 = headRow.createCell(10);
+       Cell cell10 = headRow.createCell(11);
        cell10.setCellValue(WebUtil.getMessage("creatorUID"));
-       Cell cell11 = headRow.createCell(11);
+       Cell cell11 = headRow.createCell(12);
        cell11.setCellValue(WebUtil.getMessage("caseOwnerId"));
-       Cell cell12 = headRow.createCell(12);
+       Cell cell12 = headRow.createCell(13);
        cell12.setCellValue(WebUtil.getMessage("MaintenanceNumber"));
-       Cell cell13 = headRow.createCell(13);
+       Cell cell13 = headRow.createCell(14);
        cell13.setCellValue(WebUtil.getMessage("currentStep"));
-       Cell cell14 = headRow.createCell(14);
+       Cell cell14 = headRow.createCell(15);
        cell14.setCellValue(WebUtil.getMessage("intExtType"));
-       Cell cell15 = headRow.createCell(15);
+       Cell cell15 = headRow.createCell(16);
        cell15.setCellValue(WebUtil.getMessage("PlannedCompletionTime"));
 
        for(int i=0;i<list.size();i++){
            Row dataRow = sheet.createRow(i+1);
-           for (int j = 0; j <16 ; j++) {
+           for (int j = 0; j <17 ; j++) {
                Cell dataCell = dataRow.createCell(j);
                dataCell.setCellValue(checkValue(((Object[])list.get(i))[j]));
            }
@@ -2730,6 +2738,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (clinicalDeptOrgUidSetMVS != null && !clinicalDeptOrgUidSetMVS.isEmpty()) {
                 filterArrayList.add((new SearchFilter("mvsIbMapping.assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
             }
+            if (assetDeptOrgUidSetMVS != null && !assetDeptOrgUidSetMVS.isEmpty()) {
+                filterArrayList.add((new SearchFilter("mvsIbMapping.assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSetMVS), "1*")));
+            }
         } else {
             if (StringUtils.isNotEmpty(siteUidFilter)) {
                 searchFilters.add((new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*")));
@@ -2739,6 +2750,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
             } else {
 //                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            }
+            if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
+                filterArrayList.add((new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*")));
             }
         }
         filterArrayList.addAll(searchFilters);
@@ -2973,6 +2987,26 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+        selectedMap.clear();
+        if (event instanceof SelectEvent) {
+            fileterAssetDeptOrgName = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterAssetDeptOrgName.equals(item.getName()))) {
+            fileterAssetDeptOrgName = null;
+        }
+
+        if (fileterAssetDeptOrgName != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(fileterAssetDeptOrgName)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
         }
     }
 

@@ -53,6 +53,7 @@ public class SearchController {
 	SearchService searchService;
 	OrgInfo orgSite;
 	OrgInfo selectedOrgDepart;
+	OrgInfo selectedAssetDept;
 	OrgInfo selectedOrg;
 	AssetInfo selectedAssetInfo;
 	TreeNode orgTree;
@@ -72,6 +73,7 @@ public class SearchController {
 	protected int type = 0;
 	boolean blnAccessScope = false;
 	boolean blnDepartOrg = false;
+	boolean blnAssetDept = false;
 	boolean blnOrgTree = false;
 	boolean blnDepartOrgUpdate = false;
 	boolean blnOrgTreeUpdate = false;
@@ -324,6 +326,10 @@ public class SearchController {
 		onChange();
 	}
 
+	public void onAssetDeptChange() {
+		onChange();
+	}
+
 	public void onAssetNameChange() {
 		onChange();
 	}
@@ -423,6 +429,10 @@ public class SearchController {
 				filterCount++;
 				listSearchFilter.add(new SearchFilter(STR_DEPTUID, Operator.EQ, selectedOrgDepart.getUid(), "1*"));
 			}
+			if (selectedAssetDept != null) {
+				filterCount++;
+				listSearchFilter.add(new SearchFilter("assetDeptUID", Operator.EQ, selectedAssetDept.getUid(), "1*"));
+			}
 			if (blnFilterStatus) {
 				listSearchFilter.add(new SearchFilter("status", SearchFilter.Operator.NE, "4", "1*"));
 			}
@@ -477,6 +487,14 @@ public class SearchController {
 
 	public OrgInfo getSelectedOrgDepart() {
 		return selectedOrgDepart;
+	}
+
+	public OrgInfo getSelectedAssetDept() {
+		return selectedAssetDept;
+	}
+
+	public void setSelectedAssetDept(OrgInfo selectedAssetDept) {
+		this.selectedAssetDept = selectedAssetDept;
 	}
 
 	public void setSelectedOrgDepart(OrgInfo selectedOrgDepart) {

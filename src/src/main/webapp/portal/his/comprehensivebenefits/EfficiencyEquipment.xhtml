@@ -169,6 +169,19 @@
                                     <h:outputText value="#{item.clinicalDeptName}" />
                                 </p:column>
                             </c:if>
+                            <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetDeptName' and userContextService.enableDisplayByKey('efficiencyEquipmentDeptFilter')}">
+                                <p:column headerText="#{msg.assetDeptName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                        <p:autoComplete dropdown="true" value="#{efficiencyEquipmentInfoController.filterAssetDeptOrg}" appendTo="@(Body)"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{efficiencyEquipmentInfoController.autoCompleteDeptName}" size="5">
+                                            <p:ajax event="itemSelect" listener="#{efficiencyEquipmentInfoController.onAssetDeptNameFilterChange}" process="@this"  update=":EfficiencyEquipmentInfoListForm:datalist"/>
+                                            <p:ajax process="@this" listener="#{efficiencyEquipmentInfoController.onAssetDeptNameFilterChange}" update=":EfficiencyEquipmentInfoListForm:datalist"/>
+                                        </p:autoComplete>
+                                    </f:facet>
+                                    <h:outputText value="#{efficiencyEquipmentInfoController.getOrgInfoByUid(item.assetDeptUID).name}" />
+                                </p:column>
+                            </c:if>
                             <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetGroup'}">
                                 <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                                     <f:facet name="filter">

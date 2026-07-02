@@ -50,6 +50,15 @@
                     </p:autoComplete>
                 </h:panelGroup>
 
+                <h:panelGroup rendered="#{userContextService.enableDisplayByKey('assetDepartmentConvertDeptFilter')}">
+                    <label class="label">#{msg.assetDeptName}</label>
+                    <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.filter.assetDeptOrg}"
+                                    scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDeptAsFilter}"
+                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="siteFilterChange">
+                        <p:ajax event="itemSelect" update="@(.pickList)" />
+                    </p:autoComplete>
+                </h:panelGroup>
+
                 <h:panelGroup>
                     <label class="label">#{msg.assetGroup}</label>
                     <p:selectOneMenu value="#{assetInfoBulkEditController.filter.assetGroup}">
@@ -150,6 +159,15 @@
                     </p:autoComplete>
                 </h:panelGroup>
 
+                <h:panelGroup rendered="#{userContextService.enableDisplayByKey('assetDepartmentConvertDeptFilter')}">
+                    <label class="label">#{msg.assetDeptName}</label>
+                    <p:autoComplete id="assetDeptName" dropdown="true" value="#{assetInfoBulkEditController.selected.assetDeptOrg}"
+                                    scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
+                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
+                        <p:ajax update="@(.clsBtnChangeSite) " />
+                    </p:autoComplete>
+                </h:panelGroup>
+
                 <h:panelGroup>
                     <label class="label">申请理由<span style="color:red">*</span></label>
                     <p:inputText value="#{assetInfoBulkEditController.applyReason}"/>
@@ -180,6 +198,9 @@
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptName}">
                             <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetDeptName}" rendered="#{userContextService.enableDisplayByKey('assetDepartmentConvertDeptFilter')}">
+                            <h:outputText value="#{assetInfoBulkEditController.getOrgInfoByUid(item.assetDeptUID).name}"/>
                         </p:column>
                         <p:column headerText="#{msg.assetGroup}">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
