@@ -1,11 +1,13 @@
 package com.ge.apm.view.acquisition;
 
 import com.ge.apm.dao.AcquisitionPlanRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
 import com.ge.apm.domain.acquisition.AcquisitionPlanStep;
+import com.ge.apm.domain.acquisition.AcquisitionSpecification;
 import com.ge.apm.service.acquisition.AcquisitionPlanService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
@@ -14,6 +16,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -56,11 +59,17 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
     @Getter @Setter
     private String searchDeptName;
     @Getter @Setter
+    private String searchSpecifications;
+    @Getter @Setter
     private TreeNode orgTreeEdit;
     @Getter @Setter
     private OrgInfo selectedDept;
     @Getter @Setter
     private OrgInfo org;
+    @Getter @Setter
+    private TreeNode orgTreeSpecifications;
+    @Getter @Setter
+    private AcquisitionSpecification selectedSpecifications;
 
     @Override
     protected void init() {
@@ -74,6 +83,7 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         selectedId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "id");
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(userAccount.getOrgInfoUID(), userAccount.getUid(), 4);
         orgTreeEdit = initOrgTree(treeNodeEdit);  //
+        orgTreeSpecifications = acquisitionPlanService.getSpecificationTree("");
 
         if (AcquisitionPlanEditController.CREATE_ACTION.equals(action)) {
             prepareCreate();
@@ -203,6 +213,16 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         this.selected.setApplicationDeptName(selectedDept.getName());
         this.selected.setApplicationDeptUid(selectedDept.getUid());
     }
+    public void onSelectSpecificationsTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        selectedSpecifications = (AcquisitionSpecification) node.getData();
+        this.selected.setSpecifications(selectedSpecifications.getSecondLevelCategory());
+        this.selected.setApplicationDeptUid(selectedSpecifications.getId());
+    }
+
+    public void treeSearchSpecificationsCondition(){
+        orgTreeSpecifications = acquisitionPlanService.getSpecificationTree(searchSpecifications);
+    }
 
     public void treeSearchCondition(){
         TreeNode treeNodeEdit = null;
@@ -232,6 +252,22 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         }
         rootNode.setExpanded(true);
         return orgTree;
+    }
+
+    @Setter @Getter
+    List<AssetInfo> selectedAssets = new ArrayList();
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        selectedAssets = (List<AssetInfo>) eventObject;
+        if (CollectionUtils.isEmpty(selectedAssets)) {
+            return;
+        }
+        String assetIDs = selectedAssets.stream().map(item -> item.getUid()).collect(Collectors.joining(","));
+        String names = selectedAssets.stream().map(item -> item.getName()).collect(Collectors.joining(","));
+
+        selected.setUpdatedAssetUid(assetIDs);
+        selected.setUpdatedAssetName(names);
     }
 
     @Override

@@ -80,6 +80,9 @@ public class AcquisitionPlan {
     @Column(name = "specifications")
     private String specifications;// 型号
 
+    @Column(name = "specifications_id")
+    private String specificationsId;
+
     @Column(name = "application_type")
     private String applicationType;
 
@@ -91,9 +94,6 @@ public class AcquisitionPlan {
 
     @Column(name = "application_plan_count")
     private Integer applicationPlanCount;
-
-    @Column(name = "pend_audit_uid")
-    private String pendAuditUid;
 
     @Column(name = "drug_center_uid")
     private String drugCenterUid;
@@ -229,14 +229,6 @@ public class AcquisitionPlan {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
-
-    public String getPendAuditUid() {
-        return pendAuditUid;
-    }
-
-    public void setPendAuditUid(String pendAuditUid) {
-        this.pendAuditUid = pendAuditUid;
-    }
 
     public String getCreatedBy() {
         return createdBy;
@@ -612,6 +604,14 @@ public class AcquisitionPlan {
 
     public void setBureauPartyUid(String bureauPartyUid) {
         this.bureauPartyUid = bureauPartyUid;
+    }
+
+    public String getSpecificationsId() {
+        return specificationsId;
+    }
+
+    public void setSpecificationsId(String specificationsId) {
+        this.specificationsId = specificationsId;
     }
 
     @Override

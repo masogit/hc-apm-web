@@ -2,6 +2,7 @@ package com.ge.apm.service.acquisition;
 
 import com.ge.apm.dao.AcquisitionPlanRepository;
 import com.ge.apm.dao.AcquisitionPlanStepRepository;
+import com.ge.apm.dao.AcquisitionSpecificationRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PlanFilingPeriodRepository;
 import com.ge.apm.domain.OrgInfo;
@@ -9,6 +10,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
 import com.ge.apm.domain.acquisition.AcquisitionPlanStep;
+import com.ge.apm.domain.acquisition.AcquisitionSpecification;
 import com.ge.apm.domain.acquisition.PlanFilingPeriod;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.service.asset.BlobFileService;
@@ -23,8 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 
 @Service
 public class AcquisitionPlanService {
@@ -39,6 +46,8 @@ public class AcquisitionPlanService {
     private AcquisitionPlanRepository acquisitionPlanRepository;
     @Autowired
     private AcquisitionPlanStepRepository acquisitionPlanStepRepository;
+    @Autowired
+    private AcquisitionSpecificationRepository acquisitionSpecificationRepository;
 
     @Autowired
     private UaaService uaaService;
@@ -124,7 +133,7 @@ public class AcquisitionPlanService {
         acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name());
         String names = "";
         String uids = "";
-        List<UserAccount> users = uaaService.getUsersByApmFunction(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY, account.getTenantUID());
+        List<UserAccount> users = uaaService.getUsersByApmFunction(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER, account.getTenantUID());
         if(CollectionUtils.isNotEmpty(users)){
             names = users.stream()
                     .map(UserAccount::getName)
@@ -133,7 +142,6 @@ public class AcquisitionPlanService {
                     .map(UserAccount::getUid)
                     .collect(Collectors.joining(","));
         }
-        acquisitionPlan.setPendAuditUid(uids);
         saveApplication(acquisitionPlan, account, attachList, removeFileBlobIds);
 
         AcquisitionPlanStep acquisitionPlanStep = new AcquisitionPlanStep();
@@ -180,7 +188,6 @@ public class AcquisitionPlanService {
                 acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
                 acquisitionPlan.setBureauPartyUid(account.getUid());
                 acquisitionPlan.setApplicationStep(9);
-                acquisitionPlan.setPendAuditUid(null);
             }
             acquisitionPlanRepository.save(acquisitionPlan);
         }else if(result.equals(AcquisitionPlan.ResultEnum.Rejected.name())){
@@ -194,7 +201,6 @@ public class AcquisitionPlanService {
             }else if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name())){
                 acquisitionPlan.setBureauPartyUid(account.getUid());
             }
-            acquisitionPlan.setPendAuditUid(null);
         }
         if(acquisitionPlan.getApplicationStep() != 9){
             List<UserAccount> users = uaaService.getUsersByApmFunction(function, account.getTenantUID());
@@ -206,7 +212,6 @@ public class AcquisitionPlanService {
                         .map(UserAccount::getUid)
                         .collect(Collectors.joining(","));
             }
-            acquisitionPlan.setPendAuditUid(uids);
         }
 
         acquisitionPlanRepository.save(acquisitionPlan);
@@ -247,5 +252,52 @@ public class AcquisitionPlanService {
 
     public List<AcquisitionPlanStep> queryApplicationStep(String pid){
         return acquisitionPlanStepRepository.findByPid(pid);
+    }
+
+    /**
+     * 根据采购医疗设备分类（一级分类、二级分类）构建树形结构
+     * 树结构：根节点 → 一级分类（不可选） → 二级分类（可选）
+     *
+     * @param searchKeyword 搜索关键字，在数据库层按一级分类或二级分类名称模糊匹配，为空时返回全部
+     */
+    public TreeNode getSpecificationTree(String searchKeyword) {
+        List<AcquisitionSpecification> specList;
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            specList = acquisitionSpecificationRepository.findByCategoryKeyword(searchKeyword.trim());
+        } else {
+            specList = (List<AcquisitionSpecification>) acquisitionSpecificationRepository.findAll();
+        }
+
+        // 按一级分类分组，保持插入顺序
+        Map<String, List<AcquisitionSpecification>> groupedMap = new LinkedHashMap<>();
+        for (AcquisitionSpecification spec : specList) {
+            String firstLevel = spec.getFirstLevelCategory();
+            if (firstLevel != null) {
+                groupedMap.computeIfAbsent(firstLevel, k -> new java.util.ArrayList<>()).add(spec);
+            }
+        }
+
+        // 创建根节点
+        TreeNode rootNode = new DefaultTreeNode("root", "设备分类", null);
+        rootNode.setExpanded(true);
+
+        // 构建一级分类节点和二级分类子节点
+        for (Map.Entry<String, List<AcquisitionSpecification>> entry : groupedMap.entrySet()) {
+            String firstLevelName = entry.getKey();
+            List<AcquisitionSpecification> children = entry.getValue();
+
+            TreeNode firstLevelNode = new DefaultTreeNode("firstLevel", firstLevelName, rootNode);
+            firstLevelNode.setSelectable(false);
+            firstLevelNode.setExpanded(true);
+
+            for (AcquisitionSpecification spec : children) {
+                if (spec.getSecondLevelCategory() != null && !spec.getSecondLevelCategory().trim().isEmpty()) {
+                    TreeNode secondLevelNode = new DefaultTreeNode("secondLevel", spec, firstLevelNode);
+                    secondLevelNode.setSelectable(true);
+                }
+            }
+        }
+
+        return rootNode;
     }
 }
