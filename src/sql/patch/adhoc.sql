@@ -10,7 +10,7 @@ update config_item  set  default_value='[{"label":"设备名称","field":"assetN
 
 -- YHAAO-28589: 黔东南-配置显示使用科室 - 使用科室筛选配置项
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '是否允许资产转科管理筛选使用科室', 'assetDepartmentConvertDeptFilter', '是否允许资产转科管理筛选使用科室', 'f','t',3
+SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '设备档案-资产转科管理', 'assetDepartmentConvertDeptFilter', '设备档案-资产转科管理', 'f','t',3
 WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'assetDepartmentConvertDeptFilter');
 
 -- YHAAO-28589: 各页面使用科室筛选配置项
@@ -55,3 +55,11 @@ update config_item set default_value = '[{"label":"设备名称","field":"assetN
 -- YHAAO-28518
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 2, 'false', '开启设备库存显示', 'enableStockShow', '开启设备库存显示', 'f','t',3 where not exists(select * from config_item where key = 'enableStockShow');
 
+
+-- YHAAO-28723 新增资产建档-是否显示使用科室筛选
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '新增资产建档-是否显示使用科室筛选', 'assetCreateDeptFilter', '新增资产建档-是否显示使用科室筛选', 'f','t',3
+WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'assetCreateDeptFilter');
+
+-- YHAAO-28723 新增资产建档表添加使用科室字段
+ALTER TABLE qr_code_lib ADD COLUMN IF NOT EXISTS asset_dept_uid CHAR(32);
