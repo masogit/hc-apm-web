@@ -44,6 +44,17 @@
                                 </f:facet>
                                 <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
                             </p:column>
+                            <p:column headerText="#{msg.assetDeptName}" rendered="#{userContextService.enableDisplayByKey('assetCreateDeptFilter')}">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                    <p:autoComplete dropdown="true" value="#{qrCodeLibCreateController.filterAssetDeptOrg}" appendTo="@(Body)"
+                                                    scrollHeight="300"  forceSelection="true" completeMethod="#{qrCodeLibCreateController.autoCompleteDeptName}" size="5">
+                                        <p:ajax event="itemSelect" listener="#{qrCodeLibCreateController.onAssetDeptNameFilterChange}" process="@this"  update=":QrCodeLibListForm:datalist" oncomplete="afterLoadRender()" />
+                                        <p:ajax process="@this" listener="#{qrCodeLibCreateController.onAssetDeptNameFilterChange}" update=":QrCodeLibListForm:datalist"  oncomplete="afterLoadRender()"/>
+                                    </p:autoComplete>
+                                </f:facet>
+                                <h:outputText value="#{qrCodeLibCreateController.getOrgInfoNameByUid(item.assetDeptUID)}"/>
+                            </p:column>
                         <p:column headerText="#{msg.name}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
