@@ -237,17 +237,46 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     @Override
     protected Page<PmOrderRule> loadData(PageRequest pageRequest) {
+        if(this.searchFilters == null){
+            searchFilters =  new ArrayList<>();
+        }
         List<SearchFilter> searchFilters = new ArrayList();
-        
+        setSearchFilter();
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         if(CollectionUtils.isNotEmpty(this.searchFilters)){
             searchFilters.addAll(this.searchFilters);
         }
+
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         Page<PmOrderRule> pmOrderRulePage = dao.findBySearchFilter(searchFilters, pageRequest);
         currentPageAssets = pmOrderRulePage.getContent();
         return pmOrderRulePage;
+    }
+
+    public void setSearchFilter() {
+        if (hasFilterOnField("safetyReport")) {
+            String value = searchFilters.stream().filter(item -> item.fieldName.equals("safetyReport")).map(item -> (String) item.value).findAny().orElse("");
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "safetyReport".equals(item.fieldName)).collect(Collectors.toList()));
+            if (StrUtil.isNotEmpty(value)) {
+                if ("Y".equals(value)) {
+                    searchFilters.add(new SearchFilter("safetyReport", SearchFilter.Operator.IsNotNull, ""));
+                } else if ("N".equals(value)) {
+                    searchFilters.add(new SearchFilter("safetyReport", SearchFilter.Operator.IsNull, ""));
+                }
+            }
+        }
+        if (hasFilterOnField("performanceReport")) {
+            String value = searchFilters.stream().filter(item -> item.fieldName.equals("performanceReport")).map(item -> (String) item.value).findAny().orElse("");
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "performanceReport".equals(item.fieldName)).collect(Collectors.toList()));
+            if (StrUtil.isNotEmpty(value)) {
+                if ("Y".equals(value)) {
+                    searchFilters.add(new SearchFilter("performanceReport", SearchFilter.Operator.IsNotNull, ""));
+                } else if ("N".equals(value)) {
+                    searchFilters.add(new SearchFilter("performanceReport", SearchFilter.Operator.IsNull, ""));
+                }
+            }
+        }
     }
 
     public List<UserAccount> getOwnerList(){
