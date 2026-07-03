@@ -9,6 +9,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.service.nurseSite.AssetOptRecordService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -36,8 +38,11 @@ public class AssetOptUnClosedRecordController extends GenericCRUDUUIDController<
     private UserAccountRepository userAccountRepository;
     private OrgInfoRepository orgInfoRepository;
     private AssetOptRecordService service;
+    private UaaService uaaService;
 
     private UserAccount currentUser;
+    private List<OrgInfo> clinicalDeptList;
+    private OrgInfo filterAssetDeptOrg;
 
     @Override
     protected void init() {
@@ -47,7 +52,11 @@ public class AssetOptUnClosedRecordController extends GenericCRUDUUIDController<
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         service = WebUtil.getBean(AssetOptRecordService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream()
+                .filter(item -> item.getOrgType() == 4)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -104,5 +113,34 @@ public class AssetOptUnClosedRecordController extends GenericCRUDUUIDController<
 
     public OrgInfo getOrgInfoByUid(String uid) {
         return service.fetchOrgInfoByUid(uid);
+    }
+
+
+    public void onAssetDeptNameFilterChange() {
+        if (this.searchFilters == null) {
+            this.searchFilters = new ArrayList<>();
+        }
+        // Remove existing assetDeptUID filter
+        this.searchFilters.removeIf(f -> "assetInfo.assetDeptUID".equals(f.fieldName));
+        // Add new filter if a department is selected
+        if (filterAssetDeptOrg != null && filterAssetDeptOrg.getUid() != null) {
+            this.searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, filterAssetDeptOrg.getUid(), "1*3+"));
+        }
+    }
+
+    public List<OrgInfo> getClinicalDeptList() {
+        return clinicalDeptList;
+    }
+
+    public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+        this.clinicalDeptList = clinicalDeptList;
+    }
+
+    public OrgInfo getFilterAssetDeptOrg() {
+        return filterAssetDeptOrg;
+    }
+
+    public void setFilterAssetDeptOrg(OrgInfo filterAssetDeptOrg) {
+        this.filterAssetDeptOrg = filterAssetDeptOrg;
     }
 }
