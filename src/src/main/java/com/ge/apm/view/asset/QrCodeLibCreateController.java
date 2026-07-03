@@ -51,7 +51,7 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
     private String filterAssetDeptOrg;
     private List<OrgInfo> clinicalDeptList;
     private Set<Integer> clinicalDeptOrgUidSet;
-    private Set<String> assetDeptOrgUidSet;
+    private Set<Integer> assetDeptOrgIdSet;
     @Override
     protected void init() {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -116,10 +116,10 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "orgId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
-        if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));
+        if (assetDeptOrgIdSet != null && !assetDeptOrgIdSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("assetDeptId", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgIdSet), "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptId".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
         }
         if (!this.hasFilterOnField("status")) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
@@ -204,16 +204,11 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
             List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
 
             Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
-            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+            assetDeptOrgIdSet = matchedList.stream().map(OrgInfo::getId).collect(Collectors.toSet());
         } else {
-            assetDeptOrgUidSet = Collections.emptySet();
+            assetDeptOrgIdSet = Collections.emptySet();
         }
 
-    }
-
-    public String getOrgInfoNameByUid(String uid) {
-        OrgInfo orgInfo = orgDao.getByUid(uid);
-        return orgInfo != null ? orgInfo.getName() : null;
     }
     public List<String> autoCompleteDeptName(String query) {
         if (clinicalDeptList == null) {
