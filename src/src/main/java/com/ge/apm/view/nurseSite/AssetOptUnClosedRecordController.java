@@ -124,7 +124,7 @@ public class AssetOptUnClosedRecordController extends GenericCRUDUUIDController<
         this.searchFilters.removeIf(f -> "assetInfo.assetDeptUID".equals(f.fieldName));
         // Add new filter if a department is selected
         if (filterAssetDeptOrg != null && filterAssetDeptOrg.getUid() != null) {
-            this.searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, filterAssetDeptOrg.getUid()));
+            this.searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, filterAssetDeptOrg.getUid(), "1*3+"));
         }
     }
 

@@ -49,7 +49,7 @@
 								<p:selectOneMenu value="#{assetOptUnClosedRecordController.filterAssetDeptOrg}" filter="true" filterMatchMode="contains" filterNormalize="true" converter="orgInfoUidConverter">
 									<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 									<f:selectItems value="#{assetOptUnClosedRecordController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
-									<p:ajax listener="#{assetOptUnClosedRecordController.onAssetDeptNameFilterChange}" process="@this" update=":unClosedRecordListForm:datalist"/>
+									<p:ajax listener="#{assetOptUnClosedRecordController.onAssetDeptNameFilterChange}" process="@this" update=":optRecordListForm:datalist"/>
 								</p:selectOneMenu>
 							</f:facet>
 							<h:outputText value="#{assetOptUnClosedRecordController.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}" />
