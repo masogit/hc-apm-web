@@ -123,6 +123,24 @@
                             </f:facet>
                              <h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour',item.level)}"/>
 	                 </p:column>
+                    <p:column headerText="是否已配置电气安全检测报告" sortBy="#{msg.safetyReport}" filterBy="#{msg.safetyReport}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('PmRuleConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{empty item.safetyReport ? '未配置' : '已配置'}"/>
+                    </p:column>
+                    <p:column headerText="是否已配置性能检测报告" sortBy="#{msg.performanceReport}" filterBy="#{msg.performanceReport}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('PmRuleConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{empty item.performanceReport ? '未配置' : '已配置'}"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareCreate}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"/>
                         <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"/>
