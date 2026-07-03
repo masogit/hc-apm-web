@@ -76,6 +76,14 @@
 						   </p:autoComplete>
 					   </h:panelGroup>
 
+					   <h:panelGroup rendered="#{userContextService.enableDisplayByKey('relRuleAssetDeptFilter')}">
+						   <label class ="label">#{msg.assetDeptName}</label>
+						   <p:autoComplete id="assetDeptName" value="#{generatePmOrdersController.assetDeptOrgInfo}" dropdown="true" scrollHeight="300" style="max-width: 200px"
+                                           forceSelection="true" completeMethod="#{generatePmOrdersController.getClinicalDeptList}"
+                                           var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
+						   </p:autoComplete>
+					   </h:panelGroup>
+
 						  <h:panelGroup >
 							 <label class ="label">#{msg.assetName}</label>
 							 <p:inputText  value="#{generatePmOrdersController.queryAsset.name}">
@@ -160,6 +168,9 @@
 					</p:column>
 					<p:column headerText="#{msg.Department}" >
 						<h:outputText value="#{generatePmOrdersController.getClinicalDeptName(item)}" />
+					</p:column>
+					<p:column headerText="#{msg.assetDeptName}" rendered="#{userContextService.enableDisplayByKey('relRuleAssetDeptFilter')}">
+						<h:outputText value="#{generatePmOrdersController.getOrgName(item.assetDeptUID)}" />
 					</p:column>
 					<p:column headerText="#{msg.EquipmentModel}" >
 						<h:outputText value="#{generatePmOrdersController.getFunctionType(item)}" />

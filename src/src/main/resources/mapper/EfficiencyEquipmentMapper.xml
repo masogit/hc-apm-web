@@ -188,6 +188,8 @@
         ai.function_type AS functionType,
         ai.purchase_price AS purchasePrice,
         ai.clinical_dept_name AS clinicalDeptName,
+        ai.asset_dept_uid AS assetDeptUID,
+        ai.asset_dept_name AS assetDeptName,
         ai.asset_group AS assetGroup,
         ai.make_short_name AS makerShortName,
         ai.id AS assetId,
@@ -241,6 +243,12 @@
         <if test="clinicalDeptUids != null and clinicalDeptUids.size > 0">
             AND ai.clinical_dept_uid IN
             <foreach item="item" collection="clinicalDeptUids" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assetDeptUids != null and assetDeptUids.size > 0">
+            AND ai.asset_dept_uid IN
+            <foreach item="item" collection="assetDeptUids" separator="," open="(" close=")" index="">
                 #{item}
             </foreach>
         </if>
@@ -471,6 +479,12 @@
         <if test="clinicalDeptUids != null and clinicalDeptUids.size > 0">
             AND ai.clinical_dept_uid IN
             <foreach item="item" collection="clinicalDeptUids" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assetDeptUids != null and assetDeptUids.size > 0">
+            AND ai.asset_dept_uid IN
+            <foreach item="item" collection="assetDeptUids" separator="," open="(" close=")" index="">
                 #{item}
             </foreach>
         </if>
