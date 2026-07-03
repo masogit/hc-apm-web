@@ -118,6 +118,8 @@ public class AssetOptRecordProvider {
 				sb.append("b.institution_uid='" + value + "' and ");
 			} else if (tempColumn.equals("assetInfo.tenantUID")) {
 				sb.append("b.tenant_uid='" + value + "' and ");
+			} else if (tempColumn.equals("assetInfo.assetDeptUID")) {
+				sb.append("b.asset_dept_uid='" + value + "' and ");
 			}
 		}
 	}
@@ -211,6 +213,8 @@ public class AssetOptRecordProvider {
 		} else if (tempColumn.equals("assetInfoclinicalDeptName")) {
 			sb.append("(b.clinical_dept_name like '%" + value + "%' or ");
 			sb.append("b.clinical_dept_name_py_code like '%" + value + "%') and ");
+		} else if (tempColumn.equals("assetInfo.assetDeptUID")) {
+			sb.append("b.asset_dept_uid='" + value + "' and ");
 		} else if (tempColumn.equals("assetInfoassetGroup")) {
 			sb.append("b.asset_group='" + value + "' and ");
 		} else if (tempColumn.equals("assetInfoassetType")) {

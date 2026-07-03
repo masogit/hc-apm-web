@@ -41,7 +41,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 	private UserAuth customRoleAuth;
 	private List<String> orgUidList;
 	private List<OrgInfo> clinicalDeptList;
-	private OrgInfo filterAssetDeptOrg;
+	private String filterAssetDeptUID;
 	@Override
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -174,8 +174,8 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		// Remove existing assetDeptUID filter
 		this.searchFilters.removeIf(f -> "assetInfo.assetDeptUID".equals(f.fieldName));
 		// Add new filter if a department is selected
-		if (filterAssetDeptOrg != null && filterAssetDeptOrg.getUid() != null) {
-			this.searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, filterAssetDeptOrg.getUid(), "1*3+"));
+		if (filterAssetDeptUID != null && !filterAssetDeptUID.isEmpty()) {
+			this.searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, filterAssetDeptUID, "1*3+"));
 		}
 	}
 
@@ -187,11 +187,11 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		this.clinicalDeptList = clinicalDeptList;
 	}
 
-	public OrgInfo getFilterAssetDeptOrg() {
-		return filterAssetDeptOrg;
+	public String getFilterAssetDeptUID() {
+		return filterAssetDeptUID;
 	}
 
-	public void setFilterAssetDeptOrg(OrgInfo filterAssetDeptOrg) {
-		this.filterAssetDeptOrg = filterAssetDeptOrg;
+	public void setFilterAssetDeptUID(String filterAssetDeptUID) {
+		this.filterAssetDeptUID = filterAssetDeptUID;
 	}
 }

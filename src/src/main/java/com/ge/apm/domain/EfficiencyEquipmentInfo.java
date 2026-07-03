@@ -105,6 +105,12 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
     private String clinicalDeptName;//所属科室
 
     @Transient
+    private String assetDeptUID;//使用科室UID
+
+    @Transient
+    private String assetDeptName;//使用科室名称
+
+    @Transient
     private Integer assetGroup;//设备分类
 
     @Transient
@@ -341,6 +347,22 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
 
     public void setClinicalDeptName(String clinicalDeptName) {
         this.clinicalDeptName = clinicalDeptName;
+    }
+
+    public String getAssetDeptUID() {
+        return assetDeptUID;
+    }
+
+    public void setAssetDeptUID(String assetDeptUID) {
+        this.assetDeptUID = assetDeptUID;
+    }
+
+    public String getAssetDeptName() {
+        return assetDeptName;
+    }
+
+    public void setAssetDeptName(String assetDeptName) {
+        this.assetDeptName = assetDeptName;
     }
 
     public Integer getAssetGroup() {
