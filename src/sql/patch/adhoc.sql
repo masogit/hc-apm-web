@@ -47,12 +47,9 @@ SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '资产规则管�
 WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'relRuleAssetDeptFilter');
 
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '临床助手日常检查-是否显示使用科室筛选', 'dailyCheckDeptFilter', '临床助手日常检查-是否显示使用科室筛选', 'f','t',3
+SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '临床助手-是否显示使用科室筛选', 'dailyCheckDeptFilter', '临床助手-是否显示使用科室筛选', 'f','t',3
     WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'dailyCheckDeptFilter');
 
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '资产规则管理列表-是否显示使用科室筛选', 'relRuleAssetDeptFilter', '资产规则管理列表-是否显示使用科室筛选', 'f','t',3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'relRuleAssetDeptFilter');
 -- YHAAO-28518
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 2, 'false', '开启设备库存显示', 'enableStockShow', '开启设备库存显示', 'f','t',3 where not exists(select * from config_item where key = 'enableStockShow');
 
