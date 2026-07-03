@@ -53,7 +53,7 @@
                                         <p:ajax process="@this" listener="#{qrCodeLibCreateController.onAssetDeptNameFilterChange}" update=":QrCodeLibListForm:datalist"  oncomplete="afterLoadRender()"/>
                                     </p:autoComplete>
                                 </f:facet>
-                                <h:outputText value="#{qrCodeLibCreateController.getOrgInfoNameByUid(item.assetDeptUID)}"/>
+                                <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.assetDeptId)}"/>
                             </p:column>
                         <p:column headerText="#{msg.name}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>

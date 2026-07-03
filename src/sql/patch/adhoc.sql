@@ -62,4 +62,4 @@ SELECT replace(uuid_generate_v4()::text,'-',''), 22, 'false', '新增资产建�
 WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'assetCreateDeptFilter');
 
 -- YHAAO-28723 新增资产建档表添加使用科室字段
-ALTER TABLE qr_code_lib ADD COLUMN IF NOT EXISTS asset_dept_uid CHAR(32);
+ALTER TABLE qr_code_lib ADD COLUMN IF NOT EXISTS asset_dept_id INTEGER;
