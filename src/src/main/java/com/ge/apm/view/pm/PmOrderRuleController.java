@@ -241,11 +241,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             searchFilters =  new ArrayList<>();
         }
         List<SearchFilter> searchFilters = new ArrayList();
-        setSearchFilter();
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         if(CollectionUtils.isNotEmpty(this.searchFilters)){
             searchFilters.addAll(this.searchFilters);
         }
+        setSearchFilter(searchFilters);
 
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
@@ -254,7 +254,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         return pmOrderRulePage;
     }
 
-    public void setSearchFilter() {
+    public void setSearchFilter(List<SearchFilter> searchFilters) {
         if (hasFilterOnField("safetyReport")) {
             String value = searchFilters.stream().filter(item -> item.fieldName.equals("safetyReport")).map(item -> (String) item.value).findAny().orElse("");
             searchFilters.removeAll(searchFilters.stream().filter(item -> "safetyReport".equals(item.fieldName)).collect(Collectors.toList()));
