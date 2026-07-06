@@ -41,7 +41,7 @@
 						<p:column headerText="所属科室" filterBy="#{item.assetInfoclinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfoclinicalDeptName}" />
 						</p:column>
-						<p:column headerText="使用科室" rendered="#{userContextService.enableDisplayByKey('assetOptRecordDeptFilter')}">
+						<p:column headerText="使用科室" filterBy="#{item.assetInfo.assetDeptUID}" filterMatchMode="EQ" rendered="#{userContextService.enableDisplayByKey('assetOptRecordDeptFilter')}">
 							<f:facet name="filter">
 								<p:selectOneMenu value="#{assetOptRecordController.filterAssetDeptUID}" filter="true" filterMatchMode="contains" filterNormalize="true" >
 									<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
