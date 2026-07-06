@@ -143,6 +143,8 @@ public class AssetOptRecord implements Serializable {
 	@Transient
 	private Integer assetInfoassetGroup;
 	@Transient
+	private String assetInfoassetDeptUID;
+	@Transient
 	private String createByName;
 	@Transient
 	private String modifyByName;
@@ -435,6 +437,14 @@ public class AssetOptRecord implements Serializable {
 
 	public void setAssetInfoassetGroup(Integer assetInfoassetGroup) {
 		this.assetInfoassetGroup = assetInfoassetGroup;
+	}
+
+	public String getAssetInfoassetDeptUID() {
+		return assetInfoassetDeptUID;
+	}
+
+	public void setAssetInfoassetDeptUID(String assetInfoassetDeptUID) {
+		this.assetInfoassetDeptUID = assetInfoassetDeptUID;
 	}
 
 	@Override

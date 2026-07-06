@@ -179,7 +179,7 @@
                                             <p:ajax process="@this" listener="#{efficiencyEquipmentInfoController.onAssetDeptNameFilterChange}" update=":EfficiencyEquipmentInfoListForm:datalist"/>
                                         </p:autoComplete>
                                     </f:facet>
-                                    <h:outputText value="#{efficiencyEquipmentInfoController.getOrgInfoByUid(item.assetDeptUID).name}" />
+                                    <h:outputText value="#{item.assetDeptName}" />
                                 </p:column>
                             </c:if>
                             <c:if test="#{fieldItem.rendered and fieldItem.field eq 'assetGroup'}">

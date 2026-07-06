@@ -844,11 +844,15 @@ protected boolean numberField(String fieldName, String filterVal) {
             filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
         }
 
+        if (clinicalDeptList == null) {
+            return;
+        }
+
         if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
             filterAssetDeptOrg = null;
         }
 
-        if (filterAssetDeptOrg != null) {
+        if (filterAssetDeptOrg != null && orgInfoTreeService != null) {
             List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
 
             Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
