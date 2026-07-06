@@ -362,15 +362,7 @@
                                     <p:outputLabel>保养工作台菜单</p:outputLabel>
                                     <p:outputLabel></p:outputLabel>
                                     <p:outputLabel></p:outputLabel>
-                                    <p:selectBooleanCheckbox
-                                            value="#{featureSettingController.tenantFeatureMap['MAINTAIN_ELECTRICDATAIMPORT']}"
-                                            itemLabel="电气安全数据导入">
-                                        <p:ajax update="maintain"
-                                                listener="#{featureSettingController.featureChange('MAINTAIN_ELECTRICDATAIMPORT')}"/>
-                                    </p:selectBooleanCheckbox>
-                                    <p:outputLabel>电气安全数据导入</p:outputLabel>
-                                    <p:outputLabel></p:outputLabel>
-                                    <p:outputLabel></p:outputLabel>
+
                                     <p:selectBooleanCheckbox
                                             value="#{featureSettingController.tenantFeatureMap['MAINTAIN_TEMPLATE']}"
                                             itemLabel="报表模版管理">
