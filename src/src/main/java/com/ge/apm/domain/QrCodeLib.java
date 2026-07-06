@@ -96,6 +96,9 @@ public class QrCodeLib implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name = "asset_dept_id")
+    private Integer assetDeptId;
+
     @Column(name = "depart_num")
     private String departNum;
 
@@ -196,6 +199,14 @@ public class QrCodeLib implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public Integer getAssetDeptId() {
+        return assetDeptId;
+    }
+
+    public void setAssetDeptId(Integer assetDeptId) {
+        this.assetDeptId = assetDeptId;
     }
 
     public QrCodeLib() {

@@ -188,6 +188,8 @@
         ai.function_type AS functionType,
         ai.purchase_price AS purchasePrice,
         ai.clinical_dept_name AS clinicalDeptName,
+        ai.asset_dept_uid AS assetDeptUID,
+        asset_dept_oi.name AS assetDeptName,
         ai.asset_group AS assetGroup,
         ai.make_short_name AS makerShortName,
         ai.id AS assetId,
@@ -203,6 +205,7 @@
         FROM
         efficiency_equipment_info e
         LEFT JOIN asset_info ai ON e.asset_uid = ai.uid
+        LEFT JOIN org_info asset_dept_oi ON ai.asset_dept_uid = asset_dept_oi.uid
         LEFT JOIN income_summary income ON e.asset_uid = income.asset_uid
         LEFT JOIN expense_summary expense ON e.asset_uid = expense.asset_uid
         LEFT JOIN depreciation d ON ai.id = d.asset_id
@@ -241,6 +244,12 @@
         <if test="clinicalDeptUids != null and clinicalDeptUids.size > 0">
             AND ai.clinical_dept_uid IN
             <foreach item="item" collection="clinicalDeptUids" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assetDeptUids != null and assetDeptUids.size > 0">
+            AND ai.asset_dept_uid IN
+            <foreach item="item" collection="assetDeptUids" separator="," open="(" close=")" index="">
                 #{item}
             </foreach>
         </if>
@@ -474,6 +483,12 @@
                 #{item}
             </foreach>
         </if>
+        <if test="assetDeptUids != null and assetDeptUids.size > 0">
+            AND ai.asset_dept_uid IN
+            <foreach item="item" collection="assetDeptUids" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+        </if>
         <if test="assetUids != null and assetUids.size() > 0">
             and   e.asset_uid IN
             <foreach item='item' index='index' collection='assetUids' open='(' separator=',' close=')'>
@@ -605,7 +620,7 @@
                      JOIN user_org uo ON uo.org_uid IN (ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.clinical_dept_uid)
             WHERE uo.user_uid = #{userUID} AND ai.is_valid AND NOT ai.is_deleted
         )
-        select distinct oi.uid,oi.name,oi.short_name from  efficiency_equipment_info  eei left join assets ai on eei.asset_uid=ai.uid left join org_info  oi on ai.clinical_dept_uid=oi.uid
+        select distinct oi.* from  efficiency_equipment_info  eei left join assets ai on eei.asset_uid=ai.uid left join org_info  oi on ai.clinical_dept_uid=oi.uid
         where ai.tenant_uid=#{tenantUid} and (ai.tenant_uid=#{siteUid}    or ai.institution_uid =#{siteUid} or ai.hospital_uid=#{siteUid}  or ai.site_uid=#{siteUid} or ai.clinical_dept_uid=#{siteUid} )
 
 

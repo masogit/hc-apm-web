@@ -1191,6 +1191,16 @@ public class AssetFileImportBaseService {
         result.put("canBeImport", Boolean.TRUE);
         result.put("unCheckedNurseSite", Boolean.FALSE);
 
+        // 文件内部序列号重复校验：统计每个序列号出现的次数
+        Set<String> duplicateSerialNumsInFile = importAssetMap.stream()
+                .map(item -> (AssetInfo) item.get("asset"))
+                .filter(a -> !StringUtils.isEmpty(a.getSerialNum()))
+                .collect(Collectors.groupingBy(AssetInfo::getSerialNum, Collectors.counting()))
+                .entrySet().stream()
+                .filter(e -> e.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
         int row = 0;
         for (Map<String, Object> item : importAssetMap) {
             ++row;
@@ -1408,6 +1418,23 @@ public class AssetFileImportBaseService {
                 item.put("status", ImportStatus.CheckFail);
                 result.put("canBeImport", Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号重复");
+            }
+
+            // 序列号重复校验（仅警告，不阻止导入）
+            if (!StringUtils.isEmpty(newAsset.getSerialNum())) {
+                // 文件内部序列号重复
+                if (duplicateSerialNumsInFile.contains(newAsset.getSerialNum())) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.put("canBeImport", Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "警告: 导入文件中序列号重复");
+                }
+                // 数据库中序列号重复
+                List<AssetInfo> serialDupList = assetDao.findBySerialNumAndTenantUID(newAsset.getSerialNum(), newAsset.getTenantUID());
+                if (!serialDupList.isEmpty()) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.put("canBeImport", Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "警告: 序列号重复");
+                }
             }
 
             if (!StringUtils.isEmpty(newAsset.getDepartNum())) {
