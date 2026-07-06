@@ -1165,7 +1165,7 @@ public class AssetInfo implements ChineseName, Serializable {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
             DateTime dt = TimeUtil.toJodaDate(nextMeteringDate);
             if(dt.isBeforeNow()) {
-                measuringAlertStatus = "measuringExpired";
+                measuringAlertStatus = "measuringExpiredSoon30";
             } else if(dt.minusDays(30).isBeforeNow()) {
                 measuringAlertStatus = "measuringExpiredSoon30";
             }else if(dt.minusDays(90).isBeforeNow()){
