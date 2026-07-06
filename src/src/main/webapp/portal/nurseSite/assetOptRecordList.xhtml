@@ -46,7 +46,7 @@
 								<p:selectOneMenu value="#{assetOptRecordController.filterAssetDeptUID}" filter="true" filterMatchMode="contains" filterNormalize="true" >
 									<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 									<f:selectItems value="#{assetOptRecordController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-									<p:ajax listener="#{assetOptRecordController.onAssetDeptNameFilterChange}" process="@this" update=":optRecordListForm:datalist" oncomplete="PF('varDataList').filter()"/>
+									<p:ajax listener="#{assetOptRecordController.onAssetDeptNameFilterChange}" process="@this" update=":optRecordListForm:datalist"/>
 								</p:selectOneMenu>
 							</f:facet>
 							<h:outputText value="#{assetOptRecordController.getOrgInfoByUid(item.assetInfoassetDeptUID).name}" />

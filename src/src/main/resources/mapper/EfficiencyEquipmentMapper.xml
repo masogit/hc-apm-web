@@ -620,7 +620,7 @@
                      JOIN user_org uo ON uo.org_uid IN (ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.clinical_dept_uid)
             WHERE uo.user_uid = #{userUID} AND ai.is_valid AND NOT ai.is_deleted
         )
-        select distinct oi.uid,oi.name,oi.short_name from  efficiency_equipment_info  eei left join assets ai on eei.asset_uid=ai.uid left join org_info  oi on ai.clinical_dept_uid=oi.uid
+        select distinct oi.* from  efficiency_equipment_info  eei left join assets ai on eei.asset_uid=ai.uid left join org_info  oi on ai.clinical_dept_uid=oi.uid
         where ai.tenant_uid=#{tenantUid} and (ai.tenant_uid=#{siteUid}    or ai.institution_uid =#{siteUid} or ai.hospital_uid=#{siteUid}  or ai.site_uid=#{siteUid} or ai.clinical_dept_uid=#{siteUid} )
 
 
