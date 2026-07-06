@@ -445,11 +445,15 @@ public class AssetImportDataCheckService {
             if (!StringUtils.isEmpty(assetImport.getSerialNum())) {
                 // 文件内部序列号重复
                 if (duplicateSerialNumsInFile.contains(assetImport.getSerialNum())) {
+                    assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                    result.put("canBeImport", Boolean.FALSE);
                     assetImport.addErrMsg("警告: 导入文件中序列号重复");
                 }
                 // 数据库中序列号重复
                 List<AssetInfo> serialDupList = assetDao.findBySerialNumAndTenantUID(assetImport.getSerialNum(), site.getTenantUID());
                 if (!serialDupList.isEmpty()) {
+                    assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                    result.put("canBeImport", Boolean.FALSE);
                     assetImport.addErrMsg("警告: 序列号重复");
                 }
             }
