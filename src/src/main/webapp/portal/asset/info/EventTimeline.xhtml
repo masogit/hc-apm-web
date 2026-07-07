@@ -19,11 +19,10 @@
     <h:outputScript>
         window.addEventListener('message', function(event) {
             const data = event.data;
-            if(data.type === 'deviceNameClick'){
+            console.log(data.payload.uid);
+            console.log(data);
+            if(data.type === 'eventClick'){
                 // 调用 remoteCommand，把 uid 传给后端
-                console.log(data.payload.uid);
-                console.log(data);
-
                 getAssetDetailUrl([{name:'uid', value: data.payload.uid},{name:'type', value: data.type}]);
             }
         });
