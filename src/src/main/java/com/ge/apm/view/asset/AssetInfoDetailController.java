@@ -26,6 +26,7 @@ import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.TreeNode;
@@ -571,5 +572,42 @@ public class AssetInfoDetailController {
         if (code == null) return "";
         RiskLevel level = RiskLevel.getByCode(code);
         return level != null ? level.getName() : "";
+    }
+
+
+    public void buildDataLinkUrl() {
+        String uid = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("uid");
+
+        String type = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("type");
+
+        String assetId = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("assetId");
+        String url = "";
+        String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+
+        if("repair".equals(type)){
+            String encodeUrlQueryString = "actionName=View&selectedid="
+                    + uid
+                    + "&queryIndex=12" ;
+            encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+            url = contextPath + "/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
+        }else if("maintenance".equals(type)){
+            Integer assetIdInt = Integer.parseInt(assetId);
+            String encodeUrlQueryString = "actionName=View&orderId="
+                    + uid
+                    + "&query=100&queryTab=" + getQueryTabValue(assetIdInt);
+            encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+            url = contextPath + "/pm/pmOrderListAll.xhtml?str=" + encodeUrlQueryString;
+        }
+        RequestContext.getCurrentInstance().addCallbackParam("url", url);
+
     }
 }
