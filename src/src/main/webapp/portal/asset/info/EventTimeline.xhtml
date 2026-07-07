@@ -23,7 +23,7 @@
             console.log(data);
             if(data.type === 'eventClick'){
                 // 调用 remoteCommand，把 uid 传给后端
-                getAssetDetailUrl([{name:'uid', value: data.payload.uid},{name:'type', value: data.type}]);
+                getAssetDetailUrl([{name:'uid', value: data.payload.eventId},{name:'type', value: data.payload.eventType}]);
             }
         });
     </h:outputScript>
