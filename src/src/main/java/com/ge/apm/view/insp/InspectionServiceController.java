@@ -152,6 +152,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         assetUIds.add(assetUid);
         Pagination pagination = new Pagination(0, limit);
         Wrapper wrapper = getWrapper("asset_uid", null, assetUIds, null, "end_time");
+        wrapper.ne("current_step_name", "已取消");
         return pmOrderMapper.getEventRecord(pagination, wrapper);
     }
 
@@ -196,6 +197,30 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
 
     public List<JSONObject> getAssetChangeList() {
         return assetHistoryService.getAssetChangeHistoryByJSON(this.assetInfo.getUid(), this.startTime, this.endTime, 0, 1000);
+    }
+
+    private Wrapper getWrapper(String queryField, String queryValue, List<String> assetUids, List<Integer> assetIds, String dateField) {
+        Wrapper wrapper = new EntityWrapper();
+        if (ObjectUtil.isNotEmpty(queryValue)) {
+            wrapper.eq(queryField, queryValue);
+        }
+        if (ObjectUtil.isNotEmpty(assetUids)) {
+            wrapper.in(queryField, assetUids);
+        }
+        if (ObjectUtil.isNotEmpty(assetIds)) {
+            wrapper.in(queryField, assetIds);
+        }
+        if(StrUtil.isNotEmpty(dateField)){
+            if (ObjectUtil.isNotEmpty(startTime)) {
+                wrapper.ge(dateField, startTime);
+            }
+            if (ObjectUtil.isNotEmpty(endTime)) {
+                wrapper.le(dateField, endTime);
+            }
+        }
+
+        wrapper.orderBy(dateField, false);
+        return wrapper;
     }
 
     public List<InventoryOrderDetail> getInventoryOrderDetailList(Integer assetId){
@@ -260,30 +285,6 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         steps.add("已计划");
         steps.add("待验收");
         return steps;
-    }
-
-    private Wrapper getWrapper(String queryField, String queryValue, List<String> assetUids, List<Integer> assetIds, String dateField) {
-        Wrapper wrapper = new EntityWrapper();
-        if (ObjectUtil.isNotEmpty(queryValue)) {
-            wrapper.eq(queryField, queryValue);
-        }
-        if (ObjectUtil.isNotEmpty(assetUids)) {
-            wrapper.in(queryField, assetUids);
-        }
-        if (ObjectUtil.isNotEmpty(assetIds)) {
-            wrapper.in(queryField, assetIds);
-        }
-        if(StrUtil.isNotEmpty(dateField)){
-            if (ObjectUtil.isNotEmpty(startTime)) {
-                wrapper.ge(dateField, startTime);
-            }
-            if (ObjectUtil.isNotEmpty(endTime)) {
-                wrapper.le(dateField, endTime);
-            }
-        }
-
-        wrapper.orderBy(dateField, false);
-        return wrapper;
     }
 
     public List<UserAccount> getOwnerList(){
