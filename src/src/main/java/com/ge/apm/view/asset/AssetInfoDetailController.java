@@ -586,10 +586,8 @@ public class AssetInfoDetailController {
                 .getRequestParameterMap()
                 .get("type");
 
-        String assetId = FacesContext.getCurrentInstance()
-                .getExternalContext()
-                .getRequestParameterMap()
-                .get("assetId");
+        Integer assetId = selected.getId();
+
         String url = "";
         String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
 
@@ -600,13 +598,18 @@ public class AssetInfoDetailController {
             encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
             url = contextPath + "/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
         }else if("maintenance".equals(type)){
-            Integer assetIdInt = Integer.parseInt(assetId);
             String encodeUrlQueryString = "actionName=View&orderId="
                     + uid
-                    + "&query=100&queryTab=" + getQueryTabValue(assetIdInt);
+                    + "&query=100&queryTab=" + getQueryTabValue(assetId);
             encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
             url = contextPath + "/pm/pmOrderListAll.xhtml?str=" + encodeUrlQueryString;
+        }else if("measuring".equals(type)){
+            url = "actionName=View&selectedid="
+                    + selected.getUid()
+                    +"&matchType=1"+"&boUuid="+uid;
+            url = "measuringResultList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         }
+        log.info("timeline_url:"+url);
         RequestContext.getCurrentInstance().addCallbackParam("url", url);
 
     }
