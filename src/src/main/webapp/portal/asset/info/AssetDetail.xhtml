@@ -701,7 +701,9 @@
                             <p:commandButton id="departmentCovert" value="转科申请" rendered="#{userContextService.accessContainsApmFeature('ASSET_BATCH_MODIFY')}" actionListener="#{assetInfoEditController.checkAssetOrderIsComplete(assetInfoEditController.getSelectedUidList(assetInfoDetailController.selected.uid))}" immediate="true" update="unfinishedAssetDepartmentCovertOrderDetailDialog departmentCovertApply :growl" style="float:right;" oncomplete="handleAssetDepartmentCovertSubmit(xhr, status, args);" />
                         </h:panelGroup>
                     </p:panelGrid>-->
-
+                    <p:tab title="生命时间轴" id="timeline">
+                        <ui:include src="EventTimeline.xhtml"></ui:include>
+                    </p:tab>
                     <p:tab title="已绑定规则" id="bindRule">
                         <p:fieldset legend="已绑定保养规则">
                             <p:dataTable var="item" value="#{assetBindRuleController.getPmOrderRuleList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
@@ -796,9 +798,7 @@
                             </p:dataTable>
                         </p:fieldset>
                     </p:tab>
-                    <p:tab title="时间轴" id="time">
-                        <ui:include src="EventTimeline.xhtml"></ui:include>
-                    </p:tab>
+
                 </p:tabView>
 
                 <ui:include src="AssetScrap.xhtml"/>

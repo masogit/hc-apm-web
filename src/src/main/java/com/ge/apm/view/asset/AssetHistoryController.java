@@ -111,6 +111,10 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
             Page<JSONObject> objects = new PageImpl<>(new ArrayList<>(), pageRequest, 0);
             return objects;
         }
+        if (assetHistoryPage.getTotalElements() > 10000){
+            assetHistoryPage = new PageImpl<>(assetHistoryPage.getContent(), pageRequest, 10000);
+            WebUtil.addSuccessMessage("当前查询数据仅显示10000行，如需查看更多请下载查看！");
+        }
         List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(assetHistoryPage.getContent());
         Page<JSONObject> jsonPage = new PageImpl<>(dataLists, pageRequest, assetHistoryPage.getTotalElements());
         return jsonPage;
