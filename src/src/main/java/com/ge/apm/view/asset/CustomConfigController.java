@@ -124,6 +124,14 @@ public class CustomConfigController {
         } else {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
         }
+        // 强制清空只读字段的 editRoles，防止 DB 中残留旧数据
+        if (customConfigObject.getAssetFields() != null) {
+            for (String readOnlyField : CustomConfigConstant.getReadOnlyFields()) {
+                if (customConfigObject.getAssetFields().containsKey(readOnlyField)) {
+                    customConfigObject.getAssetFields().get(readOnlyField).setEditRoles(Collections.emptyList());
+                }
+            }
+        }
         JSONObject pageWorkOrder = customConfigObject.getMobileMaintainPage().getJSONObject("pageWorkOrder");
         JSONArray group = pageWorkOrder.getJSONArray("group");
         for (int i = 0; i < group.size(); i++) {
