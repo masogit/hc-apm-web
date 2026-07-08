@@ -54,12 +54,13 @@
 									<td style="width: 300px">
 										<h:panelGroup style="display: flex; align-items: center;">
 <!--											<p:ajax event="dblclick" listener="#{maintainItemController.setSelectCheckItem(item3)}" update=":showDescription" oncomplete="PF('showDescription').show()" />-->
-											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}" disabled="#{item2.getDataValue(item3.name).isSkip}" >
+											<p:triStateCheckbox value="#{item2.getDataValue(item3.name).checkValueWeb}" disabled="#{item2.getDataValue(item3.name).isSkip}"
+																							title="#{item2.getDataValue(item3.name).isSkip ? '已忽略，不可勾选' : ''}">
 												<p:ajax  event="change" process="@this" update="maintainDlgTable" />
 											</p:triStateCheckbox>
 											<p:selectBooleanCheckbox value="#{item2.getDataValue(item3.name).isSkip}" itemLabel="忽略"
-																		 disabled="#{!maintainItemController.dailyCheckIgnorable}"
-																		 title="#{maintainItemController.dailyCheckIgnorable ? '' : '未启用忽略功能'}"
+																		 disabled="#{!maintainItemController.dailyCheckIgnorable or item2.getDataValue(item3.name).checkValueWeb ne 0}"
+																		 title="#{!maintainItemController.dailyCheckIgnorable ? '未启用忽略功能' : (item2.getDataValue(item3.name).checkValueWeb ne 0 ? '已勾选检查项，不可忽略' : '')}"
 																		 style="margin-left:5px;">
 												<p:ajax event="change" process="@this" update="maintainDlgTable" />
 											</p:selectBooleanCheckbox>
