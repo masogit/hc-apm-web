@@ -1119,7 +1119,12 @@ public class NurseSiteMaintainService {
 				}
 				int effectiveSize = listData.size() - skipNum;
 				if(nullNum > 0 && !(itemStatus ==3 || itemStatus ==8 )){
-					itemStatus=nullNum==effectiveSize?0:4;
+					if(nullNum == effectiveSize) {
+						// 仅点击了忽略但未做任何实际检查时，视为进行中
+						itemStatus = skipNum > 0 ? 4 : 0;
+					} else {
+						itemStatus = 4;
+					}
 				}
 				// 如果所有检查项都被忽略，视为通过
 				if(effectiveSize == 0 && skipNum > 0){
