@@ -335,4 +335,14 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		String value = userContextService.getConfigItemValue("dailyCheckIgnorable");
 		return Boolean.TRUE.toString().equalsIgnoreCase(value);
 	}
+
+	/**
+	 * 勾选"忽略"时，自动清除该检查项的勾选状态（通过/不通过），避免两个勾选框同时被锁定的死锁
+	 */
+	public void onSkipChange(NurseSiteMaintainData data) {
+		if (data != null && Boolean.TRUE.equals(data.getIsSkip())) {
+			data.setCheckValue(null);
+			data.setCheckValueWeb(0);
+		}
+	}
 }
