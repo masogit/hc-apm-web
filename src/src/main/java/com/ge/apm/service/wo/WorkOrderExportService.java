@@ -386,7 +386,7 @@ public class WorkOrderExportService {
             workOrderMap.put("siebleNumber", workOrderExportPojo.getSiebleNumber());
             workOrderMap.put("callCenterNumber", workOrderExportPojo.getCallCenterNumber());
 
-            workOrderMap.put(WebUtil.getMessage("tubeInstallDate"), workOrderExportPojo.getTubeInstallDate());
+            workOrderMap.put(WebUtil.getMessage("tubeInstallDate"), formatDate2(workOrderExportPojo.getTubeInstallDate()));
             workOrderMap.put(WebUtil.getMessage("totalExposureCount"), workOrderExportPojo.getTotalExposureCount());
             workOrderMap.put(WebUtil.getMessage("totalInspectionCount"), workOrderExportPojo.getTotalInspectionCount());
 
