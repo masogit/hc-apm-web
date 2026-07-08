@@ -132,6 +132,8 @@ public class OrgInfoService {
                     String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
                     String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
                     String ucmid = ExcelDocument.getCellStringValue(rowMap.get("UCMID"));
+                    String buildingNum = ExcelDocument.getCellStringValue(rowMap.get("楼号"));
+                    String floorNum = ExcelDocument.getCellStringValue(rowMap.get("层数"));
 
                     if (getLastRow(institutionName, hospitalName, siteName, departName, uuid)) break;
 
@@ -142,6 +144,8 @@ public class OrgInfoService {
                     result.put("departName", departName);
                     result.put("uuid", uuid);
                     result.put("ucmid", ucmid);
+                    result.put("buildingNum", buildingNum);
+                    result.put("floorNum", floorNum);
                     result.put("excelIndex", String.valueOf(dataRow));
 
                     checkRowData(institutionName, hospitalName, siteName, departName);
@@ -193,6 +197,10 @@ public class OrgInfoService {
                             }
                             found.setShortName(name);
                             found.setName(name);
+                            if(found.getOrgType() == 4 ){
+                                found.setBuildingNum(buildingNum);
+                                found.setFloorNum(floorNum);
+                            }
 
                             if (!StringUtils.isEmpty(ucmid)) {
                                 OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
@@ -280,6 +288,8 @@ public class OrgInfoService {
 
                                     if (depart == null) {
                                         depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, childDepartName, clinicalParent, clinicalOrgLevel);
+                                        depart.setBuildingNum(buildingNum);
+                                        depart.setFloorNum(floorNum);
                                         orgDao.save(depart);
                                         configCacheService.cleanOrgInfoCacheByUid(depart.getUid());
                                         message = "导入成功";
@@ -293,6 +303,8 @@ public class OrgInfoService {
 
                                 if (depart == null) {
                                     depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
+                                    depart.setBuildingNum(buildingNum);
+                                    depart.setFloorNum(floorNum);
                                     orgDao.save(depart);
                                     configCacheService.cleanOrgInfoCacheByUid(depart.getUid());
                                     message = "导入成功";
