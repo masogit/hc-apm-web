@@ -19,7 +19,7 @@
     <h:outputScript>
         window.addEventListener('message', function(event) {
             const data = event.data;
-            console.log(data.payload.uid);
+            console.log(data.payload.eventId);
             console.log(data);
             if(data.type === 'eventClick'){
                 // 调用 remoteCommand，把 uid 传给后端
