@@ -75,7 +75,16 @@ public class CustomConfigService {
                 .orElse(configList.stream().filter(item -> org.getHospitalUID().equals(item.getSiteUID())).findAny()
                         .orElse(configList.stream().filter(item -> org.getInstitutionUID().equals(item.getSiteUID())).findAny()
                                 .orElse(configList.stream().filter(item -> org.getTenantUID().equals(item.getSiteUID())).findAny().orElse(null))));
-        return config == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(config.getConfig(), CustomConfigObject.class);
+        CustomConfigObject result = config == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(config.getConfig(), CustomConfigObject.class);
+        // 强制清空只读字段的 editRoles，防止 DB 中残留旧数据
+        if (result.getAssetFields() != null) {
+            for (String readOnlyField : CustomConfigConstant.getReadOnlyFields()) {
+                if (result.getAssetFields().containsKey(readOnlyField)) {
+                    result.getAssetFields().get(readOnlyField).setEditRoles(Collections.emptyList());
+                }
+            }
+        }
+        return result;
 
     }
 
