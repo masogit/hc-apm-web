@@ -37,7 +37,7 @@ public class CustomConfigConstant {
 
     //只读字段
     static public List<String> getReadOnlyFields() {
-        return Arrays.asList("createdDate");
+        return Arrays.asList("createdDate","estimatedRiskLevel");
     }
 
     static public List<String> getSystemFields() {
