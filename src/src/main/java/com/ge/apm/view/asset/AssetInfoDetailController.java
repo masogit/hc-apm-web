@@ -596,18 +596,18 @@ public class AssetInfoDetailController {
                     + uid
                     + "&queryIndex=12" ;
             encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
-            url = contextPath + "/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
+            url = contextPath + "/portal/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
         }else if("maintenance".equals(type)){
             String encodeUrlQueryString = "actionName=View&orderId="
                     + uid
                     + "&query=100&queryTab=" + getQueryTabValue(assetId);
             encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
-            url = contextPath + "/pm/pmOrderListAll.xhtml?str=" + encodeUrlQueryString;
+            url = contextPath + "/portal/pm/pmOrderListAll.xhtml?str=" + encodeUrlQueryString;
         }else if("measuring".equals(type)){
             url = "actionName=View&selectedid="
                     + selected.getUid()
                     +"&matchType=1"+"&boUuid="+uid;
-            url = "measuringResultList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+            url = "/portal/measuring/measuringResultList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         }
         log.info("timeline_url:"+url);
         RequestContext.getCurrentInstance().addCallbackParam("url", url);
