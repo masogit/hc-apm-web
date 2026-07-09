@@ -203,13 +203,13 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo>, Asset
     @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
     public List<AssetInfo> getByUids(Set<String> setUids);
 
-    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation,qrCode) from AssetInfo u where u.uid in ?1 ")
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation,qrCode,siteUID,hospitalUID,institutionUID,tenantUID) from AssetInfo u where u.uid in ?1 ")
     public List<AssetInfo> getSimpleDataByUids(Set<String> setUids);
 
-    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation,qrCode) from AssetInfo u where u.id in ?1 ")
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation,qrCode,siteUID,hospitalUID,institutionUID,tenantUID) from AssetInfo u where u.id in ?1 ")
     public List<AssetInfo> getSimpleDataByIds(Set<Integer> ids);
 
-    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation,qrCode) from AssetInfo u where u.uid = ?1 ")
+    @Query(value= "select new com.ge.apm.domain.AssetInfo(id, name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation,qrCode,siteUID,hospitalUID,institutionUID,tenantUID) from AssetInfo u where u.uid = ?1 ")
     public AssetInfo getSimpleDataByUids(String uid);
 
     @Query(value= "select exists(select 1 from asset_info where tenant_uid = ?1)",nativeQuery = true)
