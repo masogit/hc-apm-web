@@ -103,6 +103,7 @@ public class AssetInfoDetailController {
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private SpecialAssetInfoService specialAssetInfoService;
     private V2_WorkOrderRepository workOrderRepository;
+    private V2_PmOrderRepository pmOrderRepository;
 
 
     private SpecialAssetInfo specialAssetInfo;
@@ -110,6 +111,7 @@ public class AssetInfoDetailController {
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         workOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
+        pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         aeMapper = WebUtil.getBean(AeMapper.class);
         mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         mvsUtil = WebUtil.getBean(MvsUtil.class);
@@ -574,7 +576,15 @@ public class AssetInfoDetailController {
         return level != null ? level.getName() : "";
     }
 
-
+    public String checkMvsData(String uid) {
+        boolean isYiMaiYangGuangTenant = userContextService.isYiMaiYangGuangTenant();
+        boolean selectedIdMatches = selected.getUid().equals(uid);
+        if (!isYiMaiYangGuangTenant || selectedIdMatches) {
+            return "0";
+        } else {
+            return "1";
+        }
+    }
     public void buildDataLinkUrl() {
         String uid = FacesContext.getCurrentInstance()
                 .getExternalContext()
@@ -590,15 +600,15 @@ public class AssetInfoDetailController {
 
         String url = "";
         String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-        log.info(getQueryTabValue(selected.getId()));
         if("repair".equals(type)){
-            if(getQueryTabValue(selected.getId()).equals("0")){
+            V2_WorkOrder workOrder = workOrderRepository.findById(uid);
+            if(checkMvsData(workOrder.getAssetUid()).equals("0")){
                 String encodeUrlQueryString = "actionName=View&selectedid="
                         + uid
                         + "&queryIndex=12" ;
                 encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
                 url = contextPath + "/portal/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
-            }else if(getQueryTabValue(selected.getId()).equals("1")){
+            }else if(checkMvsData(workOrder.getAssetUid()).equals("1")){
                 String encodeUrlQueryString = "actionName=View&selectedid="
                         + uid + "&assetUid=" + selected.getUid()
                         + "&queryIndex=11"
@@ -606,13 +616,14 @@ public class AssetInfoDetailController {
                 url = contextPath + "/portal/woMgr/mvs/woMvsMgrViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
             }
         }else if("maintenance".equals(type)){
-            if(getQueryTabValue(selected.getId()).equals("0")){
+            V2_PmOrder pmOrder = pmOrderRepository.findById(uid);
+            if(checkMvsData(pmOrder.getAssetUid()).equals("0")){
                 String encodeUrlQueryString = "actionName=View&selectedid="
                         +uid + "&assetUid=" + selected.getUid()
                         + "&queryIndex=10";
                 encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
                 url = contextPath + "/portal/pm/pmOrderViewNew.xhtml?str=" + encodeUrlQueryString;
-            }else if (getQueryTabValue(selected.getId()).equals("1")){
+            }else if (checkMvsData(pmOrder.getAssetUid()).equals("1")){
                 String encodeUrlQueryString = "actionName=View&selectedid="
                         + uid + "&assetUid=" + selected.getUid()
                         + "&queryIndex=10";
