@@ -59,7 +59,8 @@
 												<p:ajax  event="change" process="@this" update="maintainDlgTable" />
 											</p:triStateCheckbox>
 											<p:selectBooleanCheckbox value="#{item2.getDataValue(item3.name).isSkip}" itemLabel="忽略"
-																		 rendered="#{item2.getDataValue(item3.name).isSkip}"
+																		 rendered="#{maintainItemController.isDailyCheckIgnorable(item2.assetInfo) or item2.getDataValue(item3.name).isSkip}"
+																		 disabled="#{item2.getDataValue(item3.name).checkValueWeb ne 0}"
 																		 style="margin-left:5px;">
 												<p:ajax event="change" process="@this" update="maintainDlgTable" listener="#{maintainItemController.onSkipChange(item2.getDataValue(item3.name))}" />
 											</p:selectBooleanCheckbox>
