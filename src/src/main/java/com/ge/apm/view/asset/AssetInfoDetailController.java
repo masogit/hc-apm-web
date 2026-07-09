@@ -590,7 +590,7 @@ public class AssetInfoDetailController {
 
         String url = "";
         String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-
+        log.info(getQueryTabValue(selected.getId()));
         if("repair".equals(type)){
             if(getQueryTabValue(selected.getId()).equals("0")){
                 String encodeUrlQueryString = "actionName=View&selectedid="
