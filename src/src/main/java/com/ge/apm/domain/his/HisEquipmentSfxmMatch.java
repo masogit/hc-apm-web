@@ -3,6 +3,8 @@ package com.ge.apm.domain.his;
 import com.ge.apm.domain.Supplier;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -80,6 +82,7 @@ public class HisEquipmentSfxmMatch implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_group_uid",referencedColumnName = "uuid", insertable = false,updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     private HisAssetGroup hisAssetGroup;
 
 }
