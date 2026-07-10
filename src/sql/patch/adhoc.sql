@@ -140,3 +140,6 @@ INSERT INTO acquisition_specification (id, major_category, first_level_category,
 INSERT INTO acquisition_specification (id, major_category, first_level_category, second_level_category, brief_description, typical_examples) VALUES ('61093e1670864350a06695b3551a3ba4', '器械', '常规手术器械与低值器械', NULL, '单价较低或标准化程度较高的常规器械，通常不需要细分二级', '手术刀剪钳镊、基础器械包、骨科工具、无源器械');
 INSERT INTO acquisition_specification (id, major_category, first_level_category, second_level_category, brief_description, typical_examples) VALUES ('2e2cbd2babb6445f8e6c4592d1c96fdb', '器械', '其他医疗设备器械', NULL, '无法归入以上类别的医疗设备或器械，原则上应控制使用', '其他专用设备、少见设备、临时新增品类');
 INSERT INTO acquisition_specification (id, major_category, first_level_category, second_level_category, brief_description, typical_examples) VALUES ('548d76adb688499f87ff363638a11fa5', '器械', '非医疗设备器械', NULL, '不作为医疗设备器械使用', '其他不能归入医疗设备器械者');
+
+-- YHAAO-28780 特种设备is_special_asset 值刷新
+UPDATE asset_info ai SET is_special_asset = true FROM special_asset_info sai WHERE sai.asset_uid = ai.uid AND ai.is_special_asset = false;
