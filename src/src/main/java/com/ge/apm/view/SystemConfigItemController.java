@@ -533,6 +533,34 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             }
             configItemValueRepository.save(configItemValue);
             this.selected.setConfigItemValue(configItemValue);
+
+            // 当 dailyCheckIgnorable 配置项被关闭时，将该层级下没有独立配置的下级院区的未完成工单 isSkip 置空
+            if ("dailyCheckIgnorable".equals(this.selected.getKey()) && "false".equals(configItemValue.getValue())) {
+                logger.info("SystemConfigItemController 清除未完成工单的isSkip数据-----");
+
+                try {
+                    NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
+                    Integer orgType = selectSite.getOrgType();
+                    String configKey = this.selected.getKey();
+                    if (orgType != null && orgType == 3) {
+                        // 院区级别：只影响该院区（如果它自己没有独立配置则不会被清，但刚保存的就是它自己的配置，所以 NOT EXISTS 不会排除它）
+                        nurseSiteMaintainDataRepository.clearSkipForUnfinishedItemsBySite(selectSite.getSiteUID(), configKey);
+                    } else if (orgType != null && orgType == 2) {
+                        // 医院级别：影响该医院下所有没有独立 dailyCheckIgnorable 配置的院区
+                        nurseSiteMaintainDataRepository.clearSkipForUnfinishedItemsByHospital(selectSite.getHospitalUID(), configKey);
+                    } else if (orgType != null && orgType == 1) {
+                        // 机构级别：影响该机构下所有没有独立配置的院区
+                        nurseSiteMaintainDataRepository.clearSkipForUnfinishedItemsByInstitution(selectSite.getInstitutionUID(), configKey);
+                    } else {
+                        // 租户级别或其他：影响该租户下所有没有独立配置的院区
+                        nurseSiteMaintainDataRepository.clearSkipForUnfinishedItemsByTenant(selectSite.getTenantUID(), configKey);
+                    }
+                } catch (Exception e) {
+                    logger.error("SystemConfigItemController 清除未完成工单的isSkip数据失败", e);
+                }
+                logger.error("SystemConfigItemController 清除未完成工单的isSkip数据结束");
+
+            }
         }
         WebUtil.addErrorMessage("保存成功！");
     }
