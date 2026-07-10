@@ -996,6 +996,10 @@ public class NurseSiteMaintainService {
 				Iterator<NurseSiteMaintainData> itData=listData.iterator();
 				while(itData.hasNext()){
 					NurseSiteMaintainData tempData=itData.next();
+					// 已勾选忽略的检查项不参与全部勾选
+					if(Boolean.TRUE.equals(tempData.getIsSkip())){
+						continue;
+					}
 					if(blnFilter){
 						if(listCheckData.contains(tempData.getCheckItem())){
 							tempData.setCheckValue(true);
@@ -1467,6 +1471,10 @@ public class NurseSiteMaintainService {
 			if(CollectionUtils.isNotEmpty(listCheckData) && CollectionUtils.isNotEmpty(listMaintainDataByParentIds)){
 				Map<String, NurseSiteMaintainConfigCheckItem> collect = listCheckData.stream().collect(Collectors.toMap(NurseSiteMaintainConfigCheckItem::getName, (item) -> item));
 				List<NurseSiteMaintainData> collect1 = listMaintainDataByParentIds.stream().map(item -> {
+						// 已勾选忽略的检查项不参与批量通过
+						if(Boolean.TRUE.equals(item.getIsSkip())){
+							return item;
+						}
 					NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = collect.get(item.getCheckItem());
 					if(nurseSiteMaintainConfigCheckItem != null){
 						Boolean checkValue = nurseSiteMaintainConfigCheckItem.getCheckValue();
