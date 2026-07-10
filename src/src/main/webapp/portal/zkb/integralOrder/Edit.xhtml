@@ -147,11 +147,11 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人姓名*</label>
-                            <p:inputText id="hospitalRepairer" value="#{zkbIntegralOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" disabled="#{!(empty zkbIntegralOrderEditController.selected.hospitalRepairer) or !zkbIntegralOrderEditController.zkbIntegralOrderStatusVo.canEdit}" />
+                            <p:inputText id="hospitalRepairer" value="#{zkbIntegralOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" disabled="#{!(empty zkbIntegralOrderEditController.selected.hospitalRepairer) or !zkbIntegralOrderEditController.zkbIntegralOrderStatusVo.canEditFlag}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人电话*</label>
-                            <p:inputText id="hospitalRepairerPhone" value="#{zkbIntegralOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" disabled="#{!(empty zkbIntegralOrderEditController.selected.hospitalRepairer) or !zkbIntegralOrderEditController.zkbIntegralOrderStatusVo.canEdit}"/>
+                            <p:inputText id="hospitalRepairerPhone" value="#{zkbIntegralOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" disabled="#{!(empty zkbIntegralOrderEditController.selected.hospitalRepairer) or !zkbIntegralOrderEditController.zkbIntegralOrderStatusVo.canEditFlag}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">是否为紧急订单*</label>
