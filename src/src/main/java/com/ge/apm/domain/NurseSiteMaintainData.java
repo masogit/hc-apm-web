@@ -120,6 +120,9 @@ public class NurseSiteMaintainData {
 	}
 	
 	public String getStrValue(){
+		if(Boolean.TRUE.equals(this.isSkip)){
+			return "已忽略";
+		}
 		if(this.checkValue==null){
 			return "未检查";
 		}
