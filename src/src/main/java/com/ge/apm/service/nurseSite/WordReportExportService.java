@@ -177,7 +177,9 @@ public class WordReportExportService {
                         }
 
                         Boolean checkValue = nurseSiteMaintainData.getCheckValue();
-                        if (Boolean.TRUE.equals(checkValue)) {
+                        if (Boolean.TRUE.equals(nurseSiteMaintainData.getIsSkip())) {
+                            itemMap.put(nurseSiteMaintainData.getCheckItem(), "已忽略");
+                        } else if (Boolean.TRUE.equals(checkValue)) {
                             itemMap.put(nurseSiteMaintainData.getCheckItem(), "√"+description);
                         } else if (Boolean.FALSE.equals(checkValue)) {
                             itemMap.put(nurseSiteMaintainData.getCheckItem(), "x"+description);

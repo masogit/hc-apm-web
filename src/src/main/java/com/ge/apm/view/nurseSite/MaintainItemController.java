@@ -332,7 +332,9 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	 * 根据设备的四个UID判断是否启用了 dailyCheckIgnorable 配置项
 	 */
 	public boolean isDailyCheckIgnorable(AssetInfo assetInfo) {
-		if (assetInfo == null) {
+		if (assetInfo == null
+				|| StringUtils.isEmpty(assetInfo.getSiteUID())
+				|| StringUtils.isEmpty(assetInfo.getTenantUID())) {
 			return false;
 		}
 		ConfigItemValueRepository configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
