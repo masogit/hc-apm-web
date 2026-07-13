@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -18,6 +19,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -470,6 +472,45 @@ public class AssetHistoryService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static final String SHEET_IMPORT_NAME = "sheet1";
+
+
+    public Boolean exportData(ExcelDocument doc, List<Map<String, Object>> dataList) {
+
+        Integer keyRow_fileScanReport = 1;
+        Integer dataRow_fileScanReport = 2;
+
+        for (Map<String, Object> item : dataList) {
+            doc.writeRowData(SHEET_IMPORT_NAME, keyRow_fileScanReport, dataRow_fileScanReport++, item);
+        }
+
+        return Boolean.TRUE;
+    }
+
+    public List<Map<String, Object>> createFileScanData(List<JSONObject> fileScanList){
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (JSONObject importFilesVO : fileScanList) {
+            Map<String, Object> resultMap = new HashedMap();
+
+            resultMap.put("资产名称", importFilesVO.get("assetName"));
+            resultMap.put("资产编号", importFilesVO.get("financingNum"));
+            resultMap.put("设备编号（院方）", importFilesVO.get("departNum"));
+            resultMap.put("使用科室", importFilesVO.get("assetDeptName"));
+            resultMap.put("所属科室", importFilesVO.get("clinicalDeptName"));
+            resultMap.put("使用责任人", importFilesVO.get("clinicalOwnerName"));
+            resultMap.put("安装位置", importFilesVO.get("locationName"));
+            resultMap.put("资产状态", importFilesVO.get("deviceStatus"));
+            resultMap.put("当前状态", importFilesVO.get("status"));
+            resultMap.put("是否在用", importFilesVO.get("isValid"));
+
+            resultList.add(resultMap);
+        }
+
+        return resultList;
+
     }
 
 }
