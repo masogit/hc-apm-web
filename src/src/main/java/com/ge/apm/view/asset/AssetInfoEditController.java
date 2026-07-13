@@ -504,6 +504,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         type = (String) UrlEncryptController.getValueFromMap(encodeStr, "type");
 
         if(StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type) ){
+            if(specialAssetInfo==null){
+                specialAssetInfo=  specialAssetInfoService.findByAssetId(selected.getId());
+            }
             selected.setSpecialAsset(true);
             specialAssetInfo.setAssetId(selected.getId());
             specialAssetInfo.setAssetUid(selected.getUid());
