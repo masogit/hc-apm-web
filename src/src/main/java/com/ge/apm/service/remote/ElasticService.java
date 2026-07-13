@@ -1,15 +1,19 @@
 package com.ge.apm.service.remote;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.callback.BusinessErrorLog;
 import com.ge.apm.callback.DataDelVO;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.domain.AssetHistory;
+import com.ge.apm.domain.ImportFilesVO;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.cons.ApmEsIndex;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,4 +146,61 @@ public class ElasticService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         return isOkay(response);
     }
+
+    /**
+     * 使用 searchAfter 游标分页，循环查询直到取完所有符合条件的 ES 数据
+     * @param filters    查询条件列表
+     * @param pageSize   每页大小（默认 1000）
+     * @return           所有符合条件的数据列表
+     */
+    public List<JSONObject> queryAllBySearchAfter(List<SearchFilter> filters, int pageSize, String token) {
+        List<JSONObject> allResults = new ArrayList<>();
+        List<Object> searchAfterCursor = null;
+
+        int c = 0;
+        while (true) {
+            if(c * pageSize > 50000){
+                break;
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("list",filters);
+            map.put("pageSize",pageSize);
+            map.put("sortField","created_date");
+            map.put("sortValue","DESC");
+            map.put("esIndex", ApmEsIndex.ASSET_HISTORY.getValue());
+            map.put("searchAfter", searchAfterCursor);
+
+            HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
+            String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
+            try {
+                ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+                if (isOkay(response)) {
+                    LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+                    LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
+                    String content = JSON.toJSONString(data.get("content"));
+                    List<JSONObject> assetHistories = JSON.parseObject(content, new TypeReference<List<JSONObject>>() {});
+                    allResults.addAll(assetHistories);
+
+                    if(assetHistories.size() < pageSize){
+                        break;
+                    }
+                    // 更新游标，用于下一页查询
+                    String searchAfterStr = JSON.toJSONString(data.get("searchAfter"));
+                    searchAfterCursor = JSON.parseObject(searchAfterStr, new TypeReference<List<Object>>() {});
+                    if (searchAfterCursor == null || searchAfterCursor.isEmpty()) {
+                        break;
+                    }
+                }
+                c++;
+            }catch (Exception ex){
+                ex.printStackTrace();
+                break;
+            }
+        }
+
+        return allResults;
+    }
+
+
+
 }

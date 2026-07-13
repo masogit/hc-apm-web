@@ -220,11 +220,14 @@
 
     <!-- 导出文件 -->
     <f:facet name="{Toolbar}">
-        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+        <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
                          class="btn btn-sm btn-gray"
                          ajax="false">
             <p:dataExporter type="xls" target="datalistView"
                             fileName="#{msg.ModifyRecord}"/>
+        </p:commandButton>-->
+        <p:commandButton ajax="false" actionListener="#{assetHistoryController.exportData()}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" validateClient="true" update=":growl">
+            <p:fileDownload value="#{assetHistoryController.exportFile}" />
         </p:commandButton>
     </f:facet>
 
