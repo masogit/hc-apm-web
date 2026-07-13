@@ -693,7 +693,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                      }
                      if (infoVo.getSharedAssetTypeUid().equals(applySwapType.getSharedAssetTypeId())) {
                          selectedSart = applySwapType;//明细表联动选中
-                         if (applySwapType.getActualQty() < applySwapType.getApplyQty()) {
+                         if (applySwapType.getActualQty() <= applySwapType.getApplyQty()) {
                              String sql = "select a.* from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.borrow_id where a.asset_info_id = '"+infoVo.getUid()+"' and b.state in (3, 6) AND a.return_id is NULL";
                              List<Map<String, Object>> data = jdbcTemplate.queryForList(sql);
                              ArrayList<SharedAssetReqDetail> detail_list = new ArrayList<>();
