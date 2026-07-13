@@ -1367,7 +1367,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         List<OrgInfo> orgInfoList;
         orgInfoList = orgDao.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID());
         filter.setSiteOrg(orgInfoList.get(0));
-        clinicalDeptListAsFilter = uaaService.getOrgDeptList(filter.getSiteOrg().getUid(), loginUser.getUid());
+        clinicalDeptListAsFilter = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+
+        Set<OrgInfo> collect = clinicalDeptListAsFilter.stream().filter(item -> item.getSiteUID().equals(UserContextService.getCurrentUserAccount().getSiteUID()) || item.getHospitalUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())
+                || item.getInstitutionUID().equals(UserContextService.getCurrentUserAccount().getSiteUID()) || item.getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())).collect(Collectors.toSet());
+        clinicalDeptListAsFilter = new ArrayList<>(collect);
+
         TreeNode siteTree = buildTree(orgInfoList);
         expandedByOrgType(siteTree, 2);
         rootNode.getChildren().addAll(siteTree.getChildren());
