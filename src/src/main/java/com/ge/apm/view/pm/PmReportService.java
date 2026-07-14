@@ -642,8 +642,19 @@ public class PmReportService {
 
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
+                            java.util.Set<String> addedEntryNames = new java.util.HashSet<>();
+                            addedEntryNames.add(name);
                             for (V2_BlobObject v2BlobObject : byBoUuid) {
-                                String vname = pmOrder.getAssetName() + "-"+pmOrder.getPmNum()+v2BlobObject.getObjectName();
+                                String vname = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + "-" + v2BlobObject.getObjectName();
+                                // 防止同名条目导致 ZipException: duplicate entry
+                                if (!addedEntryNames.add(vname)) {
+                                    int seq = 1;
+                                    while (addedEntryNames.contains(vname + "(" + seq + ")")) {
+                                        seq++;
+                                    }
+                                    vname = vname + "(" + seq + ")";
+                                    addedEntryNames.add(vname);
+                                }
                                 zout.putNextEntry(new ZipEntry(vname));
                                 byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(v2BlobObject.getObjectStorageId()).getStream());
                                 IOUtils.write(bytess, zout);
@@ -718,8 +729,19 @@ public class PmReportService {
 //                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
 //                                    .collect(Collectors.toList());
 //                        }
+                        java.util.Set<String> addedEntryNames = new java.util.HashSet<>();
                         for (V2_BlobObject v2BlobObject : byBoUuid) {
-                            String vname = v2BlobObject.getObjectName();
+                            String vname = v2PmOrder.getPmNum() + "-" + v2BlobObject.getObjectName();
+                            // 防止同名条目导致 ZipException: duplicate entry
+                            if (!addedEntryNames.add(vname)) {
+                                // 如果名称已存在，追加序号去重
+                                int seq = 1;
+                                while (addedEntryNames.contains(vname + "(" + seq + ")")) {
+                                    seq++;
+                                }
+                                vname = vname + "(" + seq + ")";
+                                addedEntryNames.add(vname);
+                            }
                             zout.putNextEntry(new ZipEntry(vname));
                             byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(v2BlobObject.getObjectStorageId()).getStream());
                             IOUtils.write(bytess, zout);
