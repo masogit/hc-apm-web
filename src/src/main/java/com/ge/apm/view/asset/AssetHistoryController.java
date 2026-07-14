@@ -10,11 +10,15 @@ import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.BatchFileController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -28,9 +32,13 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -148,5 +156,28 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
             return true;
         }
         return false;
+    }
+    private StreamedContent exportFile;
+
+
+    public void exportData() {
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Modify_History_List.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            Boolean exportFlag = assetHistoryService.exportData(doc, assetHistoryService.createFileScanData(elasticService.queryAllBySearchAfter(searchFilters, 10000, UserContextService.getAccessToken())));
+            if (exportFlag) {
+                exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ImportFiles.xlsx");
+            }
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(BatchFileController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
     }
 }

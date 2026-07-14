@@ -66,7 +66,7 @@ ALTER TABLE qr_code_lib ADD COLUMN IF NOT EXISTS asset_dept_id INTEGER;
 
 
 
---购置规格数据
+-- 采购医疗设备分类数据导入（共73条）
 INSERT INTO acquisition_specification (id, major_category, first_level_category, second_level_category, brief_description, typical_examples) VALUES ('04b31e85b22a42f48997ff88a8415c10', '设备', '大型放射影像设备', 'CT≤64排', '中低端X线断层成像设备', '64排及以下CT');
 INSERT INTO acquisition_specification (id, major_category, first_level_category, second_level_category, brief_description, typical_examples) VALUES ('613375c05a544ecbaa2a034a43483bce', '设备', '大型放射影像设备', 'CT128排', '中高价值X线断层成像设备', '128排CT');
 INSERT INTO acquisition_specification (id, major_category, first_level_category, second_level_category, brief_description, typical_examples) VALUES ('b6981ad2639c459a9c0f85a1be953bea', '设备', '大型放射影像设备', 'CT≥256排或高端平台', '高价值X线断层成像设备', '256排及以上CT，能谱CT、双源CT、光子计数CT');
