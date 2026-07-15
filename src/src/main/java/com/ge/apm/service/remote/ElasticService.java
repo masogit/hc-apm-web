@@ -13,6 +13,7 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.cons.ApmEsIndex;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,9 +178,12 @@ public class ElasticService extends MicroServiceInvoker {
                 if (isOkay(response)) {
                     LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
                     LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
-                    String content = JSON.toJSONString(data.get("content"));
+                    String content = JSON.toJSONString(data.get("list"));
                     List<JSONObject> assetHistories = JSON.parseObject(content, new TypeReference<List<JSONObject>>() {});
-                    allResults.addAll(assetHistories);
+                    if(CollectionUtils.isNotEmpty(assetHistories)){
+                        allResults.addAll(assetHistories);
+                    }
+
 
                     if(assetHistories.size() < pageSize){
                         break;
