@@ -73,7 +73,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         List<SearchFilter> filters = buildSearchFilters();
         Page<AssetHistory> page = elasticService.searchAssetHistory(filters, UserContextService.getAccessToken(), 0, 1);
         if (page != null && page.getTotalElements() > 10000) {
-            tips = "当前查询数据仅显示10000行，如需查看更多请下载查看！";
+            tips = "当前数据显示前10000行，如需查看全部数据请下载查看，谢谢。";
         } else {
             tips = null;
         }
@@ -116,7 +116,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
             return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
         }
         if (assetHistoryPage.getTotalElements() > 10000){
-            tips = "当前查询数据仅显示10000行，如需查看更多请下载查看！";
+            tips = "当前数据显示前10000行，如需查看全部数据请下载查看，谢谢。";
             assetHistoryPage = new PageImpl<>(assetHistoryPage.getContent(), pageRequest, 10000);
         } else {
             tips = null;
