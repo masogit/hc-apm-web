@@ -18,23 +18,28 @@
 
                 <h:panelGroup id='searchButtons'>
                     <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray"
+                                     actionListener="#{assetHistoryController.doSearch}"
                                      update=":woTab:AssetInfoListFormView :woTab:searchFormView"
                                      rendered="#{empty assetHistoryController.oneSearchStr}"/>
                     <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                     action="#{assetHistoryController.setOneSearchStr('')}"
+                                     actionListener="#{assetHistoryController.doSearch}"
                                      update=":woTab:AssetInfoListFormView :woTab:searchFormView"
-                                     actionListener="#{assetHistoryController.setOneSearchStr('')}"
                                      rendered="#{not empty assetHistoryController.oneSearchStr}"/>
                 </h:panelGroup>
+                <p:outputLabel id="trainTips" style="color: red;font-weight:bold;margin-left: 12px;font-size: small" value="#{assetHistoryController.tips}"/><br/>
+
             </h:panelGrid>
         </h:form>
         <h:form id="AssetInfoListFormView">
+
             <p:dataTable id="datalistView" value="#{assetHistoryController.lazyModel}"
                          var="item"
                          widgetVar="varDataListView" resizableColumns="false" liveResize="false"
                          resizeMode="expand"
                          scrollable="false" scrollWidth="98%"
                          selection="#{assetHistoryController.selected}"
-                         lazy="true" paginator="true" paginatorPosition="bottom"
+                         lazy="true" paginator="true" paginatorPosition="both"
                          paginatorAlwaysVisible="true"
                          sortBy="#{item.createdDate}"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending"
