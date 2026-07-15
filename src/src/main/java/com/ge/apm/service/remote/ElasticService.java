@@ -171,7 +171,7 @@ public class ElasticService extends MicroServiceInvoker {
             map.put("searchAfter", searchAfterCursor);
 
             HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
-            String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY);
+            String gatewayURL = getGatewayURL(GatewayURL.ELASTICSEARCH_QUERY_AFTER);
             try {
                 ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
                 if (isOkay(response)) {
