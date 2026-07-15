@@ -154,8 +154,8 @@ public class ElasticService extends MicroServiceInvoker {
      * @param pageSize   每页大小（默认 1000）
      * @return           所有符合条件的数据列表
      */
-    public List<JSONObject> queryAllBySearchAfter(List<SearchFilter> filters, int pageSize, String token) {
-        List<JSONObject> allResults = new ArrayList<>();
+    public List<AssetHistory> queryAllBySearchAfter(List<SearchFilter> filters, int pageSize, String token) {
+        List<AssetHistory> allResults = new ArrayList<>();
         List<Object> searchAfterCursor = null;
 
         int c = 0;
@@ -179,11 +179,10 @@ public class ElasticService extends MicroServiceInvoker {
                     LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
                     LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
                     String content = JSON.toJSONString(data.get("list"));
-                    List<JSONObject> assetHistories = JSON.parseObject(content, new TypeReference<List<JSONObject>>() {});
+                    List<AssetHistory> assetHistories = JSON.parseObject(content, new TypeReference<List<AssetHistory>>() {});
                     if(CollectionUtils.isNotEmpty(assetHistories)){
                         allResults.addAll(assetHistories);
                     }
-
 
                     if(assetHistories.size() < pageSize){
                         break;
@@ -201,7 +200,7 @@ public class ElasticService extends MicroServiceInvoker {
                 break;
             }
         }
-
+        logger.info("queryAllBySearchAfter size: " + allResults.size());
         return allResults;
     }
 

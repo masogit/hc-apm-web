@@ -15,6 +15,7 @@ import com.ge.apm.view.sysutil.BatchFileController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -202,7 +203,13 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Modify_History_List.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = assetHistoryService.exportData(doc, assetHistoryService.createFileScanData(elasticService.queryAllBySearchAfter(searchFilters, 10000, UserContextService.getAccessToken())));
+            List<AssetHistory> results = elasticService.queryAllBySearchAfter(searchFilters, 10000, UserContextService.getAccessToken());
+            if(CollectionUtils.isNotEmpty(results)){
+                return;
+            }
+            List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(results);
+
+            Boolean exportFlag = assetHistoryService.exportData(doc, assetHistoryService.createFileScanData(dataLists));
             if (exportFlag) {
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ImportFiles.xlsx");
             }
