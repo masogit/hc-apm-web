@@ -157,9 +157,9 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
             filters.add(new SearchFilter("site_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
-      /*  List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
+       List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
         filters.add(new SearchFilter("has_columns", SearchFilter.Operator.CONTAINS, assetsImportantFields));
-*/
+
         if (!StringUtils.isEmpty(oneSearchStr)) {
             filters.add(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr));
         }
