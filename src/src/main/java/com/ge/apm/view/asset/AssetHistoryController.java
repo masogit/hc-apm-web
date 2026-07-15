@@ -157,9 +157,9 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
             filters.add(new SearchFilter("site_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
-        List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
+      /*  List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
         filters.add(new SearchFilter("has_columns", SearchFilter.Operator.CONTAINS, assetsImportantFields));
-
+*/
         if (!StringUtils.isEmpty(oneSearchStr)) {
             filters.add(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr));
         }
@@ -204,7 +204,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/info/APM_Asset_Modify_History_List.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             List<AssetHistory> results = elasticService.queryAllBySearchAfter(searchFilters, 10000, UserContextService.getAccessToken());
-            if(CollectionUtils.isNotEmpty(results)){
+            if(CollectionUtils.isEmpty(results)){
                 return;
             }
             List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(results);
