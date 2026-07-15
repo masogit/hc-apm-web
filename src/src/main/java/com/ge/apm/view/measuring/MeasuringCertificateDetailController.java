@@ -443,6 +443,7 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
         this.selected.setQrCode(assetInfo.getQrCode());
         this.selected.setDepartNum(assetInfo.getDepartNum());
         this.selected.setAssetName(assetInfo.getName());
+        this.selected.setFinanceNo(assetInfo.getFinancingNum());
         String assetManufacturer = this.selected.getAssetManufacturer();
         if(Objects.isNull(assetManufacturer)){
             this.selected.setAssetManufacturer(assetInfo.getManufacture());
