@@ -305,7 +305,7 @@
 
                    </c:when>
                    <!-- 质控数据概览 -->
-                   <c:when test="#{item eq 'QUALITY_CONTROL'}">
+                   <c:when test="#{item eq 'QUALITY_CONTROL_CALENDAR'}">
                        <p:submenu id="qualityDataView" label="#{msg.DeviceQualityControl}" icon="fa fa-tachometer fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_') }">
                            <!-- 质控日历 -->
                            <p:menuitem fragment="qualityControlCalendar" id="qualityControlCalendar" value="#{msg.qualityControlCalendar}" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_CONTROL_CALENDAR_VIEW')}" outcome="/portal/iframe/qualityControlCalendar.xhtml"/>
