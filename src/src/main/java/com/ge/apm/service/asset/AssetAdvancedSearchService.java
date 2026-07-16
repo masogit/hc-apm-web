@@ -102,6 +102,7 @@ public class AssetAdvancedSearchService {
         registerField("assetValueCategory", "资产价值类别", "enum");
         registerField("depreciationMethod", "折旧方法", "enum");
         registerField("functionGrade", "功能等级", "enum");
+        registerField("usageStatus", "设备状态", "enum");
 
         registerField("purchasePrice", "采购价格", "number");
         registerField("salvageValue", "最终残值(元)", "number");
@@ -133,7 +134,7 @@ public class AssetAdvancedSearchService {
         registerField("mvsContractStartDate", "MVS合同起始日", "date");
         registerField("mvsContractEndDate", "MVS合同截止日", "date");
 
-        registerField("isPm", "是否是保养", "boolean");
+        registerField("isPm", "是否PM", "boolean");
         registerField("isFixed", "是否固定资产", "boolean");
         registerField("isChecked", "是否盘点", "boolean");
         registerField("isUseRegistration", "是否使用登记", "boolean");
