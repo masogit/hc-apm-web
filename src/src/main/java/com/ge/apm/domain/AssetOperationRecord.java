@@ -81,6 +81,11 @@ public class AssetOperationRecord implements Serializable {
 	@Column(name = "serial_num")
 	private String serialNum;
 
+	//二维码
+	@Size(max = 64)
+	@Column(name = "qr_code")
+	private String assetInfoqrCode;
+
 	//从开机到关机之中所有的检查项作为一次记录，如果有关机操作，则关机之前的所有记录改为  false,默认为true
 	@Column(name = "is_end_closed_time")
 	private boolean isEndByClosedTime;

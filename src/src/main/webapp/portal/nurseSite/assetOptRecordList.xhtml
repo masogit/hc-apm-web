@@ -13,7 +13,7 @@
 								 selection="#{assetOptRecordController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
 								 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 								 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_OPERATE_RECORD_EDIT')}">
+								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" >
 
 						<p:ajax event="filter" listener="#{assetOptRecordController.onFilter}" />
 
@@ -22,6 +22,9 @@
 						</p:column>
 						<p:column headerText="设备编号" filterBy="#{item.assetInfodepartNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfodepartNum}" />
+						</p:column>
+						<p:column headerText="二维码" filterBy="#{item.assetInfoqrCode}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfoqrCode}" />
 						</p:column>
 						<p:column headerText="设备型号" filterBy="#{item.assetInfofunctionType}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfofunctionType}" />

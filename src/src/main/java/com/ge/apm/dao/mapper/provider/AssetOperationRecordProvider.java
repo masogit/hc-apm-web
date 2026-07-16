@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class AssetOperationRecordProvider {
 	private static final String ROW_NUM_STR = " row_number() over ( PARTITION BY a.asset_info_uid ORDER BY a.create_date DESC ) AS rownum,";
-	private static final String SELECT_STR = " a.id as id,a.asset_info_uid as assetInfoUid,a.asset_info_name as assetInfoName,a.asset_info_function_type as assetInfoFunctionType,a.asset_info_depart_num as assetInfoDepartNum,a.serial_num as serialNum,a.asset_info_clinical_dept_name as assetInfoClinicalDeptName,a.hospital_number as hospitalNumber,a.operation_name as operationName,a.operation_by_name as operationByName,a.create_date as createDate,a.description";
+	private static final String SELECT_STR = " a.id as id,a.asset_info_uid as assetInfoUid,a.asset_info_name as assetInfoName,a.asset_info_function_type as assetInfoFunctionType,a.asset_info_depart_num as assetInfoDepartNum,a.serial_num as serialNum,a.asset_info_clinical_dept_name as assetInfoClinicalDeptName,a.hospital_number as hospitalNumber,a.operation_name as operationName,a.operation_by_name as operationByName,a.create_date as createDate,a.description,b.qr_code as assetInfoqrCode";
 	private static final String TABLE_STR = " from ((asset_operation_record a join asset_info b on a.asset_info_uid= b.uid and b.is_deleted='f'";
 
 	private static final String TABLE_END = " ) ) where 1=1";
