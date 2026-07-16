@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.SurgeryAnesthesiaEquipmentInfoMapper">
+
+    <!-- 公共 CTE + FROM + WHERE 片段 -->
+    <sql id="commonQuery">
+        WITH surgery_stats AS (
+            SELECT
+                asset_uid,
+                COALESCE(SUM(usage_count)::INTEGER, 0) AS total_usage_count,
+                ROUND(COALESCE(SUM(usage_duration), 0) / 1440.0, 2) AS total_occupation_days,
+                COUNT(DISTINCT CASE
+                    WHEN COALESCE(NULLIF(operating_room_code, ''), NULLIF(operating_room_name, '')) IS NOT NULL
+                    THEN COALESCE(NULLIF(operating_room_code, ''), operating_room_name)
+                END) AS operating_room_coverage_count
+            FROM surgery_anesthesia_data_result
+            WHERE tenant_uid = #{tenantUid}
+            AND surgery_date BETWEEN #{startDate}::date AND #{endDate}::date
+            AND (COALESCE(usage_count, 0) > 0 OR COALESCE(usage_duration, 0) > 0)
+            <if test="siteUid != null and siteUid != ''">
+                AND site_uid = #{siteUid}
+            </if>
+            GROUP BY asset_uid
+        )
+        SELECT
+            e.uid,
+            e.asset_uid AS "assetUid",
+            COALESCE(e.asset_name, ai.name) AS "assetName",
+            e.display_name AS "displayName",
+            COALESCE(e.function_type, ai.function_type) AS "functionType",
+            COALESCE(e.depart_num, ai.depart_num) AS "departNum",
+            COALESCE(e.serial_num, ai.serial_num) AS "serialNum",
+            COALESCE(e.qr_code, ai.qr_code) AS "qrCode",
+            ai.make_short_name AS "makerShortName",
+            ai.clinical_dept_name AS "clinicalDeptName",
+            ai.asset_group AS "assetGroup",
+            e.positive_rate AS "positiveRate",
+            COALESCE(s.total_usage_count, 0) AS "totalUsageCount",
+            COALESCE(s.total_occupation_days, 0) AS "totalOccupationDays",
+            COALESCE(s.operating_room_coverage_count, 0) AS "operatingRoomCoverageCount"
+        FROM surgery_anesthesia_equipment_info e
+        LEFT JOIN asset_info ai ON e.asset_uid = ai.uid
+        LEFT JOIN surgery_stats s ON e.asset_uid = s.asset_uid
+        WHERE e.tenant_uid = #{tenantUid}
+        <if test="siteUid != null and siteUid != ''">
+            AND e.site_uid = #{siteUid}
+        </if>
+        <if test="assetName != null and assetName != ''">
+            AND COALESCE(e.asset_name, ai.name) LIKE concat('%', #{assetName}, '%')
+        </if>
+        <if test="displayName != null and displayName != ''">
+            AND e.display_name LIKE concat('%', #{displayName}, '%')
+        </if>
+        <if test="functionType != null and functionType != ''">
+            AND COALESCE(e.function_type, ai.function_type) LIKE concat('%', #{functionType}, '%')
+        </if>
+        <if test="departNum != null and departNum != ''">
+            AND COALESCE(e.depart_num, ai.depart_num) LIKE concat('%', #{departNum}, '%')
+        </if>
+        <if test="serialNum != null and serialNum != ''">
+            AND COALESCE(e.serial_num, ai.serial_num) LIKE concat('%', #{serialNum}, '%')
+        </if>
+        <if test="qrCode != null and qrCode != ''">
+            AND COALESCE(e.qr_code, ai.qr_code) LIKE concat('%', #{qrCode}, '%')
+        </if>
+        <if test="makerShortName != null and makerShortName != ''">
+            AND ai.make_short_name LIKE concat('%', #{makerShortName}, '%')
+        </if>
+        <if test="clinicalDeptName != null and clinicalDeptName != ''">
+            AND ai.clinical_dept_name LIKE concat('%', #{clinicalDeptName}, '%')
+        </if>
+        <if test="positiveRateGTE != null">
+            AND e.positive_rate &gt;= #{positiveRateGTE}
+        </if>
+        <if test="positiveRateLTE != null">
+            AND e.positive_rate <![CDATA[<=]]> #{positiveRateLTE}
+        </if>
+    </sql>
+
+    <select id="selectList" resultType="com.ge.apm.domain.surgeryAnesthesia.SurgeryAnesthesiaEquipmentInfo">
+        <include refid="commonQuery"/>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test="orderBy == null or orderBy == ''">
+            ORDER BY e.uid DESC
+        </if>
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="selectListCount" resultType="long">
+        SELECT COUNT(*) FROM (
+            <include refid="commonQuery"/>
+        ) t
+    </select>
+
+    <update id="updateBatch">
+        UPDATE surgery_anesthesia_equipment_info
+        <set>
+            <if test="displayName != null">
+                display_name = #{displayName},
+            </if>
+            <if test="positiveRate != null">
+                positive_rate = #{positiveRate},
+            </if>
+        </set>
+        WHERE uid IN
+        <foreach item="item" index="index" collection="uids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+</mapper>

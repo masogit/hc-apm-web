@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+
+<div class="ui-g-12 card">
+
+    <h:form id="importForm">
+
+        <p:fieldset   legend="导入手麻系统设备数据" id="crossSiteUploaderContainer">
+
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+
+            <h:panelGroup>
+            <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{surgeryAnesthesiaAssetMatchController.uploadDataFile}" value="#{surgeryAnesthesiaAssetMatchController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                           multiple="false" sizeLimit="10000000" update="HisTab:importForm HisTab:errorDataListForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
+
+            <p:fieldset  legend="设备导入" id="uploaderContainer">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <div style="white-space:pre">说明   1. <p:commandLink value="下载模板文件" ajax="false" actionListener="#{surgeryAnesthesiaAssetMatchController.downloadTemplate}"/>        2. 文件中填写手麻系统设备数据      3. 上传文件导入</div>
+                        <p:dataTable id="templateFields" value="#{surgeryAnesthesiaAssetMatchController.templateFieldList}" var="field"
+                                     style="margin-top: 10px; width: 600px;">
+                            <p:column headerText="列名">
+                                <h:outputText value="#{field.name}"/>
+                            </p:column>
+                            <p:column headerText="说明">
+                                <h:outputText value="#{field.description}"/>
+                            </p:column>
+                            <p:column headerText="必填">
+                                <h:outputText value="#{field.required ? '是' : '否'}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+            </h:panelGroup>
+            </p:panelGrid>
+
+        </p:fieldset>
+
+
+
+    </h:form>
+
+
+
+
+</div>
+<div>
+
+    <div class="ui-g-12 card">
+        <h:form id="errorDataListForm">
+            <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+            <p:fieldset  legend="#{msg.ImportFailureData}">
+                <p:dataTable id="errorDatalist" rendered="#{not empty surgeryAnesthesiaAssetMatchController.errorList}" value="#{surgeryAnesthesiaAssetMatchController.errorList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column headerText="#{msg.EXCELRowNumber}">
+                        <h:outputText value="#{item.get('connect').lineNum}" />
+                    </p:column>
+                    <p:column headerText="设备识别码">
+                        <h:outputText value="#{item.get('connect').deviceCode}" />
+                    </p:column>
+                    <p:column headerText="设备名称">
+                        <h:outputText value="#{item.get('connect').deviceName}" />
+                    </p:column>
+                    <p:column headerText="医院机构代码">
+                        <h:outputText value="#{item.get('connect').orgCode}" />
+                    </p:column>
+                    <p:column headerText="#{msg.FailureInformation}" >
+                        <h:outputText value="#{item.get('errmsg')}"/>
+                    </p:column>
+
+                </p:dataTable>
+            </p:fieldset>
+        </h:form>
+    </div>
+
+</div>
+
+</html>

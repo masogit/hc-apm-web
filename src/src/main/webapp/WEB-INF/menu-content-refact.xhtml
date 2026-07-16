@@ -162,6 +162,14 @@
 
                        </p:submenu>
                    </c:when>
+                   <c:when test="#{item eq 'SURGERY_ANESTHESIA'}">
+                       <!-- 手术室绩效管理 -->
+                       <p:submenu id="surgery000_01" label="手术室绩效管理" icon="fa fa-heartbeat fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('SURGERY_ANESTHESIA_')}">
+                           <p:menuitem fragment="surgery001" id="surgery001" value="设备匹配" outcome="/portal/surgeryAnesthesia/hisMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SURGERY_ANESTHESIA_DEVICE_MATCHING')}"/>
+                           <p:menuitem fragment="surgery002" id="surgery002" value="绩效明细源数据" outcome="/portal/surgeryAnesthesia/dataSource.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SURGERY_ANESTHESIA_DATA_SOURCE')}"/>
+                           <p:menuitem fragment="surgery003" id="surgery003" value="设备绩效分析" outcome="/portal/surgeryAnesthesia/EfficiencyEquipment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SURGERY_ANESTHESIA_EFFICIENCY_EQUIPMENT')}"/>
+                       </p:submenu>
+                   </c:when>
                    <c:when test="#{item eq 'REPAIR'}">
                        <!-- 维修流程 -->
                        <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_')}">

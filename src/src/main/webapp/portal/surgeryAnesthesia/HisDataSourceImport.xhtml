@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+
+<div class="ui-g-12 card">
+
+
+
+    <div class="ui-g-12 card">
+        <h:form id="importRecord">
+                <p:dataTable id="importRecordList"  value="#{surgeryAnesthesiaDataSourceController.excelImportRecords}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column headerText="文件名">
+                        <h:outputText value="#{item.fileName}" />
+                    </p:column>
+                    <p:column headerText="时间">
+                        <h:outputText value="#{item.createdDate}" />
+                    </p:column>
+                    <p:column headerText="导入人">
+                        <h:outputText value="#{item.importName}" />
+                    </p:column>
+                </p:dataTable>
+        </h:form>
+    </div>
+
+
+
+
+    <h:form id="importForm">
+
+        <p:fieldset   legend="导入手术麻醉源数据" id="crossSiteUploaderContainer">
+
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+<!--                <span style="color: red; font-weight: bold;font-size: 16px ">请注意：因系统限制，导入表格中的手术日期必须大于系统当前最新手术日期【#{surgeryAnesthesiaDataSourceController.tenantMaxSurgeryDate()}】;若有多台设备手术数据需要导入，请使用同一文件一次上传，谢谢。</span>-->
+            <h:panelGroup>
+
+            <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{surgeryAnesthesiaDataSourceController.uploadDataFile}" value="#{surgeryAnesthesiaDataSourceController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                           multiple="false" sizeLimit="10000000" update="SurgeryDataSourceTab:importForm SurgeryDataSourceTab:errorDataListForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
+
+            <p:fieldset  legend="手术麻醉源数据导入" id="uploaderContainer">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="下载模板文件" ajax="false" actionListener="#{surgeryAnesthesiaDataSourceController.downloadTemplate()}" styleClass="p-mr-2"/>        2. 文件中填写要导入的手术麻醉源数据      3. #{msg.UpFileImport}</div>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+            </h:panelGroup>
+            </p:panelGrid>
+
+        </p:fieldset>
+
+
+
+    </h:form>
+
+
+
+
+</div>
+<div>
+
+    <div class="ui-g-12 card">
+        <h:form id="errorDataListForm">
+            <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+            <p:fieldset  legend="#{msg.ImportFailureData}">
+                <p:dataTable id="errorDatalist" rendered="#{not empty surgeryAnesthesiaDataSourceController.errorList}" value="#{surgeryAnesthesiaDataSourceController.errorList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column headerText="#{msg.EXCELRowNumber}">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').lineNum}" />
+                    </p:column>
+                    <p:column headerText="#{msg.HospitalCode}">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').orgCode}" />
+                    </p:column>
+                    <p:column headerText="设备代码">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').deviceCode}" />
+                    </p:column>
+                    <p:column headerText="手术日期">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').surgeryDate}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="计划开始时间">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').scheduledStartTime}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" pattern="yyyy-MM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="手术开始时间">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').surgeryStartTime}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" pattern="yyyy-MM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="手术结束时间">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').surgeryEndTime}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" pattern="yyyy-MM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="离开手术室时间">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').exitFromOrTime}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" pattern="yyyy-MM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="手术室名称">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').operatingRoomName}" />
+                    </p:column>
+                    <p:column headerText="手术室代码">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').operatingRoomCode}" />
+                    </p:column>
+                    <p:column headerText="住院号">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').inpNo}" />
+                    </p:column>
+                    <p:column headerText="系统来源">
+                        <h:outputText value="#{item.get('surgeryAnesthesiaDataSource').sourceCode}" />
+                    </p:column>
+                    <p:column headerText="#{msg.FailureInformation}">
+                        <h:outputText value="#{item.get('errmsg')}"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="errorDatalist" fileName="surgeryDataSourceImportError"  />
+                        </p:commandButton>
+                    </f:facet>
+
+                </p:dataTable>
+            </p:fieldset>
+        </h:form>
+    </div>
+
+</div>
+
+
+
+
+</html>

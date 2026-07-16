@@ -28,7 +28,7 @@ public class HisAdjustBusinessJob implements Serializable {
     @Column(name = "org_code")
     private String orgCode;
     /**
-     * 任务类型(1 取消收费代码匹配 2 取消联机匹配 3 设备标签修改设备)  0分组成本 匹配修改
+     * 任务类型(1 取消收费代码匹配 2 取消联机匹配 3 设备标签修改设备)  0分组成本 匹配修改  4取消手麻系统设备匹配
      */
     @Column(name = "task_type")
     private Integer taskType;
