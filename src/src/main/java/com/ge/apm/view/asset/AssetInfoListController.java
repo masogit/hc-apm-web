@@ -12,10 +12,14 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.ge.apm.domain.SavedAdvancedSearch;
+import com.ge.apm.dao.SavedAdvancedSearchRepository;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.SearchCondition;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -88,6 +92,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
     private ContractInfoMapper contractInfoMapper;
+    private AssetAdvancedSearchService advancedSearchService;
+    private List<SearchCondition> advancedConditions = new ArrayList<>();
+    private boolean advancedSearchActive = false;
+    private SavedAdvancedSearchRepository savedAdvancedSearchRepository;
+    private List<SavedAdvancedSearch> savedSearches = new ArrayList<>();
+    private String newSavedSearchName = "";
 
     private QRPreViewerBean qrPreViewerBean;
     private ConfigItemService configItemService;
@@ -151,8 +161,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     @Getter
     private int queryType = 1;
     public void setQueryType(int queryType) {
+        // Preserve advanced search filters before clearing
+        List<SearchFilter> advFilters = searchFilters != null
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                : new ArrayList<>();
         this.searchFilters.clear();
+        searchFilters.addAll(advFilters);
         this.queryType = queryType;
+        this.advancedSearchActive = false;
     }
     private List<String> relRuleAssetUids = new ArrayList<>();
 
@@ -255,6 +271,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
         qrPreViewerBean = WebUtil.getBean(QRPreViewerBean.class);
         configItemService = WebUtil.getBean(ConfigItemService.class);
+        advancedSearchService = WebUtil.getBean(AssetAdvancedSearchService.class);
+        savedAdvancedSearchRepository = WebUtil.getBean(SavedAdvancedSearchRepository.class);
         user = UserContextService.getCurrentUserAccount();
         showMasterEquipment = configItemService.getConfigItemByKey("showMasterEquipment", user);
         assetTypeGroupList = user.getAssetTypeGroupList();
@@ -323,7 +341,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setUserSearchFilters();
         Integer newLifecyle = null;
         for(SearchFilter searchFilter : searchFilters) {
-            if("lifecycle".equals(searchFilter.fieldName)) {
+            if("lifecycle".equals(searchFilter.fieldName) && searchFilter.value != null) {
                 newLifecyle = Integer.parseInt(searchFilter.value.toString()) * 12;
             }
         }
@@ -335,15 +353,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         lastPageSort = pageRequest.getSort(); //export excel use
         if (this.hasFilterOnField("assetUsedLifecycle")) {
-            int assetUsedLifecycle = Integer.parseInt(searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("assetUsedLifecycle", SearchFilter.Operator.EQ, 0)).value.toString());
-            DateTime parse = DateUtil.parse(String.valueOf(org.joda.time.LocalDate.now().plusYears(-assetUsedLifecycle)));
-            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.IsNotNull, null));
-            searchFilters.add(new SearchFilter("lifecycle", SearchFilter.Operator.IsNotNull, null));
-            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, new Date(parse.getTime())));
+            SearchFilter lifecycleFilter = searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName) && sf.value != null).findFirst().orElse(null);
+            if (lifecycleFilter != null) {
+                int assetUsedLifecycle = Integer.parseInt(lifecycleFilter.value.toString());
+                DateTime parse = DateUtil.parse(String.valueOf(org.joda.time.LocalDate.now().plusYears(-assetUsedLifecycle)));
+                searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.IsNotNull, null));
+                searchFilters.add(new SearchFilter("lifecycle", SearchFilter.Operator.IsNotNull, null));
+                searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, new Date(parse.getTime())));
+            }
             this.removeFilterOnField("assetUsedLifecycle");
         }
         searchFilters.removeAll(searchFilters.stream().filter(filter -> (filter.fieldName.equals("warrantyDate") || filter.fieldName.equals("factoryWarrantyDate")) && filter.conditionPath.startsWith("1*6")).collect(Collectors.toList()));
-        if (ObjectUtil.isNotEmpty(warrantyStatus)) {
+        if (ObjectUtil.isNotEmpty(warrantyStatus) && warrantyAlertDays != null) {
             Date now = DateUtil.beginOfDay(DateUtil.now()).toDate();
             Date date = DateUtil.offsetDay(now, warrantyAlertDays).toDate();
             if (warrantyStatus.contains("1")) {
@@ -460,6 +481,20 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+
+        // When advanced search is active, skip all regular filters - only apply adv conditions
+        if (advancedSearchActive) {
+            // Ensure tenantUID filter is always present for data isolation
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
+            // Always filter out deleted assets
+            this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+            // Apply advanced search conditions
+            if (advancedSearchService != null && advancedConditions != null && !advancedConditions.isEmpty()) {
+                advancedSearchService.applyConditions(searchFilters, advancedConditions);
+            }
+            return;
+        }
+
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
         boolean assetStatus = "-1".equals(filterAssetStatus);
         if(assetStatus){
@@ -599,10 +634,21 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "spare05".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
+
+        // Apply advanced search conditions
+        if (advancedSearchService != null && advancedConditions != null && !advancedConditions.isEmpty()) {
+            advancedSearchService.applyConditions(searchFilters, advancedConditions);
+        }
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        // Preserve advanced search filters before clearing
+        List<SearchFilter> advFilters = searchFilters != null
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                : new ArrayList<>();
         this.searchFilters.clear();
+        searchFilters.addAll(advFilters);
+        this.advancedSearchActive = false;
         loadClinicalDeptList();
         loadSiteList();
         filterClinicalDeptOrg = null;
@@ -619,7 +665,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
 
     public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
+        // Preserve advanced search filters before clearing
+        List<SearchFilter> advFilters = searchFilters != null
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                : new ArrayList<>();
         this.searchFilters.clear();
+        searchFilters.addAll(advFilters);
+        this.advancedSearchActive = false;
         loadClinicalDeptList();
         loadSiteList();
         filterClinicalDeptOrg = null;
@@ -702,8 +754,207 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    // ==================== Advanced Search ====================
+
+    public List<SearchCondition> getAdvancedConditions() {
+        return advancedConditions;
+    }
+
+    public List<AssetAdvancedSearchService.FieldOption> getAdvancedSearchFieldOptions() {
+        return advancedSearchService.getFieldOptions();
+    }
+
+    public List<AssetAdvancedSearchService.OperatorOption> getOperatorsForField(String fieldName) {
+        return advancedSearchService.getOperatorsForField(fieldName);
+    }
+
+    public String getFieldType(String fieldName) {
+        return advancedSearchService.getFieldType(fieldName);
+    }
+
+    public List<AssetAdvancedSearchService.EnumOption> getEnumOptionsForField(String fieldName) {
+        return advancedSearchService.getEnumOptions(fieldName);
+    }
+
+    public void addAdvancedCondition() {
+        if (advancedConditions == null) {
+            advancedConditions = new ArrayList<>();
+        }
+        advancedConditions.add(new SearchCondition());
+    }
+
+    public void onFieldChange(SearchCondition condition) {
+        if (condition == null) return;
+        // Reset operator to first valid operator for the new field type
+        List<AssetAdvancedSearchService.OperatorOption> ops = advancedSearchService.getOperatorsForField(condition.getFieldName());
+        if (ops != null && !ops.isEmpty()) {
+            condition.setOperator(ops.get(0).getValue());
+        }
+        // Clear all value fields
+        condition.setValue("");
+        condition.setValue2("");
+        condition.setDateValue(null);
+        condition.setDateValue2(null);
+    }
+
+    public void onOperatorChange(SearchCondition condition) {
+        if (condition == null) return;
+        // Clear all value fields when operator changes
+        condition.setValue("");
+        condition.setValue2("");
+        condition.setDateValue(null);
+        condition.setDateValue2(null);
+    }
+
+    public void removeAdvancedCondition(int index) {
+        if (advancedConditions != null && index >= 0 && index < advancedConditions.size()) {
+            advancedConditions.remove(index);
+        }
+    }
+
+    public void clearAdvancedConditions() {
+        if (advancedConditions != null) {
+            advancedConditions.clear();
+        }
+        // Also clear adv filters from searchFilters
+        if (searchFilters != null && advancedSearchService != null) {
+            advancedSearchService.clearAdvancedFilters(searchFilters);
+        }
+        advancedSearchActive = false;
+    }
+
+    public void applyAdvancedSearch() {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        // Clear all non-advanced filters to isolate advanced search
+        searchFilters.removeIf(f -> f.conditionPath == null || !f.conditionPath.startsWith("adv"));
+        advancedSearchActive = true;
+        advancedSearchService.applyConditions(searchFilters, advancedConditions);
+    }
+
+    // ==================== Saved Advanced Searches ====================
+
+    public void loadSavedSearches() {
+        if (user != null && savedAdvancedSearchRepository != null) {
+            savedSearches = savedAdvancedSearchRepository.findByUserUid(user.getUid());
+        }
+    }
+
+    public void saveCurrentSearch() {
+        if (advancedConditions == null || advancedConditions.isEmpty()) {
+            WebUtil.addErrorMessage("当前没有查询条件可以保存");
+            return;
+        }
+        if (newSavedSearchName == null || newSavedSearchName.trim().isEmpty()) {
+            WebUtil.addErrorMessage("请输入收藏名称");
+            return;
+        }
+        if (user == null || savedAdvancedSearchRepository == null) {
+            WebUtil.addErrorMessage("无法获取用户信息");
+            return;
+        }
+        long count = savedAdvancedSearchRepository.countByUserUid(user.getUid());
+        if (count >= 5) {
+            WebUtil.addWarnMessage("收藏数量已达上限(5个)，请先删除部分收藏后再添加");
+            loadSavedSearches();
+            RequestContext.getCurrentInstance().execute("PF('savedSearchListDialog').show()");
+            return;
+        }
+        doSaveSearch();
+    }
+
+    private void doSaveSearch() {
+        try {
+            SavedAdvancedSearch saved = new SavedAdvancedSearch();
+            saved.setUserUid(user.getUid());
+            saved.setName(newSavedSearchName.trim());
+            saved.setConditionsJson(buildConditionsJson());
+            saved.setCreatedDate(new Date());
+            savedAdvancedSearchRepository.save(saved);
+            newSavedSearchName = "";
+            loadSavedSearches();
+            WebUtil.addSuccessMessage("收藏成功");
+        } catch (Exception e) {
+            logger.error("保存高级查询条件失败", e);
+            WebUtil.addErrorMessage("保存失败: " + e.getMessage());
+        }
+    }
+
+    private String buildConditionsJson() {
+        JSONArray arr = new JSONArray();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        for (SearchCondition c : advancedConditions) {
+            if (c.getFieldName() == null || c.getFieldName().trim().isEmpty()) continue;
+            JSONObject obj = new JSONObject();
+            obj.put("fieldName", c.getFieldName());
+            obj.put("operator", c.getOperator());
+            obj.put("value", c.getValue() != null ? c.getValue() : "");
+            obj.put("value2", c.getValue2() != null ? c.getValue2() : "");
+            obj.put("dateValue", c.getDateValue() != null ? sdf.format(c.getDateValue()) : "");
+            obj.put("dateValue2", c.getDateValue2() != null ? sdf.format(c.getDateValue2()) : "");
+            arr.add(obj);
+        }
+        return arr.toJSONString();
+    }
+
+    public void loadSavedSearch(SavedAdvancedSearch saved) {
+        if (saved == null || saved.getConditionsJson() == null) return;
+        try {
+            JSONArray arr = JSON.parseArray(saved.getConditionsJson());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            advancedConditions = new ArrayList<>();
+            for (int i = 0; i < arr.size(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                SearchCondition c = new SearchCondition();
+                c.setFieldName(obj.getString("fieldName"));
+                c.setOperator(obj.getString("operator"));
+                c.setValue(obj.getString("value"));
+                c.setValue2(obj.getString("value2"));
+                String dv = obj.getString("dateValue");
+                String dv2 = obj.getString("dateValue2");
+                if (dv != null && !dv.isEmpty()) {
+                    try { c.setDateValue(sdf.parse(dv)); } catch (Exception ignored) {}
+                }
+                if (dv2 != null && !dv2.isEmpty()) {
+                    try { c.setDateValue2(sdf.parse(dv2)); } catch (Exception ignored) {}
+                }
+                advancedConditions.add(c);
+            }
+            WebUtil.addSuccessMessage("已加载收藏: " + saved.getName());
+        } catch (Exception e) {
+            logger.error("加载收藏查询条件失败", e);
+            WebUtil.addErrorMessage("加载失败");
+        }
+    }
+
+    public void deleteSavedSearch(SavedAdvancedSearch saved) {
+        if (saved == null || saved.getUid() == null) return;
+        try {
+            savedAdvancedSearchRepository.delete(saved.getUid());
+            loadSavedSearches();
+            WebUtil.addSuccessMessage("已删除收藏: " + saved.getName());
+        } catch (Exception e) {
+            logger.error("删除收藏查询条件失败", e);
+            WebUtil.addErrorMessage("删除失败");
+        }
+    }
+
+    public List<SavedAdvancedSearch> getSavedSearches() {
+        return savedSearches;
+    }
+
+    public String getNewSavedSearchName() {
+        return newSavedSearchName;
+    }
+
+    public void setNewSavedSearchName(String newSavedSearchName) {
+        this.newSavedSearchName = newSavedSearchName;
+    }
+
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
+        this.advancedSearchActive = false;
         if (StringUtils.isEmpty(oneSearchStr)) {
             this.removeFilterOnField("name");
             this.removeFilterOnField("namePyCode");
@@ -1063,7 +1314,17 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     public void onFilter(FilterEvent event) {
+        // When column filter is used, disable advanced search isolation mode
+        this.advancedSearchActive = false;
+        // Preserve advanced search filters before super.onFilter clears all
+        List<SearchFilter> advFilters = searchFilters != null
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                : new ArrayList<>();
         super.onFilter(event);
+        // Re-add advanced search filters after super clears them
+        if (searchFilters != null) {
+            searchFilters.addAll(advFilters);
+        }
         this.selectedMap.clear();
     }
 

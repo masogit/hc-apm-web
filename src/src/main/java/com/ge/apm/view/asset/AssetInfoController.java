@@ -20,6 +20,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
 import javaslang.Tuple2;
+import com.ge.apm.service.asset.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fop.apps.FOUserAgent;
@@ -177,7 +178,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private SharedAssetTypeRepository swapDao;
 
     private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
-
+    private AssetAdvancedSearchService advancedSearchService;
     List<String> orgUids;
     List<String> swapUids;
 
@@ -289,6 +290,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
+        advancedSearchService = WebUtil.getBean(AssetAdvancedSearchService.class);
         autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
@@ -374,6 +376,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
+    }
+
+
+
+    public String getFieldType(String fieldName) {
+        return advancedSearchService.getFieldType(fieldName);
     }
 
     private void setUserSearchFilters() {
