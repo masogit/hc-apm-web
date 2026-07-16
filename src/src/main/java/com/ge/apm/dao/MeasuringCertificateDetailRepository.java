@@ -28,4 +28,6 @@ public interface MeasuringCertificateDetailRepository extends GenericRepositoryU
 
 
     public List<MeasuringCertificateDetail> findByCertificateNoAndTenantUIDOrderByCheckDateDesc(String assetUID, String tenantUID);
+
+    public List<MeasuringCertificateDetail> findBySiteUIDAndAssetUIDIsNullOrderByCheckDateDesc(String siteUID);
 }

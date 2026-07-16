@@ -181,6 +181,9 @@ public class MeasuringCertificateDetail implements Serializable {
     @Transient
     private String uploadUserName;
 
+    @Transient
+    private String importStatus;
+
     public String getId() {
         return id;
     }
@@ -507,6 +510,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setUploadUserName(String uploadUserName) {
         this.uploadUserName = uploadUserName;
+    }
+
+    public String getImportStatus() {
+        return importStatus;
+    }
+
+    public void setImportStatus(String importStatus) {
+        this.importStatus = importStatus;
     }
 
     public String getStatusName() {

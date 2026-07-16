@@ -22,7 +22,7 @@
                         <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade" style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true">
                             <p:scrollPanel style="height:300px; border: 0" mode="native">
                                 <p:inputText id="searchDeptName" value="#{measureAssetListController.assetSearchForm.deptName}"  />
-                                <p:commandButton partialSubmit="true" icon="ui-icon-search" update="orgTree" actionListener="#{measureAssetListController.treeSearchCondition()}" value="检索"/>
+                                <p:commandButton process="searchDeptName @this" partialSubmit="true" icon="ui-icon-search" update="orgTree" actionListener="#{measureAssetListController.treeSearchCondition()}" value="检索"/>
                                 <p:tree id="orgTree" value="#{measureAssetListController.orgTreeSearch}" var="node" selectionMode="single" class="tree" style="width:98%; border:0">
                                     <p:ajax process="@this" event="select" update="@parent:dept"  listener="#{measureAssetListController.onSearchTreeNode}" oncomplete="PF('varOrg').hide();"/>
                                     <p:ajax process="@this" event="expand"/>

@@ -404,6 +404,52 @@ public class MeasuringService {
 
     }
 
+    /**
+     * 批量刷新匹配未关联台账的计量记录（按SN号/资产编号/二维码依次匹配）
+     * @return int[]{matchedCount, failedCount}
+     */
+    public int[] refreshMatchUnpairedRecords() {
+        UserAccount currentUser = UserContextService.getCurrentUserAccount();
+        List<MeasuringCertificateDetail> unpairedList = measuringCertificateDetailDao
+                .findBySiteUIDAndAssetUIDIsNullOrderByCheckDateDesc(currentUser.getSiteUID());
+
+        int matched = 0;
+        int failed = 0;
+
+        for (MeasuringCertificateDetail detail : unpairedList) {
+            List<AssetInfo> matchedAssets = null;
+
+            // 1. 按设备序列号SN匹配
+            if (ObjectUtil.isNotEmpty(detail.getAssetSN())) {
+                matchedAssets = this.getAssetInfoBySerialNum(detail.getAssetSN(), detail.getSiteUID());
+            }
+            // 2. SN未匹配到，按资产编号匹配
+            if ((matchedAssets == null || matchedAssets.size() != 1) && ObjectUtil.isNotEmpty(detail.getFinanceNo())) {
+                matchedAssets = this.getAssetInfoByFinancingNum(detail.getFinanceNo(), detail.getSiteUID());
+            }
+            // 3. 资产编号未匹配到，按二维码匹配
+            if ((matchedAssets == null || matchedAssets.size() != 1) && ObjectUtil.isNotEmpty(detail.getQrCode())) {
+                matchedAssets = this.getAssetInfoByQrCode(detail.getQrCode(), detail.getSiteUID());
+            }
+
+            // 恰好匹配到1个资产设备，建立关联
+            if (matchedAssets != null && matchedAssets.size() == 1) {
+                AssetInfo asset = matchedAssets.get(0);
+                detail.setAssetUID(asset.getUid());
+                detail.setAssetSN(asset.getSerialNum());
+                detail.setQrCode(asset.getQrCode());
+                detail.setDepartNum(asset.getDepartNum());
+                detail.setFinanceNo(asset.getFinancingNum());
+                measuringCertificateDetailDao.save(detail);
+                updateMeasuringDate(asset);
+                matched++;
+            } else {
+                failed++;
+            }
+        }
+        return new int[]{matched, failed};
+    }
+
 
     private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String siteUID){
         List<AssetInfo> tempAssetInfoList = null;
@@ -879,6 +925,258 @@ public class MeasuringService {
 
         return destFile;
     }
+    public static final String IMPORT_STATUS_NEW = "New";
+    public static final String IMPORT_STATUS_CHECK_PASS = "CheckPass";
+    public static final String IMPORT_STATUS_CHECK_FAIL = "CheckFail";
+    public static final String IMPORT_STATUS_SUCCESS = "Success";
+    public static final String IMPORT_STATUS_FAILURE = "Failure";
+
+    /**
+     * 仅解析和校验Excel数据，不保存数据库。返回所有行（含校验状态）。
+     */
+    public List<MeasuringCertificateDetail> validateExcel(UploadedFile file, OrgInfo selectedOrg) throws IOException, ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        sdf.setLenient(false);
+        List<MeasuringCertificateDetail> resultList = new ArrayList<>();
+
+        Workbook workbook = WorkbookFactory.create(file.getInputstream());
+        Sheet sheet = workbook.getSheetAt(0);
+        if (sheet == null) {
+            return resultList;
+        }
+        Map<String, Integer> header = findHeader(sheet);
+        if (header.isEmpty()) {
+            return resultList;
+        }
+        for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
+            StringBuilder errorInfo = new StringBuilder();
+            Row row = sheet.getRow(j);
+            if (row == null) {
+                continue;
+            }
+            // 跳过全空行
+            boolean allBlank = true;
+            for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+                Cell cell = row.getCell(c);
+                if (cell != null && cell.getCellTypeEnum() != CellType.BLANK) {
+                    String val = cell.getCellTypeEnum() == CellType.STRING ? cell.getStringCellValue() : null;
+                    if (val != null && !val.trim().isEmpty()) {
+                        allBlank = false;
+                        break;
+                    }
+                }
+            }
+            if (allBlank) continue;
+
+            MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
+            detail.setTenantUID(selectedOrg.getTenantUID());
+            detail.setInstitutionUID(selectedOrg.getInstitutionUID());
+            detail.setHospitalUID(selectedOrg.getHospitalUID());
+            detail.setSiteUID(selectedOrg.getSiteUID());
+            detail.setCertificateType(1);
+
+            if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
+                detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("MODEL_CELL")) != null) {
+                detail.setAssetModel(CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("APPLIANCE_NAME_CELL")) != null){
+                detail.setAssetName(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NAME_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NAME_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
+                detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("CERTIFICATION_NO_CELL")) != null) {
+                String tempCertificateNo = CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue();
+                if(tempCertificateNo == null || tempCertificateNo.trim().equals("")){
+                    tempCertificateNo = null;
+                }
+                detail.setCertificateNo(tempCertificateNo);
+            }
+            if(row.getCell(header.get("VERIFICATION_DATE_CELL")) != null) {
+                try {
+                    detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
+                }catch (Exception ex){
+                    errorInfo.append("[检定日期格式不对]");
+                }
+                detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null ) {
+                boolean hasValue = false;
+                try {
+                    CellType cellType = row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum();
+                    Cell expireDateCell = row.getCell(header.get("EXPIRE_DATE_CELL"));
+                    if (CellType.NUMERIC.equals(cellType) && org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(expireDateCell)) {
+                        hasValue = true;
+                    } else if (CellType.STRING.equals(cellType)) {
+                        String strVal = expireDateCell.getStringCellValue();
+                        if (!StringUtils.isEmpty(strVal)) {
+                            hasValue = true;
+                        }
+                    }
+                    if(hasValue){
+                        detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                    }
+                }catch (Exception ex){
+                    errorInfo.append("[有效期至格式不对]");
+                }
+                if(hasValue){
+                    detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
+                }
+            }
+            if(row.getCell(header.get("VERIFICATION_UNIT_CELL")) != null){
+                detail.setCheckCompany(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("VERIFIER_CELL")) != null){
+                detail.setCheckPerson(CellType.NUMERIC.equals(row.getCell(header.get("VERIFIER_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFIER_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("REMARK_CELL")) != null){
+                detail.setComments(CellType.NUMERIC.equals(row.getCell(header.get("REMARK_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("REMARK_CELL")).getNumericCellValue()) : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("CLINICAL_DEPT_CELL")) != null){
+                detail.setDepartment(CellType.NUMERIC.equals(row.getCell(header.get("CLINICAL_DEPT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CLINICAL_DEPT_CELL")).getNumericCellValue()) : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
+                String assetSn = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue();
+                detail.setAssetSN(org.apache.commons.lang3.StringUtils.trimToNull(assetSn));
+            }
+            if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
+                String financeNo = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue();
+                detail.setFinanceNo(org.apache.commons.lang3.StringUtils.trimToNull(financeNo));
+            }
+            if(row.getCell(header.get("ITEM_CELL")) != null){
+                detail.setCheckItem(CellType.NUMERIC.equals(row.getCell(header.get("ITEM_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ITEM_CELL")).getNumericCellValue()) : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("CATEGORY_CELL")) != null){
+                detail.setType(CellType.NUMERIC.equals(row.getCell(header.get("CATEGORY_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CATEGORY_CELL")).getNumericCellValue()) : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("FILE_NO_CELL")) != null) {
+                detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
+            }
+            if(row.getCell(header.get("QR_CODE_CELL")) != null) {
+                String qrCode = CellType.NUMERIC.equals(row.getCell(header.get("QR_CODE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("QR_CODE_CELL")).getNumericCellValue()) : row.getCell(header.get("QR_CODE_CELL")).getStringCellValue();
+                detail.setQrCode(org.apache.commons.lang3.StringUtils.trimToNull(qrCode));
+            }
+            detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
+            int status = 3;
+            if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
+                switch (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue()) {
+                    case "A级合格":
+                    case "合格":
+                    case "校准合格":
+                        status = 1;
+                        break;
+                    case "不合格":
+                        status = 2;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            detail.setStatus(status);
+            detail.setExcelIdex(j + 1);
+
+            if(detail.getCheckDate() != null && detail.getCheckDate().after(sdf.parse("99999/12/31"))){
+                errorInfo.append("[检定日期不能超过99999/12/31]");
+            }
+            if(detail.getValidDateTo() != null && detail.getValidDateTo().after(sdf.parse("99999/12/31"))){
+                errorInfo.append("[有效期至不能超过99999/12/31]");
+            }
+            if (ObjectUtil.isEmpty(row.getCell(header.get("VERIFICATION_DATE_CELL")))) {
+                errorInfo.append("[检定日期不能为空]");
+            }
+            if (ObjectUtil.isAllEmpty(row.getCell(header.get("ASSET_SN_CELL")), row.getCell(header.get("ASSET_NO_CELL")), row.getCell(header.get("QR_CODE_CELL")))) {
+                errorInfo.append("[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]");
+            }
+
+            // 证书编号校验
+            if (detail.getCertificateNo() == null) {
+                errorInfo.append("[计量证书编号不能为空]");
+            } else {
+                // 检查证书编号是否已绑定其他设备
+                List<MeasuringCertificateDetail> mcdList = measuringCertificateDetailDao.findByCertificateNoAndTenantUIDOrderByCheckDateDesc(detail.getCertificateNo(), detail.getTenantUID());
+                if (mcdList != null && !mcdList.isEmpty() && mcdList.get(0).getAssetUID() != null) {
+                    MeasuringCertificateDetail existMcd = mcdList.get(0);
+                    boolean snMismatch = ObjectUtil.isNotEmpty(detail.getAssetSN()) && !detail.getAssetSN().equals(existMcd.getAssetSN());
+                    boolean financeNoMismatch = ObjectUtil.isNotEmpty(detail.getFinanceNo()) && !detail.getFinanceNo().equals(existMcd.getFinanceNo());
+                    boolean qrCodeMismatch = ObjectUtil.isNotEmpty(detail.getQrCode()) && !detail.getQrCode().equals(existMcd.getQrCode());
+                    if (snMismatch && financeNoMismatch && qrCodeMismatch) {
+                        errorInfo.append("[计量证书编号已绑定其他设备]");
+                    }
+                }
+                // 尝试匹配资产设备
+                if (errorInfo.length() == 0) {
+                    List<AssetInfo> matchedAssets = null;
+                    if (ObjectUtil.isNotEmpty(detail.getAssetSN())) {
+                        matchedAssets = this.getAssetInfoBySerialNum(detail.getAssetSN(), detail.getSiteUID());
+                        if (matchedAssets != null && matchedAssets.size() > 1) {
+                            errorInfo.append("[设备序列号SN匹配到(").append(matchedAssets.size()).append(")个资产设备]");
+                        }
+                    }
+                    if (ObjectUtil.isNotEmpty(detail.getFinanceNo()) && (matchedAssets == null || matchedAssets.size() != 1)) {
+                        matchedAssets = this.getAssetInfoByFinancingNum(detail.getFinanceNo(), detail.getSiteUID());
+                        if (matchedAssets != null && matchedAssets.size() > 1) {
+                            errorInfo.append("[资产编号匹配到(").append(matchedAssets.size()).append(")个资产设备]");
+                        }
+                    }
+                    if (ObjectUtil.isNotEmpty(detail.getQrCode()) && (matchedAssets == null || matchedAssets.size() != 1)) {
+                        matchedAssets = this.getAssetInfoByQrCode(detail.getQrCode(), detail.getSiteUID());
+                        if (matchedAssets != null && matchedAssets.size() > 1) {
+                            errorInfo.append("[二维码匹配到(").append(matchedAssets.size()).append(")个资产设备]");
+                        }
+                    }
+                }
+            }
+
+            if (errorInfo.length() > 0) {
+                detail.setErrorInfo(errorInfo.toString());
+                detail.setImportStatus(IMPORT_STATUS_CHECK_FAIL);
+            } else {
+                detail.setImportStatus(IMPORT_STATUS_CHECK_PASS);
+            }
+            resultList.add(detail);
+        }
+        return resultList;
+    }
+
+    /**
+     * 将校验通过的数据实际保存到数据库。返回导入失败的行。
+     */
+    public List<MeasuringCertificateDetail> importValidatedData(List<MeasuringCertificateDetail> validatedList) {
+        List<MeasuringCertificateDetail> failedList = new ArrayList<>();
+        boolean isShaoYiFu = isShaoYiFu();
+        for (MeasuringCertificateDetail detail : validatedList) {
+            if (!IMPORT_STATUS_CHECK_PASS.equals(detail.getImportStatus())) {
+                // 校验未通过的行直接保留为失败
+                detail.setImportStatus(IMPORT_STATUS_FAILURE);
+                failedList.add(detail);
+                continue;
+            }
+            try {
+                MeasuringCertificateDetail result;
+                if (isShaoYiFu) {
+                    result = operateMeasuringAndAssetInfo_For_ShaoYiFu(detail);
+                } else {
+                    result = operateMeasuringAndAssetInfo(detail);
+                }
+                if (result != null) {
+                    // operateMeasuringAndAssetInfo 返回非null表示导入失败
+                    result.setImportStatus(IMPORT_STATUS_FAILURE);
+                    failedList.add(result);
+                } else {
+                    detail.setImportStatus(IMPORT_STATUS_SUCCESS);
+                }
+            } catch (Exception e) {
+                LOGGER.error("import measuring row {} error: {}", detail.getExcelIdex(), e.getMessage(), e);
+                detail.setErrorInfo("[导入异常: " + e.getMessage() + "]");
+                detail.setImportStatus(IMPORT_STATUS_FAILURE);
+                failedList.add(detail);
+            }
+        }
+        return failedList;
+    }
+
     public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, OrgInfo selectedOrg) throws IOException, ParseException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
