@@ -743,6 +743,42 @@ protected boolean numberField(String fieldName, String filterVal) {
         this.endDate = endDate;
     }
 
+    /**
+     * 快捷筛选：本周（周一到今天）
+     */
+    public void setThisWeek() {
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.with(java.time.DayOfWeek.MONDAY);
+        this.startDate = Date.from(monday.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 快捷筛选：本半年（当前半年第一天到今天）
+     * 上半年: 1月1日 ~ 6月30日，下半年: 7月1日 ~ 12月31日
+     */
+    public void setThisHalfYear() {
+        LocalDate today = LocalDate.now();
+        int month = today.getMonthValue();
+        LocalDate halfYearStart;
+        if (month <= 6) {
+            halfYearStart = LocalDate.of(today.getYear(), 1, 1);
+        } else {
+            halfYearStart = LocalDate.of(today.getYear(), 7, 1);
+        }
+        this.startDate = Date.from(halfYearStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 快捷筛选：本年（1月1日到今天）
+     */
+    public void setThisYear() {
+        LocalDate today = LocalDate.now();
+        LocalDate yearStart = LocalDate.of(today.getYear(), 1, 1);
+        this.startDate = Date.from(yearStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
 
     public StreamedContent getExcelFile() {
         return excelFile;
