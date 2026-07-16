@@ -16,7 +16,6 @@
             FROM surgery_anesthesia_data_result
             WHERE tenant_uid = #{tenantUid}
             AND surgery_date BETWEEN #{startDate}::date AND #{endDate}::date
-            AND (COALESCE(usage_count, 0) > 0 OR COALESCE(usage_duration, 0) > 0)
             <if test="siteUid != null and siteUid != ''">
                 AND site_uid = #{siteUid}
             </if>
