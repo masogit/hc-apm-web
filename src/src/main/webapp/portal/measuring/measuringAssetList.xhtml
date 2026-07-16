@@ -22,6 +22,10 @@
                     <p:commandButton value="匹配台账检定结果"     process="@this" update="measuringTab "  disabled="#{measureAssetListController.matchType==1}"  actionListener="#{measureAssetListController.initMatchResult(1)}" />
                     <p:commandButton value="匹配台账校准结果"     process="@this" update="measuringTab"  disabled="#{measureAssetListController.matchType==2}"  actionListener="#{measureAssetListController.initMatchResult(2)}" />
                     <p:commandButton value="未匹配台账结果"   process="@this" update="measuringTab"  disabled="#{measureAssetListController.matchType==3}"  actionListener="#{measureAssetListController.initMatchResult(3)}" />
+                    <p:commandButton value="刷新匹配" process="@this" update="measuringTab:measuringAssetListForm :growl"
+                                     rendered="#{measureAssetListController.matchType==3}"
+                                     actionListener="#{measureAssetListController.refreshMatchBySN}"
+                                     onstart="PF('refreshMatchDlg').show()" oncomplete="PF('refreshMatchDlg').hide()"/>
                 </h:panelGrid>
 
                 <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;" rendered="#{userContextService.hasCurrentTenantName('')}">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
@@ -363,5 +367,9 @@
                 }
             </script>
         </div>
+        <p:dialog widgetVar="refreshMatchDlg" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+            <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
+            <span style="margin-left:10px;">正在根据SN号匹配台账，请稍候...</span>
+        </p:dialog>
     </ui:composition>
 </html>

@@ -757,10 +757,6 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
 
     public void searchAsset(){
-        if(StrUtil.isEmpty(assetSearchForm.getApplicationDeptId())){
-            WebUtil.addErrorMessage("清输入申请科室！");
-            return;
-        }
         assetInfoList =queryAssetByCondition(assetSearchForm);
     }
 
@@ -783,8 +779,15 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
+        filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
         if (StrUtil.isNotEmpty(assetSearchForm.getApplicationDeptId())) {
             filters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, assetSearchForm.getApplicationDeptId()));
+        }else{
+            List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+            filters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
         if (StrUtil.isNotEmpty(assetSearchForm.getAssetName())) {
             filters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetName()));
@@ -814,7 +817,7 @@ public void treeSearchCondition(){
     }else{
         treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4, assetSearchForm.getDeptName());
     }
-    orgTree = initOrgTree(treeNodeEdit);
+    orgTreeSearch = initOrgTree(treeNodeEdit);
 }
     public TreeNode initOrgTree(TreeNode treeNode) {
         OrgInfo rootOrg = new OrgInfo();
@@ -860,6 +863,27 @@ public void treeSearchCondition(){
         assetSearchForm = new BudgetAssetSearchForm();
         assetInfoList=new ArrayList<>();
 
+    }
+
+    /**
+     * 刷新匹配 - 根据SN号/资产编号/二维码自动匹配未关联台账的计量记录
+     */
+    public void refreshMatchBySN() {
+        try {
+            int[] result = measuringService.refreshMatchUnpairedRecords();
+            int matched = result[0];
+            int failed = result[1];
+            if (matched > 0) {
+                WebUtil.addSuccessMessage("匹配完成：成功匹配 " + matched + " 条" + (failed > 0 ? "，剩余 " + failed + " 条未匹配到" : ""));
+            } else {
+                WebUtil.addWarnMessage("匹配完成：没有匹配到任何台账记录");
+            }
+            // 刷新列表
+            initMatchResult(matchType);
+        } catch (Exception e) {
+            logger.error("刷新匹配异常", e);
+            WebUtil.addErrorMessage("刷新匹配失败：" + e.getMessage());
+        }
     }
 
 

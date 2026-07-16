@@ -7,39 +7,69 @@
       xmlns:apm="http://www.ge.com/tags/apm">
 
     <div class="ui-g">
+        <!-- 上传区域 -->
         <div class="ui-g-12 card">
-            <h:form enctype="multipart/form-data" rendered="#{measureFromExcelController.customRoleAuth.authSearch}">
-                <p:fieldset  legend="批量导入计量数据" id="uploaderContainer">
+            <h:form id="importForm" enctype="multipart/form-data" rendered="#{measureFromExcelController.customRoleAuth.authSearch}">
+                <p:fieldset legend="批量导入计量数据" id="uploaderContainer">
                     <h:panelGroup>
                         <apm:filterSiteOrgByOrgTree/>
                     </h:panelGroup>
-                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                        <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
-                                      dragDropSupport="false" multiple="false" auto="true"
-                                      invalidFileMessage="只支持xls或xlsx格式的文件"
-                                      invalidSizeMessage="文件大小不得超过5M"
-                                      update=":measuringTab:dataListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
-                                      label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
-                        <p:growl id="messages" showDetail="true"/>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">选择文件</label>
+                            <h:outputText value="#{measureFromExcelController.file.fileName}"
+                                          rendered="#{not empty measureFromExcelController.file}"
+                                          style="margin-left:10px;font-weight:bold;"/>
+                            <p:fileUpload id="fileUpload"
+                                          fileUploadListener="#{measureFromExcelController.handleFileUpload}"
+                                          value="#{measureFromExcelController.file}"
+                                          mode="advanced"
+                                          dragDropSupport="false" multiple="false" auto="true"
+                                          invalidFileMessage="只支持xls或xlsx格式的文件"
+                                          invalidSizeMessage="文件大小不得超过5M"
+                                          update="uploaderContainer measuringTab:resultImportWrapper measuringTab:growl"
+                                          sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                          label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"
+                                          rendered="#{empty measureFromExcelController.file}"
+                                          process="@this"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup>
                         <p>说明</p>
                         <p>1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('MEASURING_RESULT')}" styleClass="p-mr-2"/> </p>
                         <p>2. 文件中填入要导入的计量数据</p>
-                        <p>3. 上传文件进行导入</p>
+                        <p>3. 上传文件后系统将自动校验数据，校验全部通过后方可点击"确认导入"</p>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>
+            <p:growl id="growl" showDetail="true"/>
         </div>
 
-        <div class="ui-g-12 card">
-            <h:form id="dataListForm">
-                <p:fieldset  legend="导入失败数据">
-                    <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+        <!-- 校验结果区域 -->
+        <h:panelGroup layout="block" id="resultImportWrapper">
+            <h:form id="dataListForm" rendered="#{measureFromExcelController.hasData}">
+                <div class="ui-g-12 card">
+                <p:fieldset legend="系统校验结果">
+                    <p:messages id="messages" showDetail="false" closable="false" autoUpdate="true"/>
+
+                    <h:panelGroup style="display:block;margin-bottom:10px;">
+                        <p:selectOneRadio id="status" value="#{measureFromExcelController.displayErrorsOnly}">
+                            <p:ajax event="change" process="@this" update="@form"
+                                    listener="#{measureFromExcelController.switchDisplayMode}"/>
+                            <f:selectItem itemValue="false" itemLabel="全部记录"/>
+                            <f:selectItem itemValue="true" itemLabel="仅错误记录"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+
+                    <p:dataTable id="datalist"
+                                 value="#{measureFromExcelController.displayList}"
+                                 var="item" lazy="false" paginator="true" paginatorPosition="both"
+                                 paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
+                                 emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:column headerText="EXCEL行数">
+                        <p:column headerText="EXCEL行数" width="70">
                             <h:outputText value="#{item.excelIdex}" />
                         </p:column>
                         <p:column headerText="证书编号">
@@ -54,16 +84,23 @@
                         <p:column headerText="器具编号">
                             <h:outputText value="#{item.assetNo}" />
                         </p:column>
+                        <p:column headerText="器具名称">
+                            <h:outputText value="#{item.assetName}" />
+                        </p:column>
+                        <p:column headerText="制造厂">
+                            <h:outputText value="#{item.assetManufacturer}" />
+                        </p:column>
+                        <p:column headerText="型号">
+                            <h:outputText value="#{item.assetModel}" />
+                        </p:column>
                         <p:column headerText="检定结论">
                             <h:outputText value="#{item.statusDisplay}" />
                         </p:column>
                         <p:column headerText="检定日期">
-                            <h:outputText value="#{item.checkDateDisplay}">
-                            </h:outputText>
+                            <h:outputText value="#{item.checkDateDisplay}" />
                         </p:column>
                         <p:column headerText="有效期至">
-                            <h:outputText value="#{item.validDateToDisplay}">
-                            </h:outputText>
+                            <h:outputText value="#{item.validDateToDisplay}" />
                         </p:column>
                         <p:column headerText="检测单位">
                             <h:outputText value="#{item.checkCompany}" />
@@ -83,17 +120,56 @@
                         <p:column headerText="存档记录">
                             <h:outputText value="#{item.fileNo}" />
                         </p:column>
-                        <p:column headerText="导入失败信息">
-                            <h:outputText value="#{item.errorInfo}" />
+                        <p:column headerText="二维码">
+                            <h:outputText value="#{item.qrCode}" />
+                        </p:column>
+                        <p:column headerText="#{measureFromExcelController.isImported ? '导入状态' : '校验结果'}" width="180">
+                            <h:outputText value="校验通过" style="color:green;"
+                                          rendered="#{item.importStatus == 'CheckPass'}"/>
+                            <h:outputText value="校验失败" style="color:red;"
+                                          rendered="#{item.importStatus == 'CheckFail'}"/>
+                            <h:outputText value="导入成功" style="color:green;"
+                                          rendered="#{item.importStatus == 'Success'}"/>
+                            <h:outputText value="导入失败" style="color:red;"
+                                          rendered="#{item.importStatus == 'Failure'}"/>
+                            <br/>
+                            <h:outputText value="#{item.errorInfo}" style="color:red;font-size:11px;"
+                                          rendered="#{not empty item.errorInfo}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="MeasuringFailed_export"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                             class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="MeasuringImportResult"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
+
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="margin-top:15px;">
+                        <h:panelGroup>
+                            <p:commandButton value="确认导入"
+                                             actionListener="#{measureFromExcelController.importData()}"
+                                             update="@form :measuringTab:growl"
+                                             icon="ui-icon-check"
+                                             styleClass="btn btn-primary"
+                                             disabled="#{!measureFromExcelController.canbeImported or measureFromExcelController.isImported}"
+                                             onstart="PF('importStatusDialog').show()"
+                                             oncomplete="PF('importStatusDialog').hide()"/>
+                            <p:commandButton value="返回" immediate="true"
+                                             icon="ui-icon-arrow-back"
+                                             action="measuring?faces-redirect=true"
+                                             update=":measuringTab:growl"
+                                             style="margin-left:10px;"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:fieldset>
+                </div>
             </h:form>
-        </div>
+        </h:panelGroup>
     </div>
+
+    <p:dialog widgetVar="importStatusDialog" modal="true" class="ajaxStatusDialog" draggable="false"
+              closable="false" resizable="false" showHeader="false">
+        <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
+        <span style="margin-left:10px;">正在导入数据，请稍候...</span>
+    </p:dialog>
 </html>
