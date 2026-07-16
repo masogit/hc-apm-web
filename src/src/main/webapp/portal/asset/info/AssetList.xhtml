@@ -327,6 +327,11 @@
                                     </h:outputText>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetClassification32'}">
+                                <p:column headerText="#{msg.assetClassification32}" sortBy="#{item.assetClassification32}" filterBy="#{item.assetClassification32}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.assetClassification32}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'nationalStandardCode'}">
                                 <p:column headerText="#{msg.nationalStandardCode}"  >
                                     <h:outputText value="#{item.nationalStandardCode}"/>
@@ -604,7 +609,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'siteUID'}">
-                                <p:column headerText="#{msg.hospitalId}" >
+                                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.hospitalId}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterSiteName}" appendTo="@(Body)"
@@ -845,8 +850,16 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'isPm'}">
-                                <p:column headerText="#{msg.isAssetPMed}"  >
-                                    <h:outputText value="#{item.isPm?msg.True2Yes:msg.False2No}"/>
+                                <p:column headerText="#{msg.isAssetPMed}" sortBy="#{item.isPm}" filterBy="#{item.isPm}" filterMatchMode="EQ" >
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{item.isChecked?msg.True2Yes:msg.False2No}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'isFixed'}">
