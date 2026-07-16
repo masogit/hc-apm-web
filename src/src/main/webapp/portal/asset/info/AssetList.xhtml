@@ -59,6 +59,13 @@
             th{font-size: 12px!important;}
             td{font-size: 12px!important;padding: 0px!important;}
             table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+            .adv-col-field { width: 170px; }
+            .adv-col-operator { width: 130px; }
+            .adv-col-value { width: 190px; }
+            .adv-col-value2 { width: 10px; }
+            .adv-col-action { width: 40px; }
+            #advancedSearchForm .ui-panelgrid td { padding: 2px 4px; vertical-align: middle; }
+            .btn-blue { background-color: #337ab7!important; color: #fff!important; border-color: #2e6da4!important; }
         </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
@@ -161,6 +168,10 @@
                         <h:panelGroup id='searchButtons'>
                             <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':AssetInfoListForm:idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
                             <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':AssetInfoListForm:idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton value="高级查询" icon="fa fa-search-plus"
+                                             style="zoom:0.8; margin-left: 5px;" class="btn btn-sm btn-blue">
+                                <p:ajax listener="#{assetInfoListController.loadSavedSearches()}" process="@this" update=":advancedSearchForm" oncomplete="PF('advancedSearchDialog').show();"/>
+                            </p:commandButton>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
@@ -1431,6 +1442,170 @@
                 </p:overlayPanel>
             </h:form>
         </c:if>
+        <p:dialog id="advancedSearchDialog" widgetVar="advancedSearchDialog" header="高级查询" modal="true"
+                  width="900" height="600" resizable="true" draggable="true" appendTo="@(body)"
+                  closeOnEscape="true" dynamic="false">
+            <h:form id="advancedSearchForm">
+                <div style="margin-bottom: 10px;">
+                    <p:commandButton value="添加条件" icon="ui-icon-plus"
+                                     actionListener="#{assetInfoListController.addAdvancedCondition()}"
+                                     update=":advancedSearchForm:conditionPanel"
+                                     process="@this"/>
+                    <p:commandButton value="清空条件" icon="ui-icon-trash"
+                                     actionListener="#{assetInfoListController.clearAdvancedConditions()}"
+                                     update=":advancedSearchForm:conditionPanel"
+                                     process="@this" style="margin-left: 5px;"/>
+                    <span style="margin-left: 20px; border-left: 1px solid #ccc; padding-left: 15px;">
+                        <p:inputText id="savedSearchName" value="#{assetInfoListController.newSavedSearchName}"
+                                     placeholder="输入收藏名称" style="width: 150px;" maxlength="50"/>
+                        <p:commandButton value="收藏查询" icon="ui-icon-star"
+                                         actionListener="#{assetInfoListController.saveCurrentSearch()}"
+                                         update=":advancedSearchForm :growl"
+                                         process="@this :advancedSearchForm:savedSearchName"
+                                         style="margin-left: 5px;" styleClass="btn btn-sm btn-yellow"/>
+                        <p:commandButton value="我的收藏" icon="ui-icon-bookmark"
+                                         actionListener="#{assetInfoListController.loadSavedSearches()}"
+                                         update=":savedSearchListForm:savedSearchPanel"
+                                         process="@this"
+                                         oncomplete="PF('savedSearchListDialog').show();"
+                                         style="margin-left: 5px;" styleClass="btn btn-sm btn-green"/>
+                    </span>
+                </div>
+                <p:scrollPanel style="height: 380px; border: 0;" mode="native">
+                    <h:panelGroup id="conditionPanel">
+                        <ui:repeat value="#{assetInfoListController.advancedConditions}" var="condition" varStatus="status">
+                            <h:panelGrid columns="5" style="margin-bottom: 8px; width: 100%;" columnClasses="adv-col-field,adv-col-operator,adv-col-value,adv-col-value2,adv-col-action">
+                                <p:selectOneMenu value="#{condition.fieldName}" style="width: 160px;"
+                                                 filter="true" filterMatchMode="contains">
+                                    <f:selectItem itemLabel="-- 选择字段 --" itemValue="" noSelectionOption="true"/>
+                                    <f:selectItems value="#{assetInfoListController.advancedSearchFieldOptions}"
+                                                   var="field" itemLabel="#{field.label}" itemValue="#{field.value}"/>
+                                    <p:ajax update=":advancedSearchForm:conditionPanel" process="@this"
+                                            listener="#{assetInfoListController.onFieldChange(condition)}"/>
+                                </p:selectOneMenu>
+
+                                <p:selectOneMenu value="#{condition.operator}" style="width: 120px;">
+                                    <f:selectItems value="#{assetInfoListController.getOperatorsForField(condition.fieldName)}"
+                                                   var="op" itemLabel="#{op.label}" itemValue="#{op.value}"/>
+                                    <p:ajax update=":advancedSearchForm:conditionPanel" process="@this"
+                                            listener="#{assetInfoListController.onOperatorChange(condition)}"/>
+                                </p:selectOneMenu>
+
+                                <h:panelGroup rendered="#{condition.operator ne 'IsNull' and condition.operator ne 'IsNotNull' and condition.operator ne 'BETWEEN'}">
+                                    <p:inputText value="#{condition.value}" style="width: 180px;"
+                                                 rendered="#{assetInfoListController.getFieldType(condition.fieldName) eq 'string'}"
+                                                 placeholder="输入搜索内容"/>
+                                    <p:inputText value="#{condition.value}" style="width: 180px;"
+                                                 rendered="#{assetInfoListController.getFieldType(condition.fieldName) eq 'number'}"
+                                                 placeholder="输入数字"/>
+                                    <p:calendar value="#{condition.dateValue}" style="width: 180px;"
+                                                pattern="yyyy-MM-dd" showOn="button"
+                                                rendered="#{assetInfoListController.getFieldType(condition.fieldName) eq 'date'}"
+                                                placeholder="选择日期"/>
+                                    <p:selectOneMenu value="#{condition.value}" style="width: 180px;"
+                                                     rendered="#{assetInfoListController.getFieldType(condition.fieldName) eq 'boolean'}">
+                                        <f:selectItem itemLabel="-- 选择 --" itemValue="" noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="是" itemValue="true"/>
+                                        <f:selectItem itemLabel="否" itemValue="false"/>
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu value="#{condition.value}" style="width: 180px;"
+                                                     filter="true" filterMatchMode="contains"
+                                                     rendered="#{assetInfoListController.getFieldType(condition.fieldName) eq 'enum'}">
+                                        <f:selectItem itemLabel="-- 选择 --" itemValue="" noSelectionOption="true"/>
+                                        <f:selectItems value="#{assetInfoListController.getEnumOptionsForField(condition.fieldName)}"
+                                                       var="enumOpt" itemLabel="#{enumOpt.label}" itemValue="#{enumOpt.value}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{condition.operator eq 'BETWEEN'}">
+                                    <h:panelGrid columns="3" style="width: 180px;">
+                                        <p:inputText value="#{condition.value}" style="width: 75px;" placeholder="起始值"
+                                                     rendered="#{assetInfoListController.getFieldType(condition.fieldName) ne 'date'}"/>
+                                        <p:calendar value="#{condition.dateValue}" style="width: 75px;"
+                                                    pattern="yyyy-MM-dd" showOn="button"
+                                                    rendered="#{assetInfoListController.getFieldType(condition.fieldName) eq 'date'}"/>
+                                        <h:outputText value=" ~ " style="text-align:center;"/>
+                                        <p:inputText value="#{condition.value2}" style="width: 75px;" placeholder="结束值"
+                                                     rendered="#{assetInfoListController.getFieldType(condition.fieldName) ne 'date'}"/>
+                                        <p:calendar value="#{condition.dateValue2}" style="width: 75px;"
+                                                    pattern="yyyy-MM-dd" showOn="button"
+                                                    rendered="#{assetInfoListController.getFieldType(condition.fieldName) eq 'date'}"/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{condition.operator eq 'IsNull' or condition.operator eq 'IsNotNull'}">
+                                    <h:outputText value="(无需输入)" style="color: #999; font-style: italic;"/>
+                                </h:panelGroup>
+
+                                <h:outputText value="" rendered="#{condition.operator ne 'BETWEEN' and condition.operator ne 'IsNull' and condition.operator ne 'IsNotNull'}"/>
+                                <h:outputText value="" rendered="#{condition.operator eq 'BETWEEN'}"/>
+                                <h:outputText value="" rendered="#{condition.operator eq 'IsNull' or condition.operator eq 'IsNotNull'}"/>
+
+                                <p:commandButton icon="ui-icon-minus" title="删除此条件"
+                                                 actionListener="#{assetInfoListController.removeAdvancedCondition(status.index)}"
+                                                 update=":advancedSearchForm:conditionPanel"
+                                                 process="@this" style="zoom: 0.8;"/>
+                            </h:panelGrid>
+                        </ui:repeat>
+                        <h:outputText value="暂无查询条件，请点击【添加条件】按钮添加"
+                        rendered="#{empty assetInfoListController.advancedConditions}"
+                        style="color: #999; font-style: italic; display: block; text-align: center; margin-top: 20px;"/>
+                    </h:panelGroup>
+                </p:scrollPanel>
+                <div style="margin-top: 10px; text-align: right;">
+                    <p:commandButton value="查询" icon="ui-icon-search" class="btn btn-sm btn-primary"
+                                     actionListener="#{assetInfoListController.applyAdvancedSearch()}"
+                                     update=":AssetInfoListForm :growl"
+                                     process="@form"
+                                     oncomplete="PF('advancedSearchDialog').hide()"/>
+                    <p:commandButton value="取消" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                     onclick="PF('advancedSearchDialog').hide()" type="button"                                     style="margin-left: 5px;"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- 收藏查询列表对话框 -->
+        <p:dialog id="savedSearchListDialog" widgetVar="savedSearchListDialog" header="我的收藏查询" modal="true"
+                  width="600" height="400" resizable="true" draggable="true" appendTo="@(body)"
+                  closeOnEscape="true" dynamic="false">
+            <h:form id="savedSearchListForm">
+                <p:commandButton value="刷新" icon="ui-icon-refresh"
+                                 actionListener="#{assetInfoListController.loadSavedSearches()}"
+                                 update=":savedSearchListForm:savedSearchPanel"
+                                 process="@this" style="margin-bottom: 10px;"/>
+                <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+                    <h:panelGroup id="savedSearchPanel">
+                        <ui:repeat value="#{assetInfoListController.savedSearches}" var="savedSearch" varStatus="status">
+                            <h:panelGroup layout="block" style="padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
+                                <h:panelGrid columns="3" style="width: 100%;" columnClasses="saved-name,saved-actions">
+                                    <h:outputText value="#{savedSearch.name}" style="font-weight: bold; font-size: 14px;"/>
+                                    <h:panelGroup>
+                                        <p:commandButton value="加载" icon="ui-icon-arrowreturnthick-1-w"
+                                                         actionListener="#{assetInfoListController.loadSavedSearch(savedSearch)}"
+                                                         update=":advancedSearchForm:conditionPanel :growl"
+                                                         process="@this"
+                                                         oncomplete="PF('savedSearchListDialog').hide(); PF('advancedSearchDialog').show();"
+                                                         style="zoom: 0.85; margin-right: 5px;" styleClass="btn btn-sm btn-blue"/>
+                                        <p:commandButton value="删除" icon="ui-icon-trash"
+                                                         actionListener="#{assetInfoListController.deleteSavedSearch(savedSearch)}"
+                                                         update=":savedSearchListForm:savedSearchPanel :growl"
+                                                         process="@this" style="zoom: 0.85;" styleClass="btn btn-sm btn-red">
+                                            <p:confirm header="确认删除" message="确定要删除该收藏查询吗？" icon="ui-icon-warning"/>
+                                        </p:commandButton>
+                                    </h:panelGroup>
+                                    <h:outputText value=""/>
+                                </h:panelGrid>
+                            </h:panelGroup>
+                        </ui:repeat>
+                        <h:outputText value="暂无收藏的查询条件"
+                                      rendered="#{empty assetInfoListController.savedSearches}"
+                                      style="color: #999; font-style: italic; display: block; text-align: center; margin-top: 20px;"/>
+                    </h:panelGroup>
+                </p:scrollPanel>
+                <div style="margin-top: 10px; text-align: right;">
+                    <p:commandButton value="关闭" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                     onclick="PF('savedSearchListDialog').hide()" type="button"/>
+                </div>
+            </h:form>
+        </p:dialog>
 
         <script>
 

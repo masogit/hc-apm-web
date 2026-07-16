@@ -657,6 +657,8 @@ public class MeasuringService {
         }
         LOGGER.info("data:{}",data);
     }
+
+
     public List<WorkflowResponse> getWorkflowResponse(File newFile){
         ExecutorService executor = Executors.newFixedThreadPool(4);
         List<File> files = null;
