@@ -95,7 +95,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private ConfigItemRepository configItemRepository;
     private ConfigItemValueRepository configItemValueRepository;
     private UserContextService userContextService;
-
+    private AssetFileImportSupportingService supportingService;
     private List<V2_BlobObject> attachList;
     @Getter
     @Setter
@@ -229,6 +229,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         userContextService=WebUtil.getBean(UserContextService.class);
+        supportingService = WebUtil.getBean(AssetFileImportSupportingService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
@@ -467,9 +468,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
         // 序列号重复校验
         if (StringUtils.isNotEmpty(arrivalListItem.getSerialNum())) {
-            List<AssetInfo> existList = assetDao.findBySerialNumAndTenantUID(
-                    arrivalListItem.getSerialNum(), arrivalListItem.getArrivalList().getTenantUID());
-            if (!existList.isEmpty()) {
+            boolean serialNumDuplicate = supportingService.isAssetFieldDuplicate("serialNum", arrivalListItem.getSerialNum(), arrivalListItem.getSiteUid(), null);
+            if (serialNumDuplicate) {
                 WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }

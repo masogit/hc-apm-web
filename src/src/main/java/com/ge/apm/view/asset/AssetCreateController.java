@@ -11,11 +11,7 @@ import com.ge.apm.dao.GbCodeRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AssetCreateService;
-import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.GbCodeService;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.SupplierController;
@@ -56,7 +52,7 @@ public class AssetCreateController {
     private OrgInfoRepository orgDao;
     private AutoCompleteService autoCompleteService;
     private AssetInfoRepository assetInfoDao;
-
+    private AssetFileImportSupportingService supportingService;
     private GbCodeRepository gbDao;
     private GbCodeService gbCodeService;
 
@@ -114,7 +110,7 @@ public class AssetCreateController {
         supplierController = WebUtil.getBean(SupplierController.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
-
+        supportingService = WebUtil.getBean(AssetFileImportSupportingService.class);
         createRequest = acService.getCreateRequest(qrCode, siteUid);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         assetInfo = createAssetInfo();
@@ -256,8 +252,8 @@ public class AssetCreateController {
     public String applyChange() {
         // 序列号重复校验
         if (StringUtils.isNotEmpty(assetInfo.getSerialNum())) {
-            List<AssetInfo> existList = assetInfoDao.findBySerialNumAndTenantUID(assetInfo.getSerialNum(), assetInfo.getTenantUID());
-            if (!existList.isEmpty()) {
+            boolean serialNumDuplicate = supportingService.isAssetFieldDuplicate("serialNum", assetInfo.getSerialNum(), assetInfo.getSiteUID(), assetInfo.getUid());
+            if (serialNumDuplicate) {
                 WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }

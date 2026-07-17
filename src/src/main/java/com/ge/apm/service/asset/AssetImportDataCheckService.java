@@ -201,7 +201,6 @@ public class AssetImportDataCheckService {
                 .collect(Collectors.toSet());
 
         for (AssetImport assetImport : assetImportList) {
-
             if (!StringUtils.isEmpty(assetImport.getUid())) {
                 AssetInfo existAsset = assetDao.findByUid(assetImport.getUid());
                 if(existAsset !=null && !StringUtils.isEmpty(existAsset.getAssetDeptUID())){
@@ -449,8 +448,8 @@ public class AssetImportDataCheckService {
                     assetImport.addErrMsg("警告: 导入文件中序列号重复");
                 }
                 // 数据库中序列号重复
-                List<AssetInfo> serialDupList = assetDao.findBySerialNumAndTenantUID(assetImport.getSerialNum(), site.getTenantUID());
-                if (!serialDupList.isEmpty()) {
+                boolean serialNumDuplicate = supportingService.isAssetFieldDuplicate("serialNum", assetImport.getSerialNum(), site.getUid(), assetImport.getUid());
+                if (serialNumDuplicate) {
                     assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                     assetImport.addErrMsg("警告: 序列号重复");
                 }
