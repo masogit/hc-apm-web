@@ -258,8 +258,7 @@ public class AssetCreateController {
         if (StringUtils.isNotEmpty(assetInfo.getSerialNum())) {
             List<AssetInfo> existList = assetInfoDao.findBySerialNumAndTenantUID(assetInfo.getSerialNum(), assetInfo.getTenantUID());
             if (!existList.isEmpty()) {
-                WebUtil.addErrorMessage("制造商序列号已存在，不允许重复建档");
-                return "";
+                WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }
         if (owner != null) {

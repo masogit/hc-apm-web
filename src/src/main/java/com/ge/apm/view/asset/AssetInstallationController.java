@@ -470,8 +470,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             List<AssetInfo> existList = assetDao.findBySerialNumAndTenantUID(
                     arrivalListItem.getSerialNum(), arrivalListItem.getArrivalList().getTenantUID());
             if (!existList.isEmpty()) {
-                WebUtil.addErrorMessage("制造商序列号已存在，不允许重复建档");
-                isValidate = false;
+                WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }
 
