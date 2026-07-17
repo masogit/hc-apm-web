@@ -40,6 +40,8 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 	private OrgInfo selectOrgInfo;
 	private UserAuth customRoleAuth;
 	private List<String> orgUidList;
+	private List<OrgInfo> clinicalDeptList;
+	private String filterAssetDeptUID;
 	@Override
 	protected void init() {
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -53,6 +55,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		dao = WebUtil.getBean(AssetOptRecordMapper.class);
 		uaaService = WebUtil.getBean(UaaService.class);
 		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+		clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
 		this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
 	}
@@ -159,4 +162,36 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		return service.getAssetOptRecordList(assetUid);
 	}
 
+	public OrgInfo getOrgInfoByUid(String uid) {
+		return service.fetchOrgInfoByUid(uid);
+	}
+
+
+	public void onAssetDeptNameFilterChange() {
+		if (this.searchFilters == null) {
+			this.searchFilters = new HashSet<>();
+		}
+		// Remove existing assetDeptUID filter
+		this.searchFilters.removeIf(f -> "assetInfo.assetDeptUID".equals(f.fieldName));
+		// Add new filter if a department is selected
+		if (filterAssetDeptUID != null && !filterAssetDeptUID.isEmpty()) {
+			this.searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, filterAssetDeptUID, "1*3+"));
+		}
+	}
+
+	public List<OrgInfo> getClinicalDeptList() {
+		return clinicalDeptList;
+	}
+
+	public void setClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+		this.clinicalDeptList = clinicalDeptList;
+	}
+
+	public String getFilterAssetDeptUID() {
+		return filterAssetDeptUID;
+	}
+
+	public void setFilterAssetDeptUID(String filterAssetDeptUID) {
+		this.filterAssetDeptUID = filterAssetDeptUID;
+	}
 }

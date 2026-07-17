@@ -160,6 +160,17 @@
                         </f:facet>
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                     </p:column>
+                    <p:column headerText="#{msg.assetDeptName}" rendered="#{userContextService.enableDisplayByKey('relRuleAssetDeptFilter')}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.assetDeptName}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterAssetDeptOrg}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoCompleteDeptName}" size="3">
+                                <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onAssetDeptNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
+                                <p:ajax process="@this" listener="#{relRuleAssetManagerController.onAssetDeptNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                            </p:autoComplete>
+                        </f:facet>
+                        <h:outputText value="#{relRuleAssetManagerController.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}"/>
+                    </p:column>
                     <p:column headerText="#{msg.nationalStandardCode}"  filterBy="#{item.assetInfo.nationalStandardCode}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.nationalStandardCode}"/>
                     </p:column>

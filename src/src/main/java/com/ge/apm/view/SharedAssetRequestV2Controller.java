@@ -8,6 +8,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -26,6 +27,7 @@ import javaslang.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -136,6 +138,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     @Getter @Setter
     private OrgInfo currentUserOrgInfo;
+    @Getter
+    @Setter
+    private Boolean enableStockShow;
 
     public String getFilterApplyTime() {
         return filterApplyTime;
@@ -314,6 +319,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 this.setNotificationContent(virtualCellNum);
             }
         }
+        setEnableStockShowValue();
     }
     private WorkflowConfig getWorkflowConfig(){
         OrgInfo selectSite = userContextService.getSelectSite();
@@ -322,6 +328,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else{
             return  configService.findConfigBySite(UserContextService.getCurrentUserAccount().getSiteUID());
         }
+    }
+
+    public void setEnableStockShowValue() {
+        ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
+         this.enableStockShow = BooleanUtils.isFalse(configItemService.getConfigItemByKey("enableStockShow", UserContextService.getCurrentUserAccount()));
     }
     @Override
     protected SharedAssetRequestRepository getDAO() {
@@ -682,7 +693,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                      }
                      if (infoVo.getSharedAssetTypeUid().equals(applySwapType.getSharedAssetTypeId())) {
                          selectedSart = applySwapType;//明细表联动选中
-                         if (applySwapType.getActualQty() < applySwapType.getApplyQty()) {
+                         if (applySwapType.getActualQty() <= applySwapType.getApplyQty()) {
                              String sql = "select a.* from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.borrow_id where a.asset_info_id = '"+infoVo.getUid()+"' and b.state in (3, 6) AND a.return_id is NULL";
                              List<Map<String, Object>> data = jdbcTemplate.queryForList(sql);
                              ArrayList<SharedAssetReqDetail> detail_list = new ArrayList<>();
@@ -1177,7 +1188,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请先添加申请明细，再进行提交！");
                return;
        } else {
-            if(!isReturn && Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())){
+            if(!isReturn && Boolean.TRUE.equals(enableStockShow)){
                 for (SharedAssetReqType sharedAssetReqType : sartList) {
                     Integer stock = this.selectStock(sharedAssetReqType.getSharedAssetTypeId());
                     int applyQty = sharedAssetReqType.getApplyQty();
@@ -1765,7 +1776,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
              }
         }
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
-        if(!isReturn && Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())) {
+        if(!isReturn && Boolean.TRUE.equals(enableStockShow)) {
             Integer stock = this.selectStock(selectedSart.getSharedAssetTypeId());
             if(applyQty > stock){
                 String message = "wrong" ;
@@ -2305,7 +2316,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(sharedAssetType != null){
             this.getSelectedSart().setSwapName(sharedAssetType.getSwapName());
         }
-        if(Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())){
+        if(Boolean.TRUE.equals(enableStockShow)){
             this.setStock(selectStock(sharedAssetTypeId));
         }else{
             this.setStock(0);
@@ -2368,10 +2379,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
 
     public boolean showAndDisabled(){
-        if(this.currentWorkflowConfig == null){
-            return Boolean.FALSE;
-        }
-        Boolean enableStockShow = this.currentWorkflowConfig.getEnableStockShow();
+        Boolean enableStockShow = this.enableStockShow;
         if(Boolean.TRUE.equals(enableStockShow)){
             return this.getStock() < 1;
         }else{

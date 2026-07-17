@@ -62,6 +62,15 @@
                                         <p:ajax process="@this" listener="#{assetRiskAssessmentController.onClinicalDeptNameFilterChange}"  />
                                     </p:autoComplete>
                                 </h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.enableDisplayByKey('assetRiskAssessmentDeptFilter')}">
+                                    <label class="label">#{msg.assetDeptName}</label>
+                                    <p:autoComplete dropdown="true" value="#{assetRiskAssessmentController.filterAssetDeptOrg}"
+                                                    scrollHeight="300"  forceSelection="true"  completeMethod="#{assetRiskAssessmentController.autoCompleteDeptName}"
+                                                    var="t" itemLabel="#{t}" itemValue="#{t}" class="siteFilterChange">
+                                        <p:ajax event="itemSelect" listener="#{assetRiskAssessmentController.onAssetDeptNameFilterChange}" process="@this"   />
+                                        <p:ajax process="@this" listener="#{assetRiskAssessmentController.onAssetDeptNameFilterChange}"  />
+                                    </p:autoComplete>
+                                </h:panelGroup>
 
                                 <h:panelGroup>
                                     <label class="label">#{msg.assetGroup}</label>

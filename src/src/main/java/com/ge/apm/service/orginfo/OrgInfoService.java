@@ -104,227 +104,233 @@ public class OrgInfoService {
     public List<Map> importOrg(UploadedFile file, UserAccount user) throws IOException {
 
         List<Map> resultList = new ArrayList<>();
+        TenantInfo tenantInfo = configCacheService.getTenantByUid(user.getTenantUID());
+        OrgInfo tenantOrgInfo = orgDao.findByUid(tenantInfo.getUid());
 
-//        try {
+        ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
 
-            TenantInfo tenantInfo = configCacheService.getTenantByUid(user.getTenantUID());
-            OrgInfo tenantOrgInfo = orgDao.findByUid(tenantInfo.getUid());
+        int keyRow = 1;
+        int dataRow = 2;
 
-            ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+        for (Map< String, Object> rowMap = doc.getDataRowMap(keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(keyRow, ++dataRow)) {
 
-            int keyRow = 1;
-            int dataRow = 2;
+            //make tenant as default parent of clinical dept
+            OrgInfo clinicalParent = tenantOrgInfo;
+            int clinicalOrgLevel = 0;
+            String message = "已经存在";
 
-            for (Map< String, Object> rowMap = doc.getDataRowMap(keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(keyRow, ++dataRow)) {
+            Map<String, String> result = null;
 
-                //make tenant as default parent of clinical dept
-                OrgInfo clinicalParent = tenantOrgInfo;
-                int clinicalOrgLevel = 0;
-                String message = "已经存在";
+            try {
 
-                Map<String, String> result = null;
+                String institutionName = ExcelDocument.getCellStringValue(rowMap.get("集团"));
+                String institutionEn = ExcelDocument.getCellStringValue(rowMap.get("集团名称En"));
+                String hospitalName = ExcelDocument.getCellStringValue(rowMap.get("医院"));
+                String hospitalEn = ExcelDocument.getCellStringValue(rowMap.get("医院名称En"));
+                String siteName = ExcelDocument.getCellStringValue(rowMap.get("院区"));
+                String siteEn = ExcelDocument.getCellStringValue(rowMap.get("院区名称En"));
+                String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
+                String departEn = ExcelDocument.getCellStringValue(rowMap.get("科室名称En"));
+                String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
+                String ucmid = ExcelDocument.getCellStringValue(rowMap.get("UCMID"));
+                String buildingNum = ExcelDocument.getCellStringValue(rowMap.get("楼号"));
+                String floorNum = ExcelDocument.getCellStringValue(rowMap.get("层数"));
 
-                try {
+                if (getLastRow(institutionName, hospitalName, siteName, departName, uuid)) break;
 
-                    String institutionName = ExcelDocument.getCellStringValue(rowMap.get("集团"));
-                    String hospitalName = ExcelDocument.getCellStringValue(rowMap.get("医院"));
-                    String siteName = ExcelDocument.getCellStringValue(rowMap.get("院区"));
-                    String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
-                    String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
-                    String ucmid = ExcelDocument.getCellStringValue(rowMap.get("UCMID"));
+                result = new HashMap<>();
+                result.put("institutionName", institutionName);
+                result.put("institutionEn", institutionEn);
+                result.put("hospitalName", hospitalName);
+                result.put("hospitalEn", hospitalEn);
+                result.put("siteName", siteName);
+                result.put("siteEn", siteEn);
+                result.put("departName", departName);
+                result.put("departEn", departEn);
+                result.put("uuid", uuid);
+                result.put("ucmid", ucmid);
+                result.put("buildingNum", buildingNum);
+                result.put("floorNum", floorNum);
+                result.put("excelIndex", String.valueOf(dataRow));
 
-                    if (getLastRow(institutionName, hospitalName, siteName, departName, uuid)) break;
+                checkRowData(institutionName, hospitalName, siteName, departName);
 
-                    result = new HashMap<>();
-                    result.put("institutionName", institutionName);
-                    result.put("hospitalName", hospitalName);
-                    result.put("siteName", siteName);
-                    result.put("departName", departName);
-                    result.put("uuid", uuid);
-                    result.put("ucmid", ucmid);
-                    result.put("excelIndex", String.valueOf(dataRow));
+                if (!StringUtils.isEmpty(uuid)) {
+                    //update by existing uuid
+                    OrgInfo found = orgDao.findByUid(uuid);
+                    if (found == null) {
+                        throw new Exception("该组织机构不存在！");
+                    }
 
-                    checkRowData(institutionName, hospitalName, siteName, departName);
+                    //update name if depart name, site name, hospital name, institution name changed
+                    String name = null;
+                    String nameEn = null;
+                    if (found.getOrgType() == 4) {
+                        if (StringUtils.isEmpty(departName)) {
+                            throw new Exception("科室名称不能为空！");
+                        }
+                        name = departName;
+                        nameEn = departEn;
+                    } else if (found.getOrgType() == 3) {
+                        if (StringUtils.isEmpty(siteName)) {
+                            throw new Exception("院区名称不能为空！");
+                        }
+                        name = siteName;
+                        nameEn = siteEn;
+                    } else if (found.getOrgType() == 2) {
+                        if (StringUtils.isEmpty(hospitalName)) {
+                            throw new Exception("医院名称不能为空！");
+                        }
+                        name = hospitalName;
+                        nameEn = hospitalEn;
+                    } else if (found.getOrgType() == 1) {
+                        if (StringUtils.isEmpty(institutionName)) {
+                            throw new Exception("集团名称不能为空！");
+                        }
+                        name = institutionName;
+                        nameEn = institutionEn;
+                    }
 
-                    if (!StringUtils.isEmpty(uuid)) {
-                        //update by existing uuid
-                        OrgInfo found = orgDao.findByUid(uuid);
-                        if (found == null) {
-                            throw new Exception("该组织机构不存在！");
+                    OrgInfo sameNameOrg = orgDao.findFirstByParentUIDAndNameAndUidIsNot(found.getParentUID(), name, found.getUid());
+                    if(sameNameOrg != null){
+                        throw new Exception(name + "已经存在!");
+                    }
+                    boolean isSame = true;
+                    if(!found.getName().equals(name)){
+                        isSame = false;
+                    }else if(!Objects.equals(found.getNameEn(), nameEn)) {
+                        isSame = false;
+                    }else if(found.getOrgType() == 2){
+                        if(!Objects.equals(found.getHospitalUcmid(), ucmid)) {
+                            isSame = false;
+                        }
+                    }else if(found.getOrgType() == 4){
+                        if(!Objects.equals(found.getBuildingNum(), buildingNum)) {
+                            isSame = false;
+                        } else if(!Objects.equals(found.getFloorNum(), floorNum)){
+                            isSame = false;
+                        }
+                    }
+                    if (!isSame){
+                        found.setShortName(name);
+                        found.setName(name);
+                        found.setNameEn(nameEn);
+                        if(found.getOrgType() == 4 ){
+                            found.setBuildingNum(buildingNum);
+                            found.setFloorNum(floorNum);
                         }
 
-                        //update name if depart name, site name, hospital name, institution name changed
-                        if ((found.getOrgType() == 4 && !found.getName().equals(departName))
-                                || (found.getOrgType() == 3 && !found.getName().equals(siteName))
-                                || (found.getOrgType() == 2 && !found.getName().equals(hospitalName))
-                                || (found.getOrgType() == 1 && !found.getName().equals(institutionName))
-                                || (found.getOrgType() == 2 && !found.getHospitalUcmid().equals(ucmid))
-                                ) {
-                            String name = null;
-                            if (found.getOrgType() == 4) {
-                                if (StringUtils.isEmpty(departName)) {
-                                    throw new Exception("科室名称不能为空！");
-                                }
-                                name = departName;
-//                                found.setName(departName);
-                            } else if (found.getOrgType() == 3) {
-                                if (StringUtils.isEmpty(siteName)) {
-                                    throw new Exception("院区名称不能为空！");
-                                }
-                                name = siteName;
-//                                found.setName(siteName);
-                            } else if (found.getOrgType() == 2) {
-                                if (StringUtils.isEmpty(hospitalName)) {
-                                    throw new Exception("医院名称不能为空！");
-                                }
-                                name = hospitalName;
-//                                found.setName(hospitalName);
-                            } else if (found.getOrgType() == 1) {
-                                if (StringUtils.isEmpty(institutionName)) {
-                                    throw new Exception("集团名称不能为空！");
-                                }
-                                name = institutionName;
-//                                found.setName(institutionName);
+                        if (!StringUtils.isEmpty(ucmid)) {
+                            OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
+                            if (sameUcmidOrg != null && !sameUcmidOrg.getUid().equals(found.getUid())) {
+                                throw new Exception(ucmid + "重复");
                             }
+                        }
+                        found.setHospitalUcmid(ucmid);
 
-                            OrgInfo sameNameOrg = orgDao.findFirstByParentUIDAndNameAndUidIsNot(found.getParentUID(), name, found.getUid());
-                            if (sameNameOrg != null) {
-                                throw new Exception(name + "已经存在!");
-                            }
-                            found.setShortName(name);
-                            found.setName(name);
+                        orgDao.save(found);
+                        configCacheService.cleanOrgInfoCacheByUid(found.getUid());
+                        if (found.getOrgType() == 4) {
+                            assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
+                        }
+                        message = "更新成功";
+                    }
+                } else {
+                    //insert or update based on the institution name, hospital name, site name, clinical dept name
+                    OrgInfo institution = null;
+                    if (!StringUtils.isEmpty(institutionName)) {
+                        institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
+                        if (institution == null) {
+                            institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, tenantOrgInfo, institutionName);
+                            institution.setNameEn(institutionEn);
+                            orgDao.save(institution);
+                            configCacheService.cleanOrgInfoCacheByUid(institution.getUid());
+                            institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
+                            message = "导入成功";
+                        }
+                        clinicalParent = institution;
+                        clinicalOrgLevel = 1;
+                    }
 
+                    OrgInfo hospital = null;
+                    if (!StringUtils.isEmpty(hospitalName)) {
+                        hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
+                        if (hospital == null) {
+                            hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
+                            hospital.setNameEn(hospitalEn);
                             if (!StringUtils.isEmpty(ucmid)) {
                                 OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
-                                if (sameUcmidOrg != null && sameUcmidOrg.getUid() != found.getUid()) {
+                                if (sameUcmidOrg != null && sameUcmidOrg.getName()!= hospitalName) {
                                     throw new Exception(ucmid + "重复");
                                 }
                             }
-                            found.setHospitalUcmid(ucmid);
-
-                            orgDao.save(found);
-                            configCacheService.cleanOrgInfoCacheByUid(found.getUid());
-                            if (found.getOrgType() == 4) {
-                                assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
-                            }
-                            message = "更新成功";
-
-                        }
-
-
-                    } else {
-
-                        //insert or update based on the institution name, hospital name, site name, clinical dept name
-                        OrgInfo institution = null;
-                        if (!StringUtils.isEmpty(institutionName)) {
-                            institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
-                            if (institution == null) {
-                                institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, tenantOrgInfo, institutionName);
-                                orgDao.save(institution);
-                                configCacheService.cleanOrgInfoCacheByUid(institution.getUid());
-                                institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
-                                message = "导入成功";
-                            }
-
-                            clinicalParent = institution;
-                            clinicalOrgLevel = 1;
-
-                        }
-
-                        OrgInfo hospital = null;
-                        if (!StringUtils.isEmpty(hospitalName)) {
+                            hospital.setHospitalUcmid(ucmid);
+                            orgDao.save(hospital);
+                            configCacheService.cleanOrgInfoCacheByUid(hospital.getUid());
                             hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
-
-                            if (hospital == null) {
-                                hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
-                                if (!StringUtils.isEmpty(ucmid)) {
-                                    OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
-                                    if (sameUcmidOrg != null && sameUcmidOrg.getName()!= hospitalName) {
-                                        throw new Exception(ucmid + "重复");
-                                    }
-                                }
-                                hospital.setHospitalUcmid(ucmid);
-                                orgDao.save(hospital);
-                                configCacheService.cleanOrgInfoCacheByUid(hospital.getUid());
-                                hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
-                                message = "导入成功";
-                            }
-
-                            clinicalParent = hospital;
-                            clinicalOrgLevel = 2;
-
+                            message = "导入成功";
                         }
 
-                        OrgInfo site = null;
-                        if (!StringUtils.isEmpty(siteName)) {
+                        clinicalParent = hospital;
+                        clinicalOrgLevel = 2;
+                    }
+
+                    OrgInfo site = null;
+                    if (!StringUtils.isEmpty(siteName)) {
+                        site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
+                        site.setNameEn(siteEn);
+                        if (site == null) {
+                            site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
+                            orgDao.save(site);
+                            configCacheService.cleanOrgInfoCacheByUid(site.getUid());
                             site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
-
-                            if (site == null) {
-                                site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
-                                orgDao.save(site);
-                                configCacheService.cleanOrgInfoCacheByUid(site.getUid());
-                                site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
-                                message = "导入成功";
-                            }
-
-                            clinicalParent = site;
-                            clinicalOrgLevel = 3;
+                            message = "导入成功";
                         }
 
-                        if (!StringUtils.isEmpty(departName)) {
-                            if (departName.contains("-")) {
-                                String[] departNames = departName.split("-");
-                                for (String childDepartName: departNames) {
-                                    //if there is child clinical dept name, then we need to use short name, because normal name used with concatination of all clinical depts
-                                    OrgInfo depart = orgDao.findFirstByParentUIDAndShortName(clinicalParent.getUid(),childDepartName);
+                        clinicalParent = site;
+                        clinicalOrgLevel = 3;
+                    }
 
-                                    if (depart == null) {
-                                        depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, childDepartName, clinicalParent, clinicalOrgLevel);
-                                        orgDao.save(depart);
-                                        configCacheService.cleanOrgInfoCacheByUid(depart.getUid());
-                                        message = "导入成功";
-                                    }
-
-                                    clinicalParent = depart;
-                                }
-
-                            } else {
-                                OrgInfo depart = orgDao.findFirstByParentUIDAndName(clinicalParent.getUid(),departName);
-
+                    if (!StringUtils.isEmpty(departName)) {
+                        if (departName.contains("-")) {
+                            String[] departNames = departName.split("-");
+                            for (String childDepartName: departNames) {
+                                //if there is child clinical dept name, then we need to use short name, because normal name used with concatination of all clinical depts
+                                OrgInfo depart = orgDao.findFirstByParentUIDAndShortName(clinicalParent.getUid(),childDepartName);
                                 if (depart == null) {
-                                    depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
+                                    depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, childDepartName, clinicalParent, clinicalOrgLevel);
+                                    depart.setBuildingNum(buildingNum);
+                                    depart.setFloorNum(floorNum);
+                                    depart.setNameEn(departEn);
                                     orgDao.save(depart);
                                     configCacheService.cleanOrgInfoCacheByUid(depart.getUid());
                                     message = "导入成功";
                                 }
+                                clinicalParent = depart;
                             }
-
-
+                        } else {
+                            OrgInfo depart = orgDao.findFirstByParentUIDAndName(clinicalParent.getUid(),departName);
+                            if (depart == null) {
+                                depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
+                                depart.setBuildingNum(buildingNum);
+                                depart.setFloorNum(floorNum);
+                                depart.setNameEn(departEn);
+                                orgDao.save(depart);
+                                configCacheService.cleanOrgInfoCacheByUid(depart.getUid());
+                                message = "导入成功";
+                            }
                         }
-
                     }
-
-
-
-                    result.put("status", message);
-
-                } catch(Exception e){
-                    result.put("status", e.getMessage());
-                } finally {
-                    if (result != null) {
-                        resultList.add(result);
-                    }
-
                 }
-
-            }//for
-
-//        } catch (Exception e) {
-//
-//        }
-
-
-
+                result.put("status", message);
+            } catch(Exception e){
+                result.put("status", e.getMessage());
+            } finally {
+                if (result != null) {
+                    resultList.add(result);
+                }
+            }
+        }
         return resultList;
     }
 
@@ -514,38 +520,52 @@ public class OrgInfoService {
         Map<String, Object> map = new HashMap<>();
         if (orgInfo.getOrgType() == 1) {
             map.put("集团", orgInfo.getName());
+            map.put("集团名称En", orgInfo.getNameEn());
         } else if (orgInfo.getOrgType() == 2) {
             OrgInfo institutionLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
+            map.put("集团名称En", institutionLevelOrg.getNameEn());
             map.put("医院", orgInfo.getName());
+            map.put("医院名称En", orgInfo.getNameEn());
         } else if (orgInfo.getOrgType() == 3) {
             OrgInfo hospitalLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
+            map.put("集团名称En", institutionLevelOrg.getNameEn());
             map.put("医院", hospitalLevelOrg.getName());
+            map.put("医院名称En", hospitalLevelOrg.getNameEn());
             map.put("院区", orgInfo.getName());
+            map.put("院区名称En", orgInfo.getNameEn());
         } else if (orgInfo.getOrgType() == 4) {
             if (orgInfo.getOrgLevel() == 0) {
 
             } else if (orgInfo.getOrgLevel() == 1) {
                 OrgInfo institutionLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 map.put("集团", institutionLevelOrg.getName());
+                map.put("集团名称En", institutionLevelOrg.getNameEn());
             } else if (orgInfo.getOrgLevel() == 2) {
                 OrgInfo hospitalLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
+                map.put("集团名称En", institutionLevelOrg.getNameEn());
                 map.put("医院", hospitalLevelOrg.getName());
+                map.put("医院名称En", hospitalLevelOrg.getNameEn());
             } else {
                 OrgInfo siteLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo hospitalLevelOrg = orgInfoMap.get(siteLevelOrg.getParentUID());
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
+                map.put("集团名称En", institutionLevelOrg.getNameEn());
                 map.put("医院", hospitalLevelOrg.getName());
+                map.put("医院名称En", hospitalLevelOrg.getNameEn());
                 map.put("院区", siteLevelOrg.getName());
+                map.put("院区名称En", siteLevelOrg.getNameEn());
             }
 
             map.put("科室", orgInfo.getName());
-
+            map.put("科室名称En", orgInfo.getNameEn());
+            map.put("楼号", orgInfo.getBuildingNum());
+            map.put("层数", orgInfo.getFloorNum());
         }
 
         map.put("UUID", orgInfo.getUid());

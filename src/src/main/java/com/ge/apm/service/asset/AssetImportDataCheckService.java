@@ -190,6 +190,16 @@ public class AssetImportDataCheckService {
         if (crossSite) {
             orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(currentUser.getTenantUID());
         }
+
+        // 文件内部序列号重复校验：统计每个序列号出现的次数
+        Set<String> duplicateSerialNumsInFile = assetImportList.stream()
+                .filter(a -> !StringUtils.isEmpty(a.getSerialNum()))
+                .collect(Collectors.groupingBy(AssetImport::getSerialNum, Collectors.counting()))
+                .entrySet().stream()
+                .filter(e -> e.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
         for (AssetImport assetImport : assetImportList) {
 
             if (!StringUtils.isEmpty(assetImport.getUid())) {
@@ -429,6 +439,21 @@ public class AssetImportDataCheckService {
                 assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
                 result.put("canBeImport", Boolean.FALSE);
                 assetImport.addErrMsg("错误: 设备编号重复");
+            }
+
+            // 序列号重复校验（仅警告，不阻止导入）
+            if (!StringUtils.isEmpty(assetImport.getSerialNum())) {
+                // 文件内部序列号重复
+                if (duplicateSerialNumsInFile.contains(assetImport.getSerialNum())) {
+                    assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                    assetImport.addErrMsg("警告: 导入文件中序列号重复");
+                }
+                // 数据库中序列号重复
+                List<AssetInfo> serialDupList = assetDao.findBySerialNumAndTenantUID(assetImport.getSerialNum(), site.getTenantUID());
+                if (!serialDupList.isEmpty()) {
+                    assetImport.setImportStatus(AssetFileImportBaseService.ImportStatus.CheckFail);
+                    assetImport.addErrMsg("警告: 序列号重复");
+                }
             }
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594

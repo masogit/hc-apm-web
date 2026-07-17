@@ -6347,6 +6347,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','23','23月','23 months',NULL,-1,23);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id, order_by) VALUES ('validityMonths','24','24月','24 months',NULL,-1,24);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','estimatedRiskLevel','预估风险等级','Estimated Risk Level',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','1','高风险','High Risk',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','2','中风险','Medium Risk',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','3','低风险','Low Risk',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('estimatedRiskLevel','4','未知风险','Unknown Risk',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','tubeInstallDate','球管安装时间','Tube Installation Date',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','totalExposureCount','曝光总次数','Total Exposure Count',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','totalInspectionCount','检查总人数','Total Inspection Count',NULL,-1);
@@ -6354,3 +6358,52 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','totalExposureCount','曝光总次数','Total Exposure Count',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','totalInspectionCount','检查总人数','Total Inspection Count',NULL,-1);
 
+
+
+--医疗设备购置计划
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','acquisitionApplicationType','申请类别','Application Type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','acquisitionFundingSource','资金来源','funding source',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','acquisitionFundingImplemented','资金落实','funding implemented',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','medicalEquipmentLicense','甲乙类大型医疗设备及配置许可证','medical equipment license',NULL,-1);
+
+
+--医疗设备购置计划  申请类别
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionApplicationType','necessities','必需类','necessities',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionApplicationType','updates','更新类','updates',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionApplicationType','general','常规类','general',NULL,-1);
+--医疗设备购置计划  资金来源
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionFundingSource','fiscal','财政','fiscal',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionFundingSource','self-owned','自有','self-owned',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('acquisitionFundingSource','others ','其他','others',NULL,-1);
+--医疗设备购置计划  甲乙类大型医疗设备及配置许可证
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('medicalEquipmentLicense','CategoryA','甲类','Category A',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('medicalEquipmentLicense','CategoryB','乙类','Category B',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('medicalEquipmentLicense','None','无','None',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','','暂存中','TempSave',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','DrugCenterPending','待药管中心审批','DrugCenterPending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','WorkGroupPending','待调研工作组审批','WorkGroupPending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','BureauPartyPending','待局党委会审批','BureauPartyPending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Approved','审批通过','Approved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Rejected','审批不通过','Rejected',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Pending','待审批','Pending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Approved','审批通过','Approved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Rejected','审批不通过','Rejected',NULL,-1);
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionResult','SelfReview','自行审定','SelfReview',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionResult','Approved','同意','Approved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionResult','Rejected','不同意','Rejected',NULL,-1);
+
+
+
+
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('PmRuleConfig','Y','已配置','Y',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('PmRuleConfig','N','未配置','N',NULL,-1);

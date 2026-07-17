@@ -24,7 +24,7 @@
                     <div class="ui-g-12 ui-lg-4">
                         <div class="card" style="height:400px;">
                             <h:panelGroup>
-                                <p:inputText id="retrieval" value="#{orgInfoController.retrieval}">
+                                <p:inputText id="retrieval" value="#{orgInfoController.retrieval}" placeholder="名称/名称En">
                                     <!--<p:ajax listener="#{orgInfoController.filterNode()}" event="keyup" update="orgTree editPanel :growl"/>-->
                                 </p:inputText>
                                 <p:commandButton id = "portalMgrSearch" icon="ui-icon-location-searching" actionListener="#{orgInfoController.filterNode()}" update="orgTree editPanel :growl"/>

@@ -33,9 +33,9 @@
                         </h:panelGroup>
                     </h:panelGrid>
                 <h:panelGrid id="buttonSet" columns="3" cellpadding="5">
-                    <p:commandButton value="从未计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3" actionListener="#{unmeasuredAssetListController.changeIndex(0)}" disabled="#{unmeasuredAssetListController.queryIndex==0}"/>
-                    <p:commandButton style="background-color: red" value="逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(1)}" disabled="#{unmeasuredAssetListController.queryIndex==1}"/>
-                    <p:commandButton value="未逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(2)}" disabled="#{unmeasuredAssetListController.queryIndex==2}"/>
+                    <p:commandButton value="从未计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idVarPanelAssetDeptOrg3" actionListener="#{unmeasuredAssetListController.changeIndex(0)}" disabled="#{unmeasuredAssetListController.queryIndex==0}"/>
+                    <p:commandButton style="background-color: red" value="逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idVarPanelAssetDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(1)}" disabled="#{unmeasuredAssetListController.queryIndex==1}"/>
+                    <p:commandButton value="未逾期待计量"  process="@this" update="datalist_unmeasuredAsset buttonSet measuringTab:unmeasuredAssetListForm measuringTab:idVarPanelDeptOrg3 measuringTab:idVarPanelAssetDeptOrg3 measuringTab:idPanelFilterNextMeteringDate measuringTab:idPanelFilterLastMeteringDate" actionListener="#{unmeasuredAssetListController.changeIndex(2)}" disabled="#{unmeasuredAssetListController.queryIndex==2}"/>
                 </h:panelGrid>
 
                 <p:dataTable id="datalist_unmeasuredAsset" value="#{unmeasuredAssetListController.lazyModel}" var="item" widgetVar="varDataList_unmeasuredAsset"
@@ -76,6 +76,13 @@
                             <p:inputText id="clinicalDept"  value="#{unmeasuredAssetListController.filterOrg.name}"  readonly="true"/>
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+                    <p:column rendered="#{userContextService.enableDisplayByKey('measuringAssetDeptFilter')}" headerText="#{msg.assetDeptName}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.assetDeptName}"/><br/>
+                            <p:inputText id="assetDept"  value="#{unmeasuredAssetListController.filterAssetDeptOrg.name}"  readonly="true"/>
+                        </f:facet>
+                        <h:outputText value="#{measureAssetListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
                     </p:column>
                     <p:column headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}"/>
@@ -126,6 +133,22 @@
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="measuringTab:treeNodeNameFilter3 @this" update="measuringTab:orgTree1" actionListener="#{orgTreeController.filterDeptOrgTree()}" value="检索"/>
                     <p:tree id="orgTree1" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(UserContextService.getCurrentUserAccount().getSiteUID())}"  var="node" selectionMode="single" dynamic="false">
                         <p:ajax process="@this" event="select"  listener="#{unmeasuredAssetListController.onClinicalDeptFilter}" update="measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:clinicalDept measuringTab:idVarPanelDeptOrg3" oncomplete="PF('varDataList_unmeasuredAsset').filter();PF('varPanelDeptOrg3').hide();"/>
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+                        <p:treeNode type="org">
+                            <h:outputText value="#{node.shortName}"/>
+                        </p:treeNode>
+                        <p:treeNode type="hidden" rendered="false"/>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+
+            <p:overlayPanel id="idVarPanelAssetDeptOrg3" widgetVar="varPanelAssetDeptOrg3" for=":measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:assetDept" dismissable="true" style="text-align: left;">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:inputText id="treeNodeNameFilterAssetDept3" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="measuringTab:treeNodeNameFilterAssetDept3 @this" update="measuringTab:orgTreeAssetDept3" actionListener="#{orgTreeController.filterDeptOrgTree()}" value="检索"/>
+                    <p:tree id="orgTreeAssetDept3" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(UserContextService.getCurrentUserAccount().getSiteUID())}"  var="node" selectionMode="single" dynamic="false">
+                        <p:ajax process="@this" event="select"  listener="#{unmeasuredAssetListController.onAssetDeptFilter}" update="measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset:assetDept measuringTab:idVarPanelAssetDeptOrg3" oncomplete="PF('varDataList_unmeasuredAsset').filter();PF('varPanelAssetDeptOrg3').hide();"/>
                         <p:ajax process="@this" event="expand"/>
                         <p:ajax process="@this" event="collapse"/>
                         <p:treeNode type="org">

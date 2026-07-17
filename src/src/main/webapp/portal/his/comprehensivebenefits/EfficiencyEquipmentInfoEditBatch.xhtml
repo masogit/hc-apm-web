@@ -46,6 +46,12 @@
                                 <p:ajax />
                             </p:inputNumber>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">科室预计投资回收期(年)</label>
+                            <p:inputNumber minValue="0" decimalPlaces="2" id="deptExpectedPaybackPeriod" value="#{efficiencyEquipmentInfoController.deptExpectedPaybackPeriod}">
+                                <p:ajax />
+                            </p:inputNumber>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 

@@ -68,6 +68,8 @@ public class MaintainHistoryController {
     private TreeNode selectedNode;
     List<OrgInfo> listOrgDept;
     OrgInfo selectedOrgDepart;
+    @Getter @Setter
+    OrgInfo selectedAssetDept;
 
     @Getter @Setter
     private String status;
@@ -171,6 +173,9 @@ public class MaintainHistoryController {
             }
             if(this.selectedOrgDepart != null && this.selectedOrgDepart.getId() != -1){
                 param.put("deptUid", this.selectedOrgDepart.getUid());
+            }
+            if(this.selectedAssetDept != null && this.selectedAssetDept.getId() != -1){
+                param.put("assetDeptUid", this.selectedAssetDept.getUid());
             }
         }
 

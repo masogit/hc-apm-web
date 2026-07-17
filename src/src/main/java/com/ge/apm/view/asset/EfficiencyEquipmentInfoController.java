@@ -81,6 +81,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     //选定的院区
     private OrgInfo selectSite;
+    private OrgInfoRepository orgInfoDao;
 
     private List<EfficiencyEquipmentInfo> currentPageAssets;
     @Getter
@@ -116,7 +117,11 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     @Getter @Setter
     private String filterClinicalDeptOrg;
     @Getter @Setter
+    private String filterAssetDeptOrg;
+    @Getter @Setter
     private Set<String> clinicalDeptOrgUidSet;
+    @Getter @Setter
+    private Set<String> assetDeptOrgUidSet;
 
     private OrgInfoTreeService orgInfoTreeService;
     private AssetDepreciationMapper assetDepreciationMapper;
@@ -156,6 +161,10 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
     @Getter
     @Setter
+    private BigDecimal deptExpectedPaybackPeriod;
+
+    @Getter
+    @Setter
     private String displayName;
 
     private SystemTemplateService systemTemplateService;
@@ -182,6 +191,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 
         hisEquipmentDataResultMapper = WebUtil.getBean(HisEquipmentDataResultMapper.class);
         assetCostAmountInfoMapper = WebUtil.getBean(AssetCostAmountInfoMapper.class);
@@ -229,6 +239,9 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
 
         if (ObjectUtil.isNotEmpty(clinicalDeptOrgUidSet)) {
             param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
+        }
+        if (ObjectUtil.isNotEmpty(assetDeptOrgUidSet)) {
+            param.put("assetDeptUids", assetDeptOrgUidSet);
         }
         param.put("startDate",startDate);
         param.put("endDate",endDate);
@@ -490,6 +503,9 @@ protected boolean numberField(String fieldName, String filterVal) {
                 case "clinicalDeptName":
                     param.put("clinicalDeptName", searchFilter.value);
                     break;
+                case "assetDeptName":
+                    param.put("assetDeptName", searchFilter.value);
+                    break;
                 case "checkNumberPeople":
                     try {
                         double num = Double.parseDouble(searchFilter.value.toString());
@@ -749,8 +765,9 @@ protected boolean numberField(String fieldName, String filterVal) {
         this.displayName=null;
         this.expectedAnnualIncome=null;
         this.expectedCheckNumberPeople=null;
+        this.deptExpectedPaybackPeriod=null;
     }
-    public void  editBatch(){
+    public void editBatch() {
         if (positiveRate != null) {
             if (positiveRate.compareTo(BigDecimal.valueOf(100)) > 0) {
                 this.positiveRate = null;
@@ -759,7 +776,7 @@ protected boolean numberField(String fieldName, String filterVal) {
             }
         }
         Set<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-        int count = efficiencyEquipmentInfoRepository.updateBatchSmart(assetUids, positiveRate, displayName, expectedAnnualIncome, expectedCheckNumberPeople);
+        int count = efficiencyEquipmentMapper.updateBatchSmart(assetUids, positiveRate, displayName, expectedAnnualIncome, expectedCheckNumberPeople, deptExpectedPaybackPeriod);
         if (count > 0) {
             WebUtil.addErrorMessage("批量修改成功");
         } else {
@@ -770,16 +787,21 @@ protected boolean numberField(String fieldName, String filterVal) {
         this.displayName = null;
         expectedAnnualIncome = null;
         expectedCheckNumberPeople = null;
+        this.deptExpectedPaybackPeriod = null;
     }
 
 
     private void loadClinicalDeptList() {
-        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
-        if (null != selectSite) {
-            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
-                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
-        }
+//        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+//                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+//        if (null != selectSite) {
+//            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+//                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+//        }
+        String siteUid = selectSite == null ? user.getSiteUID() : selectSite.getSiteUID();
+
+        clinicalDeptList= efficiencyEquipmentMapper.getDeptList(user.getUid(),user.getTenantUID(),siteUid);
+
     }
 
     public List<String> autoCompleteDeptName(String query) {
@@ -814,5 +836,34 @@ protected boolean numberField(String fieldName, String filterVal) {
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
 
+    }
+
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (clinicalDeptList == null) {
+            return;
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
+        }
+
+        if (filterAssetDeptOrg != null && orgInfoTreeService != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgInfoDao.getByUid(uid);
     }
 }

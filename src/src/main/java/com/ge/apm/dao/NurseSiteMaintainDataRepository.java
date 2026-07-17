@@ -73,4 +73,40 @@ public interface NurseSiteMaintainDataRepository extends GenericRepositoryUUID<N
 	@Modifying
 	@Query(value = "delete from nurse_site_maintain_data where parent_id in ?1", nativeQuery = true)
 	void deleteMaintainDataByParentId(Collection<String> parentId);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_data set is_skip = null where is_skip = true " +
+			"and parent_id in (select nsmi.id from nurse_site_maintain_item nsmi " +
+			"join nurse_site_maintain nsm on nsmi.parent_id = nsm.id " +
+			"where nsmi.is_finish = false and nsm.site_uid = ?1 " +
+			"and not exists (select 1 from config_item_value civ where civ.key = ?2 and civ.site_uid = nsm.site_uid and civ.value = 'true'))", nativeQuery = true)
+	void clearSkipForUnfinishedItemsBySite(String siteUid, String configKey);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_data set is_skip = null where is_skip = true " +
+			"and parent_id in (select nsmi.id from nurse_site_maintain_item nsmi " +
+			"join nurse_site_maintain nsm on nsmi.parent_id = nsm.id " +
+			"where nsmi.is_finish = false and nsm.hospital_uid = ?1 " +
+			"and not exists (select 1 from config_item_value civ where civ.key = ?2 and civ.site_uid = nsm.site_uid and civ.value = 'true'))", nativeQuery = true)
+	void clearSkipForUnfinishedItemsByHospital(String hospitalUid, String configKey);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_data set is_skip = null where is_skip = true " +
+			"and parent_id in (select nsmi.id from nurse_site_maintain_item nsmi " +
+			"join nurse_site_maintain nsm on nsmi.parent_id = nsm.id " +
+			"where nsmi.is_finish = false and nsm.institution_uid = ?1 " +
+			"and not exists (select 1 from config_item_value civ where civ.key = ?2 and civ.site_uid = nsm.site_uid and civ.value = 'true'))", nativeQuery = true)
+	void clearSkipForUnfinishedItemsByInstitution(String institutionUid, String configKey);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_data set is_skip = null where is_skip = true " +
+			"and parent_id in (select nsmi.id from nurse_site_maintain_item nsmi " +
+			"join nurse_site_maintain nsm on nsmi.parent_id = nsm.id " +
+			"where nsmi.is_finish = false and nsm.tenant_uid = ?1 " +
+			"and not exists (select 1 from config_item_value civ where civ.key = ?2 and civ.site_uid = nsm.site_uid and civ.value = 'true'))", nativeQuery = true)
+	void clearSkipForUnfinishedItemsByTenant(String tenantUid, String configKey);
 }

@@ -78,6 +78,8 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     @Getter@Setter
     private String filterClinicalDeptOrg; //选定的所属科室
     @Getter@Setter
+    private String filterAssetDeptOrg; //选定的使用科室
+    @Getter@Setter
     private Set<String> clinicalDeptOrgUidSet;
     @Getter@Setter
     private Set<String> assetDeptOrgUidSet;
@@ -188,6 +190,11 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
+        if (!CollectionUtils.isEmpty(assetDeptOrgUidSet)) {
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, assetDeptOrgUidSet.stream().findFirst().get(), "1*2+"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*2+")).collect(Collectors.toList()));
+        }
     }
 
     public void editSearchFilters() {
@@ -203,6 +210,11 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, clinicalDeptOrgUidSet.stream().findFirst().get(), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (!CollectionUtils.isEmpty(assetDeptOrgUidSet)) {
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, assetDeptOrgUidSet.stream().findFirst().get(), "1*2+"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*2+")).collect(Collectors.toList()));
         }
         if (null != assetGroup) {
             this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  assetGroup, "1*"));
@@ -237,7 +249,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     }
 
     public DualListModel<AssetInfo> assetList() {
-        if (StringUtils.isEmpty(assetName) && StringUtils.isEmpty(functionType) && assetGroup == null && CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
+        if (StringUtils.isEmpty(assetName) && StringUtils.isEmpty(functionType) && assetGroup == null && CollectionUtils.isEmpty(clinicalDeptOrgUidSet) && CollectionUtils.isEmpty(assetDeptOrgUidSet)) {
             MessageUtil.outPutReturnFacesMessage("RiskAssessmentSearchRequire", FacesMessage.SEVERITY_INFO);
             return assets;
         }
@@ -289,6 +301,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         loadClinicalDeptList();
         //table header dropdown needs to clear manually, table filters cleared by clear method above.
         filterClinicalDeptOrg = null;
+        filterAssetDeptOrg = null;
         assetDeptOrgUidSet = null;
         clinicalDeptOrgUidSet = null;
         assetGroup = null;
@@ -368,6 +381,22 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public void onAssetDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterAssetDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+        if (!Strings.isNullOrEmpty(filterAssetDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterAssetDeptOrg.equals(item.getName()))) {
+            filterAssetDeptOrg = null;
+        }
+        if (filterAssetDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterAssetDeptOrg)).collect(Collectors.toList());
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            assetDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            assetDeptOrgUidSet = Collections.emptySet();
         }
     }
 
@@ -571,5 +600,9 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     @Override
     protected GenericRepository<AssetInfo> getDAO() {
         return assetInfoRepository;
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgInfoRepository.getByUid(uid);
     }
 }

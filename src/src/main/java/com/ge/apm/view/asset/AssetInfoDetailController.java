@@ -26,6 +26,7 @@ import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.TreeNode;
@@ -102,6 +103,7 @@ public class AssetInfoDetailController {
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     private SpecialAssetInfoService specialAssetInfoService;
     private V2_WorkOrderRepository workOrderRepository;
+    private V2_PmOrderRepository pmOrderRepository;
 
 
     private SpecialAssetInfo specialAssetInfo;
@@ -109,6 +111,7 @@ public class AssetInfoDetailController {
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         workOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
+        pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         aeMapper = WebUtil.getBean(AeMapper.class);
         mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         mvsUtil = WebUtil.getBean(MvsUtil.class);
@@ -571,5 +574,70 @@ public class AssetInfoDetailController {
         if (code == null) return "";
         RiskLevel level = RiskLevel.getByCode(code);
         return level != null ? level.getName() : "";
+    }
+
+    public String checkMvsData(String uid) {
+        boolean isYiMaiYangGuangTenant = userContextService.isYiMaiYangGuangTenant();
+        boolean selectedIdMatches = selected.getUid().equals(uid);
+        if (!isYiMaiYangGuangTenant || selectedIdMatches) {
+            return "0";
+        } else {
+            return "1";
+        }
+    }
+    public void buildDataLinkUrl() {
+        String uid = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("uid");
+
+        String type = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("type");
+
+        Integer assetId = selected.getId();
+
+        String url = "";
+        String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+        if("repair".equals(type)){
+            V2_WorkOrder workOrder = workOrderRepository.findById(uid);
+            if(checkMvsData(workOrder.getAssetUid()).equals("0")){
+                String encodeUrlQueryString = "actionName=View&selectedid="
+                        + uid
+                        + "&queryIndex=12" ;
+                encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+                url = contextPath + "/portal/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
+            }else if(checkMvsData(workOrder.getAssetUid()).equals("1")){
+                String encodeUrlQueryString = "actionName=View&selectedid="
+                        + uid + "&assetUid=" + selected.getUid()
+                        + "&queryIndex=11"
+                ;
+                url = contextPath + "/portal/woMgr/mvs/woMvsMgrViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+            }
+        }else if("maintenance".equals(type)){
+            V2_PmOrder pmOrder = pmOrderRepository.findById(uid);
+            if(checkMvsData(pmOrder.getAssetUid()).equals("0")){
+                String encodeUrlQueryString = "actionName=View&selectedid="
+                        +uid + "&assetUid=" + selected.getUid()
+                        + "&queryIndex=10";
+                encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+                url = contextPath + "/portal/pm/pmOrderViewNew.xhtml?str=" + encodeUrlQueryString;
+            }else if (checkMvsData(pmOrder.getAssetUid()).equals("1")){
+                String encodeUrlQueryString = "actionName=View&selectedid="
+                        + uid + "&assetUid=" + selected.getUid()
+                        + "&queryIndex=10";
+                encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+                url = contextPath + "/portal/pm/mvs/pmMvsOrderViewNew.xhtml?str=" + encodeUrlQueryString;
+            }
+        }else if("measuring".equals(type)){
+            url = "actionName=View&selectedid="
+                    + selected.getUid()
+                    +"&matchType=1"+"&boUuid="+uid;
+            url = contextPath + "/portal/measuring/measuringResultList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        }
+        log.info("timeline_url:"+url);
+        RequestContext.getCurrentInstance().addCallbackParam("url", url);
+
     }
 }

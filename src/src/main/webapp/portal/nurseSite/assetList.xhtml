@@ -155,7 +155,7 @@
 		</p:panelGrid>
 
 		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
-            <p:dataTable id="assets5maintain" value="#{assetSelectController.assets5Maintain}" var="asset"
+            <p:dataTable id="assets5maintain" value="#{assetSelectController.assets5MaintainModel}" var="asset"
                          selectionMode="single"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
@@ -174,25 +174,25 @@
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
-                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" filterBy="#{asset.name}" filterMatchMode="contains">
                     <h:outputText value="#{asset.name}"/>
                 </p:column>
-                <p:column headerText="设备分类">
+                <p:column headerText="设备分类" filterBy="#{asset.assetGroupName}" filterMatchMode="contains">
                     <h:outputText value="#{fieldMsg.fieldValue('assetGroup',asset.assetGroup)}"/>
                 </p:column>
-                <p:column headerText="#{msg.clinicalDeptName}">
+                <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{asset.clinicalDeptName}" filterMatchMode="contains">
                     <h:outputText value="#{asset.clinicalDeptName}"/>
                 </p:column>
-                <p:column headerText="#{msg.assetDeptName}">
+                <p:column headerText="#{msg.assetDeptName}" filterBy="#{assetSelectController.getOrgInfoByUid(asset.assetDeptUID).name}" filterMatchMode="contains">
                     <h:outputText value="#{assetSelectController.getOrgInfoByUid(asset.assetDeptUID).name}"/>
                 </p:column>
-                <p:column headerText="#{msg.departNum}">
+                <p:column headerText="#{msg.departNum}" filterBy="#{asset.departNum}" filterMatchMode="contains">
                     <h:outputText value="#{asset.departNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.serialNum}">
+                <p:column headerText="#{msg.serialNum}" filterBy="#{asset.serialNum}" filterMatchMode="contains">
                     <h:outputText value="#{asset.serialNum}"/>
                 </p:column>
-                <p:column headerText="#{msg.qrCode}">
+                <p:column headerText="#{msg.qrCode}" filterBy="#{asset.qrCode}" filterMatchMode="contains">
                     <h:outputText value="#{asset.qrCode}"/>
                 </p:column>
             </p:dataTable>

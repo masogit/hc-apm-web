@@ -68,6 +68,9 @@ public class NurseSiteMaintainData {
 	private String errorText;
 	@Transient
 	private String description;
+	// 是否忽略该检查项（dailyCheckIgnorable 配置启用时可用）
+	@Column(name = "is_skip")
+	private Boolean isSkip;
 	public String getId() {
 		return id;
 	}
@@ -117,6 +120,9 @@ public class NurseSiteMaintainData {
 	}
 	
 	public String getStrValue(){
+		if(Boolean.TRUE.equals(this.isSkip)){
+			return "已忽略";
+		}
 		if(this.checkValue==null){
 			return "未检查";
 		}
@@ -244,5 +250,16 @@ public class NurseSiteMaintainData {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Boolean getIsSkip() {
+		if (isSkip == null) {
+			isSkip = Boolean.FALSE;
+		}
+		return isSkip;
+	}
+
+	public void setIsSkip(Boolean isSkip) {
+		this.isSkip = isSkip;
 	}
 }

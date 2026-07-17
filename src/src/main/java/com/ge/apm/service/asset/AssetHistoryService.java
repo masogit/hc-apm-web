@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -18,6 +19,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -470,6 +472,73 @@ public class AssetHistoryService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static final String SHEET_IMPORT_NAME = "sheet1";
+
+
+    public Boolean exportData(ExcelDocument doc, List<Map<String, Object>> dataList) {
+
+        Integer keyRow_fileScanReport = 1;
+        Integer dataRow_fileScanReport = 2;
+
+        for (Map<String, Object> item : dataList) {
+            doc.writeRowData(SHEET_IMPORT_NAME, keyRow_fileScanReport, dataRow_fileScanReport++, item);
+        }
+
+        return Boolean.TRUE;
+    }
+
+    public List<Map<String, Object>> createFileScanData(List<JSONObject> fileScanList){
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (JSONObject importFilesVO : fileScanList) {
+            Map<String, Object> resultMap = new HashedMap();
+
+            resultMap.put("资产名称", importFilesVO.get("assetName"));
+            resultMap.put("资产编号", importFilesVO.get("financingNum"));
+            resultMap.put("设备编号（院方）", importFilesVO.get("departNum"));
+            resultMap.put("使用科室", importFilesVO.get("assetDeptName"));
+            resultMap.put("所属科室", importFilesVO.get("clinicalDeptName"));
+            resultMap.put("使用责任人", importFilesVO.get("clinicalOwnerName"));
+            resultMap.put("安装位置", importFilesVO.get("locationName"));
+            resultMap.put("资产状态", importFilesVO.get("deviceStatus"));
+            resultMap.put("当前状态", importFilesVO.get("status"));
+            resultMap.put("是否在用", importFilesVO.get("isValid"));
+            resultMap.put("资产处置结果", importFilesVO.get("assetDisposalResults"));
+            resultMap.put("采购日期", importFilesVO.get("purchaseDate"));
+            resultMap.put("采购价格", importFilesVO.get("purchasePrice"));
+            resultMap.put("二维码(旧)", importFilesVO.get("qrCodeOld"));
+            resultMap.put("二维码(新)", importFilesVO.get("qrCodeNew"));
+            resultMap.put("启用日期", importFilesVO.get("installDate"));
+            resultMap.put("设备型号", importFilesVO.get("functionType"));
+            resultMap.put("维修负责人", importFilesVO.get("assetOwnerName"));
+            resultMap.put("制造商", importFilesVO.get("manufacture"));
+            resultMap.put("品牌/制造商简称", importFilesVO.get("makerShortName"));
+            resultMap.put("注册编号", importFilesVO.get("registrationNo"));
+            resultMap.put("供应商", importFilesVO.get("vendor"));
+            resultMap.put("医疗器械分类(旧)", importFilesVO.get("assetCode68"));
+            resultMap.put("制造商序列号", importFilesVO.get("serialNum"));
+            resultMap.put("出厂日期", importFilesVO.get("manufactDate"));
+            resultMap.put("使用年限", importFilesVO.get("lifecycle"));
+            resultMap.put("质保截止日期", importFilesVO.get("factoryWarrantyDate"));
+            resultMap.put("用途分类", importFilesVO.get("assetUsage"));
+            resultMap.put("资金来源", importFilesVO.get("capitalSource"));
+            resultMap.put("计量等级", importFilesVO.get("measuringItemCategory"));
+            resultMap.put("风险等级", importFilesVO.get("estimatedRiskLevel"));
+            resultMap.put("是否急救设备", importFilesVO.get("emergencyEquipment"));
+            resultMap.put("是否进口设备", importFilesVO.get("importEquipment"));
+            resultMap.put("医疗器械分类", importFilesVO.get("functionGroup"));
+            resultMap.put("修改人", importFilesVO.get("createdBy"));
+            if(importFilesVO.get("createdDate") != null){
+                resultMap.put("修改时间", sdf.format(importFilesVO.get("createdDate")));
+            }
+
+            resultList.add(resultMap);
+        }
+
+        return resultList;
+
     }
 
 }

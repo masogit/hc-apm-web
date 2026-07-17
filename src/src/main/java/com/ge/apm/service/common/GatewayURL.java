@@ -203,6 +203,7 @@ public enum GatewayURL {
 
     //es查询设备修改历史记录分页
     ELASTICSEARCH_QUERY("/hcapmelasticservice/elasticSearch/query"),
+    ELASTICSEARCH_QUERY_AFTER("/hcapmelasticservice/elasticSearch/queryBySearchAfter"),
     SEARCH_ASSET_HISTORY_LIST("/hcapmelasticservice/assetHistory/searchAssetHistoryList"),
     INSERT_ASSET_HISTORY("/hcapmelasticservice/assetHistory/insertAssetHistory"),
     INSERT_PHYSICAL_DATA_DEL("/hcapmelasticservice/physicalDataDel/insertPhysicalDataDel"),

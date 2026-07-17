@@ -1165,7 +1165,7 @@ public class AssetInfo implements ChineseName, Serializable {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
             DateTime dt = TimeUtil.toJodaDate(nextMeteringDate);
             if(dt.isBeforeNow()) {
-                measuringAlertStatus = "measuringExpired";
+                measuringAlertStatus = "measuringExpiredSoon30";
             } else if(dt.minusDays(30).isBeforeNow()) {
                 measuringAlertStatus = "measuringExpiredSoon30";
             }else if(dt.minusDays(90).isBeforeNow()){
@@ -3044,6 +3044,23 @@ public class AssetInfo implements ChineseName, Serializable {
         this.clinicalDeptUID = clinicalDeptUID;
         this.nurseLocation = nurseLocation;
         this.qrCode = qrCode;
+    }
+
+    public AssetInfo(Integer id, String name, String uid, String departNum, String serialNum, String functionType, String clinicalDeptName, String clinicalDeptUID, String nurseLocation, String qrCode, String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
+        this.id = id;
+        this.name = name;
+        this.uid = uid;
+        this.departNum = departNum;
+        this.serialNum = serialNum;
+        this.functionType = functionType;
+        this.clinicalDeptName = clinicalDeptName;
+        this.clinicalDeptUID = clinicalDeptUID;
+        this.nurseLocation = nurseLocation;
+        this.qrCode = qrCode;
+        this.siteUID = siteUID;
+        this.hospitalUID = hospitalUID;
+        this.institutionUID = institutionUID;
+        this.tenantUID = tenantUID;
     }
 
     public Map<String, Object> buildLeaseReqHeader() {

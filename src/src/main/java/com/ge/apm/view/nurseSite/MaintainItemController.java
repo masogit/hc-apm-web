@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ibm.icu.util.Calendar;
@@ -325,5 +326,32 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 
 	public void setSelectCheckItem(NurseSiteMaintainConfigCheckItem selectCheckItem) {
 		this.selectCheckItem = selectCheckItem;
+	}
+
+	/**
+	 * 根据设备的四个UID判断是否启用了 dailyCheckIgnorable 配置项
+	 */
+	public boolean isDailyCheckIgnorable(AssetInfo assetInfo) {
+		if (assetInfo == null
+				|| StringUtils.isEmpty(assetInfo.getSiteUID())
+				|| StringUtils.isEmpty(assetInfo.getTenantUID())) {
+			return false;
+		}
+		ConfigItemValueRepository configItemValueRepository = WebUtil.getBean(ConfigItemValueRepository.class);
+		String value = configItemValueRepository.findByKeyAndSiteForUseParent(
+				assetInfo.getSiteUID(), assetInfo.getHospitalUID(),
+				assetInfo.getInstitutionUID(), assetInfo.getTenantUID(),
+				"dailyCheckIgnorable");
+		return Boolean.TRUE.toString().equalsIgnoreCase(value);
+	}
+
+	/**
+	 * 勾选"忽略"时，自动清除该检查项的勾选状态（通过/不通过），避免两个勾选框同时被锁定的死锁
+	 */
+	public void onSkipChange(NurseSiteMaintainData data) {
+		if (data != null && Boolean.TRUE.equals(data.getIsSkip())) {
+			data.setCheckValue(null);
+			data.setCheckValueWeb(0);
+		}
 	}
 }

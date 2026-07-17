@@ -669,7 +669,9 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:tab>
-
+                    <p:tab title="生命时间轴" id="timeline">
+                        <ui:include src="EventTimeline.xhtml"></ui:include>
+                    </p:tab>
 
                     <p:tab title="#{msg.specialAsset}" rendered="#{userContextService.accessContainsApmFeature('SPECIAL_ASSET')  and assetInfoDetailController.selected.specialAsset }">
                         <ui:include src="SpecialAssetInfoDetail.xhtml"/>
@@ -796,6 +798,7 @@
                             </p:dataTable>
                         </p:fieldset>
                     </p:tab>
+
                 </p:tabView>
 
                 <ui:include src="AssetScrap.xhtml"/>

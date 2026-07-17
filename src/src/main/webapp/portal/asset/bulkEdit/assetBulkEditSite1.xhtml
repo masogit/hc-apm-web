@@ -50,6 +50,15 @@
                     </p:autoComplete>
                 </h:panelGroup>
 
+                <h:panelGroup rendered="#{userContextService.enableDisplayByKey('assetDepartmentConvertDeptFilter')}">
+                    <label class="label">#{msg.assetDeptName}</label>
+                    <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.filter.assetDeptOrg}"
+                                    scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDeptAsFilter}"
+                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="siteFilterChange">
+                        <p:ajax event="itemSelect" update="@(.pickList)" />
+                    </p:autoComplete>
+                </h:panelGroup>
+
                 <h:panelGroup>
                     <label class="label">#{msg.assetGroup}</label>
                     <p:selectOneMenu value="#{assetInfoBulkEditController.filter.assetGroup}">

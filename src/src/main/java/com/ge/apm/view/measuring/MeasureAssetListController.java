@@ -91,6 +91,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private Boolean measurementRepairVisible;
     private Map<String, Boolean> selectedMap;
     private OrgInfo filterOrg;
+    @Getter @Setter
+    private OrgInfo filterAssetDeptOrg;
     private UserAccount currentUser;
     private List<AssetInfo> currentPageAssets;
     private List<V2_BlobObject> resultAttachList;
@@ -202,13 +204,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             String matchTypeStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "matchType");
             String boUuid = (String) UrlEncryptController.getValueFromMap(encodeStr, "boUuid");
+            if(StringUtils.isEmpty(matchTypeStr)) return;
             matchType = Integer.valueOf(matchTypeStr);
             this.selected = dao.findByUid(selectedId);
             if(this.selected == null){
                 this.selected = new AssetInfo();
                 this.selected.setBoUuid(boUuid);
             }
-            if(Integer.valueOf(1).equals(matchType)){
+            if(Integer.valueOf(1).equals(matchType) || Integer.valueOf(2).equals(matchType)){
                 measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
             }else{
 
@@ -240,7 +243,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 String prefix = "check_date".equals(property) || "validity_months".equals(property)? "mcd." : "ai.";
                 wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
             }
-            wrapper.and().ge("mcd.certificate_type",matchType);
+            wrapper.and().eq("mcd.certificate_type",matchType);
             wrapper.orderBy("mcd.id");
             currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
         }else{
@@ -407,6 +410,11 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
         }
         wrapper.andNew().in(ObjectUtil.isNotEmpty(clinicalUidList), "ai.clinical_dept_uid", clinicalUidList);
+        List<String> assetDeptUidList = Lists.newArrayList();
+        if(null != filterAssetDeptOrg){
+            assetDeptUidList = Lists.newArrayList(filterAssetDeptOrg.getUid());
+        }
+        wrapper.in(ObjectUtil.isNotEmpty(assetDeptUidList), "ai.asset_dept_uid", assetDeptUidList);
         if(this.hasFilterOnField("verificationConclusion")){
             Integer verificationConclusion = Integer.valueOf(searchFilters.stream().filter(sf -> "verificationConclusion".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("verificationConclusion", SearchFilter.Operator.EQ, 0)).value.toString());
             wrapper.eq("mcd.status", verificationConclusion);
@@ -528,7 +536,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public List<MeasuringCertificateDetail> getMeasuringResult(){
         List<MeasuringCertificateDetail>  list=new ArrayList<>();
-        if(matchType==1){
+        if(matchType==1 || matchType==2){
             list= measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
 
         }else{
@@ -619,6 +627,11 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 //        } else {
 //            filterOrg = null;
 //        }
+    }
+
+    public void onAssetDeptFilter(NodeSelectEvent event) {
+        selectedNode = event.getTreeNode();
+        filterAssetDeptOrg = (OrgInfo) selectedNode.getData();
     }
 
     public void onTabChange(TabChangeEvent event){
@@ -909,6 +922,10 @@ public void treeSearchCondition(){
 
     public void setExcelFile(StreamedContent excelFile) {
         this.excelFile = excelFile;
+    }
+
+    public OrgInfo getOrgInfoByUid(String uid) {
+        return orgDao.getByUid(uid);
     }
 
 }

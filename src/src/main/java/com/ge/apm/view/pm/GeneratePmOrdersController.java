@@ -89,6 +89,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
+    private OrgInfo assetDeptOrgInfo;
     private List<AssetInfo> assetInfoList = new ArrayList<>();
     private Integer total = 0;
     private Integer assetRuleModelTotal = 0;
@@ -300,6 +301,13 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
             List<String> results = new ArrayList<>(clinicalUids);
             if(CollectionUtils.isNotEmpty(results)){
                 assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
+            }
+        }
+        if (assetDeptOrgInfo != null){
+            Set<String> assetDeptUids = orgInfoTreeService.collectChildClinicalDept(assetDeptOrgInfo.getUid());
+            List<String> results = new ArrayList<>(assetDeptUids);
+            if(CollectionUtils.isNotEmpty(results)){
+                assetFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN,results));
             }
         }
 		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
@@ -789,6 +797,14 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public void setClinicalOrgInfo(OrgInfo clinicalOrgInfo) {
 		this.clinicalOrgInfo = clinicalOrgInfo;
+	}
+
+	public OrgInfo getAssetDeptOrgInfo() {
+		return assetDeptOrgInfo;
+	}
+
+	public void setAssetDeptOrgInfo(OrgInfo assetDeptOrgInfo) {
+		this.assetDeptOrgInfo = assetDeptOrgInfo;
 	}
 
 	public TenantInfo getSelectedTenant() {
