@@ -11,7 +11,7 @@
                 ROUND(COALESCE(SUM(usage_duration), 0) / 1440.0, 2) AS total_occupation_days,
                 COUNT(DISTINCT CASE
                     WHEN COALESCE(NULLIF(operating_room_code, ''), NULLIF(operating_room_name, '')) IS NOT NULL
-                    THEN COALESCE(NULLIF(operating_room_code, ''), operating_room_name)
+                    THEN (NULLIF(operating_room_code, ''), NULLIF(operating_room_name, ''))
                 END) AS operating_room_coverage_count
             FROM surgery_anesthesia_data_result
             WHERE tenant_uid = #{tenantUid}
