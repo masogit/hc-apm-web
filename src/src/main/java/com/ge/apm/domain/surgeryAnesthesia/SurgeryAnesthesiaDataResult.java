@@ -19,7 +19,7 @@ import java.util.Date;
 @Entity
 @javax.persistence.Table(name = "surgery_anesthesia_data_result",
         uniqueConstraints = @UniqueConstraint(name = "uk_sadr_org_device_date_room_asset",
-                columnNames = {"org_code", "device_code", "surgery_date", "operating_room_name", "asset_uid"}))
+                columnNames = {"org_code", "device_code", "surgery_date", "operating_room_code", "operating_room_name", "asset_uid"}))
 @Table(appliesTo = "surgery_anesthesia_data_result", indexes = {
         @Index(name = "idx_sadr_tenant_date", columnNames = {"tenant_uid", "surgery_date"}),
         @Index(name = "idx_sadr_tenant_site_date", columnNames = {"tenant_uid", "site_uid", "surgery_date"}),
