@@ -9,10 +9,7 @@
                 asset_uid,
                 COALESCE(SUM(usage_count)::INTEGER, 0) AS total_usage_count,
                 ROUND(COALESCE(SUM(usage_duration), 0) / 1440.0, 2) AS total_occupation_days,
-                COUNT(DISTINCT CASE
-                    WHEN COALESCE(NULLIF(operating_room_code, ''), NULLIF(operating_room_name, '')) IS NOT NULL
-                    THEN (NULLIF(operating_room_code, ''), NULLIF(operating_room_name, ''))
-                END) AS operating_room_coverage_count
+                COUNT(DISTINCT NULLIF(operating_room_name, '')) AS operating_room_coverage_count
             FROM surgery_anesthesia_data_result
             WHERE tenant_uid = #{tenantUid}
             AND surgery_date BETWEEN #{startDate}::date AND #{endDate}::date
