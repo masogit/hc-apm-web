@@ -9,10 +9,12 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.surgeryAnesthesia.SurgeryAnesthesiaEquipmentInfo;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +26,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,7 +51,7 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
     private OrgInfo selectSite;
 
     @Getter @Setter
-    private Date startDate = DateUtil.currentMonthFirstDay();
+    private Date startDate ;
 
     @Getter @Setter
     private Date endDate = new Date();
@@ -77,6 +80,8 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
         equipmentInfoMapper = WebUtil.getBean(SurgeryAnesthesiaEquipmentInfoMapper.class);
         uaaService = WebUtil.getBean(UaaService.class);
         user = UserContextService.getCurrentUserAccount();
+
+        startDate = DateUtil.addMonth(new Date(), -3);
     }
 
     @Override
@@ -322,4 +327,15 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
             selectedMap.put(item.getUid(), !isSelectedAll);
         }
     }
+
+    public void onSelectAsset() throws IOException {
+        if (null == selected) {
+            return;
+        }
+        String url= "assetUid=" + selected.getAssetUid();
+        url = "SurgeryAnesthesiaEquipmentInfoDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
 }

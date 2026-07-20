@@ -1,5 +1,6 @@
 package com.ge.apm.domain.surgeryAnesthesia;
 
+import com.ge.apm.domain.EfficiencyEquipmentInfo;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
@@ -153,4 +154,25 @@ public class SurgeryAnesthesiaEquipmentInfo implements Serializable {
      */
     @Transient
     private Integer operatingRoomCoverageCount;
+
+
+
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (uid != null ? uid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof SurgeryAnesthesiaEquipmentInfo)) {
+            return false;
+        }
+        SurgeryAnesthesiaEquipmentInfo other = (SurgeryAnesthesiaEquipmentInfo) object;
+        return (this.uid != null || other.uid == null) && (this.uid == null || this.uid.equals(other.uid));
+    }
+
 }
