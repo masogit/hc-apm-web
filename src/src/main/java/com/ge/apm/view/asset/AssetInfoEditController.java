@@ -2285,9 +2285,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    /**
-     * 序列号重复校验（新增资产时），返回 false 表示序列号重复
-     */
     private boolean checkSerialNumUnique() {
         if (StringUtils.isEmpty(selected.getSerialNum())) {
             return true;
