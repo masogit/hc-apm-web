@@ -140,6 +140,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SysRoleRepository sysRoleRepository;
 
     private MasterDataService masterDataService;
+    private AssetFileImportSupportingService supportingService;
 
     @Getter @Setter
     private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
@@ -373,6 +374,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTagsDao = WebUtil.getBean(AssetTagsRepository.class);
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
+        supportingService = WebUtil.getBean(AssetFileImportSupportingService.class);
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
@@ -1085,9 +1087,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         // 序列号重复校验（新增时）
         if(selected.getId() == null && StringUtils.isNotEmpty(selected.getSerialNum())){
-            if(!checkSerialNumUnique()){
-                WebUtil.addErrorMessage("制造商序列号已存在，不允许重复建档");
-                return "";
+            if(checkSerialNumUnique()){
+                WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }
         if(!checkAssetScrap()){
@@ -2291,8 +2292,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (StringUtils.isEmpty(selected.getSerialNum())) {
             return true;
         }
-        List<AssetInfo> existList = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
-        return existList.isEmpty();
+        return supportingService.isAssetFieldDuplicate("serialNum", selected.getSerialNum(), selected.getSiteUID(), selected.getUid());
     }
 
     public void requiredInput(String encoded, CustomConfigAssetField customConfigAssetField) {
