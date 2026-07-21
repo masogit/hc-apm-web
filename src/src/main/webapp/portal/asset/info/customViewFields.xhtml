@@ -651,6 +651,14 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'nextMeteringDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.nextMeteringDate}</label>
+            <p:inputText id="nextMeteringDate" value="#{assetInfoDetailController.selected.nextMeteringDate}" readonly="true" title="#{assetInfoDetailController.selected.nextMeteringDate}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'lastInventoryDate')}">
         <h:panelGroup>
             <label class="label">#{msg.lastInventoryDate}</label>

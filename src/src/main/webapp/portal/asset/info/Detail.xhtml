@@ -362,6 +362,12 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                     </p:inputText>
                                 </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.nextMeteringDate}</label>
+                                    <p:inputText id="nextMeteringDate" value="#{assetInfoController.selected.nextMeteringDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
 								<h:panelGroup >
 	                                <label class="label">#{msg.isWarrantyNotice}</label>
 		                            <p:selectOneRadio value="#{assetInfoController.selected.warranty}" disabled="true">

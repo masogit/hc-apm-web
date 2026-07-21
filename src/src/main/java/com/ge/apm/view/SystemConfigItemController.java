@@ -152,6 +152,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(20,"事件记录配置");
         categoryMap.put(21,"院区间调剂");
         categoryMap.put(22,"使用科室筛选");
+        categoryMap.put(23,"手术室绩效管理");
 
     }
 

@@ -17,7 +17,7 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="设备绩效分析"/>
+                <p:outputLabel class="pageTitle" value="手术室绩效设备管理页面"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
@@ -55,6 +55,9 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax  event="rowSelect" listener="#{surgeryAnesthesiaEquipmentInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
+
 
                         <p:ajax event="filter" listener="#{surgeryAnesthesiaEquipmentInfoController.onFilter}"
                                 oncomplete="updateSelectAllCheckBox();"/>
@@ -180,23 +183,36 @@
             </div>
 
         </div>
-
         <script>
-            //<![CDATA[
+
+            function afterLoadRender() {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX = "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX = "hidden";
+            }
+
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
             function updateSelectAllCheckBox() {
                 var checkboxlist = $(".selectCheckBox");
                 var selectAllstatus = true;
                 checkboxlist.each(function () {
-                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
                 });
-                $("#SurgeryEquipmentInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                $("#EfficiencyEquipmentInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
                 if (selectAllstatus) {
                     $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
                 } else {
                     $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
-            //]]>
         </script>
     </ui:define>
 </ui:composition>

@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="手术室设备绩效分析"/>
+            </div>
+            <div class="ui-g-12 card">
+
+                <iframe  src="/reports/operationRoomBenefit?assetUid=#{surgeryAnesthesiaEquipmentInfoDetailController.assetUid} " width="100%" height="900"></iframe>
+<!--                <iframe src="#{efficiencyEquipmentInfoController.url}" style="width: 100%;height: 90%;"> </iframe>-->
+
+            </div>
+        </div>
+
+
+    </ui:define>
+</ui:composition>

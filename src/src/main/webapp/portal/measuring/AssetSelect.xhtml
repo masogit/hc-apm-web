@@ -13,6 +13,34 @@
               draggable="true" appendTo="@(body)" width="960" height="660"
               header="选择设备">
         <h:form id="assetSearchForm">
+            <p:fieldset legend="匹配计量结果信息" rendered="#{measureAssetListController.selectedMeasuringCertificateDetail != null}">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">#{msg.certificateType}</label>
+                        <p:inputText value="#{fieldMsg.fieldValue('certificateType', measureAssetListController.selectedMeasuringCertificateDetail.certificateType)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">编号</label>
+                        <p:inputText value="#{measureAssetListController.selectedMeasuringCertificateDetail.certificateNo}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.EquipmentName}</label>
+                        <p:inputText value="#{measureAssetListController.selectedMeasuringCertificateDetail.assetName}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">型号</label>
+                        <p:inputText value="#{measureAssetListController.selectedMeasuringCertificateDetail.assetModel}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">制造厂</label>
+                        <p:inputText value="#{measureAssetListController.selectedMeasuringCertificateDetail.assetManufacturer}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">设备序列号SN</label>
+                        <p:inputText value="#{measureAssetListController.selectedMeasuringCertificateDetail.assetSN}" readonly="true"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
             <p:fieldset legend="#{msg.searchAsset}">
                 <p:panelGrid id="assetSearchPanel" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
