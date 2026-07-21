@@ -296,6 +296,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo>, Asset
     @Query(value="select uid from asset_info where depart_num = ?1  and  tenant_uid = ?2  and is_deleted = false ",nativeQuery=true)
     List<String> findIdByDepartNumAndTenantUID(String departNum,String tenantUID);
 
+    @Query(value="select uid from asset_info where depart_num = ?1 and tenant_uid = ?2 and is_deleted = false and id != ?3",nativeQuery=true)
+    List<String> findIdByDepartNumAndTenantUIDExcludeId(String departNum,String tenantUID, Integer excludeId);
+
     @Modifying
     @Transactional
     @Query(value = "UPDATE asset_info SET shared_asset_type = NULL WHERE uid IN ?1",nativeQuery = true)
