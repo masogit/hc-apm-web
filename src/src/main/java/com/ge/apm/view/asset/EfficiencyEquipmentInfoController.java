@@ -773,6 +773,29 @@ protected boolean numberField(String fieldName, String filterVal) {
     }
 
     /**
+     * 快捷筛选：本月（当月第一天到今天）
+     */
+    public void setThisMonth() {
+        LocalDate today = LocalDate.now();
+        LocalDate monthStart = today.withDayOfMonth(1);
+        this.startDate = Date.from(monthStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 快捷筛选：本季度（当前季度第一天到今天）
+     * Q1: 1-3月, Q2: 4-6月, Q3: 7-9月, Q4: 10-12月
+     */
+    public void setThisQuarter() {
+        LocalDate today = LocalDate.now();
+        int month = today.getMonthValue();
+        int quarterStartMonth = ((month - 1) / 3) * 3 + 1;
+        LocalDate quarterStart = LocalDate.of(today.getYear(), quarterStartMonth, 1);
+        this.startDate = Date.from(quarterStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
      * 快捷筛选：本年（1月1日到今天）
      */
     public void setThisYear() {
