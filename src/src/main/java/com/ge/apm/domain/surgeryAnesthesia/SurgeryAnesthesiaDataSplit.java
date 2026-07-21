@@ -85,7 +85,7 @@ public class SurgeryAnesthesiaDataSplit implements Serializable {
     /**
      * 拆分后的手术日期（对应result表中的surgery_date，即拆到天）
      */
-    @Column(name = "surgery_date")
+    @Column(name = "surgery_date", columnDefinition = "DATE")
     @Temporal(TemporalType.DATE)
     private Date surgeryDate;
 
@@ -106,7 +106,7 @@ public class SurgeryAnesthesiaDataSplit implements Serializable {
     /**
      * 源数据-手术日期（原始值）
      */
-    @Column(name = "source_surgery_date")
+    @Column(name = "source_surgery_date", columnDefinition = "DATE")
     @Temporal(TemporalType.DATE)
     private Date sourceSurgeryDate;
 

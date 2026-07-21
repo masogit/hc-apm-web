@@ -52,7 +52,7 @@ public class SurgeryAnesthesiaDataResult implements Serializable {
     /**
      * 手术日期
      */
-    @Column(name = "surgery_date")
+    @Column(name = "surgery_date", columnDefinition = "DATE")
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date surgeryDate;
