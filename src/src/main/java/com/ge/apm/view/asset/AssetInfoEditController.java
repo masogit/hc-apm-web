@@ -38,6 +38,7 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -79,6 +80,7 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
+@Slf4j
 public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private CustomConfigService ccService;
@@ -1340,6 +1342,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean checkDepartNumUniqueAssetInfo() {
+        if (selected.getId() != null) {
+            List<String> hisData = dao.findIdByDepartNumAndTenantUIDExcludeId(
+                    selected.getDepartNum(), selected.getTenantUID(), selected.getId());
+            if (!hisData.isEmpty()) {
+                log.info("设备编号冲突: departNum={}, currentUid={}, conflictUids={}",
+                        selected.getDepartNum(), selected.getUid(), hisData);
+            }
+            return hisData.isEmpty();
+        }
         List<String> hisData = dao.findIdByDepartNumAndTenantUID(selected.getDepartNum(), selected.getTenantUID());
         if(hisData.isEmpty()){
             return true;
@@ -1350,6 +1361,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 return true;
             }
         }
+        log.info("==设备编号冲突: departNum={}, currentUid={}, conflictUids={}",
+                selected.getDepartNum(), selected.getUid(), hisData);
         return false;
     }
 
