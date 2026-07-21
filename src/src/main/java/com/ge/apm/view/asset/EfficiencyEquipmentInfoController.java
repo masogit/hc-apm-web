@@ -129,7 +129,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private I18nMessageRepository i18nMessageRepository;
 
 
-    private Date startDate=DateUtil.currentMonthFirstDay();
+    private Date startDate;
 
     private Date endDate=new Date();
 
@@ -211,6 +211,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         if(!org.springframework.util.CollectionUtils.isEmpty(list)){
             fieldColumnDtoList = list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
         }
+        startDate=DateUtil.addMonth(new Date(), -3);
+
     }
 
     public Boolean showFilterRender(String field){
