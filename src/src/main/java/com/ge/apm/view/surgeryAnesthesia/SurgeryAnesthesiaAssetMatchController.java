@@ -282,7 +282,7 @@ public class SurgeryAnesthesiaAssetMatchController extends GenericCRUDUUIDContro
 
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-            response.setHeader("Content-Disposition", "attachment;filename=SurgeryEquipment_Connect_Template.xlsx");
+            response.setHeader("Content-Disposition", "attachment;filename=OR_Equipment_Connect_Template.xlsx");
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             StreamUtils.copy(inputStream, response.getOutputStream());
             facesContext.responseComplete();

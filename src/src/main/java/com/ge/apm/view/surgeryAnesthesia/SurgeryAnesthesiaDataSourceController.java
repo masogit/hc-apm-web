@@ -199,7 +199,7 @@ public class SurgeryAnesthesiaDataSourceController extends GenericCRUDUUIDContro
 
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-            response.setHeader("Content-Disposition", "attachment;filename=SurgeryDataSource_Import_Template.xlsx");
+            response.setHeader("Content-Disposition", "attachment;filename=OR_DataSource_Import_Template.xlsx");
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             StreamUtils.copy(inputStream, response.getOutputStream());
             facesContext.responseComplete();
