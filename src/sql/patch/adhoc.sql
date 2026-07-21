@@ -14,3 +14,5 @@ UPDATE asset_info ai SET next_metering_date = NULL,last_modified_date = NOW() WH
     ) latest_mcd
     WHERE latest_mcd.certificate_type = 2
 );
+
+ALTER TABLE user_auth_mapping ADD column tenant_uid varchar(32);
