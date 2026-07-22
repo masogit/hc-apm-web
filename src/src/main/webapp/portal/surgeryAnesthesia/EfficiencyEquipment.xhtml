@@ -83,7 +83,7 @@
                                 oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
 
-                        <p:column width="36" id="checkBoxColumn">
+                        <p:column width="36" id="checkBoxColumn" exportable="false">
                             <p:selectBooleanCheckbox value="#{surgeryAnesthesiaEquipmentInfoController.selectedMap[item.uid]}"
                                                      class="selectCheckBox">
                                 <p:ajax process="@this" update="@this ;@(.selectCheckBox) :SurgeryEquipmentInfoListForm:datalist"
@@ -111,14 +111,13 @@
                         </p:column>
 
                         <!-- 设备名称 -->
-                        <p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE"
-                                  sortBy="#{item.assetName}">
+                        <p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
 
                         <!-- 展示名称 -->
                         <p:column headerText="展示名称" filterBy="#{item.displayName}" filterMatchMode="LIKE"
-                                  sortBy="#{item.displayName}">
+                               >
                             <h:outputText value="#{item.displayName}"/>
                         </p:column>
 
@@ -129,7 +128,7 @@
 
                         <!-- 资产编号 -->
                         <p:column headerText="资产编号" filterBy="#{item.departNum}" filterMatchMode="LIKE"
-                                  sortBy="#{item.departNum}">
+                                  >
                             <h:outputText value="#{item.departNum}"/>
                         </p:column>
 
@@ -140,18 +139,18 @@
 
                         <!-- 制造商序列号 -->
                         <p:column headerText="制造商序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE"
-                                  sortBy="#{item.serialNum}">
+                                 >
                             <h:outputText value="#{item.serialNum}"/>
                         </p:column>
 
                         <!-- 二维码 -->
                         <p:column headerText="二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE"
-                                  sortBy="#{item.qrCode}">
+                                  >
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
 
                         <!-- 所属科室 -->
-                        <p:column sortBy="#{item.clinicalDeptName}">
+                        <p:column headerText="所属科室" >
                             <f:facet name="header">
                                 <h:outputText value="所属科室"/><br/>
                                 <p:autoComplete dropdown="true" value="#{surgeryAnesthesiaEquipmentInfoController.filterClinicalDeptOrg}" appendTo="@(Body)"
@@ -165,7 +164,7 @@
                         </p:column>
 
                         <!-- 设备分类 -->
-                        <p:column headerText="设备分类" sortBy="#{item.assetGroup}">
+                        <p:column headerText="设备分类" >
                             <h:outputText value="#{fieldMsg.doGetFieldValue('assetGroup', item.assetGroup)}"/>
                         </p:column>
 
@@ -195,13 +194,14 @@
                         </p:column>
 
                         <f:facet name="{Toolbar}">
-                            <p:commandButton title="导出Excel" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="EfficiencyEquipment_export"/>
-                            </p:commandButton>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="批量编辑"
                                              actionListener="#{surgeryAnesthesiaEquipmentInfoController.editBatch1}"
                                              oncomplete="PF('surgeryEquipmentInfoEditBatch').show()"
                                              disabled="#{not surgeryAnesthesiaEquipmentInfoController.isChecked()}"/>
+                            <p:commandButton title="导出绩效设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray"   ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="OR_EfficiencyEquipment_export"/>
+                            </p:commandButton>
+
                             <p:commandButton id="createBatchButton" icon="fa fa-cogs"
                                              update=":surgeryEquipmentBatchForm" class="btn btn-sm btn-gray" title="批量添加"
                                              oncomplete="PF('surgeryEquipmentInfoSettingEditBatch').show()"/>

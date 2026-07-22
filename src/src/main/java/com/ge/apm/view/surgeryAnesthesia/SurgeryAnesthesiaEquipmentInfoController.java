@@ -114,7 +114,10 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
         param.put("endDate", endDate);
         param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
         param.put("pageSize", pageRequest.getPageSize());
-
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(orgUidList)){
+            param.put("orgUidList",orgUidList);
+        }
         if (selectSite != null) {
             param.put("siteUid", selectSite.getUid());
         }

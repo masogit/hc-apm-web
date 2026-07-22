@@ -14,16 +14,16 @@
         <div class="ui-g-12 card">
             <h:form id="surgeryEquipmentBatchForm">
                 <style>
-                    .surgery-batch-equal-col { width: 20% !important; box-sizing: border-box; }
+                    .surgery-batch-equal-col { width: 25% !important; box-sizing: border-box; }
                     .surgery-batch-equal-col .ui-inputtext,
                     .surgery-batch-equal-col .ui-autocomplete,
                     .surgery-batch-equal-col .ui-selectonemenu,
                     .surgery-batch-equal-col .ui-inputnumber { width: 100% !important; box-sizing: border-box; }
                 </style>
 
-                <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group" columnClasses="surgery-batch-equal-col,surgery-batch-equal-col,surgery-batch-equal-col,surgery-batch-equal-col,surgery-batch-equal-col">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" columnClasses="surgery-batch-equal-col,surgery-batch-equal-col,surgery-batch-equal-col,surgery-batch-equal-col,surgery-batch-equal-col">
                     <h:panelGroup>
-                        <label class="label">#{msg.hospitalId}</label>
+                        <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
                         <p:inputText id="selectedOrgName" value="#{surgeryAnesthesiaEquipmentCreateBatchController.selectedOrg==null ? '': surgeryAnesthesiaEquipmentCreateBatchController.selectedOrg.name}" readonly="true" style="width:100%"/>
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                         <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg1" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
@@ -50,6 +50,15 @@
                             <p:ajax event="itemSelect" listener="#{surgeryAnesthesiaEquipmentCreateBatchController.onClinicalDeptChange}" process="@this" update="datalist"/>
                         </p:autoComplete>
                     </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class='label'>#{msg.assetGroup}</label>
+                        <p:selectOneMenu id="assetGroup" value="#{surgeryAnesthesiaEquipmentCreateBatchController.assetGroup}" style="width:100%">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <p:ajax/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class='label'>设备名称</label>
                         <p:inputText id="filterName" value="#{surgeryAnesthesiaEquipmentCreateBatchController.filterName}" style="width:100%"/>
@@ -66,14 +75,7 @@
                         <label class='label'>二维码</label>
                         <p:inputText id="filterQrCode" value="#{surgeryAnesthesiaEquipmentCreateBatchController.filterQrCode}" style="width:100%"/>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class='label'>#{msg.assetGroup}</label>
-                        <p:selectOneMenu id="assetGroup" value="#{surgeryAnesthesiaEquipmentCreateBatchController.assetGroup}" style="width:100%">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            <p:ajax/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class='label'>采购金额下限(元)</label>
                         <p:inputNumber id="purchasePrice" value="#{surgeryAnesthesiaEquipmentCreateBatchController.purchasePrice}" decimalPlaces="0" style="width:100%">

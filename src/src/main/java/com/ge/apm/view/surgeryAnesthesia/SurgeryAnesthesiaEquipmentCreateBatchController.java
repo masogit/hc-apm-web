@@ -65,7 +65,7 @@ public class SurgeryAnesthesiaEquipmentCreateBatchController {
     private Boolean allSelected2 = false;
 
     @Getter @Setter
-    private Double purchasePrice = 0d;
+    private Double purchasePrice ;
 
     @Getter @Setter
     private String filterName;
@@ -101,6 +101,8 @@ public class SurgeryAnesthesiaEquipmentCreateBatchController {
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
         initOrgTree();
         selectedOrg=configCacheService.findOrgByUid(user.getSiteUID());
+        loadClinicalDeptList();
+
     }
 
     /**
