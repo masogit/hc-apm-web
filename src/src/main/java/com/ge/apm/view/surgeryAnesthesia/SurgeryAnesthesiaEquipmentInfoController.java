@@ -8,13 +8,18 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.surgeryAnesthesia.SurgeryAnesthesiaEquipmentInfo;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +31,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -44,6 +50,7 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
     private OrgInfoRepository orgInfoRepository;
     private SurgeryAnesthesiaEquipmentInfoMapper equipmentInfoMapper;
     private UaaService uaaService;
+    private OrgInfoTreeService orgInfoTreeService;
 
     private UserAccount user;
 
@@ -65,6 +72,15 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
     @Getter @Setter
     private BigDecimal batchPositiveRate;
 
+    @Getter @Setter
+    private String filterClinicalDeptOrg;
+
+    @Getter @Setter
+    private List<OrgInfo> clinicalDeptList;
+
+    @Getter @Setter
+    private Set<String> clinicalDeptOrgUidSet;
+
     private List<SurgeryAnesthesiaEquipmentInfo> currentPageAssets;
 
     @Override
@@ -79,9 +95,11 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         equipmentInfoMapper = WebUtil.getBean(SurgeryAnesthesiaEquipmentInfoMapper.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         user = UserContextService.getCurrentUserAccount();
 
         startDate = DateUtil.addMonth(new Date(), -3);
+        loadClinicalDeptList();
     }
 
     @Override
@@ -99,6 +117,10 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
 
         if (selectSite != null) {
             param.put("siteUid", selectSite.getUid());
+        }
+
+        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+            param.put("clinicalDeptUids", clinicalDeptOrgUidSet);
         }
 
         // 将 searchFilters 中的过滤条件转换到 param map
@@ -326,6 +348,63 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
         for (SurgeryAnesthesiaEquipmentInfo item : currentPageAssets) {
             selectedMap.put(item.getUid(), !isSelectedAll);
         }
+    }
+
+    /**
+     * 加载科室列表
+     */
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+    }
+
+    /**
+     * 科室名称自动完成
+     */
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * 科室过滤变更事件
+     */
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    /**
+     * 院区树节点选择事件
+     */
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        this.searchFilters.clear();
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+        loadClinicalDeptList();
     }
 
     public void onSelectAsset() throws IOException {

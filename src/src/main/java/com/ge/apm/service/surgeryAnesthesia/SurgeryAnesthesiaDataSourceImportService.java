@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class SurgeryAnesthesiaDataSourceImportService {
     private static final Logger logger = LoggerFactory.getLogger(SurgeryAnesthesiaDataSourceImportService.class);
 
-    public static final String SHEET_NAME = "SurgeryDataSource List";
+    public static final String SHEET_NAME = "OrDataSource List";
     public static final int EXCEL_HEADER_ROW = 1;
     public static final int EXCEL_DATA_ROW = 2;
 
@@ -91,8 +91,12 @@ public class SurgeryAnesthesiaDataSourceImportService {
         if (ds.getOrgCode() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "机构代码不能为空"); isValid = false; }
         if (ds.getDeviceCode() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "设备代码不能为空"); isValid = false; }
         if (ds.getSurgeryDate() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "手术日期不能为空"); isValid = false; }
+        if (ds.getScheduledStartTime() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "计划开始时间不能为空"); isValid = false; }
         if (ds.getSurgeryStartTime() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "手术开始时间不能为空"); isValid = false; }
         if (ds.getSurgeryEndTime() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "手术结束时间不能为空"); isValid = false; }
+        if (ds.getExitFromOrTime() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "离开手术室时间不能为空"); isValid = false; }
+        if (ds.getOperatingRoomName() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "手术室名称不能为空"); isValid = false; }
+        if (ds.getOperatingRoomCode() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "手术室代码不能为空"); isValid = false; }
         if (ds.getInpNo() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "住院号不能为空"); isValid = false; }
         if (ds.getSourceCode() == null) { item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "系统来源不能为空"); isValid = false; }
         if (ds.getSurgeryStartTime() != null && ds.getSurgeryEndTime() != null && ds.getSurgeryEndTime().before(ds.getSurgeryStartTime())) {
@@ -104,12 +108,6 @@ public class SurgeryAnesthesiaDataSourceImportService {
             } else {
                 OrgInfo orgInfo = orgInfoMap.get(ds.getOrgCode());
                 ds.setSiteUid(orgInfo.getSiteUID()); ds.setTenantUid(orgInfo.getTenantUID());
-            }
-        }
-        if (!CollectionUtils.isEmpty(existingByOrgCode.get(ds.getOrgCode())) && ds.getSurgeryDate() != null) {
-            Date maxDate = existingByOrgCode.get(ds.getOrgCode()).stream().map(SurgeryAnesthesiaDataSource::getSurgeryDate).filter(Objects::nonNull).max(Date::compareTo).orElse(null);
-            if (maxDate != null && ds.getSurgeryDate().before(maxDate)) {
-                item.put("status", ImportStatus.Failure.name()); ContractRow.addErrMessage(item, "已经导入此时间段数据"); isValid = false;
             }
         }
         return isValid;

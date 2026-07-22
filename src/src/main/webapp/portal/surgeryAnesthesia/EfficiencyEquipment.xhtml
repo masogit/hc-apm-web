@@ -21,6 +21,26 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3" >
+                        <h:panelGroup>
+                                <p:commandButton id="btnOrg" value="#{empty surgeryAnesthesiaEquipmentInfoController.selectSite? msg.AllHospitals:surgeryAnesthesiaEquipmentInfoController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                                <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                    <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                            <p:ajax process="@this" event="select" listener="#{surgeryAnesthesiaEquipmentInfoController.onSelectSiteTreeNode}" update=":SurgeryEquipmentInfoListForm :searchForm" oncomplete="PF('varPanelOrg').hide()"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="hidden" rendered="false"/>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
                     <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">开始时间*</label>
@@ -31,7 +51,7 @@
                             </p:calendar>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">截至时间*</label>
+                            <label class="label">截止时间*</label>
                             <p:calendar timeZone="GMT+8" id="endTime" value="#{surgeryAnesthesiaEquipmentInfoController.endDate}"
                                         pattern="yyyy/MM/dd"
                                         showOn="button" showButtonPanel="true" navigator="true" mask="true">
@@ -131,7 +151,16 @@
                         </p:column>
 
                         <!-- 所属科室 -->
-                        <p:column headerText="所属科室" sortBy="#{item.clinicalDeptName}">
+                        <p:column sortBy="#{item.clinicalDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="所属科室"/><br/>
+                                <p:autoComplete dropdown="true" value="#{surgeryAnesthesiaEquipmentInfoController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300" forceSelection="true"
+                                                completeMethod="#{surgeryAnesthesiaEquipmentInfoController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{surgeryAnesthesiaEquipmentInfoController.onClinicalDeptNameFilterChange}" process="@this" update=":SurgeryEquipmentInfoListForm:datalist"/>
+                                    <p:ajax process="@this" listener="#{surgeryAnesthesiaEquipmentInfoController.onClinicalDeptNameFilterChange}" update=":SurgeryEquipmentInfoListForm:datalist"/>
+                                </p:autoComplete>
+                            </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
 
@@ -166,6 +195,9 @@
                         </p:column>
 
                         <f:facet name="{Toolbar}">
+                            <p:commandButton title="导出Excel" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="EfficiencyEquipment_export"/>
+                            </p:commandButton>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="批量编辑"
                                              actionListener="#{surgeryAnesthesiaEquipmentInfoController.editBatch1}"
                                              oncomplete="PF('surgeryEquipmentInfoEditBatch').show()"

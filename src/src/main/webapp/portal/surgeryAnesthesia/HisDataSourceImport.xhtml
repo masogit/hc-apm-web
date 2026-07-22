@@ -49,6 +49,7 @@
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup>
                         <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="下载模板文件" ajax="false" actionListener="#{surgeryAnesthesiaDataSourceController.downloadTemplate()}" styleClass="p-mr-2"/>        2. 文件中填写要导入的手术麻醉源数据      3. #{msg.UpFileImport}</div>
+                        <div style="color: red; font-weight: bold; font-size: 14px; margin-top: 6px;">注意：模板中所有字段均必填，请确保填写完整后再上传。</div>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>

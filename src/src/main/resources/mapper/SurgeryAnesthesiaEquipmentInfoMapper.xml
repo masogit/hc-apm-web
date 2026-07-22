@@ -65,6 +65,12 @@
         <if test="clinicalDeptName != null and clinicalDeptName != ''">
             AND ai.clinical_dept_name LIKE concat('%', #{clinicalDeptName}, '%')
         </if>
+        <if test="clinicalDeptUids != null and clinicalDeptUids.size() > 0">
+            AND ai.clinical_dept_uid IN
+            <foreach item="item" index="index" collection="clinicalDeptUids" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         <if test="positiveRateGTE != null">
             AND e.positive_rate &gt;= #{positiveRateGTE}
         </if>
