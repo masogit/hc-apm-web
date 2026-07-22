@@ -5,6 +5,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -13,6 +14,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -83,6 +85,8 @@ public class SurgeryAnesthesiaEquipmentCreateBatchController {
     @Getter @Setter
     private Integer assetGroup;
 
+    private ConfigCacheService configCacheService;
+
     private List<OrgInfo> clinicalDeptList;
 
     private SurgeryAnesthesiaEquipmentInfoController parentController;
@@ -94,7 +98,9 @@ public class SurgeryAnesthesiaEquipmentCreateBatchController {
         uaaService = WebUtil.getBean(UaaService.class);
         user = UserContextService.getCurrentUserAccount();
         parentController = WebUtil.getBean(SurgeryAnesthesiaEquipmentInfoController.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         initOrgTree();
+        selectedOrg=configCacheService.findOrgByUid(user.getSiteUID());
     }
 
     /**
@@ -176,6 +182,9 @@ public class SurgeryAnesthesiaEquipmentCreateBatchController {
         if (selectedOrg != null) {
             List<String> accessibleSites = orgInfoRepository.getSiteOrgUidsByParentUid(selectedOrg.getUid());
             filters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, accessibleSites, "1*2+"));
+        }else{
+            WebUtil.addWarnMessage("所属院区必填");
+            return;
         }
 
         if (purchasePrice != null && purchasePrice > 0) {
