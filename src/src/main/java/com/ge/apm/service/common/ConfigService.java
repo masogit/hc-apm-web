@@ -131,21 +131,21 @@ public class ConfigService {
     }
 
     @PostConstruct
-     public void initConfigItemValue(){
-        String key = "enableStockShow";
+     public void initConfigItemValue(){  // isNursingStaffCodeLedger
+        String key = "NursingStaffScanCodeToAssetRegister";
         List<SearchFilter> searchFilterList = new ArrayList<>();
-        searchFilterList.add(new SearchFilter(key, SearchFilter.Operator.EQ,true));
+        searchFilterList.add(new SearchFilter("isNursingStaffCodeLedger", SearchFilter.Operator.EQ,true));
         List<WorkflowConfig> workflowConfigList = configDao.findBySearchFilter(searchFilterList);
-        List<ConfigItemValue> enableStockShow = configItemValueRepository.findByKey(key);
+        List<ConfigItemValue> nursingStaffScanCodeToAssetRegister = configItemValueRepository.findByKey(key);
         if(CollectionUtils.isEmpty(workflowConfigList))return;
         List<ConfigItemValue> configItemValues = new ArrayList<>();
-        Map<String, ConfigItemValue> collect = enableStockShow.stream().collect(Collectors.toMap(item -> item.getSiteUid(), item -> item));
+        Map<String, ConfigItemValue> collect = nursingStaffScanCodeToAssetRegister.stream().collect(Collectors.toMap(item -> item.getSiteUid(), item -> item));
          for (WorkflowConfig workflowConfig : workflowConfigList) {
              String siteUid = workflowConfig.getSiteUID();
              if (!collect.containsKey(siteUid)) {
                  ConfigItemValue configItemValue = new ConfigItemValue();
                  configItemValue.setKey(key);
-                 configItemValue.setValue(workflowConfig.getEnableStockShow().toString());
+                 configItemValue.setValue("asset");
                  configItemValue.setTenantUid(workflowConfig.getTenantUID());
                  configItemValue.setInstitutionUid(workflowConfig.getInstitutionUID());
                  configItemValue.setHospitalUid(workflowConfig.getHospitalUID());
