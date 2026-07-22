@@ -85,7 +85,6 @@ public class SurgeryAnesthesiaEquipmentCreateBatchController {
     @Getter @Setter
     private Integer assetGroup;
 
-    @Autowired
     private ConfigCacheService configCacheService;
 
     private List<OrgInfo> clinicalDeptList;
