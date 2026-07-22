@@ -440,6 +440,101 @@
                                disabled="#{systemConfigItemController.configItemMap.get('mvsPmReportOnlyDownloadPmItems').configItemValue == null}"/>
             </h:panelGroup>
 
+            <!-- 巡检保养图片是否必填 -->
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('requireInspectionPhotos').name.concat('(').concat(systemConfigItemController.configItemMap.get('requireInspectionPhotos').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('requireInspectionPhotos').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('requireInspectionPhotos').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('requireInspectionPhotos'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('requireInspectionPhotos'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('requireInspectionPhotos').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <!-- 二级保养其他图片是否必填 -->
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondOtherPhotos').name.concat('(').concat(systemConfigItemController.configItemMap.get('requireRuleLevelSecondOtherPhotos').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondOtherPhotos').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondOtherPhotos').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('requireRuleLevelSecondOtherPhotos'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('requireRuleLevelSecondOtherPhotos'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondOtherPhotos').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <!-- 三级/质控保养其他图片是否必填 -->
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeOtherPhotos').name.concat('(').concat(systemConfigItemController.configItemMap.get('requireRuleLevelThreeOtherPhotos').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeOtherPhotos').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeOtherPhotos').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('requireRuleLevelThreeOtherPhotos'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('requireRuleLevelThreeOtherPhotos'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeOtherPhotos').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <!-- 二级保养前后图片是否必填 -->
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondMaintenancePhotos').name.concat('(').concat(systemConfigItemController.configItemMap.get('requireRuleLevelSecondMaintenancePhotos').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondMaintenancePhotos').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondMaintenancePhotos').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('requireRuleLevelSecondMaintenancePhotos'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('requireRuleLevelSecondMaintenancePhotos'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('requireRuleLevelSecondMaintenancePhotos').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <!-- 三级/质控保养前后图片是否必填 -->
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeMaintenancePhotos').name.concat('(').concat(systemConfigItemController.configItemMap.get('requireRuleLevelThreeMaintenancePhotos').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeMaintenancePhotos').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeMaintenancePhotos').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('requireRuleLevelThreeMaintenancePhotos'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('requireRuleLevelThreeMaintenancePhotos'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('requireRuleLevelThreeMaintenancePhotos').configItemValue == null}"/>
+            </h:panelGroup>
+
         </p:panelGrid>
         <p:dialog id="pmOrderCreateByCycleDlg" widgetVar="pmOrderCreateByCycleDlg" modal="true" resizable="true" draggable="true" width="30%" height="200px" header="#{msg.BatchConfigMaintenanceRule}">
             <h:form id="pmOrderCreateByCycleForm" class="bcls">

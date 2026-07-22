@@ -92,7 +92,6 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -258,6 +257,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private List<V2_BlobObject> picBeforeList;
     @Getter @Setter
     private List<V2_BlobObject> picAfterList;
+    @Getter @Setter
+    private List<V2_BlobObject> inspectionPhotos;
+    @Getter @Setter
+    private List<V2_BlobObject> otherPhotos;
 
     private List<V2_BlobObject> picListForRP;
     private List<V2_BlobObject> audioList;
@@ -321,6 +324,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private List<OrgInfo> orgList;
     @Setter@Getter
     private String pageType ;
+    @Setter@Getter
+    private boolean requireInspectionPhotos ;
+    @Setter@Getter
+    private boolean requireRuleLevelSecondOtherPhotos ;
+    @Setter@Getter
+    private boolean requireRuleLevelThreeOtherPhotos ;
+    @Setter@Getter
+    private boolean requireRuleLevelSecondMaintenancePhotos ;
+    @Setter@Getter
+    private boolean requireRuleLevelThreeMaintenancePhotos ;
 
     @Getter @Setter
     private boolean repaFlag = false;
@@ -1052,6 +1065,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 1);
+             if (result && requireInspectionPhotos) {
+                 WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel1WorkOrdersInBatches"));
+                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
+                 return true;
+             }
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 2);
+             if (result && (requireRuleLevelSecondMaintenancePhotos || requireRuleLevelSecondOtherPhotos)) {
+                 WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel2WorkOrdersInBatches"));
+                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
+                 return true;
+             }
          }
          return result;
     }
@@ -1443,6 +1468,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             picAfterList.removeAll(picAfterList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
         } else if (type.equals("before")) {
             picBeforeList.removeAll(picBeforeList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        } else if (type.equals("inspection")) {
+            inspectionPhotos.removeAll(inspectionPhotos.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        } else if (type.equals("other")) {
+            otherPhotos.removeAll(otherPhotos.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
         }
     }
 
@@ -1451,6 +1480,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return picAfterList.size() > 4;
         } else if (type.equals("before")) {
             return picBeforeList.size() > 4;
+        } else if (type.equals("inspection")) {
+            return inspectionPhotos.size() > 4;
+        } else if (type.equals("other")) {
+            return otherPhotos.size() > 4;
         }
         return false;
     }
@@ -1527,6 +1560,32 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (null != blobObject) {
             picBeforeList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_PrePmOrder);
+            blobObject.setBoUuid(selectedPmOrder.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void handleFileUploadInspection(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            inspectionPhotos.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmOrder_Inspection);
+            blobObject.setBoUuid(selectedPmOrder.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void handleFileUploadOther(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            otherPhotos.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmOrder_Other);
             blobObject.setBoUuid(selectedPmOrder.getId());
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
@@ -1653,6 +1712,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             RequestContext.getCurrentInstance().addCallbackParam("needplanTime", true);
             return false;
         }
+
+        // 保养等级
+        int ruleLevel = selectedPmOrder.getRuleLevel();
+
+        // 巡检工单照片上传检验
+        if (ruleLevel == 1 && requireInspectionPhotos && CollectionUtils.isEmpty(inspectionPhotos)) {
+            return failValidation("InspectionPhotosIsRequired");
+        }
+
+        // 保养工单照片上传校验
+        if (ruleLevel == 2 || ruleLevel == 3 || ruleLevel == 4) {
+            boolean requireMaintenancePhotos = ruleLevel == 2 ? requireRuleLevelSecondMaintenancePhotos : requireRuleLevelThreeMaintenancePhotos;
+            boolean requireOtherPhotos = ruleLevel == 2 ? requireRuleLevelSecondOtherPhotos : requireRuleLevelThreeOtherPhotos;
+
+            if (requireMaintenancePhotos && (CollectionUtils.isEmpty(picBeforeList) || CollectionUtils.isEmpty(picAfterList))) {
+                return failValidation("MaintenancePhotosIsRequired");
+            }
+
+            if (requireOtherPhotos && CollectionUtils.isEmpty(otherPhotos)) {
+                return failValidation("OtherPhotosIsRequired");
+            }
+        }
         return true;
     }
 
@@ -1678,7 +1759,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             coWorkerList.forEach(item -> item.setCreatedDate(null));
         }
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch,picBeforeList,picAfterList, pmHoursList);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch,picBeforeList,picAfterList, inspectionPhotos, otherPhotos, pmHoursList);
         //保存保养清单中的数据
         saveCheckItemData();
         selected = null;
@@ -1777,6 +1858,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = null;
         picAfterList = null;
         picBeforeList = null;
+        inspectionPhotos = null;
+        otherPhotos = null;
         fileTypeName = null;
     }
     public void onSupplierChange() {
@@ -1909,6 +1992,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
             getPageTypeFromConfig();
         }
+
+        String requireInspectionPhotosConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "requireInspectionPhotos");
+        String requireRuleLevelSecondOtherPhotosConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "requireRuleLevelSecondOtherPhotos");
+        String requireRuleLevelThreeOtherPhotosConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "requireRuleLevelThreeOtherPhotos");
+        String requireRuleLevelSecondMaintenancePhotosConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "requireRuleLevelSecondMaintenancePhotos");
+        String requireRuleLevelThreeMaintenancePhotosConfigValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "requireRuleLevelThreeMaintenancePhotos");
+
+        requireInspectionPhotos = StrUtil.isNotEmpty(requireInspectionPhotosConfigValue) && "true".equalsIgnoreCase(requireInspectionPhotosConfigValue);
+        requireRuleLevelSecondOtherPhotos = StrUtil.isNotEmpty(requireRuleLevelSecondOtherPhotosConfigValue) && "true".equalsIgnoreCase(requireRuleLevelSecondOtherPhotosConfigValue);
+        requireRuleLevelThreeOtherPhotos = StrUtil.isNotEmpty(requireRuleLevelThreeOtherPhotosConfigValue) && "true".equalsIgnoreCase(requireRuleLevelThreeOtherPhotosConfigValue);
+        requireRuleLevelSecondMaintenancePhotos = StrUtil.isNotEmpty(requireRuleLevelSecondMaintenancePhotosConfigValue) && "true".equalsIgnoreCase(requireRuleLevelSecondMaintenancePhotosConfigValue);
+        requireRuleLevelThreeMaintenancePhotos = StrUtil.isNotEmpty(requireRuleLevelThreeMaintenancePhotosConfigValue) && "true".equalsIgnoreCase(requireRuleLevelThreeMaintenancePhotosConfigValue);
     }
 
     public void getPageTypeFromConfig() {
@@ -2698,10 +2793,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         picList = blobDao.findByBoUuid(selectedPmOrder.getId());
         if(CollectionUtils.isNotEmpty(picList)){
-            picList = picList.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
+            picList = picList.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder_Inspection)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder_Other) )   ).collect(Collectors.toList());
         }
         picBeforeList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PrePmOrder);
         picAfterList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder);
+        inspectionPhotos = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder_Inspection);
+        otherPhotos = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder_Other);
         if( CollectionUtils.isEmpty(picList)){
            picList = new ArrayList<V2_BlobObject>();
        }
@@ -2710,6 +2807,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         if( CollectionUtils.isEmpty(picAfterList)){
             picAfterList = new ArrayList<V2_BlobObject>();
+        }
+        if( CollectionUtils.isEmpty(inspectionPhotos)){
+            inspectionPhotos = new ArrayList<V2_BlobObject>();
+        }
+        if( CollectionUtils.isEmpty(otherPhotos)){
+            otherPhotos = new ArrayList<V2_BlobObject>();
         }
         picListForRP = new ArrayList<V2_BlobObject>();
     }
@@ -2898,7 +3001,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch, picBeforeList, picAfterList, pmHoursList);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch, picBeforeList, picAfterList, inspectionPhotos, otherPhotos, pmHoursList);
     }
 
     public void stagingPmOrder() {
@@ -2906,10 +3009,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.stagingPmOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch, picBeforeList, picAfterList, pmHoursList);
+        pmOrderService.stagingPmOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch, picBeforeList, picAfterList, inspectionPhotos, otherPhotos, pmHoursList);
         //保存检查项
         saveCheckItemData();
         cancel();
+    }
+
+    private boolean failValidation(String messageKey) {
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        WebUtil.addErrorMessage(WebUtil.getMessage(messageKey));
+        return false;
     }
 
     private void loadClinicalDeptList() {
