@@ -12,9 +12,21 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface NurseSiteMaintainItemMapper extends BaseMapper<NurseSiteMaintainItem> {
     List<NurseSiteMaintainItem> findJoinAssetList(Pagination pagination, @Param("ew") Wrapper<NurseSiteMaintainItem> wrapper);
+
+    /**
+     * Search daily inspection items that have attachments.
+     * Returns data at the equipment item level with asset info and check date.
+     *
+     * @param param query parameters: tenantUid, siteUid, deptUid, orgUidList,
+     *              assetName, serialNum, qrCode, clinicalDeptName, usingDeptName,
+     *              checkDateStart, checkDateEnd
+     * @return list of maintain items with attachment info
+     */
+    List<Map<String, Object>> searchMaintainItemsWithAttachment(Map<String, Object> param);
 
     @Select({"<script>" +
                 "select * from nurse_site_maintain_data where parent_id in " +

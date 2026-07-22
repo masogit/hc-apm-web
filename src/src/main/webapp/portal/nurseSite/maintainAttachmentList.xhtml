@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="日常检查附件" />
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="maintainAttachmentForm" rendered="#{not empty maintainAttachmentListController}">
+                    <ui:include src="/portal/asset/searchDiv.xhtml"/>
+                    <p:dataTable id="datalist" value="#{maintainAttachmentListController.lazyModel}" var="item"
+                                 widgetVar="varDataList" selectionMode="single"
+                                 selection="#{maintainAttachmentListController.selectedItem}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.itemId}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.checkDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20"
+                                 emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500"
+                                 rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_VIEW')}">
+
+                        <p:ajax event="rowSelect" listener="#{maintainAttachmentListController.onRowSelect}"
+                                oncomplete="PF('attachmentDetailDialog').show()" update="attachmentDetailDialog"/>
+                        <p:ajax event="filter" listener="#{maintainAttachmentListController.onFilter}" />
+
+                        <p:column headerText="名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}" />
+                        </p:column>
+                        <p:column headerText="序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serialNum}" />
+                        </p:column>
+                        <p:column headerText="二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}" />
+                        </p:column>
+                        <p:column headerText="所属科室" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.clinicalDeptName}" />
+                        </p:column>
+                        <p:column headerText="使用科室" filterBy="#{item.usingDeptName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.usingDeptName}" />
+                        </p:column>
+                        <p:column headerText="检查日期" sortBy="#{item.checkDate}">
+                            <h:outputText value="#{item.checkDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+
+        <!-- Detail Dialog: Work Order + Attachments -->
+        <p:dialog id="attachmentDetailDialog" widgetVar="attachmentDetailDialog" header="工单详情"
+                  modal="true" resizable="true" draggable="true" appendTo="@(body)"
+                  width="80%" maxHeight="800">
+
+            <h:form id="attachmentDetailForm" rendered="#{not empty maintainAttachmentListController.nurseSiteMaintain}">
+                <div class="ui-g">
+                    <!-- Work Order Info -->
+                    <div class="ui-g-12">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank" columnClasses="ui-md-2,ui-md-4,ui-md-2,ui-md-4">
+                            <h:outputText value="工单名称:" styleClass="label" />
+                            <h:outputText value="#{maintainAttachmentListController.nurseSiteMaintain.name}" />
+                            <h:outputText value="检查日期:" styleClass="label" />
+                            <h:outputText value="#{maintainAttachmentListController.nurseSiteMaintain.checkDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                            <h:outputText value="所属科室:" styleClass="label" />
+                            <h:outputText value="#{maintainAttachmentListController.nurseSiteMaintain.clinicalDeptName}" />
+                            <h:outputText value="状态:" styleClass="label" />
+                            <h:outputText value="#{fieldMsg.fieldValue('nurseSiteMaintainStatus', maintainAttachmentListController.nurseSiteMaintain.status)}" />
+                        </p:panelGrid>
+                    </div>
+
+                    <!-- Check Items Table -->
+                    <div class="ui-g-12" rendered="#{not empty maintainAttachmentListController.nurseSiteMaintain.listNurseSiteMaintainItem}">
+                        <h3>检查项</h3>
+                        <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
+                            <table border="1" style="width:100%; border-collapse:collapse;">
+                                <tr>
+                                    <th style="min-width:120px">名称</th>
+                                    <th style="min-width:80px">二维码</th>
+                                    <th style="min-width:100px">设备编号</th>
+                                    <th style="min-width:100px">序列号</th>
+                                    <th style="min-width:80px">设备型号</th>
+                                    <th style="min-width:80px">具体位置</th>
+                                    <th style="min-width:100px">检查时间</th>
+                                    <p:repeat value="#{maintainAttachmentListController.nurseSiteMaintain.showLables}" var="checkItem">
+                                        <th style="min-width:120px">#{checkItem.name}</th>
+                                    </p:repeat>
+                                    <th style="min-width:200px">备注</th>
+                                </tr>
+                                <p:repeat value="#{maintainAttachmentListController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="nsmItem">
+                                    <tr>
+                                        <td><h:outputText value="#{nsmItem.assetInfo.name}" /></td>
+                                        <td><h:outputText value="#{nsmItem.assetInfo.qrCode}" /></td>
+                                        <td><h:outputText value="#{nsmItem.assetInfo.departNum}" /></td>
+                                        <td><h:outputText value="#{nsmItem.assetInfo.serialNum}" /></td>
+                                        <td><h:outputText value="#{nsmItem.assetInfo.functionType}" /></td>
+                                        <td><h:outputText value="#{nsmItem.assetInfo.nurseLocation}" /></td>
+                                        <td>
+                                            <h:outputText value="#{nsmItem.updateDate}">
+                                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                            </h:outputText>
+                                        </td>
+                                        <p:repeat value="#{maintainAttachmentListController.nurseSiteMaintain.showLables}" var="checkItem">
+                                            <td style="text-align:center">
+                                                <h:outputText value="#{nsmItem.getDataValue(checkItem.name).strValue}" />
+                                                <h:outputText value="#{nsmItem.getDataValue(checkItem.name).isSkip ? ' (已忽略)' : ''}"
+                                                              rendered="#{nsmItem.getDataValue(checkItem.name).isSkip}"
+                                                              style="color: gray;" />
+                                            </td>
+                                        </p:repeat>
+                                        <td><h:outputText value="#{nsmItem.comment}" /></td>
+                                    </tr>
+                                </p:repeat>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Attachments Section -->
+                    <div class="ui-g-12" rendered="#{not empty maintainAttachmentListController.attachmentList}">
+                        <h3>附件列表</h3>
+                        <p:dataTable id="attachmentTable" value="#{maintainAttachmentListController.attachmentList}" var="att"
+                                     rows="10" paginator="true" rowsPerPageTemplate="10,20,50"
+                                     emptyMessage="暂无附件">
+                            <p:column headerText="文件名">
+                                <h:outputText value="#{att.objectName}" />
+                            </p:column>
+                            <p:column headerText="文件类型">
+                                <h:outputText value="#{att.objectType}" />
+                            </p:column>
+                            <p:column headerText="文件大小">
+                                <h:outputText value="#{att.objectSize}" />
+                            </p:column>
+                            <p:column headerText="操作" style="width:120px;text-align:center">
+                                <p:commandButton title="#{msg.download}" icon="ui-icon-cloud-download" ajax="false" actionListener="#{fileDownloadService.downloadFile(att.objectStorageId)}" styleClass="p-mr-2"/>
+
+                                <p:commandButton icon="ui-icon-remove-red-eye" title="#{msg.preview}" actionListener="#{preViewerBean.onServerEvent('', att.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()"/>
+
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </h:form>
+
+            <h:outputText value="暂无详情数据" rendered="#{empty maintainAttachmentListController.nurseSiteMaintain}" style="padding:20px;" />
+        </p:dialog>
+        <ui:include src="/portal/preview/view.xhtml" />
+    </ui:define>
+</ui:composition>
+</html>

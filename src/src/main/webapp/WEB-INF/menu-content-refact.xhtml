@@ -235,6 +235,7 @@
                            <p:menuitem fragment="um704" id="um704" value="#{msg.StartupAndShutdownRegistration}" outcome="/portal/nurseSite/assetOptRecordList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_OPERATE_RECORD_EDIT')}"/>
                            <p:menuitem fragment="um707"  id="um707" value="#{msg.UseRegistration}" outcome="/portal/nurseSite/assetOperationRecordList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_USING_RECORD_EDIT')}"/>
                            <p:menuitem fragment="um708"  id="um708" value="#{msg.AssetOptUnClosedList}" outcome="/portal/nurseSite/assetOptUnClosedRecordList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_USING_RECORD_EDIT') or userContextService.accessContainsFunctionMenu('NURSESITE_OPERATE_RECORD_EDIT')}"/>
+                           <p:menuitem fragment="um709"  id="um709" value="日常检查附件" outcome="/portal/nurseSite/maintainAttachmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_USING_RECORD_EDIT') or userContextService.accessContainsFunctionMenu('NURSESITE_OPERATE_RECORD_EDIT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'KNOWLEDGE'}">
