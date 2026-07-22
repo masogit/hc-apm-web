@@ -121,6 +121,14 @@
                                          iconPos="right"
                                          onclick="PF('warrantyMenuWidget').show(); return false;" />
                         </h:panelGroup>
+                        <h:panelGroup id="adjustmentCategoryPanel">
+                            <p:menuButton id="adjustmentCategoryButton" value="#{assetInfoListController.adjustmentCategory == 0 ? '全部' : assetInfoListController.adjustmentCategory == 1 ? '院内设备' : assetInfoListController.adjustmentCategory == 2 ? '借出设备' : '借入设备'}" rendered="#{userContextService.canRender('HOSPITAL_ADJUSTMENT')}">
+                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(0)}" value="全部" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
+                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(1)}" value="院内设备" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
+                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(2)}" value="借出设备" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
+                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(3)}" value="借入设备" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
+                            </p:menuButton>
+                        </h:panelGroup>
                     </h:panelGrid>
 
                     <h:panelGrid id="searchPanel" columns="3">
