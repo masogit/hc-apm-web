@@ -88,7 +88,7 @@
                                         </p:column>
                                         <p:column headerText="计划开始时间">
                                             <h:outputText value="#{item.scheduledStartTime}">
-                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd HH:mm:ss"  />
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd"  />
                                             </h:outputText>
                                         </p:column>
                                         <p:column headerText="手术开始时间" sortBy="#{item.surgeryStartTime}">

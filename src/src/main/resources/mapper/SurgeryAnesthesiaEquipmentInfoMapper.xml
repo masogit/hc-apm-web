@@ -41,6 +41,30 @@
         <if test="siteUid != null and siteUid != ''">
             AND e.site_uid = #{siteUid}
         </if>
+        <if test="orgUidList != null and orgUidList.size > 0">
+            AND (
+            ai.institution_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.hospital_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.site_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.clinical_dept_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            OR ai.asset_dept_uid IN
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            )
+        </if>
         <if test="assetName != null and assetName != ''">
             AND COALESCE(e.asset_name, ai.name) LIKE concat('%', #{assetName}, '%')
         </if>

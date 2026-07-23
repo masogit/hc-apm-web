@@ -211,7 +211,7 @@ public class SurgeryAnesthesiaEquipmentCreateBatchController {
             filters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, assetGroup));
         }
 
-        PageRequest pageRequest = new PageRequest(0, 500);
+        PageRequest pageRequest = new PageRequest(0, 5000);
         selectAssetInfos = new ArrayList<>(assetInfoRepository.findBySearchFilter(filters, pageRequest).getContent());
         selectedAssetUidTable1.clear();
     }
