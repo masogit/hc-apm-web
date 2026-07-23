@@ -77,11 +77,11 @@
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36" visible="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31 or v2PmOrderController.queryIndex == 7 or v2PmOrderController.queryIndex == -1 or  v2PmOrderController.queryIndex == 10}" exportable="false">
                     <p:selectBooleanCheckbox  value="#{v2PmOrderController.selectedMap[item.id]}"  class="selectCheckBox">
-                        <p:ajax process="@this" listener="#{v2PmOrderController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.exportExcelBtn) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();" />
+                        <p:ajax process="@this" listener="#{v2PmOrderController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.exportExcelBtn) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();checkExportSelectionLimit(args);" />
                     </p:selectBooleanCheckbox>
                     <f:facet name="header">
-                        <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
-                            <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{v2PmOrderController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();checkExportSelectionLimit(args);"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
@@ -706,14 +706,28 @@
                 function updateSelectAllCheckBox() {
                     var checkboxlist = $(".selectCheckBox");
                     var selectAllstatus = true;
+                    var checkedCount = 0;
                     checkboxlist.each(function () {
-                        selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                        var isChecked = this.children[0].children[0].checked;
+                        selectAllstatus = selectAllstatus && isChecked;
+                        if (isChecked) checkedCount++;
                     });
                     $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
                     if (selectAllstatus) {
                         $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
                     } else {
                         $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                    }
+                }
+
+                /**
+                 * 检查导出勾选数量限制（最大500条）
+                 * 当服务端返回校验失败信息时弹出提示
+                 */
+                function checkExportSelectionLimit(args) {
+                    if (args && args.validationFailed) {
+                        // 服务端校验失败，错误消息已通过growl显示
+                        return;
                     }
                 }
                 //]]>
