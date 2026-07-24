@@ -1386,6 +1386,61 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare11')}">
+        <h:panelGroup>
+            <label class="label">#{msg.spare11}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['spare11'].required? '*':''}</span></label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" id="spare11" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.spare11}"
+                        required="#{assetInfoEditController.customConfig.assetFields['spare11'].required}"
+                        requiredMessage="#{msg.spare11} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('spare11')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare12')}">
+        <h:panelGroup>
+            <label class="label">#{msg.spare12}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['spare12'].required? '*':''}</span></label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" id="spare12" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.spare12}"
+                        required="#{assetInfoEditController.customConfig.assetFields['spare12'].required}"
+                        requiredMessage="#{msg.spare12} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('spare12')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare13')}">
+        <h:panelGroup>
+            <label class="label">#{msg.spare13}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['spare13'].required? '*':''}</span></label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" id="spare13" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.spare13}"
+                        required="#{assetInfoEditController.customConfig.assetFields['spare13'].required}"
+                        requiredMessage="#{msg.spare13} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('spare13')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare14')}">
+        <h:panelGroup>
+            <label class="label">#{msg.spare14}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['spare14'].required? '*':''}</span></label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" id="spare14" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.spare14}"
+                        required="#{assetInfoEditController.customConfig.assetFields['spare14'].required}"
+                        requiredMessage="#{msg.spare14} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('spare14')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare15')}">
+        <h:panelGroup>
+            <label class="label">#{msg.spare15}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['spare15'].required? '*':''}</span></label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" id="spare15" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.spare15}"
+                        required="#{assetInfoEditController.customConfig.assetFields['spare14'].required}"
+                        requiredMessage="#{msg.spare15} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('spare15')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+                <p:ajax event="dateSelect"/>
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'usageCount')}" >
         <h:panelGroup>
             <label class="label">#{msg.usageCount}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['usageCount'].required? '*':''}</span></label>

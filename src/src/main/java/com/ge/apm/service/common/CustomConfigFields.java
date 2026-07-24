@@ -144,6 +144,11 @@ public enum CustomConfigFields {
     spare08(fieldName, "spare08" ,Text),  //备用字段08
     spare09(fieldName, "spare09" ,Text),  //备用字段09
     spare10(fieldName, "spare10" ,Text),  //备用字段10
+    spare11(fieldName, "spare11" ,Text),  //备用字段11
+    spare12(fieldName, "spare12" ,Text),  //备用字段12
+    spare13(fieldName, "spare13" ,Text),  //备用字段13
+    spare14(fieldName, "spare14" ,Text),  //备用字段14
+    spare15(fieldName, "spare15" ,Text),  //备用字段15
     exceptionReason(fieldName, "exceptionReason" ,Text),  //备用字段10
     assetClassification32(fieldName, "assetClassification32" ,Text),  //设备32分类
     usageCount(fieldName, "usageCount" ,Text),  //已使用次数
