@@ -1497,7 +1497,7 @@
                     <p:commandButton value="添加条件" icon="ui-icon-plus"
                                      actionListener="#{assetInfoListController.addAdvancedCondition()}"
                                      update=":advancedSearchForm:conditionPanel"
-                                     process="@this"/>
+                                     process=":advancedSearchForm:conditionPanel @this"/>
                     <p:commandButton value="清空条件" icon="ui-icon-trash"
                                      actionListener="#{assetInfoListController.clearAdvancedConditions()}"
                                      update=":advancedSearchForm:conditionPanel"
@@ -1589,7 +1589,7 @@
                                 <p:commandButton icon="ui-icon-minus" title="删除此条件"
                                                  actionListener="#{assetInfoListController.removeAdvancedCondition(status.index)}"
                                                  update=":advancedSearchForm:conditionPanel"
-                                                 process="@this" style="zoom: 0.8;"/>
+                                                 process=":advancedSearchForm:conditionPanel @this" style="zoom: 0.8;"/>
                             </h:panelGrid>
                         </ui:repeat>
                         <h:outputText value="暂无查询条件，请点击【添加条件】按钮添加"
