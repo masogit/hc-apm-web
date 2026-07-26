@@ -100,7 +100,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String newSavedSearchName = "";
 
     private IdleEquipmentStockRepository idleEquipmentStockRepository;
-    // 设备调剂分类: 0=全部, 1=院内设备, 2=借出设备, 3=借入设备
+    // 设备调剂分类: 1=院内设备, 2=借出设备, 3=借入设备
     @Getter
     private int adjustmentCategory = 1;
 
@@ -651,7 +651,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "spare05".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
-        // 设备调剂分类过滤: 0=全部, 1=院内设备, 2=借出设备, 3=借入设备
+        // 设备调剂分类过滤: 1=院内设备, 2=借出设备, 3=借入设备
         searchFilters.removeAll(searchFilters.stream().filter(item -> "adjustmentCategory".equals(item.conditionPath)).collect(Collectors.toList()));
         if (idleEquipmentStockRepository != null) {
             String hospitalUid = user.getHospitalUID();
@@ -659,13 +659,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 // 获取用户可见范围org列表（包含hospital/site等多层级），用于借出/借入设备查询
                 List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
-                if (adjustmentCategory == 0) {
-                    // 全部: 包含借出设备（siteuid已变，需通过uid显式包含）
-                    List<String> lentOutUids = idleEquipmentStockRepository.findLentOutAssetUids(orgUidList, 3);
-                    if (lentOutUids != null && !lentOutUids.isEmpty()) {
-                        searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, lentOutUids, "1*2+"));
-                    }
-                } else if (adjustmentCategory == 2) {
+                if (adjustmentCategory == 2) {
                     // 借出设备: 本院放入调剂库且已被借走 (stockHospitalUid=本院 且 status=3)
                     // 借出设备的siteuid/hospitaluid等已变更，不满足org过滤条件，需移除
                     searchFilters.removeAll(searchFilters.stream().filter(item -> "1*2+".equals(item.conditionPath)).collect(Collectors.toList()));
@@ -686,7 +680,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                         searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, Collections.singletonList("__NONE__"), "adjustmentCategory"));
                     }
                 } else if (adjustmentCategory == 1) {
-
+                    // 院内设备: 排除借入设备
+                    List<String> borrowedInUids = idleEquipmentStockRepository.findBorrowedInAssetUids(orgUidList, 3);
+                    if (borrowedInUids != null && !borrowedInUids.isEmpty()) {
+                        searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, borrowedInUids, "adjustmentCategory"));
+                    }
                 }
             }
         }

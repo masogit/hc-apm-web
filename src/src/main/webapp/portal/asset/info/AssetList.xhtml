@@ -122,8 +122,7 @@
                                          onclick="PF('warrantyMenuWidget').show(); return false;" />
                         </h:panelGroup>
                         <h:panelGroup id="adjustmentCategoryPanel">
-                            <p:menuButton id="adjustmentCategoryButton" value="#{assetInfoListController.adjustmentCategory == 0 ? '全部' : assetInfoListController.adjustmentCategory == 1 ? '院内设备' : assetInfoListController.adjustmentCategory == 2 ? '借出设备' : '借入设备'}" rendered="#{userContextService.canRender('HOSPITAL_ADJUSTMENT')}">
-                                <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(0)}" value="全部" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
+                            <p:menuButton id="adjustmentCategoryButton" value="#{assetInfoListController.adjustmentCategory == 1 ? '院内设备' : assetInfoListController.adjustmentCategory == 2 ? '借出设备' : '借入设备'}" rendered="#{userContextService.canRender('HOSPITAL_ADJUSTMENT')}">
                                 <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(1)}" value="院内设备" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
                                 <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(2)}" value="借出设备" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
                                 <p:menuitem style="left: 15px" immediate="true" action="#{assetInfoListController.setAdjustmentCategory(3)}" value="借入设备" update="AssetInfoListForm :searchForm:adjustmentCategoryPanel"/>
@@ -209,8 +208,8 @@
                         </p:column>
                         <p:column headerText="#{msg.Actions}" exportable="false" width="60" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT') or userContextService.accessContainsFunctionMenu('ASSET_INFO_SINGLE_EDIT')}" >
-                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{(userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT') or userContextService.accessContainsFunctionMenu('ASSET_INFO_SINGLE_EDIT')) and assetInfoListController.adjustmentCategory ne 2}" >
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;#{assetInfoListController.adjustmentCategory eq 2 ? 'opacity:0.3;' : ''}"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
                                     <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
