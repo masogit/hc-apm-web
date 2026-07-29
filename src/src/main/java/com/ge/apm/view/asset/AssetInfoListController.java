@@ -919,19 +919,31 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void doSaveSearch() {
+        javax.persistence.EntityManager em = null;
         try {
             SavedAdvancedSearch saved = new SavedAdvancedSearch();
             saved.setUserUid(user.getUid());
             saved.setName(newSavedSearchName.trim());
             saved.setConditionsJson(buildConditionsJson());
             saved.setCreatedDate(new Date());
-            savedAdvancedSearchRepository.save(saved);
+            em = WebUtil.getBean(javax.persistence.EntityManagerFactory.class).createEntityManager();
+            em.getTransaction().begin();
+            em.persist(saved);
+            em.getTransaction().commit();
+            logger.info("收藏保存成功, uid={}, name={}", saved.getUid(), saved.getName());
             newSavedSearchName = "";
             loadSavedSearches();
             WebUtil.addSuccessMessage("收藏成功");
         } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             logger.error("保存高级查询条件失败", e);
             WebUtil.addErrorMessage("保存失败: " + e.getMessage());
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 
@@ -984,13 +996,27 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void deleteSavedSearch(SavedAdvancedSearch saved) {
         if (saved == null || saved.getUid() == null) return;
+        javax.persistence.EntityManager em = null;
         try {
-            savedAdvancedSearchRepository.delete(saved.getUid());
+            em = WebUtil.getBean(javax.persistence.EntityManagerFactory.class).createEntityManager();
+            em.getTransaction().begin();
+            SavedAdvancedSearch toDelete = em.find(SavedAdvancedSearch.class, saved.getUid());
+            if (toDelete != null) {
+                em.remove(toDelete);
+            }
+            em.getTransaction().commit();
             loadSavedSearches();
             WebUtil.addSuccessMessage("已删除收藏: " + saved.getName());
         } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             logger.error("删除收藏查询条件失败", e);
             WebUtil.addErrorMessage("删除失败");
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 
