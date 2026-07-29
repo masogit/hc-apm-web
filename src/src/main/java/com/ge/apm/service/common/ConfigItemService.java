@@ -2,9 +2,9 @@ package com.ge.apm.service.common;
 
 import com.ge.apm.dao.ConfigItemRepository;
 import com.ge.apm.dao.ConfigItemValueRepository;
-import com.ge.apm.domain.ConfigItem;
-import com.ge.apm.domain.ConfigItemValue;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
+import com.ge.apm.domain.acquisition.ConfigItemForm;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +21,9 @@ public class ConfigItemService {
 
     @Autowired
     private ConfigItemValueRepository configItemValueRepository;
+
+    @Autowired
+    ConfigCacheService configCacheService;
 
     /**
      * return boolean type
@@ -40,4 +43,19 @@ public class ConfigItemService {
     public String getConfigItemByKeyToString(String key, String hospitalUID,String tenantUid) {
         return configItemValueRepository.findByKeyAndSiteForUseParent(hospitalUID, tenantUid, key);
     }
+
+    public String getConfigByKeyAndSite(ConfigItemForm configItemForm) {
+        if (StringUtils.isBlank(configItemForm.getTenantUid())
+                || StringUtils.isBlank(configItemForm.getInstitutionUid())
+                || StringUtils.isBlank(configItemForm.getHospitalUid())) {
+            OrgInfo orgInfo = configCacheService.findOrgInfoByUid(configItemForm.getSiteUid());
+            if (orgInfo != null) {
+                configItemForm.setTenantUid(orgInfo.getTenantUID());
+                configItemForm.setInstitutionUid(orgInfo.getInstitutionUID());
+                configItemForm.setHospitalUid(orgInfo.getHospitalUID());
+            }
+        }
+        return configItemValueRepository.findByKeyAndSiteForUseParent(configItemForm.getSiteUid(), configItemForm.getHospitalUid(), configItemForm.getInstitutionUid(), configItemForm.getTenantUid(), configItemForm.getKey());
+    }
+
 }
