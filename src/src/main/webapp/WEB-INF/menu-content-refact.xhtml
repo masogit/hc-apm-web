@@ -407,8 +407,8 @@
                    </c:when>
 
                    <c:when test="#{item eq 'ACQUISITION_PLAN'}">
-                       <p:submenu id="um7000" label="设备购置管理" icon="fa fa-folder-open fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_')}">
-                           <p:menuitem fragment="um7100" id="um7100" value="购置计划申报期" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_FILING_PERIOD_EDIT') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_FILING_PERIOD_VIEW')}" outcome="/portal/acquisition/planFilingPeriod/List.xhtml"/>
+                       <p:submenu id="um7000" label="区域购置管理" icon="fa fa-folder-open fa-fw"  rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_') and userContextService.canRender('ACQUISITION_PLAN')}">
+                           <p:menuitem fragment="um7100" id="um7100" value="购置计划申报" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_FILING_PERIOD_EDIT') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_FILING_PERIOD_VIEW')}" outcome="/portal/acquisition/planFilingPeriod/List.xhtml"/>
                            <p:menuitem fragment="um7200" id="um7200" value="购置计划管理" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY_EDIT') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY_VIEW')}" outcome="/portal/acquisition/plan/List.xhtml"/>
                            <p:menuitem fragment="um7300" id="um7200" value="购置计划管理" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_VIEW') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP') or userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY')}" outcome="/portal/acquisition/audit/Main.xhtml"/>
                        </p:submenu>

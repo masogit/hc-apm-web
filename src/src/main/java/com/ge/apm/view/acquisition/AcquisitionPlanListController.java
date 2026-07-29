@@ -4,8 +4,10 @@ import com.ge.apm.dao.AcquisitionPlanRepository;
 import com.ge.apm.dao.PlanFilingPeriodRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
+import com.ge.apm.domain.acquisition.HospitalAreaClassification;
 import com.ge.apm.domain.acquisition.PlanFilingPeriod;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
+import com.ge.apm.service.acquisition.AcquisitionPlanService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.budget.BudgetApplicationBapController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -28,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -38,7 +41,7 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
     private AcquisitionPlanRepository dao;
     private UserAccount loginUser;
     private UaaService uaaService;
-
+    private AcquisitionPlanService acquisitionPlanService;
 
 
     @Override
@@ -46,6 +49,7 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
         super.init();
         dao = WebUtil.getBean(AcquisitionPlanRepository.class);
         planFilingPeriodRepository = WebUtil.getBean(PlanFilingPeriodRepository.class);
+        acquisitionPlanService = WebUtil.getBean(AcquisitionPlanService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         loginUser = UserContextService.getCurrentUserAccount();
     }
@@ -64,26 +68,23 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
             searchFilters = new ArrayList();
         }
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
+
         if (!this.hasFilterOnField("hospitalUID") ) {
-           /* List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));*/
-            updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,  UserContextService.getCurrentUserAccount().getHospitalUID(), "1*2+"));
+            HospitalAreaClassification hospitalAreaClassification = acquisitionPlanService.getHospitalAreaClassification(loginUser);
+            if(hospitalAreaClassification != null){
+                List<String> hospitalUidList = acquisitionPlanService.getHospitals(hospitalAreaClassification, UserContextService.getCurrentUserAccount().getHospitalUID());
+                if(CollectionUtils.isNotEmpty(hospitalUidList)){
+                    updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, hospitalUidList, "1*"));
+                }else{
+                    updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,  UserContextService.getCurrentUserAccount().getHospitalUID(), "1*"));
+                }
+            }else {
+                List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ,  UserContextService.getCurrentUserAccount().getHospitalUID(), "1*2+"));
+                updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ,  UserContextService.getCurrentUserAccount().getHospitalUID(), "1*2+"));
+            }
         }
-        /*List<String> status = new ArrayList<>();
-        status.add(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
-        status.add(AcquisitionPlan.ApplicationStatusEnum.Rejected.name());
-        // 方式二：静态方法精确判断
-        if (UserContextService.getCurrentUserFunction().contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER.name())) {
-            // 有权限
-            status.add(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name());
-        } else if (UserContextService.getCurrentUserFunction().contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP.name())) {
-            status.add(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name());
-        }else if (UserContextService.getCurrentUserFunction().contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY.name())){
-            status.add(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
-        }
-        if(CollectionUtils.isNotEmpty(status)){
-            updateSearchFilter(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, status));
-        }*/
     }
 
 

@@ -36,6 +36,9 @@ public class PlanFilingPeriodController extends GenericCRUDUUIDController<PlanFi
     private PlanFilingPeriodRepository dao;
     private UserAccountRepository userAccountRepository;
     private UserAccount currentUser;
+    @Getter @Setter
+    private Boolean canEdit = false;
+    UserContextService userContextService;
 
     @Override
     protected void init() {
@@ -43,7 +46,11 @@ public class PlanFilingPeriodController extends GenericCRUDUUIDController<PlanFi
         dao = WebUtil.getBean(PlanFilingPeriodRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        userContextService = WebUtil.getBean(UserContextService.class);
 
+        if(userContextService.accessContainsFunctionMenu("ACQUISITION_PLAN_FILING_PERIOD_EDIT")){
+            canEdit = true;
+        }
     }
 
     @Override

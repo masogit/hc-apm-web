@@ -1,19 +1,20 @@
 package com.ge.apm.service.acquisition;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.AcquisitionPlanRepository;
 import com.ge.apm.dao.AcquisitionPlanStepRepository;
 import com.ge.apm.dao.AcquisitionSpecificationRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PlanFilingPeriodRepository;
+import com.ge.apm.domain.ConfigItemVO;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.acquisition.AcquisitionPlan;
-import com.ge.apm.domain.acquisition.AcquisitionPlanStep;
-import com.ge.apm.domain.acquisition.AcquisitionSpecification;
-import com.ge.apm.domain.acquisition.PlanFilingPeriod;
+import com.ge.apm.domain.acquisition.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.acquisition.AcquisitionPlanEditController;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
@@ -23,15 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.util.StringUtils;
 
 @Service
 public class AcquisitionPlanService {
@@ -48,6 +48,8 @@ public class AcquisitionPlanService {
     private AcquisitionPlanStepRepository acquisitionPlanStepRepository;
     @Autowired
     private AcquisitionSpecificationRepository acquisitionSpecificationRepository;
+    @Autowired
+    private ConfigItemService configItemService;
 
     @Autowired
     private UaaService uaaService;
@@ -175,15 +177,27 @@ public class AcquisitionPlanService {
         if(result.equals(AcquisitionPlan.ResultEnum.SelfReview.name()) || result.equals(AcquisitionPlan.ResultEnum.Approved.name())) {
             nodeStatus = AcquisitionPlan.NodeStatusEnum.Approved.name();
             if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name())){
-                acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name());
-                acquisitionPlan.setApplicationStep(oldStep +1);
-                acquisitionPlan.setDrugCenterUid(account.getUid());
-                function = ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP;
+                if(acquisitionPlan.getBudgetTotalAmount().compareTo(new BigDecimal(10)) >= 0){
+                    acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name());
+                    acquisitionPlan.setApplicationStep(oldStep +1);
+                    acquisitionPlan.setDrugCenterUid(account.getUid());
+                    function = ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP;
+                }else {
+                    acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
+                    acquisitionPlan.setBureauPartyUid(account.getUid());
+                    acquisitionPlan.setApplicationStep(9);
+                }
             }else if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name())){
-                acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
-                acquisitionPlan.setApplicationStep(oldStep +1);
-                acquisitionPlan.setWorkGroupUid(account.getUid());
-                function = ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER;
+                if(acquisitionPlan.getBudgetTotalAmount().compareTo(new BigDecimal(50)) >= 0) {
+                    acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
+                    acquisitionPlan.setApplicationStep(oldStep +1);
+                    acquisitionPlan.setWorkGroupUid(account.getUid());
+                    function = ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER;
+                }else{
+                    acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
+                    acquisitionPlan.setBureauPartyUid(account.getUid());
+                    acquisitionPlan.setApplicationStep(9);
+                }
             } else if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name())){
                 acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
                 acquisitionPlan.setBureauPartyUid(account.getUid());
@@ -299,5 +313,52 @@ public class AcquisitionPlanService {
         }
 
         return rootNode;
+    }
+
+
+    public HospitalAreaClassification getHospitalAreaClassification(UserAccount user){
+        HospitalAreaClassification  classification = new HospitalAreaClassification();
+        ConfigItemForm form = new ConfigItemForm();
+        form.setSiteUid(user.getSiteUID());
+        form.setKey("HospitalAreaClassification");
+        String actualValue = configItemService.getConfigByKeyAndSite(form);
+        if(StringUtils.isEmpty(actualValue)){
+            //throw  new CustomParameterizedException("'医院区域分类'未配置!");
+            return null;
+        }
+        JSONObject jsonObject = JSONObject.parseObject(actualValue);
+        Set<String> keys = jsonObject.keySet();
+        List<MedicalInstitution> result = new ArrayList<>();
+        for (String key : keys) {
+            List<MedicalInstitution> institutionList =jsonObject.getObject(key, new TypeReference<List<MedicalInstitution>>() {});
+            result.addAll(institutionList);
+        }
+        if(org.springframework.util.CollectionUtils.isEmpty(result)){
+            return classification;
+        }
+        // 单体医院
+        List<MedicalInstitution> standaloneHospitals = result.stream().filter(item -> item.getUids() == null).collect(Collectors.toList());
+        // 医共体
+        List<MedicalInstitution> medicalConsortium = result.stream().filter(item -> !org.springframework.util.CollectionUtils.isEmpty(item.getUids() )).collect(Collectors.toList());
+        classification.setStandaloneHospitals(standaloneHospitals);
+        classification.setMedicalConsortium(medicalConsortium);
+        return classification;
+    }
+    public List<String> getHospitals(HospitalAreaClassification classification,String hospitalUID){
+        Set<String> result = new HashSet<>();
+
+        // 处理 medicalConsortium：找到 uids 包含 hospitalUID 的 consortium，将其全部 uids 加入结果
+        classification.getMedicalConsortium().stream()
+                .filter(item -> !org.springframework.util.CollectionUtils.isEmpty(item.getUids()))
+                .filter(item -> item.getUids().contains(hospitalUID))
+                .forEach(item -> result.addAll(item.getUids()));
+
+        // 处理 standaloneHospitals：找到 uid 与 hospitalUID 一致的加入结果
+        classification.getStandaloneHospitals().stream()
+                .filter(item -> StringUtils.hasText(item.getUid()) && java.util.Objects.equals(item.getUid(), hospitalUID))
+                .map(MedicalInstitution::getUid)
+                .forEach(result::add);
+
+        return new ArrayList<>(result);
     }
 }

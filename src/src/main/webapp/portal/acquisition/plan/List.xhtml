@@ -28,7 +28,7 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="医疗设备购置计划管理"/>
+                <p:outputLabel class="pageTitle" value="购置计划管理"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -95,9 +95,9 @@
                         </p:column>
 
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{acquisitionPlanListController.createUrl()}" update=":formList"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{acquisitionPlanListController.createUrl()}" update=":formList"  rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY_EDIT')}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" action="#{acquisitionPlanListController.editUrl()}" update=":formList" disabled="#{empty acquisitionPlanListController.selected.id}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{acquisitionPlanListController.delete}" update=":formList" disabled="#{empty acquisitionPlanListController.selected.id}">
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{acquisitionPlanListController.delete}" update=":formList" disabled="#{empty acquisitionPlanListController.selected.id}" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY_EDIT')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
