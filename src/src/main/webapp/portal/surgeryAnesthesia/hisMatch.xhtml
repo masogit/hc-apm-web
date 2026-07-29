@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card">
+                <h:form id="transferAssetEditForm">
+                    <p:fieldset legend="手麻系统设备匹配">
+
+                        <div style="display:inline-block;float: left;">
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" style=" width: 800px;float: right;">
+                                <h:panelGroup>
+                                        <label class='label'>金额:(元)</label>
+                                        <p:inputNumber id="purchasePrice" value="#{surgeryAnesthesiaAssetMatchController.assetInfoDto.purchasePrice}" decimalPlaces="0" minValue="0" required="true" requiredMessage="金额大于等于0！">
+                                        </p:inputNumber>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class='label'>apm资产编号</label>
+                                    <p:inputText id="departNum" rows="1" cols="10"
+                                                 value="#{surgeryAnesthesiaAssetMatchController.assetInfoDto.departNum}"/>
+                                </h:panelGroup>
+                               <h:panelGroup>
+                                    <label class='label'>apm设备名称</label>
+                                    <p:inputText id="name"  rows="1" cols="10"
+                                                 value="#{surgeryAnesthesiaAssetMatchController.assetInfoDto.name}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class='label'>apm设备型号</label>
+                                    <p:inputText id="functionType" rows="1" cols="10"
+                                                 value="#{surgeryAnesthesiaAssetMatchController.assetInfoDto.functionType}"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+
+                        <div style="width: 120px;float: left;margin: 25px -80px 0px 15px;">
+                            <p:commandButton validateClient="true" actionListener="#{surgeryAnesthesiaAssetMatchController.firstQueryOrder}"
+                                             value="apm设备检索" update="apmPickList"/>
+                        </div>
+
+                        <p:pickList id="apmPickList" widgetVar="apmPickList" value="#{surgeryAnesthesiaAssetMatchController.apmAvailableAssets}" var="item"
+                                    itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
+                                    showSourceFilter="false" showTargetFilter="false" filterMatchMode="contains" converter="assetInfoConverter"
+                                    required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
+                            <f:facet name="sourceCaption"><p  style="padding-bottom:-200px">APM待选设备
+                                <br/>
+                                <br/>
+                                <span style="width:15%;float: left">#{msg.name}</span>
+                                <span style="width:15%;float: left">#{msg.qrCode}</span>
+                                <span style="width:25%;float: left">#{msg.departNum}</span>
+                                <span style="width:15%;float: left">#{msg.clinicalDeptName}</span>
+                                <span style="width:15%;float: left">#{msg.functionType}</span>
+                                <span style="width:15%;float: left">#{msg.purchasePrice}</span></p>
+                            </f:facet>
+                            <f:facet name="targetCaption"><p  style="padding-bottom:-200px">APM已选设备
+                                <br/>
+                                <br/>
+                                <span style="width:15%;float: left">#{msg.name}</span>
+                                <span style="width:15%;float: left">#{msg.qrCode}</span>
+                                <span style="width:25%;float: left">#{msg.departNum}</span>
+                                <span style="width:15%;float: left">#{msg.clinicalDeptName}</span>
+                                <span style="width:15%;float: left">#{msg.functionType}</span>
+                                <span style="width:15%;float: left">#{msg.purchasePrice}</span></p>
+                            </f:facet>
+
+                            <p:ajax event="transfer" update="apmPickList" listener="#{surgeryAnesthesiaAssetMatchController.apmOnAssetsTransfer}" />
+                            <p:column style="float: left;width:15%;">
+                                <h:outputText value="#{item.name}" />
+                            </p:column>
+                            <p:column style="float: left;width:15%;">
+                                <h:outputText value="#{item.qrCode}" />
+                            </p:column>
+                            <p:column style="float: left;width:25%;">
+                                <h:outputText value="#{item.departNum}" />
+                            </p:column>
+                            <p:column style="float: left;width:15%;">
+                                <h:outputText value="#{item.clinicalDeptName}" />
+                            </p:column>
+                            <p:column style="float: left;width:15%;">
+                                <h:outputText value="#{item.functionType}" />
+                            </p:column>
+                            <p:column style="float: left;width:15%;">
+                                <h:outputText value="#{item.purchasePrice}"   readonly="true">
+                                    <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                </h:outputText>
+                            </p:column>
+                        </p:pickList>
+
+                        <div style="display:inline-block;float: left;">
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" style=" width: 800px;float: right;">
+                                <h:panelGroup>
+                                    <label class='label'>手麻设备名称</label>
+                                    <p:inputText id="deviceName" rows="1" cols="10"
+                                                 value="#{surgeryAnesthesiaAssetMatchController.surgeryAnesthesiaEquipmentConnect.deviceName}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class='label'>手麻设备识别码</label>
+                                    <p:inputText id="deviceCode" rows="1" cols="10"
+                                                 value="#{surgeryAnesthesiaAssetMatchController.surgeryAnesthesiaEquipmentConnect.deviceCode}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class='label'>医院机构代码</label>
+                                    <p:inputText id="orgCode" rows="1" cols="10"
+                                                 value="#{surgeryAnesthesiaAssetMatchController.surgeryAnesthesiaEquipmentConnect.orgCode}"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+
+                        <div style="width: 120px;float: left;margin: 25px -80px 0px 15px;">
+                            <p:commandButton validateClient="true" actionListener="#{surgeryAnesthesiaAssetMatchController.secondQueryOrder}"
+                                             value="手麻设备检索" update="connPickList"/>
+                        </div>
+
+                        <p:pickList id="connPickList" widgetVar="connPickList" value="#{surgeryAnesthesiaAssetMatchController.connAvailableAssets}" var="coitem"
+                                    itemValue="#{coitem}" itemLabel="#{coitem.deviceName}" showCheckbox="false" responsive="true"
+                                    showSourceFilter="false" showTargetFilter="false" filterMatchMode="contains" converter="surgeryAnesthesiaEquipmentConnectConverter"
+                                    required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
+                            <f:facet name="sourceCaption">手麻待选设备</f:facet>
+                            <f:facet name="targetCaption">手麻已选设备</f:facet>
+                            <p:ajax event="transfer" update="connPickList" listener="#{surgeryAnesthesiaAssetMatchController.connOnAssetsTransfer}" />
+                            <p:column style="float: left;width:25%;">
+                                <h:outputText value="#{coitem.deviceName}" />
+                            </p:column>
+                            <p:column style="float: left;width:30%;">
+                                <h:outputText value="#{coitem.orgCode}" />
+                            </p:column>
+                            <p:column style="float: left;width:25%;">
+                                <h:outputText value="#{coitem.deviceCode}" />
+                            </p:column>
+                        </p:pickList>
+                    </p:fieldset>
+                </h:form>
+                <div style="width: 110px;float: left;margin: 25px -80px 0px 550px;">
+                    <p:commandButton validateClient="true" actionListener="#{surgeryAnesthesiaAssetMatchController.match}"
+                                     value="匹配" style="float:left" icon="ui-icon-check" update="@(form)"/>
+                </div>
+            </div>
+        </div>
+</html>

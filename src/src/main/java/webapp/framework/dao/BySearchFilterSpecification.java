@@ -51,7 +51,8 @@ public class BySearchFilterSpecification {
                                 predicates.add(new Tuple2(filter.conditionPath, builder.notEqual(expression, filter.value)));
                                 break;
                             case LIKE:
-                                if (filter.value != null) {
+                                if (filter.value != null && !filter.value.toString().isEmpty()
+                                        && String.class.isAssignableFrom(expression.getJavaType())) {
                                     predicates.add(new Tuple2(filter.conditionPath, builder.like(builder.lower(expression), "%" + filter.value.toString().toLowerCase() + "%")));
                                 }
                                 break;
@@ -117,36 +118,91 @@ public class BySearchFilterSpecification {
             }
 
             private Predicate buildConditions(List<Tuple2<String, Predicate>> conditionList, String currentConditions, CriteriaBuilder builder) {
-                List<Tuple2<String, Predicate>> currentList = new ArrayList<>();
-                for (Tuple2<String, Predicate> item : conditionList) {
-                    if (item._1.startsWith(currentConditions)) {
-                        if (item._1.equals(currentConditions)) {
-                            currentList.add(item);
-                        } else {
-                            return buildConditions(conditionList, item._1, builder);
+                // Iterative bottom-up approach: process from longest paths to shortest,
+                // combining sibling predicates into parent groups until one remains.
+                // This replaces the original recursive approach which caused StackOverflow
+                // when multiple independent condition groups (e.g. "1*" and "adv*") coexist.
+                List<Predicate> rootResults = new ArrayList<>();
+
+                while (conditionList.size() > 1) {
+                    // Find the longest path (deepest in hierarchy)
+                    String targetPath = conditionList.get(0)._1;
+                    for (Tuple2<String, Predicate> item : conditionList) {
+                        if (item._1.length() > targetPath.length()) {
+                            targetPath = item._1;
                         }
+                    }
+
+                    // Collect all predicates with this exact path
+                    List<Predicate> matchPredicates = new ArrayList<>();
+                    List<Tuple2<String, Predicate>> remaining = new ArrayList<>();
+                    for (Tuple2<String, Predicate> item : conditionList) {
+                        if (item._1.equals(targetPath)) {
+                            matchPredicates.add(item._2);
+                        } else {
+                            remaining.add(item);
+                        }
+                    }
+
+                    // Combine predicates at this level
+                    Predicate combined;
+                    if (targetPath.endsWith("*")) {
+                        combined = builder.and(matchPredicates.toArray(new Predicate[0]));
+                    } else if (targetPath.endsWith("+")) {
+                        combined = builder.or(matchPredicates.toArray(new Predicate[0]));
+                    } else {
+                        combined = matchPredicates.size() == 1 ? matchPredicates.get(0)
+                                : builder.and(matchPredicates.toArray(new Predicate[0]));
+                    }
+
+                    // Compute parent path by stripping only ONE level
+                    // e.g. "1*2*3+" -> strip "+" -> "1*2*3" -> strip to last "*" -> "1*2*"
+                    String parentPath = targetPath;
+                    if (parentPath.endsWith("*") || parentPath.endsWith("+")) {
+                        parentPath = parentPath.substring(0, parentPath.length() - 1);
+                    }
+                    while (!parentPath.isEmpty() && !parentPath.endsWith("*") && !parentPath.endsWith("+")) {
+                        parentPath = parentPath.substring(0, parentPath.length() - 1);
+                    }
+
+                    if (!parentPath.isEmpty()) {
+                        // Check if parent path exists in remaining items
+                        boolean parentExists = false;
+                        for (Tuple2<String, Predicate> item : remaining) {
+                            if (item._1.equals(parentPath)) {
+                                parentExists = true;
+                                break;
+                            }
+                        }
+                        if (parentExists) {
+                            // Bubble up: add combined predicate under parent path for further processing
+                            remaining.add(new Tuple2<>(parentPath, combined));
+                            conditionList = remaining;
+                        } else {
+                            // Parent not in list - this is a root-level result
+                            rootResults.add(combined);
+                            conditionList = remaining;
+                        }
+                    } else {
+                        // No parent (root-level group like "1*" or "adv*") - store as result
+                        rootResults.add(combined);
+                        conditionList = remaining;
                     }
                 }
 
-                Predicate predicate = null;
-                Predicate[] predicateArray = currentList.stream().map(item -> item._2).collect(Collectors.toList()).toArray(new Predicate[currentList.size()]);
-                if (currentConditions.endsWith("*")) {
-                    predicate = builder.and(predicateArray);
-                } else if (currentConditions.endsWith("+")) {
-                    predicate = builder.or(predicateArray);
-                }
-                conditionList.removeAll(currentList);
-                do {
-                    currentConditions = currentConditions.substring(0, currentConditions.length() - 1);
-                } while (!currentConditions.isEmpty() && !currentConditions.endsWith("*") && !currentConditions.endsWith("+"));
-
-                conditionList.add(new Tuple2(currentConditions, predicate));
+                // Handle last remaining item
                 if (conditionList.size() == 1) {
-                    return predicate;
-                } else {
-                    return buildConditions(conditionList, currentConditions, builder);
+                    rootResults.add(conditionList.get(0)._2);
                 }
 
+                if (rootResults.isEmpty()) {
+                    return builder.conjunction();
+                }
+                if (rootResults.size() == 1) {
+                    return rootResults.get(0);
+                }
+                // Multiple independent root groups are ANDed together
+                return builder.and(rootResults.toArray(new Predicate[0]));
             }
         };
     }

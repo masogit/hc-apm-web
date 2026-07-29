@@ -32,7 +32,7 @@
         </script>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="不良事件上报"/>
+                <p:outputLabel class="pageTitle" value="不良事件审核"/>
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="AdverseEventApproveEditForm">
@@ -63,23 +63,35 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告人姓名<span style="color:red">*</span></label>
-                                    <p:inputText id="serialNum" value="#{adverseEventApproveController.selected.reporterName}" required="true" requiredMessage="报告人姓名不能为空" readonly="true"/>
+                                    <p:inputText id="reporterName" value="#{adverseEventApproveController.selected.reporterName}" required="true" requiredMessage="报告人姓名不能为空" readonly="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">报告日期<span style="color:red">*</span></label>
-                                    <p:outputLabel value="#{adverseEventApproveController.selected.reportDate}" >
-                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
-                                    </p:outputLabel>
+                                    <p:calendar timeZone="GMT+8"  id="reportDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.reportDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="报告日期不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">科室<span style="color:red">*</span></label>
                                     <p:outputLabel id="department" value="#{adverseEventApproveController.reporterList(adverseEventApproveController.selected.department)}" required="true" requiredMessage="科室不能为空" readonly="true" class="department"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    <p:commandButton id="btnDept" type="button" icon="fa fa-angle-down" iconPos="right"  disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
+                                    <p:overlayPanel widgetVar="varPanelDepartOrg" for="btnDept" hideEffect="fade" dynamic="false" modal="false">
+                                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                            <p:tree id="departTree" class="tree" style="width:98%;border:0;" value="#{adverseEventApproveController.deptOrgTree}" var="node" selectionMode="single" dynamic="true">
+                                                <p:ajax process="@this" event="select" listener="#{adverseEventApproveController.onAdverseSelectSiteTreeNode}" update="@(.department)" oncomplete="PF('varPanelDepartOrg').hide();"/>
+                                                <p:ajax process="@this" event="expand"/>
+                                                <p:ajax process="@this" event="collapse"/>
+                                                <p:treeNode type="org">
+                                                    <h:outputText value="#{node.name}"/>
+                                                </p:treeNode>
+                                                <p:treeNode type="hidden" rendered="false"/>
+                                            </p:tree>
+                                        </p:scrollPanel>
+                                    </p:overlayPanel>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">发生地</label>
                                     <p:inputText id="occurredPlace" value="#{adverseEventApproveController.selected.occurredPlace}"  readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup id="repairReportSendPlaceGroup">
+                                <h:panelGroup id="repairReportSendPlaceGroup" rendered="#{adverseEventApproveController.selected.adverseEventType eq '2'}">
                                     <label class="label">设备报修发生场地<span style="color:red">#{adverseEventApproveController.selected.adverseEventType eq '2' ? '*' : ''}</span></label>
                                     <p:selectOneMenu value="#{adverseEventApproveController.selected.repairReportSendPlace}" required="#{adverseEventApproveController.selected.adverseEventType eq '2' ? true :false}" disabled="true">
                                         <f:selectItem itemLabel="请选择"/>
@@ -182,21 +194,15 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">生产日期<span style="color:red">*</span></label>
-                                        <p:outputLabel value="#{adverseEventApproveController.selected.productionDate}" >
-                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
-                                        </p:outputLabel>
+                                        <p:calendar timeZone="GMT+8"  id="productionDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.productionDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="生产日期不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="true">
                                         <label class="label">有效期至<span style="color:red">#{adverseEventApproveController.assetType == 2?'*':''}</span></label>
-                                        <p:outputLabel value="#{adverseEventApproveController.selected.validUntil}" >
-                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
-                                        </p:outputLabel>
+                                        <p:calendar timeZone="GMT+8"  id="validUntil" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.validUntil}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="有效期至不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventApproveController.assetType == 2}">
                                         <label class="label">停用日期</label>
-                                        <p:outputLabel value="#{adverseEventApproveController.selected.retirementDate}" >
-                                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
-                                        </p:outputLabel>
+                                        <p:calendar timeZone="GMT+8"  id="retirementDate" pattern="yyyy/MM/dd" value="#{adverseEventApproveController.selected.retirementDate}"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="停用日期不能为空" disabled="#{adverseEventApproveController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventApproveController.assetType == 1}">
                                         <label class="label">上市许可证持有人名称</label>

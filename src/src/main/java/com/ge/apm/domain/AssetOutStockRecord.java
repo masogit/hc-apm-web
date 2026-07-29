@@ -41,7 +41,7 @@ public class AssetOutStockRecord implements Serializable {
     @Column(name = "asset_uid", columnDefinition = "CHAR(32)")
     private String assetUid;
 
-    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+    @JoinColumn(name = "asset_uid",foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), referencedColumnName = "uid", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
@@ -118,7 +118,7 @@ public class AssetOutStockRecord implements Serializable {
     @Column(name = "arrival_list_id", columnDefinition = "CHAR(32)")
     private String arrivalListId;
 
-    @JoinColumn(name = "arrival_list_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "arrival_list_id",foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private ArrivalList arrivalList;
 

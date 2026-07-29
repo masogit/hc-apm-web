@@ -145,6 +145,8 @@ public class AssetOptRecord implements Serializable {
 	@Transient
 	private String assetInfoassetDeptUID;
 	@Transient
+	private String assetInfoqrCode;
+	@Transient
 	private String createByName;
 	@Transient
 	private String modifyByName;
@@ -445,6 +447,14 @@ public class AssetOptRecord implements Serializable {
 
 	public void setAssetInfoassetDeptUID(String assetInfoassetDeptUID) {
 		this.assetInfoassetDeptUID = assetInfoassetDeptUID;
+	}
+
+	public String getAssetInfoqrCode() {
+		return assetInfoqrCode;
+	}
+
+	public void setAssetInfoqrCode(String assetInfoqrCode) {
+		this.assetInfoqrCode = assetInfoqrCode;
 	}
 
 	@Override

@@ -55,7 +55,8 @@ public class BySearchFilterSpecificationExtend {
                                 predicates.add(new Tuple2(filter.conditionPath, builder.notEqual(expression, filter.value)));
                                 break;
                             case LIKE:
-                                if (filter.value != null) {
+                                if (filter.value != null && !filter.value.toString().isEmpty()
+                                        && String.class.isAssignableFrom(expression.getJavaType())) {
                                     predicates.add(new Tuple2(filter.conditionPath, builder.like(builder.lower(expression), "%" + filter.value.toString().toLowerCase() + "%")));
                                 }
                                 break;

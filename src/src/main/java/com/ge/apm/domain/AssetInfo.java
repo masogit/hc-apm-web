@@ -1084,6 +1084,26 @@ public class AssetInfo implements ChineseName, Serializable {
     private String spare10;
     @Getter
     @Setter
+    @Column(name = "spare11")
+    private Date spare11;
+    @Getter
+    @Setter
+    @Column(name = "spare12")
+    private Date spare12;
+    @Getter
+    @Setter
+    @Column(name = "spare13")
+    private Date spare13;
+    @Getter
+    @Setter
+    @Column(name = "spare14")
+    private Date spare14;
+    @Getter
+    @Setter
+    @Column(name = "spare15")
+    private Date spare15;
+    @Getter
+    @Setter
     @Column(name = "billing_time")
     private Long billingTime; // 累计借用计费时长分钟
     @Getter

@@ -1425,14 +1425,12 @@ public class AssetFileImportBaseService {
                 // 文件内部序列号重复
                 if (duplicateSerialNumsInFile.contains(newAsset.getSerialNum())) {
                     item.put("status", ImportStatus.CheckFail);
-                    result.put("canBeImport", Boolean.FALSE);
                     AssetRow.addErrMessage(item, "警告: 导入文件中序列号重复");
                 }
                 // 数据库中序列号重复
-                List<AssetInfo> serialDupList = assetDao.findBySerialNumAndTenantUID(newAsset.getSerialNum(), newAsset.getTenantUID());
-                if (!serialDupList.isEmpty()) {
+                boolean serialNumDuplicate = supportingService.isAssetFieldDuplicate("serialNum", newAsset.getSerialNum(), newAsset.getSiteUID(), newAsset.getUid());
+                if (serialNumDuplicate) {
                     item.put("status", ImportStatus.CheckFail);
-                    result.put("canBeImport", Boolean.FALSE);
                     AssetRow.addErrMessage(item, "警告: 序列号重复");
                 }
             }

@@ -400,6 +400,27 @@ public class AssetFileImportSupportingService {
 
     }
 
+    public boolean isAssetFieldDuplicate(String fieldName, String fieldValue, String siteUid, String assetUid) {
+        if (StringUtils.isEmpty(fieldName)) {
+            return false;
+        }
+        List<SearchFilter> assetFilters = new ArrayList<>();
+
+        assetFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.EQ, fieldValue));
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
+
+        if (null != assetUid) {
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, assetUid));
+        }
+        List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
+        if (resultList.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean needGenerateFinancingNum(WorkflowConfig workflowConfig, AssetInfo assetInfo) {
 
         final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;

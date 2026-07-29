@@ -129,7 +129,7 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
     private I18nMessageRepository i18nMessageRepository;
 
 
-    private Date startDate=DateUtil.currentMonthFirstDay();
+    private Date startDate;
 
     private Date endDate=new Date();
 
@@ -211,6 +211,8 @@ public class EfficiencyEquipmentInfoController extends GenericCRUDUUIDController
         if(!org.springframework.util.CollectionUtils.isEmpty(list)){
             fieldColumnDtoList = list.stream().filter(item -> item.getRendered()).collect(Collectors.toList());
         }
+        startDate=DateUtil.addMonth(new Date(), -3);
+
     }
 
     public Boolean showFilterRender(String field){
@@ -743,6 +745,65 @@ protected boolean numberField(String fieldName, String filterVal) {
         this.endDate = endDate;
     }
 
+    /**
+     * 快捷筛选：本周（周一到今天）
+     */
+    public void setThisWeek() {
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.with(java.time.DayOfWeek.MONDAY);
+        this.startDate = Date.from(monday.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 快捷筛选：本半年（当前半年第一天到今天）
+     * 上半年: 1月1日 ~ 6月30日，下半年: 7月1日 ~ 12月31日
+     */
+    public void setThisHalfYear() {
+        LocalDate today = LocalDate.now();
+        int month = today.getMonthValue();
+        LocalDate halfYearStart;
+        if (month <= 6) {
+            halfYearStart = LocalDate.of(today.getYear(), 1, 1);
+        } else {
+            halfYearStart = LocalDate.of(today.getYear(), 7, 1);
+        }
+        this.startDate = Date.from(halfYearStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 快捷筛选：本月（当月第一天到今天）
+     */
+    public void setThisMonth() {
+        LocalDate today = LocalDate.now();
+        LocalDate monthStart = today.withDayOfMonth(1);
+        this.startDate = Date.from(monthStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 快捷筛选：本季度（当前季度第一天到今天）
+     * Q1: 1-3月, Q2: 4-6月, Q3: 7-9月, Q4: 10-12月
+     */
+    public void setThisQuarter() {
+        LocalDate today = LocalDate.now();
+        int month = today.getMonthValue();
+        int quarterStartMonth = ((month - 1) / 3) * 3 + 1;
+        LocalDate quarterStart = LocalDate.of(today.getYear(), quarterStartMonth, 1);
+        this.startDate = Date.from(quarterStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 快捷筛选：本年（1月1日到今天）
+     */
+    public void setThisYear() {
+        LocalDate today = LocalDate.now();
+        LocalDate yearStart = LocalDate.of(today.getYear(), 1, 1);
+        this.startDate = Date.from(yearStart.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.endDate = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
 
     public StreamedContent getExcelFile() {
         return excelFile;

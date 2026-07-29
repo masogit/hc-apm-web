@@ -388,6 +388,9 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
                 return "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=" + outStockRecord.getOutStockNo() + "&userName=" + currentUser.getName();
             case "returnedStocked" :
                 OrgInfo returnedDept = orgInfoRepository.findByUid(getStockDept(outStockRecord.getAssetInfo()));
+                if( null == returnedDept ){
+                    returnedDept = orgInfoRepository.findByUid(getStockDept1(outStockRecord));
+                }
                 return "/portal/JmPrintReportView.xhtml?type=assetStock&stockNo=" + outStockRecord.getReturnedStockNo() + "&userName=" + currentUser.getName() + "&returnedStockDept=" + returnedDept.getName();
             case "assetInfo" :
                 return "/portal/asset/info/AssetDetail.xhtml?actionName=View&terminate=false&assetUid=" + UrlParamUtil.encodeUrlQueryString("assetUid=" + outStockRecord.getAssetUid());
@@ -436,6 +439,9 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
 
     private String getStockDept(AssetInfo assetInfo) {
         return configItemValueRepository.findByKeyAndSiteForUseParent(assetInfo.getSiteUID(), assetInfo.getHospitalUID(), assetInfo.getInstitutionUID(), assetInfo.getTenantUID(), "setAssetOutStockDept");
+    }
+    private String getStockDept1(AssetOutStockRecord outStockRecord) {
+        return configItemValueRepository.findByKeyAndSiteForUseParent(outStockRecord.getSiteUid(), outStockRecord.getHospitalUid(), outStockRecord.getInstitutionUid(), outStockRecord.getTenantUid(), "setAssetOutStockDept");
     }
 
     public String getFilterClinicalDeptOrg() {

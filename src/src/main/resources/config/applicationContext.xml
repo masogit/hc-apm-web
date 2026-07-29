@@ -150,6 +150,11 @@
           p:dataSource-ref="risDataSource"
           p:persistenceUnitName="risSiPU"
           p:jpaVendorAdapter-ref="hibernateJpaVendorAdapter">
+        <property name="packagesToScan">
+            <list>
+                <value>com.ge.apm.domain</value>
+            </list>
+        </property>
         <property name="jpaProperties">
             <props>
                 <!--#hibernate.dialect=org.hibernate.dialect.DerbyDialect-->

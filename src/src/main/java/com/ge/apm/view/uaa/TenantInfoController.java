@@ -99,6 +99,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	@Getter@Setter
 	private List<String> selectedMenuFeaturesHisPerformance;
 	@Getter@Setter
+	private List<String> selectedMenuFeaturesSurgeryAnesthesia;
+	@Getter@Setter
 	private List<String> selectedMenuFeaturesReportCenter;
 	@Getter@Setter
 	private List<String> selectedMenuFeaturesAssetAccountDashboard;
@@ -353,6 +355,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesPerformance);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesBudget);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesHisPerformance);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesSurgeryAnesthesia);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesReportCenter);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAssetAccountDashboard);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAuditConfig);
@@ -616,6 +619,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			selectedMenuFeaturesPerformance = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PERFORMANCE")).collect(Collectors.toList());
 			selectedMenuFeaturesBudget = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("BUDGET")).collect(Collectors.toList());
 			selectedMenuFeaturesHisPerformance = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("HISPERFORMANCE")).collect(Collectors.toList());
+			selectedMenuFeaturesSurgeryAnesthesia = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SURGERY_ANESTHESIA")).collect(Collectors.toList());
 			selectedMenuFeaturesReportCenter = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("REPORT_CENTER")).collect(Collectors.toList());
 			selectedMenuFeaturesAssetAccountDashboard = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("ASSET_ACCOUNT_DASHBOARD")).collect(Collectors.toList());
 			selectedMenuFeaturesAuditConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("AUDIT_CONFIG")).collect(Collectors.toList());

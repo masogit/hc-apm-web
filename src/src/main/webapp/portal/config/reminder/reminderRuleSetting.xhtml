@@ -40,9 +40,13 @@
                         <h:panelGroup>
                             <label class="label">#{msg.messageType}<span style="color:red">*</span></label >
                             <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.messageType}">
-                                <p:ajax event="change" update="pushSetting wechatTemplate" listener="#{reminderRuleController.messageTypeChange}"/>
+                                <p:ajax event="change" update="pushSetting wechatTemplate reminderDayGroup" listener="#{reminderRuleController.messageTypeChange}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('messageType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup id="reminderDayGroup" rendered="#{reminderRuleController.selected.ruleParam.messageType eq 'overdue'}">
+                            <label class="label">天数(逾期 N 天时进行提醒)</label>
+                            <p:inputNumber id="reminderDay" value="#{reminderRuleController.selected.ruleParam.reminderDay}" maxValue="365" minValue="0" decimalPlaces="0" />
                         </h:panelGroup>
                         <h:panelGroup id="pushSetting">
                             <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.pushType eq 1}">

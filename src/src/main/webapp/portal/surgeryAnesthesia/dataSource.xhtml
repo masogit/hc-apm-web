@@ -1,0 +1,175 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:his="http://www.ge.com/tags/his">
+    <ui:define name="preRenderView">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="绩效明细源数据"/>
+                </div>
+                <h:form id="HisOrgForm">
+                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                        <his:selectOrg update="@(form)"></his:selectOrg>
+                    </div>
+                </h:form>
+                <div class="ui-g-12 card ">
+                    <p:tabView id="SurgeryDataSourceTab" class="tabs"  dynamic="true">
+                        <p:tab title="手术麻醉源数据" id="showList">
+                            <div class="ui-g-12 card">
+                                <h:form id="IouListForm">
+                                    <div style="border:0px solid ;display:inline-block;width: 95%;float: left;">
+                                        <p:panelGrid columns="4" layout="grid"
+                                                     styleClass="ui-panelgrid-blank form-group">
+
+                                            <h:panelGroup>
+                                                <label class="label">手术开始时间</label>
+                                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                            locale="#{userContextService.getCalendarLocale()}"
+                                                            pattern="#{userContextService.timeFormat()}" id="startDate"
+                                                            value="#{surgeryAnesthesiaDataSourceController.startDate}"
+                                                            showOn="button" showButtonPanel="true" navigator="true"  required="true" requiredMessage="手术开始时间必填"
+                                                            mask="true">
+                                                    <p:ajax event="dateSelect" process="@this"  update="endDate" listener="#{surgeryAnesthesiaDataSourceController.getEndDateChange()}"/>
+                                                </p:calendar>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <label class="label">手术结束时间</label>
+                                                <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                                            locale="#{userContextService.getCalendarLocale()}"
+                                                            pattern="#{userContextService.timeFormat()}" id="endDate"
+                                                            value="#{surgeryAnesthesiaDataSourceController.endDate}"
+                                                            showOn="button" showButtonPanel="true" navigator="true"
+                                                            maxdate="#{surgeryAnesthesiaDataSourceController.getMaxDate()}"   required="true" requiredMessage="手术结束时间必填"
+                                                            mask="true"/>
+                                            </h:panelGroup>
+
+                                        </p:panelGrid>
+                                    </div>
+                                    <div style="float: left;margin: 30px -80px 0px -450px">
+                                        <p:commandButton  validateClient="true" value="检索"
+                                                         update="IouListForm:datalist"/>
+                                    </div>
+
+                                    <p:dataTable id="datalist" value="#{surgeryAnesthesiaDataSourceController.lazyModel}"
+                                                 var="item"
+                                                 widgetVar="varDataList"
+                                                 selectionMode="single"
+                                                 selection="#{surgeryAnesthesiaDataSourceController.selected}"
+                                                 lazy="true" paginator="true" paginatorPosition="both"
+                                                 paginatorAlwaysVisible="true"
+                                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                                 sortBy="#{item.id}"
+                                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                                 expandableRowGroups="true"
+                                                 rowsPerPageTemplate="20,50,100,500">
+
+                                        <p:ajax event="filter" listener="#{surgeryAnesthesiaDataSourceController.onFilter}"  />
+                                        <p:column headerText="所属机构">
+                                            <h:outputText value="#{item.orgCode}"/>
+                                        </p:column>
+                                        <p:column headerText="设备代码"
+                                                  filterBy="#{item.deviceCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.deviceCode}"/>
+                                        </p:column>
+                                        <p:column headerText="手术日期" sortBy="#{item.surgeryDate}">
+                                            <h:outputText value="#{item.surgeryDate}">
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd"  />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="计划开始时间">
+                                            <h:outputText value="#{item.scheduledStartTime}">
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd"  />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="手术开始时间" sortBy="#{item.surgeryStartTime}">
+                                            <h:outputText value="#{item.surgeryStartTime}">
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd HH:mm:ss"  />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="手术结束时间">
+                                            <h:outputText value="#{item.surgeryEndTime}">
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd HH:mm:ss"  />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="离开手术室时间">
+                                            <h:outputText value="#{item.exitFromOrTime}">
+                                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"   pattern="yyyy-MM-dd HH:mm:ss"  />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="手术室名称"
+                                                  filterBy="#{item.operatingRoomName}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.operatingRoomName}"/>
+                                        </p:column>
+                                        <p:column headerText="手术室代码"
+                                                  filterBy="#{item.operatingRoomCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.operatingRoomCode}"/>
+                                        </p:column>
+                                        <p:column headerText="住院号"
+                                                  filterBy="#{item.inpNo}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.inpNo}"/>
+                                        </p:column>
+                                        <p:column headerText="是否匹配"
+                                                  filterBy="#{item.isMatched}"
+                                                  filterMatchMode="EQ">
+                                            <f:facet name="filter">
+                                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                                    <f:converter converterId="javax.faces.Boolean" />
+                                                    <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                                </p:selectOneMenu>
+                                            </f:facet>
+                                            <h:outputText value="#{item.isMatched?msg.True2Yes:msg.False2No}"/>
+                                        </p:column>
+                                        <p:column headerText="系统来源"
+                                                  filterBy="#{item.sourceCode}"
+                                                  filterMatchMode="LIKE">
+                                            <h:outputText value="#{item.sourceCode}"/>
+                                        </p:column>
+                                        <f:facet name="{Toolbar}">
+                                            <p:commandButton
+                                                    id="exportBtn"
+                                                    title="导出Excel"
+                                                    icon="ui-icon-arrowstop-1-s"
+                                                    class="btn btn-sm btn-gray"
+                                                    ajax="false"
+                                            >
+                                                <p:dataExporter
+                                                        type="xls"
+                                                        target="datalist"
+                                                        fileName="or_data_export"
+                                                 />
+                                            </p:commandButton>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </h:form>
+                                <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true"
+                                          resizable="true" draggable="true" appendTo="@(body)" header="提示信息">
+                                </p:dialog>
+                            </div>
+
+                        </p:tab>
+                        <p:tab title="数据导入" id="import">
+                            <ui:include src="HisDataSourceImport.xhtml"/>
+                        </p:tab>
+                    </p:tabView>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

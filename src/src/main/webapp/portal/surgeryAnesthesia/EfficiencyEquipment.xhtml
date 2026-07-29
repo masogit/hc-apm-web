@@ -1,0 +1,250 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <style>
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="手术室绩效设备管理页面"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3" >
+                        <h:panelGroup>
+                                <p:commandButton id="btnOrg" value="#{empty surgeryAnesthesiaEquipmentInfoController.selectSite? msg.AllHospitals:surgeryAnesthesiaEquipmentInfoController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                                <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                    <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                            <p:ajax process="@this" event="select" listener="#{surgeryAnesthesiaEquipmentInfoController.onSelectSiteTreeNode}" update=":SurgeryEquipmentInfoListForm :searchForm" oncomplete="PF('varPanelOrg').hide()"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="hidden" rendered="false"/>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">开始时间*</label>
+                            <p:calendar timeZone="GMT+8" id="startTime" value="#{surgeryAnesthesiaEquipmentInfoController.startDate}"
+                                        pattern="yyyy/MM/dd"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"></p:ajax>
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">截止时间*</label>
+                            <p:calendar timeZone="GMT+8" id="endTime" value="#{surgeryAnesthesiaEquipmentInfoController.endDate}"
+                                        pattern="yyyy/MM/dd"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true">
+                                <p:ajax event="dateSelect"></p:ajax>
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:commandButton process="@this" value="查询" update="SurgeryEquipmentInfoListForm"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+
+                <h:form id="SurgeryEquipmentInfoListForm">
+                    <p:dataTable id="datalist" value="#{surgeryAnesthesiaEquipmentInfoController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" sortBy="#{item.uid}" sortOrder="descending"
+                                 selection="#{surgeryAnesthesiaEquipmentInfoController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.uid}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax  event="rowSelect" listener="#{surgeryAnesthesiaEquipmentInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
+
+
+                        <p:ajax event="filter" listener="#{surgeryAnesthesiaEquipmentInfoController.onFilter}"
+                                oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
+
+                        <p:column width="36" id="checkBoxColumn" exportable="false">
+                            <p:selectBooleanCheckbox value="#{surgeryAnesthesiaEquipmentInfoController.selectedMap[item.uid]}"
+                                                     class="selectCheckBox">
+                                <p:ajax process="@this" update="@this ;@(.selectCheckBox) :SurgeryEquipmentInfoListForm:datalist"
+                                        oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{surgeryAnesthesiaEquipmentInfoController.onSelectAllOfPage}"
+                                            update="@(.selectCheckBox) :SurgeryEquipmentInfoListForm:datalist"
+                                            oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="操作" exportable="false" width="60">
+                            <h:panelGroup>
+                                <p:commandLink
+                                        id="deleteButton" title="#{msg.Delete}"
+                                        actionListener="#{surgeryAnesthesiaEquipmentInfoController.deleteAsset(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                               icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                        </p:column>
+
+                        <!-- 设备名称 -->
+                        <p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+
+                        <!-- 展示名称 -->
+                        <p:column headerText="展示名称" filterBy="#{item.displayName}" filterMatchMode="LIKE"
+                               >
+                            <h:outputText value="#{item.displayName}"/>
+                        </p:column>
+
+                        <!-- 设备型号 -->
+                        <p:column headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+
+                        <!-- 资产编号 -->
+                        <p:column headerText="资产编号" filterBy="#{item.departNum}" filterMatchMode="LIKE"
+                                  >
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+
+                        <!-- 品牌/制造商简称 -->
+                        <p:column headerText="品牌/制造商简称" filterBy="#{item.makerShortName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.makerShortName}"/>
+                        </p:column>
+
+                        <!-- 制造商序列号 -->
+                        <p:column headerText="制造商序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE"
+                                 >
+                            <h:outputText value="#{item.serialNum}"/>
+                        </p:column>
+
+                        <!-- 二维码 -->
+                        <p:column headerText="二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE"
+                                  >
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+
+                        <!-- 所属科室 -->
+                        <p:column headerText="所属科室" >
+                            <f:facet name="header">
+                                <h:outputText value="所属科室"/><br/>
+                                <p:autoComplete dropdown="true" value="#{surgeryAnesthesiaEquipmentInfoController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300" forceSelection="true"
+                                                completeMethod="#{surgeryAnesthesiaEquipmentInfoController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{surgeryAnesthesiaEquipmentInfoController.onClinicalDeptNameFilterChange}" process="@this" update=":SurgeryEquipmentInfoListForm:datalist"/>
+                                    <p:ajax process="@this" listener="#{surgeryAnesthesiaEquipmentInfoController.onClinicalDeptNameFilterChange}" update=":SurgeryEquipmentInfoListForm:datalist"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+
+                        <!-- 设备分类 -->
+                        <p:column headerText="设备分类" >
+                            <h:outputText value="#{fieldMsg.doGetFieldValue('assetGroup', item.assetGroup)}"/>
+                        </p:column>
+
+                        <!-- 使用总台数 -->
+                        <p:column headerText="使用总台数" sortBy="#{item.totalUsageCount}">
+                            <h:outputText value="#{item.totalUsageCount}"/>
+                        </p:column>
+
+                        <!-- 占用总时长（天） -->
+                        <p:column headerText="占用总时长（天）" sortBy="#{item.totalOccupationDays}">
+                            <h:outputText value="#{item.totalOccupationDays}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <!-- 手术室覆盖数 -->
+                        <p:column headerText="手术室覆盖数" sortBy="#{item.operatingRoomCoverageCount}">
+                            <h:outputText value="#{item.operatingRoomCoverageCount}"/>
+                        </p:column>
+
+                        <!-- 阳性率 -->
+                        <p:column headerText="阳性率(%)" sortBy="#{item.positiveRate}" filterBy="#{item.positiveRate}"
+                                  filterMatchMode="GTE">
+                            <h:outputText value="#{item.positiveRate}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="1"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="批量编辑"
+                                             actionListener="#{surgeryAnesthesiaEquipmentInfoController.editBatch1}"
+                                             oncomplete="PF('surgeryEquipmentInfoEditBatch').show()"
+                                             disabled="#{not surgeryAnesthesiaEquipmentInfoController.isChecked()}"/>
+                            <p:commandButton title="导出绩效设备" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray"   ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="OR_EfficiencyEquipment_export"/>
+                            </p:commandButton>
+
+                            <p:commandButton id="createBatchButton" icon="fa fa-cogs"
+                                             update=":surgeryEquipmentBatchForm" class="btn btn-sm btn-gray" title="批量添加"
+                                             oncomplete="PF('surgeryEquipmentInfoSettingEditBatch').show()"/>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+
+                <ui:include src="SurgeryEquipmentInfoCreateBatch.xhtml"/>
+                <ui:include src="SurgeryEquipmentInfoEditBatch.xhtml"/>
+
+            </div>
+
+        </div>
+        <script>
+
+            function afterLoadRender() {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX = "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX = "hidden";
+            }
+
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#EfficiencyEquipmentInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+        </script>
+    </ui:define>
+</ui:composition>

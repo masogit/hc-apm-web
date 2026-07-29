@@ -38,6 +38,7 @@ import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -79,6 +80,7 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
+@Slf4j
 public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private CustomConfigService ccService;
@@ -140,6 +142,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SysRoleRepository sysRoleRepository;
 
     private MasterDataService masterDataService;
+    private AssetFileImportSupportingService supportingService;
 
     @Getter @Setter
     private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
@@ -373,6 +376,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTagsDao = WebUtil.getBean(AssetTagsRepository.class);
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
+        supportingService = WebUtil.getBean(AssetFileImportSupportingService.class);
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
@@ -1085,9 +1089,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         // 序列号重复校验（新增时）
         if(selected.getId() == null && StringUtils.isNotEmpty(selected.getSerialNum())){
-            if(!checkSerialNumUnique()){
-                WebUtil.addErrorMessage("制造商序列号已存在，不允许重复建档");
-                return "";
+            if(checkSerialNumUnique()){
+                WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }
         if(!checkAssetScrap()){
@@ -1339,6 +1342,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean checkDepartNumUniqueAssetInfo() {
+        if (selected.getId() != null) {
+            List<String> hisData = dao.findIdByDepartNumAndTenantUIDExcludeId(
+                    selected.getDepartNum(), selected.getTenantUID(), selected.getId());
+            if (!hisData.isEmpty()) {
+                log.info("设备编号冲突: departNum={}, currentUid={}, conflictUids={}",
+                        selected.getDepartNum(), selected.getUid(), hisData);
+            }
+            return hisData.isEmpty();
+        }
         List<String> hisData = dao.findIdByDepartNumAndTenantUID(selected.getDepartNum(), selected.getTenantUID());
         if(hisData.isEmpty()){
             return true;
@@ -1349,6 +1361,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 return true;
             }
         }
+        log.info("==设备编号冲突: departNum={}, currentUid={}, conflictUids={}",
+                selected.getDepartNum(), selected.getUid(), hisData);
         return false;
     }
 
@@ -2284,15 +2298,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    /**
-     * 序列号重复校验（新增资产时），返回 false 表示序列号重复
-     */
     private boolean checkSerialNumUnique() {
         if (StringUtils.isEmpty(selected.getSerialNum())) {
             return true;
         }
-        List<AssetInfo> existList = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
-        return existList.isEmpty();
+        return supportingService.isAssetFieldDuplicate("serialNum", selected.getSerialNum(), selected.getSiteUID(), selected.getUid());
     }
 
     public void requiredInput(String encoded, CustomConfigAssetField customConfigAssetField) {

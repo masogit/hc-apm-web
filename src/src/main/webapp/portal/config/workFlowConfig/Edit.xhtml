@@ -628,12 +628,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
-                        <h:panelGroup >
-                            <label class="label">是否开启库存显示</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableStockShow}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup>
+<!--                        <h:panelGroup >-->
+<!--                            <label class="label">是否开启库存显示</label>-->
+<!--                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableStockShow}">-->
+<!--                                <p:ajax process="@this" />-->
+<!--                            </p:selectBooleanCheckbox>-->
+<!--                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">微信消息接收#{msg.StartTime}</label>
                             <p:calendar id="startSendingTime" value="#{workflowConfigController.selected.startSendingTime}" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" defaultHour="00" defaultMinute="00" defaultSecond="00"/>
@@ -788,12 +788,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
-                        <h:panelGroup >
-                            <label class = "label">护理人员扫码是否跳转至台账</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isNursingStaffCodeLedger}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup>
+<!--                        <h:panelGroup >-->
+<!--                            <label class = "label">护理人员扫码是否跳转至台账</label>-->
+<!--                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isNursingStaffCodeLedger}">-->
+<!--                                <p:ajax process="@this" />-->
+<!--                            </p:selectBooleanCheckbox>-->
+<!--                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class = "label">#{msg.SupplierCertificateManage}</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.supplierCertificateManage}">

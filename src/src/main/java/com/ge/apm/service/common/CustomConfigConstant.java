@@ -32,7 +32,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate", "assetTypeGroup","spare01","spare02","spare03","spare04","spare05","spare06","spare07","spare08","spare09","spare10");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate", "assetTypeGroup","spare01","spare02","spare03","spare04","spare05","spare06","spare07","spare08","spare09","spare10","spare11","spare12","spare13","spare14","spare15");
     }
 
     //只读字段
@@ -54,7 +54,7 @@ public class CustomConfigConstant {
 
     static public List<CustomConfigFields> getRenameFields() {
         return Arrays.asList(capitalSource2, accountingCategory, assetValueCategory, subjectProject, proprietaryClass
-                ,systemNum2,systemNum3,systemNum4,systemNum5,mvsContractStartDate, mvsContractEndDate,spare01,spare02,spare03,spare04,spare05,spare06,spare07,spare08,spare09,spare10);
+                ,systemNum2,systemNum3,systemNum4,systemNum5,mvsContractStartDate, mvsContractEndDate,spare01,spare02,spare03,spare04,spare05,spare06,spare07,spare08,spare09,spare10,spare11,spare12,spare13,spare14,spare15);
     }
 
 

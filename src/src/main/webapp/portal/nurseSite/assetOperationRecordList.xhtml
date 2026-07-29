@@ -24,6 +24,9 @@
 						<p:column headerText="设备型号" filterBy="#{item.assetInfofunctionType}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfofunctionType}" />
 						</p:column>
+						<p:column headerText="二维码" filterBy="#{item.assetInfoqrCode}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfoqrCode}" />
+						</p:column>
 						<p:column headerText="设备编号" filterBy="#{item.assetInfodepartNum}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfodepartNum}" />
 						</p:column>

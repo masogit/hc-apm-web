@@ -182,6 +182,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
+    private static final int MAX_EXPORT_SELECTION = 500;
     private static final String SIGNATURE_HOLDER = "审核人签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
     @Getter @Setter
@@ -586,8 +587,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedMap.forEach((k, v) -> {
             if (v == true)
                 pmIdList.add(k);
-
         });
+        if (pmIdList.size() > MAX_EXPORT_SELECTION) {
+            WebUtil.addErrorMessage("最多只能勾选" + MAX_EXPORT_SELECTION + "条数据进行导出");
+        }
+    }
+
+    /**
+     * 获取当前已勾选的数量
+     */
+    public int getSelectedCount() {
+        if (selectedMap == null) return 0;
+        return (int) selectedMap.values().stream().filter(v -> v).count();
     }
     @Override
     public void onFilter(FilterEvent event){
@@ -1124,10 +1135,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     /**
      * Generate maintenance report.
+     * 仅导出勾选的数据，不支持不勾选导全部
      */
     public void doExportMaintenanceReport() {
         maintenanceReport = null;
         try {
+            // 只导出勾选项，不支持不勾选导全部
+            long selectedCount = selectedMap.values().stream().filter(v -> v).count();
+            if (selectedCount == 0) {
+                WebUtil.addErrorMessage("请至少勾选一条数据进行导出");
+                return;
+            }
+            if (selectedCount > MAX_EXPORT_SELECTION) {
+                WebUtil.addErrorMessage("最多只能勾选" + MAX_EXPORT_SELECTION + "条数据进行导出，当前勾选" + selectedCount + "条");
+                return;
+            }
             if(!pmReportService.checkDownloadPDF(selectedMap)){
                 WebUtil.addErrorMessage("含有非已关单工单，不支持下载!");
                 return;
@@ -2089,6 +2111,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
 //            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
+            this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
             result.getContent().forEach(item->pmIdList.add(item.getId()));
             return result;
         }
@@ -2245,9 +2268,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pmIdList= new ArrayList<>();
 
         }
-        if(selectedMap.size() > 0){
-            selectedMap = new HashMap();
-        }
+        // 不在loadData中清空selectedMap，以支持跨页勾选
+        // selectedMap 仅在 searchList()（切换tab）和 onFilter()（筛选条件变化）时清空
         return result;
     }
 
@@ -2694,15 +2716,45 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
-        for (V2_PmOrder item : currentPagePmOrders) {
-            selectedMap.put(item.getId(), !isSelectedAll);
+        // isSelectedCurrentPage 已由 PrimeFaces 在 Update Model 阶段设置为 header checkbox 的提交值
+        // true=用户要全选, false=用户要取消全选
+        if (Boolean.TRUE.equals(isSelectedCurrentPage)) {
+            // 全选当前页，检查加上当前页未选中的数量是否会超过500
+            long currentSelectedCount = selectedMap.values().stream().filter(v -> v).count();
+            long currentPageUnselected = currentPagePmOrders.stream().filter(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())).count();
+            if (currentSelectedCount + currentPageUnselected > MAX_EXPORT_SELECTION) {
+                WebUtil.addErrorMessage("最多只能勾选" + MAX_EXPORT_SELECTION + "条数据，当前已勾选" + currentSelectedCount + "条，本页将选择" + (MAX_EXPORT_SELECTION - currentSelectedCount) + "条");
+                // 只选择允许数量内的条目
+                long remaining = MAX_EXPORT_SELECTION - currentSelectedCount;
+                for (V2_PmOrder item : currentPagePmOrders) {
+                    if (!selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) {
+                        if (remaining > 0) {
+                            selectedMap.put(item.getId(), true);
+                            remaining--;
+                        } else {
+                            selectedMap.put(item.getId(), false);
+                        }
+                    }
+                }
+                // 因为可能没有全部选中，重新计算 isSelectedCurrentPage
+                isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+            } else {
+                for (V2_PmOrder item : currentPagePmOrders) {
+                    selectedMap.put(item.getId(), true);
+                }
+                isSelectedCurrentPage = true;
+            }
+        } else {
+            // 取消全选当前页（仅影响当前页，不影响其他页的勾选）
+            for (V2_PmOrder item : currentPagePmOrders) {
+                selectedMap.put(item.getId(), false);
+            }
+            isSelectedCurrentPage = false;
         }
         pmIdList = new ArrayList<>();
         selectedMap.forEach((k, v) -> {
             if (v == true)
                 pmIdList.add(k);
-
         });
     }
 

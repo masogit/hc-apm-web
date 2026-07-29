@@ -373,7 +373,9 @@ public class MeasuringService {
             }
             //目标设备的所有计量记录中计量日期最大的记录
             MeasuringCertificateDetail needUpdateAssetMcd = allMcdList.get(0);
-            Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
+            // 校准证书(certificateType=2)不填入"建议下次计量日期"
+            Date nextMeteringDate = Integer.valueOf(2).equals(needUpdateAssetMcd.getCertificateType())
+                    ? null : needUpdateAssetMcd.getValidDateTo();
             Date checkDate = needUpdateAssetMcd.getCheckDate();
             TenantInfo tenantInfo = tenantInfoDao.findByuid(tempAssetInfo.getTenantUID());
             if("4".equals(tenantInfo.getCustomTenant())){
@@ -657,6 +659,8 @@ public class MeasuringService {
         }
         LOGGER.info("data:{}",data);
     }
+
+
     public List<WorkflowResponse> getWorkflowResponse(File newFile){
         ExecutorService executor = Executors.newFixedThreadPool(4);
         List<File> files = null;
@@ -783,6 +787,10 @@ public class MeasuringService {
             if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
                 MeasuringCertificateDetail detail = measuringCertificateDetails.get(0);
                 BeanUtils.copyProperties(result, detail,beanNullProperty(result));
+                // 校准证书(certificateType=2)忽略有效期, 确保历史记录的validDateTo被清空
+                if (Integer.valueOf(2).equals(detail.getCertificateType())) {
+                    detail.setValidDateTo(null);
+                }
                 measuringCertificateDetailDao.save(detail);
                 result = detail;
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
@@ -865,7 +873,10 @@ public class MeasuringService {
         detail.setCheckCompany(object.getString("checkCompany"));
         detail.setDepartment(object.getString("department"));
         detail.setCheckDate(new Date());
-        detail.setValidDateTo(new Date());
+        // 校准证书(certificateType=2)不填入"有效期至"字段
+        if (!Integer.valueOf(2).equals(detail.getCertificateType())) {
+            detail.setValidDateTo(new Date());
+        }
         String status = object.getString("status");
         if(ObjectUtil.isNotEmpty(status)){
             List<I18nMessage> byMsgType = i18nMessageService.getByMsgType(MEASURING_STATUS);
@@ -880,19 +891,22 @@ public class MeasuringService {
             detail.setStatus(3);
         }
 
-        try {
-            String validDateToStr = "";
-            String validDateToVar = object.getString("validDateTo");
-            if(ObjectUtil.isNotEmpty(validDateToVar)){
-                Matcher matcher = pattern.matcher(validDateToVar);
-                while (matcher.find()) {
-                    validDateToStr += matcher.group();
+        // 校准证书(certificateType=2)忽略有效期, 不填入"有效期至"字段
+        if (!Integer.valueOf(2).equals(detail.getCertificateType())) {
+            try {
+                String validDateToStr = "";
+                String validDateToVar = object.getString("validDateTo");
+                if(ObjectUtil.isNotEmpty(validDateToVar)){
+                    Matcher matcher = pattern.matcher(validDateToVar);
+                    while (matcher.find()) {
+                        validDateToStr += matcher.group();
+                    }
+                    Date validDateTo = format.parse(validDateToStr);
+                    detail.setValidDateTo(validDateTo);
                 }
-                Date validDateTo = format.parse(validDateToStr);
-                detail.setValidDateTo(validDateTo);
+            } catch (ParseException e) {
+                LOGGER.error(e.getLocalizedMessage(),e.getMessage());
             }
-        } catch (ParseException e) {
-            LOGGER.error(e.getLocalizedMessage(),e.getMessage());
         }
         try {
             String checkDateStr = "";

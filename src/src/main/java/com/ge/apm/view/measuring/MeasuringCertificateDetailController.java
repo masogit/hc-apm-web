@@ -278,24 +278,25 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 this.selected.setStatus(Integer.valueOf(i18nMessage.getMsgKey()));
             }
         }
-        try {
-            String validDateToStr = "";
-            String validDateToVar = object.getString("validDateTo");
-            if(StringUtils.isEmpty(validDateToVar)){
-                validDateToVar = object.getString("valid_util");
-            }
-            if(ObjectUtil.isNotEmpty(validDateToVar)){
-                Matcher matcher = pattern.matcher(validDateToVar);
-                while (matcher.find()) {
-                    validDateToStr += matcher.group();
+        // 校准证书(certificateType=2)忽略有效期, 不填入"有效期至"字段
+        if (!Integer.valueOf(2).equals(this.selected.getCertificateType())) {
+            try {
+                String validDateToStr = "";
+                String validDateToVar = object.getString("validDateTo");
+                if(StringUtils.isEmpty(validDateToVar)){
+                    validDateToVar = object.getString("valid_util");
                 }
-                Date validDateTo = format.parse(validDateToStr);
-                this.selected.setValidDateTo(validDateTo);
+                if(ObjectUtil.isNotEmpty(validDateToVar)){
+                    Matcher matcher = pattern.matcher(validDateToVar);
+                    while (matcher.find()) {
+                        validDateToStr += matcher.group();
+                    }
+                    Date validDateTo = format.parse(validDateToStr);
+                    this.selected.setValidDateTo(validDateTo);
+                }
+            } catch (ParseException e) {
+               e.printStackTrace();
             }
-
-
-        } catch (ParseException e) {
-           e.printStackTrace();
         }
         try {
             String checkDateStr = "";
@@ -345,6 +346,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
             if(!CollectionUtils.isEmpty(measuringCertificateDetails)){
                 detail = measuringCertificateDetails.get(0);
                 BeanUtils.copyProperties(selected, detail,measuringService.beanNullProperty(selected));
+                // 校准证书(certificateType=2)忽略有效期, 确保历史记录的validDateTo被清空
+                if (Integer.valueOf(2).equals(detail.getCertificateType())) {
+                    detail.setValidDateTo(null);
+                }
                 dao.save(detail);
                 eventAuditEnum = SystemEventAuditEnum.MEASURE_UPDATE;
             }else{

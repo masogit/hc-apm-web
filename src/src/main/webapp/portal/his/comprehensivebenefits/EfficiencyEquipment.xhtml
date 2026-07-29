@@ -70,7 +70,27 @@
                             </p:calendar>
                         </h:panelGroup>
 
+                        <h:panelGroup style="white-space: nowrap;">
+                            <label class="label">&#160;</label>
+                            <p:commandButton value="本周" process="@this" update="startTime endTime :EfficiencyEquipmentInfoListForm"
+                                             actionListener="#{efficiencyEquipmentInfoController.setThisWeek}"
+                                             style="margin-right: 6px;" styleClass="btn btn-sm btn-gray"/>
+                            <p:commandButton value="本月" process="@this" update="startTime endTime :EfficiencyEquipmentInfoListForm"
+                                             actionListener="#{efficiencyEquipmentInfoController.setThisMonth}"
+                                             style="margin-right: 6px;" styleClass="btn btn-sm btn-gray"/>
+                            <p:commandButton value="本季度" process="@this" update="startTime endTime :EfficiencyEquipmentInfoListForm"
+                                             actionListener="#{efficiencyEquipmentInfoController.setThisQuarter}"
+                                             style="margin-right: 6px;" styleClass="btn btn-sm btn-gray"/>
+                            <p:commandButton value="本半年" process="@this" update="startTime endTime :EfficiencyEquipmentInfoListForm"
+                                             actionListener="#{efficiencyEquipmentInfoController.setThisHalfYear}"
+                                             style="margin-right: 6px;" styleClass="btn btn-sm btn-gray"/>
+                            <p:commandButton value="本年" process="@this" update="startTime endTime :EfficiencyEquipmentInfoListForm"
+                                             actionListener="#{efficiencyEquipmentInfoController.setThisYear}"
+                                             styleClass="btn btn-sm btn-gray"/>
+                        </h:panelGroup>
+
                         <h:panelGroup>
+                            <label class="label">&#160;</label>
                             <p:commandButton process="@this" value="查询" update="EfficiencyEquipmentInfoListForm"/>
                         </h:panelGroup>
                     </p:panelGrid>
