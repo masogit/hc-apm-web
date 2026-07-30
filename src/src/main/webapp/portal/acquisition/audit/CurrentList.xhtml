@@ -43,7 +43,7 @@
                     <h:outputText value="#{item.assetName}"/>
                 </p:column>
                 <p:column headerText="申请类别">
-                    <h:outputText value="#{item.applicationType}"/>
+                    <h:outputText value="#{fieldMsg.fieldValue('acquisitionApplicationType', item.applicationType)}"/>
                 </p:column>
                 <p:column headerText="计划采购数量" styleClass="zoom-08">
                     <h:outputText value="#{item.applicationPlanCount}"/>

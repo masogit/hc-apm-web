@@ -19,7 +19,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">申报科室<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText  id="dept" value="#{acquisitionPlanEditController.selected.applicationDeptName}" readonly="true" required="true" requiredMessage="申报科室 #{msg.ValidationRequire}" />
+                                <p:inputText  id="dept" value="#{acquisitionPlanEditController.selected.applicationDeptName}" readonly="true" required="false" requiredMessage="申报科室 #{msg.ValidationRequire}" />
                                 <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
                                                  class="btn btn-sm popupIconButton" />
                                 <p:overlayPanel  id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit"
@@ -61,12 +61,12 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="acquisitionAsset">
                             <h:panelGroup>
                                 <p:outputLabel class="label">设备名称<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText value="#{acquisitionPlanEditController.selected.assetName}" required="true" requiredMessage="设备名称 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
+                                <p:inputText value="#{acquisitionPlanEditController.selected.assetName}" required="false" requiredMessage="设备名称 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
                             </h:panelGroup>
 
                             <h:panelGroup>
                                 <p:outputLabel class="label">规格<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText id="specifications" value="#{acquisitionPlanEditController.selected.specifications}" required="true" requiredMessage="规格 不能为空！" disabled="true"><p:ajax /></p:inputText>
+                                <p:inputText id="specifications" value="#{acquisitionPlanEditController.selected.specifications}" required="false" requiredMessage="规格 不能为空！" disabled="true"><p:ajax /></p:inputText>
                                 <p:commandButton id="specificationsBtn" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
                                 <p:overlayPanel  id="specificationsEdit" widgetVar="varSpecificationsEdit" for="specificationsBtn"
                                                  style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true"   >
@@ -94,7 +94,7 @@
 
                             <h:panelGroup>
                                 <p:outputLabel class="label">申请类别<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.applicationType}" required="true"  requiredMessage="申请类别 #{msg.Blank}#{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}" >
+                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.applicationType}" required="false"  requiredMessage="申请类别 #{msg.Blank}#{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}" >
                                     <p:ajax  update="acquisitionAsset"/>
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('acquisitionApplicationType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
@@ -102,30 +102,30 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'updates'}">
                                 <p:outputLabel class="label">被更新设备<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" required="true" requiredMessage="被更新设备 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
+                                <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" required="false" requiredMessage="被更新设备 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
                                 <p:commandButton class="popupIconButton" actionListener="#{acquisitionSelectAssetController.prepareDialogCallback(acquisitionPlanEditController, ':planFilingPeriodEditForm', acquisitionPlanEditController.selectedAssets)}" process="@this" icon="ui-icon-arrow-drop-down" update=":selectAssetDlg " oncomplete="PF('varSelectAssetDlg').show();"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">计划采购数量（台/套）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="计划采购数量（台/套） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.applicationPlanCount}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="false" requiredMessage="计划采购数量（台/套） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.applicationPlanCount}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax listener="#{acquisitionPlanEditController.calcAmount()}" update="@this budgetTotalAmount "/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">预算单价（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" required="true" requiredMessage="预算单价（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.budgetUnitPrice}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="4" required="false" requiredMessage="预算单价（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.budgetUnitPrice}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax listener="#{acquisitionPlanEditController.calcAmount()}" update="@this budgetTotalAmount depreciationCost"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">预算总价（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber id="budgetTotalAmount" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="预算总价（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.budgetTotalAmount}" disabled="true">
+                                <p:inputNumber id="budgetTotalAmount" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="false" requiredMessage="预算总价（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.budgetTotalAmount}" disabled="true">
                                     <p:ajax />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">预计使用年限（年）<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.estimatedServiceYears}" required="true"  requiredMessage="预计使用年限（年） #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.estimatedServiceYears}" required="false"  requiredMessage="预计使用年限（年） #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax update="depreciationCost" listener="#{acquisitionPlanEditController.calcDepreciationCost()}"/>
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{acquisitionPlanEditController.getYears()}" var="entry" itemLabel="#{entry}" itemValue="#{entry}"/>
@@ -133,19 +133,19 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">同类设备数量（台/套）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="同类设备数量（台/套） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.similarEquipmentCount}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="false" requiredMessage="同类设备数量（台/套） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.similarEquipmentCount}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'updates'}">
                                 <p:outputLabel class="label">拟更新设备已使用年数（年）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="拟更新设备已使用年数（年） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.currentEquipmentServiceYears}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="false" requiredMessage="拟更新设备已使用年数（年） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.currentEquipmentServiceYears}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">资金来源<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.fundingSource}" required="true"  requiredMessage="资金来源 #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.fundingSource}" required="false"  requiredMessage="资金来源 #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('acquisitionFundingSource')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
@@ -153,7 +153,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">资金落实（是/否）<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.fundingImplemented}" required="true"  requiredMessage="资金落实（是/否） #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.fundingImplemented}" required="false"  requiredMessage="资金落实（是/否） #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
@@ -161,7 +161,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">甲乙类大型医疗设备及配置许可证<span style="color: red">*</span></p:outputLabel>
-                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.medicalEquipmentLicense}" required="true"  requiredMessage="资金落实（是/否） #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.medicalEquipmentLicense}" required="false"  requiredMessage="资金落实（是/否） #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('medicalEquipmentLicense')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
@@ -169,7 +169,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">场地改造成本（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="场地改造成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.currentEquipmentServiceYears}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="false" requiredMessage="场地改造成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.siteRenovationCost}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>
@@ -180,7 +180,7 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'necessities' or acquisitionPlanEditController.selected.applicationType eq 'general'}">
                                 <p:outputLabel class="label">新增人员配置（人）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="新增人员配置（人） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.newStaffAllocation}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="false" requiredMessage="新增人员配置（人） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.newStaffAllocation}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>
@@ -190,31 +190,31 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
                                 <p:outputLabel class="label">折旧成本（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber id="depreciationCost" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="折旧成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.depreciationCost}" disabled="true">
+                                <p:inputNumber id="depreciationCost" inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="false" requiredMessage="折旧成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.depreciationCost}" disabled="true">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">维保成本（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="维保成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.maintenanceCost}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:outputLabel class="label">维保费用（万元）<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="false" requiredMessage="维保费用（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.maintenanceCost}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">配套不可单独收费耗材收费占比急采购成本（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="配套不可单独收费耗材收费占比急采购成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.consumablesCost}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="false" requiredMessage="配套不可单独收费耗材收费占比急采购成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.consumablesCost}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">年均服务量（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="维保成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.annualServiceVolume}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:outputLabel class="label">年均服务量（人/次）<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="false" requiredMessage="年均服务量（人/次） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.annualServiceVolume}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">年服务收入总金额（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="年服务收入总金额（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.annualServiceIncome}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="false" requiredMessage="年服务收入总金额（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanEditController.selected.annualServiceIncome}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>

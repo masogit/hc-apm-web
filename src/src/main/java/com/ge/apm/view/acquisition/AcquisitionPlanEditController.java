@@ -23,14 +23,15 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.RoundingMode;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -96,6 +97,8 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
             checkCanEdit();
             if(!selected.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.TempSave.name())){
                 canEdit = false;
+            }else {
+                canEdit = true;
             }
             if(StrUtil.isNotEmpty(selected.getApplicationStatus())){
                 acquisitionPlanStepList = acquisitionPlanService.queryApplicationStep(selected.getId());
@@ -166,9 +169,9 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         if(totalCost.compareTo(BigDecimal.ZERO) > 0){
             BigDecimal efficiencyWeight = annualServiceIncome.divide(
                     totalCost,
-                    2,
+                    4,
                     java.math.RoundingMode.HALF_UP
-            );
+            ).multiply(new BigDecimal("100"));
             selected.setAnnualOperationEfficiencyWeight(efficiencyWeight);
         } else {
             selected.setAnnualOperationEfficiencyWeight(BigDecimal.ZERO);
@@ -213,6 +216,16 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
     }
 
     public String submitApplication() {
+        String result = acquisitionPlanService.checkRequire(selected, attachList);
+        if(StrUtil.isNotEmpty(result)){
+            String[] errorMsgs = result.split("！");
+            for (String errorMsg : errorMsgs) {
+                if (StrUtil.isNotEmpty(errorMsg.trim())) {
+                    WebUtil.addErrorMessage(errorMsg.trim());
+                }
+            }
+            return "";
+        }
         acquisitionPlanService.submitApplication(selected, userAccount, attachList, removeFileBlobId);
         return "List.xhtml?faces-redirect=true";
     }
@@ -278,7 +291,79 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
 
         selected.setUpdatedAssetUid(assetIDs);
         selected.setUpdatedAssetName(names);
+
+        // 自动计算配套耗材年均采购成本/维保/年均服务量
+        calcConsumablesCostByAssetUid();
     }
+
+    /**
+     * 根据updatedAssetUid获取更新设备近三年配套耗材年均采购金额数据
+     */
+    public void calcConsumablesCostByAssetUid() {
+        String updatedAssetUid = selected.getUpdatedAssetUid();
+        if (StrUtil.isEmpty(updatedAssetUid)) {
+            selected.setConsumablesCost(BigDecimal.ZERO);
+            return;
+        }
+
+        List<String> assetUids = Arrays.stream(updatedAssetUid.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+        if (assetUids.isEmpty()) {
+            selected.setConsumablesCost(BigDecimal.ZERO);
+            return;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        Date endDate = cal.getTime();
+        cal.add(Calendar.YEAR, -3);
+        Date startDate = cal.getTime();
+
+        // 查询历史AcquisitionPlan数据，统计consumablesCost
+        Set<AcquisitionPlan> planSet = new HashSet<>();
+        for (String uid : assetUids) {
+            List<SearchFilter> filters = new ArrayList<>();
+            filters.add(new SearchFilter("applicationDate", SearchFilter.Operator.GTE, startDate));
+            filters.add(new SearchFilter("applicationDate", SearchFilter.Operator.LTE, endDate));
+            filters.add(new SearchFilter("updatedAssetUid", SearchFilter.Operator.LIKE, uid));
+            List<AcquisitionPlan> plans = dao.findBySearchFilter(filters);
+            if (CollectionUtils.isNotEmpty(plans)) {
+                planSet.addAll(plans);
+            }
+        }
+
+        // 排除当前正在编辑的记录
+        List<AcquisitionPlan> plans = planSet.stream()
+                .filter(p -> selected.getId() == null || !selected.getId().equals(p.getId()))
+                .collect(Collectors.toList());
+
+        BigDecimal totalAmount = plans.stream()
+                .map(AcquisitionPlan::getConsumablesCost)
+                .filter(p -> p != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal annualAverage = totalAmount.divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
+        selected.setConsumablesCost(annualAverage);
+
+        BigDecimal maintenanceCost = plans.stream()
+                .map(AcquisitionPlan::getMaintenanceCost)
+                .filter(p -> p != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal annualMaintenanceCost = maintenanceCost.divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
+        selected.setMaintenanceCost(annualMaintenanceCost);
+
+        // 年均服务量（万元）取三年平均
+        BigDecimal totalAnnualServiceVolume = plans.stream()
+                .map(AcquisitionPlan::getAnnualServiceVolume)
+                .filter(p -> p != null)
+                .map(BigDecimal::valueOf)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        Integer annualServiceVolumeAvg = totalAnnualServiceVolume.divide(BigDecimal.valueOf(3), 0, RoundingMode.HALF_UP).intValue();
+        selected.setAnnualServiceVolume(annualServiceVolumeAvg);
+
+    }
+
 
     @Override
     protected GenericRepositoryUUID<AcquisitionPlan> getDAO() {

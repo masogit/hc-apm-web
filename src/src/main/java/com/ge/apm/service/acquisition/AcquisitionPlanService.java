@@ -56,6 +56,78 @@ public class AcquisitionPlanService {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
+    public String checkRequire(AcquisitionPlan acquisitionPlan, List<V2_BlobObject> v2BlobObjects){
+        StringBuilder sb = new StringBuilder();
+        if(StrUtil.isEmpty(acquisitionPlan.getAssetName())){
+            sb.append("设备名称 不能为空！\n");
+        }
+        if(StrUtil.isEmpty(acquisitionPlan.getSpecifications())){
+            sb.append("规格 不能为空！\n");
+        }
+        if(StrUtil.isEmpty(acquisitionPlan.getApplicationType())){
+            sb.append("申请类别 不能为空！\n");
+        }else{
+            if("updates".equals(acquisitionPlan.getApplicationType())){
+                if(StrUtil.isEmpty(acquisitionPlan.getUpdatedAssetName())){
+                    sb.append("被更新设备 不能为空！\n");
+                }
+            }
+            if("necessities".equals(acquisitionPlan.getApplicationType()) || "general".equals(acquisitionPlan.getApplicationType())){
+                if(acquisitionPlan.getNewStaffAllocation() != null){
+                    sb.append("新增人员配置（人） 不能为空！\n");
+                }
+            }
+            if("necessities".equals(acquisitionPlan.getApplicationType())){
+                if(CollectionUtils.isEmpty(v2BlobObjects)){
+                    sb.append("附近信息 不能为空！");
+                }
+            }
+        }
+        if(acquisitionPlan.getApplicationPlanCount() != null){
+            sb.append("计划采购数量（台/套） 不能为空！\n");
+        }
+        if(acquisitionPlan.getBudgetUnitPrice() != null ){
+            sb.append("计划采购数量（台/套） 不能为空！\n");
+        }
+        if(acquisitionPlan.getEstimatedServiceYears() != null){
+            sb.append("预计使用年限（年） 不能为空！\n");
+        }
+        if(acquisitionPlan.getSimilarEquipmentCount() != null){
+            sb.append("同类设备数量（台/套） 不能为空！\n");
+        }
+        if(acquisitionPlan.getCurrentEquipmentServiceYears() != null){
+            sb.append("拟更新设备已使用年数（年） 不能为空！\n");
+        }
+        if(StrUtil.isEmpty(acquisitionPlan.getFundingSource())){
+            sb.append("资金来源 不能为空！\n");
+        }
+        if(StrUtil.isEmpty(acquisitionPlan.getFundingImplemented())){
+            sb.append("资金落实（是/否） 不能为空！\n");
+        }
+        if(StrUtil.isEmpty(acquisitionPlan.getMedicalEquipmentLicense())){
+            sb.append("甲乙类大型医疗设备及配置许可证 不能为空！\n");
+        }
+        if(acquisitionPlan.getSiteRenovationCost() != null){
+            sb.append("场地改造成本（万元） 不能为空！\n");
+        }
+        if(StrUtil.isEmpty(acquisitionPlan.getPurchaseReason())){
+            sb.append("采购原因 不能为空！\n");
+        }
+        if(acquisitionPlan.getMaintenanceCost() != null){
+            sb.append("维保费用（万元） 不能为空！\n");
+        }
+        if(acquisitionPlan.getConsumablesCost() != null){
+            sb.append("配套不可单独收费耗材收费占比急采购成本（万元） 不能为空！\n");
+        }
+        if(acquisitionPlan.getAnnualServiceVolume() != null){
+            sb.append("年均服务量（人/次） 不能为空！\n");
+        }
+        if(acquisitionPlan.getAnnualServiceIncome() != null){
+            sb.append("年服务收入总金额（万元） 不能为空！\n");
+        }
+
+        return sb.toString();
+    }
 
     public void initCreate(AcquisitionPlan acquisitionPlan, UserAccount userAccount){
         acquisitionPlan.setApplicationDate(new Date());
@@ -361,4 +433,6 @@ public class AcquisitionPlanService {
 
         return new ArrayList<>(result);
     }
+
+
 }

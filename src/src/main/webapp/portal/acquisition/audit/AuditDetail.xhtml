@@ -147,7 +147,7 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">维保成本（万元）<span style="color: red">*</span></p:outputLabel>
+                                <p:outputLabel class="label">维保费用（万元）<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="维保成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanAuditEditController.selected.maintenanceCost}" disabled="true">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanAuditEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
@@ -159,7 +159,7 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">年均服务量（万元）<span style="color: red">*</span></p:outputLabel>
+                                <p:outputLabel class="label">年均服务量（人/次）<span style="color: red">*</span></p:outputLabel>
                                 <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0" required="true" requiredMessage="维保成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanAuditEditController.selected.annualServiceVolume}" disabled="true">
                                     <p:ajax />
                                 </p:inputNumber>
