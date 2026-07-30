@@ -39,7 +39,6 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
 
     private AcquisitionPlanRepository dao;
     private UserAccount loginUser;
-
     @Override
     protected void init() {
         super.init();
