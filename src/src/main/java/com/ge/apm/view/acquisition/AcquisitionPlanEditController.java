@@ -13,6 +13,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +47,8 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
     private AcquisitionPlanService acquisitionPlanService;
     private BlobFileService blobService;
     private UaaService uaaService;
+    private UserContextService userContextService;
+
     private String selectedId;
     @Getter @Setter
     private List<V2_BlobObject> attachList;
@@ -78,6 +81,7 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         acquisitionPlanService = WebUtil.getBean(AcquisitionPlanService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         userAccount = UserContextService.getCurrentUserAccount();
         String action = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "action");
         selectedId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "id");
@@ -89,7 +93,8 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
             prepareCreate();
         } else if (AcquisitionPlanEditController.EDIT_ACTION.equals(action)) {
             prepareEdit();
-            if(StrUtil.isNotEmpty(selected.getApplicationStatus())){
+            checkCanEdit();
+            if(!selected.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.TempSave.name())){
                 canEdit = false;
             }
             if(StrUtil.isNotEmpty(selected.getApplicationStatus())){
@@ -99,6 +104,11 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         }
     }
 
+    public void checkCanEdit(){
+        if(!userContextService.accessContainsFunctionMenu(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_APPLY_EDIT.getFunctionName())){
+            canEdit = false;
+        }
+    }
 
 
     public void prepareCreate(){

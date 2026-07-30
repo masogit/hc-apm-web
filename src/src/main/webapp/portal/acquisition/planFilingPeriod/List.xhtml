@@ -28,7 +28,7 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="年度申购开启记录"/>
+                <p:outputLabel class="pageTitle" value="购置计划申报管理"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -86,9 +86,9 @@
                             <h:outputText value="#{item.operaterName}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{planFilingPeriodController.prepareCreate}" update=":planFilingPeriodEditForm"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{planFilingPeriodController.prepareEdit}" update=":planFilingPeriodEditForm" disabled="#{empty planFilingPeriodController.selected.id}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{planFilingPeriodController.delete}" update=":formList" disabled="#{empty planFilingPeriodController.selected.id}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{planFilingPeriodController.prepareCreate}" update=":planFilingPeriodEditForm" rendered="#{planFilingPeriodController.canEdit}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{planFilingPeriodController.prepareEdit}" update=":planFilingPeriodEditForm" disabled="#{empty planFilingPeriodController.selected.id}" rendered="#{planFilingPeriodController.canEdit}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{planFilingPeriodController.delete}" update=":formList" disabled="#{empty planFilingPeriodController.selected.id}" rendered="#{planFilingPeriodController.canEdit}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">

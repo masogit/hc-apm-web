@@ -1260,38 +1260,50 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'spare11'}">
-                                <p:column headerText="#{msg.spare11}" filterBy="#{item.spare11}"
-                                          sortBy="#{item.spare11}">
+                                <p:column headerText="#{msg.spare11}" sortBy="#{item.spare11}" filterBy="#{item.spare11}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterSpare11" widgetVar="varFilterSpare11" value="#{assetInfoListController.selectedObject['spare11']}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.spare11}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'spare12'}">
-                                <p:column headerText="#{msg.spare12}" filterBy="#{item.spare12}"
-                                          sortBy="#{item.spare12}">
+                                <p:column headerText="#{msg.spare12}" sortBy="#{item.spare12}" filterBy="#{item.spare12}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterSpare12" widgetVar="varFilterSpare12" value="#{assetInfoListController.selectedObject['spare12']}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.spare12}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
-                                    </h:outputText>                                </p:column>
+                                    </h:outputText>
+                                </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'spare13'}">
-                                <p:column headerText="#{msg.spare13}" filterBy="#{item.spare13}"
-                                          sortBy="#{item.spare13}">
+                                <p:column headerText="#{msg.spare13}" sortBy="#{item.spare13}" filterBy="#{item.spare13}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterSpare13" widgetVar="varFilterSpare13" value="#{assetInfoListController.selectedObject['spare13']}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.spare13}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'spare14'}">
-                                <p:column headerText="#{msg.spare14}" sortBy="#{item.spare14}">
+                                <p:column headerText="#{msg.spare14}" sortBy="#{item.spare14}" filterBy="#{item.spare14}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterSpare14" widgetVar="varFilterSpare14" value="#{assetInfoListController.selectedObject['spare14']}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.spare14}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
-                            spare15
                             <c:if test="#{columnItem eq 'spare15'}">
-                                <p:column headerText="#{msg.spare15}" sortBy="#{item.spare15}">
+                                <p:column headerText="#{msg.spare15}" sortBy="#{item.spare15}" filterBy="#{item.spare15}" filterMatchMode="GTE">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterSpare15" widgetVar="varFilterSpare15" value="#{assetInfoListController.selectedObject['spare15']}"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.spare15}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
@@ -1438,6 +1450,56 @@
                         </h:panelGrid>
                         <p:commandButton onclick="setDateFilter('varDataList', 'varFilterContractEndDate', 'varMvsEndDateFrom', 'varMvsEndDateTo'); PF('panelFilterMvsEndDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                         <p:commandButton onclick="PF('panelFilterMvsEndDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                    <p:overlayPanel appendTo="AssetInfoListForm" id="idPanelFilterSpare11" widgetVar="panelFilterSpare11" for=":AssetInfoListForm:datalist:filterSpare11" dismissable="false" rendered="#{assetInfoListController.isShowColumn('spare11')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare11From" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare11To" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterSpare11', 'varSpare11From', 'varSpare11To'); PF('panelFilterSpare11').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterSpare11').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                    <p:overlayPanel appendTo="AssetInfoListForm" id="idPanelFilterSpare12" widgetVar="panelFilterSpare12" for=":AssetInfoListForm:datalist:filterSpare12" dismissable="false" rendered="#{assetInfoListController.isShowColumn('spare12')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare12From" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare12To" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterSpare12', 'varSpare12From', 'varSpare12To'); PF('panelFilterSpare12').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterSpare12').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                    <p:overlayPanel appendTo="AssetInfoListForm" id="idPanelFilterSpare13" widgetVar="panelFilterSpare13" for=":AssetInfoListForm:datalist:filterSpare13" dismissable="false" rendered="#{assetInfoListController.isShowColumn('spare13')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare13From" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare13To" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterSpare13', 'varSpare13From', 'varSpare13To'); PF('panelFilterSpare13').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterSpare13').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                    <p:overlayPanel appendTo="AssetInfoListForm" id="idPanelFilterSpare14" widgetVar="panelFilterSpare14" for=":AssetInfoListForm:datalist:filterSpare14" dismissable="false" rendered="#{assetInfoListController.isShowColumn('spare14')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare14From" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare14To" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterSpare14', 'varSpare14From', 'varSpare14To'); PF('panelFilterSpare14').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterSpare14').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                    <p:overlayPanel appendTo="AssetInfoListForm" id="idPanelFilterSpare15" widgetVar="panelFilterSpare15" for=":AssetInfoListForm:datalist:filterSpare15" dismissable="false" rendered="#{assetInfoListController.isShowColumn('spare15')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare15From" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" widgetVar="varSpare15To" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterSpare15', 'varSpare15From', 'varSpare15To'); PF('panelFilterSpare15').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterSpare15').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
                     </p:overlayPanel>
                 </h:form>
             </div>
@@ -1617,35 +1679,32 @@
                                  actionListener="#{assetInfoListController.loadSavedSearches()}"
                                  update=":savedSearchListForm:savedSearchPanel"
                                  process="@this" style="margin-bottom: 10px;"/>
-                <p:scrollPanel style="height: 300px; border: 0;" mode="native">
-                    <h:panelGroup id="savedSearchPanel">
+                <div style="height: 300px; overflow-y: auto;">
+                    <h:panelGroup id="savedSearchPanel" layout="block">
                         <ui:repeat value="#{assetInfoListController.savedSearches}" var="savedSearch" varStatus="status">
-                            <h:panelGroup layout="block" style="padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
-                                <h:panelGrid columns="3" style="width: 100%;" columnClasses="saved-name,saved-actions">
-                                    <h:outputText value="#{savedSearch.name}" style="font-weight: bold; font-size: 14px;"/>
-                                    <h:panelGroup>
-                                        <p:commandButton value="加载" icon="ui-icon-arrowreturnthick-1-w"
-                                                         actionListener="#{assetInfoListController.loadSavedSearch(savedSearch)}"
-                                                         update=":advancedSearchForm:conditionPanel :growl"
-                                                         process="@this"
-                                                         oncomplete="PF('savedSearchListDialog').hide(); PF('advancedSearchDialog').show();"
-                                                         style="zoom: 0.85; margin-right: 5px;" styleClass="btn btn-sm btn-blue"/>
-                                        <p:commandButton value="删除" icon="ui-icon-trash"
-                                                         actionListener="#{assetInfoListController.deleteSavedSearch(savedSearch)}"
-                                                         update=":savedSearchListForm:savedSearchPanel :growl"
-                                                         process="@this" style="zoom: 0.85;" styleClass="btn btn-sm btn-red">
-                                            <p:confirm header="确认删除" message="确定要删除该收藏查询吗？" icon="ui-icon-warning"/>
-                                        </p:commandButton>
-                                    </h:panelGroup>
-                                    <h:outputText value=""/>
-                                </h:panelGrid>
-                            </h:panelGroup>
+                            <div style="display: flex; align-items: center; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
+                                <div style="flex: 1; min-width: 0; padding: 8px; font-weight: bold; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">#{savedSearch.name}</div>
+                                <div style="flex-shrink: 0; padding: 8px; white-space: nowrap;">
+                                    <p:commandButton value="加载" icon="ui-icon-arrowreturnthick-1-w"
+                                                     actionListener="#{assetInfoListController.loadSavedSearch(savedSearch)}"
+                                                     update=":advancedSearchForm:conditionPanel :growl"
+                                                     process="@this"
+                                                     oncomplete="PF('savedSearchListDialog').hide(); PF('advancedSearchDialog').show();"
+                                                     style="zoom: 0.85; margin-right: 5px;" styleClass="btn btn-sm btn-blue"/>
+                                    <p:commandButton value="删除" icon="ui-icon-trash"
+                                                     actionListener="#{assetInfoListController.deleteSavedSearch(savedSearch)}"
+                                                     update=":savedSearchListForm:savedSearchPanel :growl"
+                                                     process="@this" style="zoom: 0.85;" styleClass="btn btn-sm btn-red">
+                                        <p:confirm header="确认删除" message="确定要删除该收藏查询吗？" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
                         </ui:repeat>
                         <h:outputText value="暂无收藏的查询条件"
                                       rendered="#{empty assetInfoListController.savedSearches}"
                                       style="color: #999; font-style: italic; display: block; text-align: center; margin-top: 20px;"/>
                     </h:panelGroup>
-                </p:scrollPanel>
+                </div>
                 <div style="margin-top: 10px; text-align: right;">
                     <p:commandButton value="关闭" icon="ui-icon-close" class="btn btn-sm btn-gray"
                                      onclick="PF('savedSearchListDialog').hide()" type="button"/>

@@ -6,6 +6,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.CacheKeyConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,5 +153,15 @@ public class ConfigCacheService {
             return adminFeatureActive;
         }).collect(Collectors.toList());
         adminFeatureActiveRepository.save(adminFeatureActives);
+    }
+
+    /**
+     *  查询OrgInfo并缓存
+     * @param uid
+     * @return
+     */
+    @Cacheable(cacheNames = CacheKeyConstant.CACHE_NAME, key = CacheKeyConstant.ORG_CACHE_KEY_UID)
+    public OrgInfo findOrgInfoByUid(String uid) {
+        return orgDao.findByUid(uid);
     }
 }
