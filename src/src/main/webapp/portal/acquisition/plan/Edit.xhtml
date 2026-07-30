@@ -175,7 +175,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">采购原因<span style="color: red">*</span></p:outputLabel>
-                                <p:inputTextarea value="#{acquisitionPlanEditController.selected.purchaseReason}" rows="2" cols="20" required="false" requiredMessage="采购原因 #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                <p:inputTextarea value="#{acquisitionPlanEditController.selected.purchaseReason}" maxlength="250" rows="2" cols="20" required="false" requiredMessage="采购原因 #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
                                 </p:inputTextarea>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'necessities' or acquisitionPlanEditController.selected.applicationType eq 'general'}">
@@ -239,7 +239,7 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
-                                <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{acquisitionPlanEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{acquisitionPlanEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                               multiple="true"  sizeLimit="100000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -266,7 +266,7 @@
                                 <h:outputText value="#{fieldMsg.fieldValue('AcquisitionApplicationStatus', item.auditStatus)}"/>
                             </p:column>
                             <p:column headerText="审批节点状态">
-                                <h:outputText value="#{fieldMsg.fieldValue('AcquisitionNodenStatus', item.nodeStatus)}}"/>
+                                <h:outputText value="#{fieldMsg.fieldValue('AcquisitionNodeStatus', item.nodeStatus)}"/>
                             </p:column>
                             <p:column headerText="审批时间">
                                 <h:outputText value="#{item.auditDate}">
@@ -274,7 +274,7 @@
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="审批结果">
-                                <h:outputText value="#{fieldMsg.fieldValue('AcquisitionNodenStatus', item.auditResult)}"/>
+                                <h:outputText value="#{fieldMsg.fieldValue('AcquisitionNodeStatus', item.auditResult)}"/>
                             </p:column>
                             <p:column headerText="审批意见">
                                 <h:outputText value="#{item.auditComment}"/>

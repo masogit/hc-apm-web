@@ -6381,7 +6381,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('medicalEquipmentLicense','None','无','None',NULL,-1);
 
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','','暂存中','TempSave',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','TempSave','暂存中','TempSave',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','DrugCenterPending','待药管中心审批','DrugCenterPending',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','WorkGroupPending','待调研工作组审批','WorkGroupPending',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','BureauPartyPending','待局党委会审批','BureauPartyPending',NULL,-1);
@@ -6389,9 +6389,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Rejected','审批不通过','Rejected',NULL,-1);
 
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Pending','待审批','Pending',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Approved','审批通过','Approved',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodenStatus','Rejected','审批不通过','Rejected',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodeStatus','Pending','待审批','Pending',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodeStatus','Approved','审批通过','Approved',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodeStatus','Rejected','审批不通过','Rejected',NULL,-1);
 
 
 
