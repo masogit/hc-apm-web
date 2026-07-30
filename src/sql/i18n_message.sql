@@ -6407,3 +6407,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('PmRuleConfig','Y','已配置','Y',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('PmRuleConfig','N','未配置','N',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'spare11', '备用字段11', 'spare11', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'spare12', '备用字段12', 'spare12', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'spare13', '备用字段13', 'spare13', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'spare14', '备用字段14', 'spare14', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'spare15', '备用字段15', 'spare15', NULL, '-1');

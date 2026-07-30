@@ -133,6 +133,11 @@ public class AssetAdvancedSearchService {
         registerField("nextMeteringDate", "下次计量日期", "date");
         registerField("mvsContractStartDate", "MVS合同起始日", "date");
         registerField("mvsContractEndDate", "MVS合同截止日", "date");
+        registerField("spare11", "备用字段11(日期)", "date");
+        registerField("spare12", "备用字段12(日期)", "date");
+        registerField("spare13", "备用字段13(日期)", "date");
+        registerField("spare14", "备用字段14(日期)", "date");
+        registerField("spare15", "备用字段15(日期)", "date");
 
         registerField("isPm", "是否PM", "boolean");
         registerField("isFixed", "是否固定资产", "boolean");
@@ -345,6 +350,7 @@ public class AssetAdvancedSearchService {
 
         public String getValue() { return value; }
         public String getLabel() { return label; }
+        public void setLabel(String label) { this.label = label; }
         public String getFieldType() { return fieldType; }
     }
 

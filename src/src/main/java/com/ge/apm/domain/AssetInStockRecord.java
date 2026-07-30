@@ -110,7 +110,7 @@ public class AssetInStockRecord implements Serializable {
     @Column(name = "arrival_list_id", columnDefinition = "CHAR(32)")
     private String arrivalListId;
 
-    @JoinColumn(name = "arrival_list_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "arrival_list_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT),referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private ArrivalList arrivalList;
 

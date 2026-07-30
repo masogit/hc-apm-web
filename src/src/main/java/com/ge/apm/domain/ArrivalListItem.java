@@ -7,17 +7,7 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import lombok.Data;
@@ -88,7 +78,7 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "ack_name")
     private String ackName;
 
-    @JoinColumn(name = "arrival_list_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "arrival_list_id",foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private ArrivalList arrivalList;
 
