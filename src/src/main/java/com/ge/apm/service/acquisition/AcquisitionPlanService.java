@@ -202,6 +202,14 @@ public class AcquisitionPlanService {
         acquisitionPlan.setApplicationNoIndex(index);
     }
 
+    public void cancelApplication(AcquisitionPlan acquisitionPlan, UserAccount account){
+        acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Cancel.name());
+        acquisitionPlan.setApplicationStep(9);
+        acquisitionPlan.setLastModifiedBy(account.getLoginName());
+        acquisitionPlan.setLastModifiedDate(new Date());
+        acquisitionPlanRepository.save(acquisitionPlan);
+    }
+
     @Transactional
     public void submitApplication(AcquisitionPlan acquisitionPlan, UserAccount account, List<V2_BlobObject> attachList, List<String> removeFileBlobIds){
         acquisitionPlan.setApplicationStep(1);
@@ -247,7 +255,7 @@ public class AcquisitionPlanService {
         String names = "";
         String uids = "";
         ApmFunction function = ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP;
-        if(result.equals(AcquisitionPlan.ResultEnum.SelfReview.name()) || result.equals(AcquisitionPlan.ResultEnum.Approved.name())) {
+        if(result.equals(AcquisitionPlan.ResultEnum.Approved.name())) {
             nodeStatus = AcquisitionPlan.NodeStatusEnum.Approved.name();
             if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name())){
                 if(acquisitionPlan.getBudgetTotalAmount().compareTo(new BigDecimal(10)) >= 0){
@@ -257,7 +265,7 @@ public class AcquisitionPlanService {
                     function = ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP;
                 }else {
                     acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
-                    acquisitionPlan.setBureauPartyUid(account.getUid());
+                    acquisitionPlan.setDrugCenterUid(account.getUid());
                     acquisitionPlan.setApplicationStep(9);
                 }
             }else if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name())){
@@ -268,7 +276,7 @@ public class AcquisitionPlanService {
                     function = ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER;
                 }else{
                     acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
-                    acquisitionPlan.setBureauPartyUid(account.getUid());
+                    acquisitionPlan.setWorkGroupUid(account.getUid());
                     acquisitionPlan.setApplicationStep(9);
                 }
             } else if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name())){
@@ -288,6 +296,11 @@ public class AcquisitionPlanService {
             }else if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name())){
                 acquisitionPlan.setBureauPartyUid(account.getUid());
             }
+        }else if(result.equals(AcquisitionPlan.ResultEnum.SelfReview.name())){
+            nodeStatus = AcquisitionPlan.NodeStatusEnum.Approved.name();
+            acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());
+            acquisitionPlan.setDrugCenterUid(account.getUid());
+            acquisitionPlan.setApplicationStep(9);
         }
         if(acquisitionPlan.getApplicationStep() != 9){
             List<UserAccount> users = uaaService.getUsersByApmFunction(function, account.getTenantUID());

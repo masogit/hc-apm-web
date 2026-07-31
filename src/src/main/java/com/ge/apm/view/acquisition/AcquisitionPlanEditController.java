@@ -230,6 +230,11 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         return "List.xhtml?faces-redirect=true";
     }
 
+    public String cancelApplication(){
+        acquisitionPlanService.cancelApplication(selected, userAccount);
+        return "List.xhtml?faces-redirect=true";
+    }
+
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedDept = (OrgInfo) node.getData();

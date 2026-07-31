@@ -1,6 +1,8 @@
 package com.ge.apm.view.acquisition;
 
 import com.ge.apm.dao.AcquisitionPlanRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
@@ -17,6 +19,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
 import java.util.List;
 
 @ManagedBean
@@ -25,6 +28,7 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
 
     private AcquisitionPlanRepository dao;
     private AcquisitionPlanService acquisitionPlanService;
+    private I18nMessageRepository i18nMessageRepository;
     private BlobFileService blobService;
     private UserAccount userAccount;
     private String selectedId;
@@ -38,7 +42,8 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
     private String auditResult;
     @Getter @Setter
     private String auditComment;
-
+    @Getter @Setter
+    List<I18nMessage> acquisitionResultList = new ArrayList<>();
 
 
     @Override
@@ -53,7 +58,20 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
         selected = dao.findOne(selectedId);
         acquisitionPlanStepList = acquisitionPlanService.queryApplicationStep(selected.getId());
         attachList = blobService.findBlobObjectsByBoUid(selected.getId());
+        initAcquisitionResult();
+    }
 
+    public void initAcquisitionResult(){
+        List<I18nMessage> list = i18nMessageRepository.getByMsgType("AcquisitionResult");
+        if(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name().equals(selected.getApplicationStatus()) || AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name().equals(selected.getApplicationStatus())){
+            for(I18nMessage i18nMessage : list){
+                if(!i18nMessage.getMsgKey().equals("SelfReview")){
+                    acquisitionResultList.add(i18nMessage);
+                }
+            }
+        }else {
+            acquisitionResultList.addAll(list);
+        }
     }
 
     public String audit(){

@@ -102,7 +102,7 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'updates'}">
                                 <p:outputLabel class="label">被更新设备<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" required="false" requiredMessage="被更新设备 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
+                                <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" title="#{acquisitionPlanEditController.selected.updatedAssetName}" required="false" requiredMessage="被更新设备 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
                                 <p:commandButton class="popupIconButton" actionListener="#{acquisitionSelectAssetController.prepareDialogCallback(acquisitionPlanEditController, ':planFilingPeriodEditForm', acquisitionPlanEditController.selectedAssets, acquisitionPlanEditController.selected.applicationStatus,  acquisitionPlanEditController.selected.updatedAssetUid)}" process="@this" icon="ui-icon-arrow-drop-down" update=":selectAssetDlg " oncomplete="PF('varSelectAssetDlg').show();"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -239,8 +239,8 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
-                                <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{acquisitionPlanEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="true"  sizeLimit="100000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{acquisitionPlanEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" rendered="#{acquisitionPlanEditController.canEdit}"
+                                              multiple="true"  sizeLimit="100000000"  update="attachList" auto="true" invalidFileMessage="文件类型只能上传pdf格式" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:tab>
@@ -287,6 +287,8 @@
                                  action="#{acquisitionPlanEditController.saveApplication}" value="暂存" id="saveApplication" rendered="#{acquisitionPlanEditController.canEdit}" />
                 <p:commandButton update=":growl :planFilingPeriodEditForm" validateClient="true"
                                  action="#{acquisitionPlanEditController.submitApplication}" value="提交" id="submitApplication" rendered="#{acquisitionPlanEditController.canEdit}" />
+                <p:commandButton update=":growl :planFilingPeriodEditForm" validateClient="true"
+                                 action="#{acquisitionPlanEditController.cancelApplication}" value="取消" id="cancelApplication" rendered="#{acquisitionPlanEditController.canEdit}" />
                 <p:commandButton update=":growl :planFilingPeriodEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                  action="#{acquisitionPlanEditController.backList}" />
             </h:form>

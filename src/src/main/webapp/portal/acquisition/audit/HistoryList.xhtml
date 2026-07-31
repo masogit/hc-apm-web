@@ -22,7 +22,7 @@
                 <p:ajax event="rowSelect"/>
                 <p:ajax event="filter" listener="#{acquisitionPlanAuditListController.onFilter}" />
                 <p:column headerText="申报单位">
-                    <h:outputText value="#{item.applicationHospitalName}"/>
+                    <h:outputText value="#{item.applicationHospitalName}" filterBy="#{item.applicationHospitalUid}" filterMatchMode="EQ"/>
                 </p:column>
                 <p:column headerText="申请年份">
                     <h:outputText value="#{item.applicationYear}"/>

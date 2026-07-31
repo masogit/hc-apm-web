@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -18,7 +19,7 @@ public class AcquisitionPlan {
 
 
     public enum ApplicationStatusEnum {
-        TempSave, DrugCenterPending, WorkGroupPending, BureauPartyPending, Approved, Rejected
+        TempSave, DrugCenterPending, WorkGroupPending, BureauPartyPending, Approved, Rejected,Cancel
     }
 
     public enum NodeStatusEnum{
@@ -87,9 +88,11 @@ public class AcquisitionPlan {
     private String applicationType;
 
     @Column(name = "updated_asset_uid")
+    @Size(max = 4000)
     private String updatedAssetUid;//被更新设备
 
     @Column(name = "updated_asset_name")
+    @Size(max = 4000)
     private String updatedAssetName;
 
     @Column(name = "application_plan_count")

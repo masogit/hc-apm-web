@@ -115,6 +115,38 @@ public class PlanFilingPeriodController extends GenericCRUDUUIDController<PlanFi
             WebUtil.addErrorMessage("终止申报日期不能小于开启日期！");
             return;
         }
+        // 增加校验：StartDate 和 EndDate 必须在 year 对应的年份范围内
+        String yearStr = selected.getYear();
+        if (StringUtils.isNotEmpty(yearStr)) {
+            try {
+                int year = Integer.parseInt(yearStr);
+                Calendar yearStart = Calendar.getInstance();
+                yearStart.set(year, Calendar.JANUARY, 1, 0, 0, 0);
+                yearStart.set(Calendar.MILLISECOND, 0);
+
+                Calendar yearEnd = Calendar.getInstance();
+                yearEnd.set(year, Calendar.DECEMBER, 31, 23, 59, 59);
+                yearEnd.set(Calendar.MILLISECOND, 999);
+
+                Date beginOfYear = yearStart.getTime();
+                Date endOfYear = yearEnd.getTime();
+
+                if (selected.getStartDate().before(beginOfYear) || selected.getStartDate().after(endOfYear)) {
+                    WebUtil.addErrorMessage("开启日期必须在" + year + "年范围内！");
+                    return;
+                }
+
+                if (selected.getEndDate().before(beginOfYear) || selected.getEndDate().after(endOfYear)) {
+                    WebUtil.addErrorMessage("终止日期必须在" + year + "年范围内！");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                WebUtil.addErrorMessage("年份格式不正确！");
+                return;
+            }
+        }
+
+
         if("Edit".equals(this.actionName)){
             dao.save(selected);
         }else {
