@@ -58,7 +58,7 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{acquisitionPlanAuditEditController.selected.applicationType eq 'updates'}">
                                 <p:outputLabel class="label">被更新设备<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText value="#{acquisitionPlanAuditEditController.selected.updatedAssetName}" required="true" requiredMessage="被更新设备 不能为空！" disabled="true"><p:ajax /></p:inputText>
+                                <p:outputLabel value="#{acquisitionPlanAuditEditController.splitAssetName(acquisitionPlanAuditEditController.selected.updatedAssetName)}" title="#{acquisitionPlanAuditEditController.selected.updatedAssetName}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">计划采购数量（台/套）<span style="color: red">*</span></p:outputLabel>
@@ -242,7 +242,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">审批意见<span style="color:red">*</span></label>
-                        <p:inputTextarea id="auditComment" value="#{acquisitionPlanAuditEditController.auditComment}" ></p:inputTextarea>
+                        <p:inputTextarea id="auditComment" value="#{acquisitionPlanAuditEditController.auditComment}"  required="true" requiredMessage="审批意见不能为空！"></p:inputTextarea>
 
                     </h:panelGroup>
 

@@ -92,10 +92,17 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
     public void auditResultChange(){
         if(AcquisitionPlan.ResultEnum.SelfReview.name().equals(auditResult)){
             auditComment = "采购单位自行采购";
+        }else {
+            auditComment = "";
         }
     }
 
-
+    public String splitAssetName(String assetName){
+        if(assetName.length() > 30){
+            return assetName.substring(0, 30) + "...";
+        }
+        return assetName;
+    }
     @Override
     protected GenericRepositoryUUID<AcquisitionPlan> getDAO() {
         return dao;

@@ -286,8 +286,6 @@ public class AcquisitionPlanService {
             }
             acquisitionPlanRepository.save(acquisitionPlan);
         }else if(result.equals(AcquisitionPlan.ResultEnum.Rejected.name())){
-            acquisitionPlan.setApplicationStep(9);//完成
-            acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Rejected.name());
             nodeStatus = AcquisitionPlan.NodeStatusEnum.Rejected.name();
             if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name())){
                 acquisitionPlan.setDrugCenterUid(account.getUid());
@@ -296,6 +294,8 @@ public class AcquisitionPlanService {
             }else if(acquisitionPlan.getApplicationStatus().equals(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name())){
                 acquisitionPlan.setBureauPartyUid(account.getUid());
             }
+            acquisitionPlan.setApplicationStep(9);//完成
+            acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Rejected.name());
         }else if(result.equals(AcquisitionPlan.ResultEnum.SelfReview.name())){
             nodeStatus = AcquisitionPlan.NodeStatusEnum.Approved.name();
             acquisitionPlan.setApplicationStatus(AcquisitionPlan.ApplicationStatusEnum.Approved.name());

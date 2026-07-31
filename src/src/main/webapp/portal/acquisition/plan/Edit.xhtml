@@ -2,6 +2,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -102,7 +103,12 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'updates'}">
                                 <p:outputLabel class="label">被更新设备<span style="color: red">*</span></p:outputLabel>
-                                <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" title="#{acquisitionPlanEditController.selected.updatedAssetName}" required="false" requiredMessage="被更新设备 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
+                                <c:if test="#{!acquisitionPlanEditController.canEdit}">
+                                    <p:outputLabel value="#{acquisitionPlanEditController.splitAssetName(acquisitionPlanEditController.selected.updatedAssetName)}" title="#{acquisitionPlanEditController.selected.updatedAssetName}" />
+                                </c:if>
+                                <c:if test="#{acquisitionPlanEditController.canEdit}">
+                                    <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" title="#{acquisitionPlanEditController.selected.updatedAssetName}" required="false" requiredMessage="被更新设备 不能为空！" readonly="#{acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
+                                </c:if>
                                 <p:commandButton class="popupIconButton" actionListener="#{acquisitionSelectAssetController.prepareDialogCallback(acquisitionPlanEditController, ':planFilingPeriodEditForm', acquisitionPlanEditController.selectedAssets, acquisitionPlanEditController.selected.applicationStatus,  acquisitionPlanEditController.selected.updatedAssetUid)}" process="@this" icon="ui-icon-arrow-drop-down" update=":selectAssetDlg " oncomplete="PF('varSelectAssetDlg').show();"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -288,7 +294,7 @@
                 <p:commandButton update=":growl :planFilingPeriodEditForm" validateClient="true"
                                  action="#{acquisitionPlanEditController.submitApplication}" value="提交" id="submitApplication" rendered="#{acquisitionPlanEditController.canEdit}" />
                 <p:commandButton update=":growl :planFilingPeriodEditForm" validateClient="true"
-                                 action="#{acquisitionPlanEditController.cancelApplication}" value="取消" id="cancelApplication" rendered="#{acquisitionPlanEditController.canEdit}" />
+                                 action="#{acquisitionPlanEditController.cancelApplication}" value="取消" id="cancelApplication" rendered="#{acquisitionPlanEditController.canEdit and not empty acquisitionPlanEditController.selected.id}" />
                 <p:commandButton update=":growl :planFilingPeriodEditForm" immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                  action="#{acquisitionPlanEditController.backList}" />
             </h:form>

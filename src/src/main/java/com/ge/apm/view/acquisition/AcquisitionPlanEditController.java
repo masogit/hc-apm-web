@@ -235,6 +235,13 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         return "List.xhtml?faces-redirect=true";
     }
 
+    public String splitAssetName(String assetName){
+        if(assetName.length() > 30){
+            return assetName.substring(0, 30) + "...";
+        }
+        return assetName;
+    }
+
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectedDept = (OrgInfo) node.getData();
