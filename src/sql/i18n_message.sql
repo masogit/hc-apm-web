@@ -6387,6 +6387,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','BureauPartyPending','待局党委会审批','BureauPartyPending',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Approved','审批通过','Approved',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Rejected','审批不通过','Rejected',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionApplicationStatus','Cancel','已取消','Cancel',NULL,-1);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('AcquisitionNodeStatus','Pending','待审批','Pending',NULL,-1);
