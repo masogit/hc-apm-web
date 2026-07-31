@@ -148,6 +148,10 @@ public class V2_BlobObject implements Serializable {
 
     public static final String BO_TYPE_ACQUISITION = "acquisition";
 
+    public static final String BO_SUB_TYPE_ADJUSTMENT_AGREEMENT = "AdjustmentAgreement"; // 调剂缔结协议
+    public static final String BO_SUB_TYPE_ADJUSTMENT_RETURN_IMAGE = "AdjustmentReturnImage"; // 调剂退回图片
+    public static final String BO_SUB_TYPE_ADJUSTMENT_TERMINATION_AGREEMENT = "AdjustmentTerminationAgreement"; // 调剂中止协议
+
 
     @Id
     @GeneratedValue(generator = "uuid")

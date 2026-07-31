@@ -58,6 +58,12 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
+
+                        <p:column headerText="结束时间">
+                            <h:outputText value="#{node.endTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
                     </p:dataTable>
                 </div>
             </h:panelGroup>

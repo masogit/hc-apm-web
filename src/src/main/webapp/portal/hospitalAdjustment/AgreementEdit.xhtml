@@ -1,0 +1,478 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .agreement-container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 40px;
+                background: #fff;
+                font-family: SimSun, serif;
+                font-size: 14px;
+                line-height: 2;
+            }
+            .agreement-title {
+                text-align: center;
+                font-size: 22px;
+                font-weight: bold;
+                margin-bottom: 30px;
+            }
+            .agreement-section {
+                margin-bottom: 15px;
+            }
+            .agreement-heading {
+                font-weight: bold;
+                font-size: 16px;
+                margin-top: 20px;
+                margin-bottom: 10px;
+            }
+            .party-block {
+                margin-bottom: 20px;
+            }
+            .party-label {
+                font-weight: bold;
+                font-size: 15px;
+                margin-bottom: 5px;
+            }
+            .field-row {
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+            }
+            .field-label {
+                min-width: 200px;
+                display: inline-block;
+            }
+            .agreement-input {
+                width: 300px !important;
+            }
+            .inline-input {
+                border: none !important;
+                border-bottom: 1px solid #999 !important;
+                width: 80px !important;
+                text-align: center !important;
+                background: transparent !important;
+                font-family: SimSun, serif !important;
+                font-size: 14px !important;
+                padding: 0 2px !important;
+                margin: 0 2px !important;
+                box-shadow: none !important;
+            }
+            .inline-input-wide {
+                width: 150px !important;
+            }
+            .inline-input-narrow {
+                width: 40px !important;
+            }
+            .agreement-text {
+                text-indent: 2em;
+                margin-top: 0;
+                margin-bottom: 8px;
+            }
+            .signature-section {
+                margin-top: 40px;
+            }
+            .signature-block {
+                margin-bottom: 25px;
+            }
+            .btn-bar {
+                text-align: center;
+                margin-top: 30px;
+                padding: 20px 0;
+                border-top: 1px solid #ddd;
+            }
+            /* 复选框组使用div包裹以避免p标签内放div触发浏览器自动关闭p，以下CSS确保复选框内联渲染 */
+            .agreement-container .ui-chkbox {
+                display: inline-block !important;
+                vertical-align: middle;
+            }
+            .agreement-container .ui-chkbox .ui-chkbox-box {
+                display: inline-block !important;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="调剂协议编辑"/>
+
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="agreementForm">
+                    <p:growl id="growl" showDetail="true"/>
+
+                    <div class="agreement-container">
+
+                        <!-- 标题 -->
+                        <div class="agreement-title">武进区公立医疗卫生机构医疗设备调剂缔结协议</div>
+
+                        <!-- 甲方（调出单位） -->
+                        <div class="party-block">
+                            <div class="party-label">甲方（调出单位）：</div>
+                            <div class="field-row">
+                                <span class="field-label">单位名称：</span>
+                                <p:inputText value="#{agreementEditController.partyAName}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">统一社会信用代码：</span>
+                                <p:inputText value="#{agreementEditController.partyACreditCode}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">法定代表人/授权代表人：</span>
+                                <p:inputText value="#{agreementEditController.partyARepresentative}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">联系电话：</span>
+                                <p:inputText value="#{agreementEditController.partyAPhone}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                        </div>
+
+                        <!-- 乙方（调入单位） -->
+                        <div class="party-block">
+                            <div class="party-label">乙方（调入单位）：</div>
+                            <div class="field-row">
+                                <span class="field-label">单位名称：</span>
+                                <p:inputText value="#{agreementEditController.partyBName}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">统一社会信用代码：</span>
+                                <p:inputText value="#{agreementEditController.partyBCreditCode}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">法定代表人/授权代表人：</span>
+                                <p:inputText value="#{agreementEditController.partyBRepresentative}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">联系电话：</span>
+                                <p:inputText value="#{agreementEditController.partyBPhone}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                        </div>
+
+                        <!-- 丙方（监管单位）固定显示 -->
+                        <div class="party-block">
+                            <div class="field-row">
+                                <span class="field-label">丙方（监管单位）：</span>
+                                <h:outputText value="常州市武进区药品医用耗材管理中心"/>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">统一社会信用代码：</span>
+                                <h:outputText value="12320483MB0201929K"/>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">部门负责人：</span>
+                                <p:inputText value="#{agreementEditController.partyCRepresentative}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">联系电话：</span>
+                                <p:inputText value="#{agreementEditController.partyCPhone}" styleClass="agreement-input">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </div>
+                        </div>
+
+                        <!-- 法律依据 -->
+                        <div class="agreement-section">
+                            <p class="agreement-text">
+                                依据《中华人民共和国民法典》《医疗器械监督管理条例》等相关法律法规，甲乙双方本着"优化医疗资源配置、提高设备利用效率、保障医疗服务质量"的原则，经友好协商，就医疗设备调剂事宜达成如下协议，以资共同信守；丙方作为监管单位，对本协议履行过程进行监督。
+                            </p>
+                        </div>
+
+                        <!-- 第一条 -->
+                        <div class="agreement-heading">第一条 调剂背景与目的</div>
+                        <p class="agreement-text">
+                            为优化区域内医疗资源配置，避免医疗设备闲置浪费，提升区域整体医疗服务能力，满足甲乙双方临床诊疗、教学、科研等工作需求，甲方同意将其闲置、富余且符合国家相关标准的医疗设备调剂给乙方使用，乙方自愿接收该批设备，双方共同推动区域医疗资源均衡发展。
+                        </p>
+
+                        <!-- 第二条 -->
+                        <div class="agreement-heading">第二条 调剂设备明细</div>
+                        <p class="agreement-text">甲乙双方确认，本次调剂设备具体明细见附件1。</p>
+                        <p class="agreement-text">1.甲方保证，上述调剂设备为其合法拥有，无抵押、质押、查封等权利瑕疵，且符合国家医疗器械相关标准及行业规范，经校准、保养后可正常用于临床诊疗工作（若设备需维修，需在备注中明确维修责任方及完成时限）。</p>
+                        <p class="agreement-text">2.医疗设备的调拨转让，所有权自设备交付完毕之日起，由甲方转移至乙方；医疗设备的租用，所有权仍归甲方，乙方仅享有使用权。</p>
+                        <p class="agreement-text">3.甲方应向乙方提供设备相关合法证明文件、产品说明书等复印件，确保设备来源合法、可追溯。</p>
+
+                        <!-- 第三条 -->
+                        <div class="agreement-heading">第三条 调剂方式与期限</div>
+                        <div style="font-weight:bold; margin-bottom:5px;">3.1 调剂方式</div>
+                        <h:panelGroup id="adjustTypeGroup">
+                        <p class="agreement-text">本次设备调剂为：
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['isTransfer']}" itemLabel="调拨" style="margin:0 5px;">
+                                <p:ajax event="change" update="adjustTypeGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            （金额：人民币
+                            <p:inputText value="#{agreementEditController.contractData['transferAmount']}" styleClass="inline-input"><p:ajax/></p:inputText>
+                            元整，（大写：
+                            <p:inputText value="#{agreementEditController.contractData['transferAmountWritten']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            ） ，乙方应在
+                            <p:inputText value="#{agreementEditController.contractData['payYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
+                            <p:inputText value="#{agreementEditController.contractData['payMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
+                            <p:inputText value="#{agreementEditController.contractData['payDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日前支付至甲方指定账户，逾期支付按每日
+                            <p:inputText value="#{agreementEditController.contractData['penaltyRate']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>&#8240;支付违约金）。
+                        </p>
+                        <p class="agreement-text">指定账户：户名：
+                            <p:inputText value="#{agreementEditController.contractData['bankName']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            ，开户行：
+                            <p:inputText value="#{agreementEditController.contractData['bankBranch']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            ，账号：
+                            <p:inputText value="#{agreementEditController.contractData['bankAccount']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            。
+                        </p>
+                        <p class="agreement-text">
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['isLease']}" itemLabel="租赁" style="margin:0 5px;">
+                                <p:ajax event="change" update="adjustTypeGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            （本协议项下设备月租金：人民币
+                            <p:inputText value="#{agreementEditController.contractData['rentAmount']}" styleClass="inline-input"><p:ajax/></p:inputText>
+                            元（大写：
+                            <p:inputText value="#{agreementEditController.contractData['rentAmountWritten']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            ）租金支付方式：
+                            <h:panelGroup id="payMethodGroup">
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['payMonthly']}" itemLabel="按月支付" style="margin:0 3px;">
+                                <p:ajax event="change" update="payMethodGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['payQuarterly']}" itemLabel="按季度支付" style="margin:0 3px;">
+                                <p:ajax event="change" update="payMethodGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['payYearly']}" itemLabel="按年支付" style="margin:0 3px;">
+                                <p:ajax event="change" update="payMethodGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['payLumpSum']}" itemLabel="一次性付清" style="margin:0 3px;">
+                                <p:ajax event="change" update="payMethodGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            </h:panelGroup>
+                            支付周期：乙方应于每期首月
+                            <p:inputText value="#{agreementEditController.contractData['paymentDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>
+                            日前完成付款。乙方逾期支付租金的，每逾期一日，按逾期金额的
+                            <p:inputText value="#{agreementEditController.contractData['rentPenaltyRate']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>&#8240;向甲方支付违约金；逾期超过30日，甲方有权暂停设备使用、解除协议并追索全部欠款及损失。
+                        </p>
+                        <p class="agreement-text">指定收款账户： 户名：
+                            <p:inputText value="#{agreementEditController.contractData['rentBankName']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                        </p>
+                        <p class="agreement-text">开户行：
+                            <p:inputText value="#{agreementEditController.contractData['rentBankBranch']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            账号：
+                            <p:inputText value="#{agreementEditController.contractData['rentBankAccount']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            。
+                        </p>
+                        </h:panelGroup>
+
+                        <div style="font-weight:bold; margin-bottom:5px;">3.2 调剂期限</div>
+                        <p class="agreement-text">1.若为调拨（所有权转移），调剂期限自设备交付完毕之日起，长期有效，设备所有权永久归乙方所有。</p>
+                        <p class="agreement-text">2.若为租赁（所有权不转移），租赁期限自
+                            <p:inputText value="#{agreementEditController.contractData['rentStartYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
+                            <p:inputText value="#{agreementEditController.contractData['rentStartMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
+                            <p:inputText value="#{agreementEditController.contractData['rentStartDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日起至
+                            <p:inputText value="#{agreementEditController.contractData['rentEndYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
+                            <p:inputText value="#{agreementEditController.contractData['rentEndMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
+                            <p:inputText value="#{agreementEditController.contractData['rentEndDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日止，期满后乙方应将设备完好无损地归还甲方，如需续租，双方应另行签订补充协议。
+                        </p>
+
+                        <!-- 第四条 -->
+                        <div class="agreement-heading">第四条 设备交付与验收</div>
+                        <div style="font-weight:bold; margin-bottom:5px;">4.1 交付时间与地点</div>
+                        <div class="agreement-text">甲方应在
+                            <p:inputText value="#{agreementEditController.contractData['deliverYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
+                            <p:inputText value="#{agreementEditController.contractData['deliverMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
+                            <p:inputText value="#{agreementEditController.contractData['deliverDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日前，将本协议第二条约定的调剂设备及全部附件，送至乙方指定地点（地址：
+                            <p:inputText value="#{agreementEditController.contractData['deliverAddress']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                            ），运输费用由
+                            <h:panelGroup id="transportGroup">
+                                <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['transportPartyA']}" itemLabel="甲方" style="margin:0 3px;">
+                                    <p:ajax event="change" update="transportGroup" listener="#{agreementEditController.onCheckChange}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['transportPartyB']}" itemLabel="乙方" style="margin:0 3px;">
+                                    <p:ajax event="change" update="transportGroup" listener="#{agreementEditController.onCheckChange}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['transportShared']}" itemLabel="双方各承担50%" style="margin:0 3px;">
+                                    <p:ajax event="change" update="transportGroup" listener="#{agreementEditController.onCheckChange}"/>
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup>
+                            承担。
+                        </div>
+                        <div style="font-weight:bold; margin-bottom:5px;">4.2 验收标准与流程</div>
+                        <p class="agreement-text">1.乙方应在设备送达后
+                            <p:inputText value="#{agreementEditController.contractData['acceptDays']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>
+                            个工作日内，组织专业技术人员对设备进行验收，验收标准参照国家医疗器械相关标准、设备出厂标准及本协议第二条约定的设备现状。</p>
+                        <div class="agreement-text">2.验收内容包括但不限于：设备外观完好性、性能指标符合性、附件完整性、相关文件齐全性，必要时可委托有资质的检验机构进行检验，检验费用由
+                            <h:panelGroup id="inspectGroup">
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['inspectPartyA']}" itemLabel="甲方" style="margin:0 3px;">
+                                <p:ajax event="change" update="inspectGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['inspectPartyB']}" itemLabel="乙方" style="margin:0 3px;">
+                                <p:ajax event="change" update="inspectGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['inspectNegotiate']}" itemLabel="双方协商" style="margin:0 3px;">
+                                <p:ajax event="change" update="inspectGroup" listener="#{agreementEditController.onCheckChange}"/>
+                            </p:selectBooleanCheckbox>
+                            </h:panelGroup>
+                            承担。
+                        </div>
+                        <p class="agreement-text">3.若验收合格，甲乙双方应共同签署《设备验收确认单》（附件2），确认设备交付完毕；若验收不合格，乙方应在验收完毕后
+                            <p:inputText value="#{agreementEditController.contractData['failNotifyDays']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>
+                            个工作日内书面通知甲方，甲方应在收到通知后
+                            <p:inputText value="#{agreementEditController.contractData['fixDays']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>
+                            个工作日内进行维修、更换，或协商解除本协议。</p>
+                        <p class="agreement-text">4.转让、捐赠的医疗器械，经有资质的检验机构检验合格，并经受让方、受赠方验收合格后方可使用。</p>
+
+                        <!-- 第五条 -->
+                        <div class="agreement-heading">第五条 双方权利与义务</div>
+                        <div style="font-weight:bold; margin-bottom:5px;">5.1 甲方权利与义务</div>
+                        <p class="agreement-text">1.有权按照本协议约定，收取有偿调剂款项（若为有偿调剂），或在借（租）用期满后收回设备。</p>
+                        <p class="agreement-text">2.义务：</p>
+                        <p class="agreement-text">（1）保证调剂设备合法、无权利瑕疵，符合国家相关标准及临床使用要求，提供设备相关合法证明文件、说明书、维修保养记录等资料。</p>
+                        <p class="agreement-text">（2）负责设备交付前的拆卸、包装、运输（若约定由甲方承担运输），确保设备在运输过程中不受损坏，甲方承担运输中设备损失。</p>
+                        <p class="agreement-text">（3）根据乙方需求，提供设备操作、维护等相关技术指导，指导要求：甲方应确保乙方人员顺利进行设备操作（指导期限：15个工作日）。</p>
+                        <p class="agreement-text">（4）若设备在交付前存在隐藏故障，且甲方未提前告知乙方，甲方应承担维修责任或赔偿乙方相应损失。</p>
+
+                        <div style="font-weight:bold; margin-bottom:5px;">5.2 乙方权利与义务</div>
+                        <p class="agreement-text">1.有权对调剂设备进行验收，验收不合格时可要求甲方维修、更换或解除协议。</p>
+                        <p class="agreement-text">2.义务：</p>
+                        <p class="agreement-text">（1）按照本协议约定，及时支付有偿调剂款项（若为有偿调剂），或在借（租）用期满后按时归还设备，确保设备完好无损。</p>
+                        <p class="agreement-text">（2）负责设备接收后的安装、调试、日常维护、保养，承担设备交付后的维修、耗材、校准等相关费用。</p>
+                        <p class="agreement-text">（3）严格按照设备操作规程使用设备，在依法核定的治疗科目范围内使用，不得擅自改装、转借、出租或用于其他非法用途，如因操作不当造成设备损坏，应承担相应的维修或赔偿责任。</p>
+                        <p class="agreement-text">（4）按照相关规定，完成设备接收后的备案、使用登记等相关手续，建立设备使用档案，跟踪记录设备使用情况。</p>
+                        <p class="agreement-text">（5）使用设备过程中，发现设备存在安全隐患，可能对人体健康和生命安全造成损害的，应当立即停止使用，向药监部门报告，并通知甲方。</p>
+
+                        <div style="font-weight:bold; margin-bottom:5px;">5.3 丙方权利与义务</div>
+                        <p class="agreement-text">1.有权对甲乙双方履行本协议的过程进行监督、检查，督促双方按照协议约定及相关法律法规履行义务。</p>
+                        <p class="agreement-text">2.协助甲乙双方协调解决协议履行过程中出现的争议，推动设备调剂工作顺利开展。</p>
+                        <p class="agreement-text">3.负责监督调剂设备的合理使用，确保设备用于区域医疗服务，杜绝闲置、浪费。</p>
+
+                        <!-- 第六条 -->
+                        <div class="agreement-heading">第六条 维修与保养责任</div>
+                        <p class="agreement-text">1.设备交付前，因设备自身质量问题或正常损耗产生的维修费用，由甲方承担。</p>
+                        <p class="agreement-text">2.设备交付后，维修与保养责任由乙方承担。</p>
+                        <p class="agreement-text">3.乙方应定期对设备进行检测和维护，确保设备性能良好，符合国家相关质量标准和行业标准，定期向甲方（设备所有权不转移）或丙方提交设备维护保养记录。</p>
+                        <p class="agreement-text">4.经校准、保养、维护后，仍达不到使用安全标准的设备，乙方必须停止使用，并按有关规定处理，同时通知甲方及丙方。</p>
+
+                        <!-- 第七条 -->
+                        <div class="agreement-heading">第七条 违约责任</div>
+                        <p class="agreement-text">1.甲方未按本协议约定时间交付设备，每逾期一日，应向乙方支付违约金
+                            <p:inputText value="#{agreementEditController.contractData['breachAmount']}" styleClass="inline-input"><p:ajax/></p:inputText>
+                            元；逾期超过30个工作日，乙方有权解除协议，甲方应退还乙方已支付的款项，并赔偿乙方相应损失。</p>
+                        <p class="agreement-text">2.甲方隐瞒设备权利瑕疵、质量问题，导致乙方无法正常使用设备或遭受损失的，甲方应承担全部赔偿责任，乙方有权解除协议。</p>
+                        <p class="agreement-text">3.乙方未按协议约定使用设备、擅自改装、转借、出租设备，或未履行维护保养义务造成设备损坏、丢失的，应承担维修、赔偿责任；若为无偿借用，甲方有权提前终止协议，收回设备，并要求乙方赔偿损失。</p>
+                        <p class="agreement-text">4.任何一方违反本协议其他约定，应承担相应的违约责任，给对方造成损失的，应依法赔偿。</p>
+
+                        <!-- 第八条 -->
+                        <div class="agreement-heading">第八条 保密条款</div>
+                        <p class="agreement-text">甲乙双方（及丙方）应对本协议内容、调剂设备相关信息（包括技术参数、性能、维修记录等）及双方的商业秘密、医疗信息严格保密，未经对方书面同意，不得向任何第三方泄露。本保密条款在协议终止后仍持续有效，直至相关信息成为公开信息。</p>
+
+                        <!-- 第九条 -->
+                        <div class="agreement-heading">第九条 争议解决</div>
+                        <div class="agreement-text">本协议履行过程中发生的争议，甲乙双方应首先友好协商解决；协商不成的，任何一方均有权向
+                            <h:panelGroup id="disputeGroup">
+                                <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['disputePartyA']}" itemLabel="甲方所在地" style="margin:0 3px;">
+                                    <p:ajax event="change" update="disputeGroup" listener="#{agreementEditController.onCheckChange}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['disputePartyB']}" itemLabel="乙方所在地" style="margin:0 3px;">
+                                    <p:ajax event="change" update="disputeGroup" listener="#{agreementEditController.onCheckChange}"/>
+                                </p:selectBooleanCheckbox>
+                                <p:selectBooleanCheckbox value="#{agreementEditController.contractChecks['disputePartyC']}" itemLabel="丙方所在地" style="margin:0 3px;">
+                                    <p:ajax event="change" update="disputeGroup" listener="#{agreementEditController.onCheckChange}"/>
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup>
+                            人民法院提起诉讼。
+                        </div>
+
+                        <!-- 第十条 -->
+                        <div class="agreement-heading">第十条 其他条款</div>
+                        <p class="agreement-text">1. 本协议未尽事宜，甲乙双方可另行签订补充协议，补充协议与本协议具有同等法律效力。</p>
+                        <p class="agreement-text">2.本协议附件（设备明细清单、设备验收确认单、相关证明文件等）为本协议不可分割的组成部分，与本协议具有同等法律效力。</p>
+                        <p class="agreement-text">3.本协议自甲乙双方（及丙方，若有）签字盖章之日起生效。</p>
+                        <p class="agreement-text">4.本协议一式
+                            <p:inputText value="#{agreementEditController.contractData['totalCopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，甲方执
+                            <p:inputText value="#{agreementEditController.contractData['partyACopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，乙方执
+                            <p:inputText value="#{agreementEditController.contractData['partyBCopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，丙方执
+                            <p:inputText value="#{agreementEditController.contractData['partyCCopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，相关备案部门（若所有权转移）执
+                            <p:inputText value="#{agreementEditController.contractData['archiveCopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，具有同等法律效力。</p>
+
+                        <!-- 签字区域 -->
+                        <div class="signature-section">
+                            <div class="signature-block">
+                                <p>甲方（调出单位）（盖章）：
+                                    <p:inputText value="#{agreementEditController.contractData['signPartyAName']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                                </p>
+                                <p>法定代表人/授权代表人（签字）：
+                                    <p:inputText value="#{agreementEditController.contractData['signPartyARep']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                                </p>
+                                <p>签订日期：
+                                    <p:inputText value="#{agreementEditController.contractData['signAYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
+                                    <p:inputText value="#{agreementEditController.contractData['signAMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
+                                    <p:inputText value="#{agreementEditController.contractData['signADay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                                </p>
+                            </div>
+                            <div class="signature-block">
+                                <p>乙方（调入单位）（盖章）：
+                                    <p:inputText value="#{agreementEditController.contractData['signPartyBName']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                                </p>
+                                <p>法定代表人/授权代表人（签字）：
+                                    <p:inputText value="#{agreementEditController.contractData['signPartyBRep']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                                </p>
+                                <p>签订日期：
+                                    <p:inputText value="#{agreementEditController.contractData['signBYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
+                                    <p:inputText value="#{agreementEditController.contractData['signBMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
+                                    <p:inputText value="#{agreementEditController.contractData['signBDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                                </p>
+                            </div>
+                            <div class="signature-block">
+                                <p>丙方（监管单位）（盖章）：
+                                    <p:inputText value="#{agreementEditController.contractData['signPartyCName']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                                </p>
+                                <p>法定代表人/授权代表人（签字）：
+                                    <p:inputText value="#{agreementEditController.contractData['signPartyCRep']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
+                                </p>
+                                <p>签订日期：
+                                    <p:inputText value="#{agreementEditController.contractData['signCYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
+                                    <p:inputText value="#{agreementEditController.contractData['signCMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
+                                    <p:inputText value="#{agreementEditController.contractData['signCDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 按钮栏 -->
+                        <div class="btn-bar">
+                            <p:commandButton value="保存协议数据" icon="ui-icon-disk"
+                                             actionListener="#{agreementEditController.saveAgreementData}"
+                                             update="growl"
+                                             style="margin-right:15px;"/>
+                            <p:commandButton value="下载协议文件" icon="ui-icon-arrowthickstop-1-s"
+                                             ajax="false" alt="保存协议之后下载"
+                                             actionListener="#{agreementEditController.downloadAgreement}"
+                                             styleClass="ui-button-info">
+                                <p:tooltip value="保存协议之后下载" position="top"/>
+                            </p:commandButton>
+
+                            <p:commandButton value="返回" immediate="true"
+                                             onclick="window.close(); return false;"
+                                            />
+                        </div>
+
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

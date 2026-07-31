@@ -188,7 +188,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
 
             if (buttonType == 1) {
                 this.updateSearchFilter(new SearchFilter("stockHospitalUid", SearchFilter.Operator.EQ,currentUserAccount.getHospitalUID()));
-                this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.EQ, 6));
+                this.updateSearchFilter(new SearchFilter("status", SearchFilter.Operator.GTE, 6));
             } else {
                 this.updateSearchFilter(new SearchFilter("borrowHospitalUid", SearchFilter.Operator.EQ, currentUserAccount.getHospitalUID()));
             }
@@ -351,7 +351,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
         return null;
     }
 
-    //1待审批  2  审批未通过 3 已取消  4 待交付  5  已交付 6 已完成 7 已退回
+    //1待审批  2审批未通过  3已取消  4待交付  6已完成  7待退回审批  10退回中  8已退回
     public String statusName(Integer status) {
         if (status == null) return "";
         switch (status) {
@@ -363,16 +363,14 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
                 return "已取消";
             case 4:
                 return "待交付";
-            case 5:
-                return "已交付";
             case 6:
                 return "已完成";
             case 7:
-                return "退回待审批";
+                return "待退回审批";
+            case 10:
+                return "退回中";
             case 8:
                 return "已退回";
-            case 9:
-                return "退回审批不通过";
             default:
                 return "";
         }

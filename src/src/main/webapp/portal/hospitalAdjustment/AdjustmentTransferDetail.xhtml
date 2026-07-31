@@ -282,7 +282,7 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                             <h:outputText value="#{adjustmentTransferApplicationDetailController.getUserNameByUid(fileitem.createdBy)}" class="ui-g-2" />
-                            <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update="previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()"/>
+                            <p:commandLink value="#{msg.preview}" style="margin-right: 5px;" update=":previewedDlg" rendered="#{fileitem.showPreview()}" process="@this" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" oncomplete="PF('previewedDlg').show()"/>
                             <!--                                <p:commandLink value="#{msg.Delete}" style="margin-right: 5px;" update="AttachList" actionListener="#{adjustmentApplicationDetailController.removeAttachmentById(fileitem.id)}" process="@this" >-->
                             <!--                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
                             <!--                                </p:commandLink>-->

@@ -156,7 +156,7 @@ public class AdjustmentTransferApplication implements Serializable {
     private String updatedBy;
 
     @Column(name = "status")
-    private Integer status;   //1待审批  2  审批未通过 3 已取消  4 待交付  5  已交付 6 已完成  7退回待审批    8 已退回 9退回审批不通过
+    private Integer status;   //1待审批  2审批未通过 3已取消  4待交付  6已完成  7待退回审批  10退回中  8已退回
 
 
     @Column(name = "stock_hospital_uid")
@@ -223,6 +223,8 @@ public class AdjustmentTransferApplication implements Serializable {
     private String returnPendingUid; //退回待处理人
     @Column(name = "return_reason")
     private String returnReason;//退回原因
+    @Column(name = "return_type")
+    private String returnType;//退回类型: scrapReturn-报废退回, agreementReturn-协议退回, noUsageReturn-无使用需求退回
 
 
     @Column(name = "return_approval_uid")
@@ -657,6 +659,14 @@ public class AdjustmentTransferApplication implements Serializable {
 
     public void setReturnReason(String returnReason) {
         this.returnReason = returnReason;
+    }
+
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
     }
 
     public String getReturnApprovalUid() {
