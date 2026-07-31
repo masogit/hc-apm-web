@@ -51,6 +51,7 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
         super.init();
         dao = WebUtil.getBean(AcquisitionPlanRepository.class);
         acquisitionPlanService = WebUtil.getBean(AcquisitionPlanService.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         userAccount = UserContextService.getCurrentUserAccount();
         selectedId = (String) UrlEncryptController.getValueFromMap(WebUtil.getRequestParameter("str"), "id");
@@ -86,6 +87,12 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
     public Boolean showAudit(){
         Boolean result = true;
         return result;
+    }
+
+    public void auditResultChange(){
+        if(AcquisitionPlan.ResultEnum.SelfReview.name().equals(auditResult)){
+            auditComment = "采购单位自行采购";
+        }
     }
 
 
