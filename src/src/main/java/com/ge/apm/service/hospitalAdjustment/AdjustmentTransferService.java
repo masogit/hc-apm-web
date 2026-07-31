@@ -98,7 +98,7 @@ public class AdjustmentTransferService {
 //            return;
 //        }
 
-        selected.setStatus(5);
+        selected.setStatus(6);
         selected.setUpdateTime(new Date());
         selected.setUpdatedBy(currentUserAccount.getUid());
         selected.setDeliveryUid(currentUserAccount.getUid());
@@ -132,96 +132,49 @@ public class AdjustmentTransferService {
     }
 
 
+    /**
+     * 退回审批通过：状态7→10（退回中），不操作资产，等待借入方上传调剂中止协议后确认退回
+     */
     @Transactional
     public void   returnPass(AdjustmentTransferApplication selected,UserAccount currentUserAccount) {
-//        AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-//
-//        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE.name())  ){
-//            WebUtil.addWarnMessage("无权操作,请检查订单状态");
-//            return;
-//        }
 
-        selected.setStatus(8);
+        selected.setStatus(10);
         selected.setReturnApprovalDate(new Date());
         selected.setReturnApprovalUid(currentUserAccount.getUid());
         selected.setReturnApprovalResult(1);
-        IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
-        idleEquipmentStock.setStatus(4);
-        idleEquipmentStock.setBorrowHospitalUid(null);
-        idleEquipmentStock.setBorrowDeptUid(null);
-        idleEquipmentStock.setBorrowSiteUid(null);
-        idleEquipmentStock.setLastModifiedBy(currentUserAccount.getUid());
-        idleEquipmentStock.setLastModifiedDate(new Date());
-        OrgInfo orgInfo = orgInfoRepository.getByUid(selected.getStockDeptUid());
-        AssetInfo assetInfo = assetInfoRepository.getByUid(idleEquipmentStock.getAssetUid());
-        assetInfo.setClinicalDeptUID(selected.getStockDeptUid());
-        assetInfo.setClinicalDeptName(orgInfo.getName());
-        assetInfo.setAssetDeptUID(selected.getStockDeptUid());
-        assetInfo.setAssetDeptId(orgInfo.getId());
-        assetInfo.setSiteUID(selected.getStockSiteUid());
-        assetInfo.setHospitalUID(orgInfo.getHospitalUID());
-        assetInfoRepository.save(assetInfo);
-        stockRepository.save(idleEquipmentStock);
+        selected.setUpdatedBy(currentUserAccount.getUid());
+        selected.setUpdateTime(new Date());
         dao.save(selected);
 
-
-        IdleEquipmentApplication idleEquipmentApplication = idleEquipmentApplicationRepository.findByUid(idleEquipmentStock.getApplicationUid());
-        idleEquipmentApplication.setStatus(4);
-        idleEquipmentApplication.setLastModifiedDate(new Date());
-        idleEquipmentApplication.setLastModifiedBy(currentUserAccount.getUid());
-        idleEquipmentApplicationRepository.save(idleEquipmentApplication);
-        MqContext mqContext = new MqContext();
-        mqContext.setClassName("AdjustmentTransferService");
-        mqContext.setServiceName("hc-apm-web");
-        mqContext.setMethodName("returnPass");
-        mqContext.setDescribe("院区间调剂借用设备退回");
-        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
-
-
+        // 通知借入方审批已通过，请上传调剂中止协议完成退回
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put("orderCode", selected.getApplicationNumber());
+        stringMap.put("content", "退回审批已通过，请上传调剂中止协议完成退回");
+        stringMap.put("date", DateUtil.formatDateTime(new Date()));
+        List<String> inUserIds = getAdjustmentTransferApproval(selected, true, false);
+        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, inUserIds, null);
     }
 
+    /**
+     * 退回审批拒绝：状态7→6（已完成），设备保持借出状态
+     */
     @Transactional
-
     public void   returnRefuse(AdjustmentTransferApplication selected,UserAccount currentUserAccount) {
-//        AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-//
-//        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE.name())  ){
-//            WebUtil.addWarnMessage("无权操作,请检查订单状态");
-//            return;
-//        }
-        selected.setStatus(9);
-
+        selected.setStatus(6);
         selected.setReturnApprovalDate(new Date());
         selected.setReturnApprovalUid(currentUserAccount.getUid());
         selected.setReturnApprovalResult(2);
-
         selected.setUpdatedBy(currentUserAccount.getUid());
         selected.setUpdateTime(new Date());
-        IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
-        idleEquipmentStock.setStatus(1);
-        idleEquipmentStock.setBorrowHospitalUid(null);
-        idleEquipmentStock.setBorrowDeptUid(null);
-        idleEquipmentStock.setBorrowSiteUid(null);
-        idleEquipmentStock.setLastModifiedBy(currentUserAccount.getUid());
-        idleEquipmentStock.setLastModifiedDate(new Date());
-        OrgInfo orgInfo = orgInfoRepository.getByUid(selected.getStockDeptUid());
-        AssetInfo assetInfo = assetInfoRepository.getByUid(idleEquipmentStock.getAssetUid());
-        assetInfo.setClinicalDeptUID(selected.getStockDeptUid());
-        assetInfo.setClinicalDeptName(orgInfo.getName());
-        assetInfo.setAssetDeptUID(selected.getStockDeptUid());
-        assetInfo.setAssetDeptId(orgInfo.getId());
-        assetInfo.setSiteUID(selected.getStockSiteUid());
-        assetInfo.setHospitalUID(orgInfo.getHospitalUID());
-        assetInfoRepository.save(assetInfo);
-        stockRepository.save(idleEquipmentStock);
         dao.save(selected);
 
-        MqContext mqContext = new MqContext();
-        mqContext.setClassName("AdjustmentTransferService");
-        mqContext.setServiceName("hc-apm-web");
-        mqContext.setMethodName("returnRefuse");
-        mqContext.setDescribe("院区间调剂借用设备退回");
-        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
+        // 通知借入方审批已拒绝
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put("orderCode", selected.getApplicationNumber());
+        stringMap.put("content", "退回审批已拒绝，工单恢复已完成状态");
+        stringMap.put("date", DateUtil.formatDateTime(new Date()));
+        List<String> inUserIds = getAdjustmentTransferApproval(selected, true, false);
+        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, inUserIds, null);
     }
 
     @Transactional
@@ -252,6 +205,60 @@ public class AdjustmentTransferService {
 
         List<String> byIdsAndHospitalUID = getAdjustmentTransferApproval(adjustmentTransferApplication,true,true);
         wxMessageService.sendWxMsgToMq(stringMap,null,MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE,byIdsAndHospitalUID,null);
+    }
+
+    /**
+     * 退回确认：状态10→8（已退回），借入方上传调剂中止协议后完成退回，执行资产归还操作
+     */
+    @Transactional
+    public void returnConfirm(AdjustmentTransferApplication selected, UserAccount currentUserAccount) {
+        selected.setStatus(8);
+        selected.setUpdatedBy(currentUserAccount.getUid());
+        selected.setUpdateTime(new Date());
+
+        IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
+        idleEquipmentStock.setStatus(4);
+        idleEquipmentStock.setBorrowHospitalUid(null);
+        idleEquipmentStock.setBorrowDeptUid(null);
+        idleEquipmentStock.setBorrowSiteUid(null);
+        idleEquipmentStock.setLastModifiedBy(currentUserAccount.getUid());
+        idleEquipmentStock.setLastModifiedDate(new Date());
+
+        OrgInfo orgInfo = orgInfoRepository.getByUid(selected.getStockDeptUid());
+        AssetInfo assetInfo = assetInfoRepository.getByUid(idleEquipmentStock.getAssetUid());
+        assetInfo.setClinicalDeptUID(selected.getStockDeptUid());
+        assetInfo.setClinicalDeptName(orgInfo.getName());
+        assetInfo.setAssetDeptUID(selected.getStockDeptUid());
+        assetInfo.setAssetDeptId(orgInfo.getId());
+        assetInfo.setSiteUID(selected.getStockSiteUid());
+        assetInfo.setHospitalUID(orgInfo.getHospitalUID());
+        assetInfoRepository.save(assetInfo);
+        stockRepository.save(idleEquipmentStock);
+
+        IdleEquipmentApplication idleEquipmentApplication = idleEquipmentApplicationRepository.findByUid(idleEquipmentStock.getApplicationUid());
+        idleEquipmentApplication.setStatus(4);
+        idleEquipmentApplication.setLastModifiedDate(new Date());
+        idleEquipmentApplication.setLastModifiedBy(currentUserAccount.getUid());
+        idleEquipmentApplicationRepository.save(idleEquipmentApplication);
+
+        dao.save(selected);
+
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("AdjustmentTransferService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("returnConfirm");
+        mqContext.setDescribe("院区间调剂借用设备退回确认");
+        mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
+    }
+
+    public void returnNotifyMsg(AdjustmentTransferApplication adjustmentTransferApplication){
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put("orderCode", adjustmentTransferApplication.getApplicationNumber());
+        stringMap.put("content", "借入方已发起设备退回申请，请及时处理");
+        stringMap.put("date", DateUtil.formatDateTime(new Date()));
+
+        List<String> outUserIds = getAdjustmentTransferApproval(adjustmentTransferApplication, false, true);
+        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, outUserIds, null);
     }
 
     public List<String> getAdjustmentTransferApproval(AdjustmentTransferApplication adjustmentTransferApplication,boolean in,boolean out) {

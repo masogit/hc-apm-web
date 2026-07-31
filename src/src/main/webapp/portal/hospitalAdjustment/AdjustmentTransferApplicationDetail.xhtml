@@ -7,6 +7,25 @@
 
     <ui:define name="content">
         <style>
+            .ui-fileupload,
+            .ui-fileupload .ui-fileupload-buttonbar,
+            .ui-fileupload .ui-fileupload-content,
+            .ui-fileupload .ui-fileupload-content .ui-fileupload-cancel,
+            .ui-fileupload .ui-fileupload-content .ui-fileupload-files {
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+            .ui-fileupload .ui-fileupload-content {
+                min-height: 28px;
+            }
+            .ui-fileupload .ui-fileupload-buttonbar .ui-button {
+                width: auto !important;
+            }
+            .tab-button-bar {
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid #ddd;
+            }
         </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
@@ -15,21 +34,57 @@
 
             <div class="ui-g-12 card">
 
-
                 #{adjustmentTransferApplicationDetailController.initIdleEquipmentApplication()}
 
-                <p:fieldset legend="调剂设备详情">
-                    <ui:include src="AdjustmentEquipmentDetail.xhtml"/>
+                <p:tabView id="detailTabView" dynamic="false">
 
-                </p:fieldset>
-                <p:fieldset legend="调剂详情">
-                    <ui:include src="AdjustmentTransferDetail.xhtml"/>
-                </p:fieldset>
+                    <!-- ==================== Tab1: 调剂设备详情 ==================== -->
+                    <p:tab title="调剂设备详情">
+                        <p:fieldset legend="调剂设备详情">
+                            <ui:include src="AdjustmentEquipmentDetail.xhtml"/>
+                        </p:fieldset>
+                        <h:form id="tab1ButtonForm">
+                            <div class="tab-button-bar">
+                                <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                                 action="AdjustmentTransferApplication?faces-redirect=true"
+                                                 style="margin-left: 10px;"/>
+                                <p:commandButton value="下载文件"
+                                                 actionListener="#{adjustmentTransferApplicationDetailController.download}"
+                                                 style="margin-left: 10px;" update=":growl" ajax="false">
+                                    <p:fileDownload value="#{adjustmentTransferApplicationDetailController.exportFile}"/>
+                                </p:commandButton>
+                            </div>
+                        </h:form>
+                    </p:tab>
 
-                    <p:fieldset legend="工单信息">
-                        <ui:include src="AdjustmentTransferInfoDetail.xhtml"/>
-                    </p:fieldset>
-                <h:form id="transferDetailForm">
+                    <!-- ==================== Tab2: 调剂申请详情 ==================== -->
+                    <p:tab title="调剂申请详情">
+                        <p:fieldset legend="调剂详情">
+                            <ui:include src="AdjustmentTransferDetail.xhtml"/>
+                        </p:fieldset>
+                        <h:form id="tab2ButtonForm">
+                            <div class="tab-button-bar">
+                                <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                                 action="AdjustmentTransferApplication?faces-redirect=true"
+                                                 style="margin-left: 10px;"/>
+                                <p:commandButton value="下载文件"
+                                                 actionListener="#{adjustmentTransferApplicationDetailController.download}"
+                                                 style="margin-left: 10px;" update=":growl" ajax="false">
+                                    <p:fileDownload value="#{adjustmentTransferApplicationDetailController.exportFile}"/>
+                                </p:commandButton>
+                            </div>
+                        </h:form>
+                    </p:tab>
+
+                    <!-- ==================== Tab3: 调剂过程详情 ==================== -->
+                    <p:tab title="调剂过程详情">
+                        <h:panelGroup id="workOrderInfoPanel">
+                        <p:fieldset legend="工单信息">
+                            <ui:include src="AdjustmentTransferInfoDetail.xhtml"/>
+                        </p:fieldset>
+                        </h:panelGroup>
+
+                        <h:form id="transferDetailForm" enctype="multipart/form-data">
                     <p:fieldset legend="调剂中心处理意见"
                                 rendered="#{!(adjustmentTransferApplicationDetailController.selected.status==1 and ! userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))  and adjustmentTransferApplicationDetailController.selected.status!=3  }">
 
@@ -103,7 +158,7 @@
                                 <p:commandButton id="openSignature2" validateClient="false" immediate="true"
                                                  rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
                                                  actionListener="#{adjustmentTransferApplicationDetailController.getSignature()}"
-                                                 value="添加签名" update="signatureDlg"
+                                                 value="添加签名" update=":signatureDlg"
                                                  oncomplete="PF('signatureDlg').show();"/>
 
                             </h:panelGroup>
@@ -124,9 +179,111 @@
 
                         </p:panelGrid>
                     </p:fieldset>
+                    <p:fieldset legend="到货确认"
+                                rendered="#{adjustmentTransferApplicationDetailController.selected.status ge 6 or (adjustmentTransferApplicationDetailController.selected.status == 4 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid())}">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                            <h:panelGroup rendered="#{adjustmentTransferApplicationDetailController.selected.status == 4 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}">
+                                <label class="label">确认人</label>
+                                <p:inputText
+                                        value="#{adjustmentTransferApplicationDetailController.currentUserAccount.name}"
+                                        readonly="true"
+                                        style="width:160px;">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup rendered="#{adjustmentTransferApplicationDetailController.selected.status == 4 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}">
+                                <label class="label">确认时间</label>
+                                <p:calendar disabled="true"
+                                            value="#{adjustmentTransferApplicationDetailController.currentTime}"
+                                            pattern="yyyy-MM-dd HH:mm:ss"
+                                            showOn="button"
+                                            style="width:160px;"
+                                            readonlyInput="true"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup rendered="#{adjustmentTransferApplicationDetailController.selected.status ge 6}">
+                                <label class="label">确认人</label>
+                                <p:inputText
+                                        value="#{adjustmentTransferApplicationDetailController.getUserNameByUid(adjustmentTransferApplicationDetailController.selected.deliveryUid)}"
+                                        readonly="true"
+                                        style="width:160px;">
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup rendered="#{adjustmentTransferApplicationDetailController.selected.status ge 6}">
+                                <label class="label">确认时间</label>
+                                <p:calendar disabled="true"
+                                            value="#{adjustmentTransferApplicationDetailController.selected.deliveryDate}"
+                                            pattern="yyyy-MM-dd HH:mm:ss"
+                                            showOn="button"
+                                            style="width:160px;"
+                                            readonlyInput="true"/>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">调剂缔结协议<span style="color:red">*</span></label>
+
+                                <h:panelGroup id="agreementFileListPanel" layout="block">
+                                    <ui:repeat value="#{adjustmentTransferApplicationDetailController.agreementFiles}" var="agreementFile">
+                                        <div style="margin-bottom:5px;">
+                                            <p:commandLink
+                                                    value="#{agreementFile.objectName}"
+                                                    ajax="false"
+                                                    actionListener="#{fileDownloadService.downloadFile(agreementFile.objectStorageId)}"/>
+                                            <p:commandLink value=" 删除" ajax="true" rendered="#{adjustmentTransferApplicationDetailController.selected.status == 4 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
+                                                           actionListener="#{adjustmentTransferApplicationDetailController.deleteAgreementFile(agreementFile)}"
+                                                           update=":detailTabView:transferDetailForm:agreementFileListPanel"
+                                                           style="color:red; margin-left:10px;"/>
+                                        </div>
+                                    </ui:repeat>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="agreementFileUploadPanel" layout="block"
+                                              rendered="#{adjustmentTransferApplicationDetailController.selected.status == 4 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}">
+
+                                    <p:fileUpload fileUploadListener="#{adjustmentTransferApplicationDetailController.handleAgreementFileUpload}"
+                                                 mode="advanced"
+                                                  dragDropSupport="false" style="width:500px" process="@this"
+                                                  multiple="false" sizeLimit="10000000"  update=":detailTabView:transferDetailForm:agreementFileListPanel"
+                                                  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
+                                                  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|xslt|XLS|XLSX|DOC|DOCX|PDF|XSLT)$/" label="#{msg.Add}"/>
+                                </h:panelGroup>
+
+                                <c:if test="#{adjustmentTransferApplicationDetailController.selected.status == 4 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}">
+                                    <div style="margin-top:10px;">
+                                        <div>1. 编辑调剂协议
+                                            <p:commandButton value="编辑调剂协议" icon="ui-icon-pencil"
+                                                             actionListener="#{adjustmentTransferApplicationDetailController.openEditAgreement}"
+                                                             oncomplete="openAgreementEditWindow(xhr, status, args)"
+                                                             styleClass="ui-button-warning"/>
+                                        </div>
+                                        <div style="margin-top:5px;">2. 上传协议文件</div>
+
+                                    </div>
+                                </c:if>
+
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
                     <p:fieldset legend="退回详情"
                                 rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=7 }">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">退回类型</label>
+                                <p:inputText
+                                        value="#{adjustmentTransferApplicationDetailController.getReturnTypeLabel(adjustmentTransferApplicationDetailController.selected.returnType)}"
+                                        readonly="true"
+                                >
+                                    <p:ajax/>
+                                </p:inputText>
+                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">申请人</label>
                                 <p:inputText
@@ -160,7 +317,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup
-                                    rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=8 }">
+                                    rendered="#{ (adjustmentTransferApplicationDetailController.selected.status==8 or adjustmentTransferApplicationDetailController.selected.status==10) }">
                                 <label class="label">审批人</label>
                                 <p:inputText
                                         value="#{adjustmentTransferApplicationDetailController.getUserNameByUid(adjustmentTransferApplicationDetailController.selected.returnApprovalUid)}"
@@ -171,7 +328,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup
-                                    rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=8 }">
+                                    rendered="#{ (adjustmentTransferApplicationDetailController.selected.status==8 or adjustmentTransferApplicationDetailController.selected.status==10) }">
 
                                 <label class="label">审批时间</label>
                                 <p:calendar disabled="true"
@@ -184,7 +341,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup
-                                    rendered="#{ adjustmentTransferApplicationDetailController.selected.status>=8 }">
+                                    rendered="#{ (adjustmentTransferApplicationDetailController.selected.status==8 or adjustmentTransferApplicationDetailController.selected.status==10) }">
 
                                 <label class="label">审批结果</label>
                                 <p:inputText
@@ -198,68 +355,133 @@
 
                         </p:panelGrid>
 
+                        <h:panelGroup layout="block" style="margin:10px 15px;"
+                                      rendered="#{not empty adjustmentTransferApplicationDetailController.returnImages}">
+                            <label class="label" style="display:block; margin-bottom:5px;">退回图片</label>
+                            <ui:repeat value="#{adjustmentTransferApplicationDetailController.returnImages}" var="returnImg">
+                                <div style="display:inline-block; margin:5px; text-align:center;">
+                                    <p:graphicImage value="#{fileDownloadService.getFile(returnImg.objectStorageId)}"
+                                                    width="80" height="80" stream="false"/>
+                                </div>
+                            </ui:repeat>
+                        </h:panelGroup>
 
                     </p:fieldset>
-                    <p:commandButton value="同意" icon="ui-icon-check"
-                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.applicationApproval}"
+                    <p:fieldset legend="调剂中止协议"
+                                rendered="#{ adjustmentTransferApplicationDetailController.selected.status==10 or adjustmentTransferApplicationDetailController.selected.status==8 }">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                                     update="transferDetailForm"
-                                     style="margin-left: 10px;"/>  <!--                             action="AdjustmentTransferApplication?faces-redirect=true"-->
+                            <h:panelGroup>
+                                <label class="label">协议文件<span style="color:red">*</span></label>
 
+                                <h:panelGroup id="terminationFileListPanel" layout="block">
+                                    <ui:repeat value="#{adjustmentTransferApplicationDetailController.terminationAgreementFiles}" var="terminationFile">
+                                        <div style="margin-bottom:5px;">
+                                            <p:commandLink
+                                                    value="#{terminationFile.objectName}"
+                                                    ajax="false"
+                                                    actionListener="#{fileDownloadService.downloadFile(terminationFile.objectStorageId)}"/>
+                                            <p:commandLink value=" 删除" ajax="true" rendered="#{adjustmentTransferApplicationDetailController.selected.status == 10 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
+                                                           actionListener="#{adjustmentTransferApplicationDetailController.deleteTerminationAgreementFile(terminationFile)}"
+                                                           update=":detailTabView:transferDetailForm:terminationFileListPanel"
+                                                           style="color:red; margin-left:10px;"/>
+                                        </div>
+                                    </ui:repeat>
+                                </h:panelGroup>
 
-                    <p:commandButton  value="拒绝" icon="ui-icon-cancel"
-                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.refuse}"
-                                     update="transferDetailForm"
-                                     style="margin-left: 10px;"/>
+                                <h:panelGroup id="terminationFileUploadPanel" layout="block"
+                                              rendered="#{adjustmentTransferApplicationDetailController.selected.status == 10 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}">
 
-                    <p:commandButton immediate="true" value="取消借用" icon="ui-icon-cancel"
-                                     rendered="#{ (adjustmentTransferApplicationDetailController.selected.status==1  or   adjustmentTransferApplicationDetailController.selected.status==4  ) and      adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.cancel}"
-                                     update="transferDetailForm"
-                                     style="margin-left: 10px;"/>
-
-
-                    <p:commandButton immediate="true" value="确认到货" icon="ui-icon-check"
-                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==4  and   adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.confirmReceipt}"
-                                     update="transferDetailForm"
-                                     style="margin-left: 10px;"/>
-
-                    <p:commandButton immediate="true" value="设备退回" icon="ui-icon-cancel"
-                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==5  and   adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()  and adjustmentTransferApplicationDetailController.returnValid()  }"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.beforeReturn}"
-                                     update="returnDlg"
-                                     oncomplete="PF('returnDlg').show();"
-                                     style="margin-left: 10px;"/>
-
-
-                    <p:commandButton immediate="true" value="审批通过" icon="ui-icon-cancel"
-                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.returnPass}"
-                                     update="transferDetailForm"
-                                     style="margin-left: 10px;"/>
-
-                    <p:commandButton immediate="true" value="审批拒绝" icon="ui-icon-cancel"
-                                     rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.returnRefuse}"
-                                     update="transferDetailForm"
-                                     style="margin-left: 10px;"/>
-                    <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
-                                     action="AdjustmentTransferApplication?faces-redirect=true"
-                                     style="margin-left: 10px;"/>
+                                    <p:fileUpload fileUploadListener="#{adjustmentTransferApplicationDetailController.handleTerminationAgreementFileUpload}"
+                                                 mode="advanced"
+                                                 dragDropSupport="false" style="width:500px" process="@this"
+                                                 multiple="false" sizeLimit="10000000" update=":detailTabView:transferDetailForm:terminationFileListPanel"
+                                                 auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
+                                                 allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|xslt|XLS|XLSX|DOC|DOCX|PDF|XSLT)$/" label="#{msg.Add}"/>
+                                </h:panelGroup>
 
 
-                    <p:commandButton  value="下载文件"
-                                     actionListener="#{adjustmentTransferApplicationDetailController.download}"
-                                     style="margin-left: 10px;" update=":growl"  ajax="false">
+                                <div style="margin-top:10px;">
+                                    <div>1. 编辑终止协议
+                                        <p:commandButton value="编辑终止协议" icon="ui-icon-pencil"
+                                                         actionListener="#{adjustmentTransferApplicationDetailController.openEditTerminationAgreement}"
+                                                         oncomplete="openAgreementEditWindow(xhr, status, args)"
+                                                         styleClass="ui-button-warning"
+                                        rendered="#{adjustmentTransferApplicationDetailController.selected.status == 10 and adjustmentTransferApplicationDetailController.selected.applicationUid == adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"/>
+                                    </div>
+                                    <div style="margin-top:5px;">2. 上传协议文件</div>
 
-                        <p:fileDownload value="#{adjustmentTransferApplicationDetailController.exportFile}"/>
-                    </p:commandButton>
+                                </div>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                        <div class="tab-button-bar">
+                            <p:commandButton value="同意" icon="ui-icon-check"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.applicationApproval}"
+                                             update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                             style="margin-left: 10px;"/>
 
+                            <p:commandButton value="拒绝" icon="ui-icon-cancel"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE')}"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.refuse}"
+                                             update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                             style="margin-left: 10px;"/>
 
-                </h:form>
+                            <p:commandButton immediate="true" value="取消借用" icon="ui-icon-cancel"
+                                             rendered="#{ (adjustmentTransferApplicationDetailController.selected.status==1  or   adjustmentTransferApplicationDetailController.selected.status==4  ) and      adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.cancel}"
+                                             update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                             style="margin-left: 10px;"/>
+
+                            <p:commandButton immediate="true" value="确认到货" icon="ui-icon-check"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==4  and   adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()}"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.confirmReceipt}"
+                                             update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                             style="margin-left: 10px;"/>
+
+                            <p:commandButton immediate="true" value="设备退回" icon="ui-icon-cancel"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==6  and   adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid()   }"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.beforeReturn}"
+                                             update=":returnDlg"
+                                             oncomplete="PF('returnDlg').show();"
+                                             style="margin-left: 10px;"/>
+
+                            <p:commandButton immediate="true" value="退回确认" icon="ui-icon-check"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==10 and adjustmentTransferApplicationDetailController.selected.applicationUid==adjustmentTransferApplicationDetailController.currentUserAccount.getUid() }"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.returnConfirm}"
+                                             update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                             style="margin-left: 10px;"/>
+
+                            <p:commandButton immediate="true" value="审批通过" icon="ui-icon-check"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     adjustmentTransferApplicationDetailController.selected.stockHospitalUid==adjustmentTransferApplicationDetailController.currentUserAccount.hospitalUID   and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_WORKBENCH')}"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.returnPass}"
+                                             update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                             style="margin-left: 10px;"/>
+
+                            <p:commandButton immediate="true" value="审批拒绝" icon="ui-icon-cancel"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     adjustmentTransferApplicationDetailController.selected.stockHospitalUid==adjustmentTransferApplicationDetailController.currentUserAccount.hospitalUID   and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_WORKBENCH')}"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.returnRefuse}"
+                                             update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                             style="margin-left: 10px;"/>
+
+                            <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"
+                                             action="AdjustmentTransferApplication?faces-redirect=true"
+                                             style="margin-left: 10px;"/>
+
+                            <p:commandButton value="下载文件"
+                                             actionListener="#{adjustmentTransferApplicationDetailController.download}"
+                                             style="margin-left: 10px;" update=":growl" ajax="false">
+                                <p:fileDownload value="#{adjustmentTransferApplicationDetailController.exportFile}"/>
+                            </p:commandButton>
+                        </div>
+
+                        </h:form>
+                    </p:tab>
+
+                </p:tabView>
+
+                <ui:include src="/portal/preview/view.xhtml" />
 
                 <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
                     <h:form id="signatureForm">
@@ -277,7 +499,7 @@
                         </h:panelGrid>
                         <p:commandButton value="确认"
                                          actionListener="#{adjustmentTransferApplicationDetailController.saveSignatureAndSubmitApprove()}"
-                                         update="transferDetailForm"
+                                         update=":detailTabView:transferDetailForm"
                                          oncomplete="handleApproveSuccess(xhr, status, args);"/>
                         <p:commandButton immediate="true" process="@this" value="重写"
                                          actionListener="#{adjustmentTransferApplicationDetailController.resetSignature()}"
@@ -295,21 +517,45 @@
                 </p:dialog>
 
 
-                <p:dialog id="returnDlg" widgetVar="returnDlg" header="设备退回确认" modal="true">
-                    <h:form id="returnForm">
-                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:dialog id="returnDlg" widgetVar="returnDlg" header="设备退回确认" modal="true" width="600">
+                    <h:form id="returnForm" enctype="multipart/form-data">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">退回类型<span style="color:red">*</span></label>
+                                <p:selectOneMenu id="returnTypeSelect"
+                                                 value="#{adjustmentTransferApplicationDetailController.selected.returnType}"
+                                                 required="true" requiredMessage="退回类型必填"
+                                                 style="width:95%">
+                                    <f:selectItem itemLabel="请选择" itemValue="" noSelectionOption="true"/>
+                                    <f:selectItem itemLabel="报废退回" itemValue="scrapReturn"/>
+                                    <f:selectItem itemLabel="协议退回" itemValue="agreementReturn"/>
+                                    <f:selectItem itemLabel="无使用需求退回" itemValue="noUsageReturn"/>
+                                    <p:ajax/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">退回原因<span style="color:red">*</span></label>
+                                <p:inputTextarea required="true" requiredMessage="退回原因必填"
+                                                 value="#{adjustmentTransferApplicationDetailController.selected.returnReason}"
+                                                 rows="4" cols="30"
+                                                 style="width:95%"
+                                                 autoResize="false">
+                                    <p:ajax/>
+                                </p:inputTextarea>
+                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">申请人</label>
                                 <p:inputText
-                                        value="#{adjustmentTransferApplicationDetailController.getUserNameByUid(adjustmentTransferApplicationDetailController.selected.returnUid)}"
+                                        value="#{adjustmentTransferApplicationDetailController.currentUserAccount.name}"
                                         readonly="true"
-                                >
+                                        style="width:95%">
                                     <p:ajax/>
                                 </p:inputText>
                             </h:panelGroup>
 
-                            <h:panelGroup>
 
+                            <h:panelGroup>
                                 <label class="label">申请时间</label>
                                 <p:calendar disabled="true"
                                             value="#{adjustmentTransferApplicationDetailController.selected.returnDate}"
@@ -317,29 +563,48 @@
                                             showOn="button"
                                             style="width:160px;"
                                             readonlyInput="true"/>
-
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-
-                                <label class="label">申请原因<span style="color:red">*</span></label>
-                                <p:inputText required="true" requiredMessage="退回原因必填"
-
-                                        value="#{adjustmentTransferApplicationDetailController.selected.returnReason}">
-                                    <p:ajax/>
-                                </p:inputText>
                             </h:panelGroup>
                         </p:panelGrid>
+
+                        <p:fieldset legend="增加图片（图片数量最多上传5份！）" style="margin-top:10px;">
+                            <h:panelGroup id="returnImageListPanel" layout="block">
+                                <ui:repeat value="#{adjustmentTransferApplicationDetailController.returnImages}" var="returnImage">
+                                    <div style="display:inline-block; margin:5px; text-align:center;">
+                                        <p:graphicImage value="#{fileDownloadService.getFile(returnImage.objectStorageId)}"
+                                                        width="80" height="80" stream="false"/>
+                                        <br/>
+                                        <p:commandLink value="删除"
+                                                       actionListener="#{adjustmentTransferApplicationDetailController.deleteReturnImage(returnImage)}"
+                                                       update=":returnForm:returnImageListPanel :returnForm:returnImageUploadPanel"
+                                                       style="color:red;"/>
+                                    </div>
+                                </ui:repeat>
+                            </h:panelGroup>
+
+                            <h:panelGroup id="returnImageUploadPanel" layout="block" style="margin-top:5px;">
+                                <p:fileUpload fileUploadListener="#{adjustmentTransferApplicationDetailController.handleReturnImageUpload}"
+                                              mode="advanced"
+                                              dragDropSupport="false"
+                                              process="@this"
+                                              multiple="true"
+                                              sizeLimit="10000000"
+                                              update=":returnForm:returnImageListPanel :returnForm:returnImageUploadPanel"
+                                              auto="true"
+                                              allowTypes="/(\.|\/)(gif|jpe?g|png|bmp|GIF|JPE?G|PNG|BMP)$/"
+                                              label="添加"/>
+                            </h:panelGroup>
+                        </p:fieldset>
+
                         <p:commandButton value="确认退回" validateClient="true"
                                          actionListener="#{adjustmentTransferApplicationDetailController.equipmentReturn()}"
-                                         update="transferDetailForm"
-                                         oncomplete="handleApproveSuccess(xhr, status, args);"/>
+                                         update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
+                                         oncomplete="handleReturnSuccess(xhr, status, args);"/>
 
                         <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}"
                                          onclick="PF('returnDlg').hide()"/>
                     </h:form>
                     <script>
-                        function handleApproveSuccess(xhr, status, args) {
+                        function handleReturnSuccess(xhr, status, args) {
                             if (xhr.status !== 206) {
                                 PF('returnDlg').hide();
                             }
@@ -353,8 +618,11 @@
 
 
         <script>
-
-
+            function openAgreementEditWindow(xhr, status, args) {
+                if (args &amp;&amp; args.url) {
+                    window.open(args.url, '_blank');
+                }
+            }
         </script>
     </ui:define>
 </ui:composition>

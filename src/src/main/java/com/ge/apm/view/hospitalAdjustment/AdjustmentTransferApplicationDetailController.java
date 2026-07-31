@@ -7,11 +7,13 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.hospitalAdjustment.AdjustmentTransferService;
 import com.ge.apm.service.remote.MasterDataService;
+import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.view.secondment.DepartmentSecondmentProcess;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -85,7 +87,16 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     private StreamedContent exportFile;
 
     private ConfigItemService configItemService;
+    private SystemTemplateService systemTemplateService;
     private final String hospitalAdjustmentReturnTimeKey="hospitalAdjustmentReturnTime";
+
+    @Getter
+    @Setter
+    private String returnTypeName;
+
+    @Getter
+    @Setter
+    private List<V2_BlobObject> returnImages;
     @Override
     protected GenericRepositoryUUID<AdjustmentTransferApplication> getDAO() {
         return dao;
@@ -105,6 +116,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         userDao = WebUtil.getBean(UserAccountRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         configItemService = WebUtil.getBean(ConfigItemService.class);
+        systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
 
         currentUserAccount = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -130,6 +142,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         process=new ArrayList<>();
         Set<String> condition = new HashSet<>();
 
+        // 收集所有候选池UID
         condition.addAll(Arrays.asList(selected.getApplicationPendingApprovalUid().split(",")));
         if(selected.getPendingDeliveryUid()!=null){
             condition.addAll(Arrays.asList(selected.getPendingDeliveryUid().split(",")));
@@ -138,45 +151,68 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
             condition.addAll(Arrays.asList(selected.getReturnPendingUid().split(",")));
         }
         condition.add(selected.getReturnUid());
-        condition.add(selected.getUpdatedBy());
-        condition.add(selected.getReturnApprovalUid());
         Set<String> collect1 = condition.stream().filter(i -> i != null).collect(Collectors.toSet());
         List<UserAccount> userAccounts = userDao.findByUidIn(collect1);
         Map<String, UserAccount> collect = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUid, item -> item));
         UserAccount system = new UserAccount();
         system.setName("System");
         collect.put("System",system);
-        addNode("待审批",selected.getApplicationPendingApprovalUid(),selected.getApplicationPendingApprovalDate(),collect);
-        if(selected.getStatus()==2){
-            addNode("审批未通过",(selected.getUpdatedBy()),selected.getUpdateTime(),collect);
+
+        Integer status = selected.getStatus();
+
+        // 判断是否有退回步骤
+        boolean hasReturnStep = status >= 7 || (status == 6 && selected.getReturnUid() != null);
+
+        // 步骤1: 待借用审批
+        Date step1End = null;
+        if(status >= 4){
+            step1End = selected.getPendingDeliveryDate();
+        } else if(status == 2 || status == 3){
+            step1End = selected.getUpdateTime();
+        }
+        addNode("待借用审批", selected.getApplicationPendingApprovalUid(), selected.getApplicationPendingApprovalDate(), step1End, collect);
+
+        if(status == 2 || status == 3){
             return;
         }
 
-        if(selected.getPendingDeliveryUid()!=null){
-            addNode("待交付",(selected.getPendingDeliveryUid()),selected.getPendingDeliveryDate(),collect);
-        }
-        if(selected.getStatus()==5){
-            addNode("待调剂关单","System",selected.getDeliveryDate(),collect);
-        }
-        if(selected.getReturnPendingUid()!=null){
-            addNode("待退回审批及关单",(selected.getReturnPendingUid()),selected.getReturnDate(),collect);
+        // 步骤2: 待交付 (status >= 4)
+        if(status >= 4){
+            Date step2End = null;
+            if(hasReturnStep){
+                step2End = selected.getReturnDate();
+            } else if(status >= 6){
+                step2End = selected.getDeliveryDate();
+            }
+            addNode("待交付", selected.getPendingDeliveryUid(), selected.getPendingDeliveryDate(), step2End, collect);
         }
 
-        if(selected.getStatus()==6){
-            addNode("已完成","System",selected.getUpdateTime(),collect);
-            return;
+        // 步骤3: 待退回审批
+        if(hasReturnStep){
+            Date step3End = null;
+            if(status == 10 || status == 8){
+                step3End = selected.getReturnApprovalDate();
+            } else if(status == 6 && selected.getReturnApprovalResult() != null && selected.getReturnApprovalResult() == 2){
+                step3End = selected.getReturnApprovalDate();
+            }
+            addNode("待退回审批", selected.getReturnPendingUid(), selected.getReturnDate(), step3End, collect);
         }
-        if(selected.getStatus()==3){
-            addNode("已取消",(selected.getUpdatedBy()),selected.getUpdateTime(),collect);
+
+        // 步骤4: 待退回 (status == 10 或 8)
+        if(status == 10 || status == 8){
+            Date step4End = (status == 8) ? selected.getUpdateTime() : null;
+            addNode("待退回", selected.getReturnUid(), selected.getReturnApprovalDate(), step4End, collect);
         }
     }
 
-    private void addNode(String nodeName,String  operator, Date operatorTime, Map<String, UserAccount> userAccountMap){
+    private void addNode(String nodeName, String operatorUids, Date startTime, Date endTime, Map<String, UserAccount> userAccountMap){
         StringBuilder name = new StringBuilder();
-        if (operator != null) {
-            for (String s : operator.split(",")) {
+        if (operatorUids != null) {
+            for (String s : operatorUids.split(",")) {
                 UserAccount userAccount = userAccountMap.get(s);
-                name.append(userAccount.getName()).append(",");
+                if(userAccount != null){
+                    name.append(userAccount.getName()).append(",");
+                }
             }
             if (name.length() > 0) {
                 name.setLength(name.length() - 1);
@@ -185,7 +221,8 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         AdjustmentTransferNodeProcess processNode=new AdjustmentTransferNodeProcess();
         processNode.setNodeName(nodeName);
         processNode.setOperator(name.toString());
-        processNode.setOperatorTime(operatorTime);
+        processNode.setOperatorTime(startTime);
+        processNode.setEndTime(endTime);
         process.add(processNode);
     }
 
@@ -211,17 +248,14 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
                 return "已取消";
             case 4:
                 return "待交付";
-            case 5:
-                return "已交付";
             case 6:
                 return "已完成";
             case 7:
-                return "退回待审批";
+                return "待退回审批";
+            case 10:
+                return "退回中";
             case 8:
                 return "已退回";
-
-            case 9:
-                return "退回审批不通过";
             default:
                 return "";
         }
@@ -236,17 +270,29 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         return user == null ? orgUid : user.getName();
     }
 
+    /**
+     * 获取当前时间，用于到货确认页面默认显示
+     */
+    public Date getCurrentTime() {
+        return new Date();
+    }
+
 
 
 
 
     public List<V2_BlobObject> getAttachements() {
         if (com.baomidou.mybatisplus.toolkit.CollectionUtils.isEmpty(attachements)) return Lists.newArrayList();
-        for (V2_BlobObject att : attachements) {
+        Set<String> validTypes = FieldValueMessageController.getFieldValueList("HospitalAdjustmentBorrowAttachmentType")
+                .stream().map(I18nMessage::getMsgKey).collect(Collectors.toSet());
+        List<V2_BlobObject> filtered = attachements.stream()
+                .filter(att -> validTypes.contains(att.getBoSubType()))
+                .collect(Collectors.toList());
+        for (V2_BlobObject att : filtered) {
             att.setBoSubTypeValue(WebUtil.getFieldValueMessage("HospitalAdjustmentBorrowAttachmentType", att.getBoSubType()));
         }
 
-        return attachements;
+        return filtered;
     }
     private MasterDataService masterDataService;
 
@@ -361,6 +407,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         selected.setHandlerSignature(signatureId);
         dao.save(selected);
         adjustmentTransferService.approvalMsg(selected);
+        processNode();
         WebUtil.addSuccessMessage("审批完成");
 
     }
@@ -379,6 +426,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         selected.setHandlerSignature(signatureId);
 
         adjustmentTransferService.refuse(selected,currentUserAccount);
+        processNode();
         WebUtil.addSuccessMessage("审批结束");
     }
     public void cancel(){
@@ -390,6 +438,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
 
         try {
             adjustmentTransferService.cancel(selected,currentUserAccount);
+            processNode();
             WebUtil.addSuccessMessage("取消成功");
 
         }catch (Exception e){
@@ -408,8 +457,19 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
             return;
         }
 
+        // 校验调剂缔结协议文件是否已上传
+        List<V2_BlobObject> agreementFiles = getAgreementFiles();
+        if (agreementFiles == null || agreementFiles.isEmpty()) {
+            WebUtil.addWarnMessage("请先上传调剂缔结协议文件");
+            return;
+        }
+
         try {
+            // 保存到到货确认字段（使用已有的deliveryUid/deliveryDate）
+            selected.setDeliveryUid(currentUserAccount.getUid());
+            selected.setDeliveryDate(new Date());
             adjustmentTransferService.confirmReceipt(selected,currentUserAccount);
+            processNode();
             WebUtil.addSuccessMessage("交付成功");
         }catch (Exception e){
             logger.error("交付异常 error: ",e);
@@ -417,15 +477,80 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         }
     }
 
+    // ================= 到货确认 - 协议文件相关 =================
+
+    @Getter
+    private StreamedContent agreementTemplateFile;
+
+    /**
+     * 获取调剂缔结协议文件列表（多文件）
+     */
+    public List<V2_BlobObject> getAgreementFiles() {
+        if (selected == null || selected.getUid() == null) return Lists.newArrayList();
+        return blobService.fetchBlobObject(selected.getUid(),
+                V2_BlobObject.BO_TYPE_HospitalAdjustmentContract,
+                V2_BlobObject.BO_SUB_TYPE_ADJUSTMENT_AGREEMENT);
+    }
+
+    public void downloadAgreementTemplate() {
+        try {
+            java.io.InputStream inputStream = systemTemplateService.getTemplateInputStream(SystemTemplateEnum.HOSPITAL_ADJUSTMENT_AGREEMENT, currentUserAccount);
+            if (inputStream != null) {
+                agreementTemplateFile = new DefaultStreamedContent(inputStream, "application/octet-stream", "调剂缔结协议模板.docx");
+            } else {
+                WebUtil.addWarnMessage("未找到模板文件");
+            }
+        } catch (Exception e) {
+            logger.error("下载协议模板文件失败 error: ", e);
+            WebUtil.addErrorMessage("下载协议模板文件失败");
+        }
+    }
+
+    public void handleAgreementFileUpload(FileUploadEvent event) {
+        try {
+            V2_BlobObject uploadedFileObject = blobService.uploadFile(event.getFile());
+            if (uploadedFileObject != null) {
+                uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_HospitalAdjustmentContract);
+                uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_ADJUSTMENT_AGREEMENT);
+                uploadedFileObject.setBoUuid(selected.getUid());
+                blobService.saveBlobObject(uploadedFileObject);
+                WebUtil.addSuccessMessage("协议文件上传成功");
+            } else {
+                WebUtil.addErrorMessage("协议文件上传失败");
+            }
+        } catch (Exception e) {
+            logger.error("协议文件上传失败 error: ", e);
+            WebUtil.addErrorMessage("协议文件上传失败");
+        }
+    }
+
+    public void deleteAgreementFile(V2_BlobObject blobObject) {
+        try {
+            if (blobObject != null) {
+                blobService.deleteBlobFile(blobObject);
+                WebUtil.addSuccessMessage("协议文件删除成功");
+            }
+        } catch (Exception e) {
+            logger.error("协议文件删除失败 error: ", e);
+            WebUtil.addErrorMessage("协议文件删除失败");
+        }
+    }
+
     public void   equipmentReturn() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-        if(byUid.getStatus()!=5  || !selected.getApplicationUid().equals(currentUserAccount.getUid())){
+        if(byUid.getStatus()!=6  || !selected.getApplicationUid().equals(currentUserAccount.getUid())){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
 
-        if(!returnValid()){
-            WebUtil.addWarnMessage("已超过退回时间");
+
+        if(StringUtils.isEmpty(selected.getReturnType())){
+            WebUtil.addWarnMessage("请选择退回类型");
+            return;
+        }
+
+        if(StringUtils.isEmpty(selected.getReturnReason())){
+            WebUtil.addWarnMessage("请填写退回原因");
             return;
         }
 
@@ -434,31 +559,91 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         selected.setUpdatedBy(currentUserAccount.getUid());
         selected.setReturnDate(new Date());
         selected.setReturnUid(currentUserAccount.getUid());
-        List<UserAccount> approvalUser = adjustmentTransferService.getApprovalUser(currentUserAccount.getTenantUID(), Arrays.asList(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE));
-        List<String> uids = approvalUser.stream().map(UserAccount::getUid).collect(Collectors.toList());
-        String join = String.join(",", uids);
+        List<String> returnApprovalUserIds = adjustmentTransferService.getAdjustmentTransferApproval(selected, false, true);
+        String join = String.join(",", returnApprovalUserIds);
         selected.setReturnPendingUid(join);
         dao.save(selected);
+
+        adjustmentTransferService.returnNotifyMsg(selected);
+        processNode();
+        WebUtil.addSuccessMessage("退回申请已提交");
     }
 
 
     public void   beforeReturn() {
         selected.setReturnDate(new Date());
         selected.setReturnUid(currentUserAccount.getUid());
+        selected.setReturnType(null);
+        selected.setReturnReason(null);
+        returnTypeName = null;
+        returnImages = getReturnImages();
+    }
 
+    public List<V2_BlobObject> getReturnImages() {
+        if (selected == null || selected.getUid() == null) return Lists.newArrayList();
+        return blobService.fetchBlobObject(selected.getUid(),
+                V2_BlobObject.BO_TYPE_HospitalAdjustmentContract,
+                V2_BlobObject.BO_SUB_TYPE_ADJUSTMENT_RETURN_IMAGE);
+    }
+
+    public void handleReturnImageUpload(FileUploadEvent event) {
+        try {
+            List<V2_BlobObject> existingImages = getReturnImages();
+            if (existingImages != null && existingImages.size() >= 5) {
+                WebUtil.addWarnMessage("图片数量最多上传5份");
+                return;
+            }
+            V2_BlobObject uploadedFileObject = blobService.uploadFile(event.getFile());
+            if (uploadedFileObject != null) {
+                uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_HospitalAdjustmentContract);
+                uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_ADJUSTMENT_RETURN_IMAGE);
+                uploadedFileObject.setBoUuid(selected.getUid());
+                blobService.saveBlobObject(uploadedFileObject);
+                returnImages = getReturnImages();
+                WebUtil.addSuccessMessage("图片上传成功");
+            } else {
+                WebUtil.addErrorMessage("图片上传失败");
+            }
+        } catch (Exception e) {
+            logger.error("退回图片上传失败 error: ", e);
+            WebUtil.addErrorMessage("图片上传失败");
+        }
+    }
+
+    public void deleteReturnImage(V2_BlobObject blobObject) {
+        try {
+            if (blobObject != null) {
+                blobService.deleteBlobFile(blobObject);
+                returnImages = getReturnImages();
+                WebUtil.addSuccessMessage("图片删除成功");
+            }
+        } catch (Exception e) {
+            logger.error("退回图片删除失败 error: ", e);
+            WebUtil.addErrorMessage("图片删除失败");
+        }
+    }
+
+    public String getReturnTypeLabel(String returnType) {
+        if (returnType == null) return "";
+        switch (returnType) {
+            case "scrapReturn": return "报废退回";
+            case "agreementReturn": return "协议退回";
+            case "noUsageReturn": return "无使用需求退回";
+            default: return "";
+        }
     }
 
     public void   returnPass() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
 
-        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE.name())  ){
+        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())  ){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
 
         try {
             adjustmentTransferService.returnPass(selected,currentUserAccount);
-
+            processNode();
         }catch (Exception e){
             logger.error("调剂退回审核异常 error: ",e);
             WebUtil.addErrorMessage("调剂退回审核异常 ");
@@ -469,13 +654,13 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     public void   returnRefuse() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
 
-        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE.name())  ){
+        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())  ){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
         try {
             adjustmentTransferService.returnRefuse(selected,currentUserAccount);
-
+            processNode();
         }catch (Exception e){
             logger.error("调剂退回审核拒绝异常 error: ",e);
             WebUtil.addErrorMessage("调剂退回审核拒绝异常 ");
@@ -483,15 +668,78 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         }
     }
 
+    /**
+     * 退回确认：借入方上传调剂中止协议后完成退回，状态10→8
+     */
+    public void returnConfirm() {
+        AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
+        if(byUid.getStatus()!=10 || !selected.getApplicationUid().equals(currentUserAccount.getUid())){
+            WebUtil.addWarnMessage("无权操作,请检查订单状态");
+            return;
+        }
+
+        // 校验调剂中止协议文件是否已上传
+        List<V2_BlobObject> terminationFiles = getTerminationAgreementFiles();
+        if (terminationFiles == null || terminationFiles.isEmpty()) {
+            WebUtil.addWarnMessage("请先上传调剂中止协议文件");
+            return;
+        }
+
+        try {
+            adjustmentTransferService.returnConfirm(selected, currentUserAccount);
+            processNode();
+            WebUtil.addSuccessMessage("退回确认成功");
+        } catch (Exception e) {
+            logger.error("退回确认异常 error: ", e);
+            WebUtil.addErrorMessage("退回确认失败");
+        }
+    }
+
+    // ================= 退回确认 - 调剂中止协议文件相关 =================
+
+    /**
+     * 获取调剂中止协议文件列表
+     */
+    public List<V2_BlobObject> getTerminationAgreementFiles() {
+        if (selected == null || selected.getUid() == null) return Lists.newArrayList();
+        return blobService.fetchBlobObject(selected.getUid(),
+                V2_BlobObject.BO_TYPE_HospitalAdjustmentContract,
+                V2_BlobObject.BO_SUB_TYPE_ADJUSTMENT_TERMINATION_AGREEMENT);
+    }
+
+    public void handleTerminationAgreementFileUpload(FileUploadEvent event) {
+        try {
+            V2_BlobObject uploadedFileObject = blobService.uploadFile(event.getFile());
+            if (uploadedFileObject != null) {
+                uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_HospitalAdjustmentContract);
+                uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_ADJUSTMENT_TERMINATION_AGREEMENT);
+                uploadedFileObject.setBoUuid(selected.getUid());
+                blobService.saveBlobObject(uploadedFileObject);
+                WebUtil.addSuccessMessage("调剂中止协议文件上传成功");
+            } else {
+                WebUtil.addErrorMessage("文件上传失败");
+            }
+        } catch (Exception e) {
+            logger.error("调剂中止协议文件上传失败 error: ", e);
+            WebUtil.addErrorMessage("文件上传失败");
+        }
+    }
+
+    public void deleteTerminationAgreementFile(V2_BlobObject blobObject) {
+        try {
+            if (blobObject != null) {
+                blobService.deleteBlobFile(blobObject);
+                WebUtil.addSuccessMessage("文件删除成功");
+            }
+        } catch (Exception e) {
+            logger.error("调剂中止协议文件删除失败 error: ", e);
+            WebUtil.addErrorMessage("文件删除失败");
+        }
+    }
+
     public boolean returnValid() {
-        if(selected.getStatus()!=5){
-            return false;
-        }
-        Date pendingDeliveryDate = selected.getDeliveryDate();
-        if(pendingDeliveryDate==null){
-            return false;
-        }
-        return !isBeyondConfiguredReturnTime(pendingDeliveryDate);
+        // 已完成状态的工单均可发起退回
+        return selected.getStatus() == 6;
     }
 
 
@@ -533,5 +781,33 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    /**
+     * 打开编辑调剂协议页面
+     */
+    public void openEditAgreement() {
+        String operation = "AgreementEdit.xhtml?workOrderUid=" + selected.getUid()
+                + "&agreementType=ADJUSTMENT"
+                + "&lendingHospitalUid=" + (selected.getStockHospitalUid() != null ? selected.getStockHospitalUid() : "")
+                + "&borrowingHospitalUid=" + (selected.getBorrowHospitalUid() != null ? selected.getBorrowHospitalUid() : "");
+        String encryptedPart = UrlEncryptController.encodeUrlParam(operation);
+        // 额外拼接明文 agreementType 参数作为后备
+        String url = encryptedPart + "&agreementType=ADJUSTMENT";
+        org.primefaces.context.RequestContext.getCurrentInstance().addCallbackParam("url", url);
+    }
+
+    /**
+     * 打开编辑终止协议页面
+     */
+    public void openEditTerminationAgreement() {
+        String operation = "TerminationAgreementEdit.xhtml?workOrderUid=" + selected.getUid()
+                + "&agreementType=TERMINATION"
+                + "&lendingHospitalUid=" + (selected.getStockHospitalUid() != null ? selected.getStockHospitalUid() : "")
+                + "&borrowingHospitalUid=" + (selected.getBorrowHospitalUid() != null ? selected.getBorrowHospitalUid() : "");
+        String encryptedPart = UrlEncryptController.encodeUrlParam(operation);
+        // 额外拼接明文 agreementType 参数作为后备
+        String url = encryptedPart + "&agreementType=TERMINATION";
+        org.primefaces.context.RequestContext.getCurrentInstance().addCallbackParam("url", url);
     }
 }
