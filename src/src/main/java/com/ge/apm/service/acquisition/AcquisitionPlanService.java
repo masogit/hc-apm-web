@@ -71,6 +71,9 @@ public class AcquisitionPlanService {
                 if(StrUtil.isEmpty(acquisitionPlan.getUpdatedAssetName())){
                     sb.append("被更新设备 不能为空！\n");
                 }
+                if(acquisitionPlan.getCurrentEquipmentServiceYears() == null){
+                    sb.append("拟更新设备已使用年数（年） 不能为空！\n");
+                }
             }
             if("necessities".equals(acquisitionPlan.getApplicationType()) || "general".equals(acquisitionPlan.getApplicationType())){
                 if(acquisitionPlan.getNewStaffAllocation() == null){
@@ -95,9 +98,7 @@ public class AcquisitionPlanService {
         if(acquisitionPlan.getSimilarEquipmentCount() == null){
             sb.append("同类设备数量（台/套） 不能为空！\n");
         }
-        if(acquisitionPlan.getCurrentEquipmentServiceYears() == null){
-            sb.append("拟更新设备已使用年数（年） 不能为空！\n");
-        }
+
         if(StrUtil.isEmpty(acquisitionPlan.getFundingSource())){
             sb.append("资金来源 不能为空！\n");
         }

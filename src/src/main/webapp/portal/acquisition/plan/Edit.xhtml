@@ -103,7 +103,7 @@
                             <h:panelGroup rendered="#{acquisitionPlanEditController.selected.applicationType eq 'updates'}">
                                 <p:outputLabel class="label">被更新设备<span style="color: red">*</span></p:outputLabel>
                                 <p:inputText value="#{acquisitionPlanEditController.selected.updatedAssetName}" required="false" requiredMessage="被更新设备 不能为空！" disabled="#{!acquisitionPlanEditController.canEdit}"><p:ajax /></p:inputText>
-                                <p:commandButton class="popupIconButton" actionListener="#{acquisitionSelectAssetController.prepareDialogCallback(acquisitionPlanEditController, ':planFilingPeriodEditForm', acquisitionPlanEditController.selectedAssets)}" process="@this" icon="ui-icon-arrow-drop-down" update=":selectAssetDlg " oncomplete="PF('varSelectAssetDlg').show();"/>
+                                <p:commandButton class="popupIconButton" actionListener="#{acquisitionSelectAssetController.prepareDialogCallback(acquisitionPlanEditController, ':planFilingPeriodEditForm', acquisitionPlanEditController.selectedAssets, acquisitionPlanEditController.selected.applicationStatus,  acquisitionPlanEditController.selected.updatedAssetUid)}" process="@this" icon="ui-icon-arrow-drop-down" update=":selectAssetDlg " oncomplete="PF('varSelectAssetDlg').show();"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label">计划采购数量（台/套）<span style="color: red">*</span></p:outputLabel>

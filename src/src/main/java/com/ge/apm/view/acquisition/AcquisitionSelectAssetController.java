@@ -5,10 +5,12 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbContractAsset;
+import com.ge.apm.domain.acquisition.AcquisitionPlan;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -41,6 +43,10 @@ public class AcquisitionSelectAssetController  extends JpaCRUDController<AssetIn
     private boolean showDialog = false;
     @Getter @Setter
     private Map<String, Boolean> selectedMap = new HashMap<>();
+    @Setter @Getter
+    private String applicationStatus;
+    @Getter @Setter
+    List<AssetInfo> assetInfos;
 
     Page<AssetInfo> assetInfoPage;
     @Override
@@ -53,32 +59,50 @@ public class AcquisitionSelectAssetController  extends JpaCRUDController<AssetIn
     }
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-        this.selected = null;
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<SearchFilter>();
-        }
-        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
-        if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(user.getAssetTypeGroupList())) {
-            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
-        }
-        if (!this.hasFilterOnField("siteUID")) {
+        if(StringUtils.isEmpty(applicationStatus) || AcquisitionPlan.ApplicationStatusEnum.TempSave.name().equals(applicationStatus)){
+            this.selected = null;
+            if (searchFilters == null) {
+                searchFilters = new ArrayList<SearchFilter>();
+            }
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID(), "1*"));
+            if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(user.getAssetTypeGroupList())) {
+                return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+            }
+            if (!this.hasFilterOnField("siteUID")) {
 
-            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-            List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+                searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+                List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            }
+            if (user.isEnableAssetTypeGroup()) {
+                searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+            }
+            assetInfoPage = dao.findBySearchFilter(searchFilters, pageRequest);
+            return assetInfoPage;
+        }else {
+            return new PageImpl<>(getAssetInfos(pageRequest), pageRequest, assetInfos.size());
         }
-        if (user.isEnableAssetTypeGroup()) {
-            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
-        }
-        assetInfoPage = dao.findBySearchFilter(searchFilters, pageRequest);
-        return assetInfoPage;
     }
+
+    public List<AssetInfo> getAssetInfos(PageRequest pageRequest) {
+        if (assetInfos == null || assetInfos.isEmpty()) {
+            return new ArrayList<>();
+        }
+        int start = (int) pageRequest.getOffset();
+        if (start < 0 || start >= assetInfos.size()) {
+            return new ArrayList<>();
+        }
+        int end = Math.min(start + pageRequest.getPageSize(), assetInfos.size());
+        return new ArrayList<>(assetInfos.subList(start, end));
+    }
+
+
 
     @Override
     public void setSearchFilter() {
@@ -147,17 +171,38 @@ public class AcquisitionSelectAssetController  extends JpaCRUDController<AssetIn
         }
     }
 
-    public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs,List<AssetInfo> selectedAssets) {
+    public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs,List<AssetInfo> selectedAssets, String status, String assetUids) {
         showDialog = true;
 
         this.selected = null;
         this.selectedAssetList = new ArrayList<>();
         this.selectedMap = new HashMap<>();
-
+        applicationStatus = status;
+        assetInfos = new ArrayList<>();
         this.callingController = callingController;
         this.updateViewIDs = updateViewIDs;
-        for (AssetInfo item : selectedAssets) {
-            selectedMap.put(item.getUid(), true);
+
+        List<String> uids = Arrays.stream(assetUids.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+
+        if(StrUtil.isNotEmpty(status) && !status.equals(AcquisitionPlan.ApplicationStatusEnum.TempSave.name())){
+            for (String uid : uids){
+                AssetInfo assetInfo = dao.findByUid(uid);
+                assetInfos.add(assetInfo);
+            }
+        }else {
+            if(selectedAssets == null){
+                selectedAssets = new ArrayList<>();
+            }
+            for (String uid : uids){
+                AssetInfo assetInfo = dao.findByUid(uid);
+                selectedAssets.add(assetInfo);
+                selectedMap.put(uid, true);
+            }
+
         }
     }
 

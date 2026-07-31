@@ -1,9 +1,12 @@
 package com.ge.apm.view.acquisition;
 
 import com.ge.apm.dao.AcquisitionPlanRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -13,7 +16,10 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -27,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -36,19 +43,40 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
     private int tabIndex= 0;
     @Getter @Setter
     private Integer queryIndex = 0;
-
+    private UaaService uaaService;
+    private OrgInfoRepository orgInfoRepository;
     private AcquisitionPlanRepository dao;
     private UserAccount loginUser;
+
+    @Getter @Setter
+    private String filterApplicationDate = null;
+    @Getter @Setter
+    private OrgInfo selectedDept;
+    @Getter @Setter
+    private String treeNodeNameFilter;
+    @Getter @Setter
+    private TreeNode orgTreeEdit;
+    @Getter @Setter
+    private OrgInfo org;
+    @Getter @Setter
+    private List<OrgInfo> hospitalList;
+    @Getter @Setter
+    private String selectedHospital;
+
     @Override
     protected void init() {
         super.init();
         dao = WebUtil.getBean(AcquisitionPlanRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+
         loginUser = UserContextService.getCurrentUserAccount();
         String query = WebUtil.getRequestParameter("query");
         if(StrUtil.isNotEmpty(query)){
             queryIndex = Integer.parseInt(query);
         }
-
+        loadHospitalList();
+        getDeptOrgTree();
     }
 
     @Override
@@ -81,14 +109,23 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
                 statusList.add(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
             }
             if (!statusList.isEmpty()) {
-                this.updateSearchFilter(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, statusList, "1*"));
+                searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, statusList, "1*"));
             }
         }else if(queryIndex == 1){
             this.updateSearchFilter(new SearchFilter("drugCenterUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
             this.updateSearchFilter(new SearchFilter("workGroupUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
             this.updateSearchFilter(new SearchFilter("bureauPartyUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
         }
+
+        setSearchFilter();
         return dao.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    public void setSearchFilter() {
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "applicationDeptUid".equals(item.fieldName)).collect(Collectors.toList()));
+        if(selectedDept != null){
+            updateSearchFilter(new SearchFilter("applicationDeptUid", SearchFilter.Operator.EQ, selectedDept.getUid(), "1*"));
+        }
     }
 
     //tab切换
@@ -123,6 +160,71 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
     public void onSelectOrder(String selectedId) throws IOException {
 
     }
+
+    public void loadHospitalList(){
+        hospitalList = orgInfoRepository.getByHospitalByTenant(loginUser.getTenantUID());
+
+    }
+
+    public void hospitalListChange(){
+        treeSearchCondition();
+    }
+
+
+    public void treeSearchCondition(){
+        TreeNode treeNodeEdit = null;
+        String parentUid = loginUser.getTenantUID();
+        if(selectedHospital != null){
+            parentUid = selectedHospital;
+        }
+        if(StrUtil.isEmpty(treeNodeNameFilter)){
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptSelected(parentUid,  4);
+        }else{
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptSelected(parentUid, 4, treeNodeNameFilter);
+        }
+        orgTreeEdit = initOrgTree(treeNodeEdit);
+    }
+
+    public void clearDeptOrg(){
+        selectedDept = null;
+        treeNodeNameFilter = "";
+    }
+
+
+    public void getDeptOrgTree() {
+        String parentUid = loginUser.getTenantUID();
+        if(selectedHospital != null){
+            parentUid = selectedHospital;
+        }
+        TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptSelected(parentUid,  4);
+        orgTreeEdit =  initOrgTree(treeNodeEdit);
+    }
+
+    public TreeNode initOrgTree(TreeNode treeNode) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        } else {
+            // 用户在科室级别时, 可选择所在科室
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(org.getOrgType() == 4);
+            node.setRowKey("org_" + org.getId());
+            rootNode.getChildren().add(node);
+        }
+        rootNode.setExpanded(true);
+        return orgTree;
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        selectedDept = (OrgInfo) node.getData();
+    }
+
 
 
     @Override

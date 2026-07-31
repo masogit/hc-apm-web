@@ -375,4 +375,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query("select t from OrgInfo t where   t.institutionUID=?1  and t.orgType=4 ")
     public List<OrgInfo> getInstitutionUIDAndOrgType(String institutionUID);
 
+    @Query("select t from OrgInfo t where   t.tenantUID=?1  and t.orgType=2 ")
+    public List<OrgInfo> getByHospitalByTenant(String tenantUID);
+
 }

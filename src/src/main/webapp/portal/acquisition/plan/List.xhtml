@@ -32,7 +32,31 @@
             </div>
 
             <div class="ui-g-12 card">
+
                 <h:form id="formList">
+                    <h:panelGroup>
+                        <p:overlayPanel appendTo="formList" widgetVar="varPanelOrg1" for=":formList:datalist:btnOrg1" hideEffect="fade" dynamic="false" modal="false" >
+                            <p:inputText id="treeNodeNameFilter" value="#{acquisitionPlanListController.treeNodeNameFilter}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":formList:treeNodeNameFilter @this" update=":formList:orgTree" actionListener="#{acquisitionPlanListController.treeSearchCondition()}" value="#{msg.Search}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":@this" update=":formList" value="清空" actionListener="#{acquisitionPlanListController.clearDeptOrg}"/>
+
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{acquisitionPlanListController.orgTreeEdit}"
+                                        selectionMode="single" var="node"
+                                        dynamic="false" cache="false" propagateSelectionUp="#{orgTreeController.propagateSelectionUp}">
+                                    <p:ajax process="@this" event="select"
+                                            update=":formList "
+                                            listener="#{acquisitionPlanListController.onSelectTreeNode}"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
                     <p:dataTable id="datalist" value="#{acquisitionPlanListController.lazyModel}" var="item"
                                  widgetVar="varDataList"
                                  selectionMode="single" selection="#{acquisitionPlanListController.selected}"
@@ -45,53 +69,70 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
-                        <p:ajax event="filter" listener="#{acquisitionPlanListController.onFilter}"
-                                update="createButton editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{acquisitionPlanListController.onFilter}" update="createButton editButton deleteButton"/>
 
-                        <p:column headerText="申请年份">
-                            <h:outputText value="#{item.applicationYear}"/>
+                        <p:column headerText="申请年份" filterBy="#{item.applicationYear}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.applicationYear}"  />
                         </p:column>
-                        <p:column headerText="申请编号">
-                            <h:outputText value="#{item.applicationNo}"/>
+                        <p:column headerText="申请编号" filterBy="#{item.applicationNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.applicationNo}" />
                         </p:column>
                         <p:column headerText="申报单位">
-                            <h:outputText value="#{item.applicationHospitalName}"/>
+                            <h:outputText value="#{item.applicationHospitalName}" filterBy="#{item.applicationHospitalName}" filterMatchMode="LIKE"/>
                         </p:column>
-                        <p:column headerText="申报科室">
+                        <p:column headerText="申报科室" filterBy="#{item.applicationDeptUid}" filterMatchMode="EQ">
+                            <f:facet name="filter" >
+                                <p:autoComplete id="btnOrg1" value="请选择科室" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            </f:facet>
                             <h:outputText value="#{item.applicationDeptName}"/>
                         </p:column>
-                        <p:column headerText="设备名称">
-                            <h:outputText value="#{item.assetName}"/>
+                        <p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"  />
                         </p:column>
-                        <p:column headerText="申请类别">
+                        <p:column headerText="申请类别" filterBy="#{item.applicationType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('acquisitionApplicationType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('acquisitionApplicationType', item.applicationType)}"/>
                         </p:column>
-                        <p:column headerText="计划采购数量" styleClass="zoom-08">
-                            <h:outputText value="#{item.applicationPlanCount}"/>
+                        <p:column headerText="计划采购数量" filterBy="#{item.applicationPlanCount}" filterMatchMode="GTE">
+                            <h:outputText value="#{item.applicationPlanCount}"  />
                         </p:column>
-                        <p:column headerText="预算单价（万元）" styleClass="zoom-08">
-                            <h:outputText value="#{item.budgetUnitPrice}">
+                        <p:column headerText="预算单价（万元）"  filterBy="#{item.budgetUnitPrice}" filterMatchMode="GTE">
+                            <h:outputText value="#{item.budgetUnitPrice}" >
                                 <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="预算总价（万元）" styleClass="zoom-08">
-                            <h:outputText value="#{item.budgetTotalAmount}">
+                        <p:column headerText="预算总价（万元）"  filterBy="#{item.budgetTotalAmount}" filterMatchMode="GTE">
+                            <h:outputText value="#{item.budgetTotalAmount}" >
                                 <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="预计使用年限（年）" styleClass="zoom-08">
+                        <p:column headerText="预计使用年限（年）" filterBy="#{item.estimatedServiceYears}" filterMatchMode="GTE">
                             <h:outputText value="#{item.estimatedServiceYears}"/>
                         </p:column>
-                        <p:column headerText="工单状态">
+                        <p:column headerText="工单状态"  filterBy="#{item.applicationStatus}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('AcquisitionApplicationStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('AcquisitionApplicationStatus', item.applicationStatus)}"/>
                         </p:column>
-                        <p:column headerText="申请人">
-                            <h:outputText value="#{item.applicationUserName}"/>
+                        <p:column headerText="申请人" filterBy="#{item.applicationUserName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.applicationUserName}" />
                         </p:column>
-                        <p:column headerText="申请时间">
-                            <h:outputText value="#{item.applicationDate}">
+                        <p:column headerText="申请时间" filterBy="#{item.applicationDate}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.applicationDate}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
                             </h:outputText>
+                            <f:facet name="filter">
+                                <p:inputText id="filterApplicationDate" widgetVar="varFilterApplicationDate" value="#{acquisitionPlanListController.filterApplicationDate}"/>
+                            </f:facet>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
@@ -105,7 +146,16 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
-
+                    <p:overlayPanel appendTo="formList" id="idPanelFilterApplicationDate" widgetVar="panelFilterApplicationDate" for=":formList:datalist:filterApplicationDate" dismissable="false" >
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varApplicationDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varApplicationDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterApplicationDate', 'varApplicationDateFrom', 'varApplicationDateTo'); PF('panelFilterApplicationDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterApplicationDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
                 </h:form>
 
                 <!--<ui:include src="Edit.xhtml"/>-->

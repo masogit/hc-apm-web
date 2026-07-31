@@ -240,7 +240,7 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
         TreeNode node = event.getTreeNode();
         selectedSpecifications = (AcquisitionSpecification) node.getData();
         this.selected.setSpecifications(selectedSpecifications.getSecondLevelCategory());
-        this.selected.setApplicationDeptUid(selectedSpecifications.getId());
+        this.selected.setSpecificationsId(selectedSpecifications.getId());
     }
 
     public void treeSearchSpecificationsCondition(){

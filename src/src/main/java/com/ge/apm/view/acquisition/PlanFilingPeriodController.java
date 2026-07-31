@@ -1,8 +1,10 @@
 package com.ge.apm.view.acquisition;
 
+import com.ge.apm.dao.AcquisitionPlanRepository;
 import com.ge.apm.dao.PlanFilingPeriodRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.acquisition.AcquisitionPlan;
 import com.ge.apm.domain.acquisition.PlanFilingPeriod;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -34,6 +36,7 @@ public class PlanFilingPeriodController extends GenericCRUDUUIDController<PlanFi
     private PlanFilingPeriod searchForm = new PlanFilingPeriod();
     private String actionName;
     private PlanFilingPeriodRepository dao;
+    private AcquisitionPlanRepository acquisitionPlanRepository;
     private UserAccountRepository userAccountRepository;
     private UserAccount currentUser;
     @Getter @Setter
@@ -47,6 +50,7 @@ public class PlanFilingPeriodController extends GenericCRUDUUIDController<PlanFi
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         userContextService = WebUtil.getBean(UserContextService.class);
+        acquisitionPlanRepository = WebUtil.getBean(AcquisitionPlanRepository.class);
 
         if(userContextService.accessContainsFunctionMenu("ACQUISITION_PLAN_FILING_PERIOD_EDIT")){
             canEdit = true;
@@ -126,6 +130,15 @@ public class PlanFilingPeriodController extends GenericCRUDUUIDController<PlanFi
         selected = null;
     }
 
+    public void delete() {
+        List<AcquisitionPlan> list = acquisitionPlanRepository.findByApplicationYear(selected.getYear());
+        if(CollectionUtils.isNotEmpty(list)){
+            WebUtil.addSuccessMessage("该申报期存在购置计划申请，不能删除！");
+        }else{
+            dao.delete(selected);
+            WebUtil.addSuccessMessage("删除成功！");
+        }
+    }
 
     public void cancel(){
         selected = null;

@@ -10,7 +10,7 @@
     <p:dialog id="selectAssetDlg"  widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true" header="设备选择" appendTo="@(body)" width="80%"  >
         <h:form id="selectAssetForm" >
 
-            <h:panelGrid id="searchGrid" columns="8">
+            <h:panelGrid id="searchGrid" columns="8" rendered="#{empty acquisitionSelectAssetController.applicationStatus or acquisitionSelectAssetController.applicationStatus == 'TempSave'}">
                 <p:inputText id="search_LIKE_name" placeholder="#{msg.assetName}"/>
                 <p:inputText id="idOneSearchStr"  value="#{acquisitionSelectAssetController.oneSearchStr}"   placeholder="#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}" maxlength="100" style="width: 350px" rendered="#{!userContextService.countyArea}"/>
                 <p:inputText id="idOneSearchStr2"  value="#{acquisitionSelectAssetController.oneSearchStr}"   placeholder="#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/System ID" maxlength="110" style="width: 350px" rendered="#{userContextService.countyArea}"/>
@@ -87,7 +87,7 @@
                 </p:column>
             </p:dataTable>
 
-            <p:commandButton value="#{msg.Confirm}" icon="ui-icon-check" update="growl #{acquisitionSelectAssetController.updateViewIDs}" actionListener="#{acquisitionSelectAssetController.confirmSelection('f')}" oncomplete="handleSubmit(args, 'varSelectAssetDlg');"/>
+            <p:commandButton value="#{msg.Confirm}" icon="ui-icon-check" update="growl #{acquisitionSelectAssetController.updateViewIDs}" actionListener="#{acquisitionSelectAssetController.confirmSelection('f')}" oncomplete="handleSubmit(args, 'varSelectAssetDlg');" rendered="#{empty acquisitionSelectAssetController.applicationStatus or acquisitionSelectAssetController.applicationStatus == 'TempSave'}"/>
             <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varSelectAssetDlg').hide()"/>
         </h:form>
     </p:dialog>

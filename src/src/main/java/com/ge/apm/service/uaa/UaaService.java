@@ -1361,6 +1361,20 @@ public class UaaService {
         return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList, selectableLevel);
     }
 
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptSelected(String parentOrgId, Integer selectableLevel) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
+
+        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, selectableLevel);
+    }
+
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptSelected(String parentOrgId, Integer selectableLevel, String condition) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
+        List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (t.getOrgType() == 4 && t.getName().toLowerCase().contains(condition.toLowerCase())) || t.getOrgType() != 4).collect(Collectors.toList());
+        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList2, selectableLevel);
+    }
+
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid, Integer selectableLevel, String condition) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
@@ -1383,6 +1397,8 @@ public class UaaService {
     public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
         return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList, 4);
     }
+
+
 
     public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList, Integer selectableLevel) {
 
@@ -1426,6 +1442,49 @@ public class UaaService {
 
         return rootNode;
     }
+
+    public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, Integer selectableLevel) {
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+
+        for(OrgInfo org: orgInfoFullList){
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(selectable(org, selectableLevel));
+            node.setRowKey("org_"+org.getId());
+            treeMap.put(org.getUid(), node);
+        }
+
+        TreeNode rootNode = null;
+
+        for(OrgInfo org: orgInfoFullList){
+            TreeNode node = treeMap.get(org.getUid());
+
+            if (node == null) continue;
+
+            OrgInfo current = org;
+            while(current.getParentUID()!=null){
+                TreeNode currentNode = treeMap.get(current.getUid());
+                TreeNode parentNode = treeMap.get(current.getParentUID());
+                if (parentNode == null) break;
+
+                parentNode.getChildren().add(currentNode);
+                current = (OrgInfo)parentNode.getData();
+            }
+
+            if (rootNode == null) {
+                if (current.getParentUID() == null) {
+                    rootNode = treeMap.get(current.getUid());
+                } else if (treeMap.get(current.getParentUID()) == null){
+                    rootNode = treeMap.get(current.getUid());
+                }
+            }else {
+                OrgInfo rootOrg = (OrgInfo)rootNode.getData();
+
+            }
+        }
+
+        return rootNode;
+    }
+
 
     /**
      * level is 4: dept
