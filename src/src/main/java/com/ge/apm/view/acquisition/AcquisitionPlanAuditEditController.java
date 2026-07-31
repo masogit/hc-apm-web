@@ -19,6 +19,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +69,20 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
             for(I18nMessage i18nMessage : list){
                 if(!i18nMessage.getMsgKey().equals("SelfReview")){
                     acquisitionResultList.add(i18nMessage);
+                }
+            }
+        }else if(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name().equals(selected.getApplicationStatus()) ){
+            if(selected.getBudgetTotalAmount().compareTo(new BigDecimal(10)) >= 0){
+                for(I18nMessage i18nMessage : list){
+                    if(!i18nMessage.getMsgKey().equals("SelfReview")){
+                        acquisitionResultList.add(i18nMessage);
+                    }
+                }
+            }else {
+                for(I18nMessage i18nMessage : list){
+                    if(!i18nMessage.getMsgKey().equals("Approved")){
+                        acquisitionResultList.add(i18nMessage);
+                    }
                 }
             }
         }else {
