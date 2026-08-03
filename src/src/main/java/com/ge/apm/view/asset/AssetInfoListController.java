@@ -530,7 +530,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, false));
             }
         } else {
-            this.removeFilterOnField("isPm");
+            // 如果租户开启了是否已配置保养规则“列 那是否保养列的筛选将会失效
+            if (showIsPm()) {
+                this.removeFilterOnField("isPm");
+            }
             this.removeFilterOnField("uid");
         }
         if(!assetStatus){
