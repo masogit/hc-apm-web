@@ -4,6 +4,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -111,6 +112,19 @@
             }
             .agreement-container .ui-chkbox .ui-chkbox-box {
                 display: inline-block !important;
+            }
+            /* 校验失败字段红色下划线 */
+            .agreement-container .inline-input.ui-state-error,
+            .agreement-container .inline-input.input-error {
+                border-bottom: 2px solid #e74c3c !important;
+            }
+            .agreement-container .inline-input.ui-state-error:focus,
+            .agreement-container .inline-input.input-error:focus {
+                border-bottom: 2px solid #c0392b !important;
+            }
+            .agreement-container .inline-input.ui-state-error:hover,
+            .agreement-container .inline-input.input-error:hover {
+                border-bottom: 2px solid #c0392b !important;
             }
         </style>
 
@@ -224,9 +238,9 @@
                         <div class="agreement-heading">第一条 调剂项目基本信息</div>
                         <p class="agreement-text">
                             原调剂协议签订日期：
-                            <p:inputText value="#{agreementEditController.contractData['origSignYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
-                            <p:inputText value="#{agreementEditController.contractData['origSignMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
-                            <p:inputText value="#{agreementEditController.contractData['origSignDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                            <p:inputText value="#{agreementEditController.contractData['origSignYear']}" styleClass="inline-input" validatorMessage="年份须为2000后的四位数" pt:data-validate="^2\d{3}$"><f:validateRegex pattern="^2\d{3}$"/><p:ajax update="growl"/></p:inputText>年
+                            <p:inputText value="#{agreementEditController.contractData['origSignMonth']}" styleClass="inline-input inline-input-narrow" validatorMessage="月份须为1-12" pt:data-validate="^([1-9]|1[0-2])$"><f:validateRegex pattern="^([1-9]|1[0-2])$"/><p:ajax update="growl"/></p:inputText>月
+                            <p:inputText value="#{agreementEditController.contractData['origSignDay']}" styleClass="inline-input inline-input-narrow" validatorMessage="日期须为1-31" pt:data-validate="^([1-9]|[12]\d|3[01])$"><f:validateRegex pattern="^([1-9]|[12]\d|3[01])$"/><p:ajax update="growl"/></p:inputText>日
                         </p>
                         <p class="agreement-text">调剂设备明细：以原协议附件《调剂设备明细清单》为准。</p>
                         <div class="agreement-text">调剂方式：
@@ -266,9 +280,9 @@
                         <div class="agreement-heading" style="font-size:14px;">二、租赁模式（使用权转移）</div>
                         <p class="agreement-text">
                             乙方已于
-                            <p:inputText value="#{agreementEditController.contractData['returnYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
-                            <p:inputText value="#{agreementEditController.contractData['returnMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
-                            <p:inputText value="#{agreementEditController.contractData['returnDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                            <p:inputText value="#{agreementEditController.contractData['returnYear']}" styleClass="inline-input" validatorMessage="年份须为2000后的四位数" pt:data-validate="^2\d{3}$"><f:validateRegex pattern="^2\d{3}$"/><p:ajax update="growl"/></p:inputText>年
+                            <p:inputText value="#{agreementEditController.contractData['returnMonth']}" styleClass="inline-input inline-input-narrow" validatorMessage="月份须为1-12" pt:data-validate="^([1-9]|1[0-2])$"><f:validateRegex pattern="^([1-9]|1[0-2])$"/><p:ajax update="growl"/></p:inputText>月
+                            <p:inputText value="#{agreementEditController.contractData['returnDay']}" styleClass="inline-input inline-input-narrow" validatorMessage="日期须为1-31" pt:data-validate="^([1-9]|[12]\d|3[01])$"><f:validateRegex pattern="^([1-9]|[12]\d|3[01])$"/><p:ajax update="growl"/></p:inputText>日
                             将全部调剂设备、配套附件、使用资料等完好交还甲方，双方共同完成现场复检验收，验收结果详见本协议附件1《设备返还验收单》。设备所有权始终归属甲方，乙方对该批设备的租赁使用权自本协议生效之日起正式终止。双方确认返还设备状态完好，配件、资料齐全，无损毁、丢失情况，不存在交接争议。
                         </p>
                         <p class="agreement-text">若设备达到报废标准，无残余价值，或者已经无法使用，由乙方出具情况说明，将设备归还给甲方，由甲方进行相应的处理。</p>
@@ -327,10 +341,10 @@
                         <p class="agreement-text">原协议附件、验收单据、结算凭证、台账资料等由各方自行留存归档，以备核查。</p>
                         <p class="agreement-text">
                             本协议一式
-                            <p:inputText value="#{agreementEditController.contractData['totalCopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，甲方执
-                            <p:inputText value="#{agreementEditController.contractData['partyACopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，乙方执
-                            <p:inputText value="#{agreementEditController.contractData['partyBCopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，丙方执
-                            <p:inputText value="#{agreementEditController.contractData['partyCCopies']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>份，各份具有同等法律效力。
+                            <p:inputText value="#{agreementEditController.contractData['totalCopies']}" styleClass="inline-input inline-input-narrow" validatorMessage="份数须为1-9" pt:data-validate="^[1-9]$"><f:validateRegex pattern="^[1-9]$"/><p:ajax update="growl"/></p:inputText>份，甲方执
+                            <p:inputText value="#{agreementEditController.contractData['partyACopies']}" styleClass="inline-input inline-input-narrow" validatorMessage="份数须为1-9" pt:data-validate="^[1-9]$"><f:validateRegex pattern="^[1-9]$"/><p:ajax update="growl"/></p:inputText>份，乙方执
+                            <p:inputText value="#{agreementEditController.contractData['partyBCopies']}" styleClass="inline-input inline-input-narrow" validatorMessage="份数须为1-9" pt:data-validate="^[1-9]$"><f:validateRegex pattern="^[1-9]$"/><p:ajax update="growl"/></p:inputText>份，丙方执
+                            <p:inputText value="#{agreementEditController.contractData['partyCCopies']}" styleClass="inline-input inline-input-narrow" validatorMessage="份数须为1-9" pt:data-validate="^[1-9]$"><f:validateRegex pattern="^[1-9]$"/><p:ajax update="growl"/></p:inputText>份，各份具有同等法律效力。
                         </p>
                         <p class="agreement-text">本协议自甲、乙、丙三方签字并加盖公章之日起生效。（以下无正文）</p>
 
@@ -342,9 +356,9 @@
                                     <p:inputText value="#{agreementEditController.contractData['signPartyARep']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
                                 </p>
                                 <p>签订日期：
-                                    <p:inputText value="#{agreementEditController.contractData['signAYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
-                                    <p:inputText value="#{agreementEditController.contractData['signAMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
-                                    <p:inputText value="#{agreementEditController.contractData['signADay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                                    <p:inputText value="#{agreementEditController.contractData['signAYear']}" styleClass="inline-input" validatorMessage="年份须为2000后的四位数" pt:data-validate="^2\d{3}$"><f:validateRegex pattern="^2\d{3}$"/><p:ajax update="growl"/></p:inputText>年
+                                    <p:inputText value="#{agreementEditController.contractData['signAMonth']}" styleClass="inline-input inline-input-narrow" validatorMessage="月份须为1-12" pt:data-validate="^([1-9]|1[0-2])$"><f:validateRegex pattern="^([1-9]|1[0-2])$"/><p:ajax update="growl"/></p:inputText>月
+                                    <p:inputText value="#{agreementEditController.contractData['signADay']}" styleClass="inline-input inline-input-narrow" validatorMessage="日期须为1-31" pt:data-validate="^([1-9]|[12]\d|3[01])$"><f:validateRegex pattern="^([1-9]|[12]\d|3[01])$"/><p:ajax update="growl"/></p:inputText>日
                                 </p>
                             </div>
                             <div class="signature-block">
@@ -353,9 +367,9 @@
                                     <p:inputText value="#{agreementEditController.contractData['signPartyBRep']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
                                 </p>
                                 <p>签订日期：
-                                    <p:inputText value="#{agreementEditController.contractData['signBYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
-                                    <p:inputText value="#{agreementEditController.contractData['signBMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
-                                    <p:inputText value="#{agreementEditController.contractData['signBDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                                    <p:inputText value="#{agreementEditController.contractData['signBYear']}" styleClass="inline-input" validatorMessage="年份须为2000后的四位数" pt:data-validate="^2\d{3}$"><f:validateRegex pattern="^2\d{3}$"/><p:ajax update="growl"/></p:inputText>年
+                                    <p:inputText value="#{agreementEditController.contractData['signBMonth']}" styleClass="inline-input inline-input-narrow" validatorMessage="月份须为1-12" pt:data-validate="^([1-9]|1[0-2])$"><f:validateRegex pattern="^([1-9]|1[0-2])$"/><p:ajax update="growl"/></p:inputText>月
+                                    <p:inputText value="#{agreementEditController.contractData['signBDay']}" styleClass="inline-input inline-input-narrow" validatorMessage="日期须为1-31" pt:data-validate="^([1-9]|[12]\d|3[01])$"><f:validateRegex pattern="^([1-9]|[12]\d|3[01])$"/><p:ajax update="growl"/></p:inputText>日
                                 </p>
                             </div>
                             <div class="signature-block">
@@ -364,9 +378,9 @@
                                     <p:inputText value="#{agreementEditController.contractData['signPartyCRep']}" styleClass="inline-input inline-input-wide"><p:ajax/></p:inputText>
                                 </p>
                                 <p>签订日期：
-                                    <p:inputText value="#{agreementEditController.contractData['signCYear']}" styleClass="inline-input"><p:ajax/></p:inputText>年
-                                    <p:inputText value="#{agreementEditController.contractData['signCMonth']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>月
-                                    <p:inputText value="#{agreementEditController.contractData['signCDay']}" styleClass="inline-input inline-input-narrow"><p:ajax/></p:inputText>日
+                                    <p:inputText value="#{agreementEditController.contractData['signCYear']}" styleClass="inline-input" validatorMessage="年份须为2000后的四位数" pt:data-validate="^2\d{3}$"><f:validateRegex pattern="^2\d{3}$"/><p:ajax update="growl"/></p:inputText>年
+                                    <p:inputText value="#{agreementEditController.contractData['signCMonth']}" styleClass="inline-input inline-input-narrow" validatorMessage="月份须为1-12" pt:data-validate="^([1-9]|1[0-2])$"><f:validateRegex pattern="^([1-9]|1[0-2])$"/><p:ajax update="growl"/></p:inputText>月
+                                    <p:inputText value="#{agreementEditController.contractData['signCDay']}" styleClass="inline-input inline-input-narrow" validatorMessage="日期须为1-31" pt:data-validate="^([1-9]|[12]\d|3[01])$"><f:validateRegex pattern="^([1-9]|[12]\d|3[01])$"/><p:ajax update="growl"/></p:inputText>日
                                 </p>
                             </div>
                         </div>
@@ -375,10 +389,10 @@
                         <div class="btn-bar">
                             <p:commandButton value="保存协议数据" icon="ui-icon-disk"
                                              actionListener="#{agreementEditController.saveAgreementData}"
-                                             update="growl"
+                                             update="growl @form"
                                              style="margin-right:15px;"/>
                             <p:commandButton value="下载协议文件" icon="ui-icon-arrowthickstop-1-s"
-                                             ajax="false"
+                                             ajax="false" immediate="true" title="保存协议之后下载"
                                              actionListener="#{agreementEditController.downloadAgreement}"
                                              styleClass="ui-button-info"/>
 
@@ -391,5 +405,39 @@
                 </h:form>
             </div>
         </div>
+        <script>
+        (function(){
+            function hasClass(el, cls) {
+                if (!el.classList) return false;
+                return el.classList.contains(cls);
+            }
+            function findInlineInput(el) {
+                while (el) {
+                    if (hasClass(el, 'inline-input')) return el;
+                    el = el.parentElement;
+                }
+                return null;
+            }
+            function validateField(inputEl) {
+                var wrapper = findInlineInput(inputEl);
+                if (!wrapper) return;
+                var pattern = inputEl.getAttribute('data-validate') || wrapper.getAttribute('data-validate');
+                if (!pattern) return;
+                var val = inputEl.value.trim();
+                if (val === '') { wrapper.classList.remove('input-error'); return; }
+                if (!new RegExp(pattern).test(val)) {
+                    wrapper.classList.add('input-error');
+                } else {
+                    wrapper.classList.remove('input-error');
+                }
+            }
+            document.addEventListener('focusout', function(e) {
+                if (e.target.tagName === 'INPUT') validateField(e.target);
+            }, true);
+            document.addEventListener('input', function(e) {
+                if (e.target.tagName === 'INPUT') validateField(e.target);
+            }, true);
+        })();
+        </script>
     </ui:define>
 </ui:composition>

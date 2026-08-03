@@ -301,18 +301,19 @@ public class AgreementTemplateService {
      * @return 模板字节数组，未找到返回null
      */
     public byte[] getTemplateBytes(UserAccount user, String agreementType) throws IOException {
-        // 根据协议类型选择本地模板路径
-        String localPath = AdjustmentAgreementData.TYPE_TERMINATION.equals(agreementType)
-                ? LOCAL_TERMINATION_TEMPLATE_PATH : LOCAL_TEMPLATE_PATH;
-        // 1. 优先从本地classpath加载
-        byte[] localBytes = loadLocalTemplate(localPath);
-        if (localBytes != null) {
-            logger.info("使用本地模板: {}", localPath);
-            return localBytes;
-        }
-        // 2. Fallback: 从远程模板服务获取
-        logger.warn("本地模板未找到，尝试从远程模板服务获取");
-        byte[] templateBytes = systemTemplateService.getTemplateFileByte(SystemTemplateEnum.HOSPITAL_ADJUSTMENT_AGREEMENT, user);
+//        // 根据协议类型选择本地模板路径
+//        String localPath = AdjustmentAgreementData.TYPE_TERMINATION.equals(agreementType)
+//                ? LOCAL_TERMINATION_TEMPLATE_PATH : LOCAL_TEMPLATE_PATH;
+//        // 1. 优先从本地classpath加载
+//        byte[] localBytes = loadLocalTemplate(localPath);
+//        if (localBytes != null) {
+//            logger.info("使用本地模板: {}", localPath);
+//            return localBytes;
+//        }
+//        // 2. Fallback: 从远程模板服务获取
+//        logger.warn("本地模板未找到，尝试从远程模板服务获取");
+        SystemTemplateEnum  systemTemplateEnum= AdjustmentAgreementData.TYPE_TERMINATION.equals(agreementType)?SystemTemplateEnum.HOSPITAL_ADJUSTMENT_TERMINATION_AGREEMENT:SystemTemplateEnum.HOSPITAL_ADJUSTMENT_AGREEMENT;
+        byte[] templateBytes = systemTemplateService.getTemplateFileByte(systemTemplateEnum, user);
         if (templateBytes != null) {
             return templateBytes;
         }
