@@ -62,7 +62,7 @@ public class AgreementTemplateService {
             "terminationReason",
             "origSignYear", "origSignMonth", "origSignDay",
             "returnYear", "returnMonth", "returnDay",
-            "settlementDetail1", "settlementDetail2",
+            "settlementDetail",
             "termOtherReason",
             "totalCopies", "partyACopies", "partyBCopies", "partyCCopies",
             "signPartyARep", "signAYear", "signAMonth", "signADay",

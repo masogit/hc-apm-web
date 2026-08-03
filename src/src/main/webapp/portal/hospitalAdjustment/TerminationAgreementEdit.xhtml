@@ -291,15 +291,8 @@
                         <div class="agreement-heading">第三条 费用款项结算</div>
                         <p class="agreement-text">针对原协议项下调拨款、租金、运输费、维修费、违约金等全部款项，甲乙双方已逐项核对、全额结清。</p>
                         <p class="agreement-text">结算明细：</p>
-                        <p class="agreement-text">甲方结算明细：</p>
                         <p style="margin-left:2em; margin-bottom:8px;">
-                            <p:inputTextarea value="#{agreementEditController.contractData['settlementDetail1']}" styleClass="settlement-area" rows="3">
-                                <p:ajax/>
-                            </p:inputTextarea>
-                        </p>
-                        <p class="agreement-text">乙方结算明细：</p>
-                        <p style="margin-left:2em; margin-bottom:8px;">
-                            <p:inputTextarea value="#{agreementEditController.contractData['settlementDetail2']}" styleClass="settlement-area" rows="3">
+                            <p:inputTextarea value="#{agreementEditController.contractData['settlementDetail']}" styleClass="settlement-area" rows="5">
                                 <p:ajax/>
                             </p:inputTextarea>
                         </p>
