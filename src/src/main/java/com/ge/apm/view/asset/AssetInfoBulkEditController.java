@@ -1423,7 +1423,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (null == filterSiteOrg) {
             clinicalDeptListAsFilter = Collections.emptyList();
         } else {
-            clinicalDeptListAsFilter = uaaService.getOrgDeptList(filter.getSiteOrg().getUid(), loginUser.getUid());
+            clinicalDeptListAsFilter = uaaService.getAllAccessibleClinicalDeptList()
+                    .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+
+            OrgInfo finalFilterSiteOrg = filterSiteOrg;
+            Set<OrgInfo> collect = clinicalDeptListAsFilter.stream().filter(item -> item.getSiteUID().equals(finalFilterSiteOrg.getSiteUID()) || item.getHospitalUID().equals(finalFilterSiteOrg.getSiteUID())
+                    || item.getInstitutionUID().equals(finalFilterSiteOrg.getSiteUID()) || item.getTenantUID().equals(finalFilterSiteOrg.getSiteUID())).collect(Collectors.toSet());
+            clinicalDeptListAsFilter = new ArrayList<>(collect);
         }
         logger.error("clinicalDeptListAsFilter size = {}", clinicalDeptListAsFilter.size());
     }
