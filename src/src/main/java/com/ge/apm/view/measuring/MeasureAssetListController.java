@@ -234,7 +234,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
 
-        if(matchType==1 || matchType==2){
+        if(matchType==1 || matchType==2 || matchType == 9){
             Wrapper<AssetInfo> wrapper = convert();
             Sort sort = pageRequest.getSort();
             for (Sort.Order order : sort) {
@@ -243,7 +243,11 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 String prefix = "check_date".equals(property) || "validity_months".equals(property)? "mcd." : "ai.";
                 wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
             }
-            wrapper.and().eq("mcd.certificate_type",matchType);
+            if (matchType == 9) {
+                wrapper.and().in("mcd.certificate_type", Arrays.asList(1, 2));
+            } else {
+                wrapper.and().eq("mcd.certificate_type", matchType);
+            }
             wrapper.orderBy("mcd.id");
             currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
         }else{
@@ -644,6 +648,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             scrapped = true;
             selected = null;
             measuringCertificateList = null;
+            // 报废计量结果
+            matchType = 9;
         }
     }
 
