@@ -460,13 +460,13 @@
                                              style="margin-left: 10px;"/>
 
                             <p:commandButton immediate="true" value="审批通过" icon="ui-icon-check"
-                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     adjustmentTransferApplicationDetailController.selected.stockHospitalUid==adjustmentTransferApplicationDetailController.currentUserAccount.hospitalUID   and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_WORKBENCH')}"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     adjustmentTransferApplicationDetailController.selected.stockSiteUid==adjustmentTransferApplicationDetailController.currentUserAccount.siteUID   and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_WORKBENCH')}"
                                              actionListener="#{adjustmentTransferApplicationDetailController.returnPass}"
                                              update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
                                              style="margin-left: 10px;"/>
 
                             <p:commandButton immediate="true" value="审批拒绝" icon="ui-icon-cancel"
-                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     adjustmentTransferApplicationDetailController.selected.stockHospitalUid==adjustmentTransferApplicationDetailController.currentUserAccount.hospitalUID   and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_WORKBENCH')}"
+                                             rendered="#{ adjustmentTransferApplicationDetailController.selected.status==7    and     adjustmentTransferApplicationDetailController.selected.stockSiteUid==adjustmentTransferApplicationDetailController.currentUserAccount.siteUID   and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_WORKBENCH')}"
                                              actionListener="#{adjustmentTransferApplicationDetailController.returnRefuse}"
                                              update=":detailTabView:transferDetailForm :detailTabView:workOrderInfoPanel"
                                              style="margin-left: 10px;"/>
