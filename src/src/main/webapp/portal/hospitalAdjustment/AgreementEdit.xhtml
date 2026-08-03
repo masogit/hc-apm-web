@@ -277,7 +277,7 @@
                                 <p:ajax event="change" update="payMethodGroup" listener="#{agreementEditController.onCheckChange}"/>
                             </p:selectBooleanCheckbox>
                             </h:panelGroup>
-                            支付周期：乙方应于每期首月
+                            <span style="white-space:nowrap;">支付周期：</span>乙方应于每期首月
                             <p:inputText value="#{agreementEditController.contractData['paymentDay']}" styleClass="inline-input inline-input-narrow" validatorMessage="须为正整数" pt:data-validate="^[1-9]\d*$"><f:validateRegex pattern="^[1-9]\d*$"/><p:ajax update="growl"/></p:inputText>
                             日前完成付款。乙方逾期支付租金的，每逾期一日，按逾期金额的
                             <p:inputText value="#{agreementEditController.contractData['rentPenaltyRate']}" styleClass="inline-input inline-input-narrow" validatorMessage="违约金比例须为非负数" pt:data-validate="^\d+(\.\d{1,2})?$"><f:validateRegex pattern="^\d+(\.\d{1,2})?$"/><p:ajax update="growl"/></p:inputText>&#8240;向甲方支付违约金；逾期超过30日，甲方有权暂停设备使用、解除协议并追索全部欠款及损失。
@@ -324,7 +324,7 @@
                                     <p:ajax event="change" update="transportGroup" listener="#{agreementEditController.onCheckChange}"/>
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup>
-                            承担。
+                            <span style="white-space:nowrap;">承担。</span>
                         </div>
                         <div style="font-weight:bold; margin-bottom:5px;">4.2 验收标准与流程</div>
                         <p class="agreement-text">1.乙方应在设备送达后
@@ -342,7 +342,7 @@
                                 <p:ajax event="change" update="inspectGroup" listener="#{agreementEditController.onCheckChange}"/>
                             </p:selectBooleanCheckbox>
                             </h:panelGroup>
-                            承担。
+                            <span style="white-space:nowrap;">承担。</span>
                         </div>
                         <p class="agreement-text">3.若验收合格，甲乙双方应共同签署《设备验收确认单》（附件2），确认设备交付完毕；若验收不合格，乙方应在验收完毕后
                             <p:inputText value="#{agreementEditController.contractData['failNotifyDays']}" styleClass="inline-input inline-input-narrow" validatorMessage="天数须为正整数" pt:data-validate="^[1-9]\d*$"><f:validateRegex pattern="^[1-9]\d*$"/><p:ajax update="growl"/></p:inputText>
@@ -409,7 +409,7 @@
                                     <p:ajax event="change" update="disputeGroup" listener="#{agreementEditController.onCheckChange}"/>
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup>
-                            人民法院提起诉讼。
+                            <span style="white-space:nowrap;">人民法院提起诉讼。</span>
                         </div>
 
                         <!-- 第十条 -->
