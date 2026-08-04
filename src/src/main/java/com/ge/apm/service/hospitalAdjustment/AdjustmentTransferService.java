@@ -147,12 +147,12 @@ public class AdjustmentTransferService {
         dao.save(selected);
 
         // 通知借入方审批已通过，请上传调剂中止协议完成退回
-        Map<String, String> stringMap = new HashMap<>();
-        stringMap.put("orderCode", selected.getApplicationNumber());
-        stringMap.put("content", "退回审批已通过，请上传调剂中止协议完成退回");
-        stringMap.put("date", DateUtil.formatDateTime(new Date()));
-        List<String> inUserIds = getAdjustmentTransferApproval(selected, true, false);
-        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, inUserIds, null);
+//        Map<String, String> stringMap = new HashMap<>();
+//        stringMap.put("orderCode", selected.getApplicationNumber());
+//        stringMap.put("content", "退回审批已通过，请上传调剂中止协议完成退回");
+//        stringMap.put("date", DateUtil.formatDateTime(new Date()));
+//        List<String> inUserIds = getAdjustmentTransferApproval(selected, true, false);
+//        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, inUserIds, null);
     }
 
     /**
@@ -169,12 +169,12 @@ public class AdjustmentTransferService {
         dao.save(selected);
 
         // 通知借入方审批已拒绝
-        Map<String, String> stringMap = new HashMap<>();
-        stringMap.put("orderCode", selected.getApplicationNumber());
-        stringMap.put("content", "退回审批已拒绝，工单恢复已完成状态");
-        stringMap.put("date", DateUtil.formatDateTime(new Date()));
-        List<String> inUserIds = getAdjustmentTransferApproval(selected, true, false);
-        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, inUserIds, null);
+//        Map<String, String> stringMap = new HashMap<>();
+//        stringMap.put("orderCode", selected.getApplicationNumber());
+//        stringMap.put("content", "退回审批已拒绝，工单恢复已完成状态");
+//        stringMap.put("date", DateUtil.formatDateTime(new Date()));
+//        List<String> inUserIds = getAdjustmentTransferApproval(selected, true, false);
+//        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, inUserIds, null);
     }
 
     @Transactional
@@ -258,7 +258,7 @@ public class AdjustmentTransferService {
         stringMap.put("date", DateUtil.formatDateTime(new Date()));
 
         List<String> outUserIds = getAdjustmentTransferApproval(adjustmentTransferApplication, false, true);
-        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_APPROVAL_NOTICE, outUserIds, null);
+        wxMessageService.sendWxMsgToMq(stringMap, null, MSGEvent.HOSPITAL_ADJUSTMENT_BORROW_RETURN_PENDING_REVIEW, outUserIds, null);
     }
 
     public List<String> getAdjustmentTransferApproval(AdjustmentTransferApplication adjustmentTransferApplication,boolean in,boolean out) {
