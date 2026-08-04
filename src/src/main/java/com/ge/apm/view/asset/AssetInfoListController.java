@@ -369,8 +369,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         lastPageSort = pageRequest.getSort(); //export excel use
         if (this.hasFilterOnField("assetUsedLifecycle")) {
-            SearchFilter lifecycleFilter = searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName) && sf.value != null).findFirst().orElse(null);
-            if (lifecycleFilter != null) {
+            SearchFilter lifecycleFilter = searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName) && sf.value != null && StringUtils.isNotBlank(sf.value.toString())).findFirst().orElse(null);            if (lifecycleFilter != null ) {
                 int assetUsedLifecycle = Integer.parseInt(lifecycleFilter.value.toString());
                 DateTime parse = DateUtil.parse(String.valueOf(org.joda.time.LocalDate.now().plusYears(-assetUsedLifecycle)));
                 searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.IsNotNull, null));
