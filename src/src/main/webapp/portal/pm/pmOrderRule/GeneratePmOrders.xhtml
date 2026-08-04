@@ -137,8 +137,13 @@
 <!--							  </c:if>-->
 						   </h:panelGroup>
 					   <h:panelGroup rendered="#{generatePmOrdersController.enableWarrantyDateSearch}">
-						   <label class ="label">#{msg.warrantyDate}</label>
-						   <p:calendar  timeZone="GMT+8" id="warrantyDate" pattern="yyyy/MM/dd" mask="true" value="#{generatePmOrdersController.queryAsset.warrantyDate}" showOn="button" showButtonPanel="true" >
+						   <label class ="label">#{msg.warrantyDateStart}</label>
+						   <p:calendar timeZone="GMT+8" id="warrantyDateStart" pattern="yyyy/MM/dd" mask="true" navigator="true" value="#{generatePmOrdersController.queryAsset.warrantyDateStart}" showOn="button" showButtonPanel="true" >
+						   </p:calendar>
+					   </h:panelGroup>
+					   <h:panelGroup rendered="#{generatePmOrdersController.enableWarrantyDateSearch}">
+						   <label class ="label">#{msg.warrantyDateEnd}</label>
+						   <p:calendar timeZone="GMT+8" id="warrantyDateEnd" pattern="yyyy/MM/dd" mask="true" navigator="true" value="#{generatePmOrdersController.queryAsset.warrantyDateEnd}" showOn="button" showButtonPanel="true" >
 						   </p:calendar>
 					   </h:panelGroup>
                        <h:panelGroup></h:panelGroup>

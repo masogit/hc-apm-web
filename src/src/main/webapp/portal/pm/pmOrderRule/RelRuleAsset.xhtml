@@ -211,10 +211,15 @@
                            </p:selectOneMenu>
                        </h:panelGroup>
                        <h:panelGroup rendered="#{relRuleAssetController.enableWarrantyDateSearch}">
-                           <label class ="label">#{msg.warrantyDate}</label>
-                           <p:calendar  timeZone="GMT+8" id="warrantyDate" pattern="yyyy/MM/dd" mask="true" value="#{relRuleAssetController.queryAsset.warrantyDate}" showOn="button" showButtonPanel="true" >
+                           <label class ="label">#{msg.warrantyDateStart}</label>
+                           <p:calendar timeZone="GMT+8" id="warrantyDateStart" pattern="yyyy/MM/dd" mask="true" navigator="true" value="#{relRuleAssetController.queryAsset.warrantyDateStart}" showOn="button" showButtonPanel="true" >
                                <p:ajax event="dateSelect" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this"/>
-
+                           </p:calendar>
+                       </h:panelGroup>
+                       <h:panelGroup rendered="#{relRuleAssetController.enableWarrantyDateSearch}">
+                           <label class ="label">#{msg.warrantyDateEnd}</label>
+                           <p:calendar timeZone="GMT+8" id="warrantyDateEnd" pattern="yyyy/MM/dd" mask="true" navigator="true" value="#{relRuleAssetController.queryAsset.warrantyDateEnd}" showOn="button" showButtonPanel="true" >
+                               <p:ajax event="dateSelect" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this"/>
                            </p:calendar>
                        </h:panelGroup>
                    </p:panelGrid>

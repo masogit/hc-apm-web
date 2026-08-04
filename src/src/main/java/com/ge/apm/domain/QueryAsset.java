@@ -28,7 +28,8 @@ public class QueryAsset {
  	private String mainDirectory;
  	private String secondDirectory;
 	private Integer emergencyEquipment;
-	private Date warrantyDate;
+	private Date warrantyDateStart;
+	private Date warrantyDateEnd;
 
 
 	public String getMainDirectory() {
@@ -200,11 +201,19 @@ public class QueryAsset {
 	}
 
 
-	public Date getWarrantyDate() {
-		return warrantyDate;
+	public Date getWarrantyDateStart() {
+		return warrantyDateStart;
 	}
 
-	public void setWarrantyDate(Date warrantyDate) {
-		this.warrantyDate = warrantyDate;
+	public void setWarrantyDateStart(Date warrantyDateStart) {
+		this.warrantyDateStart = warrantyDateStart;
+	}
+
+	public Date getWarrantyDateEnd() {
+		return warrantyDateEnd;
+	}
+
+	public void setWarrantyDateEnd(Date warrantyDateEnd) {
+		this.warrantyDateEnd = warrantyDateEnd;
 	}
 }

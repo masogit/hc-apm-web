@@ -12,7 +12,6 @@ import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
@@ -29,9 +28,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -384,9 +381,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (queryAsset.getEmergencyEquipment()!=null) {
             assetFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, queryAsset.getEmergencyEquipment()));
         }
-        if (queryAsset.getWarrantyDate() != null) {
-
-            assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.EQ, queryAsset.getWarrantyDate()));
+        if (queryAsset.getWarrantyDateStart() != null) {
+            assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.GTE, queryAsset.getWarrantyDateStart()));
+        }
+        if (queryAsset.getWarrantyDateEnd() != null) {
+            assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, queryAsset.getWarrantyDateEnd()));
         }
 
         if (clinicalOrgInfo != null){

@@ -2121,6 +2121,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ArrivalDate', '到货日期', 'Arrival Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'StartUsingDate', '开始使用时间', 'Start Using Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyDate', '维保截止日期', 'Warranty Date ', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyDateStart', '维保截止日期（起）', 'Warranty Date (Start) ', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyDateEnd', '维保截止日期（止）', 'Warranty Date (End) ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyExpirationDate', '维保截止日期', 'Warranty Expiration Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TerminateDate', '报废日期', 'Terminate Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'LastMaintenanceDate', '上次保养日期', 'Last Maintenance Date ', NULL, '-1');
