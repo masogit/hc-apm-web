@@ -81,6 +81,24 @@
                                disabled="#{systemConfigItemController.configItemMap.get('maintenanceCostIncludedWorkOrderCost').configItemValue == null}"/>
             </h:panelGroup>
             <ui:include src="configItemEntryType.xhtml"/>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue').name.concat('(').concat(systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue').validation}" pattern="#{systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('RegionalInstitutionalEquipmentRevenue').configItemValue == null}"/>
+            </h:panelGroup>
         </p:panelGrid>
     </ui:composition>
 
