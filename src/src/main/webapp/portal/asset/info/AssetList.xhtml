@@ -1309,12 +1309,6 @@
                                     </h:outputText>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'meteringCycle'}">
-                                <p:column headerText="#{msg.meteringCycle}" exportable="true"  filterBy="#{item.meteringCycle}"  filterMatchMode="LIKE"
-                                          sortBy="#{item.meteringCycle}">
-                                    <h:outputText value="#{item.meteringCycle}"/>
-                                </p:column>
-                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
