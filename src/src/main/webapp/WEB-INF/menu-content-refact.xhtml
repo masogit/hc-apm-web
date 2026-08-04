@@ -117,11 +117,11 @@
                    </c:when>
                    <c:when test="#{item eq 'ADJUST_UNATTENDED'}">
                        <!-- 设备调剂 -->
-                       <p:submenu id="um073_1" label="#{msg.EquipmentSwap}" icon="fa fa-share-square-o fa-fw" rendered="#{userContextService.accessContainsApmFeature('ADJUST_UNATTENDED') and 'true' eq userContextService.getConfigItemValue('whetherToEnableUnattended')}">
-                           <p:menuitem fragment="um907_1" id="um907_1" value="#{msg.EquipmentCharging}" outcome="/portal/ReturnAcceptanceV2/ListForQuery" rendered="#{userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_CHARGING')}"/>
-                           <p:menuitem fragment="um908_1" id="um908_1" value="#{msg.EquipmentInventory}" outcome="/portal/allocationCenter/StockOfAssets.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_INVENTORY')}"/>
-                           <p:menuitem fragment="um900_1" id="um900_1" value="#{msg.SwappedEquipmentConfiguration}" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_CONFIGURATION')}"/>
-                           <p:menuitem fragment="um909_1" id="um909_1" value="#{msg.SwappedEquipmentNameSettings}" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_NAME_SETTINGS')}"/>
+                       <p:submenu id="um073_1" label="#{msg.EquipmentSwap}" icon="fa fa-share-square-o fa-fw" rendered="#{userContextService.accessContainsApmFeature('ADJUST_UNATTENDED') and(userContextService.siteOrgInfoChild.size() > 0 or  'true' eq userContextService.getConfigItemValue('whetherToEnableUnattended'))}">
+                           <p:menuitem fragment="um907_1" id="um907_1" value="#{msg.EquipmentCharging}" outcome="/portal/ReturnAcceptanceV2/ListForQuery" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_CHARGING')}"/>
+                           <p:menuitem fragment="um908_1" id="um908_1" value="#{msg.EquipmentInventory}" outcome="/portal/allocationCenter/StockOfAssets.xhtml" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_INVENTORY')}"/>
+                           <p:menuitem fragment="um900_1" id="um900_1" value="#{msg.SwappedEquipmentConfiguration}" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_CONFIGURATION')}"/>
+                           <p:menuitem fragment="um909_1" id="um909_1" value="#{msg.SwappedEquipmentNameSettings}" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or userContextService.accessContainsFunctionMenu('ADJUST_UNATTENDED_EQUIPMENT_NAME_SETTINGS')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'ADJUST_DEPTMENT'}">
