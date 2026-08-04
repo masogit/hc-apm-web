@@ -134,7 +134,10 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
 
         }
         processNode();
-        selected.setApplicationPendingApprovalDate(new Date());
+        // 待审批状态下，处理日期默认带出当前时间
+        if(selected.getStatus() == 1 && selected.getPendingDeliveryDate() == null){
+            selected.setPendingDeliveryDate(new Date());
+        }
         signatureId=selected.getHandlerSignature();
     }
 
@@ -170,7 +173,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         } else if(status == 2 || status == 3){
             step1End = selected.getUpdateTime();
         }
-        addNode("待借用审批", selected.getApplicationPendingApprovalUid(), selected.getApplicationPendingApprovalDate(), step1End, collect);
+        addNode("待借用审批", selected.getApplicationPendingApprovalUid(), selected.getCreateTime(), step1End, collect);
 
         if(status == 2 || status == 3){
             return;
@@ -179,9 +182,8 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         // 步骤2: 待交付 (status >= 4)
         if(status >= 4){
             Date step2End = null;
-            if(hasReturnStep){
-                step2End = selected.getReturnDate();
-            } else if(status >= 6){
+            if(status >= 6){
+                // 到货确认完成即结束，与后续退回流程无关
                 step2End = selected.getDeliveryDate();
             }
             addNode("待交付", selected.getPendingDeliveryUid(), selected.getPendingDeliveryDate(), step2End, collect);
@@ -424,6 +426,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
             return;
         }
         selected.setHandlerSignature(signatureId);
+        selected.setPendingDeliveryDate(new Date());
 
         adjustmentTransferService.refuse(selected,currentUserAccount);
         processNode();
