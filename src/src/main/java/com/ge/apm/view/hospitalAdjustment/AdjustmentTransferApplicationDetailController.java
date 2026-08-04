@@ -626,9 +626,9 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     public String getReturnTypeLabel(String returnType) {
         if (returnType == null) return "";
         switch (returnType) {
-            case "scrapReturn": return "报废退回";
-            case "agreementReturn": return "协议退回";
-            case "noUsageReturn": return "无使用需求退回";
+            case "scrapReturn": return "报废退回（退回原单位有实际物流动作）";
+            case "agreementReturn": return "协议退回（借出到期退回，退回原单位有实际物流动作）";
+            case "noUsageReturn": return "无使用需求退回，借入方不需要使用，设备退回设备调剂库可由其他医院继续申请调用（线上退回，无实际物流动作）";
             default: return "";
         }
     }

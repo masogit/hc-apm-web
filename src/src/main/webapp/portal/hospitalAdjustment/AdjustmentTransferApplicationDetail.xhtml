@@ -552,9 +552,9 @@
                                                  value="#{adjustmentTransferApplicationDetailController.selected.returnType}"
                                                  required="true" requiredMessage="退回类型必填">
                                     <f:selectItem itemLabel="请选择" itemValue="" noSelectionOption="true"/>
-                                    <f:selectItem itemLabel="报废退回" itemValue="scrapReturn"/>
-                                    <f:selectItem itemLabel="协议退回" itemValue="agreementReturn"/>
-                                    <f:selectItem itemLabel="无使用需求退回" itemValue="noUsageReturn"/>
+                                    <f:selectItem itemLabel="报废退回（退回原单位有实际物流动作）" itemValue="scrapReturn"/>
+                                    <f:selectItem itemLabel="协议退回（借出到期退回，退回原单位有实际物流动作）" itemValue="agreementReturn"/>
+                                    <f:selectItem itemLabel="无使用需求退回，借入方不需要使用，设备退回设备调剂库可由其他医院继续申请调用（线上退回，无实际物流动作）" itemValue="noUsageReturn"/>
                                     <p:ajax/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
