@@ -67,7 +67,7 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
-                        <p:inputNumber  decimalPlaces="2" maxValue="99999999" id="partsPrice" disabled="true"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}">
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice" disabled="true"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}">
                             <!-- <p:ajax listener="#{workOrderMgrController.f1()}" update="woTab:moreAccDialogForm" >-->
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)">
                             </p:ajax>
@@ -106,7 +106,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ContractPriceRMB}</label>
-                        <p:inputNumber  decimalPlaces="2" maxValue="99999999" id="closedPrice" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPrice" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
 
                             <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
                             </p:ajax>
