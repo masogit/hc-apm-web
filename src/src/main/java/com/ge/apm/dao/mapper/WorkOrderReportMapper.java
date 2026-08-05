@@ -51,4 +51,7 @@ public interface WorkOrderReportMapper {
 
     @SelectProvider(type = WorkOrderReportProvider.class,method="workOrderDetailExport")
     public List<WorkOrderDetailPojo> workOrderDetailExport(@Param("filters") List<SearchFilter> filters);
+
+    @SelectProvider(type = WorkOrderReportProvider.class,method="mvsWorkOrderDetailExport")
+    public List<WorkOrderDetailPojo> mvsWorkOrderDetailExport(@Param("filters") List<SearchFilter> filters);
 }
