@@ -114,56 +114,14 @@
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                 </p:inputText>
                             </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="#{msg.equipmentMaterialInformation}">
-                        <div style="display: flex; gap: 1rem;">
-                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
-                                <h:panelGroup>
-                                    <label class="label">#{msg.Device.concat(msg.certificate)}<span style="color:red">*</span></label>
-                                    <h:panelGrid>
-                                        <p:selectBooleanCheckbox value="#{assetProbationEditController.selected.hasCertificate}" disabled="#{!assetProbationEditController.canEditBase}"/>
-                                    </h:panelGrid>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.specification}<span style="color:red">*</span></label>
-                                    <h:panelGrid>
-                                        <p:selectManyCheckbox id="specification" value="#{assetProbationEditController.specificationList}" disabled="#{!assetProbationEditController.canEditBase}">
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('specification')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectManyCheckbox>
-                                    </h:panelGrid>
-                                </h:panelGroup>
-                            </p:panelGrid>
-                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
-                                <h:panelGroup>
-                                    <label class="label">#{msg.threeInformation}<span style="color:red">*</span></label>
-                                    <h:panelGrid>
-                                        <p:selectManyCheckbox id="threeInformation" value="#{assetProbationEditController.informationList}" disabled="#{!assetProbationEditController.canEditBase}">
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('threeInformation')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectManyCheckbox>
-                                    </h:panelGrid>
-                                </h:panelGroup>
-                            </p:panelGrid>
-                        </div>
-                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:dataList id="informationList" value="#{assetProbationEditController.getAttachList('information')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">#{msg.attachmentUrl}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                    </p:commandLink>
-                                    <span/><span/>
-                                    <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="informationList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditBase}">
-                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>
-                                </p:dataList>
-                                <p:fileUpload id="information" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
-                                              multiple="true"  sizeLimit="500000000"  update="informationList" rendered="#{assetProbationEditController.canEditBase}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                            <h:panelGroup >
+                                <label class="label">#{msg.comments}</label>
+                                <p:inputTextarea  rows="3" value="#{assetProbationEditController.selected.remark}" readonly="#{!assetProbationEditController.canEditBase}"/>
+
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
+
                     <p:fieldset legend="#{msg.WorkorderInformation}" rendered="#{assetProbationEditController.selected.status ge 0}">
                         <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -200,47 +158,102 @@
                                 <h:outputText value="#{stepItem.startTime}"/>
                             </p:column>
                         </p:dataTable>
+
                         <p:fieldset legend="#{msg.tempEngineerDetection}" rendered="#{assetProbationEditController.viewDetection()}">
-                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.selected.status ge 2 and assetProbationEditController.action ne -22}">
-                                <h:panelGroup>
-                                    <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
-                                    <p:inputTextarea id="detectionSituationRead" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" readonly="true" style="width: 80%"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.detectionPeople}<span style="color:red">*</span></label>
-                                    <p:inputText value="#{assetProbationEditController.selected.detectionUserName}" readonly="true"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.detectionTime}<span style="color:red">*</span></label>
-                                    <p:inputText value="#{assetProbationEditController.selected.detectionTime}" readonly="true">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
-                                    </p:inputText>
-                                </h:panelGroup>
-                            </p:panelGrid>
-                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.canEditDetection()}">
-                                <h:panelGroup>
-                                    <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
-                                    <p:inputTextarea id="detectionSituation" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" style="width: 100%"/>
-                                </h:panelGroup>
-                            </p:panelGrid>
-                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <h:panelGroup>
-                                    <p:dataList id="detectionList" value="#{assetProbationEditController.getAttachList('detection')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                        <f:facet name="header">#{msg.addPic}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
-                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                        <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                            <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                        </p:commandLink>
-                                        <span/><span/>
-                                        <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="detectionList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditDetection()}">
-                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                        </p:commandButton>
-                                    </p:dataList>
-                                    <p:fileUpload id="detection" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
-                                                  multiple="true"  sizeLimit="500000000"  update="detectionList" rendered="#{assetProbationEditController.canEditDetection()}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
-                                </h:panelGroup>
-                            </p:panelGrid>
+                            <p:fieldset legend="#{msg.equipmentMaterialInformation}">
+                                <div style="display: flex; gap: 1rem;">
+                                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.Device.concat(msg.certificate)}<span style="color:red">*</span></label>
+                                            <h:panelGrid>
+                                                <p:selectBooleanCheckbox value="#{assetProbationEditController.selected.hasCertificate}" disabled="#{!assetProbationEditController.canEditDetection()}"/>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.specification}<span style="color:red">*</span></label>
+                                            <h:panelGrid>
+                                                <p:selectManyCheckbox id="specification" value="#{assetProbationEditController.specificationList}" disabled="#{!assetProbationEditController.canEditDetection()}">
+                                                    <f:selectItems value="#{fieldMsg.getFieldValueList('specification')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                                </p:selectManyCheckbox>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.threeInformation}<span style="color:red">*</span></label>
+                                            <h:panelGrid>
+                                                <p:selectManyCheckbox id="threeInformation" value="#{assetProbationEditController.informationList}" disabled="#{!assetProbationEditController.canEditDetection()}">
+                                                    <f:selectItems value="#{fieldMsg.getFieldValueList('threeInformation')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                                </p:selectManyCheckbox>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                </div>
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <p:dataList id="informationList" value="#{assetProbationEditController.getAttachList('information')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{msg.attachmentUrl}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                            </p:commandLink>
+                                            <span/><span/>
+                                            <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="informationList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditDetection()}">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="information" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                                      multiple="true"  sizeLimit="500000000"  update="informationList" rendered="#{assetProbationEditController.canEditDetection()}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset legend="检测信息">
+                                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.selected.status ge 2 and assetProbationEditController.action ne -22}">
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
+                                        <p:inputTextarea id="detectionSituationRead" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" readonly="true" style="width: 80%"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.detectionPeople}<span style="color:red">*</span></label>
+                                        <p:inputText value="#{assetProbationEditController.selected.detectionUserName}" readonly="true"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.detectionTime}<span style="color:red">*</span></label>
+                                        <p:inputText value="#{assetProbationEditController.selected.detectionTime}" readonly="true">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.canEditDetection()}">
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.detectionSituation}<span style="color:red">*</span></label>
+                                        <p:inputTextarea id="detectionSituation" rows="1" value="#{assetProbationEditController.selected.detectionSituation}" style="width: 100%"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <p:dataList id="detectionList" value="#{assetProbationEditController.getAttachList('detection')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{msg.addPic}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                            <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                                <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                            </p:commandLink>
+                                            <span/><span/>
+                                            <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="detectionList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditDetection()}">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="detection" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                                      multiple="true"  sizeLimit="500000000"  update="detectionList" rendered="#{assetProbationEditController.canEditDetection()}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+
+                            </p:fieldset>
+
+
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetProbationEditController.canEditDetection()}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.probationConfirmor}<span style="color:red">*</span></label>
