@@ -168,7 +168,7 @@ public class WorkOrderReportProvider {
                 "wo.accept_step_start_time as acceptStepStartTime, " +
                 "wo.work_step_end_time as workStepEndTime, " +
                 "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
-                "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(round(wod.closed_price, 2), ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
+                "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(round(wod.closed_price::numeric, 2), ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
                 "(select sum(wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = true or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
                 "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
                 "wo.evaluate_step_owner_name as evaluateStepOwnerName, " +
