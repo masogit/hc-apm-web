@@ -136,7 +136,10 @@ public class MeasuringService {
             if(mcdList != null && !mcdList.isEmpty()  ) {
                 MeasuringCertificateDetail measuringCertificateDetail1 = mcdList.get(0);
                 if(measuringCertificateDetail1.getAssetUID()!=null){
-                    if(!measuringCertificateDetail1.getAssetSN().equals(measuringCertificateDetail.getAssetSN())  && !measuringCertificateDetail1.getFinanceNo().equals(measuringCertificateDetail.getFinanceNo())  && !measuringCertificateDetail1.getQrCode().equals(measuringCertificateDetail.getQrCode()) ){
+                    boolean snMatch = measuringCertificateDetail1.getAssetSN() != null && Objects.equals(measuringCertificateDetail1.getAssetSN(), measuringCertificateDetail.getAssetSN());
+                    boolean financeNoMatch = measuringCertificateDetail1.getFinanceNo() != null && Objects.equals(measuringCertificateDetail1.getFinanceNo(), measuringCertificateDetail.getFinanceNo());
+                    boolean qrCodeMatch = measuringCertificateDetail1.getQrCode() != null && Objects.equals(measuringCertificateDetail1.getQrCode(), measuringCertificateDetail.getQrCode());
+                    if(!snMatch && !financeNoMatch && !qrCodeMatch){
                         failureFlag=true;
                         errorInfo.append("[计量证书编号已绑定其他设备");
                     }else{
@@ -245,7 +248,10 @@ public class MeasuringService {
             if(mcdList != null && !mcdList.isEmpty()  ) {
                 MeasuringCertificateDetail measuringCertificateDetail1 = mcdList.get(0);
                 if(measuringCertificateDetail1.getAssetUID()!=null){
-                    if(!measuringCertificateDetail1.getAssetSN().equals(measuringCertificateDetail.getAssetSN())  && !measuringCertificateDetail1.getFinanceNo().equals(measuringCertificateDetail.getFinanceNo())  && !measuringCertificateDetail1.getQrCode().equals(measuringCertificateDetail.getQrCode()) ){
+                    boolean snMatch = measuringCertificateDetail1.getAssetSN() != null && Objects.equals(measuringCertificateDetail1.getAssetSN(), measuringCertificateDetail.getAssetSN());
+                    boolean financeNoMatch = measuringCertificateDetail1.getFinanceNo() != null && Objects.equals(measuringCertificateDetail1.getFinanceNo(), measuringCertificateDetail.getFinanceNo());
+                    boolean qrCodeMatch = measuringCertificateDetail1.getQrCode() != null && Objects.equals(measuringCertificateDetail1.getQrCode(), measuringCertificateDetail.getQrCode());
+                    if(!snMatch && !financeNoMatch && !qrCodeMatch){
                         failureFlag=true;
                         errorInfo.append("[计量证书编号已绑定其他设备");
                     }else{
