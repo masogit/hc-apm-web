@@ -168,7 +168,7 @@ public class WorkOrderReportProvider {
                 "wo.accept_step_start_time as acceptStepStartTime, " +
                 "wo.work_step_end_time as workStepEndTime, " +
                 "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
-                "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(round(wod.closed_price, 2), ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
+                "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(round(wod.closed_price::numeric, 2), ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
                 "(select sum(wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = true or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
                 "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
                 "wo.evaluate_step_owner_name as evaluateStepOwnerName, " +
@@ -696,6 +696,107 @@ public class WorkOrderReportProvider {
                     }
                     sb.append(")");
                 }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public String mvsWorkOrderDetailExport(Map<String, Object> param) {
+
+        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("select wod.id as id,oi.short_name as assetClinicalDeptName, ai.name as assetName,ai.depart_num as assetDepartNum,wod.serial_num serialNum,wod.supplier as supplierName,wod.parts as partsName,wod.parts_quantity as partsQuantity, " +
+                "wod.closed_price as closedPrice,wod.invoice_num as invoiceNum,wod.invoice_time as invoiceTime,wo.approver_name as approverName,wod.contract_num as contractNum,wod.comment as comment,wod.closed as statementStatus, wod.parts_type, wod.approved  " +
+                "from v2_work_order_detail wod " +
+                "INNER JOIN v2_work_order wo ON wod.wo_id = wo.id " +
+                "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
+                "INNER JOIN mvs_ib_mapping m1 ON wo.asset_uid = m1.mvs_ib_uid OR wo.asset_uid = m1.e_home_ib_uid " +
+                "INNER JOIN asset_info ai ON m1.ib_uid = ai.uid " +
+                "INNER JOIN user_org uo ON uo.org_uid IN (ai.tenant_uid, ai.institution_uid, ai.hospital_uid, ai.site_uid, ai.clinical_dept_uid) " +
+                "LEFT JOIN org_info oi ON ai.clinical_dept_uid = oi.uid " +
+                "WHERE ai.is_valid AND NOT ai.is_deleted AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL) ");
+
+        String filter = buildFilter_MVS_WorkOrderDetail(searchFilterList);
+        sb.append(filter);
+        sb.append(" order by wo.created_date desc ");
+
+        return sb.toString();
+    }
+
+    public String buildFilter_MVS_WorkOrderDetail(List<SearchFilter> searchFilterList) {
+        StringBuilder sb = new StringBuilder();
+
+        for (SearchFilter searchFilter : searchFilterList) {
+            String tempColumn = searchFilter.fieldName;
+            Object value = searchFilter.value;
+            SearchFilter.Operator op = searchFilter.operator;
+
+            if (tempColumn.equals("orgUID")) {
+                sb.append(" and (ai.tenant_uid='" + value + "' or ai.institution_uid='" + value + "' or ai.hospital_uid='" + value + "' or ai.site_uid='" + value + "') ");
+            } else if (tempColumn.equals("assetInfo.clinicalDeptUID")) {
+                String str = "";
+                for (Object obj : (List<Object>) value) {
+                    str += "'" + obj + "',";
+                }
+                str = str.substring(0, str.length() - 1);
+                sb.append(" and ai.clinical_dept_uid in (" + str + ") ");
+            } else if (tempColumn.equals("currentPersonId")) {
+                sb.append(" and wo.current_person_id=" + value);
+            } else if (tempColumn.equals("createdDate")) {
+                if (op.equals(SearchFilter.Operator.GTE)) {
+                    sb.append(" and wo.created_date>='" + value + "' ");
+                } else if (op.equals(SearchFilter.Operator.LT)) {
+                    sb.append(" and wo.created_date<'" + value + "' ");
+                }
+            } else if (tempColumn.equals("totalPrice")) {
+                if (op.equals(SearchFilter.Operator.GTE)) {
+                    sb.append(" and (wod.closed_price)>=" + value);
+                } else if (op.equals(SearchFilter.Operator.LT)) {
+                    sb.append(" and (wod.closed_price)<=" + value);
+                }
+            } else if (tempColumn.equals("statementStatus")) {
+                if (Boolean.valueOf(value.toString())) {
+                    sb.append(" and wod.closed=" + value);
+                } else {
+                    sb.append(" and (wod.closed=" + value + " or wod.closed is null) ");
+                }
+            } else if (tempColumn.equals("searchStr")) {
+                if (value != null) {
+                    String tempValue = value.toString().toLowerCase();
+                    sb.append(" and (lower(ai.depart_num) like '%" + tempValue + "%' or lower(sr.sr_num) like '%" + tempValue + "%' or lower(wod.invoice_num) like '%" + tempValue + "%' or lower(wod.supplier) like '%" + tempValue + "%')");
+                }
+            } else if (tempColumn.equals("assetInfo.assetType")) {
+                String str = "";
+                for (Object obj : (Set<Object>) value) {
+                    str += "'" + obj + "'" + ",";
+                }
+                str = str.substring(0, str.length() - 1);
+                sb.append(" and ai.asset_type in (" + str + ") ");
+            } else if (tempColumn.equals("approvedStatus")) {
+                List<String> approvedStatus = (List<String>) value;
+                if (!approvedStatus.isEmpty() && approvedStatus.size() < 3) {
+                    sb.append("and (");
+                    boolean flag = false;
+                    if (approvedStatus.contains("1")) {
+                        sb.append("wod.approved = true");
+                        flag = true;
+                    }
+                    if (approvedStatus.contains("2")) {
+                        sb.append(flag ? " or " : "");
+                        sb.append("wod.approved = false");
+                        flag = true;
+                    }
+                    if (approvedStatus.contains("3")) {
+                        sb.append(flag ? " or " : "");
+                        sb.append("wod.approved is null");
+                    }
+                    sb.append(")");
+                }
+            } else if (tempColumn.equals("userUid")) {
+                sb.append(" and uo.user_uid = '" + value + "'");
             }
         }
 

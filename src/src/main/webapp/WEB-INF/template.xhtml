@@ -58,6 +58,7 @@
              rendered="#{sharedAssetRequestV2Controller.selected.state != 8 and sharedAssetRequestV2Controller.selected.state != 2}">
         <p:autoUpdate />
     </p:growl>
+    <p:growl id="stickyGrowl" showDetail="false" showSummary="true" sticky="true" />
     <div class="layout-wrapper #{guestPreferences.menuLayout}">
         <ui:include src="./menu.xhtml"/>
         <ui:include src="/authorization.xhtml"/>

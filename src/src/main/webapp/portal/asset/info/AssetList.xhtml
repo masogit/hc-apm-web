@@ -877,7 +877,7 @@
                                             <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
                                         </p:selectOneMenu>
                                     </f:facet>
-                                    <h:outputText value="#{item.isChecked?msg.True2Yes:msg.False2No}"/>
+                                    <h:outputText value="#{item.isPm?msg.True2Yes:msg.False2No}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'isFixed'}">

@@ -9,7 +9,10 @@ import com.ge.apm.domain.pure.WorkOrderDetailPojo;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
@@ -28,6 +31,7 @@ import java.util.*;
 @Component
 public class WorkOrderDetailExportService {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkOrderDetailExportService.class);
     private static final String SHEET_WORKORDERDETAIL = "WorkOrderDetail List";
     private static final String STATEMENT_STATUS_OPENED = "Opened";
     private static final String STATEMENT_STATUS_CLOSED = "Closed";
@@ -110,6 +114,16 @@ public class WorkOrderDetailExportService {
 
         searchFilters.add(new SearchFilter("approvedStatus", SearchFilter.Operator.IN, filterMap.get("approvedStatus")));
         List<WorkOrderDetailPojo> workOrderDetailList =  worDao.workOrderDetailExport(searchFilters);
+
+        // 查询MVS工单备件数据
+        try {
+            searchFilters.add(new SearchFilter("userUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+            List<WorkOrderDetailPojo> mvsWorkOrderDetailList = worDao.mvsWorkOrderDetailExport(searchFilters);
+            log.info("MVS workOrderDetail query returned {} records, local query returned {} records", mvsWorkOrderDetailList.size(), workOrderDetailList.size());
+            workOrderDetailList.addAll(mvsWorkOrderDetailList);
+        } catch (Exception e) {
+            log.error("Failed to query MVS workOrderDetail data", e);
+        }
 
         for(WorkOrderDetailPojo workOrderDetailPojo : workOrderDetailList){
             Map<String, Object> workOrderDetailMap = new HashedMap();

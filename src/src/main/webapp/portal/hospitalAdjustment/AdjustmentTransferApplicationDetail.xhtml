@@ -185,7 +185,7 @@
                                 <span class="label" style="display:block; margin-bottom:5px;">处理日期</span>
                                 <p:calendar
                                         disabled="#{ !(adjustmentTransferApplicationDetailController.selected.status==1  and     userContextService.accessContainsFunctionMenu('HOSPITAL_ADJUSTMENT_IDLE_EQUIPMENT_ADJUSTMENT_ACCEPTANCE'))}"
-                                        value="#{adjustmentTransferApplicationDetailController.selected.applicationPendingApprovalDate}"
+                                        value="#{adjustmentTransferApplicationDetailController.selected.pendingDeliveryDate}"
                                         pattern="yyyy-MM-dd HH:mm:ss"
                                         showOn="button"
                                         style="width:160px;"
