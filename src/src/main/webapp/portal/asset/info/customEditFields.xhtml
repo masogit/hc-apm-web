@@ -12,7 +12,7 @@
             <label class="label">#{msg.serialNum}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['serialNum'].required? '*':''}</span></label>
             <p:inputText id="serialNum" value="#{assetInfoEditController.selected.serialNum}" required="#{assetInfoEditController.customConfig.assetFields['serialNum'].required}"
                          requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('serialNum')}">
-                <p:ajax event="blur" listener="#{assetInfoEditController.checkSerialNumExists}"/>
+                <p:ajax event="blur" listener="#{assetInfoEditController.checkSerialNumExists}" update=":stickyGrowl"/>
             </p:inputText>
         </h:panelGroup>
     </c:if>
