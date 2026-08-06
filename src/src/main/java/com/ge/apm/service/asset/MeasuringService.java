@@ -1118,10 +1118,10 @@ public class MeasuringService {
                 List<MeasuringCertificateDetail> mcdList = measuringCertificateDetailDao.findByCertificateNoAndTenantUIDOrderByCheckDateDesc(detail.getCertificateNo(), detail.getTenantUID());
                 if (mcdList != null && !mcdList.isEmpty() && mcdList.get(0).getAssetUID() != null) {
                     MeasuringCertificateDetail existMcd = mcdList.get(0);
-                    boolean snMismatch = ObjectUtil.isNotEmpty(detail.getAssetSN()) && !detail.getAssetSN().equals(existMcd.getAssetSN());
-                    boolean financeNoMismatch = ObjectUtil.isNotEmpty(detail.getFinanceNo()) && !detail.getFinanceNo().equals(existMcd.getFinanceNo());
-                    boolean qrCodeMismatch = ObjectUtil.isNotEmpty(detail.getQrCode()) && !detail.getQrCode().equals(existMcd.getQrCode());
-                    if (snMismatch && financeNoMismatch && qrCodeMismatch) {
+                    boolean snMatch = existMcd.getAssetSN() != null && Objects.equals(existMcd.getAssetSN(), detail.getAssetSN());
+                    boolean financeNoMatch = existMcd.getFinanceNo() != null && Objects.equals(existMcd.getFinanceNo(), detail.getFinanceNo());
+                    boolean qrCodeMatch = existMcd.getQrCode() != null && Objects.equals(existMcd.getQrCode(), detail.getQrCode());
+                    if (!snMatch && !financeNoMatch && !qrCodeMatch) {
                         errorInfo.append("[计量证书编号已绑定其他设备]");
                     }
                 }
