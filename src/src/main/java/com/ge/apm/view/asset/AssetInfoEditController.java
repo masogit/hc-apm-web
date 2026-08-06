@@ -1090,7 +1090,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         // 序列号重复校验（新增时）
         if(selected.getId() == null && StringUtils.isNotEmpty(selected.getSerialNum())){
             if(checkSerialNumUnique()){
-                WebUtil.addErrorMessage("制造商序列号已存在！");
+                WebUtil.addStickyErrorMessage("制造商序列号已存在！");
             }
         }
         if(!checkAssetScrap()){
@@ -2294,7 +2294,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void checkSerialNumExists () {
         List<AssetInfo> list = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
         if (CollectionUtils.isNotEmpty(list)) {
-            WebUtil.addWarnMessage("制造商序列号已存在！");
+            WebUtil.addStickyErrorMessage("制造商序列号已存在！");
         }
     }
 

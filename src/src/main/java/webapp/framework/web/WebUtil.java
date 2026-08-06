@@ -200,6 +200,16 @@ public class WebUtil implements ApplicationContextAware {
         FacesContext.getCurrentInstance().addMessage(null, facesMsg);
     }
 
+    /**
+     * 添加不会自动消失的错误消息（sticky growl），即使页面跳转也会保留
+     */
+    public static void addStickyErrorMessage(String msg) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg);
+        context.addMessage("stickyGrowl", facesMsg);
+        context.getExternalContext().getFlash().setKeepMessages(true);
+    }
+
     public static void addWarnMessage(String msg) {
         addWarnMessage(msg, "xx");
     }
