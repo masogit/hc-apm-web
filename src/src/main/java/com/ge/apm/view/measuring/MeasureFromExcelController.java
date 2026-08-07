@@ -133,6 +133,24 @@ public class MeasureFromExcelController implements ServerEventInterface {
     }
 
     /**
+     * 重置导入状态，清空所有校验数据和文件
+     */
+    public void resetImport() {
+        this.file = null;
+        this.selectedOrg = null;
+        this.displayList = null;
+        this.displayErrorList = null;
+        this.canbeImported = false;
+        this.isImported = false;
+        this.displayErrorsOnly = false;
+        // 同步清空所属院区下拉组件的状态
+        if (filterSiteOrgTreeComponentController != null) {
+            filterSiteOrgTreeComponentController.setSelectedOrg(null);
+            filterSiteOrgTreeComponentController.setSelectedNode(null);
+        }
+    }
+
+    /**
      * 切换显示全部/仅错误
      */
     public void switchDisplayMode() {
