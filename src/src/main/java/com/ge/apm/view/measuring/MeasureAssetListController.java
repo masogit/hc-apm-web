@@ -651,6 +651,13 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             // 报废计量结果
             matchType = 9;
         }
+        if ("resultImport".equals(tabId)) {
+            MeasureFromExcelController importController = WebUtil.getBean(MeasureFromExcelController.class);
+            importController.resetImport();
+            RequestContext rc = RequestContext.getCurrentInstance();
+            rc.update("measuringTab:importForm");
+            rc.update("measuringTab:resultImportWrapper");
+        }
     }
 
     public List<I18nMessage> getMeasureGradeList(){

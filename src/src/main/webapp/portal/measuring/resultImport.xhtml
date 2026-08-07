@@ -143,26 +143,28 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
-
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="margin-top:15px;">
-                        <h:panelGroup>
-                            <p:commandButton value="确认导入"
-                                             actionListener="#{measureFromExcelController.importData()}"
-                                             update="@form :measuringTab:growl"
-                                             icon="ui-icon-check"
-                                             styleClass="btn btn-primary"
-                                             disabled="#{!measureFromExcelController.canbeImported or measureFromExcelController.isImported}"
-                                             onstart="PF('importStatusDialog').show()"
-                                             oncomplete="PF('importStatusDialog').hide()"/>
-                            <p:commandButton value="返回" immediate="true"
-                                             icon="ui-icon-arrow-back"
-                                             action="measuring?faces-redirect=true"
-                                             update=":measuringTab:growl"
-                                             style="margin-left:10px;"/>
-                        </h:panelGroup>
-                    </p:panelGrid>
                 </p:fieldset>
                 </div>
+            </h:form>
+
+            <h:form id="actionForm">
+            <h:panelGroup rendered="#{measureFromExcelController.hasData}">
+                <div class="ui-g-12 card" style="padding-top:0;">
+                    <p:commandButton value="确认导入"
+                                     actionListener="#{measureFromExcelController.importData()}"
+                                     update=":measuringTab:resultImportWrapper :measuringTab:growl"
+                                     icon="ui-icon-check"
+                                     styleClass="btn btn-primary"
+                                     disabled="#{!measureFromExcelController.canbeImported or measureFromExcelController.isImported}"
+                                     onstart="PF('importStatusDialog').show()"
+                                     oncomplete="PF('importStatusDialog').hide()"/>
+                    <p:commandButton value="返回" immediate="true"
+                                     icon="ui-icon-arrow-back"
+                                     actionListener="#{measureFromExcelController.resetImport()}"
+                                     update=":measuringTab:importForm :measuringTab:resultImportWrapper :measuringTab:growl"
+                                     style="margin-left:10px;"/>
+                </div>
+            </h:panelGroup>
             </h:form>
         </h:panelGroup>
     </div>
