@@ -346,4 +346,32 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
         }
         return str;
     }
+
+    public String getStatusStr(Integer status){
+        // 0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，已完成，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，已完成，没有延期 9.有问题，进行中
+        switch (status){
+            case 0:
+                return "未检查";
+            case 1:
+                return "已检查";
+            case 2:
+                return "通过";
+            case 3:
+                return "有问题";
+            case 4:
+                return "进行中";
+            case 5:
+                return "通过有备注没有延期";
+            case 6:
+                return "通过有备注延期";
+            case 7:
+                return "通过，没有备注，延期了";
+            case 8:
+                return "有问题，已完成，没有延期";
+            case 9:
+                return "有问题，进行中";
+            default:
+                return "未检查";
+        }
+    }
 }
