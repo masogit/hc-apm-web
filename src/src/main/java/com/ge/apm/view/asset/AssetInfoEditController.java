@@ -2813,6 +2813,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         String serialNum = equipmentNameplate.getSerial_num();
         if(StringUtils.isNotEmpty(serialNum) && useValue.get("serial_num")){
             this.selected.setSerialNum(serialNum);
+            if(checkSerialNumUnique()){
+                WebUtil.addStickyErrorMessage("制造商序列号已存在！");
+            }
         }
 
         String manufactory = equipmentNameplate.getManufactory();
