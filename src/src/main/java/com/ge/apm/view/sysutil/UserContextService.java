@@ -496,6 +496,10 @@ public class UserContextService implements Serializable {
         if(flagIsHospitalUser!=null) return flagIsHospitalUser;
 
         UserAccount loginUser = getLoginUser();
+        if(CollectionUtils.isNotEmpty(child)) {
+            flagIsHospitalUser = Boolean.TRUE;
+            return flagIsHospitalUser;
+        }
         //判断医院级别是否有调剂中心
         List<WorkflowConfig> list = WebUtil.getBean(WorkflowConfigRepository.class).findHospitalLevel(loginUser.getSiteUID());
         if(CollectionUtils.isNotEmpty(list)) {
@@ -1498,6 +1502,21 @@ public class UserContextService implements Serializable {
         this.selectedSiteUid = selectedSiteUid;
     }
 
+    public boolean enableUnmannedMode(){
+        boolean flag = false;
+        List<OrgInfo> siteOrgInfoChild = getSiteOrgInfoChild();
+        if(CollectionUtils.isEmpty(siteOrgInfoChild)) return flag;
+        ConfigItemValueRepository bean = WebUtil.getBean(ConfigItemValueRepository.class);
+        for (OrgInfo orgInfo : siteOrgInfoChild) {
+            ConfigItemValue whetherToEnableUnattended = bean.findFirstByKeyAndSiteUid("whetherToEnableUnattended", orgInfo.getSiteUID());
+            if(whetherToEnableUnattended != null){
+                if(Boolean.TRUE.toString().equals(whetherToEnableUnattended.getValue())){
+                    return  true;
+                }
+            }
+        }
+        return flag;
+    }
     public List<OrgInfo> getSiteOrgInfoChild() {
         if (CollectionUtils.isNotEmpty(child)) return child;
         String hospitalUID = userAccount.getSiteUID();
