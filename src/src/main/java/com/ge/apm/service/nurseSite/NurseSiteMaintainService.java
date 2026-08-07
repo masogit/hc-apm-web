@@ -742,7 +742,7 @@ public class NurseSiteMaintainService {
 		obj.setModifyDate(date);
 	}
 
-	private void supplementMaintainItem(List<NurseSiteMaintainItem> listItem) {
+	public void supplementMaintainItem(List<NurseSiteMaintainItem> listItem) {
 		Set<String> setAssetInfoUids = new HashSet<String>();
 		Set<String> setItemIds = new HashSet<String>();
 		Map<String, List<NurseSiteMaintainData>> mapData = new HashMap<String, List<NurseSiteMaintainData>>();

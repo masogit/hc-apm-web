@@ -3,6 +3,7 @@ package com.ge.apm.view.nurseSite;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainItemMapper;
 import com.ge.apm.domain.*;
@@ -48,6 +49,7 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
     private OrgInfoRepository orgInfoRepository;
     private UaaService uaaService;
     private SearchController searchController;
+    private NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
     private LazyDataModel<Map<String, Object>> lazyModel;
     private List<String> orgUidList = Collections.singletonList("-1");
     private NurseSiteMaintain nurseSiteMaintain;
@@ -67,6 +69,7 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         searchController = WebUtil.getBean(SearchController.class);
+        nurseSiteMaintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
 
         searchController.setCallingController(this);
         searchController.setType(3);
@@ -89,8 +92,11 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
             public List<Map<String, Object>> load(int first, int pageSize, String sortField,
                                                    SortOrder sortOrder, Map<String, Object> filters) {
                 Map<String, Object> param = buildQueryParams(filters);
+                param.put("pageNum",first);
+                param.put("pageSize",pageSize);
                 List<Map<String, Object>> result = maintainItemMapper.searchMaintainItemsWithAttachment(param);
-                this.setRowCount(result.size());
+               int count = maintainItemMapper.searchMaintainItemsWithAttachmentCount(param);
+                this.setRowCount(count);
                 return result;
             }
 
@@ -137,6 +143,9 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
                 if (filterStr.isEmpty()) continue;
 
                 switch (field) {
+                    case "maintainName":
+                        param.put("maintainName", filterStr);
+                        break;
                     case "assetName":
                         param.put("assetName", filterStr);
                         break;
@@ -184,11 +193,14 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
     public void onRowSelect(SelectEvent selectEvent) {
         Map<String, Object> item = (Map<String, Object>) selectEvent.getObject();
         String maintainId = (String) item.get("maintainId");
+        String itemId = (String) item.get("itemId");
 
         // Load work order details
         if (maintainId != null) {
             nurseSiteMaintain = nurseSiteMaintainService.findByIds(Collections.singleton(maintainId)).get(0);
-            nurseSiteMaintainService.supplementMaintain(nurseSiteMaintain, 100, 0, false);
+            List<NurseSiteMaintainItem> listItem = nurseSiteMaintainItemRepository.findByIdIn(Arrays.asList(itemId));
+            nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
+            nurseSiteMaintainService.supplementMaintainItem(listItem);
             generateShowLables();
         }
 
@@ -301,5 +313,37 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
 
     public void setAttachmentList(List<V2_BlobObject> attachmentList) {
         this.attachmentList = attachmentList;
+    }
+
+
+    public String getShowTitle(Map<String, Object> map) {
+        //0：未检查,1:已检查，2:通过，3有问题
+        String strStatus="未检查";
+        Integer status =(Integer) map.get("status");
+        String name =(String) map.get("maintainName");
+        Integer sequence =(Integer) map.get("sequence");
+        if(status==null || status==0){
+        }
+        else if(status==1){
+            strStatus="已检查";
+        }
+        else if(status==2|| status==5|| status==6|| status==7){
+            strStatus="通过";
+        }
+        else if(status==3 || status==8 || status==9){
+            strStatus="有问题";
+        }
+        else if(status==4){
+            strStatus="进行中";
+        }
+
+        String str=name;
+        if(sequence==null||sequence<=0){
+            str+="-"+strStatus;
+        }
+        else{
+            str+="-"+sequence+"-"+strStatus;
+        }
+        return str;
     }
 }
