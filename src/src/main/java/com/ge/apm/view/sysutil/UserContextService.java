@@ -1504,7 +1504,7 @@ public class UserContextService implements Serializable {
         if (userAccount.getOrgLevel() < 3) {
             WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
             OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-            child = orgInfoRepository.getHospitalByTenantUIDAndType(hospitalUID);
+            child = orgInfoRepository.getHospitalChildrenByUids(Arrays.asList(hospitalUID));
             if (CollectionUtils.isNotEmpty(child)) {
                 child = filterChildOrgInfo(child, workflowConfigDao);
                 if (CollectionUtils.isNotEmpty(child)) {
