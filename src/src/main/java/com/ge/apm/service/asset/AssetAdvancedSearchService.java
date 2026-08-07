@@ -12,7 +12,7 @@ import java.util.*;
 @Component
 public class AssetAdvancedSearchService {
 
-    private static final String CONDITION_PATH = "adv*";
+    private static final String CONDITION_PATH = "1*9";
 
     private static final List<FieldOption> FIELD_OPTIONS = new ArrayList<>();
     private static final Map<String, String> FIELD_TYPE_MAP = new HashMap<>();
@@ -256,7 +256,7 @@ public class AssetAdvancedSearchService {
             } else {
                 Object value = resolveValue(condition, fieldType);
                 if (value != null) {
-                    searchFilters.add(new SearchFilter(condition.getFieldName(), operator, value, CONDITION_PATH));
+                    searchFilters.add(new SearchFilter(condition.getFieldName(), operator, value));
                 }
             }
         }

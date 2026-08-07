@@ -27,6 +27,7 @@ public interface NurseSiteMaintainItemMapper extends BaseMapper<NurseSiteMaintai
      * @return list of maintain items with attachment info
      */
     List<Map<String, Object>> searchMaintainItemsWithAttachment(Map<String, Object> param);
+    int searchMaintainItemsWithAttachmentCount(Map<String, Object> param);
 
     @Select({"<script>" +
                 "select * from nurse_site_maintain_data where parent_id in " +

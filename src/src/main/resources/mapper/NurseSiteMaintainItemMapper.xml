@@ -29,27 +29,7 @@
         select nsmi.* from nurse_site_maintain_item nsmi left join asset_info ai on nsmi.asset_uid = ai.uid
         <where>${ew.sqlSegment}</where> order by id
     </select>
-
-    <!-- Query daily inspection items with attachments, joining asset_info and nurse_site_maintain -->
-    <select id="searchMaintainItemsWithAttachment" resultType="java.util.Map">
-        select
-            nsmi.id as "itemId",
-            nsmi.parent_id as "maintainId",
-            nsm.name as "maintainName",
-            ai.name as "assetName",
-            ai.serial_num as "serialNum",
-            ai.qr_code as "qrCode",
-            ai.clinical_dept_name as "clinicalDeptName",
-            o2.name as "usingDeptName",
-            nsm.check_date as "checkDate"
-        from nurse_site_maintain_item nsmi
-        inner join nurse_site_maintain nsm on nsmi.parent_id = nsm.id
-        inner join asset_info ai on nsmi.asset_uid = ai.uid
-        left join org_info o2 on ai.asset_dept_uid = o2.uid
-        where exists (
-            select 1 from v2_blob_object vbo
-            where vbo.bo_uuid = nsmi.id
-        )
+    <sql id="filtersSql">
         <if test="tenantUid != null">
             and nsm.tenant_uid = #{tenantUid}
         </if>
@@ -61,6 +41,9 @@
         </if>
         <if test="assetDeptUid != null">
             and ai.asset_dept_uid = #{assetDeptUid}
+        </if>
+        <if test="maintainName != null and maintainName != ''">
+            and nsm.name like concat('%', #{maintainName}, '%')
         </if>
         <if test="assetName != null and assetName != ''">
             and ai.name like concat('%', #{assetName}, '%')
@@ -85,17 +68,55 @@
         </if>
         <if test="orgUidList != null and orgUidList.size > 0">
             and (
-                ai.site_uid in
-                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
-                    #{item}
-                </foreach>
-                or ai.clinical_dept_uid in
-                <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
-                    #{item}
-                </foreach>
+            ai.site_uid in
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            or ai.clinical_dept_uid in
+            <foreach item="item" collection="orgUidList" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
             )
         </if>
+    </sql>
+    <!-- Query daily inspection items with attachments, joining asset_info and nurse_site_maintain -->
+    <select id="searchMaintainItemsWithAttachment" resultType="java.util.Map">
+        select
+            nsmi.id as "itemId",
+            nsmi.parent_id as "maintainId",
+            nsm.name as "maintainName",
+            ai.name as "assetName",
+            ai.serial_num as "serialNum",
+            ai.qr_code as "qrCode",
+            ai.clinical_dept_name as "clinicalDeptName",
+            o2.name as "usingDeptName",
+            nsm.check_date as "checkDate",
+            nsm.schedule_date as "scheduleDate",
+            nsm.status as "status",
+            nsm.sequence as "sequence"
+        from nurse_site_maintain_item nsmi
+        inner join nurse_site_maintain nsm on nsmi.parent_id = nsm.id
+        inner join asset_info ai on nsmi.asset_uid = ai.uid
+        left join org_info o2 on ai.asset_dept_uid = o2.uid
+        where exists (
+            select 1 from v2_blob_object vbo
+            where vbo.bo_uuid = nsmi.id
+        )
+        <include refid="filtersSql" />
         order by nsm.check_date desc
+        limit #{pageSize} offset #{pageNum}
+    </select>
+    <select id="searchMaintainItemsWithAttachmentCount" resultType="int">
+        select count(*)
+        from nurse_site_maintain_item nsmi
+                 inner join nurse_site_maintain nsm on nsmi.parent_id = nsm.id
+                 inner join asset_info ai on nsmi.asset_uid = ai.uid
+                 left join org_info o2 on ai.asset_dept_uid = o2.uid
+        where exists (
+            select 1 from v2_blob_object vbo
+            where vbo.bo_uuid = nsmi.id
+        )
+        <include refid="filtersSql" />
     </select>
 
 </mapper>

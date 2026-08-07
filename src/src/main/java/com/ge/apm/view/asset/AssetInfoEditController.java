@@ -1090,7 +1090,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         // 序列号重复校验（新增时）
         if(selected.getId() == null && StringUtils.isNotEmpty(selected.getSerialNum())){
             if(checkSerialNumUnique()){
-                WebUtil.addStickyErrorMessage("制造商序列号已存在！");
+                WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }
         if(!checkAssetScrap()){

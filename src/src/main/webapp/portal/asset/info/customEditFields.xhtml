@@ -207,7 +207,7 @@
         </h:panelGroup>
     </c:if>
     <!--上次计量日期-->
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'lastMeteringDate')}">
+<!--    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'lastMeteringDate')}">
         <h:panelGroup>
             <label class="label">#{msg.lastMeteringDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['lastMeteringDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" id="lastMeteringDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.lastMeteringDate}"
@@ -217,9 +217,9 @@
                 <p:ajax event="dateSelect"/>
             </p:calendar>
         </h:panelGroup>
-    </c:if>
+    </c:if>-->
     <!--下次计量日期-->
-    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'nextMeteringDate')}">
+<!--    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'nextMeteringDate')}">
         <h:panelGroup>
             <label class="label">#{msg.nextMeteringDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['nextMeteringDate'].required? '*':''}</span></label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" id="nextMeteringDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.nextMeteringDate}"
@@ -229,7 +229,7 @@
                 <p:ajax event="dateSelect"/>
             </p:calendar>
         </h:panelGroup>
-    </c:if>
+    </c:if>-->
     <!--保养巡检负责人-->
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'patrolInspectionOwnerName')}" >
         <h:panelGroup >
