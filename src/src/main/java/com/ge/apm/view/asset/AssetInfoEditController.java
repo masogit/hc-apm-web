@@ -2292,8 +2292,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void checkSerialNumExists () {
-        List<AssetInfo> list = dao.findBySerialNumAndTenantUID(selected.getSerialNum(), selected.getTenantUID());
-        if (CollectionUtils.isNotEmpty(list)) {
+        if (supportingService.isAssetFieldDuplicate("serialNum", selected.getSerialNum(), selected.getSiteUID(), selected.getUid())) {
             WebUtil.addStickyErrorMessage("制造商序列号已存在！");
         }
     }
