@@ -1339,9 +1339,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     }
 
     public void checkSerialNumExists () {
-        List<AssetInfo> list = assetDao.findBySerialNumAndTenantUID(this.arrivalListItem.getSerialNum(), this.arrivalList.getTenantUID());
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(list)) {
-            WebUtil.addWarnMessage("制造商序列号已存在！");
+        if (supportingService.isAssetFieldDuplicate("serialNum", arrivalListItem.getSerialNum(), arrivalListItem.getSiteUid(), arrivalListItem.getAssetUID())) {
+            WebUtil.addStickyErrorMessage("制造商序列号已存在！");
         }
     }
 
