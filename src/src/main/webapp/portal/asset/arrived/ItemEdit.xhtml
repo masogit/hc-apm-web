@@ -282,7 +282,7 @@
                                     <label class="label">#{msg.serialNum}<span style="color:red">#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired? '*':''}</span></label>
                                     <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="#{assetInstallationController.customConfig.assetFields['serialNum'].arrivalRequired}" 
                                                  requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}">
-                                        <p:ajax event="blur" listener="#{assetInstallationController.checkSerialNumExists}" process="@this" update="@this"/>
+                                        <p:ajax event="blur" listener="#{assetInstallationController.checkSerialNumExists}" process="@this" update="@this :stickyGrowl"/>
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
