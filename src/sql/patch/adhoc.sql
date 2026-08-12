@@ -21,3 +21,9 @@ ALTER TABLE user_auth_mapping ADD column tenant_uid varchar(32);
 -- YHAAO-28879
 delete from  public.config_item where key = 'NursingStaffScanCodeToAssetRegister';
 insert into public.config_item (uid, category,default_value,  description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 1, 'repair', '护理人员扫码默认打开页面设置', 'NursingStaffScanCodeToAssetRegister', '护理人员扫码默认打开页面设置', 'f', 't', 7,'[{"key":"事件记录","value":"record"},{"key":"设备台账","value":"asset"},{"key":"报修页面","value":"repair"}]' where not exists (select * from config_item where key = 'NursingStaffScanCodeToAssetRegister');
+
+
+
+
+--YHAAO-29195
+ALTER TABLE public.pm_order_rule ADD CONSTRAINT pm_order_rule_unique UNIQUE (uid);
