@@ -63,6 +63,7 @@ public class MeasureFromZipController {
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
     public void handleZipFileUploadOCR(FileUploadEvent event) throws IOException {
+        measuringService.setProgress(0);
         resultListOCR = new ArrayList<>();
         String identifyPatterns = configItemService.getConfigItemByKeyToString("identifyPatterns",currentUser);
         if("local".equals(identifyPatterns)){
