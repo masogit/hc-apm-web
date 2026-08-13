@@ -123,6 +123,9 @@
                         <p:column headerText="二维码">
                             <h:outputText value="#{item.qrCode}" />
                         </p:column>
+                        <p:column headerText="证书类型">
+                            <h:outputText value="#{fieldMsg.fieldValue('certificateType', item.certificateType)}"/>
+                        </p:column>
                         <p:column headerText="#{measureFromExcelController.isImported ? '导入状态' : '校验结果'}" width="180">
                             <h:outputText value="校验通过" style="color:green;"
                                           rendered="#{item.importStatus == 'CheckPass'}"/>
