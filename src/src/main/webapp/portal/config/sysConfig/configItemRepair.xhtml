@@ -409,10 +409,10 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').name.concat('(').concat(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').key).concat(')')}</label>
                 <p:fieldset>
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="overflow-x: auto">
                         <h:panelGroup>
                             <label class="label">无台账报修派工人1</label>
-                            <p:autoComplete  dropdown="true"
+                            <p:autoComplete  dropdown="true" inputStyle="width: 100%"
                                             value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers1']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
@@ -422,7 +422,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">无台账报修派工人2</label>
-                            <p:autoComplete  dropdown="true"
+                            <p:autoComplete  dropdown="true" inputStyle="width: 100%"
                                             value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers2']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
@@ -432,7 +432,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医学工程处主任</label>
-                            <p:autoComplete  dropdown="true"
+                            <p:autoComplete  dropdown="true" inputStyle="width: 100%"
                                             value="#{systemConfigItemController.selectedObjectMap['AssetHead']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteAssetHead}"
