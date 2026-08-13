@@ -67,11 +67,12 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice" disabled="true"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}">
+                        <p:inputNumber  decimalPlaces="2" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}">
                             <!-- <p:ajax listener="#{workOrderMgrController.f1()}" update="woTab:moreAccDialogForm" >-->
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)">
                             </p:ajax>
                         </p:inputNumber>
+
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
@@ -179,7 +180,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
-                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPriceView"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
+                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="2" maxValue="99999999" id="partsPriceView"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" >
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)"/>
                         </p:inputNumber>
                     </h:panelGroup>

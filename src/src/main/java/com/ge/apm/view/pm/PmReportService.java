@@ -26,6 +26,7 @@ import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.pdf.PDFConversion;
 import com.ge.healthcare.cn.common.pdf.PDFConversionUtil;
@@ -712,6 +713,13 @@ public class PmReportService {
         messageTipBuilder.append("请确认是否需要下载？");
         return messageTipBuilder.toString();
     }
+
+    public boolean enableDisplayByKey(String key){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String value = WebUtil.getBean(ConfigItemValueRepository.class).findByKeyAndSiteForUseParent(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID(), key);
+        return Boolean.TRUE.toString().equalsIgnoreCase(value);
+    }
+
     public DefaultStreamedContent generateEhome(Map<String, Boolean> woOrders, UserAccount userAccount ) throws IOException {
         if (!woOrders.values().contains(true)) {
             throw new BusinessException("未选中工单记录");
@@ -723,7 +731,12 @@ public class PmReportService {
                 if (selected) {
                     try {
                         V2_PmOrder v2PmOrder = pmOrderService.findById(id);
-                        List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
+                        List<V2_BlobObject> byBoUuid;
+                        if (enableDisplayByKey("mvsPmReportOnlyDownloadPmItems")) {
+                            byBoUuid = blobObjectRepository.fetchBlobObjectNotType(v2PmOrder.getId(), Arrays.asList(new String[]{"PmOrderEHome", "SignatureEHome"}).stream().collect(Collectors.toSet()));
+                        } else {
+                            byBoUuid = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
+                        }
 //                        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(byBoUuid)){
 //                            byBoUuid = byBoUuid.stream()
 //                                    .filter(item -> item.getObjectName().contains("-工单报告.pdf"))
@@ -752,6 +765,49 @@ public class PmReportService {
                     }
                 }
             });
+            zout.close();
+            return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", reportName);
+        }
+    }
+
+    /**
+     * 全部下载：将筛选条件下的前maxCount条工单附件打包成ZIP
+     */
+    public DefaultStreamedContent generateEhomeAll(List<V2_PmOrder> pmOrders, UserAccount userAccount) throws IOException {
+        if (pmOrders == null || pmOrders.isEmpty()) {
+            throw new BusinessException("未查询到工单记录");
+        }
+        String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "工单报告_全部.zip";
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+             ZipOutputStream zout = new ZipOutputStream(bout)) {
+            for (V2_PmOrder v2PmOrder : pmOrders) {
+                try {
+                    List<V2_BlobObject> byBoUuid;
+                    if (enableDisplayByKey("mvsPmReportOnlyDownloadPmItems")) {
+                        byBoUuid = blobObjectRepository.fetchBlobObjectNotType(v2PmOrder.getId(), Arrays.asList(new String[]{"PmOrderEHome", "SignatureEHome"}).stream().collect(Collectors.toSet()));
+                    } else {
+                        byBoUuid = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
+                    }
+                    java.util.Set<String> addedEntryNames = new java.util.HashSet<>();
+                    for (V2_BlobObject v2BlobObject : byBoUuid) {
+                        String vname = v2PmOrder.getPmNum() + "-" + v2BlobObject.getObjectName();
+                        if (!addedEntryNames.add(vname)) {
+                            int seq = 1;
+                            while (addedEntryNames.contains(vname + "(" + seq + ")")) {
+                                seq++;
+                            }
+                            vname = vname + "(" + seq + ")";
+                            addedEntryNames.add(vname);
+                        }
+                        zout.putNextEntry(new ZipEntry(vname));
+                        byte[] bytess = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(v2BlobObject.getObjectStorageId()).getStream());
+                        IOUtils.write(bytess, zout);
+                    }
+                    zout.closeEntry();
+                } catch (Exception e) {
+                    logger.error("全部下载报告下载失败, 工单ID: " + v2PmOrder.getId() + " e :", e);
+                }
+            }
             zout.close();
             return new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", reportName);
         }

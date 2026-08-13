@@ -1219,6 +1219,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         return  pmReportService.generateMessageTip(selectedMap);
     }
     private StreamedContent maintenanceWorkReport;
+    private StreamedContent maintenanceWorkReportAll;
 
     public StreamedContent getMaintenanceWorkReport() {
         return maintenanceWorkReport;
@@ -1226,6 +1227,43 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 
     public void setMaintenanceWorkReport(StreamedContent maintenanceWorkReport) {
         this.maintenanceWorkReport = maintenanceWorkReport;
+    }
+
+    public StreamedContent getMaintenanceWorkReportAll() {
+        return maintenanceWorkReportAll;
+    }
+
+    public void setMaintenanceWorkReportAll(StreamedContent maintenanceWorkReportAll) {
+        this.maintenanceWorkReportAll = maintenanceWorkReportAll;
+    }
+
+    /**
+     * 全部下载：基于当前筛选条件下载前500条工单附件
+     */
+    public void doExportAllWorkOrderReport() {
+        maintenanceWorkReportAll = null;
+        try {
+            Map<String, Object> params = initializeParams();
+            processSearchFilters(params);
+            setParamsByQueryIndex(params);
+            List<V2_PmOrder> allOrders = mvsPmOrderMapper.loadData(params);
+            if (allOrders == null || allOrders.isEmpty()) {
+                WebUtil.addErrorMessage("未查询到符合条件的工单记录");
+                return;
+            }
+            int maxCount = 500;
+            if (allOrders.size() > maxCount) {
+                allOrders = allOrders.subList(0, maxCount);
+            }
+            maintenanceWorkReportAll = pmReportService.generateEhomeAll(allOrders, loginUser);
+        } catch (BusinessException e) {
+            logger.error("全部下载 pm_word BusinessException ", e);
+            WebUtil.addErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            logger.error("全部下载 pm_word Exception", e);
+            java.util.logging.Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate all maintenance report", e);
+            WebUtil.addErrorMessage("全部下载失败，请稍后重试");
+        }
     }
 
     public void setMessageTip(String messageTip) {

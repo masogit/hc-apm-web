@@ -2729,34 +2729,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return true;
         }
         if( selectedWorkOrder.getStatus()==2) {//关单后
-            if(userContextService.hasAnyRole("AssetHead")){
-                return true;
-            }else{
-                return false;
-            }
-        }else{
-            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
-                return true;
-            }
+            return userContextService.hasAnyRole("AssetHead") || userContextService.hasAnyRole("AssetStaff");
         }
         return true;
     }
 
-    public boolean allowChangedForDisable(){
-        if(selected.getStatus()==2) {//关单后
-            if(userContextService.hasAnyRole("AssetHead")){
+    public boolean allowChangedForDisable() {
+        if (selected.getStatus() == 2) {//关单后
+            if (userContextService.hasAnyRole("AssetHead") || userContextService.hasAnyRole("AssetStaff")) {
                 return false;
-            }else{
-                return true;
-            }
-        }else{
-            if(userContextService.hasAnyRole("AssetHead")||userContextService.hasAnyRole("AssetStaff")){
-                return false;
-            }else{
-                return true;
             }
         }
-
+        return true;
     }
 
     public List<V2_BlobObject> getPartPictures(String id){

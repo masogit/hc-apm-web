@@ -193,10 +193,32 @@
                     <ui:fragment rendered="true">
                         <p:commandButton  icon="ui-icon ui-icon-arrow-downward" onclick="PF('downloadConfirm').show(); return false;" class="btn-export-maintenance-report" title="批量下载附件工单" rendered="#{v2PmOrderMvsController.queryIndex==7}" disabled="#{not v2PmOrderMvsController.isTargetSelected()}" ajax="false"/>
                     </ui:fragment>
+                    <ui:fragment rendered="true">
+                        <p:commandButton  icon="ui-icon ui-icon-circle-arrow-s" onclick="PF('downloadAllConfirm').show(); return false;" class="btn-export-all-maintenance-report" title="全部下载（最多500条）" rendered="#{v2PmOrderMvsController.queryIndex==7}" ajax="false"/>
+                    </ui:fragment>
 
                 </f:facet>
             </p:dataTable>
         </h:form>
+
+        <p:confirmDialog id="downloadAllConfirm" widgetVar="downloadAllConfirm"
+                         message="确认下载当前筛选条件下的全部工单附件（最多500条）？"
+                         header="确认全部下载"
+                         severity="warn" class="downloadAllConfirm" width="700px">
+            <h:form>
+                <p:commandButton value="确定" ajax="false"
+                                 actionListener="#{v2PmOrderMvsController.doExportAllWorkOrderReport()}"
+                                 onclick="PF('downloadAllConfirm').hide()" styleClass="ui-confirmdialog-yes uiButton"
+                                 icon="ui-icon-check">
+                    <p:fileDownload value="#{v2PmOrderMvsController.maintenanceWorkReportAll}"
+                                    oncomplete="PF('downloadAllConfirm').hide()"/>
+                </p:commandButton>
+                <p:commandButton value="取消" type="button"
+                                 onclick="PF('downloadAllConfirm').hide()" styleClass="ui-confirmdialog-no uiButton"
+                                 icon="ui-icon-close"
+                />
+            </h:form>
+        </p:confirmDialog>
 
         <p:confirmDialog id="downloadConfirm" widgetVar="downloadConfirm"
                          message="#{v2PmOrderMvsController.messageTip}"
