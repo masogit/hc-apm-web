@@ -721,7 +721,7 @@ public class WorkOrderReportProvider {
 
         String filter = buildFilter_MVS_WorkOrderDetail(searchFilterList);
         sb.append(filter);
-        sb.append(" order by wo.created_date desc ");
+        sb.append(" order by sr.request_time desc ");
 
         return sb.toString();
     }
@@ -747,9 +747,9 @@ public class WorkOrderReportProvider {
                 sb.append(" and wo.current_person_id=" + value);
             } else if (tempColumn.equals("createdDate")) {
                 if (op.equals(SearchFilter.Operator.GTE)) {
-                    sb.append(" and wo.created_date>='" + value + "' ");
+                    sb.append(" and sr.request_time>='" + value + "' ");
                 } else if (op.equals(SearchFilter.Operator.LT)) {
-                    sb.append(" and wo.created_date<'" + value + "' ");
+                    sb.append(" and sr.request_time<'" + value + "' ");
                 }
             } else if (tempColumn.equals("totalPrice")) {
                 if (op.equals(SearchFilter.Operator.GTE)) {

@@ -152,6 +152,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     @Getter
     private Boolean measuringDateWarningEnabled = false;
+    @Getter
+    private Boolean displayMeasureCycle = false;
     @Getter @Setter
     private Integer validityMonths;
 
@@ -183,7 +185,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         if (configItemValue != null && "true".equalsIgnoreCase(configItemValue.getValue())) {
             measuringDateWarningEnabled = true;
         }
-
+        ConfigItemValue configItemValue1 = configItemMapper.findByKey("displayMeasureCycle", currentUser.getSiteUID());
+        if (configItemValue1 != null && "true".equalsIgnoreCase(configItemValue1.getValue())) {
+            displayMeasureCycle = true;
+        }
         String enCodeParameters = WebUtil.getRequestParameter("str");
         queryAssetUID = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
         this.selectedMap = MapUtil.newHashMap();
@@ -466,7 +471,25 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths","certificateType");
+        if(this.hasFilterOnField("measureCycle")){
+            String measureCycleVal = searchFilters.stream().filter(sf -> "measureCycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("measureCycle", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.eq("ai.metering_cycle", (int)(Double.parseDouble(measureCycleVal) * 12));
+        }
+        if(this.hasFilterOnField("certificateType")){
+            Optional<SearchFilter> first = searchFilters.stream().filter(sf -> "certificateType".equals(sf.fieldName)).findFirst();
+            if (first.isPresent()) {
+                wrapper.eq("mcd.certificate_type", Integer.valueOf(first.get().value.toString()));
+            }
+
+        }
+        if(this.hasFilterOnField("measuringType")){
+            Optional<SearchFilter> first = searchFilters.stream().filter(sf -> "measuringType".equals(sf.fieldName)).findFirst();
+            if (first.isPresent()) {
+                wrapper.eq("mcd.type", first.get().value.toString());
+            }
+
+        }
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths","certificateType","measuringType");
         List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
         WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
@@ -823,15 +846,15 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
 
 
-public void treeSearchCondition(){
-    TreeNode treeNodeEdit = null;
-    if(StrUtil.isEmpty(assetSearchForm.getDeptName())){
-        treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4);
-    }else{
-        treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4, assetSearchForm.getDeptName());
+    public void treeSearchCondition(){
+        TreeNode treeNodeEdit = null;
+        if(StrUtil.isEmpty(assetSearchForm.getDeptName())){
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4);
+        }else{
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4, assetSearchForm.getDeptName());
+        }
+        orgTreeSearch = initOrgTree(treeNodeEdit);
     }
-    orgTreeSearch = initOrgTree(treeNodeEdit);
-}
     public TreeNode initOrgTree(TreeNode treeNode) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);

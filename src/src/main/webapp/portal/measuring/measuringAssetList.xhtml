@@ -19,6 +19,7 @@
             <h:form id="measuringAssetListForm" rendered="#{measureAssetListController.customRoleAuth.authSearch}">
 
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="全部匹配台账结果"     process="@this" update="measuringTab "  disabled="#{measureAssetListController.matchType==9}"  actionListener="#{measureAssetListController.initMatchResult(9)}" />
                     <p:commandButton value="匹配台账检定结果"     process="@this" update="measuringTab "  disabled="#{measureAssetListController.matchType==1}"  actionListener="#{measureAssetListController.initMatchResult(1)}" />
                     <p:commandButton value="匹配台账校准结果"     process="@this" update="measuringTab"  disabled="#{measureAssetListController.matchType==2}"  actionListener="#{measureAssetListController.initMatchResult(2)}" />
                     <p:commandButton value="未匹配台账结果"   process="@this" update="measuringTab"  disabled="#{measureAssetListController.matchType==3}"  actionListener="#{measureAssetListController.initMatchResult(3)}" />
@@ -109,6 +110,10 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
+                    <p:column rendered="#{measureAssetListController.matchType!=3 and measureAssetListController.displayMeasureCycle}" headerText="计量周期(年)" filterBy="#{item.measureCycle}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.measureCycle}"/>
+                    </p:column>
+                 
                     <p:column headerText="计量证书编号" filterBy="#{item.meteringNO}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.meteringNO}"/>
                     </p:column>
@@ -130,7 +135,7 @@
 
 
 
-                    <p:column headerText="检定结论" filterBy="#{item.verificationConclusion}" filterMatchMode="EQ" rendered="#{measureAssetListController.matchType==1}">
+                    <p:column headerText="检定结论" filterBy="#{item.verificationConclusion}" filterMatchMode="EQ" rendered="#{measureAssetListController.matchType==1 or measureAssetListController.matchType==9}">
                      <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -139,7 +144,7 @@
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}"/>
                     </p:column>
-                    <p:column rendered="#{measureAssetListController.matchType==1}"    headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
+                    <p:column rendered="#{measureAssetListController.matchType==1 or measureAssetListController.matchType==9}"    headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.measuringType}"/>
                     </p:column>
                     <p:column headerText="检测单位" filterBy="#{item.lastCheckCompany}" filterMatchMode="LIKE">
@@ -174,7 +179,7 @@
 <!--                        </f:facet>-->
 <!--                        <h:outputText value="#{fieldMsg.fieldValue('validityMonths',item.validityMonths)}"/>-->
 <!--                    </p:column>-->
-                    <p:column headerText="下次计量日期" rendered="#{measureAssetListController.matchType==1}" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
+                    <p:column headerText="下次计量日期" rendered="#{measureAssetListController.matchType==1 or measureAssetListController.matchType==9}" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>
@@ -182,13 +187,13 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{msg.certificateType}" >
-<!--                        <f:facet name="filter">-->
-<!--                                <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">-->
-<!--                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
-<!--                                    <f:selectItems value="#{fieldMsg.getFieldValueList('certificateType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>-->
-<!--                                </p:selectOneMenu>-->
-<!--                        </f:facet>-->
+                    <p:column headerText="#{msg.certificateType}"  filterBy="#{item.certificateType}" filterMatchMode="EQ" >
+                        <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('certificateType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('certificateType', item.certificateType)}"/>
                     </p:column>
                     <p:column width="110" headerText="是否上传附件" exportable="false"  filterBy="#{item.existFileFlag}" filterMatchMode="GTE" >

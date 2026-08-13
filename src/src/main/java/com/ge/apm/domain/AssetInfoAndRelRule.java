@@ -25,4 +25,5 @@ public class AssetInfoAndRelRule {
     private Date createdDate;     //配置日期
 
     private String serialNum;
+    private String siteName;      //所属院区
 }

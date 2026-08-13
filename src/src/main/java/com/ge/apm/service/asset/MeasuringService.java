@@ -88,6 +88,7 @@ public class MeasuringService {
     private final String HEADER_REMARK = "备注";
     private final String HEADER_FILE_NO = "存档记录";
     private final String HEADER_QR_CODE = "二维码";
+    private final String HEADER_CERTIFICATE_TYPE = "证书类型";
     private static final String MEASURING_STATUS= "measuringStatus";
     private int progress;
     private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -742,6 +743,9 @@ public class MeasuringService {
                 List<SearchFilter> searchFilters = new ArrayList<>();
                 searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
+                searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+                searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
                 assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
             };
 
@@ -1095,6 +1099,21 @@ public class MeasuringService {
                 }
             }
             detail.setStatus(status);
+            Integer certificateType = null;
+            if(row.getCell(header.get("CERTIFICATE_TYPE_CELL")) != null){
+                //证书类型: 检定证书输出：1，校准证书输出：2，其他输出：-1
+                switch (row.getCell(header.get("CERTIFICATE_TYPE_CELL")).getStringCellValue()) {
+                    case "检定证书":
+                        certificateType = 1;
+                        break;
+                    case "校准证书":
+                        certificateType = 2;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            detail.setCertificateType(certificateType);
             detail.setExcelIdex(j + 1);
 
             if(detail.getCheckDate() != null && detail.getCheckDate().after(sdf.parse("99999/12/31"))){
@@ -1109,7 +1128,9 @@ public class MeasuringService {
             if (ObjectUtil.isAllEmpty(row.getCell(header.get("ASSET_SN_CELL")), row.getCell(header.get("ASSET_NO_CELL")), row.getCell(header.get("QR_CODE_CELL")))) {
                 errorInfo.append("[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]");
             }
-
+            if(detail.getCertificateType() == null){
+                errorInfo.append("[证书类型不能为空]");
+            }
             // 证书编号校验
             if (detail.getCertificateNo() == null) {
                 errorInfo.append("[计量证书编号不能为空]");
@@ -1407,6 +1428,7 @@ public class MeasuringService {
             boolean hasRemark = false;
             boolean hasFileNo = false;
             boolean hasQrCode = false;
+            boolean hasCertificateType = false;
 
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
                 HSSFCell cell = row.getCell(j);
@@ -1432,6 +1454,7 @@ public class MeasuringService {
                     hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
                     hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
                     hasQrCode = HEADER_QR_CODE.equals(cell.getStringCellValue()) ? true : hasQrCode;
+                    hasCertificateType = HEADER_CERTIFICATE_TYPE.equals(cell.getStringCellValue()) ? true : hasCertificateType;
                     switch (cell.getStringCellValue()) {
                         case HEADER_CERTIFICATION_NO:
                             hasCertificationNo = true;
@@ -1505,6 +1528,10 @@ public class MeasuringService {
                             hasQrCode = true;
                             header.put("QR_CODE_CELL", j);
                             break;
+                        case HEADER_CERTIFICATE_TYPE:
+                            hasCertificateType = true;
+                            header.put("CERTIFICATE_TYPE_CELL", j);
+                            break;
                         default:
                             break;
                     }
@@ -1514,7 +1541,7 @@ public class MeasuringService {
             }
             if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetSN && hasAssetNo
                     && hasApplianceNo && hasVerificationConclusion && hasVerificationDate && hasExpireDate
-                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo) {
+                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo && hasCertificateType) {
                 header.put("HEADER_ROW", i);
                 break;
             }
@@ -1548,6 +1575,7 @@ public class MeasuringService {
             boolean hasRemark = false;
             boolean hasFileNo = false;
             boolean hasQrCode = false;
+            boolean hasCertificateType = false;
 
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
                 Cell cell = row.getCell(j);
@@ -1573,6 +1601,7 @@ public class MeasuringService {
                     hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
                     hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
                     hasQrCode = HEADER_QR_CODE.equals(cell.getStringCellValue()) ? true : hasQrCode;
+                    hasCertificateType = HEADER_CERTIFICATE_TYPE.equals(cell.getStringCellValue()) ? true : hasCertificateType;
                     switch (cell.getStringCellValue()) {
                         case HEADER_CERTIFICATION_NO:
                             hasCertificationNo = true;
@@ -1646,6 +1675,10 @@ public class MeasuringService {
                             hasQrCode = true;
                             header.put("QR_CODE_CELL", j);
                             break;
+                        case HEADER_CERTIFICATE_TYPE:
+                            hasCertificateType = true;
+                            header.put("CERTIFICATE_TYPE_CELL", j);
+                            break;
                         default:
                             break;
                     }
@@ -1655,7 +1688,7 @@ public class MeasuringService {
             }
             if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetSN && hasAssetNo
                     && hasApplianceNo && hasVerificationConclusion && hasVerificationDate && hasExpireDate
-                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo) {
+                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo && hasCertificateType) {
                 header.put("HEADER_ROW", i);
                 break;
             }

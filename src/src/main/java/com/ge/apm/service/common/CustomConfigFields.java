@@ -155,6 +155,7 @@ public enum CustomConfigFields {
     ratingUsageCount(fieldName, "ratingUsageCount" ,Text),  //额定使用次数
     epc(fieldName, "epc" ,Text),  //epc码
     estimatedRiskLevel(fieldName, "estimatedRiskLevel" ,Select),  //风险等级(预估)
+    meteringCycle(fieldName, "meteringCycle" ,Select),  //计量周期（月）
 
     ;
 

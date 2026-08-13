@@ -1,8 +1,10 @@
 package com.ge.apm.service.pm;
 
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.AssetInfoAndRelRule;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -27,6 +29,9 @@ public class RelRuleAssetService {
     @Autowired
     private PmOrderRuleRepository pmOrderRuleRepository;
 
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
+
     public StreamedContent getExcelFile(List<AssetInfoAndRelRule> assetInfoAndRelRules) throws IOException{
         HSSFWorkbook b=new HSSFWorkbook();
         CellStyle cellStyle = b.createCellStyle();
@@ -34,7 +39,7 @@ public class RelRuleAssetService {
         createExcelHeader(sheet,cellStyle);
         createExcelBody(sheet,assetInfoAndRelRules);
         ByteArrayOutputStream os=new ByteArrayOutputStream();
-        for(int i=0;i<15;i++) {
+        for(int i=0;i<19;i++) {
             sheet.autoSizeColumn(i);
         }
         b.write(os);
@@ -68,6 +73,7 @@ public class RelRuleAssetService {
             if(assetInfoAndRelRule.getCreatedDate()!=null) row.createCell(15).setCellValue(simpleDateFormat.format(assetInfoAndRelRule.getCreatedDate()));
             if(assetInfoAndRelRule.getQrCode()!=null) row.createCell(16).setCellValue(assetInfoAndRelRule.getQrCode());
             if(assetInfoAndRelRule.getSerialNum()!=null) row.createCell(17).setCellValue(assetInfoAndRelRule.getSerialNum());
+            if(assetInfoAndRelRule.getSiteName()!=null) row.createCell(18).setCellValue(assetInfoAndRelRule.getSiteName());
             i++;
         }
     }
@@ -92,6 +98,7 @@ public class RelRuleAssetService {
         row.createCell(15).setCellValue("配置日期");
         row.createCell(16).setCellValue("二维码");
         row.createCell(17).setCellValue("制造商序列号");
+        row.createCell(18).setCellValue("所属院区");
     }
 
     public List<AssetInfoAndRelRule> mergeAssetInfoAndRelRule(List<AssetInfo> assetInfos, List<RelRuleAsset> relRuleAssets) {
@@ -108,9 +115,11 @@ public class RelRuleAssetService {
         for(PmOrderRule pmOrderRule : pmOrderRules) {
             uidAndName.put(pmOrderRule.getUid(),pmOrderRule.getName());
         }
+        Map<String, String> siteNameCache = new HashMap<>();
         boolean hasConfigRule = false;
         for(AssetInfo assetInfo : assetInfos) {
             AssetInfoAndRelRule assetInfoAndRelRule = new AssetInfoAndRelRule();
+            String siteName = resolveSiteName(assetInfo.getSiteUID(), siteNameCache);
             for(RelRuleAsset relRuleAsset : relRuleAssets) {
                 if(assetInfo.getUid().equals(relRuleAsset.getAssetUID())) {
                     assetInfoAndRelRule.setInstallDate(assetInfo.getInstallDate());
@@ -130,6 +139,7 @@ public class RelRuleAssetService {
                     assetInfoAndRelRule.setCreatedDate(relRuleAsset.getCreatedDate());
                     assetInfoAndRelRule.setQrCode(assetInfo.getQrCode());
                     assetInfoAndRelRule.setSerialNum(assetInfo.getSerialNum());
+                    assetInfoAndRelRule.setSiteName(siteName);
                     hasConfigRule = true;
                 }
             }
@@ -146,10 +156,25 @@ public class RelRuleAssetService {
                 assetInfoAndRelRule.setMakerShortName(assetInfo.getMakerShortName());
                 assetInfoAndRelRule.setQrCode(assetInfo.getQrCode());
                 assetInfoAndRelRule.setSerialNum(assetInfo.getSerialNum());
+                assetInfoAndRelRule.setSiteName(siteName);
             }
             hasConfigRule = false;
             result.add(assetInfoAndRelRule);
         }
         return result;
+    }
+
+    private String resolveSiteName(String siteUID, Map<String, String> cache) {
+        if (siteUID == null) return null;
+        if (cache.containsKey(siteUID)) return cache.get(siteUID);
+        String name = null;
+        try {
+            OrgInfo org = orgInfoRepository.getByUid(siteUID);
+            if (org != null) name = org.getName();
+        } catch (Exception e) {
+            // ignore
+        }
+        cache.put(siteUID, name);
+        return name;
     }
 }

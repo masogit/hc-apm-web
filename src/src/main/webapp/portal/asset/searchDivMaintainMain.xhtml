@@ -73,6 +73,17 @@
 					converter="assetInfoConverter">
 				</p:autoComplete>
 			</h:panelGroup>
+			<h:panelGroup rendered="#{not empty maintainController}">
+				<label class="label">状态</label>
+				<p:selectOneMenu value="#{maintainController.selectedStatus}" style="width:100%;">
+					<p:ajax listener="#{maintainController.onStatusChange}" update=":maintainForm:maintain" />
+					<f:selectItem itemLabel="全部" itemValue="" noSelectionOption="true" />
+					<f:selectItem itemLabel="未检查" itemValue="(0)" />
+					<f:selectItem itemLabel="进行中" itemValue="(4)" />
+					<f:selectItem itemLabel="已通过" itemValue="(2,5,6,7)" />
+					<f:selectItem itemLabel="有问题" itemValue="(3,8,9)" />
+				</p:selectOneMenu>
+			</h:panelGroup>
 		</p:panelGrid>
 		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
 			<h:panelGroup rendered="#{searchController.blnPickList}"><!--required="true" requiredMessage="已选设备 #{msg.ValidationRequire}"-->

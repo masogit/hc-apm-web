@@ -1,29 +1,38 @@
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 23, '8', '手术室设备工作时长', 'OperatingRoomEquipmentWorkingHours', '手术室设备工作时长', 'f', 't', 2 where not exists (select * from config_item where key = 'OperatingRoomEquipmentWorkingHours');
+-- 增加配置项：MVS保养报告仅下载保养项目，默认否，归属预防维护tag(category=5)
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', 'MVS保养报告仅下载保养项目', 'mvsPmReportOnlyDownloadPmItems', 'MVS保养报告仅下载保养项目', 'f', 't', 3
+    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'mvsPmReportOnlyDownloadPmItems');
 
--- YHAAO-28825
--- Step 1: 清空所有校准证书(certificate_type=2)的有效期至(valid_date_to)
-UPDATE measuring_certificate_detailSET valid_date_to = NULL,last_modified_date = NOW()WHERE certificate_type = 2 AND valid_date_to IS NOT NULL;
--- Step 2: 清空最新计量记录为校准证书的设备的"建议下次计量日期"(next_metering_date)
--- 仅处理每个设备计量日期(check_date)最大的记录且该记录为校准证书的情况
-UPDATE asset_info ai
-UPDATE asset_info ai SET next_metering_date = NULL,last_modified_date = NOW() WHERE ai.uid IN (SELECT latest_mcd.asset_uid FROM (SELECT DISTINCT ON (mcd.asset_uid) mcd.asset_uid,
-    mcd.certificate_type
-    FROM measuring_certificate_detail mcd
-    WHERE mcd.asset_uid IS NOT NULL
-    ORDER BY mcd.asset_uid, mcd.check_date DESC, mcd.id DESC
-    ) latest_mcd
-    WHERE latest_mcd.certificate_type = 2
-);
-
-ALTER TABLE user_auth_mapping ADD column tenant_uid varchar(32);
+-- 增加配置项：维修是否显示自动验收，默认否，归属维修流程tag(category=4)
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修是否显示自动验收', 'repairShowAutoAcceptance', '维修是否显示自动验收', 'f', 't', 3
+    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'repairShowAutoAcceptance');
 
 
--- YHAAO-28879
-delete from  public.config_item where key = 'NursingStaffScanCodeToAssetRegister';
-insert into public.config_item (uid, category,default_value,  description, key, name, super_admin_edit, user_parent_config, value_type,validation) select replace(uuid_generate_v4()::text,'-',''), 1, 'repair', '护理人员扫码默认打开页面设置', 'NursingStaffScanCodeToAssetRegister', '护理人员扫码默认打开页面设置', 'f', 't', 7,'[{"key":"事件记录","value":"record"},{"key":"设备台账","value":"asset"},{"key":"报修页面","value":"repair"}]' where not exists (select * from config_item where key = 'NursingStaffScanCodeToAssetRegister');
+-- YHAAO-28922 巡检保养工单增加巡检图片上传,其他保养工单增加其他图片上传
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '巡检保养巡检图片是否必填', 'requireInspectionPhotos', '巡检保养巡检图片必填', 'f','t',3
+    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireInspectionPhotos');
+
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '二级保养其他图片是否必填', 'requireRuleLevelSecondOtherPhotos', '二级保养其他图片必填', 'f','t',3
+    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelSecondOtherPhotos');
+
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '三级/质控保养其他图片是否必填', 'requireRuleLevelThreeOtherPhotos', '三级/质控保养其他图片必填', 'f','t',3
+    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelThreeOtherPhotos');
+
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '二级保养前后图片是否必填', 'requireRuleLevelSecondMaintenancePhotos', '二级保养前后图片必填', 'f','t',3
+    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelSecondMaintenancePhotos');
+
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '三级/质控保养前后图片是否必填', 'requireRuleLevelThreeMaintenancePhotos', '三级/质控保养前后图片必填', 'f','t',3
+    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelThreeMaintenancePhotos');
 
 
+INSERT INTO public.config_item (uid, name, category, key, value_type, description, super_admin_edit, default_value, user_parent_config)SELECT replace(uuid_generate_v4()::text,'-',''),'计量周期',7, 'displayMeasureCycle',3,'计量是否显示检定周期',false,'false',false WHERE NOT EXISTS (SELECT 1 FROM public.config_item WHERE key = 'displayMeasureCycle');
 
 
---YHAAO-29195
-ALTER TABLE public.pm_order_rule ADD CONSTRAINT pm_order_rule_unique UNIQUE (uid);
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF|PPTX|PPT|ppt|pptx|mp4|MP4', '资产附件上传文件格式', 'assetUploadFileFormats', '资产附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'assetUploadFileFormats');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx', '合同附件上传文件格式', 'contractUploadFileFormats', '合同附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'contractUploadFileFormats');

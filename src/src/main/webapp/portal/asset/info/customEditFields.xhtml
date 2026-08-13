@@ -1299,7 +1299,8 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare01')}">
         <h:panelGroup>
             <label class="label">#{msg.spare01}</label>
-            <p:selectOneMenu id="spare01" value="#{assetInfoEditController.selected.spare01}" requiredMessage="#{msg.spare01} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare01')}">
+            <p:selectOneMenu id="spare01" value="#{assetInfoEditController.selected.spare01}" requiredMessage="#{msg.spare01} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare01')}"
+                             filter="true" filterMatchMode="contains">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare01')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
@@ -1309,7 +1310,8 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare02')}">
         <h:panelGroup>
             <label class="label">#{msg.spare02}</label>
-            <p:selectOneMenu id="spare02" value="#{assetInfoEditController.selected.spare02}" requiredMessage="#{msg.spare02} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare02')}">
+            <p:selectOneMenu id="spare02" value="#{assetInfoEditController.selected.spare02}" requiredMessage="#{msg.spare02} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare02')}"
+                             filter="true" filterMatchMode="contains">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare02')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
@@ -1319,7 +1321,8 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare03')}">
         <h:panelGroup>
             <label class="label">#{msg.spare03}</label>
-            <p:selectOneMenu id="spare03" value="#{assetInfoEditController.selected.spare03}" requiredMessage="#{msg.spare03} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare03')}">
+            <p:selectOneMenu id="spare03" value="#{assetInfoEditController.selected.spare03}" requiredMessage="#{msg.spare03} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare03')}"
+                             filter="true" filterMatchMode="contains">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare03')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
@@ -1329,7 +1332,8 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare04')}">
         <h:panelGroup>
             <label class="label">#{msg.spare04}</label>
-            <p:selectOneMenu id="spare04" value="#{assetInfoEditController.selected.spare04}" requiredMessage="#{msg.spare04} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare04')}">
+            <p:selectOneMenu id="spare04" value="#{assetInfoEditController.selected.spare04}" requiredMessage="#{msg.spare04} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare04')}"
+                             filter="true" filterMatchMode="contains">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare04')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
@@ -1339,7 +1343,8 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'spare05')}">
         <h:panelGroup>
             <label class="label">#{msg.spare05}</label>
-            <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}">
+            <p:selectOneMenu id="spare05" value="#{assetInfoEditController.selected.spare05}" requiredMessage="#{msg.spare05} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('spare05')}"
+                             filter="true" filterMatchMode="contains">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('spare05')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 <p:ajax event="change" process="@this"/>
@@ -1463,6 +1468,14 @@
         <h:panelGroup >
             <label class="label">#{msg.epc}</label>
             <p:inputText id="epc" value="#{assetInfoEditController.selected.epc}" disabled="#{!assetInfoEditController.needEdit('epc')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'meteringCycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.meteringCycle}</label>
+            <p:inputText id="meteringCycle" value="#{assetInfoEditController.selected.meteringCycle}" disabled="#{!assetInfoEditController.needEdit('meteringCycle')}">
                 <p:ajax />
             </p:inputText>
         </h:panelGroup>

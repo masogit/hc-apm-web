@@ -12,7 +12,6 @@ import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.OrgInfoComparator;
 import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
@@ -313,9 +312,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
 			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
 		}
-		if (queryAsset.getWarrantyDate() != null) {
-
-			assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.EQ, queryAsset.getWarrantyDate()));
+		if (queryAsset.getWarrantyDateStart() != null) {
+			assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.GTE, queryAsset.getWarrantyDateStart()));
+		}
+		if (queryAsset.getWarrantyDateEnd() != null) {
+			assetFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, queryAsset.getWarrantyDateEnd()));
 		}
 		if(level != null) {
 			List<String> uids = null;

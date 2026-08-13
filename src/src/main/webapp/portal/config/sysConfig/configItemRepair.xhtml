@@ -409,10 +409,10 @@
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').name.concat('(').concat(systemConfigItemController.configItemMap.get('NoAssetDispatchWorkers').key).concat(')')}</label>
                 <p:fieldset>
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="overflow-x: auto">
                         <h:panelGroup>
                             <label class="label">无台账报修派工人1</label>
-                            <p:autoComplete  dropdown="true"
+                            <p:autoComplete  dropdown="true" inputStyle="width: 100%"
                                             value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers1']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
@@ -422,7 +422,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">无台账报修派工人2</label>
-                            <p:autoComplete  dropdown="true"
+                            <p:autoComplete  dropdown="true" inputStyle="width: 100%"
                                             value="#{systemConfigItemController.selectedObjectMap['NoAssetDispatchWorkers2']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteDispatchWorkers}"
@@ -432,7 +432,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医学工程处主任</label>
-                            <p:autoComplete  dropdown="true"
+                            <p:autoComplete  dropdown="true" inputStyle="width: 100%"
                                             value="#{systemConfigItemController.selectedObjectMap['AssetHead']}"
                                             scrollHeight="300" forceSelection="true"
                                             completeMethod="#{systemConfigItemController.autoCompleteAssetHead}"
@@ -688,6 +688,24 @@
                 <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('workOrderShowTubeInstall'))}" update="configItemForm" />
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('workOrderShowTubeInstall'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('workOrderShowTubeInstall').configItemValue == null}"/>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('repairShowAutoAcceptance').name.concat('(').concat(systemConfigItemController.configItemMap.get('repairShowAutoAcceptance').key).concat(')')}</label>
+                <p:selectOneRadio value="#{systemConfigItemController.configItemMap.get('repairShowAutoAcceptance').showValue}" style="width: 15%;">
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                </p:selectOneRadio>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('repairShowAutoAcceptance').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('repairShowAutoAcceptance'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('repairShowAutoAcceptance'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('repairShowAutoAcceptance').configItemValue == null}"/>
             </h:panelGroup>
         </p:panelGrid>
     </ui:composition>

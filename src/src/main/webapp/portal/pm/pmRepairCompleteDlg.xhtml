@@ -262,6 +262,21 @@
                     </p:panelGrid>
                 </p:fieldset>
 
+                <p:fieldset legend="#{msg.InspectionPhotos}" rendered="#{1 eq v2PmOrderController.selectedPmOrder.ruleLevel}">
+                    <p:dataGrid id="inspectionPhotos" var="fileitem" value="#{v2PmOrderController.inspectionPhotos}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
+                        <f:facet name="header">#{msg.InspectionPhotos}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentByIdandType(fileitem.id, 'inspection')}" update="inspectionPhotos pmTab:pmrepairCompleteDialogForm:inspectionPhotosUpload" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    <p:fileUpload id="inspectionPhotosUpload" disabled="#{v2PmOrderController.disableUploadButton('inspection')}" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadInspection}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this inspectionPhotos" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                </p:fieldset>
+
                 <p:fieldset legend="#{msg.MaintenancePhotos}" >
                     <p:dataGrid id="pictureBeforeList" var="fileitem" value="#{v2PmOrderController.picBeforeList}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">#{msg.BeforeMaintenancePhotos}</f:facet>
@@ -287,6 +302,21 @@
                         </p:panel>
                     </p:dataGrid>
                     <p:fileUpload id="afterPic" disabled="#{v2PmOrderController.disableUploadButton('after')}" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadAfter}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureAfterList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                </p:fieldset>
+
+                <p:fieldset legend="#{msg.OtherPhotos}" rendered="#{2 eq v2PmOrderController.selectedPmOrder.ruleLevel or 3 eq v2PmOrderController.selectedPmOrder.ruleLevel or 4 eq v2PmOrderController.selectedPmOrder.ruleLevel}">
+                    <p:dataGrid id="otherPhotos" var="fileitem" value="#{v2PmOrderController.otherPhotos}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
+                        <f:facet name="header">#{msg.OtherPhotos}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentByIdandType(fileitem.id, 'other')}" update="otherPhotos pmTab:pmrepairCompleteDialogForm:otherPhotosUpload" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    <p:fileUpload id="otherPhotosUpload" disabled="#{v2PmOrderController.disableUploadButton('other')}" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadOther}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this otherPhotos" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                 </p:fieldset>
 
                 <p:growl id="msgs" showDetail="true" />

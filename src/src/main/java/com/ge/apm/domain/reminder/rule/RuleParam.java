@@ -37,6 +37,12 @@ public class RuleParam {
 
     private String messageType;
 
+    private String scheduledFrequency;
+
+    private Integer scheduledDay;
+
+    private Date scheduledTime;
+
     private Integer pushType = 1;
 
     private Integer pushCycle = 0;
