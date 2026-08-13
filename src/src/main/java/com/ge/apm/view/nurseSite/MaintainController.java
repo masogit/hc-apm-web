@@ -90,6 +90,8 @@ public class MaintainController implements ServerEventInterface{
 
 	private Boolean checkRequired=Boolean.TRUE;
 
+	private String selectedStatus;
+
 	@PostConstruct
 	protected void init() {
 		uaaService = WebUtil.getBean(UaaService.class);
@@ -161,6 +163,9 @@ public class MaintainController implements ServerEventInterface{
 		}
 		if (ObjectUtil.isNotEmpty(selectedSite)) {
 			param.put("siteUid", selectedSite.getUid());
+		}
+		if (StringUtils.isNotEmpty(selectedStatus)) {
+			param.put("status", selectedStatus);
 		}
 //		if (currentUser.isEnableAssetTypeGroup()) {
 //			param.put("assetTypes", currentUser.getAssetTypeGroupMap().keySet());
@@ -759,6 +764,18 @@ public class MaintainController implements ServerEventInterface{
 	public void onCheckDefault(){
 		listCheckedNurseSiteMaintainConfig = new ArrayList<>();
 		setSelectAll(false);
+	}
+
+	public void onStatusChange() {
+		loadMaintainData();
+	}
+
+	public String getSelectedStatus() {
+		return selectedStatus;
+	}
+
+	public void setSelectedStatus(String selectedStatus) {
+		this.selectedStatus = selectedStatus;
 	}
 
 	public UserAccount getCurrentUser() {
