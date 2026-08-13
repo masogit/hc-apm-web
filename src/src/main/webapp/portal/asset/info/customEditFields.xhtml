@@ -1467,4 +1467,12 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'meteringCycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.meteringCycle}</label>
+            <p:inputText id="meteringCycle" value="#{assetInfoEditController.selected.meteringCycle}" disabled="#{!assetInfoEditController.needEdit('meteringCycle')}">
+                <p:ajax />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

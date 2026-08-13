@@ -110,6 +110,10 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
+                    <p:column rendered="#{measureAssetListController.matchType!=3 and measureAssetListController.displayMeasureCycle}" headerText="计量周期(年)" filterBy="#{item.measureCycle}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.measureCycle}"/>
+                    </p:column>
+                 
                     <p:column headerText="计量证书编号" filterBy="#{item.meteringNO}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.meteringNO}"/>
                     </p:column>

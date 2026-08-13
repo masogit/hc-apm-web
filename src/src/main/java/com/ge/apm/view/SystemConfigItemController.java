@@ -100,6 +100,14 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private static final String VALUE ="value";
     private List<String> datePatternSelect = ListUtil.newArrayList("yyyy/MM/dd", "yyyy/MM/dd HH", "yyyy/MM/dd HH:mm", "yyyy/MM/dd HH:mm:ss");
 
+    private List<String> uploadFileFormatsSelected = new ArrayList<>();
+    private List<String> contractUploadFileFormatsSelected = new ArrayList<>();
+    private final List<String> uploadFileFormatOptions = Arrays.asList(
+            "xls", "xlsx", "doc", "docx", "pdf", "jpeg", "jpg", "png", "txt", "ps", "jfif", "XLS", "XLSX", "DOC", "DOCX",
+            "PDF", "JPEG", "JPG", "PNG", "TXT", "PS", "JFIF", "PPTX", "PPT", "ppt", "pptx", "mp4", "MP4");
+    private final List<String> contractUploadFileFormatsOptions = Arrays.asList(
+            "jpg","jpeg","png","pdf","doc","docx","xls","xlsx");
+
     @Getter@Setter
     private ConfigItem selectedConfigItem;
     @Getter@Setter
@@ -153,7 +161,8 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(21,"院区间调剂");
         categoryMap.put(22,"使用科室筛选");
         categoryMap.put(23,"手术室绩效管理");
-
+        uploadFileFormatsSelected = new ArrayList<>(uploadFileFormatOptions);
+        contractUploadFileFormatsSelected = new ArrayList<>(contractUploadFileFormatsOptions);
     }
 
     @Override
@@ -223,6 +232,12 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         for (ConfigItem configItem : configItemList) {
             if ("assetScrap".equals(configItem.getKey()) || "showAssetScrapNo".equals(configItem.getKey()) ) {
                 configItemMap.put(configItem.getKey(),configItem);
+            }
+            if ("assetUploadFileFormats".equals(configItem.getKey())) {
+                uploadFileFormatsSelected = new ArrayList<>(Arrays.asList(configItem.getShowValue().split("\\|")));
+            }
+            if ("contractUploadFileFormats".equals(configItem.getKey())) {
+                contractUploadFileFormatsSelected = new ArrayList<>(Arrays.asList(configItem.getShowValue().split("\\,")));
             }
         }
          return page;
@@ -473,6 +488,14 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
             if ("setAssetOutStockDept".equals(this.selected.getKey())) {
                 this.selected.setShowValue(Optional.ofNullable(assetOutStockDept).map(OrgInfo::getUid).orElse(null));
+            }
+
+            if ("assetUploadFileFormats".equals(this.selected.getKey())) {
+                this.selected.setShowValue(String.join("|", uploadFileFormatsSelected));
+            }
+
+            if ("contractUploadFileFormats".equals(this.selected.getKey())) {
+                this.selected.setShowValue(String.join(",", contractUploadFileFormatsSelected));
             }
 
             if ("NoAssetDispatchWorkers".equals(this.selected.getKey())) {
@@ -1029,5 +1052,25 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 "showMobileAdverseEventRecordTable",
                 "showMobileScrapRecordTable"
         );
+    }
+
+    public List<String> getUploadFileFormatsSelected() {
+        return uploadFileFormatsSelected;
+    }
+
+    public void setUploadFileFormatsSelected(List<String> uploadFileFormatsSelected) {
+        this.uploadFileFormatsSelected = uploadFileFormatsSelected;
+    }
+
+    public List<String> getContractUploadFileFormatsSelected() {
+        return contractUploadFileFormatsSelected;
+    }
+
+    public void setContractUploadFileFormatsSelected(List<String> contractUploadFileFormatsSelected) {
+        this.contractUploadFileFormatsSelected = contractUploadFileFormatsSelected;
+    }
+
+    public List<String> getUploadFileFormatOptions() {
+        return uploadFileFormatOptions;
     }
 }

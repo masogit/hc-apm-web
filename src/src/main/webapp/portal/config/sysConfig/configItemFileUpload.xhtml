@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('assetUploadFileFormats').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetUploadFileFormats').key).concat(')')}</label>
+                <p:selectCheckboxMenu value="#{systemConfigItemController.uploadFileFormatsSelected}" label="#{msg.PleaseSelect}" style="width: 95%;" multiple="true" showHeader="true" updateLabel="true">
+                    <f:selectItems value="#{systemConfigItemController.uploadFileFormatOptions}" var="fmt" itemLabel="#{fmt}" itemValue="#{fmt}"/>
+                </p:selectCheckboxMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('assetUploadFileFormats').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('assetUploadFileFormats'))}" update="configItemForm" />
+            </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('contractUploadFileFormats').name.concat('(').concat(systemConfigItemController.configItemMap.get('contractUploadFileFormats').key).concat(')')}</label>
+                <p:selectCheckboxMenu value="#{systemConfigItemController.contractUploadFileFormatsSelected}" label="#{msg.PleaseSelect}" style="width: 95%;" multiple="true" showHeader="true" updateLabel="true">
+                    <f:selectItems value="#{systemConfigItemController.uploadFileFormatOptions}" var="fmt" itemLabel="#{fmt}" itemValue="#{fmt}"/>
+                </p:selectCheckboxMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('contractUploadFileFormats').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('contractUploadFileFormats'))}" update="configItemForm" />
+            </h:panelGroup>
+
+        </p:panelGrid>
+    </ui:composition>
+
+</html>

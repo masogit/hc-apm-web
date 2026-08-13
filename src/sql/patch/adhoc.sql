@@ -8,3 +8,10 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 SELECT replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修是否显示自动验收', 'repairShowAutoAcceptance', '维修是否显示自动验收', 'f', 't', 3
     WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'repairShowAutoAcceptance');
 
+
+
+INSERT INTO public.config_item (uid, name, category, key, value_type, description, super_admin_edit, default_value, user_parent_config)SELECT replace(uuid_generate_v4()::text,'-',''),'计量周期',7, 'displayMeasureCycle',3,'计量是否显示检定周期',false,'false',false WHERE NOT EXISTS (SELECT 1 FROM public.config_item WHERE key = 'displayMeasureCycle');
+
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF|PPTX|PPT|ppt|pptx|mp4|MP4', '资产附件上传文件格式', 'assetUploadFileFormats', '资产附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'assetUploadFileFormats');
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx', '合同附件上传文件格式', 'contractUploadFileFormats', '合同附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'contractUploadFileFormats');

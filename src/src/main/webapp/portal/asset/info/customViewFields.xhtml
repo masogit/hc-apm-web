@@ -915,4 +915,10 @@
             <p:inputText id="epc" value="#{assetInfoDetailController.selected.epc}" readonly="true" title="#{assetInfoDetailController.selected.epc}"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'meteringCycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.meteringCycle}</label>
+            <p:inputText id="meteringCycle" value="#{assetInfoDetailController.selected.meteringCycle}" readonly="true" title="#{assetInfoDetailController.selected.meteringCycle}"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

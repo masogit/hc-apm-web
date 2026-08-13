@@ -175,7 +175,7 @@
                                                         </h:panelGroup>
                                                     </h:panelGrid>
                                                 </p:dataList>
-                                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF)$/" fileUploadListener="#{assetInfoDetailController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoDetailController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                               multiple="true"  sizeLimit="500000000"  update="assetDetail pictureList"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                         </c:when>
                                         <c:otherwise>

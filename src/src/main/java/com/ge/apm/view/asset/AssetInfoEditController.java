@@ -10,6 +10,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.approval.WxMessageService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.UserCommonService;
@@ -309,6 +310,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter
     private StreamedContent signatureContentStream;
     @Getter
+    private ConfigItemService configItemService;
+    @Getter
     private String signatureId;
     @Getter
     private boolean newSignature = true;
@@ -327,6 +330,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private String approvalReason;
     private String equipmentDisposalMethod;
     private String customDisposalMethod;
+    private String assetUploadFileFormats;
     @Getter @Setter
     private String inDeptUid;
     @Getter @Setter
@@ -568,7 +572,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (assetGroupSecondarySupport) {
             onAssetGroupChange();
         }
-
         //ge mvc data
         if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
             mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
@@ -586,7 +589,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 });
             }
         }
+    }
 
+    public String getAssetUploadFileFormats() {
+        ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
+        return  configItemService.getConfigItemByKeyToString("assetUploadFileFormats",loginUser);
     }
     private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
         BeanUtils.copyProperties(assetInfo,selected);

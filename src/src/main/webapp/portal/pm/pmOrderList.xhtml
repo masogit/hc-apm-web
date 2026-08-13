@@ -205,7 +205,8 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE"
+                          rendered="#{v2PmOrderController.queryIndex==10 or v2PmOrderController.queryIndex==7 or userContextService.hasCurrentTenantName('')}">
                     <f:facet name="filter">
                         <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2PmOrderController.actualCompletionTimeFormat}"/>
                     </f:facet>

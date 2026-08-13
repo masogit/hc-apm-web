@@ -3611,6 +3611,18 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Transient
     @TableField(exist = false)
+    private Double measureCycle;
+
+    public Double getMeasureCycle() {
+        return measureCycle;
+    }
+
+    public void setMeasureCycle(Double measureCycle) {
+        this.measureCycle = measureCycle;
+    }
+
+    @Transient
+    @TableField(exist = false)
     private Boolean hasDateWarning;
 
     @Transient
