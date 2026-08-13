@@ -466,7 +466,21 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths","certificateType");
+        if(this.hasFilterOnField("certificateType")){
+            Optional<SearchFilter> first = searchFilters.stream().filter(sf -> "certificateType".equals(sf.fieldName)).findFirst();
+            if (first.isPresent()) {
+                wrapper.eq("mcd.certificate_type", Integer.valueOf(first.get().value.toString()));
+            }
+
+        }
+        if(this.hasFilterOnField("measuringType")){
+            Optional<SearchFilter> first = searchFilters.stream().filter(sf -> "measuringType".equals(sf.fieldName)).findFirst();
+            if (first.isPresent()) {
+                wrapper.eq("mcd.type", first.get().value.toString());
+            }
+
+        }
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths","certificateType","measuringType");
         List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
         WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
