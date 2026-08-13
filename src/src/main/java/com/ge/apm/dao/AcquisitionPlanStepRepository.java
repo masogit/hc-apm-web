@@ -12,4 +12,7 @@ public interface AcquisitionPlanStepRepository extends GenericRepositoryUUID<Acq
 
     List<AcquisitionPlanStep> findByPid(String pid);
 
+
+    List<AcquisitionPlanStep> findByPidAndAuditStatus(String pid, String status);
+
 }

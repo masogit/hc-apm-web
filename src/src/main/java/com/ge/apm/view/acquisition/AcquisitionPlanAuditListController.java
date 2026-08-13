@@ -2,12 +2,16 @@ package com.ge.apm.view.acquisition;
 
 import com.ge.apm.dao.AcquisitionPlanRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.mapper.AcquisitionPlanMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
+import com.ge.apm.service.acquisition.AcquisitionPlanService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.acquisition.form.AcquisitionPlanSearchForm;
+import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
@@ -18,10 +22,12 @@ import lombok.Setter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
+import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -30,6 +36,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -46,8 +53,11 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
     private UaaService uaaService;
     private OrgInfoRepository orgInfoRepository;
     private AcquisitionPlanRepository dao;
+    AcquisitionPlanMapper acquisitionPlanMapper;
+    private AcquisitionPlanService acquisitionPlanService;
     private UserAccount loginUser;
-
+    @Getter@Setter
+    private StreamedContent excelFile;
     @Getter @Setter
     private String filterApplicationDate = null;
     @Getter @Setter
@@ -62,6 +72,8 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
     private List<OrgInfo> hospitalList;
     @Getter @Setter
     private String selectedHospital;
+    @Getter @Setter
+    private AcquisitionPlanSearchForm searchForm;
 
     @Override
     protected void init() {
@@ -69,12 +81,15 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         dao = WebUtil.getBean(AcquisitionPlanRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        acquisitionPlanMapper = WebUtil.getBean(AcquisitionPlanMapper.class);
+        acquisitionPlanService = WebUtil.getBean(AcquisitionPlanService.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
         String query = WebUtil.getRequestParameter("query");
         if(StrUtil.isNotEmpty(query)){
             queryIndex = Integer.parseInt(query);
         }
+        searchForm = new AcquisitionPlanSearchForm();
         loadHospitalList();
         getDeptOrgTree();
     }
@@ -84,6 +99,15 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
+
+        setSearchFilter();
+        List<AcquisitionPlan> list = acquisitionPlanMapper.queryAcquisitionPlanListForPage(searchFilters, (int) pageRequest.getOffset(), pageRequest.getPageSize());
+        int c = acquisitionPlanMapper.queryAcquisitionPlanListForPageCount(searchFilters);
+
+        return new PageImpl<>(list, pageRequest, c);
+    }
+
+    public void setSearchFilter() {
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         if(tabIndex == 0){
             String currentYear = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
@@ -109,6 +133,7 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
                 statusList.add(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
             }
             if (!statusList.isEmpty()) {
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "applicationStatus".equals(item.fieldName)).collect(Collectors.toList()));
                 searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, statusList, "1*"));
             }
         }else if(queryIndex == 1){
@@ -117,18 +142,53 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
             this.updateSearchFilter(new SearchFilter("bureauPartyUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
         }
 
-        setSearchFilter();
-        return dao.findBySearchFilter(searchFilters, pageRequest);
-    }
 
-    public void setSearchFilter() {
         searchFilters.removeAll(searchFilters.stream().filter(item -> "applicationDeptUid".equals(item.fieldName)).collect(Collectors.toList()));
         if(selectedDept != null){
             updateSearchFilter(new SearchFilter("applicationDeptUid", SearchFilter.Operator.EQ, selectedDept.getUid(), "1*"));
         }
     }
 
-    //tab切换
+    private void addSearchFilter() {
+        if(searchForm != null){
+            if(StrUtil.isNotEmpty(searchForm.getApplicationHospitalName())){
+                updateSearchFilter(new SearchFilter("applicationHospitalName", SearchFilter.Operator.LIKE, searchForm.getApplicationHospitalName(), "1*"));
+            }
+            if(StrUtil.isNotEmpty(searchForm.getAssetName())){
+                updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, searchForm.getAssetName(), "1*"));
+            }
+            if(StrUtil.isNotEmpty(searchForm.getApplicationType())){
+                updateSearchFilter(new SearchFilter("applicationType", SearchFilter.Operator.EQ, searchForm.getApplicationType(), "1*"));
+            }
+            if(searchForm.getBudgetTotalAmountBegin() != null){
+                updateSearchFilter(new SearchFilter("budgetTotalAmount", SearchFilter.Operator.GTE, searchForm.getBudgetTotalAmountBegin(), "1*"));
+            }
+            if(searchForm.getBudgetTotalAmountEnd() != null){
+                updateSearchFilter(new SearchFilter("budgetTotalAmount", SearchFilter.Operator.LTE, searchForm.getBudgetTotalAmountEnd(), "1*"));
+            }
+        }
+    }
+
+    public void search() {
+        addSearchFilter();
+    }
+
+    public void resetSearch() {
+        selected = null;
+        clearSearchFilter();
+        searchForm = new AcquisitionPlanSearchForm();
+        addSearchFilter();
+    }
+
+    private void clearSearchFilter() {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        } else {
+            searchFilters.clear();
+        }
+    }
+
+        //tab切换
     public void onTabChange(TabChangeEvent event) {
         switch (event.getTab().getId()) {
             case "current":
@@ -225,7 +285,32 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         selectedDept = (OrgInfo) node.getData();
     }
 
+    public void onRowToggle(ToggleEvent event) {
+        AcquisitionPlan acquisitionPlan = (AcquisitionPlan) event.getData();
+        // 判断当前是展开还是折叠
+        if (event.getVisibility() == Visibility.VISIBLE) {
+            // 展开时：去数据库查询详情，并赋值给当前对象
+            List<SearchFilter> ns = new ArrayList<>();
+            ns.addAll(searchFilters);
+            ns.add(new SearchFilter("applicationHospitalUid", SearchFilter.Operator.EQ, acquisitionPlan.getApplicationHospitalUid()));
+            ns.add(new SearchFilter("applicationYear", SearchFilter.Operator.EQ, acquisitionPlan.getApplicationYear()));
+            Sort sort = new Sort(Sort.Direction.DESC, "applicationNo");
+            List<AcquisitionPlan> acquisitionPlans = dao.findBySearchFilter(searchFilters, sort);
+            acquisitionPlan.setList(acquisitionPlans);
+        } else {
+            // 折叠时：可选操作，清空数据以释放内存
+            //car.setDetails(null);
+        }
+    }
 
+    public void exportExcel() throws IOException {
+        Sort sort = new Sort(Sort.Direction.DESC, "applicationNo");
+        List<AcquisitionPlan> list = dao.findBySearchFilter(searchFilters, sort);
+
+        InputStream inputStream = acquisitionPlanService.exportExcel(list);
+        excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
+
+    }
 
     @Override
     protected GenericRepositoryUUID<AcquisitionPlan> getDAO() {

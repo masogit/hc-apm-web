@@ -11,7 +11,9 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "acquisition_plan")
@@ -232,6 +234,17 @@ public class AcquisitionPlan {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
+
+    @Transient
+    private List<AcquisitionPlan> list= new ArrayList<>();
+
+    public List<AcquisitionPlan> getList() {
+        return list;
+    }
+
+    public void setList(List<AcquisitionPlan> list) {
+        this.list = list;
+    }
 
     public String getCreatedBy() {
         return createdBy;
