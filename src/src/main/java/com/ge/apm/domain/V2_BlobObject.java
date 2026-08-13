@@ -69,6 +69,8 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_PartAttachment="PartAttachment";
     public static final String BO_TYPE_PrePmOrder = "PrePmOrder"; //保养前照片
     public static final String BO_TYPE_PmOrder = "PmOrder"; //保养后照片
+    public static final String BO_TYPE_PmOrder_Inspection = "PmOrderInspection"; //巡检照片
+    public static final String BO_TYPE_PmOrder_Other = "PmOrderOther"; //其他照片
     public static final String BO_TYPE_PmReport = "PmReport"; //保养报告
     public static final String BO_TYPE_MeReport = "MeReport"; //计量报告
     public static final String BO_TYPE_AuReport = "AuReport"; //质控报告

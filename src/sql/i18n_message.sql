@@ -2121,6 +2121,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ArrivalDate', '到货日期', 'Arrival Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'StartUsingDate', '开始使用时间', 'Start Using Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyDate', '维保截止日期', 'Warranty Date ', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyDateStart', '维保截止日期（起）', 'Warranty Date (Start) ', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyDateEnd', '维保截止日期（止）', 'Warranty Date (End) ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WarrantyExpirationDate', '维保截止日期', 'Warranty Expiration Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TerminateDate', '报废日期', 'Terminate Date ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'LastMaintenanceDate', '上次保养日期', 'Last Maintenance Date ', NULL, '-1');
@@ -2833,6 +2835,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CanTLevel3WorkOrdersInBatches', '3级保养工单不能批量完成', 'Cannot complete the level 3 maintenance work orders in batches', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CanTLevel4WorkOrdersInBatches', '质量控制保养工单不能批量完成', 'Cannot complete the level 3 maintenance work orders in batches', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CantRessignApprovalBatch', '审核中的工单，无法批量转单', 'Unable to reassign the workorders under approval in batches', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message', 'CanTLevel1WorkOrdersInBatches', '由于巡检照片不能为空，巡检保养工单不支持批量完成', 'Because inspection photos can’t be empty, inspection work orders don’t support batch completion', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message', 'CanTLevel2WorkOrdersInBatches', '由于保养前后照片或其他照片不能为空，2级保养工单不支持批量完成', 'Because before-and-after maintenance photos or other photos can’t be empty, level 2 maintenance orders don’t support batch completion', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message', 'InspectionPhotosIsRequired', '巡检照片不能为空', 'Inspection photos cannot be empty', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message', 'MaintenancePhotosIsRequired', '保养前后照片不能为空', 'Maintenance photos cannot be empty', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message', 'OtherPhotosIsRequired', '其他照片不能为空', 'Other photos cannot be empty', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'FailedToGenerateTheMaintenanceReport', '保养报告生成失败', 'Failed to generate the maintenance report', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'DeactivatedCantRepair', '所选设备停用，不能保养', 'The selected equipment is deactivated and cannot be maintained', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CantRepairToBeTerminated', '所选设备待报废，不能保养', 'The selected equipment is to be terminated and cannot be requested for repair', NULL, '-1');
@@ -6162,7 +6169,9 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ExpenseDetails','费用明细','Expense Details',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Manhours','工时','Man Hours',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AddParts','增加备件','Add Parts',NULL,-1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','InspectionPhotos','巡检照片','Inspection Photos',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','MaintenancePhotos','保养前后照片','Maintenance Photos',NULL,-1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','OtherPhotos','其他照片','Other Photos',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BeforeMaintenancePhotos','保养前照片','Before Maintenance Photos',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AfterMaintenancePhotos','保养后照片','After Maintenance Photos',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AddAttachment','添加附件','Add Attachment',NULL,-1);

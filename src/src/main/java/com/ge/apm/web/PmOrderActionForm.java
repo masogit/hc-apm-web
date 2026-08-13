@@ -42,6 +42,10 @@ public class PmOrderActionForm {
     private List<V2_BlobObject> attachmentsTwo = new ArrayList<>();
     //保养前照片
     private List<V2_BlobObject> prePmAttachments = new ArrayList<>();
+    // 巡检照片
+    private List<V2_BlobObject> inspectionPhotos = new ArrayList<>();
+    // 其他照片
+    private List<V2_BlobObject> otherPhotos = new ArrayList<>();
 
     private List<V2_PmOrderManHoursDetail> pmOrderManHoursDetails;
 
@@ -293,6 +297,22 @@ public class PmOrderActionForm {
 
     public void setPrePmAttachments(List<V2_BlobObject> prePmAttachments) {
         this.prePmAttachments = prePmAttachments;
+    }
+
+    public List<V2_BlobObject> getOtherPhotos() {
+        return otherPhotos;
+    }
+
+    public void setOtherPhotos(List<V2_BlobObject> otherPhotos) {
+        this.otherPhotos = otherPhotos;
+    }
+
+    public List<V2_BlobObject> getInspectionPhotos() {
+        return inspectionPhotos;
+    }
+
+    public void setInspectionPhotos(List<V2_BlobObject> inspectionPhotos) {
+        this.inspectionPhotos = inspectionPhotos;
     }
 
     public Integer getEntryType() {
