@@ -154,7 +154,28 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private boolean verifyEmpty(String actionName) {
         boolean flag = true;
         RuleParam ruleParam = selected.getRuleParam();
-        if ("setting".equals(actionName) && ruleParam.getPushType().equals(2)) {
+        if ("setting".equals(actionName) && "scheduledReport".equals(ruleParam.getMessageType())) {
+            if (ObjectUtil.isEmpty(ruleParam.getScheduledFrequency())) {
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessageKey("发送频率不能为空");
+                flag = false;
+            }
+            // if (ruleParam.getScheduledTime() == null) {
+            //     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            //     WebUtil.addErrorMessageKey("发送时间不能为空");
+            //     flag = false;
+            // }
+            if ("weekly".equals(ruleParam.getScheduledFrequency()) && ruleParam.getScheduledDay() == null) {
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessageKey("请选择星期");
+                flag = false;
+            }
+            if ("monthly".equals(ruleParam.getScheduledFrequency()) && ruleParam.getScheduledDay() == null) {
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessageKey("请选择日期");
+                flag = false;
+            }
+        } else if ("setting".equals(actionName) && ruleParam.getPushType().equals(2)) {
             Integer pushCycle = ruleParam.getPushCycle();
             Integer pushNum = ruleParam.getPushNum();
             if (pushCycle == null || pushCycle < 1) {
@@ -351,6 +372,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
                 break;
             case "ArrivalInstallExpiration":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.ARRIVAL_INSTALL_EXPIRATION_MSG, WechatParam.class));
+                break;
+            case "RepairMaintenanceReport":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.REPAIR_MAINTENANCE_REPORT_MSG, WechatParam.class));
                 break;
             default:
                 break;

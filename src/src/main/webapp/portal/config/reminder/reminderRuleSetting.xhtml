@@ -31,16 +31,18 @@
                                 <f:selectItems value="#{reminderRuleController.getUserList()}" var="userItem" itemLabel="#{userItem.name}" itemValue="#{userItem.id}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <p:outputPanel id="pushDateUnitGroup">
+                        <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.messageType ne 'scheduledReport'}">
                             <label class="label">周期单位<span style="color:red">*</span></label >
                             <p:selectOneMenu value="#{reminderRuleController.selected.pushDateUnit}">
                                 <f:selectItems value="#{reminderRuleController.getDateUnitList()}" var="item" itemLabel="#{item.label}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        </p:outputPanel>
                         <h:panelGroup>
                             <label class="label">#{msg.messageType}<span style="color:red">*</span></label >
                             <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.messageType}">
-                                <p:ajax event="change" update="pushSetting wechatTemplate reminderDayGroup" listener="#{reminderRuleController.messageTypeChange}"/>
+                                <p:ajax event="change" update="pushDateUnitGroup scheduledConfigWrapper wechatTemplate reminderDayGroup" listener="#{reminderRuleController.messageTypeChange}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('messageType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
@@ -48,7 +50,36 @@
                             <label class="label">天数(逾期 N 天时进行提醒)</label>
                             <p:inputNumber id="reminderDay" value="#{reminderRuleController.selected.ruleParam.reminderDay}" maxValue="365" minValue="0" decimalPlaces="0" />
                         </h:panelGroup>
-                        <h:panelGroup id="pushSetting">
+                        <p:outputPanel id="scheduledConfigWrapper">
+                        <h:panelGroup id="scheduledConfig" rendered="#{reminderRuleController.selected.ruleParam.messageType eq 'scheduledReport'}">
+                            <label class="label">#{msg.scheduledConfig}</label>
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.scheduledFrequency}<span style="color:red">*</span></label>
+                                    <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.scheduledFrequency}">
+                                        <p:ajax event="change" update="scheduledConfigWrapper" process="@this"/>
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('scheduledFrequency')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.scheduledFrequency eq 'weekly'}">
+                                    <label class="label">#{msg.scheduledDay}<span style="color:red">*</span></label>
+                                    <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.scheduledDay}">zzl
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('scheduledDay')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.scheduledFrequency eq 'monthly'}">
+                                    <label class="label">#{msg.scheduledMonthDay}<span style="color:red">*</span></label>
+                                    <p:inputNumber value="#{reminderRuleController.selected.ruleParam.scheduledDay}" minValue="1" maxValue="31" decimalPlaces="0" suffix="日"/>
+                                </h:panelGroup>
+                                <!--<h:panelGroup>
+                                    <label class="label">#{msg.scheduledTime}<span style="color:red">*</span></label>
+                                    <p:calendar value="#{reminderRuleController.selected.ruleParam.scheduledTime}" pattern="HH:mm" timeOnly="true" showOn="button" mask="true"/>
+                                </h:panelGroup>-->
+                            </p:panelGrid>
+                        </h:panelGroup>
+                        <h:panelGroup id="pushSetting" rendered="#{reminderRuleController.selected.ruleParam.messageType ne 'scheduledReport'}">
                             <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.pushType eq 1}">
                                 <label class="label">#{msg.pushSetting.concat(reminderRuleController.getPushSettingComment())}</label>
                                 <!--                            <label class="label">#{msg.pushSetting.concat(reminderRuleController.getPushSettingComment())}</label>-->
@@ -73,6 +104,7 @@
                                 </p:panelGrid>
                             </h:panelGroup>
                         </h:panelGroup>
+                        </p:outputPanel>
                         <h:panelGroup rendered="#{reminderRuleController.selected.type eq 'WorkOrder'}">
                             <label class="label">是否急救设备?<span style="color:red">*</span></label>
                             <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.emergencyEquipment}" required="true"
