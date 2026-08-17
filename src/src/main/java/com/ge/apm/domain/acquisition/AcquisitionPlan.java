@@ -235,7 +235,7 @@ public class AcquisitionPlan {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
-    @Column(name = "purchase_reason")
+    @Column(name = "file_comments")
     @Size(max = 2000)
     private String fileComments;
 
