@@ -272,7 +272,7 @@
                                                 </h:panelGroup>
                                             </h:panelGrid>
                                         </p:dataList>
-                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                        <p:fileUpload id="type1" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="30000000"  update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict nameplateRecognitionForm':'pictureList nameplateRecognitionForm'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
@@ -284,7 +284,7 @@
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
-                                        <p:fileUpload id="type2" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                        <p:fileUpload id="type2" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="30000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
@@ -296,7 +296,7 @@
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
-                                        <p:fileUpload id="type3" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                        <p:fileUpload id="type3" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="30000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
@@ -309,7 +309,7 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                            <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                           rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                           multiple="true"  sizeLimit="30000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                         </h:panelGroup>
@@ -322,7 +322,7 @@
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
-                                        <p:fileUpload id="type4" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                        <p:fileUpload id="type4" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                                       rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_FILE_UPLOAD')}"
                                                       multiple="true"  sizeLimit="30000000"  update="acklList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}30M" label="#{msg.Add}"/>
                                     </h:panelGroup>
@@ -697,7 +697,7 @@
                             </p:panel>
 
                         </p:dataGrid>
-                        <p:fileUpload id="typeScrap" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                        <p:fileUpload id="typeScrap" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                       multiple="true" sizeLimit="10000000" fileLimit="#{5-assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size()}" fileLimitMessage="#{msg.maxUpload5Pics}" update="pictureListScrap @this" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}" disabled="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.getUid(),'Scrap').size() ge 5}"/>
                     </h:panelGroup>
                 </p:panelGrid>
@@ -797,7 +797,7 @@
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
                     </p:dataList>
-                    <p:fileUpload id="reportttype1" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUploadReport}" mode="advanced" dragDropSupport="false" style="width:100%"
+                    <p:fileUpload id="reportttype1" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUploadReport}" mode="advanced" dragDropSupport="false" style="width:100%"
                                   multiple="true"  sizeLimit="100000000"  update="reportAttachList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                 </h:panelGroup>
                 <br/>
@@ -881,7 +881,7 @@
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
                     </p:dataList>
-                    <p:fileUpload id="permittype1" allowTypes="/(\.|\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUploadPermit}" mode="advanced" dragDropSupport="false" style="width:100%"
+                    <p:fileUpload id="permittype1" allowTypes="/(\\.|\\/)(#{assetInfoEditController.assetUploadFileFormats})$/" fileUploadListener="#{assetInfoEditController.handleFileUploadPermit}" mode="advanced" dragDropSupport="false" style="width:100%"
                                   multiple="true"  sizeLimit="100000000"  update="permitAttachList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                 </h:panelGroup>
                 <br/>
