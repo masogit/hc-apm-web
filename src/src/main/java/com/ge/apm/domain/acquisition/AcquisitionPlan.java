@@ -235,8 +235,20 @@ public class AcquisitionPlan {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
+    @Column(name = "purchase_reason")
+    @Size(max = 2000)
+    private String fileComments;
+
     @Transient
     private List<AcquisitionPlan> list= new ArrayList<>();
+
+    public String getFileComments() {
+        return fileComments;
+    }
+
+    public void setFileComments(String fileComments) {
+        this.fileComments = fileComments;
+    }
 
     public List<AcquisitionPlan> getList() {
         return list;
