@@ -1,5 +1,6 @@
 package com.ge.apm.service.acquisition;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.AcquisitionPlanRepository;
@@ -7,12 +8,11 @@ import com.ge.apm.dao.AcquisitionPlanStepRepository;
 import com.ge.apm.dao.AcquisitionSpecificationRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PlanFilingPeriodRepository;
-import com.ge.apm.domain.ConfigItemVO;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.acquisition.*;
 import com.ge.apm.domain.budget.BudgetApplication;
+import com.ge.apm.domain.dto.AdverseEventsExportDto;
+import com.ge.apm.service.adverseEvent.AdverseEventCellWriteWidthConfig;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.uaa.UaaService;
@@ -20,10 +20,16 @@ import com.ge.apm.view.acquisition.AcquisitionPlanEditController;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,6 +38,9 @@ import java.util.stream.Collectors;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.util.StringUtils;
+import webapp.framework.web.WebUtil;
+
+import javax.faces.context.FacesContext;
 
 @Service
 public class AcquisitionPlanService {
@@ -448,5 +457,62 @@ public class AcquisitionPlanService {
         return new ArrayList<>(result);
     }
 
+    public InputStream exportExcel(List<AcquisitionPlan> list) throws IOException {
+        InputStream templateStream = FacesContext.getCurrentInstance().getExternalContext()
+                .getResourceAsStream("/portal/acquisition/audit/Exp_AcquisitionPlan_Template.xlsx");
+        if (templateStream == null) {
+            return null;
+        }
+        List<Map<String, Object>> result = new ArrayList<>();
+        for(AcquisitionPlan plan : list){
+            Map<String, Object> m = new HashMap<>();
+            m.put("applicationHospitalName", plan.getApplicationHospitalName());
+            m.put("applicationDeptName", plan.getApplicationDeptName());
+            m.put("assetName", plan.getAssetName());
+            m.put("applicationType", WebUtil.getMessage("acquisitionApplicationType", plan.getApplicationType()));
+            m.put("applicationPlanCount", plan.getApplicationPlanCount());
+            m.put("budgetUnitPrice", plan.getBudgetUnitPrice());
+            m.put("budgetTotalAmount", plan.getBudgetTotalAmount());
+            m.put("estimatedServiceYears", plan.getEstimatedServiceYears());
+            m.put("similarEquipmentCount", plan.getSimilarEquipmentCount());
+            m.put("currentEquipmentServiceYears", plan.getCurrentEquipmentServiceYears());
+            m.put("fundingSource", WebUtil.getMessage("acquisitionFundingSource", plan.getFundingSource()));
+            m.put("fundingImplemented", WebUtil.getMessage("budgetApplicationT_F", plan.getFundingImplemented()));
+            m.put("medicalEquipmentLicense", WebUtil.getMessage("medicalEquipmentLicense", plan.getMedicalEquipmentLicense()));
+            m.put("siteRenovationCost", plan.getSiteRenovationCost());
+            m.put("purchaseReason", plan.getPurchaseReason());
+            m.put("newStaffAllocation", plan.getNewStaffAllocation());
+            m.put("depreciationCost", plan.getDepreciationCost());
+            m.put("maintenanceCost", plan.getMaintenanceCost());
+            m.put("consumablesCost", plan.getConsumablesCost());
+            m.put("annualServiceVolume", plan.getAnnualServiceVolume());
+            m.put("annualServiceIncome", plan.getAnnualServiceIncome());
+            m.put("annualOperationEfficiencyWeight", plan.getAnnualOperationEfficiencyWeight());
+            m.put("applicationNo", plan.getApplicationNo());
+            m.put("result1", getComment(plan.getId(), "DrugCenterPending"));
+            m.put("result2", getComment(plan.getId(), "WorkGroupPending"));
+            m.put("result3", getComment(plan.getId(), "BureauPartyPending"));
+            result.add(m);
+        }
 
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        EasyExcel.write(outputStream)
+                .withTemplate(templateStream)
+                .sheet()
+                .doFill(result);
+        return new ByteArrayInputStream(outputStream.toByteArray());
+
+
+    }
+
+
+    public String getComment(String id, String status){
+        List<AcquisitionPlanStep> steps = acquisitionPlanStepRepository.findByPidAndAuditStatus(id, status);
+        if (CollectionUtils.isEmpty(steps)){
+            return "";
+        }else{
+            return steps.get(0).getAuditComment();
+        }
+    }
 }

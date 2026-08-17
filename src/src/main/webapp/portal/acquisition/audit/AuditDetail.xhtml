@@ -189,6 +189,11 @@
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                 </p:dataList>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">上传资料说明</p:outputLabel>
+                                <p:inputTextarea value="#{acquisitionPlanAuditEditController.selected.fileComments}" maxlength="2000" rows="3" cols="30"  disabled="true">
+                                </p:inputTextarea>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:tab>
                     <p:tab title="辅助论证" closable="true">

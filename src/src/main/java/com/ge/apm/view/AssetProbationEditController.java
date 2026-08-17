@@ -205,6 +205,21 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                     RequestContext.getCurrentInstance().addCallbackParam("probationUser", true);
                     valid = false;
                 }
+                if (ObjectUtil.isEmpty(this.specificationList)) {
+                    WebUtil.addErrorMessage("说明书不能为空！");
+                    RequestContext.getCurrentInstance().addCallbackParam("specification", true);
+                    valid = false;
+                }
+                if (ObjectUtil.isEmpty(this.specificationList)) {
+                    WebUtil.addErrorMessage("说明书不能为空！");
+                    RequestContext.getCurrentInstance().addCallbackParam("specification", true);
+                    valid = false;
+                }
+                if (ObjectUtil.isEmpty(this.informationList)) {
+                    WebUtil.addErrorMessage("三证资料不能为空！");
+                    RequestContext.getCurrentInstance().addCallbackParam("threeInformation", true);
+                    valid = false;
+                }
                 if (!valid) {
                     break;
                 }
@@ -214,7 +229,12 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 this.selected.setProbationStartUserUid(probationConfirmor.getUid());
                 this.selected.setProbationStartUserName(probationConfirmor.getName());
                 this.selected.setDetectionTime(now);
-                sendMsgUserUid = probationConfirmor.getUid();
+                if (ObjectUtil.isNotEmpty(specificationList)) {
+                    this.selected.setSpecification(String.join(",", specificationList));
+                }
+                if (ObjectUtil.isNotEmpty(informationList)) {
+                    this.selected.setInformation(String.join(",", informationList));
+                }                sendMsgUserUid = probationConfirmor.getUid();
                 eventParams.put("currentPerson", probationConfirmor.getName());
                 eventParams.put("content", "您有新的设备试用工单需要确认试用");
                 break;
@@ -334,16 +354,6 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         if (ObjectUtil.isEmpty(this.selected.getPlanEndDate())) {
             WebUtil.addErrorMessage("计划结束时间不能为空！");
             RequestContext.getCurrentInstance().addCallbackParam("planEndDate", true);
-            valid = false;
-        }
-        if (ObjectUtil.isEmpty(this.specificationList)) {
-            WebUtil.addErrorMessage("说明书不能为空！");
-            RequestContext.getCurrentInstance().addCallbackParam("specification", true);
-            valid = false;
-        }
-        if (ObjectUtil.isEmpty(this.informationList)) {
-            WebUtil.addErrorMessage("三证资料不能为空！");
-            RequestContext.getCurrentInstance().addCallbackParam("threeInformation", true);
             valid = false;
         }
         if (ObjectUtil.isNotEmpty(this.selected.getStatus())) {

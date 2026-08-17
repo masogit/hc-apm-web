@@ -186,6 +186,18 @@ public class AssetProbation implements Serializable {
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUid;
 
+    @Column(name = "remark")
+    @Size(max = 2000)
+    private String remark;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public String getTenantUid() {
         return tenantUid;
     }
