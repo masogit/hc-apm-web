@@ -19,6 +19,7 @@
     </style>
     <div class="menu-content" tabindex="0" style="padding-bottom: 100px">
         <ui:include src="aiAssistant.xhtml" />
+        <ui:include src="message.xhtml" />
         <pu:menu id="me" widgetVar="me">
 
             <p:menuitem style=" font-size: 30" id="um9001" value="ChangeToEnglish" rendered="#{(localeService.language eq 'zh') and (userContextService.getTenantInfo().isSupportMultiLanguage)}" icon="fa fa-language fa-fw" url="#{request.requestURI}?locale=en"/>
@@ -59,6 +60,7 @@
 <!--                           <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_DOCUMENT_EDIT')}"/>-->
 <!--                           <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_RISK_EDIT')}"/>-->
                            <p:menuitem  fragment="um0117" id="um0117" value="证照管理" outcome="/portal/asset/info/specialAssetPermitList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_PERMIT_EDIT')}"/>
+<!--                           <p:menuitem  fragment="um0114" id="um0114" value="年检管理" outcome="/portal/asset/info/SpecialAssetAnnualManagement.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SPECIALASSET_PERMIT_EDIT')}"/>-->
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'MULTILEVEL_APPROVE'}">
