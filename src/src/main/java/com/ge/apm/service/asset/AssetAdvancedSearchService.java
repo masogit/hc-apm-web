@@ -2,8 +2,13 @@ package com.ge.apm.service.asset;
 
 
 import com.ge.apm.domain.SearchCondition;
+import com.ge.apm.domain.pure.AdvancedSearchConfig;
+import com.ge.apm.domain.pure.AdvancedSearchFieldConfig;
+import com.ge.apm.domain.pure.RangeOption;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.domain.I18nMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 
@@ -12,7 +17,8 @@ import java.util.*;
 @Component
 public class AssetAdvancedSearchService {
 
-    private static final String CONDITION_PATH = "1*9";
+    private static final Logger logger = LoggerFactory.getLogger(AssetAdvancedSearchService.class);
+    private static final String CONDITION_PATH = "1*9*";
 
     private static final List<FieldOption> FIELD_OPTIONS = new ArrayList<>();
     private static final Map<String, String> FIELD_TYPE_MAP = new HashMap<>();
@@ -44,7 +50,7 @@ public class AssetAdvancedSearchService {
         registerField("locationNotes", "位置备注1(科室)", "string");
         registerField("manufacture", "制造商", "string");
         registerField("manufactureTel", "制造商电话", "string");
-        registerField("vendor", "供应商", "string");
+        registerField("vendor", "供应商", "enum");
         registerField("vendorTel", "制造商联系方式", "string");
         registerField("makerShortName", "品牌/制造商简称", "string");
         registerField("deviceName", "设备标准名称", "string");
@@ -152,6 +158,27 @@ public class AssetAdvancedSearchService {
         FIELD_TYPE_MAP.put(value, fieldType);
     }
 
+    public List<FieldOption> getConfiguredFieldOptions(AdvancedSearchConfig config) {
+        if (config == null || config.getFields() == null || config.getFields().isEmpty()) {
+            return FIELD_OPTIONS;
+        }
+        List<String> enabledKeys = config.getEnabledFieldKeys();
+        List<FieldOption> result = new ArrayList<>();
+        for (FieldOption fo : FIELD_OPTIONS) {
+            if (enabledKeys.contains(fo.getValue())) {
+                result.add(fo);
+            }
+        }
+        return result;
+    }
+
+    public List<RangeOption> getConfiguredRanges(String fieldName, AdvancedSearchConfig config) {
+        if (config == null || fieldName == null) return Collections.emptyList();
+        AdvancedSearchFieldConfig fc = config.getFieldConfig(fieldName);
+        if (fc == null || fc.getRanges() == null) return Collections.emptyList();
+        return fc.getRanges();
+    }
+
     public List<FieldOption> getFieldOptions() {
         return FIELD_OPTIONS;
     }
@@ -218,7 +245,8 @@ public class AssetAdvancedSearchService {
         Iterator<SearchFilter> iterator = searchFilters.iterator();
         while (iterator.hasNext()) {
             SearchFilter filter = iterator.next();
-            if (CONDITION_PATH.equals(filter.conditionPath)) {
+            // handle both old ("1*9") and new ("1*9*") condition paths
+            if (CONDITION_PATH.equals(filter.conditionPath) || "1*9".equals(filter.conditionPath)) {
                 iterator.remove();
             }
         }
@@ -226,17 +254,59 @@ public class AssetAdvancedSearchService {
 
     public void applyConditions(List<SearchFilter> searchFilters, List<SearchCondition> conditions) {
         if (searchFilters == null || conditions == null || conditions.isEmpty()) {
+            logger.info("[AdvancedSearch] applyConditions skipped: searchFilters={}, conditions={}",
+                    searchFilters == null ? "null" : "size=" + searchFilters.size(),
+                    conditions == null ? "null" : "size=" + conditions.size());
             return;
         }
 
+        logger.info("[AdvancedSearch] applyConditions start: conditions count={}, searchFilters before clear={}",
+                conditions.size(), searchFilters.size());
         clearAdvancedFilters(searchFilters);
+        logger.info("[AdvancedSearch] after clearAdvancedFilters: searchFilters size={}", searchFilters.size());
 
-        for (SearchCondition condition : conditions) {
+        for (int i = 0; i < conditions.size(); i++) {
+            SearchCondition condition = conditions.get(i);
+            logger.info("[AdvancedSearch] processing condition[{}]: fieldName={}, operator={}, value={}, dateValue={}, dateValue2={}, value2={}, enumValues={}",
+                    i, condition.getFieldName(), condition.getOperator(),
+                    condition.getValue(), condition.getDateValue(), condition.getDateValue2(),
+                    condition.getValue2(), condition.getEnumValues());
+
             if (condition.getFieldName() == null || condition.getFieldName().trim().isEmpty()) {
+                logger.warn("[AdvancedSearch] condition[{}] SKIPPED: fieldName is null or empty", i);
                 continue;
             }
             String operatorStr = condition.getOperator();
             if (operatorStr == null || operatorStr.trim().isEmpty()) {
+                logger.warn("[AdvancedSearch] condition[{}] SKIPPED: operator is null or empty", i);
+                continue;
+            }
+
+            String fieldType = getFieldType(condition.getFieldName());
+
+            // Handle enum multi-select: enumValues非空时统一按IN处理（无论operator是EQ还是IN）
+            if ("enum".equals(fieldType)
+                    && condition.getEnumValues() != null && !condition.getEnumValues().isEmpty()) {
+                // 先尝试解析为整数（适用于标准枚举字段如assetGroup、status等）
+                List<Integer> intValues = new ArrayList<>();
+                boolean allInteger = true;
+                for (String ev : condition.getEnumValues()) {
+                    try {
+                        intValues.add(Integer.valueOf(ev));
+                    } catch (NumberFormatException e) {
+                        allInteger = false;
+                        break;
+                    }
+                }
+                if (allInteger && !intValues.isEmpty()) {
+                    searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.IN, intValues, CONDITION_PATH));
+                    logger.info("[AdvancedSearch] condition[{}] ADDED as IN enum(int): field={}, values={}", i, condition.getFieldName(), intValues);
+                } else {
+                    // 非整数值（如供应商名称字符串），直接使用字符串列表做IN查询
+                    List<String> strValues = new ArrayList<>(condition.getEnumValues());
+                    searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.IN, strValues, CONDITION_PATH));
+                    logger.info("[AdvancedSearch] condition[{}] ADDED as IN enum(str): field={}, values={}", i, condition.getFieldName(), strValues);
+                }
                 continue;
             }
 
@@ -244,21 +314,34 @@ public class AssetAdvancedSearchService {
             try {
                 operator = SearchFilter.Operator.valueOf(operatorStr);
             } catch (IllegalArgumentException e) {
+                logger.warn("[AdvancedSearch] condition[{}] SKIPPED: invalid operator '{}'", i, operatorStr);
                 continue;
             }
 
-            String fieldType = getFieldType(condition.getFieldName());
-
             if (operator == SearchFilter.Operator.IsNull || operator == SearchFilter.Operator.IsNotNull) {
                 searchFilters.add(new SearchFilter(condition.getFieldName(), operator, null, CONDITION_PATH));
+                logger.info("[AdvancedSearch] condition[{}] ADDED as {}: field={}", i, operator, condition.getFieldName());
             } else if (operator == SearchFilter.Operator.BETWEEN) {
+                int beforeSize = searchFilters.size();
                 applyBetween(searchFilters, condition, fieldType);
+                logger.info("[AdvancedSearch] condition[{}] BETWEEN: field={}, type={}, added {} filters", i, condition.getFieldName(), fieldType, searchFilters.size() - beforeSize);
             } else {
                 Object value = resolveValue(condition, fieldType);
                 if (value != null) {
-                    searchFilters.add(new SearchFilter(condition.getFieldName(), operator, value));
+                    searchFilters.add(new SearchFilter(condition.getFieldName(), operator, value, CONDITION_PATH));
+                    logger.info("[AdvancedSearch] condition[{}] ADDED: field={}, operator={}, value={}, type={}", i, condition.getFieldName(), operator, value, fieldType);
+                } else {
+                    logger.warn("[AdvancedSearch] condition[{}] SKIPPED: resolved value is null, field={}, operator={}, type={}, rawValue={}, dateValue={}",
+                            i, condition.getFieldName(), operator, fieldType, condition.getValue(), condition.getDateValue());
                 }
             }
+        }
+
+        logger.info("[AdvancedSearch] applyConditions end: searchFilters final size={}", searchFilters.size());
+        for (int i = 0; i < searchFilters.size(); i++) {
+            SearchFilter sf = searchFilters.get(i);
+            logger.info("[AdvancedSearch]   searchFilter[{}]: field={}, operator={}, conditionPath={}, value={}",
+                    i, sf.fieldName, sf.operator, sf.conditionPath, sf.value);
         }
     }
 
@@ -288,6 +371,7 @@ public class AssetAdvancedSearchService {
 
     public List<EnumOption> getEnumOptions(String fieldName) {
         if (fieldName == null || fieldName.isEmpty()) return Collections.emptyList();
+        
         String msgType = fieldName;
         // status field uses "assetStatus" as i18n message type
         if ("status".equals(fieldName)) {

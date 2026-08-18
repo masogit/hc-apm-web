@@ -406,6 +406,7 @@
                             </p:dataTable>
                         </p:tab>
 
+
                         <p:tab title="供应商授权字段页面" rendered="#{customConfigController.showSupplierViewAndEditFieldsTable()}">
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <p:fieldset legend="可查看字段">
@@ -435,10 +436,35 @@
                                 </p:column>
                             </p:dataTable>
                         </p:tab>
+
+                        <p:tab title="高级查询配置">
+                            <p:dataTable id="advSearchFieldTable" var="fieldKey" value="#{customConfigController.allFields.keySet().toArray()}">
+                                <p:column headerText="字段名称">
+                                    <h:outputText value="#{customConfigController.allFields[fieldKey]}" />
+                                </p:column>
+                                <p:column headerText="字段类型">
+                                    <h:outputText value="#{customConfigController.getFieldTypeLabel(fieldKey)}" />
+                                </p:column>
+                                <p:column headerText="启用">
+                                    <p:selectBooleanCheckbox value="#{customConfigController.advancedSearchFieldSelection[fieldKey]}">
+                                        <p:ajax process="@form" update="advSearchFieldTable" listener="#{customConfigController.setAdvancedSearchFieldSelected(fieldKey, customConfigController.advancedSearchFieldSelection[fieldKey])}" />
+                                    </p:selectBooleanCheckbox>
+                                </p:column>
+                                <p:column headerText="默认条件" >
+                                    <p:selectBooleanCheckbox value="#{customConfigController.getAdvSearchFieldConfig(fieldKey).defaultCondition}" />
+                                </p:column>
+                                <p:column headerText="操作" >
+                                    <p:commandButton value="配置区间" icon="ui-icon-gear"
+                                                     rendered="#{customConfigController.advancedSearchFieldSelection[fieldKey] and customConfigController.isRangeField(fieldKey)}"
+                                                     actionListener="#{customConfigController.prepareEditAdvSearchField(fieldKey)}"
+                                                     update=":advSearchRangeForm" oncomplete="PF('AdvSearchRangeDialog').show()" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
                     </p:tabView>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Onekey}#{msg.Save}" icon="ui-icon-check" action="#{customConfigController.saveChange()}" validateClient="true" update=":customConfigForm :growl" style="float:left"/>
+                        <p:commandButton value="#{msg.Onekey}#{msg.Save}"  icon="ui-icon-check" action="#{customConfigController.saveChange()}" validateClient="true" update=":customConfigForm :growl" style="float:left"/>
                         <p:commandButton value="#{msg.Onekey}#{msg.Delete}" icon="ui-icon-check" action="#{customConfigController.deleteConfig()}" validateClient="true" update=":customConfigForm :growl" style="float:left">
                             <p:confirm header="#{msg.DeleteConformation}" message="是否确认删除当前配置并使用上级组织机构的自定义配置？" icon="ui-icon-warning"/>
                         </p:commandButton>
@@ -593,6 +619,35 @@
                                                  update="#{customConfigController.getAddFieldsUpdateString()} :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'FieldsAddDialog');"/>
                                 <p:commandButton immediate="true" actionListener="#{customConfigController.cancelAddFields}" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FieldsAddDialog').hide()"/>
                             </h:panelGroup>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+                <p:dialog id="AdvSearchRangeDialog" widgetVar="AdvSearchRangeDialog" modal="true" width="700" resizable="true" draggable="true" appendTo="@(body)" header="区间配置">
+                    <h:form id="advSearchRangeForm">
+                        <h:panelGroup rendered="#{not empty customConfigController.currentAdvSearchEditField}">
+                            <h:outputText value="字段: #{customConfigController.allFields[customConfigController.currentAdvSearchEditField.fieldKey]}" style="font-weight:bold;display:block;margin-bottom:10px" />
+                            <ui:repeat value="#{customConfigController.currentAdvSearchEditField.ranges}" var="range" varStatus="rStatus">
+                                <h:panelGrid columns="4" style="margin-bottom: 5px; width: 100%;">
+                                    <h:panelGroup>
+                                        <h:outputText value="最小值: " />
+                                        <p:inputText value="#{range.minValue}" placeholder="最小值" style="width: 120px;" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <h:outputText value="最大值: " />
+                                        <p:inputText value="#{range.maxValue}" placeholder="空=无上限" style="width: 120px;" />
+                                    </h:panelGroup>
+                                    <p:commandButton value="删除" icon="ui-icon-trash"
+                                                     actionListener="#{customConfigController.removeRangeOption(rStatus.index)}"
+                                                     update=":advSearchRangeForm" process="@form" />
+                                    <h:outputText value="" />
+                                </h:panelGrid>
+                            </ui:repeat>
+                            <br/>
+                            <p:commandButton value="添加区间" icon="ui-icon-plus" actionListener="#{customConfigController.addRangeOption()}" update=":advSearchRangeForm" process="@form" />
+                            <br/><br/>
+                            <p:commandButton value="确定" icon="ui-icon-check" process="@form"
+                                             update=":advSearchRangeForm"
+                                             oncomplete="PF('AdvSearchRangeDialog').hide()" />
                         </h:panelGroup>
                     </h:form>
                 </p:dialog>

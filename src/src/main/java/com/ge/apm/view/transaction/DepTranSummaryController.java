@@ -100,8 +100,8 @@ public Integer getCurrentMonth(){
         HashMap<String, Object> viewByAssetHead=null;
         if(startTime!=null) {
             viewByAssetHead=transactionService.getSummary(TimeUtils.getInputStartDate(startTime),TimeUtils.getInputEndDate(startTime), UserContextService.getAccessToken());
+            summaryTraList= decomposeSummary(tf,viewByAssetHead);
         }
-        summaryTraList= decomposeSummary(tf,viewByAssetHead);
     }
 
 

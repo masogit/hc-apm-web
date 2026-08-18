@@ -13,4 +13,7 @@ public interface SavedAdvancedSearchRepository extends GenericRepositoryUUID<Sav
 
     @Query(value = "SELECT COUNT(s) FROM SavedAdvancedSearch s WHERE s.userUid = ?1")
     long countByUserUid(String userUid);
+
+    @Query(value = "SELECT s FROM SavedAdvancedSearch s WHERE s.userUid = ?1 AND s.name = ?2")
+    SavedAdvancedSearch findByUserUidAndName(String userUid, String name);
 }
