@@ -57,3 +57,6 @@ WHERE sr.name IN ('AssetHead', 'AssetStaff')
       AND existing.role_id = (SELECT id FROM sys_role WHERE name = 'DepartmentConvertManager')
       AND existing.role_type = 0
 );
+
+-- YHAAO-29251
+update shared_asset_req_detail  set  charging_begin_time = create_date  where  id in ('2c9b85829ff5fb8d019fff247d552896','2c9b85829ff5fb8d019fff23434b288f');
