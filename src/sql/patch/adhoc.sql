@@ -11,8 +11,8 @@ SELECT replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修是否显示
 
 -- YHAAO-28922 巡检保养工单增加巡检图片上传,其他保养工单增加其他图片上传
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '巡检保养巡检图片是否必填', 'requireInspectionPhotos', '巡检保养巡检图片必填', 'f','t',3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireInspectionPhotos');
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '巡检图片是否必填', 'requireInspectionPhotos', '巡检图片必填', 'f','t',3
+    ON CONFLICT (key) DO UPDATE SET category = EXCLUDED.category, default_value = EXCLUDED.default_value, description = EXCLUDED.description, name = EXCLUDED.name, super_admin_edit = EXCLUDED.super_admin_edit, user_parent_config = EXCLUDED.user_parent_config, value_type = EXCLUDED.value_type;
 
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '二级保养其他图片是否必填', 'requireRuleLevelSecondOtherPhotos', '二级保养其他图片必填', 'f','t',3

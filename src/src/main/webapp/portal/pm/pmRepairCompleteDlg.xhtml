@@ -264,7 +264,7 @@
 
                 <p:fieldset legend="#{msg.InspectionPhotos}" rendered="#{1 eq v2PmOrderController.selectedPmOrder.ruleLevel}">
                     <p:dataGrid id="inspectionPhotos" var="fileitem" value="#{v2PmOrderController.inspectionPhotos}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                        <f:facet name="header">#{msg.InspectionPhotos}</f:facet>
+                        <f:facet name="header">#{msg.InspectionPhotos}<p:outputLabel rendered="#{v2PmOrderController.requireInspectionPhotos}">*</p:outputLabel></f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
@@ -279,7 +279,7 @@
 
                 <p:fieldset legend="#{msg.MaintenancePhotos}" >
                     <p:dataGrid id="pictureBeforeList" var="fileitem" value="#{v2PmOrderController.picBeforeList}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                        <f:facet name="header">#{msg.BeforeMaintenancePhotos}</f:facet>
+                        <f:facet name="header">#{msg.BeforeMaintenancePhotos}<p:outputLabel rendered="#{v2PmOrderController.selectedPmOrder.ruleLevel ne 1 and (2 eq v2PmOrderController.selectedPmOrder.ruleLevel ? v2PmOrderController.requireRuleLevelSecondMaintenancePhotos : v2PmOrderController.requireRuleLevelThreeMaintenancePhotos)}">*</p:outputLabel></f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
@@ -291,7 +291,7 @@
                     </p:dataGrid>
                     <p:fileUpload id="beforePic" disabled="#{v2PmOrderController.disableUploadButton('before')}" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureBeforeList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <p:dataGrid id="pictureAfterList" var="fileitem" value="#{v2PmOrderController.picAfterList}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                        <f:facet name="header">#{msg.AfterMaintenancePhotos}</f:facet>
+                        <f:facet name="header">#{msg.AfterMaintenancePhotos}<p:outputLabel rendered="#{v2PmOrderController.selectedPmOrder.ruleLevel ne 1 and (2 eq v2PmOrderController.selectedPmOrder.ruleLevel ? v2PmOrderController.requireRuleLevelSecondMaintenancePhotos : v2PmOrderController.requireRuleLevelThreeMaintenancePhotos)}">*</p:outputLabel></f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
@@ -306,7 +306,7 @@
 
                 <p:fieldset legend="#{msg.OtherPhotos}" rendered="#{2 eq v2PmOrderController.selectedPmOrder.ruleLevel or 3 eq v2PmOrderController.selectedPmOrder.ruleLevel or 4 eq v2PmOrderController.selectedPmOrder.ruleLevel}">
                     <p:dataGrid id="otherPhotos" var="fileitem" value="#{v2PmOrderController.otherPhotos}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                        <f:facet name="header">#{msg.OtherPhotos}</f:facet>
+                        <f:facet name="header">#{msg.OtherPhotos}<p:outputLabel rendered="#{2 eq v2PmOrderController.selectedPmOrder.ruleLevel ? v2PmOrderController.requireRuleLevelSecondOtherPhotos : v2PmOrderController.requireRuleLevelThreeOtherPhotos}">*</p:outputLabel></f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
