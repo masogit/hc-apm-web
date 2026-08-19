@@ -543,11 +543,13 @@ public class MeasuringService {
         progress = 0;
         // 获取压缩文件中的每个子文件
         try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
-            ZipEntry entry;
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                List<MeasuringCertificateDetail> detailList = handleOcr(zipInputStream, entry,identifyPatterns,ruleJSON);
+            List<File> zipEntry = getZipEntryFile(zipInputStream);
+            int fileCount = zipEntry.size();
+            int fileCountAvg = 100 / fileCount;
+            for (File efile : zipEntry) {
+                List<MeasuringCertificateDetail> detailList = handleOcr(efile,identifyPatterns,ruleJSON);
                 resultList.addAll(detailList);
-                progress ++;
+                progress += fileCountAvg;
             }
             progress = 100;
         }catch (Exception e){
@@ -557,21 +559,30 @@ public class MeasuringService {
         resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         return resultList;
     }
-    public List<MeasuringCertificateDetail> handleOcr(ZipInputStream zis, ZipEntry entry, String identifyPatterns, JSONObject ruleJSON){
-        File newFile = null;
-        List<MeasuringCertificateDetail> measuringCertificateDetailResult = new ArrayList<>();
-        try {
-            byte[] buffer = new byte[1024];
-            File destDir = new File(FILE_SCAN_FOLDER);
-            if(entry.isDirectory()) return null;
-            newFile = newFile(destDir, entry);
-            // 写入文件内容
-            try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
+
+    public List<File> getZipEntryFile(ZipInputStream zipInputStream) throws IOException {
+        List<File> zipEntryFileList = new ArrayList<>();
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    byte[] buffer = new byte[1024];
+                    File destDir = new File(FILE_SCAN_FOLDER);
+                    if(entry.isDirectory()) return null;
+                    File newFile = newFile(destDir, entry);
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                        int len;
+                        while ((len = zipInputStream.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                    zipEntryFileList.add(newFile);
                 }
             }
+        return zipEntryFileList;
+    }
+    public List<MeasuringCertificateDetail> handleOcr( File newFile, String identifyPatterns, JSONObject ruleJSON){
+        List<MeasuringCertificateDetail> measuringCertificateDetailResult = new ArrayList<>();
+        try {
             Map<String, Object> params = new HashMap<>();
             if("AI".equalsIgnoreCase(identifyPatterns)){
 //                params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());

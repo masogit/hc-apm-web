@@ -21,6 +21,9 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.SearchCondition;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.domain.pure.AdvancedSearchConfig;
+import com.ge.apm.domain.pure.AdvancedSearchFieldConfig;
+import com.ge.apm.domain.pure.RangeOption;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -98,6 +101,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private SavedAdvancedSearchRepository savedAdvancedSearchRepository;
     private List<SavedAdvancedSearch> savedSearches = new ArrayList<>();
     private String newSavedSearchName = "";
+    private AdvancedSearchConfig advancedSearchConfig;
 
     private IdleEquipmentStockRepository idleEquipmentStockRepository;
     // 设备调剂分类: 1=院内设备, 2=借出设备, 3=借入设备
@@ -168,7 +172,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setQueryType(int queryType) {
         // Preserve advanced search filters before clearing
         List<SearchFilter> advFilters = searchFilters != null
-                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("1*9")).collect(Collectors.toList())
                 : new ArrayList<>();
         this.searchFilters.clear();
         searchFilters.addAll(advFilters);
@@ -178,7 +182,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setAdjustmentCategory(int adjustmentCategory) {
         List<SearchFilter> advFilters = searchFilters != null
-                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("1*9")).collect(Collectors.toList())
                 : new ArrayList<>();
         this.searchFilters.clear();
         searchFilters.addAll(advFilters);
@@ -336,6 +340,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private void loadCustomConfig() {
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        advancedSearchConfig = customConfig.getAdvancedSearchConfig();
         List<String> roles = UserContextService.getRoles();
         List<CustomRole> customRoles = userContextService.getListCustomRole(UserContextService.getCurrentUserAccount().getId());
         if (CollectionUtils.isNotEmpty(customRoles)) {
@@ -395,6 +400,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             if (warrantyStatus.contains("4")) {
                 searchFilters.add(new SearchFilter("factoryWarrantyDate", SearchFilter.Operator.LTE, now, "1*6+"));
+            }
+        }
+        logger.info("[AdvancedSearch] loadData before query: advancedSearchActive={}, searchFilters size={}", advancedSearchActive, searchFilters != null ? searchFilters.size() : 0);
+        if (searchFilters != null) {
+            for (int i = 0; i < searchFilters.size(); i++) {
+                SearchFilter sf = searchFilters.get(i);
+                logger.info("[AdvancedSearch]   pre-query filter[{}]: field={}, op={}, path={}, value={}", i, sf.fieldName, sf.operator, sf.conditionPath, sf.value);
             }
         }
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -702,7 +714,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         // Preserve advanced search filters before clearing
         List<SearchFilter> advFilters = searchFilters != null
-                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("1*9")).collect(Collectors.toList())
                 : new ArrayList<>();
         this.searchFilters.clear();
         searchFilters.addAll(advFilters);
@@ -725,7 +737,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onUnSelectSiteTreeNode(NodeUnselectEvent event) {
         // Preserve advanced search filters before clearing
         List<SearchFilter> advFilters = searchFilters != null
-                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("1*9")).collect(Collectors.toList())
                 : new ArrayList<>();
         this.searchFilters.clear();
         searchFilters.addAll(advFilters);
@@ -819,7 +831,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<AssetAdvancedSearchService.FieldOption> getAdvancedSearchFieldOptions() {
-        return advancedSearchService.getFieldOptions();
+        if (advancedSearchConfig != null && advancedSearchConfig.getFields() != null && !advancedSearchConfig.getFields().isEmpty()) {
+            return advancedSearchService.getConfiguredFieldOptions(advancedSearchConfig);
+        }
+        return null;
     }
 
     public List<AssetAdvancedSearchService.OperatorOption> getOperatorsForField(String fieldName) {
@@ -831,6 +846,22 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<AssetAdvancedSearchService.EnumOption> getEnumOptionsForField(String fieldName) {
+        // 供应商字段特殊处理：从数据库加载供应商名称列表
+        if ("vendor".equals(fieldName)) {
+            try {
+                List<com.ge.apm.domain.Supplier> suppliers = supplierDao.findSupplierByTenantUID(user.getTenantUID(), 1000);
+                List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+                for (com.ge.apm.domain.Supplier s : suppliers) {
+                    if (s.getName() != null && !s.getName().trim().isEmpty()) {
+                        options.add(new AssetAdvancedSearchService.EnumOption(s.getName(), s.getName()));
+                    }
+                }
+                return options;
+            } catch (Exception e) {
+                logger.error("加载供应商列表失败", e);
+                return Collections.emptyList();
+            }
+        }
         return advancedSearchService.getEnumOptions(fieldName);
     }
 
@@ -843,16 +874,23 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void onFieldChange(SearchCondition condition) {
         if (condition == null) return;
-        // Reset operator to first valid operator for the new field type
-        List<AssetAdvancedSearchService.OperatorOption> ops = advancedSearchService.getOperatorsForField(condition.getFieldName());
-        if (ops != null && !ops.isEmpty()) {
-            condition.setOperator(ops.get(0).getValue());
+        String fieldType = advancedSearchService.getFieldType(condition.getFieldName());
+        // For enum fields, force IN operator; for others, use first available operator
+        if ("enum".equals(fieldType)) {
+            condition.setOperator("IN");
+        } else {
+            List<AssetAdvancedSearchService.OperatorOption> ops = advancedSearchService.getOperatorsForField(condition.getFieldName());
+            if (ops != null && !ops.isEmpty()) {
+                condition.setOperator(ops.get(0).getValue());
+            }
         }
         // Clear all value fields
         condition.setValue("");
         condition.setValue2("");
         condition.setDateValue(null);
         condition.setDateValue2(null);
+        condition.setEnumValues(null);
+        condition.setSelectedRangeLabel(null);
     }
 
     public void onOperatorChange(SearchCondition condition) {
@@ -879,14 +917,88 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             advancedSearchService.clearAdvancedFilters(searchFilters);
         }
         advancedSearchActive = false;
+        newSavedSearchName = "";
+    }
+
+    public void loadDefaultConditions() {
+        logger.info("=== loadDefaultConditions 开始 ===");
+        // 重新打开高级查询对话框时，清空收藏名称
+        newSavedSearchName = "";
+        try {
+            // 每次打开高级查询对话框时，重新加载配置和默认条件
+            loadCustomConfig();
+            logger.info("loadCustomConfig 完成, advancedSearchConfig={}", advancedSearchConfig != null ? "非空" : "空");
+            // 使用 clear() 而不是 new ArrayList，保持列表引用不变，避免 ui:repeat 状态不同步
+            if (advancedConditions == null) {
+                advancedConditions = new ArrayList<>();
+            }
+            advancedConditions.clear();
+            if (advancedSearchConfig == null) {
+                logger.info("advancedSearchConfig 为空，跳过默认条件加载");
+                return;
+            }
+            List<AdvancedSearchFieldConfig> allFields = advancedSearchConfig.getFields();
+            logger.info("高级查询配置总字段数: {}", allFields != null ? allFields.size() : 0);
+            List<AdvancedSearchFieldConfig> defaultFields = advancedSearchConfig.getDefaultFields();
+            logger.info("默认条件字段数: {}", defaultFields != null ? defaultFields.size() : 0);
+            if (defaultFields == null || defaultFields.isEmpty()) {
+                logger.info("无默认条件字段，跳过加载，列表为空");
+                return;
+            }
+            List<SearchCondition> newConditions = new ArrayList<>();
+            for (AdvancedSearchFieldConfig fc : defaultFields) {
+                if (fc.getFieldKey() == null || fc.getFieldKey().isEmpty()) {
+                    logger.warn("跳过无效默认字段（fieldKey为空）");
+                    continue;
+                }
+                logger.info("加载默认字段: {}", fc.getFieldKey());
+                SearchCondition cond = new SearchCondition();
+                cond.setFieldName(fc.getFieldKey());
+                List<AssetAdvancedSearchService.OperatorOption> ops = advancedSearchService.getOperatorsForField(fc.getFieldKey());
+                if (ops != null && !ops.isEmpty()) {
+                    cond.setOperator(ops.get(0).getValue());
+                }
+                newConditions.add(cond);
+            }
+            advancedConditions.addAll(newConditions);
+            logger.info("=== loadDefaultConditions 完成, 共加载 {} 个默认条件 ===", advancedConditions.size());
+        } catch (Exception e) {
+            logger.error("loadDefaultConditions 执行异常", e);
+        }
+    }
+
+    public List<RangeOption> getRangeOptionsForField(String fieldName) {
+        return advancedSearchService.getConfiguredRanges(fieldName, advancedSearchConfig);
+    }
+
+    public void onRangeSelect(SearchCondition condition, String rangeLabel) {
+        if (condition == null || rangeLabel == null || rangeLabel.isEmpty()) return;
+        List<RangeOption> ranges = getRangeOptionsForField(condition.getFieldName());
+        for (RangeOption r : ranges) {
+            if (rangeLabel.equals(r.getLabel())) {
+                condition.setSelectedRangeLabel(r.getLabel());
+                condition.setValue(r.getMinValue() != null ? r.getMinValue() : "");
+                condition.setValue2(r.getMaxValue() != null ? r.getMaxValue() : "");
+                condition.setOperator("BETWEEN");
+                break;
+            }
+        }
+    }
+
+    public AdvancedSearchConfig getAdvancedSearchConfig() {
+        return advancedSearchConfig;
     }
 
     public void applyAdvancedSearch() {
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        // Clear all non-advanced filters to isolate advanced search
-        searchFilters.removeIf(f -> f.conditionPath == null || !f.conditionPath.startsWith("adv"));
+        // 高级查询隔离：移除列表搜索框的普通查询条件(conditionPath为空或"1*")和旧的高级查询条件("1*9*")
+        // 保留其他特殊过滤条件(如 "1*2+"组织过滤、"1*3+"搜索文本、"1*5+"院区科室等)
+        searchFilters.removeIf(f -> f.conditionPath == null
+                || "1*".equals(f.conditionPath)
+                || "1*9*".equals(f.conditionPath)
+                || "1*9".equals(f.conditionPath));
         advancedSearchActive = true;
         advancedSearchService.applyConditions(searchFilters, advancedConditions);
     }
@@ -912,32 +1024,49 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("无法获取用户信息");
             return;
         }
-        long count = savedAdvancedSearchRepository.countByUserUid(user.getUid());
-        if (count >= 5) {
-            WebUtil.addWarnMessage("收藏数量已达上限(5个)，请先删除部分收藏后再添加");
-            loadSavedSearches();
-            RequestContext.getCurrentInstance().execute("PF('savedSearchListDialog').show()");
-            return;
+        // 判断同名收藏是否已存在，存在则更新，不存在才检查数量上限
+        SavedAdvancedSearch existing = savedAdvancedSearchRepository.findByUserUidAndName(user.getUid(), newSavedSearchName.trim());
+        if (existing == null) {
+            long count = savedAdvancedSearchRepository.countByUserUid(user.getUid());
+            if (count >= 5) {
+                WebUtil.addWarnMessage("收藏数量已达上限(5个)，请先删除部分收藏后再添加");
+                loadSavedSearches();
+                RequestContext.getCurrentInstance().execute("PF('savedSearchListDialog').show()");
+                return;
+            }
         }
-        doSaveSearch();
+        doSaveSearch(existing);
     }
 
-    private void doSaveSearch() {
+    private void doSaveSearch(SavedAdvancedSearch existing) {
         javax.persistence.EntityManager em = null;
         try {
-            SavedAdvancedSearch saved = new SavedAdvancedSearch();
-            saved.setUserUid(user.getUid());
-            saved.setName(newSavedSearchName.trim());
-            saved.setConditionsJson(buildConditionsJson());
-            saved.setCreatedDate(new Date());
             em = WebUtil.getBean(javax.persistence.EntityManagerFactory.class).createEntityManager();
             em.getTransaction().begin();
-            em.persist(saved);
-            em.getTransaction().commit();
-            logger.info("收藏保存成功, uid={}, name={}", saved.getUid(), saved.getName());
-            newSavedSearchName = "";
-            loadSavedSearches();
-            WebUtil.addSuccessMessage("收藏成功");
+            if (existing != null) {
+                // 同名收藏已存在，执行更新操作
+                existing.setConditionsJson(buildConditionsJson());
+                existing.setCreatedDate(new Date());
+                em.merge(existing);
+                em.getTransaction().commit();
+                logger.info("收藏更新成功, uid={}, name={}", existing.getUid(), existing.getName());
+                newSavedSearchName = existing.getName();
+                loadSavedSearches();
+                WebUtil.addSuccessMessage("收藏「" + existing.getName() + "」已更新");
+            } else {
+                // 新建收藏
+                SavedAdvancedSearch saved = new SavedAdvancedSearch();
+                saved.setUserUid(user.getUid());
+                saved.setName(newSavedSearchName.trim());
+                saved.setConditionsJson(buildConditionsJson());
+                saved.setCreatedDate(new Date());
+                em.persist(saved);
+                em.getTransaction().commit();
+                logger.info("收藏保存成功, uid={}, name={}", saved.getUid(), saved.getName());
+                newSavedSearchName = saved.getName();
+                loadSavedSearches();
+                WebUtil.addSuccessMessage("收藏成功");
+            }
         } catch (Exception e) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -963,6 +1092,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             obj.put("value2", c.getValue2() != null ? c.getValue2() : "");
             obj.put("dateValue", c.getDateValue() != null ? sdf.format(c.getDateValue()) : "");
             obj.put("dateValue2", c.getDateValue2() != null ? sdf.format(c.getDateValue2()) : "");
+            if (c.getEnumValues() != null && !c.getEnumValues().isEmpty()) {
+                obj.put("enumValues", c.getEnumValues());
+            }
+            obj.put("selectedRangeLabel", c.getSelectedRangeLabel() != null ? c.getSelectedRangeLabel() : "");
             arr.add(obj);
         }
         return arr.toJSONString();
@@ -973,7 +1106,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         try {
             JSONArray arr = JSON.parseArray(saved.getConditionsJson());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            advancedConditions = new ArrayList<>();
+            List<SearchCondition> loaded = new ArrayList<>();
             for (int i = 0; i < arr.size(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
                 SearchCondition c = new SearchCondition();
@@ -989,8 +1122,21 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 if (dv2 != null && !dv2.isEmpty()) {
                     try { c.setDateValue2(sdf.parse(dv2)); } catch (Exception ignored) {}
                 }
-                advancedConditions.add(c);
+                List<String> evArr = obj.getObject("enumValues", List.class);
+                if (evArr != null) {
+                    List<String> enumVals = new ArrayList<>();
+                    for (Object o : evArr) { enumVals.add(String.valueOf(o)); }
+                    c.setEnumValues(enumVals);
+                }
+                c.setSelectedRangeLabel(obj.getString("selectedRangeLabel"));
+                loaded.add(c);
             }
+            if (advancedConditions == null) {
+                advancedConditions = new ArrayList<>();
+            }
+            advancedConditions.clear();
+            advancedConditions.addAll(loaded);
+            newSavedSearchName = saved.getName();
             WebUtil.addSuccessMessage("已加载收藏: " + saved.getName());
         } catch (Exception e) {
             logger.error("加载收藏查询条件失败", e);
@@ -1402,7 +1548,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.advancedSearchActive = false;
         // Preserve advanced search filters before super.onFilter clears all
         List<SearchFilter> advFilters = searchFilters != null
-                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("adv")).collect(Collectors.toList())
+                ? searchFilters.stream().filter(f -> f.conditionPath != null && f.conditionPath.startsWith("1*9")).collect(Collectors.toList())
                 : new ArrayList<>();
         super.onFilter(event);
         // Re-add advanced search filters after super clears them

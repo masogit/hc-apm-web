@@ -356,6 +356,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 wrapper.isNull("o.cu");
             }
         }
+        if(this.hasFilterOnField("certificateType")){
+            String certificateType = searchFilters.stream().filter(sf -> "certificateType".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("certificateType", SearchFilter.Operator.EQ, 0)).value.toString();
+            wrapper.eq("mcd.certificate_type", Integer.valueOf(certificateType));
+        }
         return wrapper;
     }
 

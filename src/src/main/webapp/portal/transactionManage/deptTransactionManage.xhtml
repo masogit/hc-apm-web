@@ -26,7 +26,7 @@
                         -->
                         <h:panelGroup>
                             <label class="label">月份查询*</label>
-                            <p:calendar  timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd" value="#{depTranSummaryController.startTime}"  showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"></p:calendar>
+                            <p:calendar  timeZone="GMT+8" id="fillDate" pattern="yyyy/MM" value="#{depTranSummaryController.startTime}"  showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"></p:calendar>
                         </h:panelGroup>
                         <p:commandButton value="查询"  update="@(.dt)" actionListener="#{depTranSummaryController.searchTheMonth()}" />
                     </p:panelGrid>
