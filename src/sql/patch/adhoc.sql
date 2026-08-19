@@ -11,8 +11,8 @@ SELECT replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修是否显示
 
 -- YHAAO-28922 巡检保养工单增加巡检图片上传,其他保养工单增加其他图片上传
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '巡检保养巡检图片是否必填', 'requireInspectionPhotos', '巡检保养巡检图片必填', 'f','t',3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireInspectionPhotos');
+SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '巡检图片是否必填', 'requireInspectionPhotos', '巡检图片必填', 'f','t',3
+    ON CONFLICT (key) DO UPDATE SET category = EXCLUDED.category, default_value = EXCLUDED.default_value, description = EXCLUDED.description, name = EXCLUDED.name, super_admin_edit = EXCLUDED.super_admin_edit, user_parent_config = EXCLUDED.user_parent_config, value_type = EXCLUDED.value_type;
 
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
 SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '二级保养其他图片是否必填', 'requireRuleLevelSecondOtherPhotos', '二级保养其他图片必填', 'f','t',3
@@ -36,3 +36,27 @@ INSERT INTO public.config_item (uid, name, category, key, value_type, descriptio
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF|PPTX|PPT|ppt|pptx|mp4|MP4', '资产附件上传文件格式', 'assetUploadFileFormats', '资产附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'assetUploadFileFormats');
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx', '合同附件上传文件格式', 'contractUploadFileFormats', '合同附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'contractUploadFileFormats');
+
+-- YHAAO-29249
+CREATE INDEX CONCURRENTLY idx_sys_doc_oss_key ON sys_doc (oss_key) WHERE oss_key IS NOT NULL;
+CREATE INDEX CONCURRENTLY idx_sys_doc_tenant_uid ON sys_doc (tenant_uid);
+
+-- YHAAO-29169 为所有医工/主任添加转科管理员权限
+INSERT INTO user_role (user_id, role_id, created_by, created_date, last_modified_by, last_modified_date, role_type)
+SELECT DISTINCT ur.user_id,
+                (SELECT id FROM sys_role WHERE name = 'DepartmentConvertManager'),
+                'adhoc', NOW(), 'adhoc', NOW(), 0
+FROM user_role ur
+         INNER JOIN sys_role sr ON ur.role_id = sr.id AND ur.role_type = 0
+         INNER JOIN user_account ua ON ur.user_id = ua.id AND ua.is_active = true
+         INNER JOIN tenant_info ti ON ua.tenant_uid = ti.uid AND ti.is_enabled = true
+WHERE sr.name IN ('AssetHead', 'AssetStaff')
+  AND NOT EXISTS (
+    SELECT 1 FROM user_role existing
+    WHERE existing.user_id = ur.user_id
+      AND existing.role_id = (SELECT id FROM sys_role WHERE name = 'DepartmentConvertManager')
+      AND existing.role_type = 0
+);
+
+-- YHAAO-29251
+update shared_asset_req_detail  set  charging_begin_time = create_date  where  id in ('2c9b85829ff5fb8d019fff247d552896','2c9b85829ff5fb8d019fff23434b288f');

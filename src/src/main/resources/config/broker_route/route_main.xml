@@ -75,7 +75,7 @@
             <from uri="direct:executeNativeSQL"/>
             <removeHeaders pattern="Camel*"/>
             <log message="***NativeSQL: ${headers}" loggingLevel="ERROR"/>
-            <recipientList delimiter="|">
+            <recipientList delimiter="§">
                 <simple>sql:${headers._sql}?dataSource=risDataSource</simple>
             </recipientList>
         </route>

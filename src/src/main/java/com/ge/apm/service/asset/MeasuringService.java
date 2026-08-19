@@ -543,11 +543,13 @@ public class MeasuringService {
         progress = 0;
         // 获取压缩文件中的每个子文件
         try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
-            ZipEntry entry;
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                List<MeasuringCertificateDetail> detailList = handleOcr(zipInputStream, entry,identifyPatterns,ruleJSON);
+            List<File> zipEntry = getZipEntryFile(zipInputStream);
+            int fileCount = zipEntry.size();
+            int fileCountAvg = 100 / fileCount;
+            for (File efile : zipEntry) {
+                List<MeasuringCertificateDetail> detailList = handleOcr(efile,identifyPatterns,ruleJSON);
                 resultList.addAll(detailList);
-                progress ++;
+                progress += fileCountAvg;
             }
             progress = 100;
         }catch (Exception e){
@@ -557,21 +559,30 @@ public class MeasuringService {
         resultList = resultList.stream().filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
         return resultList;
     }
-    public List<MeasuringCertificateDetail> handleOcr(ZipInputStream zis, ZipEntry entry, String identifyPatterns, JSONObject ruleJSON){
-        File newFile = null;
-        List<MeasuringCertificateDetail> measuringCertificateDetailResult = new ArrayList<>();
-        try {
-            byte[] buffer = new byte[1024];
-            File destDir = new File(FILE_SCAN_FOLDER);
-            if(entry.isDirectory()) return null;
-            newFile = newFile(destDir, entry);
-            // 写入文件内容
-            try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
+
+    public List<File> getZipEntryFile(ZipInputStream zipInputStream) throws IOException {
+        List<File> zipEntryFileList = new ArrayList<>();
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    byte[] buffer = new byte[1024];
+                    File destDir = new File(FILE_SCAN_FOLDER);
+                    if(entry.isDirectory()) return null;
+                    File newFile = newFile(destDir, entry);
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                        int len;
+                        while ((len = zipInputStream.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                    zipEntryFileList.add(newFile);
                 }
             }
+        return zipEntryFileList;
+    }
+    public List<MeasuringCertificateDetail> handleOcr( File newFile, String identifyPatterns, JSONObject ruleJSON){
+        List<MeasuringCertificateDetail> measuringCertificateDetailResult = new ArrayList<>();
+        try {
             Map<String, Object> params = new HashMap<>();
             if("AI".equalsIgnoreCase(identifyPatterns)){
 //                params.put("type", ApplicationType.FORM_OCR_WORKFLOWS.name());
@@ -956,6 +967,65 @@ public class MeasuringService {
     public static final String IMPORT_STATUS_FAILURE = "Failure";
 
     /**
+     * 安全读取单元格字符串值，处理所有类型包括ERROR（公式错误如#N/A、#VALUE!等）
+     */
+    private static String getCellStringValueSafe(Cell cell) {
+        if (cell == null) return null;
+        CellType type = cell.getCellTypeEnum();
+        switch (type) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return new DecimalFormat("##############.#####").format(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case ERROR:
+            case BLANK:
+                return null;
+            case FORMULA:
+                try {
+                    return cell.getStringCellValue();
+                } catch (Exception e) {
+                    try {
+                        return new DecimalFormat("##############.#####").format(cell.getNumericCellValue());
+                    } catch (Exception e2) {
+                        return null;
+                    }
+                }
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * 安全读取单元格日期值，处理所有类型包括ERROR
+     */
+    private static Date getCellDateValueSafe(Cell cell, SimpleDateFormat sdf) {
+        if (cell == null) return null;
+        CellType type = cell.getCellTypeEnum();
+        if (type == CellType.NUMERIC) {
+            return cell.getDateCellValue();
+        } else if (type == CellType.STRING) {
+            try {
+                return sdf.parse(cell.getStringCellValue());
+            } catch (ParseException e) {
+                return null;
+            }
+        } else if (type == CellType.FORMULA) {
+            try {
+                return cell.getDateCellValue();
+            } catch (Exception e) {
+                try {
+                    return sdf.parse(cell.getStringCellValue());
+                } catch (Exception e2) {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * 仅解析和校验Excel数据，不保存数据库。返回所有行（含校验状态）。
      */
     public List<MeasuringCertificateDetail> validateExcel(UploadedFile file, OrgInfo selectedOrg) throws IOException, ParseException {
@@ -1000,19 +1070,20 @@ public class MeasuringService {
             detail.setCertificateType(1);
 
             if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
-                detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+                detail.setAssetManufacturer(getCellStringValueSafe(row.getCell(header.get("MANUFACTURE_CELL"))));
             }
             if(row.getCell(header.get("MODEL_CELL")) != null) {
-                detail.setAssetModel(CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+                String modelVal = getCellStringValueSafe(row.getCell(header.get("MODEL_CELL")));
+                detail.setAssetModel(modelVal != null && CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()).intValue()) : modelVal);
             }
             if(row.getCell(header.get("APPLIANCE_NAME_CELL")) != null){
-                detail.setAssetName(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NAME_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NAME_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+                detail.setAssetName(getCellStringValueSafe(row.getCell(header.get("APPLIANCE_NAME_CELL"))));
             }
             if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
-                detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+                detail.setAssetNo(getCellStringValueSafe(row.getCell(header.get("APPLIANCE_NO_CELL"))));
             }
             if(row.getCell(header.get("CERTIFICATION_NO_CELL")) != null) {
-                String tempCertificateNo = CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue();
+                String tempCertificateNo = getCellStringValueSafe(row.getCell(header.get("CERTIFICATION_NO_CELL")));
                 if(tempCertificateNo == null || tempCertificateNo.trim().equals("")){
                     tempCertificateNo = null;
                 }
@@ -1020,17 +1091,18 @@ public class MeasuringService {
             }
             if(row.getCell(header.get("VERIFICATION_DATE_CELL")) != null) {
                 try {
-                    detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
+                    detail.setCheckDate(getCellDateValueSafe(row.getCell(header.get("VERIFICATION_DATE_CELL")), sdf));
                 }catch (Exception ex){
                     errorInfo.append("[检定日期格式不对]");
                 }
-                detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
+                Date checkDateVal = getCellDateValueSafe(row.getCell(header.get("VERIFICATION_DATE_CELL")), sdf);
+                detail.setCheckDateDisplay(checkDateVal != null ? sdf.format(checkDateVal) : getCellStringValueSafe(row.getCell(header.get("VERIFICATION_DATE_CELL"))));
             }
             if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null ) {
                 boolean hasValue = false;
                 try {
-                    CellType cellType = row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum();
                     Cell expireDateCell = row.getCell(header.get("EXPIRE_DATE_CELL"));
+                    CellType cellType = expireDateCell.getCellTypeEnum();
                     if (CellType.NUMERIC.equals(cellType) && org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(expireDateCell)) {
                         hasValue = true;
                     } else if (CellType.STRING.equals(cellType)) {
@@ -1040,52 +1112,54 @@ public class MeasuringService {
                         }
                     }
                     if(hasValue){
-                        detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                        detail.setValidDateTo(getCellDateValueSafe(expireDateCell, sdf));
                     }
                 }catch (Exception ex){
                     errorInfo.append("[有效期至格式不对]");
                 }
                 if(hasValue){
-                    detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
+                    Date validDateToVal = getCellDateValueSafe(row.getCell(header.get("EXPIRE_DATE_CELL")), sdf);
+                    detail.setValidDateToDisplay(validDateToVal != null ? sdf.format(validDateToVal) : getCellStringValueSafe(row.getCell(header.get("EXPIRE_DATE_CELL"))));
                 }
             }
             if(row.getCell(header.get("VERIFICATION_UNIT_CELL")) != null){
-                detail.setCheckCompany(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
+                detail.setCheckCompany(getCellStringValueSafe(row.getCell(header.get("VERIFICATION_UNIT_CELL"))));
             }
             if(row.getCell(header.get("VERIFIER_CELL")) != null){
-                detail.setCheckPerson(CellType.NUMERIC.equals(row.getCell(header.get("VERIFIER_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFIER_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
+                detail.setCheckPerson(getCellStringValueSafe(row.getCell(header.get("VERIFIER_CELL"))));
             }
             if(row.getCell(header.get("REMARK_CELL")) != null){
-                detail.setComments(CellType.NUMERIC.equals(row.getCell(header.get("REMARK_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("REMARK_CELL")).getNumericCellValue()) : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
+                detail.setComments(getCellStringValueSafe(row.getCell(header.get("REMARK_CELL"))));
             }
             if(row.getCell(header.get("CLINICAL_DEPT_CELL")) != null){
-                detail.setDepartment(CellType.NUMERIC.equals(row.getCell(header.get("CLINICAL_DEPT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CLINICAL_DEPT_CELL")).getNumericCellValue()) : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+                detail.setDepartment(getCellStringValueSafe(row.getCell(header.get("CLINICAL_DEPT_CELL"))));
             }
             if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
-                String assetSn = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue();
+                String assetSn = getCellStringValueSafe(row.getCell(header.get("ASSET_SN_CELL")));
                 detail.setAssetSN(org.apache.commons.lang3.StringUtils.trimToNull(assetSn));
             }
             if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
-                String financeNo = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue();
+                String financeNo = getCellStringValueSafe(row.getCell(header.get("ASSET_NO_CELL")));
                 detail.setFinanceNo(org.apache.commons.lang3.StringUtils.trimToNull(financeNo));
             }
             if(row.getCell(header.get("ITEM_CELL")) != null){
-                detail.setCheckItem(CellType.NUMERIC.equals(row.getCell(header.get("ITEM_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ITEM_CELL")).getNumericCellValue()) : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+                detail.setCheckItem(getCellStringValueSafe(row.getCell(header.get("ITEM_CELL"))));
             }
             if(row.getCell(header.get("CATEGORY_CELL")) != null){
-                detail.setType(CellType.NUMERIC.equals(row.getCell(header.get("CATEGORY_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CATEGORY_CELL")).getNumericCellValue()) : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
+                detail.setType(getCellStringValueSafe(row.getCell(header.get("CATEGORY_CELL"))));
             }
             if(row.getCell(header.get("FILE_NO_CELL")) != null) {
-                detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
+                detail.setFileNo(getCellStringValueSafe(row.getCell(header.get("FILE_NO_CELL"))));
             }
             if(row.getCell(header.get("QR_CODE_CELL")) != null) {
-                String qrCode = CellType.NUMERIC.equals(row.getCell(header.get("QR_CODE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("QR_CODE_CELL")).getNumericCellValue()) : row.getCell(header.get("QR_CODE_CELL")).getStringCellValue();
+                String qrCode = getCellStringValueSafe(row.getCell(header.get("QR_CODE_CELL")));
                 detail.setQrCode(org.apache.commons.lang3.StringUtils.trimToNull(qrCode));
             }
-            detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
+            String conclusionStr = getCellStringValueSafe(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")));
+            detail.setStatusDisplay(conclusionStr);
             int status = 3;
-            if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
-                switch (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue()) {
+            if (conclusionStr != null) {
+                switch (conclusionStr) {
                     case "A级合格":
                     case "合格":
                     case "校准合格":
@@ -1101,8 +1175,10 @@ public class MeasuringService {
             detail.setStatus(status);
             Integer certificateType = null;
             if(row.getCell(header.get("CERTIFICATE_TYPE_CELL")) != null){
+                String certTypeStr = getCellStringValueSafe(row.getCell(header.get("CERTIFICATE_TYPE_CELL")));
                 //证书类型: 检定证书输出：1，校准证书输出：2，其他输出：-1
-                switch (row.getCell(header.get("CERTIFICATE_TYPE_CELL")).getStringCellValue()) {
+                if (certTypeStr != null) {
+                    switch (certTypeStr) {
                     case "检定证书":
                         certificateType = 1;
                         break;
@@ -1111,6 +1187,7 @@ public class MeasuringService {
                         break;
                     default:
                         break;
+                    }
                 }
             }
             detail.setCertificateType(certificateType);
@@ -1248,23 +1325,24 @@ public class MeasuringService {
                 detail.setCertificateType(1);
 
                 if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
-                    detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+                    detail.setAssetManufacturer(getCellStringValueSafe(row.getCell(header.get("MANUFACTURE_CELL"))));
                 }
 
                 if(row.getCell(header.get("MODEL_CELL")) != null) {
-                    detail.setAssetModel(CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+                    String modelVal = getCellStringValueSafe(row.getCell(header.get("MODEL_CELL")));
+                    detail.setAssetModel(modelVal != null && CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()).intValue()) : modelVal);
                 }
 
                 if(row.getCell(header.get("APPLIANCE_NAME_CELL")) != null){
-                    detail.setAssetName(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NAME_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NAME_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+                    detail.setAssetName(getCellStringValueSafe(row.getCell(header.get("APPLIANCE_NAME_CELL"))));
                 }
 
                 if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
-                    detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+                    detail.setAssetNo(getCellStringValueSafe(row.getCell(header.get("APPLIANCE_NO_CELL"))));
                 }
 
                 if(row.getCell(header.get("CERTIFICATION_NO_CELL")) != null) {
-                    String tempCertificateNo = CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue();
+                    String tempCertificateNo = getCellStringValueSafe(row.getCell(header.get("CERTIFICATION_NO_CELL")));
                     if(tempCertificateNo == null || tempCertificateNo.trim().equals("")){
                         tempCertificateNo = null;
                     }
@@ -1273,18 +1351,19 @@ public class MeasuringService {
 
                 if(row.getCell(header.get("VERIFICATION_DATE_CELL")) != null) {
                     try {
-                        detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
+                        detail.setCheckDate(getCellDateValueSafe(row.getCell(header.get("VERIFICATION_DATE_CELL")), sdf));
                     }catch (Exception ex){
                         errorInfo.append("[检定日期格式不对]");
                     }
 
-                    detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
+                    Date checkDateVal = getCellDateValueSafe(row.getCell(header.get("VERIFICATION_DATE_CELL")), sdf);
+                    detail.setCheckDateDisplay(checkDateVal != null ? sdf.format(checkDateVal) : getCellStringValueSafe(row.getCell(header.get("VERIFICATION_DATE_CELL"))));
                 }
                 if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null ) {
                     boolean hasValue = false;
                     try {
-                        CellType cellType = row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum();
                         Cell expireDateCell = row.getCell(header.get("EXPIRE_DATE_CELL"));
+                        CellType cellType = expireDateCell.getCellTypeEnum();
 
                         if (CellType.NUMERIC.equals(cellType) && org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(expireDateCell)) {
                             hasValue = true;
@@ -1297,53 +1376,55 @@ public class MeasuringService {
                             }
                         }
                         if(hasValue){
-                            detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                            detail.setValidDateTo(getCellDateValueSafe(expireDateCell, sdf));
                         }
                     }catch (Exception ex){
                         errorInfo.append("[有效期至格式不对]");
                     }
                     if(hasValue){
-                        detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
+                        Date validDateToVal = getCellDateValueSafe(row.getCell(header.get("EXPIRE_DATE_CELL")), sdf);
+                        detail.setValidDateToDisplay(validDateToVal != null ? sdf.format(validDateToVal) : getCellStringValueSafe(row.getCell(header.get("EXPIRE_DATE_CELL"))));
                     }
 
                 }
                 if(row.getCell(header.get("VERIFICATION_UNIT_CELL")) != null){
-                    detail.setCheckCompany(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
+                    detail.setCheckCompany(getCellStringValueSafe(row.getCell(header.get("VERIFICATION_UNIT_CELL"))));
                 }
                 if(row.getCell(header.get("VERIFIER_CELL")) != null){
-                    detail.setCheckPerson(CellType.NUMERIC.equals(row.getCell(header.get("VERIFIER_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFIER_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
+                    detail.setCheckPerson(getCellStringValueSafe(row.getCell(header.get("VERIFIER_CELL"))));
                 }
                 if(row.getCell(header.get("REMARK_CELL")) != null){
-                    detail.setComments(CellType.NUMERIC.equals(row.getCell(header.get("REMARK_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("REMARK_CELL")).getNumericCellValue()) : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
+                    detail.setComments(getCellStringValueSafe(row.getCell(header.get("REMARK_CELL"))));
                 }
                 if(row.getCell(header.get("CLINICAL_DEPT_CELL")) != null){
-                    detail.setDepartment(CellType.NUMERIC.equals(row.getCell(header.get("CLINICAL_DEPT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CLINICAL_DEPT_CELL")).getNumericCellValue()) : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+                    detail.setDepartment(getCellStringValueSafe(row.getCell(header.get("CLINICAL_DEPT_CELL"))));
                 }
                 if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
-                    String assetSn = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue();
+                    String assetSn = getCellStringValueSafe(row.getCell(header.get("ASSET_SN_CELL")));
                     detail.setAssetSN(org.apache.commons.lang3.StringUtils.trimToNull(assetSn));
                 }
                 if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
-                    String financeNo = CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue();
+                    String financeNo = getCellStringValueSafe(row.getCell(header.get("ASSET_NO_CELL")));
                     detail.setFinanceNo(org.apache.commons.lang3.StringUtils.trimToNull(financeNo));
                 }
                 if(row.getCell(header.get("ITEM_CELL")) != null){
-                    detail.setCheckItem(CellType.NUMERIC.equals(row.getCell(header.get("ITEM_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ITEM_CELL")).getNumericCellValue()) : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+                    detail.setCheckItem(getCellStringValueSafe(row.getCell(header.get("ITEM_CELL"))));
                 }
                 if(row.getCell(header.get("CATEGORY_CELL")) != null){
-                    detail.setType(CellType.NUMERIC.equals(row.getCell(header.get("CATEGORY_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CATEGORY_CELL")).getNumericCellValue()) : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
+                    detail.setType(getCellStringValueSafe(row.getCell(header.get("CATEGORY_CELL"))));
                 }
                 if(row.getCell(header.get("FILE_NO_CELL")) != null) {
-                    detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
+                    detail.setFileNo(getCellStringValueSafe(row.getCell(header.get("FILE_NO_CELL"))));
                 }
                 if(row.getCell(header.get("QR_CODE_CELL")) != null) {
-                    String qrCode = CellType.NUMERIC.equals(row.getCell(header.get("QR_CODE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("QR_CODE_CELL")).getNumericCellValue()) : row.getCell(header.get("QR_CODE_CELL")).getStringCellValue();
+                    String qrCode = getCellStringValueSafe(row.getCell(header.get("QR_CODE_CELL")));
                     detail.setQrCode(org.apache.commons.lang3.StringUtils.trimToNull(qrCode));
                 }
-                detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
+                String conclusionStr = getCellStringValueSafe(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")));
+                detail.setStatusDisplay(conclusionStr);
                 int status = 3;
-                if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
-                    switch (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue()) {
+                if (conclusionStr != null) {
+                    switch (conclusionStr) {
                         case "A级合格":
                         case "合格":
                         case "校准合格":

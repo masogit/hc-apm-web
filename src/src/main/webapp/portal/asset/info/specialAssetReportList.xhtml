@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <div class="ui-g-12 card">
+            <h:form id="specialAssetReportListForm" rendered="#{assetAnnualInspectionReportController.customRoleAuth.authSearch}">
+
+                <p:dataTable id="datalist_specialAssetReport" value="#{assetAnnualInspectionReportController.lazyModel}" var="item" widgetVar="varDataList_specialAssetReport"
+                             selectionMode="single" selection="#{assetAnnualInspectionReportController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             rowKey="#{item.uid}" sortMode="single" sortOrder="descending"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="filter" listener="#{assetAnnualInspectionReportController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                    <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                    <p:ajax event="rowSelect" listener="#{assetAnnualInspectionReportController.onSelectRow}" onstart="prepareAssetViewWindow1();" oncomplete="openAssetViewWindow1(xhr, status, args)" />
+                    <p:column width="36" id="checkBoxColumn" exportable="false">
+                        <p:selectBooleanCheckbox value="#{assetAnnualInspectionReportController.selectedMap[item.uid]}" class="selectCheckBox">
+                            <p:ajax process="@this" update="@this" oncomplete="updateSelectAllCheckBox();"/>
+                        </p:selectBooleanCheckbox>
+                        <f:facet name="header">
+                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                <p:ajax listener="#{assetAnnualInspectionReportController.onSelectAllOfPage()}" update="@(.selectCheckBox)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetName}"/>
+                    </p:column>
+                    <p:column headerText="设备序列号" filterBy="#{item.assetSerialNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetSerialNum}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.QRCode}" width="150" filterBy="#{item.assetQrCode}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetQrCode}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetClinicalDeptName}"/>
+                    </p:column>
+                    <p:column headerText="报告名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+                    <p:column headerText="报告类型" filterBy="#{item.reportType}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.reportType}"/>
+                    </p:column>
+                    <p:column headerText="检测单位" filterBy="#{item.testingUnit}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.testingUnit}"/>
+                    </p:column>
+                    <p:column headerText="检测结果" filterBy="#{item.testResults}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.testResults}"/>
+                    </p:column>
+                    <p:column headerText="报告发证单位" filterBy="#{item.certificateIssuingUnit}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.certificateIssuingUnit}"/>
+                    </p:column>
+                    <p:column headerText="报告生效时间" sortBy="#{item.effectiveTime}" filterBy="#{item.effectiveTime}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:inputText id="filterCheckDate" widgetVar="varFilterCheckDate" />
+                        </f:facet>
+                        <h:outputText value="#{item.effectiveTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="报告到期时间" sortBy="#{item.expiryDate}" filterBy="#{item.effectiveTime}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
+                        </f:facet>
+                        <h:outputText value="#{item.expiryDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="上传人" filterBy="#{item.createdByName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.createdByName}"/>
+                    </p:column>
+                    <p:column headerText="是否上传报告" filterBy="#{item.isUpdate}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_specialAssetReport').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{empty item.blobObjects ? '否' : '是'}"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetAnnualInspectionReportController.deleteSelected()}" update="specialAssetTab:specialAssetReportListForm">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist_specialAssetReport" fileName="SpecialAssetReport_export"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <p:overlayPanel id="idPanelFilterCheckDate" widgetVar="panelFilterCheckDate" for=":specialAssetTab:specialAssetReportListForm:datalist_specialAssetReport:filterCheckDate" dismissable="false">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{msg.From}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_CheckDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    <p:outputLabel value="#{msg.To}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_CheckDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                </h:panelGrid>
+                <p:commandButton onclick="setDateFilter('varDataList_specialAssetReport','varFilterCheckDate','varStartTimeFrom_CheckDate','varStartTimeTo_CheckDate'); PF('panelFilterCheckDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterCheckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            </p:overlayPanel>
+
+            <p:overlayPanel id="idPanelFilterNextMeteringDate1" widgetVar="panelFilterNextMeteringDate1" for=":specialAssetTab:specialAssetReportListForm:datalist_specialAssetReport:filterNextMeteringDate1" dismissable="false">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{msg.From}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_NextMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    <p:outputLabel value="#{msg.To}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_NextMeteringDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                </h:panelGrid>
+                <p:commandButton onclick="setDateFilter('varDataList_specialAssetReport','varFilterNextMeteringDate1','varStartTimeFrom_NextMeteringDate','varStartTimeTo_NextMeteringDate'); PF('panelFilterNextMeteringDate1').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterNextMeteringDate1').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            </p:overlayPanel>
+            <script type="text/javascript">
+                var newWin;
+                function prepareAssetViewWindow1() {
+                    newWin = window.open('about:blank', '_blank');
+                    newWin.document.body.innerHTML = '加载中...';
+                }
+                function openAssetViewWindow1(xhr, status, args) {
+                    newWin.location.href = args.url;
+                }
+            </script>
+        </div>
+    </ui:composition>
+</html>
