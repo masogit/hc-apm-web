@@ -716,8 +716,8 @@
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.reportName}<span
-                                style="color:red"></span></label>
-                        <p:inputText id="reportName"
+                                style="color:red">*</span></label>
+                        <p:inputText id="reportName" required="true"
                                      value="#{assetInfoEditController.assetAnnualInspectionReport.name}"
                                      requiredMessage="#{msg.reportName} #{msg.ValidationRequire}"
                         >
@@ -801,7 +801,7 @@
                                   multiple="true"  sizeLimit="100000000"  update="reportAttachList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                 </h:panelGroup>
                 <br/>
-                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.saveReport}"
+                <p:commandButton validateClient="true"  actionListener="#{assetInfoEditController.saveReport}"
                                  value="#{msg.Save}" update="tab:CreateSpecialAssetForm:reportInfoList tab:CreateSpecialAssetForm:reportattachmentList" icon="ui-icon-check"
                                  oncomplete="handleSubmit(args, 'annualInspectionReportDlg');"
                 />
