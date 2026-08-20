@@ -87,6 +87,9 @@ public class DeptTransactionLog implements Serializable {
     @Column(name="author_id")
     private Integer authorId;
 
+    @Column(name="times")
+    private Integer times;
+
     public String getAuthorName() {
         return authorName;
     }

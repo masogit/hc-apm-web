@@ -12,6 +12,7 @@ public class TransactionForm {
     Integer category;
     String remark;
     Double hours;
+    Integer times;
    /* Integer authorId;
     String startTime;
     String endTime;
@@ -55,6 +56,14 @@ public class TransactionForm {
 
     public void setHours(Double hours) {
         this.hours = hours;
+    }
+
+    public Integer getTimes() {
+        return times;
+    }
+
+    public void setTimes(Integer times) {
+        this.times = times;
     }
 
     /*public String getStartTime() {

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.AssetAnnualInspectionReportMapper">
+
+    <resultMap type="com.ge.apm.domain.AssetAnnualInspectionReport" id="assetAnnualInspectionReportBean" autoMapping="true">
+        <id column="uid" property="uid"/>
+        <result column="special_asset_uid" property="specialAssetUid"/>
+        <result column="name" property="name"/>
+        <result column="report_type" property="reportType"/>
+        <result column="testing_unit" property="testingUnit"/>
+        <result column="test_results" property="testResults"/>
+        <result column="certificate_issuing_unit" property="certificateIssuingUnit"/>
+        <result column="effective_time" property="effectiveTime"/>
+        <result column="expiry_date" property="expiryDate"/>
+        <result column="created_by_uid" property="createdByUid"/>
+        <result column="created_by_name" property="createdByName"/>
+        <result column="tenant_uid" property="tenantUID"/>
+        <result column="institution_uid" property="institutionUID"/>
+        <result column="hospital_uid" property="hospitalUID"/>
+        <result column="site_uid" property="siteUID"/>
+        <collection property="blobObjects" ofType="com.ge.apm.domain.V2_BlobObject">
+            <result property="id" column="t_bo_id"/>
+            <result property="boUuid" column="bo_uuid"/>
+            <result property="boType" column="bo_type"/>
+            <result property="boSubType" column="bo_sub_type"/>
+            <result property="objectStorageId" column="object_storage_id"/>
+            <result property="objectName" column="object_name"/>
+            <result property="objectType" column="object_type"/>
+            <result property="objectSize" column="object_size"/>
+        </collection>
+    </resultMap>
+    <sql id="columnSql" >
+        aair.uid,
+            aair.special_asset_uid,
+            aair.name,
+            aair.report_type,
+            aair.testing_unit,
+            aair.test_results,
+            aair.certificate_issuing_unit,
+            aair.effective_time,
+            aair.expiry_date,
+            aair.created_by_uid,
+            aair.created_by_name,
+            aair.tenant_uid,
+            aair.institution_uid,
+            aair.hospital_uid,
+            aair.site_uid,
+            ai.name as assetName,
+            ai.serial_num as assetSerialNum,
+            ai.qr_code as assetQrCode,
+            ai.clinical_dept_name as assetClinicalDeptName,
+            bo.id as t_bo_id,
+            bo.bo_uuid ,
+            bo.bo_type,
+            bo.bo_sub_type,
+            bo.object_storage_id,
+            bo.object_name,
+            bo.object_type,
+            bo.object_size
+    </sql>
+    <select id="selectAnnualInspectionReportList" resultMap="assetAnnualInspectionReportBean">
+        SELECT
+            <include refid="columnSql" />
+        FROM asset_annual_inspection_report aair
+        left JOIN special_asset_info sai ON aair.special_asset_uid = sai.id
+        left JOIN asset_info ai ON sai.asset_uid = ai.uid
+        left join v2_blob_object bo on aair.uid = bo.bo_uuid
+        <where>${ew.sqlSegment}</where>
+
+    </select>
+    <select id="selectAnnualInspectionReportListByTenantUid" resultMap="assetAnnualInspectionReportBean">
+        SELECT
+        <include refid="columnSql" />
+        FROM asset_annual_inspection_report aair
+        left JOIN special_asset_info sai ON aair.special_asset_uid = sai.id
+        left JOIN asset_info ai ON sai.asset_uid = ai.uid
+        left join v2_blob_object bo on aair.uid = bo.bo_uuid
+        where ai.tenant_uid = #{tenantUid}
+    </select>
+
+</mapper>

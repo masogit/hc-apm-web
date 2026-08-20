@@ -21,7 +21,7 @@
 
        <!-- <route>
             <from uri="direct:queryHisDb"/>
-            <recipientList delimiter="|">
+            <recipientList delimiter="§">
                 <simple>sql:${body}?dataSource=hisDataSource</simple>
             </recipientList>
         </route>-->

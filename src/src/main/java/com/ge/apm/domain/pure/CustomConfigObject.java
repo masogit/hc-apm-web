@@ -54,6 +54,7 @@ public class CustomConfigObject {
     JSONObject mobilePage;
     JSONObject mobileMaintainPage;
     JSONObject assetListSort;
+    AdvancedSearchConfig advancedSearchConfig;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
 
@@ -337,5 +338,16 @@ public class CustomConfigObject {
 
     public void setAssetAllocateFields(List<String> assetAllocateFields) {
         this.assetAllocateFields = assetAllocateFields;
+    }
+
+    public AdvancedSearchConfig getAdvancedSearchConfig() {
+        if (advancedSearchConfig == null) {
+            advancedSearchConfig = new AdvancedSearchConfig();
+        }
+        return advancedSearchConfig;
+    }
+
+    public void setAdvancedSearchConfig(AdvancedSearchConfig advancedSearchConfig) {
+        this.advancedSearchConfig = advancedSearchConfig;
     }
 }
