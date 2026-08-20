@@ -38,8 +38,7 @@ insert into public.config_item (uid, category, default_value, description, key, 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx', '合同附件上传文件格式', 'contractUploadFileFormats', '合同附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'contractUploadFileFormats');
 
 -- YHAAO-29249
-CREATE INDEX CONCURRENTLY idx_sys_doc_oss_key ON sys_doc (oss_key) WHERE oss_key IS NOT NULL;
-CREATE INDEX CONCURRENTLY idx_sys_doc_tenant_uid ON sys_doc (tenant_uid);
+CREATE INDEX CONCURRENTLY idx_sys_doc_file_hash ON sys_doc (file_hash);
 
 -- YHAAO-29169 为所有医工/主任添加转科管理员权限
 INSERT INTO user_role (user_id, role_id, created_by, created_date, last_modified_by, last_modified_date, role_type)
