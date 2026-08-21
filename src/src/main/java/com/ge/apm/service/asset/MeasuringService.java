@@ -755,8 +755,6 @@ public class MeasuringService {
                 searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
                 searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-                searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
                 assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
             };
 
