@@ -161,15 +161,16 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
                 updateSearchFilter(new SearchFilter("applicationType", SearchFilter.Operator.EQ, searchForm.getApplicationType(), "1*"));
             }
             if(searchForm.getBudgetTotalAmountBegin() != null){
-                updateSearchFilter(new SearchFilter("budgetTotalAmount", SearchFilter.Operator.GTE, searchForm.getBudgetTotalAmountBegin(), "1*"));
+                searchFilters.add(new SearchFilter("budgetTotalAmount", SearchFilter.Operator.GTE, searchForm.getBudgetTotalAmountBegin(), "1*"));
             }
             if(searchForm.getBudgetTotalAmountEnd() != null){
-                updateSearchFilter(new SearchFilter("budgetTotalAmount", SearchFilter.Operator.LTE, searchForm.getBudgetTotalAmountEnd(), "1*"));
+                searchFilters.add(new SearchFilter("budgetTotalAmount", SearchFilter.Operator.LTE, searchForm.getBudgetTotalAmountEnd(), "1*"));
             }
         }
     }
 
     public void search() {
+        searchFilters.clear();
         addSearchFilter();
     }
 

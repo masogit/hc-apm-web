@@ -73,7 +73,7 @@ public class AcquisitionPlanProvider {
                     sb.append(" and application_hospital_uid = '").append(value).append("'");
                     break;
                 case "assetName":
-                    sb.append(" and asset_name like '%").append(value).append("%'");
+                    sb.append(" and aset_name like '%").append(value).append("%'");
                     break;
                 case "applicationType": {
                     sb.append(" and application_type = '").append(value).append("'");
@@ -95,8 +95,8 @@ public class AcquisitionPlanProvider {
                     BigDecimal budgetTotalAmount = parseBigDecimal(value.toString());
                     if (op.equals(SearchFilter.Operator.GTE)) {
                         sb.append(" and budget_total_amount >= ").append(budgetTotalAmount);
-                    } else if (op.equals(SearchFilter.Operator.LT)) {
-                        sb.append(" and budget_total_amount < ").append(budgetTotalAmount);
+                    } else if (op.equals(SearchFilter.Operator.LTE)) {
+                        sb.append(" and budget_total_amount <= ").append(budgetTotalAmount);
                     }
                     break;
                 case "estimatedServiceYears":
