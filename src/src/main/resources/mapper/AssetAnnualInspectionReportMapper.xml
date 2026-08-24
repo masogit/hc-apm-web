@@ -49,6 +49,7 @@
             ai.serial_num as assetSerialNum,
             ai.qr_code as assetQrCode,
             ai.clinical_dept_name as assetClinicalDeptName,
+            o.name as assetDeptName,
             bo.id as t_bo_id,
             bo.bo_uuid ,
             bo.bo_type,
@@ -65,6 +66,7 @@
         left JOIN special_asset_info sai ON aair.special_asset_uid = sai.id
         left JOIN asset_info ai ON sai.asset_uid = ai.uid
         left join v2_blob_object bo on aair.uid = bo.bo_uuid
+        left join org_info o on ai.asset_dept_uid = o.uid
         <where>${ew.sqlSegment}</where>
 
     </select>
@@ -75,6 +77,7 @@
         left JOIN special_asset_info sai ON aair.special_asset_uid = sai.id
         left JOIN asset_info ai ON sai.asset_uid = ai.uid
         left join v2_blob_object bo on aair.uid = bo.bo_uuid
+        left join org_info o on ai.asset_dept_uid = o.uid
         where ai.tenant_uid = #{tenantUid}
     </select>
 

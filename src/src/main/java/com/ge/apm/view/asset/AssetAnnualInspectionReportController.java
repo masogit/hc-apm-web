@@ -91,6 +91,7 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
         fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         filterSiteOrgTreeComponentController = WebUtil.getBean(FilterSiteOrgTreeComponentController.class);
         filterSiteOrgTreeComponentController.registerController(this);
+        selectedOrg = filterSiteOrgTreeComponentController.getSelectedOrg();
         currentUser = UserContextService.getCurrentUserAccount();
         customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), "SPECIALASSET_CHECK");
         selectedMap = new HashMap<>();
@@ -185,6 +186,11 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
                         }else{
                             wrapper.isNull("bo.id");
                         }
+                        break;
+                    case "assetDeptName":
+                        wrapper.like("o.name", filter.value.toString());
+                        break;
+                    default:
                         break;
                 }
 
