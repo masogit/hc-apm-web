@@ -206,23 +206,24 @@ public class AssetAdvancedSearchService {
                 operators.add(new OperatorOption("IsNotNull", "不为空"));
                 break;
             case "number":
+                operators.add(new OperatorOption("BETWEEN", "区间"));
                 operators.add(new OperatorOption("EQ", "等于"));
                 operators.add(new OperatorOption("GT", "大于"));
                 operators.add(new OperatorOption("LT", "小于"));
                 operators.add(new OperatorOption("GTE", "大于等于"));
                 operators.add(new OperatorOption("LTE", "小于等于"));
                 operators.add(new OperatorOption("NE", "不等于"));
-                operators.add(new OperatorOption("BETWEEN", "区间"));
                 operators.add(new OperatorOption("IsNull", "为空"));
                 operators.add(new OperatorOption("IsNotNull", "不为空"));
                 break;
             case "date":
-                operators.add(new OperatorOption("EQ", "等于"));
-                operators.add(new OperatorOption("GT", "晚于"));
-                operators.add(new OperatorOption("LT", "早于"));
+                operators.add(new OperatorOption("BETWEEN", "区间"));
                 operators.add(new OperatorOption("GTE", "不早于"));
                 operators.add(new OperatorOption("LTE", "不晚于"));
-                operators.add(new OperatorOption("BETWEEN", "区间"));
+                operators.add(new OperatorOption("GT", "晚于"));
+                operators.add(new OperatorOption("LT", "早于"));
+                operators.add(new OperatorOption("EQ", "等于"));
+                operators.add(new OperatorOption("NE", "不等于"));
                 operators.add(new OperatorOption("IsNull", "为空"));
                 operators.add(new OperatorOption("IsNotNull", "不为空"));
                 break;
@@ -347,11 +348,22 @@ public class AssetAdvancedSearchService {
 
     private void applyBetween(List<SearchFilter> searchFilters, SearchCondition condition, String fieldType) {
         if ("date".equals(fieldType)) {
-            if (condition.getDateValue() != null) {
-                searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.GTE, condition.getDateValue(), CONDITION_PATH));
+            Date date1 = condition.getDateValue();
+            Date date2 = condition.getDateValue2();
+            // Fallback: parse string values from range config as Date
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            if (date1 == null && isNotBlank(condition.getValue())) {
+                try { date1 = sdf.parse(condition.getValue()); } catch (Exception e) { logger.warn("[AdvancedSearch] Failed to parse date value: {}", condition.getValue()); }
             }
-            if (condition.getDateValue2() != null) {
-                searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.LTE, condition.getDateValue2(), CONDITION_PATH));
+            if (date2 == null && isNotBlank(condition.getValue2())) {
+                try { date2 = sdf.parse(condition.getValue2()); } catch (Exception e) { logger.warn("[AdvancedSearch] Failed to parse date value2: {}", condition.getValue2()); }
+            }
+            if (date1 != null) {
+                searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.GTE, date1, CONDITION_PATH));
+            }
+            if (date2 != null) {
+                searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.LTE, date2, CONDITION_PATH));
             }
         } else {
             if (isNotBlank(condition.getValue())) {
