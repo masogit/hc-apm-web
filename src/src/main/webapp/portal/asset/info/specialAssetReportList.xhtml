@@ -96,6 +96,10 @@
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist_specialAssetReport" fileName="SpecialAssetReport_export"/>
                         </p:commandButton>
+                        <p:commandButton id="downloadAllId" title="#{msg.DownloadFile}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false"
+                                         actionListener="#{assetAnnualInspectionReportController.downloadSelectedFile()}" update=":growl">
+                            <p:fileDownload value="#{assetAnnualInspectionReportController.exportFile}" />
+                        </p:commandButton>
                     </f:facet>
                 </p:dataTable>
             </h:form>

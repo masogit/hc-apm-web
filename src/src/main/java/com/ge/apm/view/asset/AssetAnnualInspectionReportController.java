@@ -20,16 +20,27 @@ import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import com.ge.apm.view.sysutil.FileDownloadService;
+import org.apache.commons.io.IOUtils;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -52,6 +63,8 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
     private UploadedFile file;
     private BlobFileService blobService;
     private BlobObjectRepository blobDao;
+    private StreamedContent exportFile;
+    private FileDownloadService fileDownloadService;
 
     /** 校验后的全部数据列表 */
     private List<AssetAnnualInspectionReport> displayList;
@@ -75,6 +88,7 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
         assetAnnualInspectionReportService = WebUtil.getBean(AssetAnnualInspectionReportService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
         filterSiteOrgTreeComponentController = WebUtil.getBean(FilterSiteOrgTreeComponentController.class);
         filterSiteOrgTreeComponentController.registerController(this);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -91,12 +105,12 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
     @Override
     protected Page<AssetAnnualInspectionReport> loadData(PageRequest pageRequest) {
         Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
-        Wrapper<AssetAnnualInspectionReport> wrapper = buildWrapper();
+        Wrapper<AssetAnnualInspectionReport> wrapper = buildWrapper(pageRequest);
         List<AssetAnnualInspectionReport> list = assetAnnualInspectionReportMapper.selectAnnualInspectionReportList(pagination, wrapper);
         return new PageImpl<>(list, pageRequest, pagination.getTotal());
     }
 
-    private Wrapper<AssetAnnualInspectionReport> buildWrapper() {
+    private Wrapper<AssetAnnualInspectionReport> buildWrapper(PageRequest pageRequest) {
         Wrapper<AssetAnnualInspectionReport> wrapper = new EntityWrapper<>();
         wrapper.eq("ai.tenant_uid", currentUser.getTenantUID());
         if (!UserContextService.isMVSRole()) {
@@ -176,8 +190,30 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
 
             }
         }
-        wrapper.orderBy("aair.effective_time", false);
+        Sort sort = pageRequest.getSort();
+        if (sort != null ) {
+            Iterator<Sort.Order> iterator = sort.iterator();
+            while (iterator.hasNext()){
+                Sort.Order next = iterator.next();
+                String property = next.getProperty();
+                property = getOrderByFiled(property);
+                if(Sort.Direction.ASC.equals(next.getDirection())){
+                    wrapper.orderBy(true,property,true);
+                }else{
+                    wrapper.orderBy(true,property,false);
+                }
+
+            }
+        }else{
+            wrapper.orderBy("aair.effective_time", false);
+        }
         return wrapper;
+    }
+    public String getOrderByFiled(String key){
+        Map<String,String> result = new HashMap<>();
+        result.put("effectiveTime", "aair.effective_time");
+        result.put("expiryDate", "aair.expiry_date");
+        return result.get(key);
     }
 
     public UserAuth getCustomRoleAuth() {
@@ -496,6 +532,37 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
             WebUtil.addErrorMessage("fail to upload file");
         }
         extracted();
+    }
+
+    public void downloadSelectedFile() {
+        List<AssetAnnualInspectionReport> currentPageItems = lazyModel.getWrappedData();
+        if (currentPageItems == null || currentPageItems.isEmpty()) {
+            WebUtil.addErrorMessage("当前页没有数据");
+            return;
+        }
+        List<String> uids = currentPageItems.stream().map(AssetAnnualInspectionReport::getUid).collect(Collectors.toList());
+        List<V2_BlobObject> blobObjects = blobDao.fetchListByBoUUIds(new HashSet<>(uids));
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        try (ZipOutputStream zipOut = new ZipOutputStream(bout)) {
+            for (V2_BlobObject blobObject : blobObjects) {
+                StreamedContent file = fileDownloadService.getFile(blobObject.getObjectStorageId());
+                InputStream stream = file.getStream();
+                zipOut.putNextEntry(new ZipEntry(blobObject.getObjectName()));
+                byte[] bytes = IOUtils.toByteArray(stream);
+                if (bytes != null) {
+                    IOUtils.write(bytes, zipOut);
+                }
+                zipOut.closeEntry();
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            WebUtil.addErrorMessage("下载文件失败:" + e.getMessage());
+        }
+        exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "AnnualInspectionFiles.zip");
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
     }
 
     @Override
