@@ -143,6 +143,7 @@ public class AssetHistoryService {
             jsonObject.put("financingNum", assetHistory.getFinancingNum());
             jsonObject.put("createdBy", assetHistory.getCreatedBy());
             jsonObject.put("createdDate", assetHistory.getCreatedDate());
+            jsonObject.put("assetUid", assetHistory.getAssetUid());
 
             //multiple column value changed
             objects.stream().forEach(item -> {

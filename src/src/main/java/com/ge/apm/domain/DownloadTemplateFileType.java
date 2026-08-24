@@ -67,7 +67,7 @@ public enum DownloadTemplateFileType {
     ARRIVAL_ITEM(SystemTemplateEnum.ARRIVAL_ITEM, SystemTemplateEnum.ARRIVAL_ITEM),
 
     ASSET_PURCHASE(SystemTemplateEnum.ASSET_PURCHASE, SystemTemplateEnum.ASSET_PURCHASE),
-
+    SPECIAL_ASSET(SystemTemplateEnum.SPECIAL_ASSET_INFO, SystemTemplateEnum.SPECIAL_ASSET_INFO),
     ;
 
     private final SystemTemplateEnum enumZh;

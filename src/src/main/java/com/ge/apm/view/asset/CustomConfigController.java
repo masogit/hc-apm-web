@@ -12,8 +12,8 @@ import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.CustomConfigAssetField;
-import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.domain.pure.*;
+import com.ge.apm.service.asset.AssetAdvancedSearchService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.cache.CacheService;
 import com.ge.apm.service.common.*;
@@ -71,7 +71,10 @@ public class CustomConfigController {
     private PinYinComparator pinYinComparator;
     private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
     private List<AssetTypeGroup> assetTypeGroups = new ArrayList<>();
-
+    private AssetAdvancedSearchService advancedSearchService;
+    private Map<String, Boolean> advancedSearchFieldSelection = new HashMap<>();
+    private Map<String, AdvancedSearchFieldConfig> advSearchFieldConfigMap = new HashMap<>();
+    private AdvancedSearchFieldConfig currentAdvSearchEditField;
 
     private OrgInfoRepository orgInfoDao;
 
@@ -115,6 +118,8 @@ public class CustomConfigController {
         assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
         assetTypeGroups = assetTypeGroupRepository.listAssetTypeGroupInHierarchy(UserContextService.getCurrentUserAccount().getTenantUID());
         initImportantFieldsChecked();
+        advancedSearchService = WebUtil.getBean(AssetAdvancedSearchService.class);
+        initAdvancedSearchFieldSelection();
     }
 
     private void loadConfigForSite(String siteUid) {
@@ -610,6 +615,7 @@ public class CustomConfigController {
     }
 
     public void saveChange() {
+        saveAdvancedSearchConfig();
         ccService.saveConfig(selectSite, customConfigObject);
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage("已保存");
@@ -873,6 +879,120 @@ public class CustomConfigController {
                 selectSite.getInstitutionUID(),
                 selectSite.getTenantUID(), key);
         return Boolean.TRUE.toString().equalsIgnoreCase(byKeyAndSiteForUseParent);
+    }
+
+    // ==================== 高级查询配置 ====================
+
+    private void initAdvancedSearchFieldSelection() {
+        advancedSearchFieldSelection = new HashMap<>();
+        advSearchFieldConfigMap = new HashMap<>();
+        AdvancedSearchConfig config = customConfigObject.getAdvancedSearchConfig();
+        if (config != null && config.getFields() != null) {
+            for (AdvancedSearchFieldConfig fc : config.getFields()) {
+                advancedSearchFieldSelection.put(fc.getFieldKey(), Boolean.TRUE);
+                advSearchFieldConfigMap.put(fc.getFieldKey(), fc);
+            }
+        }
+    }
+
+    public boolean isAdvancedSearchFieldSelected(String fieldKey) {
+        Boolean val = advancedSearchFieldSelection.get(fieldKey);
+        return val != null && val;
+    }
+
+    public void setAdvancedSearchFieldSelected(String fieldKey, boolean selected) {
+        advancedSearchFieldSelection.put(fieldKey, selected);
+        if (selected && !advSearchFieldConfigMap.containsKey(fieldKey)) {
+            advSearchFieldConfigMap.put(fieldKey, new AdvancedSearchFieldConfig(fieldKey));
+        }
+        if (!selected) {
+            advSearchFieldConfigMap.remove(fieldKey);
+        }
+    }
+
+    public Map<String, Boolean> getAdvancedSearchFieldSelection() {
+        return advancedSearchFieldSelection;
+    }
+
+    public Map<String, AdvancedSearchFieldConfig> getAdvSearchFieldConfigMap() {
+        return advSearchFieldConfigMap;
+    }
+
+    public AdvancedSearchFieldConfig getAdvSearchFieldConfig(String fieldKey) {
+        return advSearchFieldConfigMap.computeIfAbsent(fieldKey, k -> new AdvancedSearchFieldConfig(k));
+    }
+
+    public String getFieldTypeForKey(String fieldKey) {
+        if (advancedSearchService == null) return "string";
+        return advancedSearchService.getFieldType(fieldKey);
+    }
+
+    public String getFieldTypeLabel(String fieldKey) {
+        String type = getFieldTypeForKey(fieldKey);
+        switch (type) {
+            case "string": return "字符串";
+            case "number": return "数字";
+            case "date": return "日期";
+            case "enum": return "枚举";
+            case "boolean": return "是/否";
+            default: return type;
+        }
+    }
+
+    public boolean isRangeField(String fieldKey) {
+        String type = getFieldTypeForKey(fieldKey);
+        return "number".equals(type) || "date".equals(type);
+    }
+
+    public AdvancedSearchFieldConfig getCurrentAdvSearchEditField() {
+        return currentAdvSearchEditField;
+    }
+
+    public void prepareEditAdvSearchField(String fieldKey) {
+        currentAdvSearchEditField = advSearchFieldConfigMap.get(fieldKey);
+        if (currentAdvSearchEditField == null) {
+            currentAdvSearchEditField = new AdvancedSearchFieldConfig(fieldKey);
+            advSearchFieldConfigMap.put(fieldKey, currentAdvSearchEditField);
+        }
+    }
+
+    public void addRangeOption() {
+        if (currentAdvSearchEditField != null) {
+            currentAdvSearchEditField.getRanges().add(new RangeOption("", "", ""));
+        }
+    }
+
+    public void removeRangeOption(int index) {
+        if (currentAdvSearchEditField != null && index >= 0 && index < currentAdvSearchEditField.getRanges().size()) {
+            currentAdvSearchEditField.getRanges().remove(index);
+        }
+    }
+
+    public void saveAdvancedSearchConfig() {
+        List<AdvancedSearchFieldConfig> fields = new ArrayList<>();
+        for (Map.Entry<String, Boolean> entry : advancedSearchFieldSelection.entrySet()) {
+            if (entry.getValue() != null && entry.getValue()) {
+                AdvancedSearchFieldConfig fc = advSearchFieldConfigMap.get(entry.getKey());
+                if (fc == null) {
+                    fc = new AdvancedSearchFieldConfig(entry.getKey());
+                }
+                // Auto-generate range labels as "minValue-maxValue"
+                if (fc.getRanges() != null) {
+                    for (RangeOption range : fc.getRanges()) {
+                        String min = range.getMinValue() != null ? range.getMinValue() : "";
+                        String max = range.getMaxValue() != null ? range.getMaxValue() : "";
+                        range.setLabel(min + "-" + max);
+                    }
+                }
+                fields.add(fc);
+            }
+        }
+        AdvancedSearchConfig config = customConfigObject.getAdvancedSearchConfig();
+        if (config == null) {
+            config = new AdvancedSearchConfig();
+        }
+        config.setFields(fields);
+        customConfigObject.setAdvancedSearchConfig(config);
     }
 
 }

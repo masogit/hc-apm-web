@@ -1,0 +1,113 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <f:event listener="#{assetAnnualInspectionReportController.initDetailData()}" type="preRenderView" />
+        <div class="ui-g clearfix" id="header">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="年检信息"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="detailForm">
+                    <p:fieldset legend="设备信息">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank">
+                            <h:panelGroup>
+                                <label class="label">设备名称</label>
+                                <p:outputLabel value="#{assetAnnualInspectionReportController.detailAssetInfo.name}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">设备序列号</label>
+                                <p:outputLabel value="#{assetAnnualInspectionReportController.detailAssetInfo.serialNum}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">设备二维码</label>
+                                <p:outputLabel value="#{assetAnnualInspectionReportController.detailAssetInfo.qrCode}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">所属科室</label>
+                                <p:outputLabel value="#{assetAnnualInspectionReportController.detailAssetInfo.clinicalDeptName}" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset legend="年检结果">
+                        <p:dataTable id="datalist_detailReport" value="#{assetAnnualInspectionReportController.detailReportList}" var="item"
+                                     lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="10" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="10,20,50">
+                            <p:column headerText="报告名称">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="报告类型">
+                                <h:outputText value="#{item.reportType}"/>
+                            </p:column>
+                            <p:column headerText="检测单位">
+                                <h:outputText value="#{item.testingUnit}"/>
+                            </p:column>
+                            <p:column headerText="检测结果">
+                                <h:outputText value="#{item.testResults}"/>
+                            </p:column>
+                            <p:column headerText="报告发证单位">
+                                <h:outputText value="#{item.certificateIssuingUnit}"/>
+                            </p:column>
+                            <p:column headerText="报告生效日期">
+                                <h:outputText value="#{item.effectiveTime}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="报告到期日期">
+                                <h:outputText value="#{item.expiryDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="上传人">
+                                <h:outputText value="#{item.createdByName}"/>
+                            </p:column>
+                            <p:column headerText="上传文件" style="width: 140px">
+                                <p:fileUpload id="annualInspectionUploadFile" value="#{item.uid}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetAnnualInspectionReportController.uploadAnnualInspectionFile}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true" sizeLimit="100000000" update=":detailForm:datalist_attachList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+
+                    <p:fieldset legend="附件列表" rendered="#{not empty assetAnnualInspectionReportController.detailReportList}">
+                        <p:dataTable id="datalist_attachList" value="#{assetAnnualInspectionReportController.detailReportList}" var="attachItem"
+                                     lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="10" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="10,20,50">
+                            <p:column headerText="报告名称">
+                                <h:outputText value="#{attachItem.name}"/>
+                            </p:column>
+                            <p:column headerText="报告类型">
+                                <h:outputText value="#{attachItem.reportType}"/>
+                            </p:column>
+                            <p:column headerText="报告生效日期">
+                                <h:outputText value="#{attachItem.effectiveTime}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="附件列表">
+                                <p:dataList id="datalist_attachList2" value="#{attachItem.blobObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandButton icon="ui-icon-remove-red-eye" title="#{msg.preview}" rendered="#{fileitem.showPreview()}" actionListener="#{preViewerBean.onServerEvent('', fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()" process="@this"/>
+                                    <p:commandButton actionListener="#{assetAnnualInspectionReportController.removeAttachmentById(fileitem.id)}" update=":detailForm:datalist_attachList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </h:form>
+                <ui:include src="/portal/preview/view.xhtml" />
+
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

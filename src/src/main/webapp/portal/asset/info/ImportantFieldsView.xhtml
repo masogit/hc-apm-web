@@ -11,7 +11,9 @@
 
     <!-- 资产名称 -->
     <p:column headerText="#{msg.assetName}" width="100" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-        <h:outputText value="#{empty item.name ? item.assetName : item.name}"/>
+        <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/info/AssetDetail.xhtml?faces-redirect=true&amp;actionName=View&amp;terminate=false&amp;selectedid='.concat(item.assetUid))}" style="color: #337ab7;">
+            <h:outputText value="#{empty item.name ? item.assetName : item.name}"/>
+        </p:link>
     </p:column>
 
     <!-- 资产编号 -->

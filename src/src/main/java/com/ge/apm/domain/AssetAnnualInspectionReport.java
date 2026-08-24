@@ -61,12 +61,65 @@ public class AssetAnnualInspectionReport implements Serializable {
     @Transient
     private Integer nodeId;
 
+    @Transient
+    private String assetName;
+
+    @Transient
+    private String assetSerialNum;
+
+    @Transient
+    private String assetQrCode;
+
+    @Transient
+    private String assetClinicalDeptName;
+
+    @Transient
+    private String importStatus;
+
+    @Transient
+    private String errorInfo;
+
+    @Transient
+    private Integer excelIdex;
+
     public Integer getNodeId() {
         return nodeId;
     }
 
     public void setNodeId(Integer nodeId) {
         this.nodeId = nodeId;
+    }
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getAssetSerialNum() {
+        return assetSerialNum;
+    }
+
+    public void setAssetSerialNum(String assetSerialNum) {
+        this.assetSerialNum = assetSerialNum;
+    }
+
+    public String getAssetQrCode() {
+        return assetQrCode;
+    }
+
+    public void setAssetQrCode(String assetQrCode) {
+        this.assetQrCode = assetQrCode;
+    }
+
+    public String getAssetClinicalDeptName() {
+        return assetClinicalDeptName;
+    }
+
+    public void setAssetClinicalDeptName(String assetClinicalDeptName) {
+        this.assetClinicalDeptName = assetClinicalDeptName;
     }
 
     public String getUid() {
@@ -196,5 +249,36 @@ public class AssetAnnualInspectionReport implements Serializable {
 
     public void setBlobObjects(Set<V2_BlobObject> blobObjects) {
         this.blobObjects = blobObjects;
+    }
+
+    public String getImportStatus() {
+        return importStatus;
+    }
+
+    public void setImportStatus(String importStatus) {
+        this.importStatus = importStatus;
+    }
+
+    public String getErrorInfo() {
+        return errorInfo;
+    }
+
+    public void setErrorInfo(String errorInfo) {
+        this.errorInfo = errorInfo;
+    }
+
+    public Integer getExcelIdex() {
+        return excelIdex;
+    }
+
+    public void setExcelIdex(Integer excelIdex) {
+        this.excelIdex = excelIdex;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (uid != null ? uid.hashCode() : 0);
+        return hash;
     }
 }

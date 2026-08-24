@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:apm="http://www.ge.com/tags/apm">
+
+    <div class="ui-g">
+        <!-- 上传区域 -->
+        <div class="ui-g-12 card">
+            <h:form id="importForm" enctype="multipart/form-data">
+                <p:fieldset legend="批量导入年检结果" id="uploaderContainer">
+                    <h:panelGroup>
+                        <apm:filterSiteOrgByOrgTree/>
+                    </h:panelGroup>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">选择文件</label>
+                            <h:outputText value="#{assetAnnualInspectionReportController.file.fileName}"
+                                          rendered="#{not empty assetAnnualInspectionReportController.file}"
+                                          style="margin-left:10px;font-weight:bold;"/>
+                            <p:fileUpload id="fileUpload"
+                                          fileUploadListener="#{assetAnnualInspectionReportController.handleFileUpload}"
+                                          value="#{assetAnnualInspectionReportController.file}"
+                                          mode="advanced"
+                                          dragDropSupport="false" multiple="false" auto="true"
+                                          invalidFileMessage="只支持xls或xlsx格式的文件"
+                                          invalidSizeMessage="文件大小不得超过5M"
+                                          update="uploaderContainer specialAssetTab:resultImportWrapper specialAssetTab:growl"
+                                          sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                          label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"
+                                          rendered="#{empty assetAnnualInspectionReportController.file}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p>说明</p>
+                        <p>1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('SPECIAL_ASSET')}" styleClass="p-mr-2"/> </p>
+                        <p>2. 文件中填入要导入的年检报告数据</p>
+                        <p>3. 上传文件后系统将自动校验数据，校验全部通过后方可点击"确认导入"</p>
+                    </h:panelGroup>
+                </p:fieldset>
+            </h:form>
+            <p:growl id="growl" showDetail="true"/>
+        </div>
+
+        <!-- 校验结果区域 -->
+        <h:panelGroup layout="block" id="resultImportWrapper">
+            <h:form id="dataListForm" rendered="#{assetAnnualInspectionReportController.hasData}">
+                <div class="ui-g-12 card">
+                <p:fieldset legend="系统校验结果">
+                    <p:messages id="messages" showDetail="false" closable="false" autoUpdate="true"/>
+
+                    <h:panelGroup style="display:block;margin-bottom:10px;">
+                        <p:selectOneRadio id="status" value="#{assetAnnualInspectionReportController.displayErrorsOnly}">
+                            <p:ajax event="change" process="@this" update="@form"
+                                    listener="#{assetAnnualInspectionReportController.switchDisplayMode}"/>
+                            <f:selectItem itemValue="false" itemLabel="全部记录"/>
+                            <f:selectItem itemValue="true" itemLabel="仅错误记录"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+
+                    <p:dataTable id="datalist"
+                                 value="#{assetAnnualInspectionReportController.displayList}"
+                                 var="item" lazy="false" paginator="true" paginatorPosition="both"
+                                 paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
+                                 emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="EXCEL行数" width="70">
+                            <h:outputText value="#{item.excelIdex}" />
+                        </p:column>
+                        <p:column headerText="设备名称">
+                            <h:outputText value="#{item.assetName}" />
+                        </p:column>
+                        <p:column headerText="设备序列号SN">
+                            <h:outputText value="#{item.assetSerialNum}" />
+                        </p:column>
+                        <p:column headerText="二维码">
+                            <h:outputText value="#{item.assetQrCode}" />
+                        </p:column>
+                        <p:column headerText="所属科室">
+                            <h:outputText value="#{item.assetClinicalDeptName}" />
+                        </p:column>
+                        <p:column headerText="报告名称">
+                            <h:outputText value="#{item.name}" />
+                        </p:column>
+                        <p:column headerText="报告类型">
+                            <h:outputText value="#{item.reportType}" />
+                        </p:column>
+                        <p:column headerText="检测单位">
+                            <h:outputText value="#{item.testingUnit}" />
+                        </p:column>
+                        <p:column headerText="检测结果">
+                            <h:outputText value="#{item.testResults}" />
+                        </p:column>
+                        <p:column headerText="报告发证单位">
+                            <h:outputText value="#{item.certificateIssuingUnit}" />
+                        </p:column>
+                        <p:column headerText="报告生效时间">
+                            <h:outputText value="#{item.effectiveTime}">
+                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="报告到期时间">
+                            <h:outputText value="#{item.expiryDate}">
+                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="上传人">
+                            <h:outputText value="#{item.createdByName}" />
+                        </p:column>
+                        <p:column headerText="#{assetAnnualInspectionReportController.isImported ? '导入状态' : '校验结果'}" width="180">
+                            <h:outputText value="校验通过" style="color:green;"
+                                          rendered="#{item.importStatus == 'CheckPass'}"/>
+                            <h:outputText value="校验失败" style="color:red;"
+                                          rendered="#{item.importStatus == 'CheckFail'}"/>
+                            <h:outputText value="导入成功" style="color:green;"
+                                          rendered="#{item.importStatus == 'Success'}"/>
+                            <h:outputText value="导入失败" style="color:red;"
+                                          rendered="#{item.importStatus == 'Failure'}"/>
+                            <br/>
+                            <h:outputText value="#{item.errorInfo}" style="color:red;font-size:11px;"
+                                          rendered="#{not empty item.errorInfo}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                             class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="AnnualInspectionReportImportResult"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </p:fieldset>
+                </div>
+            </h:form>
+
+            <h:form id="actionForm">
+            <h:panelGroup rendered="#{assetAnnualInspectionReportController.hasData}">
+                <div class="ui-g-12 card" style="padding-top:0;">
+                    <p:commandButton value="确认导入"
+                                     actionListener="#{assetAnnualInspectionReportController.importData()}"
+                                     update=":specialAssetTab:resultImportWrapper :specialAssetTab:growl"
+                                     icon="ui-icon-check"
+                                     styleClass="btn btn-primary"
+                                     disabled="#{!assetAnnualInspectionReportController.canbeImported or assetAnnualInspectionReportController.isImported}"
+                                     onstart="PF('importStatusDialog').show()"
+                                     oncomplete="PF('importStatusDialog').hide()"/>
+                    <p:commandButton value="返回" immediate="true"
+                                     icon="ui-icon-arrow-back"
+                                     actionListener="#{assetAnnualInspectionReportController.resetImport()}"
+                                     update=":specialAssetTab:importForm :specialAssetTab:resultImportWrapper :specialAssetTab:growl"
+                                     style="margin-left:10px;"/>
+                </div>
+            </h:panelGroup>
+            </h:form>
+        </h:panelGroup>
+    </div>
+
+    <p:dialog widgetVar="importStatusDialog" modal="true" class="ajaxStatusDialog" draggable="false"
+              closable="false" resizable="false" showHeader="false">
+        <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
+        <span style="margin-left:10px;">正在导入数据，请稍候...</span>
+    </p:dialog>
+</html>

@@ -376,6 +376,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             case "RepairMaintenanceReport":
                 selected.setWechatParam(JSON.parseObject(ReminderRule.REPAIR_MAINTENANCE_REPORT_MSG, WechatParam.class));
                 break;
+            case "SpecialEquipmentReport":
+                selected.setWechatParam(JSON.parseObject(ReminderRule.SPECIAL_EQUIPMENT_REPORT_MSG, WechatParam.class));
+                break;
             default:
                 break;
         }

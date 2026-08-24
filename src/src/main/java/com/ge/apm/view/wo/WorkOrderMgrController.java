@@ -1013,7 +1013,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
 
 
-            } else if (queryIndex == 11) { //全部维修单
+            } else if (queryIndex == 11) { //全部维修单（不包含已取消）
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 3));
                 if (stepFileter != null) {
                     fillterStepId = woStatus.get(stepFileter);
                     if (fillterStepId > 6) {
