@@ -255,6 +255,8 @@ public class AssetAnnualInspectionReportService {
                     } else {
                         AssetInfo assetInfo = assetInfoList.get(0);
                         // 检查是否为特种设备
+                        report.setAssetQrCode(assetInfo.getQrCode());
+                        report.setAssetClinicalDeptName(assetInfo.getClinicalDeptName());
                         SpecialAssetInfo specialAssetInfo = specialAssetInfoRepository.findByAssetId(assetInfo.getId());
                         if (specialAssetInfo == null) {
                             errorInfo.append("[未匹配到特种设备]");
@@ -393,7 +395,7 @@ public class AssetAnnualInspectionReportService {
                     // ignore
                 }
             }
-            if (hasAssetName && hasAssetSN && hasQrCode && hasClinicalDept && hasName && hasReportType
+            if (hasAssetName && hasAssetSN &&  hasName && hasReportType
                     && hasTestingUnit && hasTestResults && hasCertificateIssuingUnit && hasEffectiveTime
                     && hasExpiryDate && hasCreatedByName) {
                 header.put("HEADER_ROW", i);

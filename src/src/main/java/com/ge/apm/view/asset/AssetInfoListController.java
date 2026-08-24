@@ -875,9 +875,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void onFieldChange(SearchCondition condition) {
         if (condition == null) return;
         String fieldType = advancedSearchService.getFieldType(condition.getFieldName());
-        // For enum fields, force IN operator; for others, use first available operator
+        // For enum fields, force IN operator; for date/number fields, force BETWEEN; for others, use first available operator
         if ("enum".equals(fieldType)) {
             condition.setOperator("IN");
+        } else if ("date".equals(fieldType) || "number".equals(fieldType)) {
+            condition.setOperator("BETWEEN");
         } else {
             List<AssetAdvancedSearchService.OperatorOption> ops = advancedSearchService.getOperatorsForField(condition.getFieldName());
             if (ops != null && !ops.isEmpty()) {
@@ -956,7 +958,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 cond.setFieldName(fc.getFieldKey());
                 List<AssetAdvancedSearchService.OperatorOption> ops = advancedSearchService.getOperatorsForField(fc.getFieldKey());
                 if (ops != null && !ops.isEmpty()) {
-                    cond.setOperator(ops.get(0).getValue());
+                    String ft = advancedSearchService.getFieldType(fc.getFieldKey());
+                    if ("date".equals(ft) || "number".equals(ft)) {
+                        cond.setOperator("BETWEEN");
+                    } else {
+                        cond.setOperator(ops.get(0).getValue());
+                    }
                 }
                 newConditions.add(cond);
             }

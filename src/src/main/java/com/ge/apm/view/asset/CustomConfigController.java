@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ import webapp.framework.web.service.DbMessageSource;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -966,6 +969,60 @@ public class CustomConfigController {
         if (currentAdvSearchEditField != null && index >= 0 && index < currentAdvSearchEditField.getRanges().size()) {
             currentAdvSearchEditField.getRanges().remove(index);
         }
+    }
+
+    public boolean isCurrentAdvSearchFieldDateType() {
+        if (currentAdvSearchEditField == null) return false;
+        return "date".equals(getFieldTypeForKey(currentAdvSearchEditField.getFieldKey()));
+    }
+
+    public void confirmRangeDialog() {
+        if (!validateRangeOptions()) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        }
+    }
+
+    private boolean validateRangeOptions() {
+        if (currentAdvSearchEditField == null) return true;
+        String fieldKey = currentAdvSearchEditField.getFieldKey();
+        String fieldType = getFieldTypeForKey(fieldKey);
+        String fieldName = allFields.get(fieldKey);
+        List<RangeOption> ranges = currentAdvSearchEditField.getRanges();
+        for (int i = 0; i < ranges.size(); i++) {
+            RangeOption range = ranges.get(i);
+            String min = range.getMinValue();
+            String max = range.getMaxValue();
+            if (StringUtils.isNotEmpty(min) && StringUtils.isNotEmpty(max)) {
+                if ("number".equals(fieldType)) {
+                    try {
+                        double minNum = Double.parseDouble(min.trim());
+                        double maxNum = Double.parseDouble(max.trim());
+                        if (maxNum <= minNum) {
+                            WebUtil.addErrorMessage("字段[" + fieldName + "]第" + (i + 1) + "行: 最大值必须大于最小值");
+                            return false;
+                        }
+                    } catch (NumberFormatException e) {
+                        WebUtil.addErrorMessage("字段[" + fieldName + "]第" + (i + 1) + "行: 请输入有效的数字");
+                        return false;
+                    }
+                } else if ("date".equals(fieldType)) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    sdf.setLenient(false);
+                    try {
+                        Date minDate = sdf.parse(min.trim());
+                        Date maxDate = sdf.parse(max.trim());
+                        if (!maxDate.after(minDate)) {
+                            WebUtil.addErrorMessage("字段[" + fieldName + "]第" + (i + 1) + "行: 最大值必须大于最小值");
+                            return false;
+                        }
+                    } catch (ParseException e) {
+                        WebUtil.addErrorMessage("字段[" + fieldName + "]第" + (i + 1) + "行: 日期格式不正确，请使用yyyy-MM-dd格式");
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public void saveAdvancedSearchConfig() {

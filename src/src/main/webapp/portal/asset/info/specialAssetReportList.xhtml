@@ -44,6 +44,9 @@
                     <p:column headerText="#{msg.clinicalDeptName}"  filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetClinicalDeptName}"/>
                     </p:column>
+                    <p:column headerText="使用科室"  filterBy="#{item.assetDeptName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetDeptName}"/>
+                    </p:column>
                     <p:column headerText="报告名称" filterBy="#{item.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.name}"/>
                     </p:column>

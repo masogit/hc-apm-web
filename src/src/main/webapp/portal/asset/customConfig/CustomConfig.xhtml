@@ -630,11 +630,19 @@
                                 <h:panelGrid columns="4" style="margin-bottom: 5px; width: 100%;">
                                     <h:panelGroup>
                                         <h:outputText value="最小值: " />
-                                        <p:inputText value="#{range.minValue}" placeholder="最小值" style="width: 120px;" />
+                                        <p:inputText value="#{range.minValue}" mask="9999-99-99" maxlength="10"
+                                                     placeholder="yyyy-MM-dd" style="width: 130px;"
+                                                     rendered="#{customConfigController.currentAdvSearchFieldDateType}" />
+                                        <p:inputText value="#{range.minValue}" placeholder="最小值" style="width: 120px;"
+                                                     rendered="#{!customConfigController.currentAdvSearchFieldDateType}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <h:outputText value="最大值: " />
-                                        <p:inputText value="#{range.maxValue}" placeholder="空=无上限" style="width: 120px;" />
+                                        <p:inputText value="#{range.maxValue}" mask="9999-99-99" maxlength="10"
+                                                     placeholder="yyyy-MM-dd" style="width: 130px;"
+                                                     rendered="#{customConfigController.currentAdvSearchFieldDateType}" />
+                                        <p:inputText value="#{range.maxValue}" placeholder="空=无上限" style="width: 120px;"
+                                                     rendered="#{!customConfigController.currentAdvSearchFieldDateType}" />
                                     </h:panelGroup>
                                     <p:commandButton value="删除" icon="ui-icon-trash"
                                                      actionListener="#{customConfigController.removeRangeOption(rStatus.index)}"
@@ -646,8 +654,9 @@
                             <p:commandButton value="添加区间" icon="ui-icon-plus" actionListener="#{customConfigController.addRangeOption()}" update=":advSearchRangeForm" process="@form" />
                             <br/><br/>
                             <p:commandButton value="确定" icon="ui-icon-check" process="@form"
-                                             update=":advSearchRangeForm"
-                                             oncomplete="PF('AdvSearchRangeDialog').hide()" />
+                                             actionListener="#{customConfigController.confirmRangeDialog()}"
+                                             update=":advSearchRangeForm :growl"
+                                             oncomplete="if (!args.validationFailed) { PF('AdvSearchRangeDialog').hide(); }" />
                         </h:panelGroup>
                     </h:form>
                 </p:dialog>

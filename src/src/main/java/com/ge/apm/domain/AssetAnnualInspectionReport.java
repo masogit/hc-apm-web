@@ -81,6 +81,8 @@ public class AssetAnnualInspectionReport implements Serializable {
 
     @Transient
     private Integer excelIdex;
+    @Transient
+    private String assetDeptName;
 
     public Integer getNodeId() {
         return nodeId;
@@ -273,6 +275,14 @@ public class AssetAnnualInspectionReport implements Serializable {
 
     public void setExcelIdex(Integer excelIdex) {
         this.excelIdex = excelIdex;
+    }
+
+    public String getAssetDeptName() {
+        return assetDeptName;
+    }
+
+    public void setAssetDeptName(String assetDeptName) {
+        this.assetDeptName = assetDeptName;
     }
 
     @Override

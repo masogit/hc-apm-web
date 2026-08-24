@@ -65,6 +65,12 @@
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                 </h:outputText>
                             </p:column>
+                            <p:column headerText="所属科室">
+                                <h:outputText value="#{item.assetClinicalDeptName}"/>
+                            </p:column>
+                            <p:column headerText="使用科室">
+                                <h:outputText value="#{item.assetDeptName}"/>
+                            </p:column>
                             <p:column headerText="上传人">
                                 <h:outputText value="#{item.createdByName}"/>
                             </p:column>
