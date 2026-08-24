@@ -34,6 +34,7 @@
         <result property="parentWoId" column="parent_wo_id"/>
         <result property="mainSub" column="main_sub"/>
         <result property="issueType" column="issue_type"/>
+        <result property="confirmFLag" column="confirm_fLag"/>
 
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>
@@ -84,7 +85,7 @@
         t.rule_level,
         t.owner_name,
         t.parent_wo_id,
-        t.main_sub,
+        t.main_sub,t.confirm_fLag,
         a.name AS asset_name,
         a.serial_num as asset_serial_num,
         a.depart_num as asset_depart_num,
