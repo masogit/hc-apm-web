@@ -2,8 +2,6 @@ package com.ge.apm.view.transaction;
 
 import com.ge.apm.dao.DeptTransactionLogRepository;
 import com.ge.apm.domain.DeptTransactionLog;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.transaction.TransactionService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -11,7 +9,6 @@ import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TransactionForm;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -43,21 +40,14 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     @Getter @Setter
     private Integer tmCategory;
     @Getter @Setter
-    private Integer times;
-    @Getter @Setter
     private Date startTime;
     @Getter @Setter
     private Date endTime;
     private TransactionService transactionService;
     private UserContextService userContextService;
-    private BlobFileService blobFileService;
     @Setter @Getter
     private DeptTransactionLog deptTransactionLog;
     private Integer authorId;
-    @Getter @Setter
-    private List<V2_BlobObject> transactionImages;
-    @Getter @Setter
-    private List<V2_BlobObject> viewImages;
 
     //    private ServerEventInterface callingController;
     @Setter @Getter
@@ -79,10 +69,9 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         depTranForTrans= new DepTranForTrans();
         transactionService = WebUtil.getBean(TransactionService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
-        blobFileService = WebUtil.getBean(BlobFileService.class);
         authorId=userContextService.getLoginUser().getId();
         deptDao = WebUtil.getBean(DeptTransactionLogRepository.class);
-        transactionImages = new ArrayList<>();
+
     }
     public String titleNameDetail(){
         if(userContextService.isOnlyAssetStaff()){
@@ -94,12 +83,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     private boolean search=false;
     public void searchRanageSet(){
         depTranForTrans= new DepTranForTrans();
-        if(startTime != null){
-            depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
-        }
-        if(endTime != null){
-            depTranForTrans.setEndTime(TimeUtils.getInputEndDate(endTime));
-        }
+        depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
+        depTranForTrans.setEndTime(TimeUtils.getInputEndDate(endTime));
         search=true;
 
     }
@@ -108,12 +93,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         upStartTime=selected.getDate();
         hours= selected.getHours();
         remark=selected.getRemark();
-        times=selected.getTimes();
-        // 加载已有图片
-        if(selected.getId()!=null){
-            transactionImages = blobFileService.fetchBlobObject(selected.getId().toString(), V2_BlobObject.BO_TYPE_DeptTransactionLog, V2_BlobObject.BO_SUB_TYPE_IMG);
-            if(transactionImages==null) transactionImages = new ArrayList<>();
-        }
+
     }
     boolean isSummarySelected=false;
     @Override
@@ -132,9 +112,9 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         }else{
             if(search && transactionStatis!=null){
 //                if(transactionStatis!=null){
-                    depTranForTrans.setUserId(transactionStatis.getAuthorId());
-                    deptTranLogList=refreshLoadData(depTranForTrans);
-                    search=false;
+                depTranForTrans.setUserId(transactionStatis.getAuthorId());
+                deptTranLogList=refreshLoadData(depTranForTrans);
+                search=false;
 //                }else{ //根据指定时间来查询
 //                    depTranForTrans.setUserId(userContextService.getLoginUserId());
 //                    depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
@@ -218,15 +198,6 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         return deptTranLogList;
     }
 
-    public void loadViewImages(DeptTransactionLog item) {
-        if (item != null && item.getId() != null) {
-            viewImages = blobFileService.fetchBlobObject(item.getId().toString(), V2_BlobObject.BO_TYPE_DeptTransactionLog, V2_BlobObject.BO_SUB_TYPE_IMG);
-            if (viewImages == null) viewImages = new ArrayList<>();
-        } else {
-            viewImages = new ArrayList<>();
-        }
-    }
-
     public void onselectDetailItem(){
         //    System.out.println(selected);
     }
@@ -275,69 +246,25 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             if(hm1.get("remark")!=null) {
                 ts.setRemark(hm1.get("remark").toString());
             }
-            if(hm1.get("times")!=null) {
-                ts.setTimes(Integer.valueOf(hm1.get("times").toString()));
-            }
 
             ts.setAuthorId(Integer.valueOf(hm1.get("authorId").toString()));
             tranList.add(ts);
         }
         return tranList;
     }
-    public void handleImageUpload(FileUploadEvent event) {
-        if(transactionImages!=null && transactionImages.size()>=5){
-            WebUtil.addErrorMessage("最多上传5张图片");
-            return;
-        }
-        try {
-            V2_BlobObject blobObject = blobFileService.uploadFile(event);
-            if(blobObject!=null){
-                blobObject.setBoType(V2_BlobObject.BO_TYPE_DeptTransactionLog);
-                blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-                if(selected!=null && selected.getId()!=null){
-                    blobObject.setBoUuid(selected.getId().toString());
-                }
-                blobFileService.saveBlobObject(blobObject);
-                if(transactionImages==null) transactionImages = new ArrayList<>();
-                transactionImages.add(blobObject);
-                WebUtil.addSuccessMessage(event.getFile().getFileName() + " 上传成功");
-            }
-        }catch (Exception e){
-            WebUtil.addErrorMessage("图片上传失败");
-        }
-    }
-
-    public void removeImage(V2_BlobObject image){
-        try {
-            blobFileService.deleteBlobFile(image);
-            if(transactionImages!=null){
-                transactionImages.remove(image);
-            }
-            WebUtil.addSuccessMessage("图片已删除");
-        }catch (Exception e){
-            WebUtil.addErrorMessage("图片删除失败");
-        }
-    }
-
-    public boolean isImageUploadDisabled(){
-        return transactionImages!=null && transactionImages.size()>=5;
-    }
-
     public void prepareCreate(){
         remark=null;
         startTime=null;
         upStartTime=null;
         hours=null;
         tmCategory=null;
-        times=null;
-        transactionImages = new ArrayList<>();
+
     }
     public void locUpdateTransaction() {
         selected.setRemark(remark);
         selected.setDate(startTime);
         selected.setHours(hours);
         selected.setCategory(tmCategory);
-        selected.setTimes(times);
         transactionService.localUpdateTransaction(selected);
         WebUtil.addSuccessMessage("更新成功");
     }
@@ -347,18 +274,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setCategory(tmCategory);
         tf.setRemark(remark);
         tf.setHours(hours);
-        tf.setTimes(times);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
         transactionService.updateTransaction(tf,selected.getId(),UserContextService.getAccessToken());
-        // 保存新上传的图片关联
-        if(transactionImages!=null && selected.getId()!=null){
-            for(V2_BlobObject img : transactionImages){
-                if(img.getBoUuid()==null){
-                    img.setBoUuid(selected.getId().toString());
-                    blobFileService.saveBlobObject(img);
-                }
-            }
-        }
     }
 
     public void createTransaction(){
@@ -366,11 +283,11 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setCategory(tmCategory);
         tf.setRemark(remark);
         tf.setHours(hours);
-        tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
         transactionService.createTmByLink(tf, UserContextService.getAccessToken());
         WebUtil.addSuccessMessage("成功创建科务记录");
+        // refreshLoadData(userContextService.getLoginUserId());
         cancel();
         deptTransactionLog= new DeptTransactionLog();
     }
@@ -379,8 +296,6 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         this.tmCategory=null;
         this.startTime=null;
         this.hours=null;
-        this.times=null;
-        this.transactionImages = new ArrayList<>();
     }
 
 /*
