@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition>
+    <div class="ui-g-12 card">
+        <h:form id="pmMvsListForm">
+
+            <p:dataTable id="datalist" value="#{v2PmOrderMvsManuallyConfirmController.lazyModel}" var="item" widgetVar="varDataListgl"
+                         selectionMode="single" selection="#{v2PmOrderMvsManuallyConfirmController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="ascending"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500">
+
+              <!--  <c:if test="#{v2PmOrderMvsManuallyConfirmController.pageType eq 'new'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderMvsManuallyConfirmController.onSelectOrderRedirect()}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)" />
+                </c:if>
+                <c:if test="#{v2PmOrderMvsManuallyConfirmController.pageType eq 'current'}">
+                    <p:ajax event="rowSelect" listener="#{v2PmOrderMvsManuallyConfirmController.onSelectPmOrder()}" update="mcTab:pmMvsOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
+                </c:if>
+-->
+                <p:ajax event="filter" listener="#{v2PmOrderMvsManuallyConfirmController.onFilter}" update="datalist  @(.pmOrderDetailFormCls)" oncomplete="updateSelectAllCheckBox();"/>
+                <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+               <!-- <p:column width="36" exportable="false">
+                    <p:selectBooleanCheckbox  value="#{v2PmOrderMvsManuallyConfirmController.selectedMap[item.id]}"  class="selectCheckBox">
+                        <p:ajax process="@this" listener="#{v2PmOrderMvsManuallyConfirmController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.exportExcelBtn) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn) @(.downloadConfirm)" oncomplete="updateSelectAllCheckBox();" />
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
+                            <p:ajax  listener="#{v2PmOrderMvsManuallyConfirmController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn) @(.downloadConfirm)" oncomplete="updateSelectAllCheckBox();"/>
+
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>-->
+                <p:column headerText="#{msg.assetName}"  filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.ManufacturerSerialNumber}"  filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.EquipmentIDHospital}"  filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.assetInfo.departNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.functionType}"/>
+                </p:column>
+                <p:column headerText="#{msg.MeasurementGrade2}" filterBy="#{msg.ruleLevel}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsManuallyConfirmController.filterPmRuleLevel}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <c:if test="#{v2PmOrderMvsManuallyConfirmController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
+                            <c:if test="#{!v2PmOrderMvsManuallyConfirmController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour',item.ruleLevel)}"/>
+                </p:column>
+                <p:column headerText="#{msg.MaintenanceType}"  filterBy="#{item.pmType}" filterMatchMode="EQ">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
+                </p:column>
+                <p:column headerText="#{msg.hospitalId}"  filterBy="#{item.assetInfo.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsManuallyConfirmController.siteUidFilterMVS}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{v2PmOrderMvsManuallyConfirmController.LoadSiteNameListMVS()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{v2PmOrderMvsManuallyConfirmController.getSiteOrgName(item.assetInfo.siteUID)}"/>
+                </p:column>
+                <!--所属科室-->
+                <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                        <p:autoComplete dropdown="true" value="#{v2PmOrderMvsManuallyConfirmController.fileterOrgNameMVS}" appendTo="@(Body)"
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderMvsManuallyConfirmController.autoCompleteDeptNameMVS}" size="5">
+                            <p:ajax event="itemSelect" listener="#{v2PmOrderMvsManuallyConfirmController.onClinicalDeptNameFilterChangeMVS}" process="@this"  update="mcTab:pmMvsListForm:datalist"/>
+                            <p:ajax listener="#{v2PmOrderMvsManuallyConfirmController.onClinicalDeptNameFilterChangeMVS}" process="@this"  update="mcTab:pmMvsListForm:datalist"/>
+                        </p:autoComplete>
+                    </f:facet>
+                    <h:outputText value="#{v2PmOrderMvsManuallyConfirmController.getOrgInfoByUid(item.assetInfo.clinicalDeptUID).name}"/>
+                </p:column>
+                <!--使用科室-->
+                <p:column headerText="#{msg.assetDeptName}"  width="100" rendered="#{userContextService.enableDisplayByKey('pmOrderDeptFilter')}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.assetDeptName}"/><br/>
+                        <p:autoComplete dropdown="true" value="#{v2PmOrderMvsManuallyConfirmController.fileterAssetDeptOrgNameMVS}" appendTo="@(Body)"
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderMvsManuallyConfirmController.autoCompleteDeptNameMVS}" size="5">
+                            <p:ajax event="itemSelect" listener="#{v2PmOrderMvsManuallyConfirmController.onAssetDeptNameFilterChangeMVS}" process="@this"  update="mcTab:pmMvsListForm:datalist"/>
+                            <p:ajax listener="#{v2PmOrderMvsManuallyConfirmController.onAssetDeptNameFilterChangeMVS}" process="@this"  update="mcTab:pmMvsListForm:datalist"/>
+                        </p:autoComplete>
+                    </f:facet>
+                    <h:outputText value="#{v2PmOrderMvsManuallyConfirmController.getOrgInfoByUid(item.assetInfo.assetDeptUID).name}"/>
+                </p:column>
+                <p:column headerText="#{msg.locationName}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" rendered="#{v2PmOrderMvsManuallyConfirmController.showLocationName()}">
+                    <h:outputText value="#{item.assetInfo.locationName}"/>
+                </p:column>
+                <p:column headerText="#{msg.PmOrderRule}" filterBy="#{item.ruleName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.ruleName}"/>
+                </p:column>
+                <p:column headerText="保养周期" filterBy="#{item.period}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.period}"/>
+                </p:column>
+                <p:column headerText="保养周期单位" filterBy="#{item.periodUnit}" filterMatchMode="LIKE">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsManuallyConfirmController.stepFileter}">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="年" itemValue="y" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="月" itemValue="m" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="周" itemValue="w" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="日" itemValue="d" noSelectionOption="true"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{v2PmOrderMvsManuallyConfirmController.getPeriodUnit(item.periodUnit)}"/>
+                </p:column>
+                <p:column headerText="#{msg.Creator}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.creatorName}"/>
+                </p:column>
+                <p:column headerText="#{msg.Owner}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.ownerName}"/>
+                </p:column>
+                <p:column headerText="保养编号"  filterBy="#{item.pmNum}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.pmNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.CurrentProcessingStep}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsManuallyConfirmController.stepFileter}">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{pmOrderGlobalController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.currentStepName}"/>
+                </p:column>
+                <p:column headerText="#{msg.intExtType}" filterBy="#{item.intExtType}" filterMatchMode="EQ" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderMvsManuallyConfirmController.stepFileter}" >
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType')}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                </p:column>
+                <p:column headerText="#{msg.PlannedCompletionTime}" filterBy="#{item.planTime}" filterMatchMode="GTE" >
+                    <f:facet name="filter">
+                        <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterPlannedCompletionTime" value="#{v2PmOrderMvsManuallyConfirmController.plannedCompletionTimeFormat}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.planTime}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg.ActualCompletionTime}" filterBy="#{item.endTime}" filterMatchMode="GTE">
+                    <f:facet name="filter">
+                        <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2PmOrderMvsManuallyConfirmController.actualCompletionTimeFormat}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.endTime}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column width="90" headerText="主子工单" rendered="#{!userContextService.isEnableBtnByKey('displayMainSubPmOrder')}"  filterBy="#{item.mainSub}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()">
+                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                            <f:selectItem itemLabel="主工单" itemValue="main" />
+                            <f:selectItem itemLabel="子工单" itemValue="sub" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
+                </p:column>
+                <p:column headerText="是否确认" >
+                    <h:outputText value="#{item.confirmFLag ? '是' : '否'}"/>
+                </p:column>
+                <p:column headerText="#{msg.Operation}"  style="width: 100px" exportable="false">
+                    <p:commandButton id="deleteButton" icon="ui-icon-close" title="确认" actionListener="#{v2PmOrderMvsManuallyConfirmController.confirmPm(item.id)}" update=":datakist " disabled="#{item.confirmFLag}">
+                        <p:confirm header="确认" message="是否关单确认？" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </p:column>
+                <f:facet name="{Toolbar}" >
+
+
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+        <h:outputScript>
+            //<![CDATA[
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                var checkedCount = 0;
+                checkboxlist.each(function () {
+                    var isChecked = this.children[0].children[0].checked;
+                    selectAllstatus = selectAllstatus && isChecked;
+                    if (isChecked) checkedCount++;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </h:outputScript>
+
+        <p:overlayPanel id="idMvsPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="mcTab:pmMvsListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataListgl', 'varFilterPlannedCompletionTime', 'varPlannedCompletionTimeFrom', 'varPlannedCompletionTimeTo'); PF('panelFilterPlannedCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterPlannedCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+        <p:overlayPanel id="idMvsPanelFilterActualCompletionTime" widgetVar="panelFilterActualCompletionTime" for="mcTab:pmMvsListForm:datalist:filterActualCompletionTime" dismissable="false" >
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varActualCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varActualCompletionTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataListgl', 'varFilterActualCompletionTime', 'varActualCompletionTimeFrom', 'varActualCompletionTimeTo'); PF('panelFilterActualCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterActualCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+    </div>
+
+
+</ui:composition>
+</html>

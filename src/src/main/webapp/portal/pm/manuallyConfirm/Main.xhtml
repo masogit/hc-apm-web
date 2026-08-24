@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+    	<h:outputScript name="js/commonUtils.js"/>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="保养工单确认列表"/>
+            </div>
+
+            <div class="ui-g-12 ">
+                <p:tabView class="ui-g-12" id="mcTab" dynamic="true" cache="false">
+                    <p:tab class="ui-g-12" title="#{msg.innerPm}" id="pmOrderList" >
+                        <ui:include src="List.xhtml"/>
+                    </p:tab>
+                    <p:tab class="ui-g-12" title="MVS保养" id="mvsOrderList" >
+                        <ui:include src="MvsList.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

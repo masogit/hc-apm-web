@@ -36,3 +36,7 @@ INSERT INTO public.config_item (uid, name, category, key, value_type, descriptio
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF|PPTX|PPT|ppt|pptx|mp4|MP4', '资产附件上传文件格式', 'assetUploadFileFormats', '资产附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'assetUploadFileFormats');
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx', '合同附件上传文件格式', 'contractUploadFileFormats', '合同附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'contractUploadFileFormats');
+
+
+
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, '', '', 'pmOrederManuallyConfirmFlag', '保养工单是否手动确认', false, true, '[{"key":"巡检","value":"1"},{"key":"二级保养","value":"2"},{"key":"三级保养","value":"3"},{"key":"质量控制","value":"4"}]', 8 where not exists(select * from config_item where key = 'pmOrederManuallyConfirmFlag')
