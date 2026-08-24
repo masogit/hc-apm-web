@@ -80,6 +80,7 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
         currentUser = UserContextService.getCurrentUserAccount();
         customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), "SPECIALASSET_CHECK");
         selectedMap = new HashMap<>();
+        this.searchFilters = new ArrayList<>();
     }
 
     @Override
