@@ -207,6 +207,18 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "paid")
     private Boolean paid = Boolean.FALSE;
 
+    @Basic(optional = true)
+    @Column(name = "amount")
+    private Double amount;
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
     public String getId() {
         return id;
     }

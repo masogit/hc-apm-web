@@ -131,6 +131,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     @Getter
     @Setter
     private StreamedContent attachListFile;
+    @Getter
+    @Setter
+    private ContractInfoItem selectedItem;
 
     @Override
     protected void init() {
@@ -502,6 +505,18 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             //contractItemDao.delete(item);
             //removedItemList.add(item);
         }
+    }
+
+    public void modifyContractItem(ContractInfoItem item) {
+        selectedItem = item;
+    }
+
+    public void saveModifyAssetItem(){
+        contractItemDao.save(selectedItem);
+    }
+
+    public void cancelModifyAssetItem(){
+        selectedItem = null;
     }
 
     public boolean canRemovePucheseItem(ContractInfoItem contractItem) {
