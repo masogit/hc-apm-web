@@ -37,8 +37,8 @@
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="20,50,100,500"
-                             rowStyleClass="#{measureAssetListController.measuringDateWarningEnabled and item.hasDateWarning ? 'warning-row' : ''}">
+                             rowsPerPageTemplate="20,50,100,500">
+<!--                             rowStyleClass="#{measureAssetListController.measuringDateWarningEnabled and item.hasDateWarning ? 'warning-row' : ''}">-->
 
                     <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" onstart="prepareAssetViewWindow1();" oncomplete="openAssetViewWindow1(xhr, status, args)" />
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
@@ -170,16 +170,16 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-<!--                    <p:column headerText="有效期（月）" rendered="#{measureAssetListController.matchType==2}"  sortBy="#{item.validityMonths}" filterBy="#{item.validityMonths}" filterMatchMode="EQ">-->
-<!--                        <f:facet name="filter">-->
-<!--                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;" value="#{measureAssetListController.validityMonths}">-->
-<!--                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
-<!--                                <f:selectItems value="#{fieldMsg.getFieldValueList('validityMonths')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>-->
-<!--                            </p:selectOneMenu>-->
-<!--                        </f:facet>-->
-<!--                        <h:outputText value="#{fieldMsg.fieldValue('validityMonths',item.validityMonths)}"/>-->
-<!--                    </p:column>-->
-                    <p:column headerText="下次计量日期" rendered="#{measureAssetListController.matchType==1 or measureAssetListController.matchType==9}" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
+                    <p:column headerText="有效期（月）" rendered="#{measureAssetListController.matchType==2}"  sortBy="#{item.validityMonths}" filterBy="#{item.validityMonths}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;" value="#{measureAssetListController.validityMonths}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('validityMonths')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('validityMonths',item.validityMonths)}"/>
+                    </p:column>
+                    <p:column headerText="#{measureAssetListController.matchType==1?'下次计量日期':measureAssetListController.matchType==3?'有效期至':measureAssetListController.matchType==2?'建议下次计量日期':''}" rendered="#{measureAssetListController.matchType==1 or measureAssetListController.matchType==3 or measureAssetListController.matchType==2}" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>
@@ -233,7 +233,7 @@
                                          actionListener="#{measureAssetListController.downloadSelectedFile()}" update=":growl">
                             <p:fileDownload value="#{measureAssetListController.exportFile}" />
                         </p:commandButton>
-<!--                        <p:commandButton id="batchToValidPeriodMonths" oncomplete="PF('batchValidPeriodMonthsDialog').show()" update="measuringTab:batchValidPeriodMonthsDlg" actionListener="#{measureAssetListController.setSelectedAssetsAndMeasuring()}" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated"  title="批量修改有效期（月）" disabled="#{measureAssetListController.matchType!=2}" />-->
+                        <p:commandButton id="batchToValidPeriodMonths" oncomplete="PF('batchValidPeriodMonthsDialog').show()" update="measuringTab:batchValidPeriodMonthsDlg" actionListener="#{measureAssetListController.setSelectedAssetsAndMeasuring()}" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated"  title="批量修改有效期（月）" disabled="#{measureAssetListController.matchType!=2}" />
                     </f:facet>
                 </p:dataTable>
             </h:form>

@@ -84,6 +84,9 @@ public class AssetAnnualInspectionReport implements Serializable {
     @Transient
     private String assetDeptName;
 
+    @Transient
+    private Boolean isUpdate;
+
     public Integer getNodeId() {
         return nodeId;
     }
@@ -285,10 +288,35 @@ public class AssetAnnualInspectionReport implements Serializable {
         this.assetDeptName = assetDeptName;
     }
 
+    public Boolean getIsUpdate() {
+        return isUpdate;
+    }
+
+    public void setIsUpdate(Boolean isUpdate) {
+        this.isUpdate = isUpdate;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (uid != null ? uid.hashCode() : 0);
         return hash;
+    }
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof AssetAnnualInspectionReport)) {
+            return false;
+        }
+        AssetAnnualInspectionReport other = (AssetAnnualInspectionReport) object;
+        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.ge.apm.domain.AssetAnnualInspectionReport[ uid=" + uid + " ]";
     }
 }
