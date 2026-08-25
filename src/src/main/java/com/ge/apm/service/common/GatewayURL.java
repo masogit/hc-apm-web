@@ -5,9 +5,9 @@ public enum GatewayURL {
     //Transaction
     LISt_ALL_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog"),
     CREATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog"),
-    DELETE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    DELETE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{uid}"),
     QUERY_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog?from={from}&to={to}&staffId={staffId}&page={page}&pageSize={pageSize}"),
-    UPDATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{id}"),
+    UPDATE_DEPTTRANSACTION_LOG("/hcapmassetservice/api/apm/asset/deptTransaction/deptTransactionLog/{uid}"),
     GET_DEPTRASACTION_LOG_SUMMARY("/hcapmassetservice/api/apm/asset/deptTransaction/summary?from={from}&to={to}"),
 
 

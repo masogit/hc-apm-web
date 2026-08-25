@@ -219,6 +219,9 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             HashMap<String,Object> hm1 = (HashMap<String,Object>)al1.get(i);
             DeptTransactionLog ts = new DeptTransactionLog();
             ts.setId((Integer)hm1.get("id"));
+            if(hm1.get("uid") != null) {
+                ts.setUid(hm1.get("uid").toString());
+            }
             if(hm1.get("authorName")!=null) {
                 ts.setAuthorName(hm1.get("authorName").toString());
             }
@@ -275,7 +278,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setRemark(remark);
         tf.setHours(hours);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
-        transactionService.updateTransaction(tf,selected.getId(),UserContextService.getAccessToken());
+        transactionService.updateTransaction(tf,selected.getUid(),UserContextService.getAccessToken());
     }
 
     public void createTransaction(){
