@@ -159,6 +159,9 @@ public Integer getCurrentMonth(){
             HashMap<String,Object> hm1 = (HashMap<String,Object>)al1.get(i);
             DeptTransactionLog ts = new DeptTransactionLog();
             ts.setId((Integer)hm1.get("id"));
+            if(hm1.get("uid") != null) {
+                ts.setUid(hm1.get("uid").toString());
+            }
             if(hm1.get("authorName")!=null) {
                 ts.setAuthorName(hm1.get("authorName").toString());
             }
