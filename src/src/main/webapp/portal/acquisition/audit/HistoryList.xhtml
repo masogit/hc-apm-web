@@ -80,7 +80,7 @@
 
                 </f:facet>
             </p:dataTable>
-            <p:overlayPanel appendTo="currentListForm" id="idPanelFilterApplicationDate" widgetVar="panelFilterApplicationDate" for="tab:currentListForm:datalist:filterApplicationDate" dismissable="false" >
+            <p:overlayPanel appendTo="historyListForm" id="idPanelFilterApplicationDate" widgetVar="panelFilterApplicationDate" for="tab:currentListForm:datalist:filterApplicationDate" dismissable="false" >
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>
                     <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varApplicationDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />

@@ -144,7 +144,7 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
 
     private Map<String, Object> initializeParams() {
         Map<String, Object> params = new HashMap<>();
-        params.put("userUid", loginUser.getUid());
+       /* params.put("userUid", loginUser.getUid());
         params.put("tenantUid", loginUser.getTenantUID());
         if (!org.springframework.util.CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
             params.put("assetInfoClinicalDeptUID", clinicalDeptOrgUidSetMVS.stream().toArray(String[]::new));
@@ -158,7 +158,7 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
         if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             params.put("assetInfoAssetType", encodedList.stream().toArray(String[]::new));
-        }
+        }*/
         return params;
     }
 

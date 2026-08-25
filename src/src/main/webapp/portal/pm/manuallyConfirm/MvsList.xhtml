@@ -182,7 +182,7 @@
                     <h:outputText value="#{item.confirmFLag ? '是' : '否'}"/>
                 </p:column>
                 <p:column headerText="#{msg.Operation}"  style="width: 100px" exportable="false">
-                    <p:commandButton id="deleteButton" icon="ui-icon-close" title="确认" actionListener="#{v2PmOrderMvsManuallyConfirmController.confirmPm(item.id)}" update=":datakist " disabled="#{item.confirmFLag}">
+                    <p:commandButton id="deleteButton" icon="ui-icon-close" title="确认" actionListener="#{v2PmOrderMvsManuallyConfirmController.confirmPm(item.id)}" update="mcTab:pmMvsListForm:datalist" disabled="#{item.confirmFLag}">
                         <p:confirm header="确认" message="是否关单确认？" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>
