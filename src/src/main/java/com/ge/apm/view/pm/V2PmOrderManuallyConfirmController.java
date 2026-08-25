@@ -186,9 +186,9 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        //this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
+        this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         filterArrayList.clear();
-      /*  if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+         if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
             List<String> selectedSiteList = ListUtil.newArrayList();
             for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
                 OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
@@ -198,7 +198,7 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
             filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
             filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
             filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-        }*/
+        }
         updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if (StringUtils.isNotEmpty(siteUidFilter)) {
@@ -212,7 +212,7 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
         }
 
         filterArrayList.addAll(searchFilters);
-      /*  if (!this.hasFilterOnField("assetInfo.siteUID")) {
+        if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -220,7 +220,7 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
             filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             filterArrayList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
             filterArrayList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
-        }*/
+        }
 
         // 资产分类权限
         if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
