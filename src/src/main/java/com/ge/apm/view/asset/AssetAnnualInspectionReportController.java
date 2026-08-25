@@ -130,7 +130,8 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
             wrapper.or().in("ai.site_uid", orgUidList);
             wrapper.or().in("ai.clinical_dept_uid", orgUidList);
         }
-        if (searchFilters != null) {
+        if (CollectionUtils.isNotEmpty(searchFilters)) {
+            wrapper.andNew();
             for (SearchFilter filter : searchFilters) {
                 switch (filter.fieldName){
                     case "assetName":

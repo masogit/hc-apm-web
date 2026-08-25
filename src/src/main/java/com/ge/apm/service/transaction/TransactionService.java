@@ -100,10 +100,10 @@ public HashMap<String,Object> getSummary(String from,String to,String token){
         }
     }
 
-    public String updateTransaction(TransactionForm formData,Integer userId,String token){
+    public String updateTransaction(TransactionForm formData, String uid, String token){
         HttpEntity<TransactionForm> requestEntity = new HttpEntity<TransactionForm>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.UPDATE_DEPTTRANSACTION_LOG);
-        gatewayURL = gatewayURL.replace("{id}",userId.toString());
+        gatewayURL = gatewayURL.replace("{uid}", uid);
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();

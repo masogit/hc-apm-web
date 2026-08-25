@@ -70,7 +70,7 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="报告到期时间" sortBy="#{item.expiryDate}" filterBy="#{item.effectiveTime}" filterMatchMode="EQ">
+                    <p:column headerText="报告到期时间" sortBy="#{item.expiryDate}" filterBy="#{item.expiryDate}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>
