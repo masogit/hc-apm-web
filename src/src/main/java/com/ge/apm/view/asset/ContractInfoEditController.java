@@ -365,6 +365,18 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 }
             }
         }
+        // 校验合同金额与台账设备金额合计是否一致
+        if (selected.getAmount() != null && selected.getAmount() > 0) {
+            double totalAmount = allItemList.stream()
+                    .filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType()))
+                    .filter(item -> item.getAmount() != null)
+                    .mapToDouble(ContractInfoItem::getAmount)
+                    .sum();
+
+            if (selected.getAmount().doubleValue() != totalAmount) {
+                WebUtil.addWarnMessage("合同金额与台账设备金额合计不一致，请确认。");
+            }
+        }
         boolean isEdit = selected.getId() == null ? false : true;
         if (!isEdit) {
             this.selected.setCreatedBy(currentUser.getUid());
