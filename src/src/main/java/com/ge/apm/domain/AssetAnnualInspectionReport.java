@@ -84,9 +84,6 @@ public class AssetAnnualInspectionReport implements Serializable {
     @Transient
     private String assetDeptName;
 
-    @Transient
-    private Boolean isUpdate;
-
     public Integer getNodeId() {
         return nodeId;
     }
@@ -286,14 +283,6 @@ public class AssetAnnualInspectionReport implements Serializable {
 
     public void setAssetDeptName(String assetDeptName) {
         this.assetDeptName = assetDeptName;
-    }
-
-    public Boolean getIsUpdate() {
-        return isUpdate;
-    }
-
-    public void setIsUpdate(Boolean isUpdate) {
-        this.isUpdate = isUpdate;
     }
 
     @Override
