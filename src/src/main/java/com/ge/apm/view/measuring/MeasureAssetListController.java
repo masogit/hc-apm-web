@@ -119,7 +119,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     @Getter
-    private int matchType=1;
+    private int matchType=9;
 
     @Getter
     @Setter
