@@ -61,4 +61,4 @@ WHERE sr.name IN ('AssetHead', 'AssetStaff')
 update shared_asset_req_detail  set  charging_begin_time = create_date  where  id in ('2c9b85829ff5fb8d019fff247d552896','2c9b85829ff5fb8d019fff23434b288f');
 
 
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 5, '', '', 'pmOrederManuallyConfirmFlag', '保养工单是否手动确认', false, true, '[{"key":"巡检","value":"1"},{"key":"二级保养","value":"2"},{"key":"三级保养","value":"3"},{"key":"质量控制","value":"4"}]', 8 where not exists(select * from config_item where key = 'pmOrederManuallyConfirmFlag')
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, validation, value_type )select replace(uuid_generate_v4()::text, '-', ''), 5, '', '保养工单是否手动确认', 'pmOrederManuallyConfirmFlag', '保养工单是否手动确认', 'f', 't', '[{"key":"巡检","value":"1"},{"key":"二级保养","value":"2"},{"key":"三级保养","value":"3"},{"key":"质量控制","value":"4"}]', 8 where not exists(select * from config_item where key = 'pmOrederManuallyConfirmFlag');
