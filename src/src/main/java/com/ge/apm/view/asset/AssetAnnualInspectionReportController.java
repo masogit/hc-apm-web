@@ -80,6 +80,8 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
     private AssetInfo detailAssetInfo;
     /** 详情页年检报告列表 */
     private List<AssetAnnualInspectionReport> detailReportList;
+    /** 到期过滤状态: 1-临期(3个月内), 2-逾期 */
+    private Integer expiryFilterStatus;
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetAnnualInspectionReportRepository.class);
@@ -213,6 +215,25 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
             }
         }else{
             wrapper.orderBy("aair.effective_time", false);
+        }
+        // 临期/逾期过滤
+        if (expiryFilterStatus != null) {
+            wrapper.andNew();
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date now = cal.getTime();
+            if (expiryFilterStatus == 1) {
+                // 临期: 今天 <= expiry_date <= 今天+90天
+                Date soon = org.apache.commons.lang3.time.DateUtils.addDays(now, 90);
+                wrapper.ge("aair.expiry_date", now);
+                wrapper.le("aair.expiry_date", soon);
+            } else if (expiryFilterStatus == 2) {
+                // 逾期: expiry_date < 今天
+                wrapper.lt("aair.expiry_date", now);
+            }
         }
         return wrapper;
     }
@@ -572,8 +593,38 @@ public class AssetAnnualInspectionReportController extends GenericCRUDUUIDContro
         return exportFile;
     }
 
+    public Integer getExpiryFilterStatus() {
+        return expiryFilterStatus;
+    }
+
+    public void setExpiryFilterStatus(Integer expiryFilterStatus) {
+        this.expiryFilterStatus = expiryFilterStatus;
+    }
+
+    public void toggleExpiryFilterStatus(Integer status) {
+        if (this.expiryFilterStatus != null && this.expiryFilterStatus.equals(status)) {
+            this.expiryFilterStatus = null;
+        } else {
+            this.expiryFilterStatus = status;
+        }
+    }
+
+    public void filterExpiredSoon() {
+        this.expiryFilterStatus = 1;
+    }
+
+    public void filterExpired() {
+        this.expiryFilterStatus = 2;
+    }
+
+    public void clearExpiryFilter() {
+        this.expiryFilterStatus = null;
+    }
+
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
         selectedOrg = (OrgInfo) eventObject;
     }
+
+
 }
