@@ -218,6 +218,12 @@
         <if test="intExtType != null">
             AND t.int_ext_type = #{intExtType}
         </if>
+          <if test="confirmFlag != null and confirmFlag == 'Y'">
+              AND t.confirm_flag = 'Y'
+          </if>
+          <if test="confirmFlag != null and confirmFlag == 'N'">
+              AND (t.confirm_flag = 'N' or t.confirm_flag IS NULL )
+          </if>
               AND a.is_valid
               AND NOT a.is_deleted
               AND (m1.mvs_ib_uid IS NOT NULL OR m1.e_home_ib_uid IS NOT NULL)

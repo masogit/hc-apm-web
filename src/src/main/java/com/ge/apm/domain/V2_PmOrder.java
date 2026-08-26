@@ -273,7 +273,7 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     private String siteName;
 
     @Column(name="confirm_fLag")
-    private Boolean confirmFLag = false;
+    private String confirmFlag;
 
     @Transient
     @JsonIgnore
@@ -942,11 +942,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
         this.travelTime = travelTime;
     }
 
-    public Boolean getConfirmFLag() {
-        return confirmFLag;
+    public String getConfirmFlag() {
+        return confirmFlag;
     }
 
-    public void setConfirmFLag(Boolean confirmFLag) {
-        this.confirmFLag = confirmFLag;
+    public void setConfirmFlag(String confirmFlag) {
+        this.confirmFlag = confirmFlag;
     }
 }

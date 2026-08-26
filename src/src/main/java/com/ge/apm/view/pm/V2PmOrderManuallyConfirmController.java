@@ -188,7 +188,7 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
         }
         this.updateSearchFilter(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID(), "1*"));
         filterArrayList.clear();
-         if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+        if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
             List<String> selectedSiteList = ListUtil.newArrayList();
             for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
                 OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
@@ -209,6 +209,19 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
         }
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
             filterArrayList.add((new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*")));
+        }
+        if(this.hasFilterOnField("confirmFlag")){
+            List<SearchFilter> ss = searchFilters.stream().filter(item -> "confirmFlag".equals(item.fieldName)).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(ss)){
+                SearchFilter searchFilter = ss.get(0);
+                if(searchFilter.value.equals("Y")){
+                    filterArrayList.add(new SearchFilter("confirmFlag", SearchFilter.Operator.EQ, "Y"));
+                }else {
+                    filterArrayList.add(new SearchFilter("confirmFlag", SearchFilter.Operator.EQ, "N", "1*4+"));
+                    filterArrayList.add(new SearchFilter("confirmFlag", SearchFilter.Operator.IsNull, "", "1*4+"));
+                }
+            }
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "confirmFlag".equals(item.fieldName)).collect(Collectors.toList()));
         }
 
         filterArrayList.addAll(searchFilters);
@@ -465,7 +478,7 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
 
     public void confirmPm(String id){
         V2_PmOrder pmOrder = dao.findById(id);
-        pmOrder.setConfirmFLag(true);
+        pmOrder.setConfirmFlag("Y");
         dao.save(pmOrder);
     }
 

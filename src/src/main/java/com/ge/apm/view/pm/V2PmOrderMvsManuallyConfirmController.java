@@ -227,6 +227,8 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
                     break;
                 case "intExtType":
                     params.put("intExtType", Integer.valueOf(searchFilter.value.toString()));
+                case "confirmFlag":
+                    params.put("confirmFlag", searchFilter.value);
                 default:
                     break;
             }
@@ -368,7 +370,7 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
 
     public void confirmPm(String id){
         V2_PmOrder pmOrder = dao.findById(id);
-        pmOrder.setConfirmFLag(true);
+        pmOrder.setConfirmFlag("Y");
         dao.save(pmOrder);
     }
 
