@@ -366,7 +366,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             }
         }
         // 校验合同金额与台账设备金额合计是否一致
-        if (selected.getAmount() != null && selected.getAmount() > 0) {
+        if (selected.getAmount() != null && selected.getAmount() > 0 && allItemList != null && !allItemList.isEmpty()) {
             double totalAmount = allItemList.stream()
                     .filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType()))
                     .filter(item -> item.getAmount() != null)

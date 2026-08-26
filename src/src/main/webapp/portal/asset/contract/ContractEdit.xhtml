@@ -514,8 +514,10 @@
                             <p:column headerText="#{msg.clinicalDeptName}">
                                 <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
                             </p:column>
-                            <p:column headerText="金额">
-                                <h:outputText value="#{item.amount}" />
+                            <p:column headerText="维保金额（元）">
+                                <h:outputText value="#{item.amount}" >
+                                        <f:convertNumber maxFractionDigits="2"  minFractionDigits="2" />
+                                </h:outputText>
                             </p:column>
 
                             <p:column width="140" >
@@ -596,7 +598,7 @@
                         <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedItem.assetInfo.clinicalDeptName}" disabled="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">金额</label>
+                        <label class="label">维保金额（元）</label>
                         <p:inputNumber decimalPlaces="2" value="#{contractInfoEditController.selectedItem.amount}" minValue="0">
                         </p:inputNumber>
                     </h:panelGroup>
