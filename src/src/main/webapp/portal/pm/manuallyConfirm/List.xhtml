@@ -181,7 +181,7 @@
                     <h:outputText value="#{item.confirmFlag == 'Y' ? '是' : '否'}"/>
                 </p:column>
                 <p:column headerText="#{msg.Operation}"  style="width: 100px" exportable="false">
-                    <p:commandButton  value="确认" actionListener="#{v2PmOrderManuallyConfirmController.confirmPm(item.id)}" update="mcTab:pmOrderListForm:datalist " disabled="#{item.confirmFlag or v2PmOrderManuallyConfirmController.showDisabled(item.ruleLevel)}">
+                    <p:commandButton  value="确认" actionListener="#{v2PmOrderManuallyConfirmController.confirmPm(item.id)}" update="mcTab:pmOrderListForm:datalist " disabled="#{item.confirmFlag  eq 'Y' or v2PmOrderManuallyConfirmController.showDisabled(item.ruleLevel)}">
                         <p:confirm header="确认" message="是否关单确认？" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>
