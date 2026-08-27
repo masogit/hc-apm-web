@@ -65,7 +65,7 @@
         mcd.created_by as upload_user_id,
         mcd.certificate_type,
         mcd.validity_months,
-        ROUND(ai.metering_cycle / 12.0, 1) as measure_cycle,
+        ai.metering_cycle as measure_cycle,
         ua.name as upload_user_name,
         case when o.cu is not null then '是' else '否' end as exist_file_flag
         FROM asset_info ai

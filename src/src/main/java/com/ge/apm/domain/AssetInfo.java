@@ -3611,13 +3611,13 @@ public class AssetInfo implements ChineseName, Serializable {
 
     @Transient
     @TableField(exist = false)
-    private Double measureCycle;
+    private Integer measureCycle;
 
-    public Double getMeasureCycle() {
+    public Integer getMeasureCycle() {
         return measureCycle;
     }
 
-    public void setMeasureCycle(Double measureCycle) {
+    public void setMeasureCycle(Integer measureCycle) {
         this.measureCycle = measureCycle;
     }
 

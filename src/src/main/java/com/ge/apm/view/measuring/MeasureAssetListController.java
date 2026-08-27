@@ -477,7 +477,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
         if(this.hasFilterOnField("measureCycle")){
             String measureCycleVal = searchFilters.stream().filter(sf -> "measureCycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("measureCycle", SearchFilter.Operator.EQ, 0)).value.toString();
-            wrapper.eq("ai.metering_cycle", (int)(Double.parseDouble(measureCycleVal) * 12));
+            wrapper.eq("ai.metering_cycle",Integer.valueOf(measureCycleVal));
         }
         if(this.hasFilterOnField("certificateType")){
             Optional<SearchFilter> first = searchFilters.stream().filter(sf -> "certificateType".equals(sf.fieldName)).findFirst();
