@@ -220,7 +220,7 @@
                         <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm"  >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType==1}" >
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType!=3}" >
                             <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export" postProcessor="#{measureAssetListController.postProcessorExcel}" />
                         </p:commandButton>
 
