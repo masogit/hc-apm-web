@@ -400,6 +400,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         por.setOwnerId(user.getId());
         por.setPeriod(1);
         por.setPeriodUnit("m");//默认一个月
+        por.setIsScheduleType(0);//默认非定时周期
     }
 
     public void resetNewObject() {
@@ -432,6 +433,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Transactional
     public void applyChange() {
         selected.setPeriod(getPeriod());
+        // 校验定时周期配置
+        if (!validateScheduleConfig()) {
+            return;
+        }
         if (selected.getId() != null) {
             onBeforeSave(selected.getUid(),deletedCheckListIds);
         }
@@ -1078,5 +1083,86 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void setSelectedMap(Map<String, Boolean> selectedMap) {
         this.selectedMap = selectedMap;
+    }
+
+    /**
+     * 获取1-31天的列表
+     */
+    public List<Integer> getMonthDays() {
+        List<Integer> days = new ArrayList<>();
+        for (int i = 1; i <= 31; i++) {
+            days.add(i);
+        }
+        return days;
+    }
+
+    /**
+     * 获取1-12月的列表
+     */
+    public List<Integer> getMonths() {
+        List<Integer> months = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            months.add(i);
+        }
+        return months;
+    }
+
+    /**
+     * 校验定时周期配置
+     */
+    public boolean validateScheduleConfig() {
+        if (selected == null) {
+            return true;
+        }
+        // 如果选择了定时周期
+        if (selected.getIsScheduleType() != null && selected.getIsScheduleType() == 1) {
+            // 校验首次生成工单日期
+            if (selected.getFirstGenerateDate() == null) {
+                WebUtil.addErrorMessage("首次生成工单日期不能为空");
+                return false;
+            }
+            // 校验首次生成工单日期 >= 当前日期
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date today = cal.getTime();
+            if (selected.getFirstGenerateDate().before(today)) {
+                WebUtil.addErrorMessage("首次生成工单日期必须大于等于当前日期");
+                return false;
+            }
+            // 根据周期单位校验
+            String periodUnit = selected.getPeriodUnit();
+            if ("w".equals(periodUnit)) {
+                if (selected.getScheduleDay() == null) {
+                    WebUtil.addErrorMessage("周几不能为空");
+                    return false;
+                }
+            } else if ("m".equals(periodUnit)) {
+                if (selected.getScheduleDay() == null) {
+                    WebUtil.addErrorMessage("每月几号不能为空");
+                    return false;
+                }
+            } else if ("y".equals(periodUnit)) {
+                if (selected.getScheduleMonth() == null) {
+                    WebUtil.addErrorMessage("每年几月不能为空");
+                    return false;
+                }
+                if (selected.getScheduleDay() == null) {
+                    WebUtil.addErrorMessage("每月几号不能为空");
+                    return false;
+                }
+            } else if ("d".equals(periodUnit)) {
+                WebUtil.addErrorMessage("日周期暂不支持定时周期配置");
+                return false;
+            }
+            // 校验预计完成天数
+            if (selected.getCompletionDays() == null || selected.getCompletionDays() <= 0) {
+                WebUtil.addErrorMessage("预计完成天数必须大于0");
+                return false;
+            }
+        }
+        return true;
     }
 }
