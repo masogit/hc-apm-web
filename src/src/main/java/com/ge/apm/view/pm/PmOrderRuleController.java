@@ -277,6 +277,18 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
                 }
             }
         }
+        if (hasFilterOnField("isScheduleType")) {
+            String value = searchFilters.stream().filter(item -> item.fieldName.equals("isScheduleType")).map(item -> (String) item.value).findAny().orElse("");
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "isScheduleType".equals(item.fieldName)).collect(Collectors.toList()));
+            if (StrUtil.isNotEmpty(value)) {
+                if ("0".equals(value)) {
+                    searchFilters.add(new SearchFilter("isScheduleType", SearchFilter.Operator.IsNull, "","1*2+"));
+                    searchFilters.add(new SearchFilter("isScheduleType", SearchFilter.Operator.EQ, 0,"1*2+"));
+                } else  {
+                    searchFilters.add(new SearchFilter("isScheduleType", SearchFilter.Operator.EQ, 1));
+                }
+            }
+        }
     }
 
     public List<UserAccount> getOwnerList(){
@@ -1128,10 +1140,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MILLISECOND, 0);
             Date today = cal.getTime();
-            if (selected.getFirstGenerateDate().before(today)) {
-                WebUtil.addErrorMessage("首次生成工单日期必须大于等于当前日期");
-                return false;
-            }
+//            if (selected.getFirstGenerateDate().before(today)) {
+//                WebUtil.addErrorMessage("首次生成工单日期必须大于等于当前日期");
+//                return false;
+//            }
             // 根据周期单位校验
             String periodUnit = selected.getPeriodUnit();
             if ("w".equals(periodUnit)) {
