@@ -101,8 +101,11 @@
         <if test="ownerName != null">
             AND t.owner_name like CONCAT('%', #{ownerName}, '%')
         </if>
-        <if test="currentStepName1 != null">
+        <if test='currentStepName1 != null and currentStepName1 != "已计划" ' >
             AND t.current_step_name like CONCAT('%', #{currentStepName1}, '%')
+        </if>
+        <if test='currentStepName1 != null and currentStepName1 == "已计划" ' >
+            AND (t.current_step_name  = '已计划' or t.current_step_name = '进行中')
         </if>
         <if test="intExtType != null">
             AND t.int_ext_type = #{intExtType}
