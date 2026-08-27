@@ -380,9 +380,8 @@ public class MeasuringService {
             }
             //目标设备的所有计量记录中计量日期最大的记录
             MeasuringCertificateDetail needUpdateAssetMcd = allMcdList.get(0);
-            // 校准证书(certificateType=2)不填入"建议下次计量日期"
-            Date nextMeteringDate = Integer.valueOf(2).equals(needUpdateAssetMcd.getCertificateType())
-                    ? null : needUpdateAssetMcd.getValidDateTo();
+
+            Date nextMeteringDate =  needUpdateAssetMcd.getValidDateTo();
             Date checkDate = needUpdateAssetMcd.getCheckDate();
             TenantInfo tenantInfo = tenantInfoDao.findByuid(tempAssetInfo.getTenantUID());
             if("4".equals(tenantInfo.getCustomTenant())){
