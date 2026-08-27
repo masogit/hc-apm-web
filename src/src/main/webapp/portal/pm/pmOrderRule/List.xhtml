@@ -141,6 +141,16 @@
                         </f:facet>
                         <h:outputText value="#{empty item.performanceReport ? '未配置' : '已配置'}"/>
                     </p:column>
+                    <p:column headerText="周期"  filterBy="#{item.isScheduleType}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="循环周期" itemValue="0"  />
+                                <f:selectItem itemLabel="定时周期" itemValue="1" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.isScheduleType == 1 ? '定时周期' : '循环周期'}"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareCreate}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"/>
                         <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"/>

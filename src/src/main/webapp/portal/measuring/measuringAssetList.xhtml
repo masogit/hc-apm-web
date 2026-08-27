@@ -110,7 +110,7 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
-                    <p:column rendered="#{measureAssetListController.matchType!=3 and measureAssetListController.displayMeasureCycle}" headerText="计量周期(年)" filterBy="#{item.measureCycle}" filterMatchMode="EQ">
+                    <p:column rendered="#{measureAssetListController.matchType!=3 and measureAssetListController.displayMeasureCycle}" headerText="计量周期(月)" filterBy="#{item.measureCycle}" filterMatchMode="EQ">
                         <h:outputText value="#{item.measureCycle}"/>
                     </p:column>
                  
