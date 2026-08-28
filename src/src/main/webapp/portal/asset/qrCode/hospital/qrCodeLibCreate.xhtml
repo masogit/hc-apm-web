@@ -34,7 +34,7 @@
                     <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
                     <br/>
                     <br/>
-                    <p:commandButton value="#{msg.ConfirmCreate}"  validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
+                    <p:commandButton value="#{msg.ConfirmCreate}"  validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :overlayPanelForm:overlayPanelGroup :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
                     <br/>
                 </h:panelGroup>
             </h:form>
