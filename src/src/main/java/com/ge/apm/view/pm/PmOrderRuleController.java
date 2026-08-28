@@ -1165,10 +1165,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
                     WebUtil.addErrorMessage("每月几号不能为空");
                     return false;
                 }
-            } else if ("d".equals(periodUnit)) {
-                WebUtil.addErrorMessage("日周期暂不支持定时周期配置");
-                return false;
             }
+//            else if ("d".equals(periodUnit)) {
+//                WebUtil.addErrorMessage("日周期暂不支持定时周期配置");
+//                return false;
+//            }
             // 校验预计完成天数
             if (selected.getCompletionDays() == null || selected.getCompletionDays() <= 0) {
                 WebUtil.addErrorMessage("预计完成天数必须大于0");

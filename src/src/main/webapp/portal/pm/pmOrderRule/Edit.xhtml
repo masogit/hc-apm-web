@@ -153,9 +153,9 @@
                             <p:inputNumber value="#{pmOrderRuleController.selected.completionDays}" minValue="1" maxValue="365" decimalPlaces="0" 
                                            required="#{pmOrderRuleController.selected.isScheduleType == 1}" requiredMessage="预计完成天数 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'd'}">
-                            <p:outputLabel style="color: red;" value="日周期暂不支持定时周期配置"/>
-                        </h:panelGroup>
+<!--                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'd'}">-->
+<!--                            <p:outputLabel style="color: red;" value="日周期暂不支持定时周期配置"/>-->
+<!--                        </h:panelGroup>-->
                         <h:panelGroup rendered="#{!pmOrderRuleController.getPmRule()}">
                             <label class ="label">#{msg.ruleLevel}*</label>
                             <p:selectOneMenu value="#{pmOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}" >
