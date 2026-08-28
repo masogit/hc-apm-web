@@ -199,7 +199,7 @@
                            <p:menuitem fragment="um307" id="um307" value="#{msg.ElectricSafetyDataImport}" outcome="/portal/electricSafety/measureElectricSafetyMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ELECTRIC_IMPORT')}"/>
                            <p:menuitem fragment="um308" id="um308" value="#{msg.ReportTemplateManagement}" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_REPORT_VIEW')}"/>
                            <p:menuitem fragment="um309" id="um309" value="#{msg.ReportFormTemplateManagement}" outcome="/portal/pm/pmOrderReportTemplate/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_TEMPLATE_VIEW')}"/>
-                           <p:menuitem fragment="um309" id="um309" value="保养工单确认列表" outcome="/portal/pm/manuallyConfirm/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_CONFIRM_VIEW') or userContextService.accessContainsFunctionMenu('MAINTAIN_TEMPLATE_EDIT')}"/>
+                           <p:menuitem fragment="um309" id="um309" value="保养工单确认" outcome="/portal/pm/manuallyConfirm/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_CONFIRM_VIEW') or userContextService.accessContainsFunctionMenu('MAINTAIN_CONFIRM_EDIT')}"/>
                        </p:submenu>
                    </c:when>
                    <c:when test="#{item eq 'BUDGET'}">

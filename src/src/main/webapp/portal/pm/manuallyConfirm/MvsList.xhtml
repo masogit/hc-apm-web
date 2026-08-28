@@ -26,8 +26,8 @@
                     <p:ajax event="rowSelect" listener="#{v2PmOrderMvsManuallyConfirmController.onSelectPmOrder()}" update="mcTab:pmMvsOrderDetailForm @(.coworkcls) @(.btn-export-maintenance-report)"/>
                 </c:if>
 -->
-                <p:ajax event="filter" listener="#{v2PmOrderMvsManuallyConfirmController.onFilter}" update="datalist  @(.pmOrderDetailFormCls)" oncomplete="updateSelectAllCheckBox();"/>
-                <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                <p:ajax event="filter" listener="#{v2PmOrderMvsManuallyConfirmController.onFilter}" update="datalist  @(.pmOrderDetailFormCls)" />
+                <p:ajax event="page"  />
                <!-- <p:column width="36" exportable="false">
                     <p:selectBooleanCheckbox  value="#{v2PmOrderMvsManuallyConfirmController.selectedMap[item.id]}"  class="selectCheckBox">
                         <p:ajax process="@this" listener="#{v2PmOrderMvsManuallyConfirmController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.exportExcelBtn) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn) @(.downloadConfirm)" oncomplete="updateSelectAllCheckBox();" />
@@ -178,11 +178,18 @@
                     </f:facet>
                     <h:outputText value="#{empty item.mainSub?'':'main'.equals(item.mainSub)?'主工单':'子工单'}" />
                 </p:column>
-                <p:column headerText="是否确认" >
-                    <h:outputText value="#{item.confirmFLag ? '是' : '否'}"/>
+                <p:column headerText="是否确认" filterBy="#{msg.confirmFlag}" filterMatchMode="EQ" >
+                    <f:facet name="filter">
+                        <p:selectOneMenu  onchange="PF('varDataListgl').filter()" >
+                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                            <f:selectItem itemLabel="是" itemValue="Y" />
+                            <f:selectItem itemLabel="否" itemValue="N" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.confirmFlag == 'Y' ? '是' : '否'}"/>
                 </p:column>
                 <p:column headerText="#{msg.Operation}"  style="width: 100px" exportable="false">
-                    <p:commandButton id="deleteButton" icon="ui-icon-close" title="确认" actionListener="#{v2PmOrderMvsManuallyConfirmController.confirmPm(item.id)}" update=":datakist " disabled="#{item.confirmFLag}">
+                    <p:commandButton value="确认" actionListener="#{v2PmOrderMvsManuallyConfirmController.confirmPm(item.id)}" update="mcTab:pmMvsListForm:datalist"  disabled="#{item.confirmFlag eq 'Y' or v2PmOrderMvsManuallyConfirmController.showDisabled(item.ruleLevel)}">
                         <p:confirm header="确认" message="是否关单确认？" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>

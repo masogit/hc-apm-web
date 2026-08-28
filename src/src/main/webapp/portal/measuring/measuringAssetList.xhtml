@@ -110,7 +110,10 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
-                    <p:column rendered="#{measureAssetListController.matchType!=3 and measureAssetListController.displayMeasureCycle}" headerText="计量周期(年)" filterBy="#{item.measureCycle}" filterMatchMode="EQ">
+                    <p:column rendered="#{measureAssetListController.matchType!=3 and measureAssetListController.displayMeasureCycle}" headerText="计量周期(月)" filterBy="#{item.measureCycle}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:inputText type="number" onkeyup="PF('varDataList_measuringAsset').filter()"/>
+                        </f:facet>
                         <h:outputText value="#{item.measureCycle}"/>
                     </p:column>
                  
@@ -220,7 +223,7 @@
                         <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"  actionListener="#{measureAssetListController.delete()}" update="measuringTab:measuringAssetListForm"  >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType==1}" >
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false"  rendered="#{measureAssetListController.matchType!=3}" >
                             <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export" postProcessor="#{measureAssetListController.postProcessorExcel}" />
                         </p:commandButton>
 

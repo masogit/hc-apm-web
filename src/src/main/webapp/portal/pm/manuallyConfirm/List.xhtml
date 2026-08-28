@@ -170,11 +170,18 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
-                <p:column headerText="是否确认" >
-                    <h:outputText value="#{item.confirmFLag ? '是' : '否'}"/>
+                <p:column headerText="是否确认" filterBy="#{item.confirmFlag}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu  onchange="PF('varDataListgl').filter()" >
+                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                            <f:selectItem itemLabel="是" itemValue="Y" />
+                            <f:selectItem itemLabel="否" itemValue="N" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.confirmFlag == 'Y' ? '是' : '否'}"/>
                 </p:column>
                 <p:column headerText="#{msg.Operation}"  style="width: 100px" exportable="false">
-                    <p:commandButton  value="确认" actionListener="#{v2PmOrderManuallyConfirmController.confirmPm(item.id)}" update="mcTab:pmOrderListForm:datalist " disabled="#{item.confirmFLag}">
+                    <p:commandButton  value="确认" actionListener="#{v2PmOrderManuallyConfirmController.confirmPm(item.id)}" update="mcTab:pmOrderListForm:datalist " disabled="#{item.confirmFlag  eq 'Y' or v2PmOrderManuallyConfirmController.showDisabled(item.ruleLevel)}">
                         <p:confirm header="确认" message="是否关单确认？" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </p:column>

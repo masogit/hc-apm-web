@@ -1005,9 +1005,17 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'spare10')}">
         <h:panelGroup >
             <label class="label">#{msg.spare10}</label>
-            <p:inputText id="spare10" value="#{assetInfoEditController.selected.spare10}" disabled="#{!assetInfoEditController.needEdit('spare10')}">
+            <p:inputText id="spare10" value="#{assetInfoBulkEditController.selected.spare10}" disabled="#{!assetInfoBulkEditController.needEdit('spare10')}">
                 <p:ajax />
             </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'meteringCycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.meteringCycle}</label>
+            <p:inputNumber id="meteringCycle" minValue="0" decimalPlaces="0" value="#{assetInfoBulkEditController.selected.meteringCycle}" disabled="#{!assetInfoBulkEditController.needEdit('meteringCycle')}">
+                <p:ajax />
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
 </ui:composition>

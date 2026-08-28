@@ -34,7 +34,7 @@
         <result property="parentWoId" column="parent_wo_id"/>
         <result property="mainSub" column="main_sub"/>
         <result property="issueType" column="issue_type"/>
-        <result property="confirmFLag" column="confirm_fLag"/>
+        <result property="confirmFlag" column="confirm_fLag"/>
 
         <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
             <id property="uid" column="asset_uid"/>
@@ -217,6 +217,12 @@
         </if>
         <if test="intExtType != null">
             AND t.int_ext_type = #{intExtType}
+        </if>
+        <if test='confirmFlag != null and confirmFlag == "Y"'>
+            AND t.confirm_flag = 'Y'
+        </if>
+        <if test='confirmFlag != null and confirmFlag == "N"'>
+            AND (t.confirm_flag = 'N' or t.confirm_flag IS NULL )
         </if>
               AND a.is_valid
               AND NOT a.is_deleted

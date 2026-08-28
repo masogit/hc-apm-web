@@ -46,6 +46,7 @@
                            <label class="label">启用日期开始</label>
                            <p:calendar  timeZone="GMT+8" id="startDate" pattern="yyyy/MM/dd" mask="true" value="#{relRuleAssetController.queryAsset.startInstallDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
                                <p:ajax event="dateSelect" process="@this" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"></p:ajax>
+                               <p:ajax event="valueChange" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
 
                            </p:calendar>
                        </h:panelGroup>
@@ -53,6 +54,7 @@
                            <label class="label">启用日期结束</label>
                            <p:calendar  timeZone="GMT+8" id="endDate" pattern="yyyy/MM/dd" mask="true" value="#{relRuleAssetController.queryAsset.endInstallDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
                                <p:ajax event="dateSelect" process="@this" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"></p:ajax>
+                               <p:ajax event="valueChange" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                            </p:calendar>
                        </h:panelGroup>
 
@@ -60,6 +62,7 @@
                            <label class="label">采购日期开始</label>
                            <p:calendar  timeZone="GMT+8"  pattern="yyyy/MM/dd" mask="true" value="#{relRuleAssetController.queryAsset.purchaseDateStart}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
                                <p:ajax event="dateSelect" process="@this" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"></p:ajax>
+                               <p:ajax event="valueChange" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
 
                            </p:calendar>
                        </h:panelGroup>
@@ -67,6 +70,7 @@
                            <label class="label">采购日期结束</label>
                            <p:calendar  timeZone="GMT+8"  pattern="yyyy/MM/dd" mask="true" value="#{relRuleAssetController.queryAsset.purchaseDateEnd}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}">
                                <p:ajax event="dateSelect" process="@this" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"></p:ajax>
+                               <p:ajax event="valueChange" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                            </p:calendar>
                        </h:panelGroup>
 
@@ -78,7 +82,7 @@
                                            forceSelection="true" completeMethod="#{relRuleAssetController.getClinicalDeptList}"
                                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" >
                                <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
-                               <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                               <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                            </p:autoComplete>
 
                        </h:panelGroup>
@@ -89,7 +93,7 @@
                                            forceSelection="true" completeMethod="#{relRuleAssetController.getClinicalDeptList}"
                                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" >
                                <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
-                               <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                               <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                            </p:autoComplete>
 
                        </h:panelGroup>
@@ -114,7 +118,7 @@
                                              forceSelection="true" required="false" requiredMessage="" completeMethod="#{relRuleAssetController.getSupplier}"
                                              var="t" itemLabel="#{t}" itemValue="#{t}">
                                  <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
-                                 <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                                 <p:ajax process="@this" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                              </p:autoComplete>
 
 		                 </h:panelGroup>
@@ -213,13 +217,15 @@
                        <h:panelGroup rendered="#{relRuleAssetController.enableWarrantyDateSearch}">
                            <label class ="label">#{msg.warrantyDateStart}</label>
                            <p:calendar timeZone="GMT+8" id="warrantyDateStart" pattern="yyyy/MM/dd" mask="true" navigator="true" value="#{relRuleAssetController.queryAsset.warrantyDateStart}" showOn="button" showButtonPanel="true" >
-                               <p:ajax event="dateSelect" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this"/>
+                               <p:ajax event="dateSelect" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
+                               <p:ajax event="valueChange" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                            </p:calendar>
                        </h:panelGroup>
                        <h:panelGroup rendered="#{relRuleAssetController.enableWarrantyDateSearch}">
                            <label class ="label">#{msg.warrantyDateEnd}</label>
                            <p:calendar timeZone="GMT+8" id="warrantyDateEnd" pattern="yyyy/MM/dd" mask="true" navigator="true" value="#{relRuleAssetController.queryAsset.warrantyDateEnd}" showOn="button" showButtonPanel="true" >
-                               <p:ajax event="dateSelect" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this"/>
+                               <p:ajax event="dateSelect" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
+                               <p:ajax event="valueChange" listener="#{relRuleAssetController.addFilter}" update="AssetsPickList" process="@this" oncomplete="clinicalDeptNameComplete(xhr, status, args)"/>
                            </p:calendar>
                        </h:panelGroup>
                    </p:panelGrid>

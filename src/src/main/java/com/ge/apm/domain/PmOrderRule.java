@@ -98,6 +98,22 @@ public class PmOrderRule implements Serializable{
     @Column(name = "default_work_hours")
     private Double defaultWorkHours;
 
+    @Column(name = "is_schedule_type")
+    private Integer isScheduleType;//0、普通周期 1、定时周期
+
+	@Temporal(TemporalType.DATE)
+    @Column(name = "first_generate_date")
+    private Date firstGenerateDate;//首次生成工单日期
+
+    @Column(name = "schedule_day")
+    private Integer scheduleDay;//定时日（周几1-7，或每月几号1-31）
+
+    @Column(name = "schedule_month")
+    private Integer scheduleMonth;//定时月（仅年周期使用，1-12）
+
+    @Column(name = "completion_days")
+    private Integer completionDays;//预计完成天数
+
     public Double getDefaultWorkHours() {
         return defaultWorkHours;
     }
@@ -297,7 +313,47 @@ public class PmOrderRule implements Serializable{
 	public void setSiteUID(String siteUID) {
 		this.siteUID = siteUID;
 	}
-	
+
+	public Integer getIsScheduleType() {
+		return isScheduleType;
+	}
+
+	public void setIsScheduleType(Integer isScheduleType) {
+		this.isScheduleType = isScheduleType;
+	}
+
+	public Date getFirstGenerateDate() {
+		return firstGenerateDate;
+	}
+
+	public void setFirstGenerateDate(Date firstGenerateDate) {
+		this.firstGenerateDate = firstGenerateDate;
+	}
+
+	public Integer getScheduleDay() {
+		return scheduleDay;
+	}
+
+	public void setScheduleDay(Integer scheduleDay) {
+		this.scheduleDay = scheduleDay;
+	}
+
+	public Integer getScheduleMonth() {
+		return scheduleMonth;
+	}
+
+	public void setScheduleMonth(Integer scheduleMonth) {
+		this.scheduleMonth = scheduleMonth;
+	}
+
+	public Integer getCompletionDays() {
+		return completionDays;
+	}
+
+	public void setCompletionDays(Integer completionDays) {
+		this.completionDays = completionDays;
+	}
+
     @Override
     public int hashCode() {
         int hash = 0;

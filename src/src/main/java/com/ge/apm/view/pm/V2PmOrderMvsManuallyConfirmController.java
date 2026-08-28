@@ -1,5 +1,7 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.dao.mapper.MvsPmOrderMapper;
@@ -76,6 +78,9 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
     private String plannedCompletionTimeFormat = null;
     @Getter @Setter
     private String actualCompletionTimeFormat = null;
+    @Setter @Getter
+    List<Map<String, String>> customMap = new ArrayList<>();
+
 
     @Override
     protected void init() {
@@ -94,7 +99,13 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
 
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
         this.selectedMap = new HashMap();
-
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(
+                loginUser.getSiteUID(), loginUser.getHospitalUID(),
+                loginUser.getInstitutionUID(), loginUser.getTenantUID(),
+                "pmOrederManuallyConfirmFlag");
+        if(StringUtils.isNotBlank(value)){
+            customMap = JSON.parseObject(value, new TypeReference<List<Map<String,String>>>(){});
+        }
     }
 
     @Override
@@ -144,7 +155,7 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
 
     private Map<String, Object> initializeParams() {
         Map<String, Object> params = new HashMap<>();
-        params.put("userUid", loginUser.getUid());
+       params.put("userUid", loginUser.getUid());
         params.put("tenantUid", loginUser.getTenantUID());
         if (!org.springframework.util.CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
             params.put("assetInfoClinicalDeptUID", clinicalDeptOrgUidSetMVS.stream().toArray(String[]::new));
@@ -227,6 +238,8 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
                     break;
                 case "intExtType":
                     params.put("intExtType", Integer.valueOf(searchFilter.value.toString()));
+                case "confirmFlag":
+                    params.put("confirmFlag", searchFilter.value);
                 default:
                     break;
             }
@@ -238,7 +251,17 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
         params.put("currentStepName",strArray);
     }
 
-
+    public Boolean showDisabled(Integer ruleLevel){
+        if(ruleLevel == null){
+            return true;
+        }
+        for(Map<String, String> map : customMap){
+            if(map.get("value").equals(ruleLevel.toString())){
+                return false;
+            }
+        }
+        return true;
+    }
 
     private void loadMVSClinicalDeptList() {
         try {
@@ -368,7 +391,7 @@ public class V2PmOrderMvsManuallyConfirmController extends GenericCRUDUUIDContro
 
     public void confirmPm(String id){
         V2_PmOrder pmOrder = dao.findById(id);
-        pmOrder.setConfirmFLag(true);
+        pmOrder.setConfirmFlag("Y");
         dao.save(pmOrder);
     }
 

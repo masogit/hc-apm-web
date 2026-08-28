@@ -131,6 +131,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     @Getter
     @Setter
     private StreamedContent attachListFile;
+    @Getter
+    @Setter
+    private ContractInfoItem selectedItem;
 
     @Override
     protected void init() {
@@ -362,6 +365,18 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 }
             }
         }
+        // 校验合同金额与台账设备金额合计是否一致
+        if (selected.getAmount() != null && selected.getAmount() > 0 && allItemList != null && !allItemList.isEmpty()) {
+            double totalAmount = allItemList.stream()
+                    .filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType()))
+                    .filter(item -> item.getAmount() != null)
+                    .mapToDouble(ContractInfoItem::getAmount)
+                    .sum();
+
+            if (selected.getAmount().doubleValue() != totalAmount) {
+                WebUtil.addWarnMessage("合同金额与台账设备金额合计不一致，请确认。");
+            }
+        }
         boolean isEdit = selected.getId() == null ? false : true;
         if (!isEdit) {
             this.selected.setCreatedBy(currentUser.getUid());
@@ -502,6 +517,18 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             //contractItemDao.delete(item);
             //removedItemList.add(item);
         }
+    }
+
+    public void modifyContractItem(ContractInfoItem item) {
+        selectedItem = item;
+    }
+
+    public void saveModifyAssetItem(){
+        contractItemDao.save(selectedItem);
+    }
+
+    public void cancelModifyAssetItem(){
+        selectedItem = null;
     }
 
     public boolean canRemovePucheseItem(ContractInfoItem contractItem) {

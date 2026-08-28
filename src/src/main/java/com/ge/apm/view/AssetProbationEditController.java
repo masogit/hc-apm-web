@@ -144,7 +144,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setCreatedBy(loginUser.getName());
             this.selected.setCreatedDate(now);
         }
-        if (this.selected.getStatus() == 0 || action == -11) {
+        if (this.selected.getStatus() == 0 || this.selected.getStatus() == 1 || action == -11) {
             if (ObjectUtil.isNotEmpty(deptContact)) {
                 this.selected.setDeptContactUid(deptContact.getUid());
                 this.selected.setDeptContactName(deptContact.getName());
@@ -234,7 +234,8 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 }
                 if (ObjectUtil.isNotEmpty(informationList)) {
                     this.selected.setInformation(String.join(",", informationList));
-                }                sendMsgUserUid = probationConfirmor.getUid();
+                }
+                sendMsgUserUid = probationConfirmor.getUid();
                 eventParams.put("currentPerson", probationConfirmor.getName());
                 eventParams.put("content", "您有新的设备试用工单需要确认试用");
                 break;

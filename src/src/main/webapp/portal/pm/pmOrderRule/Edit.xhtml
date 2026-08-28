@@ -82,6 +82,7 @@
                         <h:panelGroup >
                             <label class ="label">#{msg.cyclePeriodUnit} *</label>
                             <p:selectOneMenu  value="#{pmOrderRuleController.selected.periodUnit}" required="true" style="max-width: 150px;" >
+                                <p:ajax update="scheduleConfigPanel" process="@this"/>
 <!--                                <f:selectItem itemLabel="年" itemValue="y"/>-->
 <!--                                <f:selectItem itemLabel="月" itemValue="m"/>-->
 <!--                                <f:selectItem itemLabel="周" itemValue="w"/>-->
@@ -92,6 +93,68 @@
                         <h:panelGroup >
                             <label class ="label">#{msg.feedbackComment}</label>
                             <p:inputText id="remark" value="#{pmOrderRuleController.selected.remark}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <!-- 定时周期配置 -->
+                        <h:panelGroup>
+                            <label class="label">定时周期</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.isScheduleType}">
+                                <f:selectItem itemLabel="否" itemValue="0"/>
+                                <f:selectItem itemLabel="是" itemValue="1"/>
+                                <p:ajax update="scheduleConfigPanel" process="@this"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup/>
+                    </p:panelGrid>
+                    <!-- 定时周期详细配置 -->
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="scheduleConfigPanel">
+                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1}">
+                            <label class="label">首次生成工单日期 *</label>
+                            <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{pmOrderRuleController.selected.firstGenerateDate}" 
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"
+                                        required="#{pmOrderRuleController.selected.isScheduleType == 1}" requiredMessage="首次生成工单日期 #{msg.ValidationRequire}">
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'w'}">
+                            <label class="label">周几 *</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.scheduleDay}" required="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'w'}" requiredMessage="周几 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="周一" itemValue="1"/>
+                                <f:selectItem itemLabel="周二" itemValue="2"/>
+                                <f:selectItem itemLabel="周三" itemValue="3"/>
+                                <f:selectItem itemLabel="周四" itemValue="4"/>
+                                <f:selectItem itemLabel="周五" itemValue="5"/>
+                                <f:selectItem itemLabel="周六" itemValue="6"/>
+                                <f:selectItem itemLabel="周日" itemValue="7"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'm'}">
+                            <label class="label">每月几号 *</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.scheduleDay}" required="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'm'}" requiredMessage="每月几号 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getMonthDays()}" var="day" itemLabel="#{day}号" itemValue="#{day}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'y'}">
+                            <label class="label">每年几月 *</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.scheduleMonth}" required="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'y'}" requiredMessage="每年几月 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getMonths()}" var="month" itemLabel="#{month}月" itemValue="#{month}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'y'}">
+                            <label class="label">每月几号 *</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.scheduleDay}" required="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'y'}" requiredMessage="每月几号 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getMonthDays()}" var="day" itemLabel="#{day}号" itemValue="#{day}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1}">
+                            <label class="label">预计完成天数 *</label>
+                            <p:inputNumber value="#{pmOrderRuleController.selected.completionDays}" minValue="1" maxValue="365" decimalPlaces="0" 
+                                           required="#{pmOrderRuleController.selected.isScheduleType == 1}" requiredMessage="预计完成天数 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'd'}">
+                            <p:outputLabel style="color: red;" value="日周期暂不支持定时周期配置"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!pmOrderRuleController.getPmRule()}">
                             <label class ="label">#{msg.ruleLevel}*</label>
@@ -120,7 +183,7 @@
                             <p:inputNumber id="defaultWorkHours" value="#{pmOrderRuleController.selected.defaultWorkHours}" minValue="0" decimalPlaces="2" required="false"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    
+
                    <p:panelGrid id="report" columns="4"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="#{pmOrderRuleController.selected != null}">
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>

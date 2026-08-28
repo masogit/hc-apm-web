@@ -1,5 +1,7 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.ConfigItemValueRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
@@ -98,6 +100,9 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
     private Object  ruleNameObj;
     @Setter @Getter
     private Object  periodObj;
+    @Setter @Getter
+    List<Map<String, String>> customMap = new ArrayList<>();
+
     @Override
     protected void init() {
         super.init();
@@ -115,6 +120,26 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
         String configItemValue = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "showLocationNameFlag");
         showLocationNameFlag =  StrUtil.isNotEmpty(configItemValue) && "true".equals(configItemValue);
         loadClinicalDeptList();
+
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(
+                loginUser.getSiteUID(), loginUser.getHospitalUID(),
+                loginUser.getInstitutionUID(), loginUser.getTenantUID(),
+                "pmOrederManuallyConfirmFlag");
+        if(StringUtils.isNotBlank(value)){
+            customMap = JSON.parseObject(value, new TypeReference<List<Map<String,String>>>(){});
+        }
+    }
+
+    public Boolean showDisabled(Integer ruleLevel){
+        if(ruleLevel == null){
+            return true;
+        }
+        for(Map<String, String> map : customMap){
+            if(map.get("value").equals(ruleLevel.toString())){
+                return false;
+            }
+        }
+        return true;
     }
 
     public void pick(String itemId){
@@ -184,6 +209,19 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
         }
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
             filterArrayList.add((new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*")));
+        }
+        if(this.hasFilterOnField("confirmFlag")){
+            List<SearchFilter> ss = searchFilters.stream().filter(item -> "confirmFlag".equals(item.fieldName)).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(ss)){
+                SearchFilter searchFilter = ss.get(0);
+                if(searchFilter.value.equals("Y")){
+                    filterArrayList.add(new SearchFilter("confirmFlag", SearchFilter.Operator.EQ, "Y"));
+                }else {
+                    filterArrayList.add(new SearchFilter("confirmFlag", SearchFilter.Operator.EQ, "N", "1*4+"));
+                    filterArrayList.add(new SearchFilter("confirmFlag", SearchFilter.Operator.IsNull, "", "1*4+"));
+                }
+            }
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "confirmFlag".equals(item.fieldName)).collect(Collectors.toList()));
         }
 
         filterArrayList.addAll(searchFilters);
@@ -440,7 +478,7 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
 
     public void confirmPm(String id){
         V2_PmOrder pmOrder = dao.findById(id);
-        pmOrder.setConfirmFLag(true);
+        pmOrder.setConfirmFlag("Y");
         dao.save(pmOrder);
     }
 

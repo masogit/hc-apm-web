@@ -119,7 +119,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     @Getter
-    private int matchType=1;
+    private int matchType=9;
 
     @Getter
     @Setter
@@ -477,7 +477,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
         if(this.hasFilterOnField("measureCycle")){
             String measureCycleVal = searchFilters.stream().filter(sf -> "measureCycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("measureCycle", SearchFilter.Operator.EQ, 0)).value.toString();
-            wrapper.eq("ai.metering_cycle", (int)(Double.parseDouble(measureCycleVal) * 12));
+            wrapper.eq("ai.metering_cycle",Integer.valueOf(measureCycleVal));
         }
         if(this.hasFilterOnField("certificateType")){
             Optional<SearchFilter> first = searchFilters.stream().filter(sf -> "certificateType".equals(sf.fieldName)).findFirst();
@@ -493,7 +493,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths","certificateType","measuringType");
+        List<String> removeFields = ListUtil.newArrayList("verificationConclusion", "checkDate", "nextMeteringDate", "meteringNO", "checkPerson","existFileFlag","validityMonths","certificateType","measuringType","measureCycle");
         List<SearchFilter> covertSearchFilters = searchFilters.stream().filter(sf -> !removeFields.contains(sf.fieldName)).collect(Collectors.toList());
         WrapperSearchFilterUtils.convert(covertSearchFilters, wrapper, "ai");
         return wrapper;
