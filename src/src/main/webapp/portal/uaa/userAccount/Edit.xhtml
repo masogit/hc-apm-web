@@ -130,8 +130,12 @@
             </h:form>
             <h:outputScript>
                 function handleSubmit(arg,t){
-                    PF(t).hide();
-                    window.location.reload();
+                    if (args.validationFailed) {
+                        PF(t).show();
+                    } else {
+                        PF(t).hide();
+                        window.location.reload();
+                    }
                 }
             </h:outputScript>
         </p:dialog>
