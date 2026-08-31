@@ -182,7 +182,7 @@
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('validityMonths',item.validityMonths)}"/>
                     </p:column>
-                    <p:column headerText="#{measureAssetListController.matchType==1?'下次计量日期':measureAssetListController.matchType==3?'有效期至':measureAssetListController.matchType==2?'建议下次计量日期':''}" rendered="#{measureAssetListController.matchType==1 or measureAssetListController.matchType==3 or measureAssetListController.matchType==2}" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
+                    <p:column headerText="#{measureAssetListController.matchType==1?'下次计量日期':measureAssetListController.matchType==3?'有效期至':measureAssetListController.matchType==2?'建议下次计量日期':measureAssetListController.matchType==9?'下次计量日期':''}"  sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>
