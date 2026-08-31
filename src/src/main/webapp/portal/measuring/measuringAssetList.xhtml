@@ -173,7 +173,7 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="有效期（月）" rendered="#{measureAssetListController.matchType==2}"  sortBy="#{item.validityMonths}" filterBy="#{item.validityMonths}" filterMatchMode="EQ">
+                    <p:column headerText="#{measureAssetListController.matchType==2?'有效期（月）':measureAssetListController.matchType==9?'校准有效期（月）':''}" rendered="#{measureAssetListController.matchType==2 or measureAssetListController.matchType==9}"  sortBy="#{item.validityMonths}" filterBy="#{item.validityMonths}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;" value="#{measureAssetListController.validityMonths}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
