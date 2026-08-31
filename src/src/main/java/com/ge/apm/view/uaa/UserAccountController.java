@@ -761,6 +761,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (selected == null) {
             return;
         }
+        // 访问权限设置：至少选择一个访问权限节点
+        if (selectedAccessOrgNodes == null || selectedAccessOrgNodes.length == 0) {
+            WebUtil.addErrorMessage("访问权限设置至少需要选择一个");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
         //如果租户不是院区隔离时，修改用户角色时保证有LocalITAdmin角色的用户，LocalITAdmin角色不丢失
         TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
         if ((ti.getInsulate() == null || !ti.getInsulate())) {
