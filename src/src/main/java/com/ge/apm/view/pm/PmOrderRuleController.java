@@ -1140,10 +1140,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MILLISECOND, 0);
             Date today = cal.getTime();
-//            if (selected.getFirstGenerateDate().before(today)) {
-//                WebUtil.addErrorMessage("首次生成工单日期必须大于等于当前日期");
-//                return false;
-//            }
+            if (selected.getFirstGenerateDate().before(today)) {
+                WebUtil.addErrorMessage("首次生成工单日期必须大于等于当前日期");
+                return false;
+            }
             // 根据周期单位校验
             String periodUnit = selected.getPeriodUnit();
             if ("w".equals(periodUnit)) {
