@@ -101,10 +101,20 @@
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="scheduleConfigPanel">
                         <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1}">
                             <label class="label">首次生成工单日期 *</label>
-                            <p:calendar mindate="#{pmOrderRuleController.getMinDate()}" timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{pmOrderRuleController.selected.firstGenerateDate}"
+                            <p:calendar id="firstGenerateDate" widgetVar="firstGenerateDateCal" timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{pmOrderRuleController.selected.firstGenerateDate}"
                                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"
                                         required="#{pmOrderRuleController.selected.isScheduleType == 1}" requiredMessage="首次生成工单日期 #{msg.ValidationRequire}">
                             </p:calendar>
+                            <script>
+                                $(function() {
+                                    var $input = $('[id$="firstGenerateDate_input"]');
+                                    var currentVal = $input.val();
+                                    $input.datepicker('option', 'minDate', new Date());
+                                    if (currentVal) {
+                                        $input.val(currentVal);
+                                    }
+                                });
+                            </script>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{pmOrderRuleController.selected.isScheduleType == 1 and pmOrderRuleController.selected.periodUnit == 'w'}">
                             <label class="label">周几 *</label>
