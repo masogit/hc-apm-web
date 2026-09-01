@@ -355,7 +355,7 @@
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{msg.description}">
-                        <h:outputText value="#{userContextService.enableDisplayByKey('repairShowAutoAcceptance') ? stepItem.comments : '验收'}" style="word-wrap: break-word;"/>
+                        <h:outputText value="#{(stepItem.stepName eq '待验收' and userContextService.enableDisplayByKey('repairShowAutoAcceptance')) ? stepItem.comments : stepItem.stepName eq '待验收' ? '验收' : ''}" style="word-wrap: break-word;"/>
                     </p:column>
                 </p:dataTable>
                 <br/>
