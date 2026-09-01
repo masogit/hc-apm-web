@@ -40,6 +40,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -105,7 +107,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Setter@Getter
     private String pmRuleShowScoreFlag;
 
-    private Date mindate = new Date();
+    private Date minDate;
 
     @Override
     protected void init() {
@@ -1181,11 +1183,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         return true;
     }
 
-    public Date getMindate() {
-        return mindate;
+    public Date getMinDate() {
+        LocalDate now = LocalDate.now();
+        minDate = Date.from(now.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return minDate;
     }
 
-    public void setMindate(Date mindate) {
-        this.mindate = mindate;
+    public void setMinDate(Date mindate) {
+        this.minDate = mindate;
     }
 }
