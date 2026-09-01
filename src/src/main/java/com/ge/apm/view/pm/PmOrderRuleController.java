@@ -105,6 +105,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Setter@Getter
     private String pmRuleShowScoreFlag;
 
+    private Date mindate = new Date();
+
     @Override
     protected void init() {
         filterBySite = false;
@@ -1177,5 +1179,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             }
         }
         return true;
+    }
+
+    public Date getMindate() {
+        return mindate;
+    }
+
+    public void setMindate(Date mindate) {
+        this.mindate = mindate;
     }
 }
