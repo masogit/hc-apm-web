@@ -115,7 +115,7 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
             if (ObjectUtil.isNotEmpty(orgUidList)) {
                 paramMap.put("orgUidList", orgUidList);
             } else {
-                paramMap.put("orgUidList", new ArrayList<>());
+                paramMap.put("orgUidList", Collections.singletonList(currentUser.getOrgInfoUID()));
             }
         }
 
