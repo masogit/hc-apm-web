@@ -141,8 +141,8 @@
                             <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{acquisitionPlanListController.delete}" update=":formList" disabled="#{empty acquisitionPlanListController.selected.id}" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY_EDIT')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="Purcahse_Budget_Config_Export"/>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{acquisitionPlanListController.exportExcel}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{acquisitionPlanListController.excelFile}"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>

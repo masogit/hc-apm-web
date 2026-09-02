@@ -25,10 +25,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -37,6 +40,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -62,6 +67,10 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
     private TreeNode orgTreeEdit;
     @Getter @Setter
     private OrgInfo org;
+    @Getter@Setter
+    private StreamedContent excelFile;
+
+
     @Override
     protected void init() {
         super.init();
@@ -179,6 +188,15 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
         }else{
             WebUtil.addErrorMessage("该购置计划已提交不能删除！");
         }
+    }
+
+    public void exportExcel() throws IOException {
+        Sort sort = new Sort(Sort.Direction.DESC, "applicationNo");
+        List<AcquisitionPlan> list = dao.findBySearchFilter(searchFilters, sort);
+
+        InputStream inputStream = acquisitionPlanService.exportExcel(list);
+        excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "Acquisition_Export.xlsx");
+
     }
 
 

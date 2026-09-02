@@ -319,7 +319,7 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         List<AcquisitionPlan> list = dao.findBySearchFilter(searchFilters, sort);
 
         InputStream inputStream = acquisitionPlanService.exportExcel(list);
-        excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
+        excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "Acquisition_Export.xlsx");
 
     }
 
