@@ -38,7 +38,7 @@
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500"
-                             rowStyleClass="#{measureAssetListController.matchType!=2 and measureAssetListController.measuringDateWarningEnabled and item.hasDateWarning ? 'warning-row' : ''}">
+                             rowStyleClass="#{measureAssetListController.matchType!=2 and measureAssetListController.measuringDateWarningEnabled  and item.certificateType eq 1 and item.hasDateWarning ? 'warning-row' : ''}">
 
                     <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" onstart="prepareAssetViewWindow1();" oncomplete="openAssetViewWindow1(xhr, status, args)" />
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
