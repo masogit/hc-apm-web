@@ -129,7 +129,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         }else {
             if(action == -11){
                 return getCRUDActionName() + "试用申请";
-            }else if(action == -22){
+            }else if(action == 0){
                 return getCRUDActionName() + "试用申请";
             }
             return "试用工单";
@@ -407,6 +407,12 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setProbationEndUserName(probationConfirmor.getName());
             this.selected.setCurrentPersonId(probationConfirmor.getUid());
             this.selected.setCurrentPersonName(probationConfirmor.getName());
+            if (ObjectUtil.isNotEmpty(specificationList)) {
+                this.selected.setSpecification(String.join(",", specificationList));
+            }
+            if (ObjectUtil.isNotEmpty(informationList)) {
+                this.selected.setInformation(String.join(",", informationList));
+            }
         }
         dao.save(this.selected);
         if (ObjectUtil.isNotEmpty(sendMsgUserUid)) {
