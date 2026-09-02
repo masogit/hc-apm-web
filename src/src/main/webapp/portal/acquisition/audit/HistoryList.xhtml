@@ -21,66 +21,106 @@
 
                 <p:ajax event="rowSelect"/>
                 <p:ajax event="filter" listener="#{acquisitionPlanAuditListController.onFilter}" />
-                <p:column headerText="申报单位">
-                    <h:outputText value="#{item.applicationHospitalName}" filterBy="#{item.applicationHospitalUid}" filterMatchMode="EQ"/>
+
+                <p:column style="width:3rem" ariaHeaderText="Row Toggler">
+                    <p:rowToggler />
                 </p:column>
-                <p:column headerText="申请年份" filterBy="#{item.applicationYear}" filterMatchMode="LIKE">
+                <p:ajax event="rowToggle" listener="#{acquisitionPlanAuditListController.onRowToggle}" />
+
+                <p:column headerText="申报单位" >
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{acquisitionPlanAuditListController.selectedHospital}" >
+                            <p:ajax update="tab:currentListForm" listener="#{acquisitionPlanAuditListController.hospitalListChange}" />
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{acquisitionPlanAuditListController.hospitalList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{item.applicationHospitalName}"/>
+                </p:column>
+                <p:column headerText="申请年份" >
                     <h:outputText value="#{item.applicationYear}"/>
                 </p:column>
-                <p:column headerText="申请编号" filterBy="#{item.applicationNo}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.applicationNo}"/>
-                </p:column>
-
-                <p:column headerText="申报科室">
-                    <h:outputText value="#{item.applicationDeptName}"/>
-                </p:column>
-                <p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetName}"/>
-                </p:column>
-                <p:column headerText="申请类别">
-                    <h:outputText value="#{item.applicationType}"/>
-                </p:column>
-                <p:column headerText="计划采购数量" styleClass="zoom-08" filterBy="#{item.applicationPlanCount}" filterMatchMode="GTE">
+                <p:column headerText="计划采购数量" >
                     <h:outputText value="#{item.applicationPlanCount}"/>
                 </p:column>
-                <p:column headerText="预算单价（万元）" styleClass="zoom-08" filterBy="#{item.budgetUnitPrice}" filterMatchMode="GTE">
-                    <h:outputText value="#{item.budgetUnitPrice}">
-                        <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="预算总价（万元）" styleClass="zoom-08" filterBy="#{item.budgetTotalAmount}" filterMatchMode="GTE">
+
+                <p:column headerText="预算总价（万元）" >
                     <h:outputText value="#{item.budgetTotalAmount}">
                         <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="预计使用年限（年）" styleClass="zoom-08" filterBy="#{item.estimatedServiceYears}" filterMatchMode="GTE">
-                    <h:outputText value="#{item.estimatedServiceYears}"/>
-                </p:column>
-                <p:column headerText="工单状态" filterBy="#{item.applicationStatus}" filterMatchMode="EQ">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()"  >
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('AcquisitionApplicationStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{fieldMsg.fieldValue('AcquisitionApplicationStatus', item.applicationStatus)}"/>
-                </p:column>
-                <p:column headerText="申请人" filterBy="#{item.applicationUserName}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.applicationUserName}"/>
-                </p:column>
-                <p:column headerText="申请时间">
-                    <h:outputText value="#{item.applicationDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
-                    </h:outputText>
-                    <f:facet name="filter">
-                        <p:inputText id="filterApplicationDate" widgetVar="varFilterApplicationDate" value="#{acquisitionPlanAuditListController.filterApplicationDate}"/>
-                    </f:facet>
-                </p:column>
+
+
+                <!-- <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{acquisitionPlanAuditListController.queryIndex == 0}">
+                     <p:commandButton value="审批"  action="#{acquisitionPlanAuditListController.auditUrl(item.id)}"/>
+
+                 </p:column>-->
+
+                <p:rowExpansion>
+                    <div class="product">
+                        <p:dataTable id="detailList" value="#{item.list}" var="detailItem"
+                                     widgetVar="detailList" selectionMode="single" selection="#{acquisitionPlanAuditListController.selected}"
+                                     lazy="false" paginator="true" rowKey="#{detailItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{detailItem.id}"
+                                     paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                            <p:ajax event="rowSelect" listener="#{acquisitionPlanAuditListController.viewUrl(detailItem.id)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)"/>
+
+                            <p:column headerText="申报单位">
+                                <h:outputText value="#{detailItem.applicationHospitalName}"/>
+                            </p:column>
+                            <p:column headerText="申请年份">
+                                <h:outputText value="#{detailItem.applicationYear}"/>
+                            </p:column>
+                            <p:column headerText="申请编号">
+                                <h:outputText value="#{detailItem.applicationNo}"/>
+                            </p:column>
+                            <p:column headerText="申报科室" >
+                                <h:outputText value="#{detailItem.applicationDeptName}"/>
+                            </p:column>
+                            <p:column headerText="设备名称">
+                                <h:outputText value="#{detailItem.assetName}"/>
+                            </p:column>
+                            <p:column headerText="申请类别">
+                                <h:outputText value="#{fieldMsg.fieldValue('acquisitionApplicationType', detailItem.applicationType)}"/>
+                            </p:column>
+                            <p:column headerText="计划采购数量">
+                                <h:outputText value="#{detailItem.applicationPlanCount}"/>
+                            </p:column>
+                            <p:column headerText="预算单价（万元）">
+                                <h:outputText value="#{detailItem.budgetUnitPrice}">
+                                    <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="预算总价（万元）">
+                                <h:outputText value="#{detailItem.budgetTotalAmount}">
+                                    <f:convertNumber pattern="#,##0.0000" maxFractionDigits="4"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="预计使用年限（年）">
+                                <h:outputText value="#{detailItem.estimatedServiceYears}"/>
+                            </p:column>
+                            <p:column headerText="工单状态">
+                                <h:outputText value="#{fieldMsg.fieldValue('AcquisitionApplicationStatus', detailItem.applicationStatus)}"/>
+                            </p:column>
+                            <p:column headerText="申请人">
+                                <h:outputText value="#{detailItem.applicationUserName}"/>
+                            </p:column>
+                            <p:column headerText="申请时间">
+                                <h:outputText value="#{detailItem.applicationDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                          
+                            <f:facet name="{Toolbar}">
+                            </f:facet>
+                        </p:dataTable>
+                    </div>
+                </p:rowExpansion>
+
                 <f:facet name="{Toolbar}">
 
                 </f:facet>
             </p:dataTable>
-            <p:overlayPanel appendTo="historyListForm" id="idPanelFilterApplicationDate" widgetVar="panelFilterApplicationDate" for="tab:currentListForm:datalist:filterApplicationDate" dismissable="false" >
+            <!--<p:overlayPanel appendTo="historyListForm" id="idPanelFilterApplicationDate" widgetVar="panelFilterApplicationDate" for="tab:currentListForm:datalist:filterApplicationDate" dismissable="false" >
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>
                     <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varApplicationDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
@@ -89,7 +129,7 @@
                 </h:panelGrid>
                 <p:commandButton onclick="setDateFilter('varDataList', 'varFilterApplicationDate', 'varApplicationDateFrom', 'varApplicationDateTo'); PF('panelFilterApplicationDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                 <p:commandButton onclick="PF('panelFilterApplicationDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-            </p:overlayPanel>
+            </p:overlayPanel>-->
         </h:form>
     </div>
 </ui:composition>

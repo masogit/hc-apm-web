@@ -63,7 +63,13 @@ public class AcquisitionPlanProvider {
                     sb.append(" and application_hospital_uid = '").append(value).append("'");
                     break;
                 case "applicationYear":
-                    sb.append(" and application_year like '%").append(value).append("%'");
+                    if (op.equals(SearchFilter.Operator.LIKE)) {
+                        sb.append(" and application_year like '%").append(value).append("%'");
+                    } else if (op.equals(SearchFilter.Operator.EQ)) {
+                        sb.append(" and application_year = '").append(value).append("'");
+                    } else if (op.equals(SearchFilter.Operator.NE)) {
+                        sb.append(" and application_year != '").append(value).append("'");
+                    }
                     break;
                 case "applicationNo": {
                     sb.append(" and application_no like '%").append(value).append("%'");
@@ -132,6 +138,10 @@ public class AcquisitionPlanProvider {
                 case "applicationHospitalName":
                     sb.append(" and application_hospital_name like '%").append(value).append("%'");
                     break;
+                case "userIds":
+                    sb.append(" and (drug_center_uid = '").append(value).append("' or work_group_uid = '").append(value).append("' or bureau_party_uid = '").append(value).append("') ");
+                    break;
+                case "":
 
 
                 default:

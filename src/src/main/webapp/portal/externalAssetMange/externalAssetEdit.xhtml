@@ -162,7 +162,7 @@
                         <p:fieldset legend="#{msg.tempEngineerDetection}" rendered="#{assetProbationEditController.viewDetection()}">
                             <p:fieldset legend="#{msg.equipmentMaterialInformation}">
                                 <div style="display: flex; gap: 1rem;">
-                                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
+                                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 0.8;">
                                         <h:panelGroup>
                                             <label class="label">#{msg.Device.concat(msg.certificate)}<span style="color:red">*</span></label>
                                             <h:panelGrid>
@@ -178,7 +178,7 @@
                                             </h:panelGrid>
                                         </h:panelGroup>
                                     </p:panelGrid>
-                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1;">
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1.2;">
                                         <h:panelGroup>
                                             <label class="label">#{msg.threeInformation}<span style="color:red">*</span></label>
                                             <h:panelGrid>
@@ -246,7 +246,7 @@
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
-                                        <p:fileUpload id="detection" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                        <p:fileUpload id="detection" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" invalidFileMessage="请上传图片！"
                                                       multiple="true"  sizeLimit="500000000"  update="detectionList" rendered="#{assetProbationEditController.canEditDetection()}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>

@@ -32,7 +32,7 @@
                         <p:outputLabel class="label">工单状态</p:outputLabel>
                         <p:selectOneMenu value="#{acquisitionPlanAuditListController.searchForm.applicationType}" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('acquisitionApplicationType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('AcquisitionApplicationStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup style="display: flex;">
@@ -74,7 +74,7 @@
             </h:panelGroup>-->
             <p:dataTable id="datalist" value="#{acquisitionPlanAuditListController.lazyModel}" var="item"
                          widgetVar="varDataList" styleClass="custom-datatable"
-                         selection="#{acquisitionPlanAuditListController.selected}"
+
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending"
                          sortBy="#{item.applicationDate}"
@@ -83,7 +83,7 @@
                          rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
                          rowsPerPageTemplate="20,50,100,500">
 
-                <p:ajax event="rowSelect" listener="#{acquisitionPlanAuditListController.viewUrl(item.id)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)"/>
+
                 <p:ajax event="filter" listener="#{acquisitionPlanAuditListController.onFilter}"/>
 
                 <p:column style="width:3rem" ariaHeaderText="Row Toggler">
@@ -122,9 +122,11 @@
                 <p:rowExpansion>
                     <div class="product">
                         <p:dataTable id="detailList" value="#{item.list}" var="detailItem"
-                                     widgetVar="detailList" selectionMode="single"
+                                     widgetVar="detailList" selectionMode="single" selection="#{acquisitionPlanAuditListController.selected}"
                                      lazy="false" paginator="true" rowKey="#{detailItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{detailItem.id}"
                                      paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                            <p:ajax event="rowSelect" listener="#{acquisitionPlanAuditListController.viewUrl(detailItem.id)}" onstart="prepareOrderViewWindow();" oncomplete="openOrderViewWindow(xhr, status, args)"/>
+
                             <p:column headerText="申报单位">
                                 <h:outputText value="#{detailItem.applicationHospitalName}"/>
                             </p:column>

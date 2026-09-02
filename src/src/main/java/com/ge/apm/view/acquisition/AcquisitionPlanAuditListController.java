@@ -101,8 +101,18 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         }
 
         setSearchFilter();
-        List<AcquisitionPlan> list = acquisitionPlanMapper.queryAcquisitionPlanListForPage(searchFilters, (int) pageRequest.getOffset(), pageRequest.getPageSize());
-        int c = acquisitionPlanMapper.queryAcquisitionPlanListForPageCount(searchFilters);
+
+        List<SearchFilter> searchFiltersQuery = new ArrayList<>();
+        searchFiltersQuery.addAll(searchFilters);
+        if(queryIndex == 1){
+            searchFiltersQuery.removeAll(searchFilters.stream().filter(item -> "drugCenterUid".equals(item.fieldName)).collect(Collectors.toList()));
+            searchFiltersQuery.removeAll(searchFilters.stream().filter(item -> "workGroupUid".equals(item.fieldName)).collect(Collectors.toList()));
+            searchFiltersQuery.removeAll(searchFilters.stream().filter(item -> "bureauPartyUid".equals(item.fieldName)).collect(Collectors.toList()));
+            searchFiltersQuery.add(new SearchFilter("userIds", SearchFilter.Operator.EQ, loginUser.getUid(), "1*"));
+        }
+
+        List<AcquisitionPlan> list = acquisitionPlanMapper.queryAcquisitionPlanListForPage(searchFiltersQuery, (int) pageRequest.getOffset(), pageRequest.getPageSize());
+        int c = acquisitionPlanMapper.queryAcquisitionPlanListForPageCount(searchFiltersQuery);
 
         return new PageImpl<>(list, pageRequest, c);
     }
@@ -158,7 +168,7 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
                 updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, searchForm.getAssetName(), "1*"));
             }
             if(StrUtil.isNotEmpty(searchForm.getApplicationType())){
-                updateSearchFilter(new SearchFilter("applicationType", SearchFilter.Operator.EQ, searchForm.getApplicationType(), "1*"));
+                updateSearchFilter(new SearchFilter("applicationStatus", SearchFilter.Operator.EQ, searchForm.getApplicationType(), "1*"));
             }
             if(searchForm.getBudgetTotalAmountBegin() != null){
                 searchFilters.add(new SearchFilter("budgetTotalAmount", SearchFilter.Operator.GTE, searchForm.getBudgetTotalAmountBegin(), "1*"));
