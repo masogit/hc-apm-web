@@ -8,11 +8,11 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{assetProbationEditController.CRUDActionName} #{assetProbationEditController.setProbationApplication()}"/>
+                <p:outputLabel class="pageTitle" value="#{assetProbationEditController.setProbationApplication()}"/>
             </div>
-            <div class="ui-g-12 card">
+            <div class="ui-g-12 card" >
                 <h:form id="externalAssetEditForm">
-                    <p:fieldset legend="试用表上传">
+                    <p:fieldset legend="试用表上传" rendered="#{assetProbationEditController.actionName != 'View' and (assetProbationEditController.action == -1 or assetProbationEditController.action == -11 or assetProbationEditController.action == -22) }">
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
                                 <p:fileUpload id="fileUpload" fileUploadListener="#{assetProbationEditController.ocrCreated}"

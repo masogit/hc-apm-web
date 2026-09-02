@@ -32,6 +32,7 @@ public class AcquisitionPlanProvider {
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         String filter = buildFilter(searchFilterList);
         sb.append(filter);
+        sb.append(" group by application_hospital_name,application_hospital_uid, application_year ");
         return sb.toString();
     }
 

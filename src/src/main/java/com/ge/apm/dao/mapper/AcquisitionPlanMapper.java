@@ -15,6 +15,6 @@ public interface AcquisitionPlanMapper {
     public List<AcquisitionPlan> queryAcquisitionPlanListForPage(@Param("filters") List<SearchFilter> filters, @Param("offset") int offset, @Param("limit") int limit);
 
     @SelectProvider(type = AcquisitionPlanProvider.class,method="queryAcquisitionPlanListForPageCount")
-    public int queryAcquisitionPlanListForPageCount(@Param("filters") List<SearchFilter> filters);
+    public String queryAcquisitionPlanListForPageCount(@Param("filters") List<SearchFilter> filters);
 
 }

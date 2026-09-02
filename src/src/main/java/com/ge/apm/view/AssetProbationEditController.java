@@ -125,12 +125,12 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
 
     public String setProbationApplication(){
         if (-1 == action && ObjectUtil.isEmpty(actionName)) {
-            return "试用申请";
+            return getCRUDActionName() + "试用申请";
         }else {
             if(action == -11){
-                return "试用申请";
+                return getCRUDActionName() + "试用申请";
             }else if(action == -22){
-                return "试用申请";
+                return getCRUDActionName() + "试用申请";
             }
             return "试用工单";
         }

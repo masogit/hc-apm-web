@@ -112,9 +112,13 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         }
 
         List<AcquisitionPlan> list = acquisitionPlanMapper.queryAcquisitionPlanListForPage(searchFiltersQuery, (int) pageRequest.getOffset(), pageRequest.getPageSize());
-        int c = acquisitionPlanMapper.queryAcquisitionPlanListForPageCount(searchFiltersQuery);
+        String c = acquisitionPlanMapper.queryAcquisitionPlanListForPageCount(searchFiltersQuery);
+        int count = 0;
+        if(StrUtil.isNotEmpty(c)){
+            count = Integer.parseInt(c);
+        }
 
-        return new PageImpl<>(list, pageRequest, c);
+        return new PageImpl<>(list, pageRequest, count);
     }
 
     public void setSearchFilter() {
