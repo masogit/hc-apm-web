@@ -1,8 +1,10 @@
 package com.ge.apm.view.acquisition;
 
 import com.ge.apm.dao.AcquisitionPlanRepository;
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.AcquisitionPlanMapper;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_WorkOrder;
@@ -37,9 +39,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -52,6 +52,7 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
     private Integer queryIndex = 0;
     private UaaService uaaService;
     private OrgInfoRepository orgInfoRepository;
+    private I18nMessageRepository i18nMessageRepository;
     private AcquisitionPlanRepository dao;
     AcquisitionPlanMapper acquisitionPlanMapper;
     private AcquisitionPlanService acquisitionPlanService;
@@ -83,6 +84,7 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         acquisitionPlanMapper = WebUtil.getBean(AcquisitionPlanMapper.class);
         acquisitionPlanService = WebUtil.getBean(AcquisitionPlanService.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
         String query = WebUtil.getRequestParameter("query");
@@ -327,6 +329,27 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
 
     }
 
+    public List<I18nMessage> getI18nMessages() {
+        List<I18nMessage> i18nMessages = i18nMessageRepository.findI18nByType("AcquisitionApplicationStatus");
+        Map<String, I18nMessage> i18Map = new HashMap<>();
+        for (I18nMessage i18nMessage : i18nMessages) {
+            i18Map.put(i18nMessage.getMsgKey(), i18nMessage);
+        }
+        List<I18nMessage> result = new ArrayList<>();
+        List<String> statusList = new ArrayList<>();
+        statusList.add("TempSave");
+        statusList.add("DrugCenterPending");
+        statusList.add("WorkGroupPending");
+        statusList.add("BureauPartyPending");
+        statusList.add("Approved");
+        statusList.add("Rejected");
+        statusList.add("Cancel");
+        for(String key : statusList){
+            I18nMessage i18nMessage = i18Map.get(key);
+            result.add(i18nMessage);
+        }
+        return result;
+    }
     @Override
     protected GenericRepositoryUUID<AcquisitionPlan> getDAO() {
         return dao;

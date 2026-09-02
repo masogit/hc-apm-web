@@ -153,8 +153,8 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">配套不可单独收费耗材收费占比急采购成本（万元）<span style="color: red">*</span></p:outputLabel>
-                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="配套不可单独收费耗材收费占比急采购成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanAuditEditController.selected.consumablesCost}" disabled="true">
+                                <p:outputLabel class="label">配套不可单独收费耗材收费占比及采购成本（万元）<span style="color: red">*</span></p:outputLabel>
+                                <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2" required="true" requiredMessage="配套不可单独收费耗材收费占比及采购成本（万元） #{msg.ValidationRequire}" value="#{acquisitionPlanAuditEditController.selected.consumablesCost}" disabled="true">
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanAuditEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>

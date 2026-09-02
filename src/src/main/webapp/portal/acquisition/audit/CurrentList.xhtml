@@ -32,7 +32,7 @@
                         <p:outputLabel class="label">工单状态</p:outputLabel>
                         <p:selectOneMenu value="#{acquisitionPlanAuditListController.searchForm.applicationType}" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('AcquisitionApplicationStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <f:selectItems value="#{acquisitionPlanAuditListController.getI18nMessages()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup style="display: flex;">
