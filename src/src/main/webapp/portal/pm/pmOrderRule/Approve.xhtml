@@ -108,10 +108,9 @@
                             <script>
                                 $(function() {
                                     var $input = $('[id$="firstGenerateDate_input"]');
-                                    var currentVal = $input.val();
-                                    $input.datepicker('option', 'minDate', new Date());
-                                    if (currentVal) {
-                                        $input.val(currentVal);
+                                    var inst = $.data($input[0], 'datepicker');
+                                    if (inst) {
+                                        inst.settings.minDate = new Date();
                                     }
                                 });
                             </script>
