@@ -107,7 +107,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ContractPriceRMB}</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPrice" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
+                        <p:inputNumber  decimalPlaces="2" maxValue="99999999" id="closedPrice" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
 
                             <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
                             </p:ajax>
@@ -217,7 +217,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ContractPriceRMB}</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPriceView" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
+                        <p:inputNumber  decimalPlaces="2" maxValue="99999999" id="closedPriceView" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
                             <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
                             </p:ajax>
                         </p:inputNumber>

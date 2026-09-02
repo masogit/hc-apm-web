@@ -88,7 +88,7 @@
         mcd.type measuring_type,
         mcd.check_company last_check_company,
 
-        CASE WHEN mcd.certificate_type = 2 THEN NULL ELSE mcd.valid_date_to END next_metering_date,
+        mcd.valid_date_to as next_metering_date,
         mcd.check_date,
         mcd.check_person,
         mcd.department  department,

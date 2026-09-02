@@ -111,6 +111,9 @@
                         </f:facet>
                     </p:column>
                     <p:column rendered="#{measureAssetListController.matchType!=3 and measureAssetListController.displayMeasureCycle}" headerText="计量周期(月)" filterBy="#{item.measureCycle}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:inputText type="number" onkeyup="PF('varDataList_measuringAsset').filter()"/>
+                        </f:facet>
                         <h:outputText value="#{item.measureCycle}"/>
                     </p:column>
                  
@@ -170,7 +173,7 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="有效期（月）" rendered="#{measureAssetListController.matchType==2}"  sortBy="#{item.validityMonths}" filterBy="#{item.validityMonths}" filterMatchMode="EQ">
+                    <p:column headerText="#{measureAssetListController.matchType==2?'有效期（月）':measureAssetListController.matchType==9?'校准有效期（月）':''}" rendered="#{measureAssetListController.matchType==2 or measureAssetListController.matchType==9}"  sortBy="#{item.validityMonths}" filterBy="#{item.validityMonths}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;" value="#{measureAssetListController.validityMonths}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -179,7 +182,7 @@
                         </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('validityMonths',item.validityMonths)}"/>
                     </p:column>
-                    <p:column headerText="#{measureAssetListController.matchType==1?'下次计量日期':measureAssetListController.matchType==3?'有效期至':measureAssetListController.matchType==2?'建议下次计量日期':''}" rendered="#{measureAssetListController.matchType==1 or measureAssetListController.matchType==3 or measureAssetListController.matchType==2}" sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
+                    <p:column headerText="#{measureAssetListController.matchType==1?'下次计量日期':measureAssetListController.matchType==3?'有效期至':measureAssetListController.matchType==2?'建议下次计量日期':measureAssetListController.matchType==9?'下次计量日期':''}"  sortBy="#{item.nextMeteringDate}" filterBy="#{item.nextMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterNextMeteringDate1" widgetVar="varFilterNextMeteringDate1" />
                         </f:facet>

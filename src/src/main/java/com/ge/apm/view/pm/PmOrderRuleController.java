@@ -40,6 +40,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,6 +106,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     @Setter@Getter
     private String pmRuleShowScoreFlag;
+
+    private Date minDate;
 
     @Override
     protected void init() {
@@ -1165,10 +1169,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
                     WebUtil.addErrorMessage("每月几号不能为空");
                     return false;
                 }
-            } else if ("d".equals(periodUnit)) {
-                WebUtil.addErrorMessage("日周期暂不支持定时周期配置");
-                return false;
             }
+//            else if ("d".equals(periodUnit)) {
+//                WebUtil.addErrorMessage("日周期暂不支持定时周期配置");
+//                return false;
+//            }
             // 校验预计完成天数
             if (selected.getCompletionDays() == null || selected.getCompletionDays() <= 0) {
                 WebUtil.addErrorMessage("预计完成天数必须大于0");
@@ -1176,5 +1181,15 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             }
         }
         return true;
+    }
+
+    public Date getMinDate() {
+        LocalDate now = LocalDate.now();
+        minDate = Date.from(now.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return minDate;
+    }
+
+    public void setMinDate(Date mindate) {
+        this.minDate = mindate;
     }
 }

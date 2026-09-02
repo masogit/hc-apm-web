@@ -1314,6 +1314,9 @@
                             <c:if test="#{columnItem eq 'meteringCycle'}">
                                 <p:column headerText="#{msg.meteringCycle}" exportable="true"  filterBy="#{item.meteringCycle}"  filterMatchMode="EQ"
                                           sortBy="#{item.meteringCycle}">
+                                    <f:facet name="filter">
+                                        <p:inputText type="number" onkeyup="PF('varDataList').filter()"/>
+                                    </f:facet>
                                     <h:outputText value="#{item.meteringCycle}"/>
                                 </p:column>
                             </c:if>

@@ -114,6 +114,8 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
 //            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             if (ObjectUtil.isNotEmpty(orgUidList)) {
                 paramMap.put("orgUidList", orgUidList);
+            } else {
+                paramMap.put("orgUidList", Collections.singletonList(currentUser.getOrgInfoUID()));
             }
         }
 

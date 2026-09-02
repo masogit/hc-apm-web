@@ -1475,9 +1475,9 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'meteringCycle')}">
         <h:panelGroup >
             <label class="label">#{msg.meteringCycle}</label>
-            <p:inputText id="meteringCycle" value="#{assetInfoEditController.selected.meteringCycle}" disabled="#{!assetInfoEditController.needEdit('meteringCycle')}">
+            <p:inputNumber minValue="0" decimalPlaces="0" id="meteringCycle" value="#{assetInfoEditController.selected.meteringCycle}" disabled="#{!assetInfoEditController.needEdit('meteringCycle')}">
                 <p:ajax />
-            </p:inputText>
+            </p:inputNumber>
         </h:panelGroup>
     </c:if>
 </ui:composition>

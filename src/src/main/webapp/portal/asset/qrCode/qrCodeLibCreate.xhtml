@@ -70,7 +70,7 @@
             </h:panelGroup>
 
 
-            <p:commandButton value="#{msg.ConfirmCreate}"  validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
+            <p:commandButton value="#{msg.ConfirmCreate}"  validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :overlayPanelForm:overlayPanelGroup :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
             <br/>
         </h:panelGroup>
     </h:form>
