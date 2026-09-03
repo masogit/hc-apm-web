@@ -8,9 +8,9 @@
 
     <ui:define name="head">
         <style>
-            .quota-type-highlight.ui-selectonemenu{background-color:#FFF3CD!important;border-color:#F0C040!important;}
-            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-label{background-color:#FFF3CD!important;}
-            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-trigger{background-color:#FFF3CD!important;border-color:#F0C040!important;}
+            .quota-type-highlight.ui-selectonemenu{background-color:#FFCA28!important;border-color:#E6A800!important;}
+            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-label{background-color:#FFCA28!important;}
+            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-trigger{background-color:#FFCA28!important;border-color:#E6A800!important;}
         </style>
     </ui:define>
 
@@ -246,7 +246,7 @@
                                 <p:ajax event="change" update="zkbPartOrderEditForm:warmMessageCT"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Parts'}" layout="block" style="background-color:#FFF3CD; padding:8px 12px; border-radius:4px;">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Parts'}" layout="block" style="background-color:#FFCA28; padding:8px 12px; border-radius:4px;">
                             <label class="label">名额扣除类型*</label>
                             <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" disabled="#{zkbPartOrderEditController.spareArtificialFlag}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}" styleClass="quota-type-highlight">
                                 <p:ajax event="change" update="partsHighTypeGroup zkbDetailDatalist remainQty" listener="#{zkbPartOrderEditController.calcRemainQty}"/>
