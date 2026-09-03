@@ -733,7 +733,13 @@ public class PmReportService {
                         V2_PmOrder v2PmOrder = pmOrderService.findById(id);
                         List<V2_BlobObject> byBoUuid;
                         if (enableDisplayByKey("mvsPmReportOnlyDownloadPmItems")) {
-                            byBoUuid = blobObjectRepository.fetchBlobObjectNotType(v2PmOrder.getId(), Arrays.asList(new String[]{"PmOrderEHome", "SignatureEHome"}).stream().collect(Collectors.toSet()));
+                            byBoUuid = blobObjectRepository.fetchBlobObjectNotType(v2PmOrder.getId(), Arrays.asList(new String[]{"SignatureEHome"}).stream().collect(Collectors.toSet()));
+                            // 按照名称在过滤一边 标准保养报告、巡检报告、质控报告
+                            byBoUuid = byBoUuid.stream()
+                                    .filter(item -> item.getObjectName().contains("-标准保养报告") ||
+                                            item.getObjectName().contains("-巡检报告") ||
+                                            item.getObjectName().contains("-质控报告"))
+                                    .collect(Collectors.toList());
                         } else {
                             byBoUuid = blobObjectRepository.findByBoUuid(v2PmOrder.getId());
                         }
