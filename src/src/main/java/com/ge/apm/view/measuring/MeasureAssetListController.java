@@ -818,7 +818,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         List<AssetInfo> assetInfos = new ArrayList<>();
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
+//        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
         filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
         if (StrUtil.isNotEmpty(assetSearchForm.getApplicationDeptId())) {
             filters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, assetSearchForm.getApplicationDeptId()));
@@ -855,7 +855,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         if(StrUtil.isEmpty(assetSearchForm.getDeptName())){
             treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4);
         }else{
-            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4, assetSearchForm.getDeptName());
+            treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4, assetSearchForm.getDeptName(),true);
         }
         orgTreeSearch = initOrgTree(treeNodeEdit);
     }
