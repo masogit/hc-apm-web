@@ -99,6 +99,15 @@
                                  </p:selectOneMenu>
                              </f:facet>
                         </p:column>
+                        <p:column headerText="名额类型" filterBy="#{item.radiationQuotaType}"  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('ZkbPoPartQuotaType',item.radiationQuotaType)}"/>
+                             <f:facet name="filter">
+                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                     <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoPartQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                 </p:selectOneMenu>
+                             </f:facet>
+                        </p:column>
                         <p:column headerText="zone" filterBy="#{item.zone}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.zone}" />
                         </p:column>
