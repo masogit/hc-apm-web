@@ -161,6 +161,7 @@ public class ZkbPartOrderExcelService {
         }
 
         zkbPartOrderDataMap.put("订单类型", WebUtil.getFieldValueMessage("zkbPartOrderType", p.getOrderType()));
+        zkbPartOrderDataMap.put("名额类型", WebUtil.getFieldValueMessage("ZkbPoPartQuotaType", p.getRadiationQuotaType()));
         zkbPartOrderDataMap.put("申请人", p.getRequestUser());
         zkbPartOrderDataMap.put("申请人电话", p.getRequestPhone());
         zkbPartOrderDataMap.put("申请时间", DateFormatUtils.format(p.getRequestDate(),"yyyy-MM-dd HH:mm:ss"));

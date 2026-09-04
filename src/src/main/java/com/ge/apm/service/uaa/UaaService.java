@@ -1374,14 +1374,17 @@ public class UaaService {
         List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (t.getOrgType() == 4 && t.getName().toLowerCase().contains(condition.toLowerCase())) || t.getOrgType() != 4).collect(Collectors.toList());
         return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList2, selectableLevel);
     }
-
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid, Integer selectableLevel, String condition) {
+        return getOrgTreeByParentIdWithClinicalDeptsSelected(parentOrgId,userUid,selectableLevel,condition,false);
+    }
+
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid, Integer selectableLevel, String condition,boolean expandAll) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
         List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (t.getOrgType() == 4 && t.getName().toLowerCase().contains(condition.toLowerCase())) || t.getOrgType() != 4).collect(Collectors.toList());
         List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
 
-        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList2, orgInfoSelectableList, selectableLevel);
+        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList2, orgInfoSelectableList, selectableLevel,expandAll);
     }
 
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(String parentOrgId, String userUid) {
@@ -1398,9 +1401,11 @@ public class UaaService {
         return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList, 4);
     }
 
+    public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList, Integer selectableLevel){
+        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList, selectableLevel, false);
+    }
 
-
-    public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList, Integer selectableLevel) {
+    public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList, Integer selectableLevel,boolean expandAll) {
 
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
 
@@ -1408,6 +1413,7 @@ public class UaaService {
             TreeNode node = new DefaultTreeNode("org", org, null);
             node.setSelectable(selectable(org, selectableLevel));
             node.setRowKey("org_"+org.getId());
+            node.setExpanded(expandAll);
             treeMap.put(org.getUid(), node);
         }
 

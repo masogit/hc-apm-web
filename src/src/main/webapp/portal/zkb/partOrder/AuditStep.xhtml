@@ -6,6 +6,14 @@
             xmlns:c="http://java.sun.com/jsp/jstl/core"
             template="/WEB-INF/template.xhtml">
 
+    <ui:define name="head">
+        <style>
+            .quota-type-highlight.ui-selectonemenu{background-color:#FFCA28!important;border-color:#E6A800!important;}
+            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-label{background-color:#FFCA28!important;}
+            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-trigger{background-color:#FFCA28!important;border-color:#E6A800!important;}
+        </style>
+    </ui:define>
+
     <ui:define name="content">
         <div class="ui-g-12 card cardTitle">
             <p:outputLabel class="pageTitle" value="#{zkbPartOrderAuditController.CRUDActionName} #{msg.zkbPartOrder}"/>
@@ -199,9 +207,9 @@
                                 <f:selectItem itemLabel="XR" itemValue="XR"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and not empty zkbPartOrderAuditController.selected.radiationQuotaType}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and not empty zkbPartOrderAuditController.selected.radiationQuotaType}" layout="block" style="background-color:#FFCA28; padding:8px 12px; border-radius:4px;">
                             <label class="label">名额扣除类型*</label>
-                            <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.radiationQuotaType}" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}"  disabled="true">
+                            <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.radiationQuotaType}" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}"  disabled="true" styleClass="quota-type-highlight">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoPartQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>

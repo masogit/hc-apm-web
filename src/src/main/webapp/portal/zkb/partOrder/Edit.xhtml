@@ -5,6 +5,15 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
+
+    <ui:define name="head">
+        <style>
+            .quota-type-highlight.ui-selectonemenu{background-color:#FFCA28!important;border-color:#E6A800!important;}
+            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-label{background-color:#FFCA28!important;}
+            .quota-type-highlight.ui-selectonemenu .ui-selectonemenu-trigger{background-color:#FFCA28!important;border-color:#E6A800!important;}
+        </style>
+    </ui:define>
+
     <ui:define name="content">
         <div class="ui-g-12 card cardTitle">
             <p:outputLabel class="pageTitle" value="#{zkbPartOrderEditController.CRUDActionName} #{msg.zkbPartOrder}"/>
@@ -237,9 +246,9 @@
                                 <p:ajax event="change" update="zkbPartOrderEditForm:warmMessageCT"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Parts'}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.orderType eq 'Parts'}" layout="block" style="background-color:#FFCA28; padding:8px 12px; border-radius:4px;">
                             <label class="label">名额扣除类型*</label>
-                            <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" disabled="#{zkbPartOrderEditController.spareArtificialFlag}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}">
+                            <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" disabled="#{zkbPartOrderEditController.spareArtificialFlag}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}" styleClass="quota-type-highlight">
                                 <p:ajax event="change" update="partsHighTypeGroup zkbDetailDatalist remainQty" listener="#{zkbPartOrderEditController.calcRemainQty}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbPartOrderEditController.zkbPoPartQuotaTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

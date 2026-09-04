@@ -598,6 +598,12 @@ public class ZkbPartOrderEditService {
                             reLog.append("合同备件+人工+保养剩余名额不足，请检查！");
                         }
                     }
+                    if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(selected.getRadiationQuotaType())){
+                        Integer contractCount = zkbContract.getConsumableQuota() == null ? 0 : zkbContract.getConsumableQuota();
+                        if(contractCount - selected.getQty() < 0){
+                            reLog.append("耗材剩余名额不足，请检查！");
+                        }
+                    }
                 }else{
                     Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
                     if(contractCount - selected.getQty() < 0){
@@ -616,6 +622,8 @@ public class ZkbPartOrderEditService {
                                     el += "备件号："+i.getPartNo()+"属于高值备件，不可订购！";
                                 }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
                                     el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
+                                }else if(ZkbHighPartInfo.PartTypeEnum.consumable.toString().equals(z.getPartType())){
+                                    el += "备件号："+i.getPartNo()+"属于耗材，不可订购！";
                                 }
                             }
                         }
@@ -625,9 +633,23 @@ public class ZkbPartOrderEditService {
                             if(zkbHighPartInfos != null && zkbHighPartInfos.size() > 0){
                                 el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
                             }
+                            List<ZkbHighPartInfo> consumableInfos = zkbHighPartInfoRepository.findConsumable(i.getPartNo());
+                            if(consumableInfos != null && consumableInfos.size() > 0){
+                                el += "备件号："+i.getPartNo()+"属于耗材，不可订购！";
+                            }
                         }
                     }
                     reLog.append(el);
+                }
+                if(ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(selected.getRadiationQuotaType())){
+                    String el2 = "";
+                    for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                        List<ZkbHighPartInfo> consumableInfos = zkbHighPartInfoRepository.findConsumable(i.getPartNo());
+                        if(consumableInfos == null || consumableInfos.size() == 0){
+                            el2 += "备件号："+i.getPartNo()+"不属于耗材，不可订购！";
+                        }
+                    }
+                    reLog.append(el2);
                 }
             }
         } else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
@@ -780,6 +802,8 @@ public class ZkbPartOrderEditService {
                                 rsLog.append(zkbPartOrderItem.getPartNo() + "属于高值备件，不可订购！");
                             } else if (ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())) {
                                 rsLog.append(zkbPartOrderItem.getPartNo() + "属于球管，不可订购！");
+                            } else if (ZkbHighPartInfo.PartTypeEnum.consumable.toString().equals(z.getPartType())) {
+                                rsLog.append(zkbPartOrderItem.getPartNo() + "属于耗材，不可订购！");
                             }
                         }
                     } else if (ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())) {
@@ -787,6 +811,16 @@ public class ZkbPartOrderEditService {
                         if (zkbHighPartInfos != null && zkbHighPartInfos.size() > 0) {
                             rsLog.append(zkbPartOrderItem.getPartNo() + "属于球管，不可订购！");
                         }
+                        List<ZkbHighPartInfo> consumableInfos = zkbHighPartInfoRepository.findConsumable(zkbPartOrderItem.getPartNo());
+                        if (consumableInfos != null && consumableInfos.size() > 0) {
+                            rsLog.append(zkbPartOrderItem.getPartNo() + "属于耗材，不可订购！");
+                        }
+                    }
+                }
+                if (ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(selected.getRadiationQuotaType())) {
+                    List<ZkbHighPartInfo> consumableInfos = zkbHighPartInfoRepository.findConsumable(zkbPartOrderItem.getPartNo());
+                    if (consumableInfos == null || consumableInfos.size() == 0) {
+                        rsLog.append(zkbPartOrderItem.getPartNo() + "不属于耗材，不可订购！");
                     }
                 }
             }
