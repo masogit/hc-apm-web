@@ -438,7 +438,7 @@
                         </p:tab>
 
                         <p:tab title="高级查询配置">
-                            <p:dataTable id="advSearchFieldTable" var="fieldKey" value="#{customConfigController.allFields.keySet().toArray()}">
+                            <p:dataTable id="advSearchFieldTable" var="fieldKey" value="#{customConfigController.assetAdvancedSearchFields}">
                                 <p:column headerText="字段名称">
                                     <h:outputText value="#{customConfigController.allFields[fieldKey]}" />
                                 </p:column>

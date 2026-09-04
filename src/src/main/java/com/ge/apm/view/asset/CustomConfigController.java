@@ -858,7 +858,13 @@ public class CustomConfigController {
             }
         }
     }
-
+    List<String> assetAdvancedSearchFields;
+    public List<String> getAssetAdvancedSearchFields() {
+        if (assetAdvancedSearchFields == null) {
+            assetAdvancedSearchFields =advancedSearchService.getFieldOptions().stream().map(AssetAdvancedSearchService.FieldOption::getValue).collect(Collectors.toList());
+        }
+        return assetAdvancedSearchFields;
+    }
     private String getUsernameFromUid(String uid) {
         UserAccount userAccount  = userService.getUserByUid(uid);
         return userAccount == null ? "" : userAccount.getName();

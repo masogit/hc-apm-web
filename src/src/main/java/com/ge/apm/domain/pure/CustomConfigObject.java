@@ -8,6 +8,7 @@ package com.ge.apm.domain.pure;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.ge.apm.service.asset.AssetAdvancedSearchService;
 import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.CustomConfigConstant;
 import org.slf4j.Logger;

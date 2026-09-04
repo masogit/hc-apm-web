@@ -22,8 +22,21 @@ public class AssetAdvancedSearchService {
 
     private static final List<FieldOption> FIELD_OPTIONS = new ArrayList<>();
     private static final Map<String, String> FIELD_TYPE_MAP = new HashMap<>();
+    // 搜索字段名 → 实体字段名映射（当两者不一致时使用）
+    private static final Map<String, String> FIELD_NAME_MAPPING = new HashMap<>();
+    // 搜索字段名 → i18n消息类型映射（当搜索字段名与i18n msgType不一致时使用）
+    private static final Map<String, String> I18N_KEY_MAPPING = new HashMap<>();
 
     static {
+        // assetTypeGroup 搜索字段对应实体中的 assetType 字段
+        FIELD_NAME_MAPPING.put("assetTypeGroup", "assetType");
+
+        // i18n键映射：搜索字段名 → i18n消息类型（当两者不一致时）
+        I18N_KEY_MAPPING.put("status", "assetStatus");
+        I18N_KEY_MAPPING.put("functionGroup", "assetFunctionType");
+        I18N_KEY_MAPPING.put("assetDisposalResults", "assetDisposalResultsType");
+        I18N_KEY_MAPPING.put("functionGrade", "assetFunctionGrade");
+        I18N_KEY_MAPPING.put("depreciationMethod", "depreciationMethodList");
         registerField("name", "设备名称", "string");
         registerField("aliasName", "设备别名", "string");
         registerField("functionType", "设备型号", "string");
@@ -70,7 +83,7 @@ public class AssetAdvancedSearchService {
         registerField("assetOwnerTel3", "维修负责人3电话", "string");
         registerField("clinicalOwnerName", "使用责任人", "string");
         registerField("clinicalOwnerTel", "使用责任人电话", "string");
-        registerField("measuringOwnerName", "计量负责人", "string");
+        registerField("measuringOwner", "计量负责人", "string");
         registerField("createdBy", "创建者", "string");
         registerField("UCMID", "UCMID", "string");
         registerField("epc", "EPC码", "string");
@@ -82,9 +95,9 @@ public class AssetAdvancedSearchService {
         registerField("spare10", "备用字段10", "string");
         registerField("currentId", "电流ID", "string");
         registerField("powerOnThreshold", "开机电流阈值", "string");
-        registerField("clinicalDeptName", "所属科室", "string");
-        registerField("warrantyStatus", "维保状态", "string");
-        registerField("medicalApparatusClassification", "医疗器械分类", "string");
+        registerField("clinicalDeptName", "所属科室", "enum");
+        registerField("warrantyStatus", "维保状态", "enum");
+        registerField("medicalApparatusClassification", "医疗器械分类", "enum");
 
         registerField("assetGroup", "设备分类", "enum");
         registerField("assetClass", "管理分类", "enum");
@@ -151,6 +164,22 @@ public class AssetAdvancedSearchService {
         registerField("isUseRegistration", "是否使用登记", "boolean");
         registerField("warranty", "是否保修提醒", "boolean");
         registerField("isValid", "是否在用", "boolean");
+
+        registerField("hospitalId", "所属院区", "enum");
+        registerField("assetDeptName", "使用科室", "enum");
+        registerField("accountingDeptName", "账户科室", "enum");
+        registerField("functionGroup", "医疗器械分类(旧)", "enum");
+        registerField("assetCode68", "医疗器械子分类(旧)", "enum");
+        registerField("assetClassification32", "设备32分类", "enum");
+        registerField("assetTypeGroup", "资产分类", "enum");
+        registerField("spare01", "备用字段01", "string");
+        registerField("spare02", "备用字段02", "string");
+        registerField("spare03", "备用字段03", "string");
+        registerField("spare04", "备用字段04", "string");
+        registerField("spare05", "备用字段05", "string");
+        registerField("startUsingDate", "开始使用日期", "date");
+        registerField("assetGroupSecondary", "设备分类2级", "enum");
+        registerField("meteringCycle", "计量周期（月）", "number");
     }
 
     private static void registerField(String value, String label, String fieldType) {
@@ -284,6 +313,8 @@ public class AssetAdvancedSearchService {
             }
 
             String fieldType = getFieldType(condition.getFieldName());
+            // 将搜索字段名映射为实体字段名（如 assetTypeGroup → assetType）
+            String entityFieldName = resolveEntityFieldName(condition.getFieldName());
 
             // Handle enum multi-select: enumValues非空时统一按IN处理（无论operator是EQ还是IN）
             if ("enum".equals(fieldType)
@@ -300,13 +331,13 @@ public class AssetAdvancedSearchService {
                     }
                 }
                 if (allInteger && !intValues.isEmpty()) {
-                    searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.IN, intValues, CONDITION_PATH));
-                    logger.info("[AdvancedSearch] condition[{}] ADDED as IN enum(int): field={}, values={}", i, condition.getFieldName(), intValues);
+                    searchFilters.add(new SearchFilter(entityFieldName, SearchFilter.Operator.IN, intValues, CONDITION_PATH));
+                    logger.info("[AdvancedSearch] condition[{}] ADDED as IN enum(int): field={}, values={}", i, entityFieldName, intValues);
                 } else {
                     // 非整数值（如供应商名称字符串），直接使用字符串列表做IN查询
                     List<String> strValues = new ArrayList<>(condition.getEnumValues());
-                    searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.IN, strValues, CONDITION_PATH));
-                    logger.info("[AdvancedSearch] condition[{}] ADDED as IN enum(str): field={}, values={}", i, condition.getFieldName(), strValues);
+                    searchFilters.add(new SearchFilter(entityFieldName, SearchFilter.Operator.IN, strValues, CONDITION_PATH));
+                    logger.info("[AdvancedSearch] condition[{}] ADDED as IN enum(str): field={}, values={}", i, entityFieldName, strValues);
                 }
                 continue;
             }
@@ -320,20 +351,20 @@ public class AssetAdvancedSearchService {
             }
 
             if (operator == SearchFilter.Operator.IsNull || operator == SearchFilter.Operator.IsNotNull) {
-                searchFilters.add(new SearchFilter(condition.getFieldName(), operator, null, CONDITION_PATH));
-                logger.info("[AdvancedSearch] condition[{}] ADDED as {}: field={}", i, operator, condition.getFieldName());
+                searchFilters.add(new SearchFilter(entityFieldName, operator, null, CONDITION_PATH));
+                logger.info("[AdvancedSearch] condition[{}] ADDED as {}: field={}", i, operator, entityFieldName);
             } else if (operator == SearchFilter.Operator.BETWEEN) {
                 int beforeSize = searchFilters.size();
-                applyBetween(searchFilters, condition, fieldType);
-                logger.info("[AdvancedSearch] condition[{}] BETWEEN: field={}, type={}, added {} filters", i, condition.getFieldName(), fieldType, searchFilters.size() - beforeSize);
+                applyBetween(searchFilters, condition, fieldType, entityFieldName);
+                logger.info("[AdvancedSearch] condition[{}] BETWEEN: field={}, type={}, added {} filters", i, entityFieldName, fieldType, searchFilters.size() - beforeSize);
             } else {
                 Object value = resolveValue(condition, fieldType);
                 if (value != null) {
-                    searchFilters.add(new SearchFilter(condition.getFieldName(), operator, value, CONDITION_PATH));
-                    logger.info("[AdvancedSearch] condition[{}] ADDED: field={}, operator={}, value={}, type={}", i, condition.getFieldName(), operator, value, fieldType);
+                    searchFilters.add(new SearchFilter(entityFieldName, operator, value, CONDITION_PATH));
+                    logger.info("[AdvancedSearch] condition[{}] ADDED: field={}, operator={}, value={}, type={}", i, entityFieldName, operator, value, fieldType);
                 } else {
                     logger.warn("[AdvancedSearch] condition[{}] SKIPPED: resolved value is null, field={}, operator={}, type={}, rawValue={}, dateValue={}",
-                            i, condition.getFieldName(), operator, fieldType, condition.getValue(), condition.getDateValue());
+                            i, entityFieldName, operator, fieldType, condition.getValue(), condition.getDateValue());
                 }
             }
         }
@@ -346,7 +377,7 @@ public class AssetAdvancedSearchService {
         }
     }
 
-    private void applyBetween(List<SearchFilter> searchFilters, SearchCondition condition, String fieldType) {
+    private void applyBetween(List<SearchFilter> searchFilters, SearchCondition condition, String fieldType, String entityFieldName) {
         if ("date".equals(fieldType)) {
             Date date1 = condition.getDateValue();
             Date date2 = condition.getDateValue2();
@@ -360,22 +391,22 @@ public class AssetAdvancedSearchService {
                 try { date2 = sdf.parse(condition.getValue2()); } catch (Exception e) { logger.warn("[AdvancedSearch] Failed to parse date value2: {}", condition.getValue2()); }
             }
             if (date1 != null) {
-                searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.GTE, date1, CONDITION_PATH));
+                searchFilters.add(new SearchFilter(entityFieldName, SearchFilter.Operator.GTE, date1, CONDITION_PATH));
             }
             if (date2 != null) {
-                searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.LTE, date2, CONDITION_PATH));
+                searchFilters.add(new SearchFilter(entityFieldName, SearchFilter.Operator.LTE, date2, CONDITION_PATH));
             }
         } else {
             if (isNotBlank(condition.getValue())) {
                 Object val = "number".equals(fieldType) ? parseNumber(condition.getValue()) : condition.getValue();
                 if (val != null) {
-                    searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.GTE, val, CONDITION_PATH));
+                    searchFilters.add(new SearchFilter(entityFieldName, SearchFilter.Operator.GTE, val, CONDITION_PATH));
                 }
             }
             if (isNotBlank(condition.getValue2())) {
                 Object val2 = "number".equals(fieldType) ? parseNumber(condition.getValue2()) : condition.getValue2();
                 if (val2 != null) {
-                    searchFilters.add(new SearchFilter(condition.getFieldName(), SearchFilter.Operator.LTE, val2, CONDITION_PATH));
+                    searchFilters.add(new SearchFilter(entityFieldName, SearchFilter.Operator.LTE, val2, CONDITION_PATH));
                 }
             }
         }
@@ -383,12 +414,9 @@ public class AssetAdvancedSearchService {
 
     public List<EnumOption> getEnumOptions(String fieldName) {
         if (fieldName == null || fieldName.isEmpty()) return Collections.emptyList();
-        
-        String msgType = fieldName;
-        // status field uses "assetStatus" as i18n message type
-        if ("status".equals(fieldName)) {
-            msgType = "assetStatus";
-        }
+
+        // 使用映射的i18n键（如果有），否则使用字段名
+        String msgType = I18N_KEY_MAPPING.getOrDefault(fieldName, fieldName);
         try {
             List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(msgType);
             List<EnumOption> options = new ArrayList<>();
@@ -431,6 +459,13 @@ public class AssetAdvancedSearchService {
 
     private boolean isNotBlank(String str) {
         return str != null && !str.trim().isEmpty();
+    }
+
+    /**
+     * 将搜索字段名映射为实体字段名
+     */
+    private String resolveEntityFieldName(String fieldName) {
+        return FIELD_NAME_MAPPING.getOrDefault(fieldName, fieldName);
     }
 
     public static class FieldOption {

@@ -862,7 +862,194 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 return Collections.emptyList();
             }
         }
+        // 所属院区：从院区列表获取（orgType=3）
+        if ("hospitalId".equals(fieldName)) {
+            return getSiteEnumOptions();
+        }
+        // 所属科室、使用科室、账户科室：从科室列表获取（orgType=4）
+        if ("clinicalDeptName".equals(fieldName) || "assetDeptName".equals(fieldName) || "accountingDeptName".equals(fieldName)) {
+            return getDeptEnumOptions();
+        }
+        // 资产分类：从AssetTypeGroup实体表获取
+        if ("assetTypeGroup".equals(fieldName)) {
+            return getAssetTypeGroupEnumOptions();
+        }
+        // 设备32分类：从AssetClassification32Enum枚举获取
+        if ("assetClassification32".equals(fieldName)) {
+            return getAssetClassification32EnumOptions();
+        }
+        // 医疗器械子分类(旧)：级联下拉，聚合所有functionGroup下的子分类
+        if ("assetCode68".equals(fieldName)) {
+            return getAssetCode68EnumOptions();
+        }
+        // 设备分类2级：级联下拉，聚合所有assetGroup下的二级分类
+        if ("assetGroupSecondary".equals(fieldName)) {
+            return getAssetGroupSecondaryEnumOptions();
+        }
+        // 医疗器械分类：从SysAuthGroup表获取
+        if ("medicalApparatusClassification".equals(fieldName)) {
+            return getMedicalApparatusClassificationEnumOptions();
+        }
         return advancedSearchService.getEnumOptions(fieldName);
+    }
+
+    /**
+     * 从院区列表(siteList)构建枚举选项，value为hospitalId(Integer)
+     */
+    private List<AssetAdvancedSearchService.EnumOption> getSiteEnumOptions() {
+        if (siteList == null || siteList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+        Set<Integer> addedIds = new HashSet<>();
+        for (OrgInfo org : siteList) {
+            if (org.getHospitalId() != null && addedIds.add(org.getHospitalId())) {
+                options.add(new AssetAdvancedSearchService.EnumOption(
+                        String.valueOf(org.getHospitalId()), org.getName()));
+            }
+        }
+        return options;
+    }
+
+    /**
+     * 从科室列表(clinicalDeptList)构建枚举选项，value为科室名称(String)
+     */
+    private List<AssetAdvancedSearchService.EnumOption> getDeptEnumOptions() {
+        if (clinicalDeptList == null || clinicalDeptList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+        Set<String> addedNames = new HashSet<>();
+        for (OrgInfo org : clinicalDeptList) {
+            if (org.getName() != null && addedNames.add(org.getName())) {
+                options.add(new AssetAdvancedSearchService.EnumOption(org.getName(), org.getName()));
+            }
+        }
+        return options;
+    }
+
+    /**
+     * 从资产分类列表(assetTypeGroupList)构建枚举选项，value为encoded，label为显示名称
+     */
+    private List<AssetAdvancedSearchService.EnumOption> getAssetTypeGroupEnumOptions() {
+        if (assetTypeGroupList == null || assetTypeGroupList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+        Set<String> addedEncoded = new HashSet<>();
+        for (AssetTypeGroup atg : assetTypeGroupList) {
+            if (atg.getEncoded() != null && addedEncoded.add(atg.getEncoded())) {
+                options.add(new AssetAdvancedSearchService.EnumOption(atg.getEncoded(), atg.getDisplayName()));
+            }
+        }
+        return options;
+    }
+
+    /**
+     * 聚合所有functionGroup下的医疗器械子分类(旧)选项
+     * 编辑页中assetCode68是级联下拉，i18n键为functionGroup选中项的msgKey
+     * 高级查询中无父级选择，因此聚合所有子分类
+     */
+    private List<AssetAdvancedSearchService.EnumOption> getAssetCode68EnumOptions() {
+        try {
+            List<I18nMessage> functionGroups = FieldValueMessageController.getFieldValueList("assetFunctionType");
+            if (functionGroups == null || functionGroups.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+            Set<String> addedKeys = new HashSet<>();
+            for (I18nMessage fg : functionGroups) {
+                List<I18nMessage> code68List = i18nDao.getByMsgType(fg.getMsgKey());
+                if (code68List != null) {
+                    for (I18nMessage msg : code68List) {
+                        if (msg.getMsgKey() != null && addedKeys.add(msg.getMsgKey())) {
+                            options.add(new AssetAdvancedSearchService.EnumOption(msg.getMsgKey(), msg.getValue()));
+                        }
+                    }
+                }
+            }
+            return options;
+        } catch (Exception e) {
+            logger.error("加载医疗器械子分类(旧)列表失败", e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 聚合所有assetGroup下的设备分类2级选项
+     * 编辑页中assetGroupSecondary是级联下拉，i18n键为"assetGroupSecondary_" + assetGroup值
+     * 高级查询中无父级选择，因此聚合所有二级分类
+     */
+    private List<AssetAdvancedSearchService.EnumOption> getAssetGroupSecondaryEnumOptions() {
+        try {
+            List<I18nMessage> assetGroups = FieldValueMessageController.getFieldValueList("assetGroup");
+            if (assetGroups == null || assetGroups.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+            Set<String> addedKeys = new HashSet<>();
+            for (I18nMessage ag : assetGroups) {
+                String msgType = "assetGroupSecondary_" + ag.getMsgKey();
+                List<I18nMessage> secondaryList = i18nDao.getByMsgType(msgType);
+                if (secondaryList != null) {
+                    for (I18nMessage msg : secondaryList) {
+                        if (msg.getMsgKey() != null && addedKeys.add(msg.getMsgKey())) {
+                            options.add(new AssetAdvancedSearchService.EnumOption(msg.getMsgKey(), msg.getValue()));
+                        }
+                    }
+                }
+            }
+            return options;
+        } catch (Exception e) {
+            logger.error("加载设备分类2级列表失败", e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 从SysAuthGroup表获取医疗器械分类选项，value为classificationCode，label为显示名称
+     */
+    private List<AssetAdvancedSearchService.EnumOption> getMedicalApparatusClassificationEnumOptions() {
+        try {
+            List<SysAuthGroup> allGroups = sysAuthGroupRepository.listSysAuthGroup();
+            if (allGroups == null || allGroups.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+            Set<String> addedCodes = new HashSet<>();
+            for (SysAuthGroup group : allGroups) {
+                String code = group.getClassificationCode();
+                if (code != null && !code.trim().isEmpty() && addedCodes.add(code)) {
+                    options.add(new AssetAdvancedSearchService.EnumOption(code, group.getDisplayName()));
+                }
+            }
+            return options;
+        } catch (Exception e) {
+            logger.error("加载医疗器械分类列表失败", e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 从AssetClassification32Enum枚举获取设备32分类选项，value和label均为显示名称
+     */
+    private List<AssetAdvancedSearchService.EnumOption> getAssetClassification32EnumOptions() {
+        try {
+            List<String> displayNames = com.ge.healthcare.cn.common.cons.AssetClassification32Enum.getAllDisplayNameList();
+            if (displayNames == null || displayNames.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<AssetAdvancedSearchService.EnumOption> options = new ArrayList<>();
+            for (String name : displayNames) {
+                if (name != null && !name.trim().isEmpty()) {
+                    options.add(new AssetAdvancedSearchService.EnumOption(name, name));
+                }
+            }
+            return options;
+        } catch (Exception e) {
+            logger.error("加载设备32分类列表失败", e);
+            return Collections.emptyList();
+        }
     }
 
     public void addAdvancedCondition() {
