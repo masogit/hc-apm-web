@@ -199,6 +199,7 @@ public enum GatewayURL {
     ASSET_CLASSIFICATION_MODEL_EDIT("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/editModel"),
     ASSET_CLASSIFICATION_MODEL_DELETE("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/deleteModel"),
     ASSET_CLASSIFICATION_MODEL_GETRESMAPBYASSET("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/getResMapByAsset"),
+    ASSET_CLASSIFICATION_MODEL_BATCH_GETRESMAPBYASSET("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/batchGetResMapByAsset"),
     ASSET_CLASSIFICATION_MODEL_UPLOAD_FILE("/hcapmmasterdataservice/api/apm/masterData/assetClassificationModel/uploadFileModel"),
 
     //es查询设备修改历史记录分页

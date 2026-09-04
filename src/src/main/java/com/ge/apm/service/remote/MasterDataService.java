@@ -19,9 +19,11 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 @Service
 public class MasterDataService  extends MicroServiceInvoker {
@@ -98,6 +100,72 @@ public class MasterDataService  extends MicroServiceInvoker {
         } else {
             return null;
         }
+    }
+
+    /** 单批设备数，与 ONNX 的 ONNX_BATCH_SIZE(100) 对齐，每批只触发一次 ONNX 调用 */
+    private static final int WEB_BATCH_SIZE = 100;
+
+    /** 并行线程数，控制对 ONNX 的并发压力 */
+    private static final int WEB_PARALLELISM = 4;
+
+    private static final ExecutorService webBatchExecutor = Executors.newFixedThreadPool(WEB_PARALLELISM, r -> {
+        Thread t = new Thread(r, "web-batch");
+        t.setDaemon(true);
+        return t;
+    });
+
+    /**
+     * 批量获取设备分类推理结果，按 WEB_BATCH_SIZE 分批并行调用 masterData。
+     * 每批 100 台，masterData 直接透传给 ONNX（无需二次拆分），4 线程并行。
+     * 返回结果列表与输入列表索引一一对应。
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> batchGetResMapByAsset(List<AssetClassificationModel> assets) {
+        int total = assets.size();
+        List<Map<String, Object>> allResults = Collections.synchronizedList(new ArrayList<>(total));
+        for (int i = 0; i < total; i++) {
+            allResults.add(null);
+        }
+
+        // 主线程捕获 token，供子线程使用（RequestContextHolder 是线程局部的）
+        String token = UserContextService.getAccessToken();
+        String gatewayURL = getGatewayURL(GatewayURL.ASSET_CLASSIFICATION_MODEL_BATCH_GETRESMAPBYASSET);
+
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        for (int start = 0; start < total; start += WEB_BATCH_SIZE) {
+            int end = Math.min(start + WEB_BATCH_SIZE, total);
+            int offset = start;
+            List<AssetClassificationModel> chunk = assets.subList(start, end);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    HttpHeaders header = createHttpHeaders(token);
+                    HttpEntity<List<AssetClassificationModel>> requestEntity = new HttpEntity<>(chunk, header);
+                    ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+                    if (isOkay(response)) {
+                        List<Map<String, Object>> chunkResults = (List<Map<String, Object>>) response.getBody().get("data");
+                        if (chunkResults != null) {
+                            for (int j = 0; j < chunkResults.size(); j++) {
+                                allResults.set(offset + j, chunkResults.get(j));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("批量分类推理分批失败 (offset={}, size={}): {}", offset, chunk.size(), e.getMessage(), e);
+                }
+            }, webBatchExecutor);
+            futures.add(future);
+        }
+
+        try {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(5, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            logger.warn("部分批量分类推理超时或失败", e);
+        }
+
+        logger.info("批量分类推理完成，总数: {}, 成功: {}", total,
+                allResults.stream().filter(r -> r != null).count());
+        return allResults;
     }
 
 

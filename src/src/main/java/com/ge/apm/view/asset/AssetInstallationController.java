@@ -1423,6 +1423,14 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetClassificationModel.setPattern(arrivalListItem.getFunctionType());
         assetClassificationModel.setSourceName(arrivalListItem.getArrivalList().getAssetName());
         assetClassificationModel.setFactory(null);
+        // ONNX FULL 模型扩展字段
+        assetClassificationModel.setDepartment(
+            arrivalListItem.getArrivalList() != null ? arrivalListItem.getArrivalList().getClinicalDeptName() : null);
+        assetClassificationModel.setRegistrationNo(arrivalListItem.getRegistrationNo());
+        assetClassificationModel.setIsEmergencyDevice(
+            arrivalListItem.getEmergencyEquipment() != null ? (arrivalListItem.getEmergencyEquipment() == 1 ? "是" : "否") : null);
+        assetClassificationModel.setPurchasePrice(
+            arrivalListItem.getPurchasePrice() != null ? String.valueOf(arrivalListItem.getPurchasePrice()) : null);
 
         return    masterDataService.autoAssetClassification32(assetClassificationModel);
 

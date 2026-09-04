@@ -12,6 +12,7 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.component.UserSiteOrgTreeComponentController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AssetClassification32Enum;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.base.Strings;
 import lombok.Data;
@@ -375,23 +376,57 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     }
 
     public void addCheckedDevice(){
+        // 第一步：筛选出需要添加的设备
+        List<AssetInfo> newAssets = new ArrayList<>();
         for (AssetInfo assetInfo : selectedAssetsed1) {
             boolean b = selectAsset.stream().anyMatch(item -> item.getUid().equals(assetInfo.getUid()));
             if(!b){
                 selectAsset.add(assetInfo);
                 assetInfo.setCategoryRadio(assetInfo.getAssetClassification32());
-                if(StringUtils.isEmpty(assetInfo.getCategory1())) {
-                    AssetClassificationModel assetClassificationModel = new AssetClassificationModel();
-                    assetClassificationModel.setBrand(assetInfo.getMakerShortName());
-                    assetClassificationModel.setPattern(assetInfo.getFunctionType());
-                    assetClassificationModel.setSourceName(assetInfo.getName());
-                    assetClassificationModel.setFactory(assetInfo.getManufacture());
-                    Map<String, Object> resMapByAsset = masterDataService.getResMapByAsset(assetClassificationModel);
+                newAssets.add(assetInfo);
+            }
+        }
+
+        // 第二步：筛选出需要分类推理的设备，并批量构建请求模型
+        List<AssetInfo> needClassify = new ArrayList<>();
+        List<AssetClassificationModel> models = new ArrayList<>();
+        for (AssetInfo assetInfo : newAssets) {
+            if (StringUtils.isEmpty(assetInfo.getCategory1())) {
+                needClassify.add(assetInfo);
+                AssetClassificationModel m = new AssetClassificationModel();
+                m.setBrand(assetInfo.getMakerShortName());
+                m.setPattern(assetInfo.getFunctionType());
+                m.setSourceName(assetInfo.getName());
+                m.setFactory(assetInfo.getManufacture());
+                // ONNX FULL 模型扩展字段
+                m.setDepartment(assetInfo.getClinicalDeptName());
+                String riskVal = assetInfo.getRiskGrade() != null
+                    ? FieldValueMessageController.fieldValue("riskGrade", String.valueOf(assetInfo.getRiskGrade())) : null;
+                m.setRiskLevel(org.apache.commons.lang.StringUtils.isNotBlank(riskVal) ? riskVal : null);
+                String meterVal = assetInfo.getMeasureGrade() != null
+                    ? FieldValueMessageController.fieldValue("measureGrade", String.valueOf(assetInfo.getMeasureGrade())) : null;
+                m.setMeterLevel(org.apache.commons.lang.StringUtils.isNotBlank(meterVal) ? meterVal : null);
+                m.setRegistrationNo(assetInfo.getRegistrationNo());
+                m.setIsEmergencyDevice(
+                    assetInfo.getEmergencyEquipment() != null ? (assetInfo.getEmergencyEquipment() == 1 ? "是" : "否") : null);
+                m.setPurchasePrice(
+                    assetInfo.getPurchasePrice() != null ? String.valueOf(assetInfo.getPurchasePrice()) : null);
+                models.add(m);
+            }
+        }
+
+        // 第三步：批量调用 MasterData 服务获取分类结果
+        if (!models.isEmpty()) {
+            List<Map<String, Object>> results = masterDataService.batchGetResMapByAsset(models);
+            if (results != null) {
+                for (int i = 0; i < needClassify.size() && i < results.size(); i++) {
+                    Map<String, Object> resMapByAsset = results.get(i);
+                    AssetInfo assetInfo = needClassify.get(i);
                     if (resMapByAsset != null) {
                         assetInfo.setCategory1(!StringUtils.isEmpty(resMapByAsset.get("category")) ? (String) resMapByAsset.get("category") : null);
                         assetInfo.setCategory2(!StringUtils.isEmpty(resMapByAsset.get("category2")) ? (String) resMapByAsset.get("category2") : null);
                         assetInfo.setCategory3(!StringUtils.isEmpty(resMapByAsset.get("category3")) ? (String) resMapByAsset.get("category3") : null);
-                        if(assetInfo.getCategory1()==null && assetInfo.getCategory2()==null && assetInfo.getCategory3()==null){
+                        if (assetInfo.getCategory1() == null && assetInfo.getCategory2() == null && assetInfo.getCategory3() == null) {
                             assetInfo.setCategory1(AssetClassification32Enum.NON_MEDICAL_EQUIPMENT.getDisplayName());
                         }
                     }

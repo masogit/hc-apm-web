@@ -13,6 +13,7 @@ import com.ge.apm.service.remote.MasterDataService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import com.google.common.base.Strings;
@@ -317,6 +318,19 @@ public class DetailsController extends GenericCRUDController<AssetInfo> implemen
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getName());
         assetClassificationModel.setFactory(selected.getManufacture());
+        // ONNX FULL 模型扩展字段
+        assetClassificationModel.setDepartment(selected.getClinicalDeptName());
+        String riskVal = selected.getRiskGrade() != null
+            ? FieldValueMessageController.fieldValue("riskGrade", String.valueOf(selected.getRiskGrade())) : null;
+        assetClassificationModel.setRiskLevel(StringUtils.isNotBlank(riskVal) ? riskVal : null);
+        String meterVal = selected.getMeasureGrade() != null
+            ? FieldValueMessageController.fieldValue("measureGrade", String.valueOf(selected.getMeasureGrade())) : null;
+        assetClassificationModel.setMeterLevel(StringUtils.isNotBlank(meterVal) ? meterVal : null);
+        assetClassificationModel.setRegistrationNo(selected.getRegistrationNo());
+        assetClassificationModel.setIsEmergencyDevice(
+            selected.getEmergencyEquipment() != null ? (selected.getEmergencyEquipment() == 1 ? "是" : "否") : null);
+        assetClassificationModel.setPurchasePrice(
+            selected.getPurchasePrice() != null ? String.valueOf(selected.getPurchasePrice()) : null);
 
         return  masterDataService.autoAssetClassification32(assetClassificationModel);
 
