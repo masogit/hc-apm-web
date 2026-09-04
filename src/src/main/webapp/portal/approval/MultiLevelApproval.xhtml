@@ -44,10 +44,10 @@
                     <p:ajax event="rowSelect" listener="#{multiLevelApprovalListController.onRowSelect}" update="ItemDetailViewForm"/>
                     <p:ajax event="filter" listener="#{multiLevelApprovalListController.onFilter}"/>
 
-                    <p:column headerText="#{msg.ApprovalNumber}"   filterBy="#{item.la.approva_number}" filterMatchMode="LIKE"  >
+                    <p:column headerText="#{msg.ApprovalNumber}"   filterBy="#{item.la.approva_number}" filterMatchMode="LIKE" sortBy="#{item.approvalNumber}" >
                         <h:outputText value="#{item.approvalNumber}"/>
                     </p:column>
-                    <p:column headerText="#{msg.BusinessNumber}" filterBy="#{item.la.business_number}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.BusinessNumber}" filterBy="#{item.la.business_number}" filterMatchMode="LIKE" sortBy="#{item.businessNumber}" >
                         <h:outputText value="#{item.businessNumber}"/>
                     </p:column>
                     <p:column headerText="#{msg.BusinessType}"  filterBy="#{item.la.business_type}" filterMatchMode="EQ" >
