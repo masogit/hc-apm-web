@@ -8,8 +8,8 @@
 
 <ui:composition>
 
-    <p:dialog id="newTransactionDlg" widgetVar="newTransactionDlg" width="600" height="280" modal="true" resizable="true" draggable="true" appendTo="@this" header="事务">
-        <h:form id="newDefTranManForm" class="wokao">
+    <p:dialog id="newTransactionDlg" widgetVar="newTransactionDlg" width="600" height="500" modal="true" resizable="true" draggable="true" appendTo="@this" header="事务">
+        <h:form id="newDefTranManForm" class="wokao" enctype="multipart/form-data">
             <h:panelGroup class="newTrFormGrNew" id="display" >
                 <p:panelGrid  columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
@@ -22,9 +22,15 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
+                        <label class="label">次数</label>
+                        <p:inputText id="times" value="#{depTranDetailController.times}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
                         <label class="label">开始时间*</label>
                         <p:calendar  timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{depTranDetailController.upStartTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
+
                     <h:panelGroup>
                         <label class ="label">工时*</label>
                         <p:inputText id="hours" value="#{depTranDetailController.hours}" required="true" requiredMessage="工时 #{msg.ValidationRequire}"/>
@@ -37,10 +43,31 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </h:panelGroup>
-            <h:panelGroup >
-                <p:commandButton   validateClient="true" actionListener="#{depTranDetailController.createTransaction()}" process="newDefTranManForm" value="创建" update="deptTransactionForm:tranTabView:trDetailFormNew:datalist :growl"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'newTransactionDlg');">
-                </p:commandButton>
+
+            <h:panelGroup id="newImagePanel">
+                <label class="label">图片(最多5张)</label>
+                <p:dataTable value="#{depTranDetailController.transactionImages}" var="img" emptyMessage="暂无图片" style="margin-bottom:5px;">
+                    <p:column headerText="预览" width="60">
+                        <p:graphicImage value="#{fileDownloadService.getFile(img.objectStorageId)}" alt="不支持预览" height="40" width="100" stream="false" >
+                        </p:graphicImage>
+                    </p:column>
+                    <p:column headerText="文件名">
+                        <h:outputText value="#{img.objectName}"/>
+                    </p:column>
+                    <p:column headerText="操作" width="50">
+                        <p:commandButton icon="ui-icon-delete" title="删除" actionListener="#{depTranDetailController.removeImage(img)}" update=":deptTransactionForm:tranTabView:newDefTranManForm:newImagePanel" process="@this" class="popupIconButton"/>
+                    </p:column>
+                </p:dataTable>
+                <p:fileUpload id="newImgUpload" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/"
+                              fileUploadListener="#{depTranDetailController.handleImageUpload}" mode="advanced"
+                              dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="10000000"
+                              update=":deptTransactionForm:tranTabView:newDefTranManForm:newImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
+                              invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="文件大小不超过10M" label="添加图片"/>
             </h:panelGroup>
+           <h:panelGroup >
+            <p:commandButton   validateClient="true" actionListener="#{depTranDetailController.createTransaction()}" process="newDefTranManForm" value="创建" update="deptTransactionForm:tranTabView:trDetailFormNew:datalist :growl"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'newTransactionDlg');">
+            </p:commandButton>
+           </h:panelGroup>
             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('depTranDetailController').hide()">
             </p:commandButton>
         </h:form>
@@ -48,8 +75,8 @@
     </p:dialog>
 
     <!-- 更新科务记录-->
-    <p:dialog id="updateTransactionDlg" widgetVar="updateTransactionDlg" width="600" height="280" modal="true" resizable="true" draggable="true" appendTo="@this" header="事务">
-        <h:form id="updateDefTranManForm" class="updateTrCls">
+    <p:dialog id="updateTransactionDlg" widgetVar="updateTransactionDlg" width="600" height="500" modal="true" resizable="true" draggable="true" appendTo="@this" header="事务">
+        <h:form id="updateDefTranManForm" class="updateTrCls" enctype="multipart/form-data">
             <h:panelGroup class="newTrFormGrNew" id="display2" >
                 <p:panelGrid  columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
@@ -62,16 +89,19 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
+                        <label class="label">次数</label>
+                        <p:inputText id="times2" value="#{depTranDetailController.times}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
                         <label class="label">开始时间*</label>
                         <p:calendar  timeZone="GMT+8" id="fillDate2" pattern="yyyy/MM/dd"  value="#{depTranDetailController.upStartTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="开始时间#{msg.ValidationRequire}"></p:calendar>
-
-
                     </h:panelGroup>
+
                     <h:panelGroup>
                         <label class ="label">工时*</label>
                         <p:inputText id="hours2" value="#{depTranDetailController.hours}" required="true" requiredMessage="工时 #{msg.ValidationRequire}"/>
                     </h:panelGroup>
-
 
                     <h:panelGroup>
                         <label class="label">备注</label>
@@ -79,6 +109,28 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </h:panelGroup>
+
+            <h:panelGroup id="updateImagePanel">
+                <label class="label">图片(最多5张)</label>
+                <p:dataTable value="#{depTranDetailController.transactionImages}" var="img" emptyMessage="暂无图片" style="margin-bottom:5px;">
+                    <p:column headerText="预览" width="60">
+                        <p:graphicImage value="#{fileDownloadService.getFile(img.objectStorageId)}" height="40" width="100" stream="false" >
+                        </p:graphicImage>
+                    </p:column>
+                    <p:column headerText="文件名">
+                        <h:outputText value="#{img.objectName}"/>
+                    </p:column>
+                    <p:column headerText="操作" width="50">
+                        <p:commandButton icon="ui-icon-delete" title="删除" actionListener="#{depTranDetailController.removeImage(img)}" update=":deptTransactionForm:tranTabView:updateDefTranManForm:updateImagePanel" process="@this" class="popupIconButton"/>
+                    </p:column>
+                </p:dataTable>
+                <p:fileUpload id="updateImgUpload" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/"
+                              fileUploadListener="#{depTranDetailController.handleImageUpload}" mode="advanced"
+                              dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="20000000"
+                              update=":deptTransactionForm:tranTabView:updateDefTranManForm:updateImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
+                              invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="文件大小不超过20M" label="添加图片"/>
+            </h:panelGroup>
+
             <h:panelGroup >
                 <p:commandButton   validateClient="true" actionListener="#{depTranDetailController.locUpdateTransactionbyLink()}" process="updateDefTranManForm" value="保存" update="deptTransactionForm:tranTabView:trDetailFormNew:datalist :growl"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'updateTransactionDlg');">
                 </p:commandButton>

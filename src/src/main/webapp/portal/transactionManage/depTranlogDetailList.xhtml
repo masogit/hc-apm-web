@@ -21,16 +21,16 @@
                         <label class="label">结束时间*</label>
                         <p:calendar timeZone="GMT+8" id="fillDate1" value="#{depTranDetailController.endTime}" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
-                    <p:commandButton value="查询"  update="datalist" actionListener="#{depTranDetailController.searchRanageSet()}" />
+                     <p:commandButton value="查询"  update="datalist" actionListener="#{depTranDetailController.searchRanageSet()}" />
                 </p:panelGrid>
                 <p:dataTable id="datalist"
                              value="#{depTranDetailController.lazyModel}"
                              var="item2"       widgetVar="varDataList" selectionMode="single"
                              selection="#{depTranDetailController.selected}" lazy="true"
                              paginator="true"
-                             rowKey="#{item2.id}"
-                             paginatorPosition="both" sortBy="#{item2.id}" paginatorAlwaysVisible="true" paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,30,40">
-                    <p:ajax event="rowSelect" update="@(.delBtn) @(.btnEdit)" listener="#{depTranDetailController.onselectDetailItem()}"/>
+                              rowKey="#{item2.id}"
+                               paginatorPosition="both" sortBy="#{item2.id}" paginatorAlwaysVisible="true" paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,30,40">
+                     <p:ajax event="rowSelect" update="@(.delBtn) @(.btnEdit)" listener="#{depTranDetailController.onselectDetailItem()}"/>
                     <p:column headerText="姓名">
                         <h:outputText value="#{item2.authorName}"/>
                     </p:column>
@@ -41,7 +41,9 @@
                     </p:column>
                     <p:column headerText="类别"  >
                         <h:outputText value="#{fieldMsg.fieldValue('transaction',item2.category)}"/>
-
+                    </p:column>
+                    <p:column headerText="次数"  >
+                        <h:outputText value="#{item2.times}"/>
                     </p:column>
                     <p:column headerText="工时">
                         <h:outputText value="#{item2.hours}">
@@ -51,10 +53,17 @@
                     <p:column headerText="备注">
                         <h:outputText value="#{item2.remark}"/>
                     </p:column>
+                    <p:column headerText="图片" width="60" exportable="false">
+                        <p:commandButton icon="ui-icon-image" title="查看图片"
+                                         actionListener="#{depTranDetailController.loadViewImages(item2)}"
+                                         update=":deptTransactionForm:tranTabView:viewImagePanel"
+                                         oncomplete="PF('viewImageDlg').show()"
+                                         process="@this" class="popupIconButton"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
 
-                        <p:commandButton id="addButton" actionListener="#{depTranDetailController.prepareCreate()}"
-                                         update="@(.newTrFormGrNew)" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  oncomplete="PF('newTransactionDlg').show()"/>
+                    <p:commandButton id="addButton" actionListener="#{depTranDetailController.prepareCreate()}"
+                                     update="@(.newTrFormGrNew)" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  oncomplete="PF('newTransactionDlg').show()"/>
 
                         <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btnEdit" update="@(.updateTrCls)"  actionListener="#{depTranDetailController.prepareEdit}"  oncomplete="PF('updateTransactionDlg').show()" disabled="#{empty depTranDetailController.selected}"/>
 
@@ -77,6 +86,45 @@
             </p:fieldset>
 
         </h:form>
+
+        <p:dialog id="viewImageDlg" widgetVar="viewImageDlg" width="650" height="450" modal="true"
+                  resizable="true" draggable="true" appendTo="@this" header="查看图片">
+            <h:panelGroup id="viewImagePanel">
+                <p:dataTable value="#{depTranDetailController.viewImages}" var="img" emptyMessage="暂无图片">
+                    <p:column headerText="预览" width="120">
+                        <h:panelGroup styleClass="img-thumb-wrap">
+                            <p:graphicImage value="#{fileDownloadService.getFile(img.objectStorageId)}"
+                                            alt="不支持预览" height="80" width="120" stream="false"
+                                            style="cursor:pointer;" styleClass="view-img-thumb"/>
+                            <p:graphicImage value="#{fileDownloadService.getFile(img.objectStorageId)}"
+                                            alt="" stream="false" style="display:none;" styleClass="view-img-full"/>
+                        </h:panelGroup>
+                    </p:column>
+                    <p:column headerText="文件名">
+                        <h:outputText value="#{img.objectName}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGroup>
+        </p:dialog>
+
+        <p:dialog id="viewFullImageDlg" widgetVar="viewFullImageDlg" modal="true"
+                  responsive="true" draggable="true" appendTo="@this" header="查看大图"
+                  styleClass="view-full-img-dlg">
+            <h:panelGroup id="viewFullImagePanel">
+                <img id="viewFullImg" src="" alt="大图预览" style="max-width:100%;max-height:70vh;display:block;margin:0 auto;"/>
+            </h:panelGroup>
+        </p:dialog>
+
+        <script type="text/javascript">
+            $(document).on('click', '.view-img-thumb', function() {
+                var fullSrc = $(this).siblings('.view-img-full').attr('src');
+                if (fullSrc) {
+                    $('#viewFullImg').attr('src', fullSrc);
+                    PF('viewFullImageDlg').show();
+                }
+            });
+        </script>
+
         <ui:include src="newOrUpdateDefTranLog.xhtml"/>
 
 
