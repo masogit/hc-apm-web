@@ -131,7 +131,7 @@
                     <p:fieldset legend="营业执照信息">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                             <h:panelGroup>
-                                <label class="label">营业执照编码</label>
+                                <label class="label">营业执照代码</label>
                                 <p:inputText title="#{supplierController.selected.licenseCode}"  style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" readonly="true" value="#{supplierController.selected.licenseCode}" />
                             </h:panelGroup>
                             <h:panelGroup>
@@ -141,6 +141,12 @@
                             <h:panelGroup>
                                 <label class="label">业务范围</label>
                                 <p:inputText readonly="true" value="#{supplierController.selected.licenseScope}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">营业执照登记机关批准日期(必填)</label>
+                                <p:inputText id="licenseApprovalDate" value="#{supplierController.selected.licenseApprovalDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </p:inputText>
                             </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >
@@ -157,12 +163,18 @@
                     <p:fieldset legend="医疗器械经营许可证/医疗器械经营备案凭证信息">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                             <h:panelGroup>
-                                <label class="label">许可证编码</label>
+                                <label class="label">经营许可证编号</label>
                                 <p:inputText title="#{supplierController.selected.permitCode}"  style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" readonly="true" value="#{supplierController.selected.permitCode}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">许可证截止日期</label>
                                 <p:calendar timeZone="GMT+8" id="permitEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.permitEndDate}" required="false" requiredMessage="营业许可证截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">经营发证日期</label>
+                                <p:inputText id="businessIssuinglDate" value="#{supplierController.selected.businessIssuinglDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </p:inputText>
                             </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >
@@ -176,38 +188,44 @@
                             </p:dataList>
                         </h:panelGroup>
                         <br/>
-                        <h:panelGroup >
-                            <p:dataList id="afterServiceAttachements" value="#{supplierController.getAttachList('AfterService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                <f:facet name="header">售后服务承诺附件</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                </p:commandLink>
-                            </p:dataList>
-                        </h:panelGroup>
+<!--                        <h:panelGroup >-->
+<!--                            <p:dataList id="afterServiceAttachements" value="#{supplierController.getAttachList('AfterService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
+<!--                                <f:facet name="header">售后服务承诺附件</f:facet>-->
+<!--                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+<!--                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">-->
+<!--                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"-->
+<!--                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>-->
+<!--                                </p:commandLink>-->
+<!--                            </p:dataList>-->
+<!--                        </h:panelGroup>-->
                         <br/>
-                        <h:panelGroup >
-                            <p:dataList id="authorizationAttachements" value="#{supplierController.getAttachList('Authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
-                                <f:facet name="header">授权书附件</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
-                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"
-                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
-                                </p:commandLink>
-                            </p:dataList>
-                        </h:panelGroup>
+<!--                        <h:panelGroup >-->
+<!--                            <p:dataList id="authorizationAttachements" value="#{supplierController.getAttachList('Authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >-->
+<!--                                <f:facet name="header">授权书附件</f:facet>-->
+<!--                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+<!--                                <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{supplierController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">-->
+<!--                                    <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : ''}"-->
+<!--                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>-->
+<!--                                </p:commandLink>-->
+<!--                            </p:dataList>-->
+<!--                        </h:panelGroup>-->
                     </p:fieldset>
                     <!--                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.activeSupplier()}">-->
                     <p:fieldset legend="生产许可证信息">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                             <h:panelGroup>
-                                <label class="label">生产许可证编码</label>
+                                <label class="label">生产许可证编号</label>
                                 <p:inputText title="#{supplierController.selected.manufacturingPermitCode}"  style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" readonly="true" value="#{supplierController.selected.manufacturingPermitCode}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">生产许可证截止日期</label>
                                 <p:calendar timeZone="GMT+8" id="manufacturingPermitEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.manufacturingPermitEndDate}" required="false" requiredMessage="生产许可证截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">生产发证日期</label>
+                                <p:inputText id="productionIssuinglDate" value="#{supplierController.selected.productionIssuinglDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </p:inputText>
                             </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >

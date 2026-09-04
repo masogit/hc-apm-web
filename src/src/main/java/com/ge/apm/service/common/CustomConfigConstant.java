@@ -204,7 +204,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsImportantFieldsAll() {
-        return Arrays.asList("name","assetOwnerName","departNum","clinicalDeptName","assetDeptName","clinicalOwnerName","manufacture","makerShortName","registrationNo","vendor","functionGroup","assetCode68","functionType","serialNum","purchasePrice","lifecycle","manufactDate","installDate","factoryWarrantyDate","locationName","assetUsage","capitalSource","measureGrade","riskGrade","emergencyEquipment","importEquipment","systemNum4","medicalApparatusClassification","deviceStatus","status","isValid","assetDisposalResults","purchaseDate","qrCode","spare06","spare07","spare08","spare09","spare10","financingNum","locationNotes");
+        return Arrays.asList("name","assetOwnerName","departNum","clinicalDeptName","assetDeptName","clinicalOwnerName","manufacture","makerShortName","registrationNo","vendor","functionGroup","assetCode68","functionType","serialNum","purchasePrice","lifecycle","manufactDate","installDate","factoryWarrantyDate","locationName","assetUsage","capitalSource","measureGrade","riskGrade","emergencyEquipment","importEquipment","systemNum4","medicalApparatusClassification","deviceStatus","status","isValid","assetDisposalResults","purchaseDate","qrCode","spare06","spare07","spare08","spare09","spare10","financingNum","locationNotes","repairForm");
     }
 
     public static List<String> getTemplateEnableList() {

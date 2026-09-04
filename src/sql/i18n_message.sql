@@ -5948,18 +5948,18 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'supplierAbbreviation', '供应商名称缩写', 'Supplier Abbreviation', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'creditCode', '统一社会信用编码', 'Unified Social Credit Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessLicenseInfo', '营业执照信息', 'Business License Information', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'licenseCode', '营业执照编码', 'Business License Code', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'licenseCode', '营业执照代码', 'Business License Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'licenseEndDate', '营业执照截止日期', 'Business License End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'licenseScope', '业务范围', 'Business Scope', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseAttachments', '营业执照附件', 'Business License Attachments', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'MedicalDevicePermitInfo', '医疗器械经营许可证/医疗器械经营备案凭证信息', 'Medical Device Operation Permit / Record Certificate Information', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'permitCode', '许可证编码', 'Permit Code', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'permitCode', '经营许可证编号', 'Permit Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'permitEndDate', '许可证截止日期', 'Permit End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PermitAttachments', '许可证附件', 'Permit Attachments', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'AfterServiceAttachments', '售后服务承诺附件', 'After-Sales Service Commitment Attachments', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'AuthorizationAttachments', '授权书附件', 'Authorization Letter Attachments', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitInfo', '生产许可证信息', 'Manufacturing Permit Information', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'manufacturingPermitCode', '生产许可证编码', 'Manufacturing Permit Code', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'manufacturingPermitCode', '生产许可证编号', 'Manufacturing Permit Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'manufacturingPermitEndDate', '生产许可证截止日期', 'Manufacturing Permit End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitAttachments', '生产许可证附件', 'Manufacturing Permit Attachments', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ProductRegistrationInfo', '产品注册证信息', 'Product Registration Certificate Information', NULL, -1);
@@ -5991,8 +5991,8 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ProjectContactTel', '项目对接人电话', 'Project Contact Telephone', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ProjectContactPosition', '项目对接人职位', 'Project Contact Position', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'SupplierType', '供应商类型', 'Supplier Type', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseCode', '营业执照编码', 'Business License Code', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseStartDate', '营业执照开始日期', 'Business License Start Date', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseCode', '营业执照代码', 'Business License Code', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseStartDate', '营业执照成立日期', 'Business License Start Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseEndDate', '营业执照截止日期', 'Business License End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseScope', '业务范围', 'Business License Scope', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'MaintenanceQualificationInfo', '维修资质信息', 'Maintenance Qualification Information', NULL, -1);
@@ -6002,15 +6002,15 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PermitEndDate', '许可证截止日期', 'Permit End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'AfterSaleServiceAttachments', '售后服务承诺附件', 'After-Sales Service Commitment Attachments', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessFilingInfo', '医疗器械经营备案凭证信息', 'Business Filing Certificate Information', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessFilingCode', '备案凭证编码', 'Business Filing Code', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessFilingCode', '经营备案编号', 'Business Filing Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessFilingStartDate', '备案凭证开始日期', 'Business Filing Start Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessFilingEndDate', '备案凭证截止日期', 'Business Filing End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessFilingAttachments', '备案凭证附件', 'Business Filing Attachments', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitCode', '生产许可证编码', 'Manufacturing Permit Code', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitCode', '生产许可证编号', 'Manufacturing Permit Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitStartDate', '生产许可证开始日期', 'Manufacturing Permit Start Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingPermitEndDate', '生产许可证截止日期', 'Manufacturing Permit End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingInfo', '医疗器械生产备案凭证信息', 'Manufacturing Filing Certificate Information', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingCode', '生产备案凭证编码', 'Manufacturing Filing Code', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingCode', '生产备案凭证编号', 'Manufacturing Filing Code', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingStartDate', '生产备案凭证开始日期', 'Manufacturing Filing Start Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingEndDate', '生产备案凭证截止日期', 'Manufacturing Filing End Date', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ManufacturingFilingAttachments', '生产备案凭证附件', 'Manufacturing Filing Attachments', NULL, -1);
@@ -6444,3 +6444,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'spare14', '备用字段14', 'spare14', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'spare15', '备用字段15', 'spare15', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'meteringCycle', '计量周期（月）', 'meteringCycle', NULL, '-1');
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseApprovalDate', '营业执照登记机关批准日期(必填)', 'Business License Approval Date', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ProductionIssuinglDate', '生产发证日期', 'Production License Issuingl Date', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessIssuinglDate', '经营发证日期', 'Business License Issuingl Date', NULL, -1);
+

@@ -98,6 +98,10 @@
                             <p:inputText id="licenseEndDate" value="#{venderCompanyController.selected.licenseEndDate}" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">#{msg.LicenseApprovalDate}</label>
+                            <p:inputText id="licenseApprovalDate" value="#{venderCompanyController.selected.licenseApprovalDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">#{msg.LicenseScope}</label>
                             <p:inputText id="licenseScope" value="#{venderCompanyController.selected.licenseScope}" readonly="true"/>
                         </h:panelGroup>
@@ -142,6 +146,10 @@
                         <h:panelGroup>
                             <label class="label">#{msg.PermitEndDate}</label>
                             <p:inputText id="permitEndDate" value="#{venderCompanyController.selected.permitEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.BusinessIssuinglDate}</label>
+                            <p:inputText id="businessIssuinglDate" value="#{venderCompanyController.selected.businessIssuinglDate}" readonly="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -246,6 +254,10 @@
                         <h:panelGroup>
                             <label class="label">#{msg.ManufacturingPermitEndDate}</label>
                             <p:inputText id="manufacturingPermitEndDate" value="#{venderCompanyController.selected.manufacturingPermitEndDate}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ProductionIssuinglDate}</label>
+                            <p:inputText id="productionIssuinglDate" value="#{venderCompanyController.selected.productionIssuinglDate}" readonly="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">

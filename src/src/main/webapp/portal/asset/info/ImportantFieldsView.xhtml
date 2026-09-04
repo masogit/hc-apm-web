@@ -210,6 +210,10 @@
               rendered="#{currentCustomConfigController.showImportantField('serialNum')}">
         <h:outputText value="#{item.serialNum}" />
     </p:column>
+    <p:column headerText="#{msg.repairForm}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('repairForm')}">
+        <h:outputText value="#{item.repairForm}" />
+    </p:column>
     <!-- 修改时间 -->
     <p:column headerText="#{msg.modifiedTime}" width="160" filterBy="#{item.createdDate}" filterMatchMode="GTE">
         <f:facet name="filter">

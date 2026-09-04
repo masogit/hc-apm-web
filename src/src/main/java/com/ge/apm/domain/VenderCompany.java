@@ -103,6 +103,11 @@ public class VenderCompany implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date licenseEndDate;
+    // 营业执照登记机关批准日期
+    @Column(name = "license_approval_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date licenseApprovalDate;
     // 业务范围
     @Column(name = "license_scope")
     private String licenseScope;
@@ -130,6 +135,11 @@ public class VenderCompany implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date permitEndDate;
+    // 经营发证日期
+    @Column(name = "business_issuing_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date businessIssuinglDate;
     // 医疗器械经营许可证附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
@@ -188,6 +198,11 @@ public class VenderCompany implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date manufacturingPermitEndDate;
+    // 生产发证日期
+    @Column(name = "production_issuing_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date productionIssuinglDate;
     // 医疗器械生产许可证附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
@@ -501,6 +516,14 @@ public class VenderCompany implements Serializable {
         this.licenseEndDate = licenseEndDate;
     }
 
+    public Date getLicenseApprovalDate() {
+        return licenseApprovalDate;
+    }
+
+    public void setLicenseApprovalDate(Date licenseApprovalDate) {
+        this.licenseApprovalDate = licenseApprovalDate;
+    }
+
     public String getLicenseScope() {
         return licenseScope;
     }
@@ -533,6 +556,14 @@ public class VenderCompany implements Serializable {
         this.permitEndDate = permitEndDate;
     }
 
+    public Date getBusinessIssuinglDate() {
+        return businessIssuinglDate;
+    }
+
+    public void setBusinessIssuinglDate(Date businessIssuinglDate) {
+        this.businessIssuinglDate = businessIssuinglDate;
+    }
+
     public String getManufacturingPermitCode() {
         return manufacturingPermitCode;
     }
@@ -555,6 +586,14 @@ public class VenderCompany implements Serializable {
 
     public void setManufacturingPermitEndDate(Date manufacturingPermitEndDate) {
         this.manufacturingPermitEndDate = manufacturingPermitEndDate;
+    }
+
+    public Date getProductionIssuinglDate() {
+        return productionIssuinglDate;
+    }
+
+    public void setProductionIssuinglDate(Date productionIssuinglDate) {
+        this.productionIssuinglDate = productionIssuinglDate;
     }
 
     public String getProductRegistrationCode() {
