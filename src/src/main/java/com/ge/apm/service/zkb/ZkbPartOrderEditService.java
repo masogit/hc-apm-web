@@ -475,6 +475,11 @@ public class ZkbPartOrderEditService {
         if(StringUtils.isEmpty(selected.getOrderType())){
             errorLog.append("订单类型不能为空！");
         }
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(StringUtils.isEmpty(selected.getRadiationQuotaType())){
+                errorLog.append("名额扣除类型不能为空！");
+            }
+        }
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(StringUtils.isEmpty(faultUnClosedSr)){
                 errorLog.append("同一故障需继续订购且有未关闭的SR不能为空！");
