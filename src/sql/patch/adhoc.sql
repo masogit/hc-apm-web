@@ -4,3 +4,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 -- YHAAO-28255  推理模型部署-邵逸夫32分类
 UPDATE asset_classification_model_details SET category = '清洗消毒灭菌类' WHERE category = '消毒灭菌类';
 UPDATE asset_classification_model_details SET category = '灯床塔设备类' WHERE category = '灯床塔等手术室设备类';
+
+-- 创建索引
+CREATE INDEX IF NOT EXISTS idx_his_data_source_create_date ON his_equipment_data_source (create_date);
