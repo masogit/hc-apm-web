@@ -1524,6 +1524,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getAssetName());
         assetClassificationModel.setFactory(selected.getManufacture());
+        // ONNX FULL 模型扩展字段
+        assetClassificationModel.setDepartment(selected.getClinicalDeptName());
         return    masterDataService.autoAssetClassification32(assetClassificationModel);
 
     }

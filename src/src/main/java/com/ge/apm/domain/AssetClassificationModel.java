@@ -48,6 +48,20 @@ public class AssetClassificationModel implements Serializable {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
+    // ── 以下为 ONNX FULL 模型推理所需的扩展字段（不持久化，仅用于请求传递） ──
+    @Transient
+    private String department;       // 所属科室
+    @Transient
+    private String riskLevel;        // 风险等级
+    @Transient
+    private String meterLevel;       // 计量等级
+    @Transient
+    private String registrationNo;   // 注册证号
+    @Transient
+    private String isEmergencyDevice; // 是否急救设备
+    @Transient
+    private String purchasePrice;    // 采购价格
+
     public String getId() {
         return id;
     }

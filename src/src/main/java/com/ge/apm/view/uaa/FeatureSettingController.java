@@ -330,6 +330,8 @@ public class FeatureSettingController extends JpaCRUDController<TenantInfo> {
         features.add(ApmAdminActiveFeature.DIGITAL_MEDICAL_ENGINEERING);
         features.add(ApmAdminActiveFeature.DAVINCI_REPORT_CUSTOMIZED);
         features.add(ApmAdminActiveFeature.DEVICE_RISK_ASSESSMENT);
+        features.add(ApmAdminActiveFeature.DEVICE_CLASSIFICATION_MODEL);
+        features.add(ApmAdminActiveFeature.DEVICE_CLASSIFICATION_4F_MODEL);
         return features;
     }
 

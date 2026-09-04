@@ -1,64 +1,9 @@
--- 增加配置项：MVS保养报告仅下载保养项目，默认否，归属预防维护tag(category=5)
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', 'MVS保养报告仅下载保养项目', 'mvsPmReportOnlyDownloadPmItems', 'MVS保养报告仅下载保养项目', 'f', 't', 3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'mvsPmReportOnlyDownloadPmItems');
+--YHAAO-29247
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '生命时间轴是否只显示主工单', 'assetEventTimelineOnlyShowMainsub', '生命时间轴是否只显示主工单', 'f','t',3 where not exists(select * from config_item where key = 'assetEventTimelineOnlyShowMainsub');
 
--- 增加配置项：维修是否显示自动验收，默认否，归属维修流程tag(category=4)
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 4, 'true', '维修是否显示自动验收', 'repairShowAutoAcceptance', '维修是否显示自动验收', 'f', 't', 3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'repairShowAutoAcceptance');
+-- YHAAO-28255  推理模型部署-邵逸夫32分类
+UPDATE asset_classification_model_details SET category = '清洗消毒灭菌类' WHERE category = '消毒灭菌类';
+UPDATE asset_classification_model_details SET category = '灯床塔设备类' WHERE category = '灯床塔等手术室设备类';
 
-
--- YHAAO-28922 巡检保养工单增加巡检图片上传,其他保养工单增加其他图片上传
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '巡检图片是否必填', 'requireInspectionPhotos', '巡检图片必填', 'f','t',3
-    ON CONFLICT (key) DO UPDATE SET category = EXCLUDED.category, default_value = EXCLUDED.default_value, description = EXCLUDED.description, name = EXCLUDED.name, super_admin_edit = EXCLUDED.super_admin_edit, user_parent_config = EXCLUDED.user_parent_config, value_type = EXCLUDED.value_type;
-
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '二级保养其他图片是否必填', 'requireRuleLevelSecondOtherPhotos', '二级保养其他图片必填', 'f','t',3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelSecondOtherPhotos');
-
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '三级/质控保养其他图片是否必填', 'requireRuleLevelThreeOtherPhotos', '三级/质控保养其他图片必填', 'f','t',3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelThreeOtherPhotos');
-
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '二级保养前后图片是否必填', 'requireRuleLevelSecondMaintenancePhotos', '二级保养前后图片必填', 'f','t',3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelSecondMaintenancePhotos');
-
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type)
-SELECT replace(uuid_generate_v4()::text,'-',''), 5, 'false', '三级/质控保养前后图片是否必填', 'requireRuleLevelThreeMaintenancePhotos', '三级/质控保养前后图片必填', 'f','t',3
-    WHERE NOT EXISTS(SELECT * FROM config_item WHERE key = 'requireRuleLevelThreeMaintenancePhotos');
-
-
-INSERT INTO public.config_item (uid, name, category, key, value_type, description, super_admin_edit, default_value, user_parent_config)SELECT replace(uuid_generate_v4()::text,'-',''),'计量周期',7, 'displayMeasureCycle',3,'计量是否显示检定周期',false,'false',false WHERE NOT EXISTS (SELECT 1 FROM public.config_item WHERE key = 'displayMeasureCycle');
-
-
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|jfif|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|JFIF|PPTX|PPT|ppt|pptx|mp4|MP4', '资产附件上传文件格式', 'assetUploadFileFormats', '资产附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'assetUploadFileFormats');
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 24, 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx', '合同附件上传文件格式', 'contractUploadFileFormats', '合同附件上传文件格式', 'f', 't', 1 where not exists(select * from config_item where key = 'contractUploadFileFormats');
-
--- YHAAO-29249
-CREATE INDEX CONCURRENTLY idx_sys_doc_file_hash ON sys_doc (file_hash);
-
--- YHAAO-29169 为所有医工/主任添加转科管理员权限
-INSERT INTO user_role (user_id, role_id, created_by, created_date, last_modified_by, last_modified_date, role_type)
-SELECT DISTINCT ur.user_id,
-                (SELECT id FROM sys_role WHERE name = 'DepartmentConvertManager'),
-                'adhoc', NOW(), 'adhoc', NOW(), 0
-FROM user_role ur
-         INNER JOIN sys_role sr ON ur.role_id = sr.id AND ur.role_type = 0
-         INNER JOIN user_account ua ON ur.user_id = ua.id AND ua.is_active = true
-         INNER JOIN tenant_info ti ON ua.tenant_uid = ti.uid AND ti.is_enabled = true
-WHERE sr.name IN ('AssetHead', 'AssetStaff')
-  AND NOT EXISTS (
-    SELECT 1 FROM user_role existing
-    WHERE existing.user_id = ur.user_id
-      AND existing.role_id = (SELECT id FROM sys_role WHERE name = 'DepartmentConvertManager')
-      AND existing.role_type = 0
-);
-
--- YHAAO-29251
-update shared_asset_req_detail  set  charging_begin_time = create_date  where  id in ('2c9b85829ff5fb8d019fff247d552896','2c9b85829ff5fb8d019fff23434b288f');
-
-
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, validation, value_type )select replace(uuid_generate_v4()::text, '-', ''), 5, '', '保养工单是否手动确认', 'pmOrederManuallyConfirmFlag', '保养工单是否手动确认', 'f', 't', '[{"key":"巡检","value":"1"},{"key":"二级保养","value":"2"},{"key":"三级保养","value":"3"},{"key":"质量控制","value":"4"}]', 8 where not exists(select * from config_item where key = 'pmOrederManuallyConfirmFlag');
+-- 创建索引
+CREATE INDEX IF NOT EXISTS idx_his_data_source_create_date ON his_equipment_data_source (create_date);
