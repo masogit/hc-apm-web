@@ -1,6 +1,7 @@
 package com.ge.apm.domain.his;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ge.apm.domain.AssetInfo;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -54,6 +55,15 @@ public class HisEquipmentDataResult implements Serializable {
      */
     @Column(name = "asset_uid")
     private String assetUid;
+
+    /**
+     * 关联资产信息（通过asset_uid关联）
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false,
+            foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    private AssetInfo assetInfo;
+
     /**
      * apm设备资产名称
      */

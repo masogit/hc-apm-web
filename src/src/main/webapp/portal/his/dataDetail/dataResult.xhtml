@@ -43,13 +43,17 @@
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.orgCode}"/>
                         </p:column>
+                        <p:column headerText="二维码" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        </p:column>
                         <p:column headerText="设备UID" sortBy="#{item.assetUid}" filterBy="#{item.assetUid}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetUid}"/>
                         </p:column>
-                        <p:column headerText="资产名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
+                        <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetName}"/>
+                            <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column>
                         <p:column headerText="所属科室" sortBy="#{item.ksbm}" filterBy="#{item.ksbm}"
                                   filterMatchMode="LIKE">
