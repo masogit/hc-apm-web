@@ -18,7 +18,7 @@ public class ZkbHighPartInfo {
     private static final long serialVersionUID = 1L;
 
     public enum PartTypeEnum{
-        highPart, bulbTube, consumable
+        highPart, bulbTube, consumable, tool
     }
 
     @Id
