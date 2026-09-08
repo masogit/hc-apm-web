@@ -112,6 +112,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     @Getter
     private CustomConfigObject customConfig;
 
+    @Getter @Setter
+    private List<SortMeta> multiSortMeta;
+
     private String imageZoom;
     private String imageName;
 
@@ -205,7 +208,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             if(selected.getAssetClassification32()!=null){
                 selectItemDto=new SelectItemDto(selected.getAssetClassification32(),null);
             }
-            arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+            arrivalItemList = itemDao.findByArrivalListIdOrderByFinancingNumAscItemNumAsc(selected.getId());
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             deptInfoList = uaaService.getClinicalDeptListBySiteUID(selected.getSiteUID());
 
@@ -237,12 +240,29 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
         }
         initLazyModelArrivalItemList();
+        initMultiSortMeta();
         customConfig = ccService.getCurrentCustomConfig(currentUser.getSiteUID());
 //        suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
 //        maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
 //        manueList=aiService.getOnlyManuListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
 
         needInstorageCheck = userContextService.needInstorageCheck();
+    }
+
+    public void initMultiSortMeta(){
+        multiSortMeta = new ArrayList<>();
+
+        // 第一排序字段：financingNum 升序
+        SortMeta sort1 = new SortMeta();
+        sort1.setSortField("financingNum");
+        sort1.setSortOrder(SortOrder.ASCENDING);
+        multiSortMeta.add(sort1);
+
+        // 第二排序字段：itemNum 升序
+        SortMeta sort2 = new SortMeta();
+        sort2.setSortField("itemNum");
+        sort2.setSortOrder(SortOrder.ASCENDING);
+        multiSortMeta.add(sort2);
     }
 
     public void  initLazyModelArrivalItemList(){
@@ -375,7 +395,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             autoFillInfo();
         }
 
-        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+        arrivalItemList = itemDao.findByArrivalListIdOrderByFinancingNumAscItemNumAsc(selected.getId());
         initEasyInstallItem();
         selected = dao.findById(selected.getId());
         // 安装时添加
