@@ -116,24 +116,13 @@ public class JobController extends GenericCRUDUUIDController<HisEquipmentDataRes
             searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, selectedOrg.getSiteUID()));
         }
 
-        Page<HisEquipmentDataResult> page = null;
+        Page<HisEquipmentDataResult> page;
         if (this.searchFilters.isEmpty()) {
             page = resultDao.findAll(pageRequest);
         } else {
             page = resultDao.findBySearchFilter(searchFilters,pageRequest);
         }
         List<HisEquipmentDataResult> content = page.getContent();
-        if(content !=null && !content.isEmpty()){
-            List<String> assetUids = content.stream().filter(f -> StringUtils.isNotBlank(f.getAssetUid())).map(HisEquipmentDataResult::getAssetUid).collect(Collectors.toList());
-            List<AssetInfo> assetinfos = assetInfoRepository.findByUidIn(assetUids);
-            for(AssetInfo info:assetinfos){
-                for(HisEquipmentDataResult r:content){
-                    if(info.getUid().equals(r.getAssetUid())){
-                        r.setAssetName(info.getName());
-                    }
-                }
-            }
-        }
         return page;
     }
 
