@@ -909,9 +909,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
                 case "siteUID":
                     param.put("siteUid", searchFilter.value);
                     break;
-                case "oneSearchStr":
-                    param.put("oneSearchStr", searchFilter.value);
-                    break;
                 case "assetDeptOrgUidSet":
                     param.put("assetDeptOrgUidSet", searchFilter.value);
                     break;
@@ -1008,6 +1005,10 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         }
         if (null != selectSite) {
             param.put("selectSite", selectSite.getUid());
+        }
+
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            param.put("oneSearchStr", oneSearchStr);
         }
     }
 
