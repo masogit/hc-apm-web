@@ -629,6 +629,8 @@ public class ZkbPartOrderEditService {
                                     el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
                                 }else if(ZkbHighPartInfo.PartTypeEnum.consumable.toString().equals(z.getPartType())){
                                     el += "备件号："+i.getPartNo()+"属于耗材，不可订购！";
+                                }else if(ZkbHighPartInfo.PartTypeEnum.tool.toString().equals(z.getPartType())){
+                                    el += "备件号："+i.getPartNo()+"属于工具，不可订购！";
                                 }
                             }
                         }
@@ -641,6 +643,10 @@ public class ZkbPartOrderEditService {
                             List<ZkbHighPartInfo> consumableInfos = zkbHighPartInfoRepository.findConsumable(i.getPartNo());
                             if(consumableInfos != null && consumableInfos.size() > 0){
                                 el += "备件号："+i.getPartNo()+"属于耗材，不可订购！";
+                            }
+                            List<ZkbHighPartInfo> toolInfos = zkbHighPartInfoRepository.findTool(i.getPartNo());
+                            if(toolInfos != null && toolInfos.size() > 0){
+                                el += "备件号："+i.getPartNo()+"属于工具，不可订购！";
                             }
                         }
                     }
@@ -782,6 +788,14 @@ public class ZkbPartOrderEditService {
                     reLog.append("合同备件+人工+保养剩余名额不足，请检查！");
                 }
             }
+            String toolEl = "";
+            for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                List<ZkbHighPartInfo> toolInfos = zkbHighPartInfoRepository.findTool(i.getPartNo());
+                if(toolInfos == null || toolInfos.size() == 0){
+                    toolEl += "备件号："+i.getPartNo()+"不属于工具，不可订购！";
+                }
+            }
+            reLog.append(toolEl);
         }
 
         return reLog.toString();
@@ -809,6 +823,8 @@ public class ZkbPartOrderEditService {
                                 rsLog.append(zkbPartOrderItem.getPartNo() + "属于球管，不可订购！");
                             } else if (ZkbHighPartInfo.PartTypeEnum.consumable.toString().equals(z.getPartType())) {
                                 rsLog.append(zkbPartOrderItem.getPartNo() + "属于耗材，不可订购！");
+                            } else if (ZkbHighPartInfo.PartTypeEnum.tool.toString().equals(z.getPartType())) {
+                                rsLog.append(zkbPartOrderItem.getPartNo() + "属于工具，不可订购！");
                             }
                         }
                     } else if (ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())) {
@@ -820,6 +836,10 @@ public class ZkbPartOrderEditService {
                         if (consumableInfos != null && consumableInfos.size() > 0) {
                             rsLog.append(zkbPartOrderItem.getPartNo() + "属于耗材，不可订购！");
                         }
+                        List<ZkbHighPartInfo> toolInfos = zkbHighPartInfoRepository.findTool(zkbPartOrderItem.getPartNo());
+                        if (toolInfos != null && toolInfos.size() > 0) {
+                            rsLog.append(zkbPartOrderItem.getPartNo() + "属于工具，不可订购！");
+                        }
                     }
                 }
                 if (ZkbPartOrder.RadiationQuotaTypeEnum.Consumable.toString().equals(selected.getRadiationQuotaType())) {
@@ -828,6 +848,12 @@ public class ZkbPartOrderEditService {
                         rsLog.append(zkbPartOrderItem.getPartNo() + "不属于耗材，不可订购！");
                     }
                 }
+            }
+        }
+        if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())) {
+            List<ZkbHighPartInfo> toolInfos = zkbHighPartInfoRepository.findTool(zkbPartOrderItem.getPartNo());
+            if (toolInfos == null || toolInfos.size() == 0) {
+                rsLog.append(zkbPartOrderItem.getPartNo() + "不属于工具，不可订购！");
             }
         }
         return rsLog.toString();

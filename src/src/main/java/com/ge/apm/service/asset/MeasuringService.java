@@ -750,12 +750,15 @@ public class MeasuringService {
             List<AssetInfo> assetInfos=new ArrayList<>();
             if(!StringUtils.isEmpty(assetSN)) {
                 String[] split = assetSN.split("/");
-                List<SearchFilter> searchFilters = new ArrayList<>();
-                searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
-                searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-                assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
-            };
+                if(split.length > 0){
+                    List<SearchFilter> searchFilters = new ArrayList<>();
+                    searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
+                    searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
+                    searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+                    assetInfos = assetInfoDao.findBySearchFilter(searchFilters);
+                }
+
+            }
 
 //            if(CollectionUtils.isEmpty(assetInfos)){
 //                result.setCertificateNo(object.getString("certificateNo"));
@@ -829,7 +832,7 @@ public class MeasuringService {
             SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(UserContextService.getCurrentUserAccount(), eventAuditEnum, result.getId(), Boolean.TRUE, "","measuring", JSONObject.toJSONString(result,(PropertyFilter)(o,n,v)->!n.equals("assetInfo")));
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage(),e.getMessage());
+            LOGGER.error(e.getLocalizedMessage(),e.getMessage(),e);
             result.setCertificateNo(object.getString("certificateNo"));
             result.setErrorInfo(e.getMessage());
             result.setStatus(-1);

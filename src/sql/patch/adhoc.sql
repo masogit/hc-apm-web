@@ -8,6 +8,27 @@ UPDATE asset_classification_model_details SET category = '灯床塔设备类' WH
 -- 创建索引
 CREATE INDEX IF NOT EXISTS idx_his_data_source_create_date ON his_equipment_data_source (create_date);
 
+-- YHAAO-29473
+CREATE INDEX IF NOT EXISTS v2_pm_order_current_step_id_idx ON public.v2_pm_order USING btree (current_step_id);
+
+-- ==================YHAAO-29413==========================
+-- 1. 备份 sys_role 全表数据（已存在则先删除）
+-- ============================================
+DROP TABLE IF EXISTS sys_role_backup_20260907;
+CREATE TABLE sys_role_backup_20260907 AS SELECT * FROM sys_role;
+-- ============================================
+-- 2. 更新全部角色的 home_page
+-- ============================================
+UPDATE sys_role SET home_page = '/portal/homeNurse1.xhtml';
+-- ============================================
+-- 3. 回滚语句（需要回滚时执行）
+-- ============================================
+-- UPDATE sys_role r SET home_page = b.home_page FROM sys_role_backup_20260907 b WHERE r.id = b.id;
+-- DROP TABLE IF EXISTS sys_role_backup_20260907;
+
+
+
+
 
 -- 供应商新增字段：经营发证日期、生产发证日期、营业执照登记机关批准日期
 ALTER TABLE vender_company ADD COLUMN IF NOT EXISTS business_issuing_date TIMESTAMP;

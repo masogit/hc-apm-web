@@ -23,4 +23,7 @@ public interface ZkbHighPartInfoRepository extends GenericRepositoryUUID<ZkbHigh
 
     @Query("select o from ZkbHighPartInfo o where o.partNo = ?1 and o.partType = 'consumable'")
     List<ZkbHighPartInfo> findConsumable(String partNo);
+
+    @Query("select o from ZkbHighPartInfo o where o.partNo = ?1 and o.partType = 'tool'")
+    List<ZkbHighPartInfo> findTool(String partNo);
 }

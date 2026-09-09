@@ -99,6 +99,8 @@ public class ZkbHighPartService {
                     zkbHighPartInfo.setPartType(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString());
                 }else if("耗材".equals(zkbHighPartInfo.getPartType())){
                     zkbHighPartInfo.setPartType(ZkbHighPartInfo.PartTypeEnum.consumable.toString());
+                }else if("工具".equals(zkbHighPartInfo.getPartType())){
+                    zkbHighPartInfo.setPartType(ZkbHighPartInfo.PartTypeEnum.tool.toString());
                 }else {
                     zkbHighPartInfo.setPartType("");
                 }

@@ -22,6 +22,8 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     public List<ArrivalListItem> findByArrivalListId(String arrivalListId);
 
+    List<ArrivalListItem> findByArrivalListIdOrderByFinancingNumAscItemNumAsc(String arrivalListId);
+
     List<ArrivalListItem> findByIdIn(Collection<String> ids);
 
     List<ArrivalListItem> findByInStockNo(String inStockNo);
