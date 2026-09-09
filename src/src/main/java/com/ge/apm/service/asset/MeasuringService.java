@@ -750,7 +750,7 @@ public class MeasuringService {
             List<AssetInfo> assetInfos=new ArrayList<>();
             if(!StringUtils.isEmpty(assetSN)) {
                 String[] split = assetSN.split("/");
-                if(split.length > 1){
+                if(split.length > 0){
                     List<SearchFilter> searchFilters = new ArrayList<>();
                     searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.IN,Arrays.asList(split)));
                     searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUserAccount.getSiteUID()));
