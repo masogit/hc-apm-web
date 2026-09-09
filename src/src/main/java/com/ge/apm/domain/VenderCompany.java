@@ -139,7 +139,7 @@ public class VenderCompany implements Serializable {
     @Column(name = "business_issuing_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date businessIssuinglDate;
+    private Date businessIssuingDate;
     // 医疗器械经营许可证附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
@@ -202,7 +202,7 @@ public class VenderCompany implements Serializable {
     @Column(name = "production_issuing_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date productionIssuinglDate;
+    private Date productionIssuingDate;
     // 医疗器械生产许可证附件
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
@@ -557,11 +557,11 @@ public class VenderCompany implements Serializable {
     }
 
     public Date getBusinessIssuinglDate() {
-        return businessIssuinglDate;
+        return businessIssuingDate;
     }
 
-    public void setBusinessIssuinglDate(Date businessIssuinglDate) {
-        this.businessIssuinglDate = businessIssuinglDate;
+    public void setBusinessIssuingDate(Date businessIssuingDate) {
+        this.businessIssuingDate = businessIssuingDate;
     }
 
     public String getManufacturingPermitCode() {
@@ -588,12 +588,12 @@ public class VenderCompany implements Serializable {
         this.manufacturingPermitEndDate = manufacturingPermitEndDate;
     }
 
-    public Date getProductionIssuinglDate() {
-        return productionIssuinglDate;
+    public Date getProductionIssuingDate() {
+        return productionIssuingDate;
     }
 
-    public void setProductionIssuinglDate(Date productionIssuinglDate) {
-        this.productionIssuinglDate = productionIssuinglDate;
+    public void setProductionIssuingDate(Date productionIssuingDate) {
+        this.productionIssuingDate = productionIssuingDate;
     }
 
     public String getProductRegistrationCode() {

@@ -7,3 +7,14 @@ UPDATE asset_classification_model_details SET category = '灯床塔设备类' WH
 
 -- 创建索引
 CREATE INDEX IF NOT EXISTS idx_his_data_source_create_date ON his_equipment_data_source (create_date);
+
+
+-- 供应商新增字段：经营发证日期、生产发证日期、营业执照登记机关批准日期
+ALTER TABLE vender_company ADD COLUMN IF NOT EXISTS business_issuing_date TIMESTAMP;
+ALTER TABLE vender_company ADD COLUMN IF NOT EXISTS production_issuing_date TIMESTAMP;
+ALTER TABLE vender_company ADD COLUMN IF NOT EXISTS license_approval_date TIMESTAMP;
+
+ALTER TABLE supplier ADD COLUMN IF NOT EXISTS business_issuing_date TIMESTAMP;
+ALTER TABLE supplier ADD COLUMN IF NOT EXISTS production_issuing_date TIMESTAMP;
+ALTER TABLE supplier ADD COLUMN IF NOT EXISTS license_approval_date TIMESTAMP;
+

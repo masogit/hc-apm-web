@@ -6446,6 +6446,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('customI18n', 'meteringCycle', '计量周期（月）', 'meteringCycle', NULL, '-1');
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'LicenseApprovalDate', '营业执照登记机关批准日期(必填)', 'Business License Approval Date', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ProductionIssuinglDate', '生产发证日期', 'Production License Issuingl Date', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessIssuinglDate', '经营发证日期', 'Business License Issuingl Date', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ProductionIssuingDate', '生产发证日期', 'Production License Issuingl Date', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BusinessIssuingDate', '经营发证日期', 'Business License Issuingl Date', NULL, -1);
 
