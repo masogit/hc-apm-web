@@ -308,7 +308,8 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             }
         }
 
-        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+        //y由jpa转mybatis 需要去除
+       /* if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
@@ -317,7 +318,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-        }
+        }*/
 
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));
