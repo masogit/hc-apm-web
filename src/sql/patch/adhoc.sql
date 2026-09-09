@@ -32,3 +32,15 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 select replace(uuid_generate_v4()::text,'-',''), 3, '1', '供应商合同默认层级', 'supplierContractDefaultOrg', '供应商合同默认层级', 'f','t',7,'[{"key":"集团","value":"1"},{"key":"医院","value":"2"},{"key":"院区","value":"3"}]' where not exists(select * from config_item where key = 'supplierContractDefaultOrg');
 
 
+
+
+
+-- 供应商新增字段：经营发证日期、生产发证日期、营业执照登记机关批准日期
+ALTER TABLE vender_company ADD COLUMN IF NOT EXISTS business_issuing_date TIMESTAMP;
+ALTER TABLE vender_company ADD COLUMN IF NOT EXISTS production_issuing_date TIMESTAMP;
+ALTER TABLE vender_company ADD COLUMN IF NOT EXISTS license_approval_date TIMESTAMP;
+
+ALTER TABLE supplier ADD COLUMN IF NOT EXISTS business_issuing_date TIMESTAMP;
+ALTER TABLE supplier ADD COLUMN IF NOT EXISTS production_issuing_date TIMESTAMP;
+ALTER TABLE supplier ADD COLUMN IF NOT EXISTS license_approval_date TIMESTAMP;
+

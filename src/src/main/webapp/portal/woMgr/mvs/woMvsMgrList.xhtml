@@ -108,12 +108,8 @@
                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}"/>
                     </h:outputText>
                 </p:column>
-
-                <p:column headerText="#{msg.Assignee}" rendered="#{workOrderMgrMvsController.queryIndex==8}">
-                    <!--6 表示 step_name 是待关单-->
-                    <h:outputText value="#{empty item.currentPersonName ?
-                    workOrderMgrMvsController.getRepairResponer(item.id,4) :
-                    item.currentPersonName}"/>
+                <p:column headerText="#{msg.Assignee}" rendered="#{workOrderMgrMvsController.queryIndex==8 or workOrderMgrMvsController.queryIndex==4}">
+                    <h:outputText value="#{item.currentPersonName}"/>
                 </p:column>
                 <!--当前处理步骤 for 待办-->
 <!--                <p:column rendered="#{workOrderMgrMvsController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" filterBy="#{item.currentStepName}" filterMatchMode="EQ">-->
