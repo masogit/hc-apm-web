@@ -27,3 +27,8 @@ UPDATE sys_role SET home_page = '/portal/homeNurse1.xhtml';
 -- DROP TABLE IF EXISTS sys_role_backup_20260907;
 
 
+--YHAAO-29537
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type, validation)
+select replace(uuid_generate_v4()::text,'-',''), 3, '1', '供应商合同默认层级', 'supplierContractDefaultOrg', '供应商合同默认层级', 'f','t',7,'[{"key":"集团","value":"1"},{"key":"医院","value":"2"},{"key":"院区","value":"3"}]' where not exists(select * from config_item where key = 'supplierContractDefaultOrg');
+
+
