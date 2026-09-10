@@ -556,13 +556,6 @@ public class VenderCompany implements Serializable {
         this.permitEndDate = permitEndDate;
     }
 
-    public Date getBusinessIssuinglDate() {
-        return businessIssuingDate;
-    }
-
-    public void setBusinessIssuingDate(Date businessIssuingDate) {
-        this.businessIssuingDate = businessIssuingDate;
-    }
 
     public String getManufacturingPermitCode() {
         return manufacturingPermitCode;
