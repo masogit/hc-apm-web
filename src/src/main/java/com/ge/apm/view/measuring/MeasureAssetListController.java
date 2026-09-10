@@ -216,7 +216,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 this.selected = new AssetInfo();
                 this.selected.setBoUuid(boUuid);
             }
-            if(Integer.valueOf(1).equals(matchType) || Integer.valueOf(2).equals(matchType)){
+            if(Integer.valueOf(1).equals(matchType) || Integer.valueOf(2).equals(matchType) || Integer.valueOf(9).equals(matchType)){
                 measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
             }else{
 

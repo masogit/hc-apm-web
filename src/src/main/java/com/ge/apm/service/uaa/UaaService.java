@@ -118,7 +118,8 @@ public class UaaService {
         else if(userContextService.hasRole("ClinicalStaff"))
             url = getDefautHomePage("ClinicalStaff");
         else
-            url = "/home.xhtml";
+//            url = "/home.xhtml";
+            url = "/portal/homeNurse1.xhtml";
 
         return url;
     }
