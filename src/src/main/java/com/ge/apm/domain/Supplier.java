@@ -167,7 +167,7 @@ public class Supplier implements Serializable, ChineseName {
     @Column(name = "business_issuing_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date businessIssuinglDate;
+    private Date businessIssuingDate;
     //生产许可证编码
     @Column(name = "manufacturing_permit_code")
     private String manufacturingPermitCode;
@@ -176,11 +176,12 @@ public class Supplier implements Serializable, ChineseName {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date manufacturingPermitEndDate;
+
     //生产发证日期
     @Column(name = "production_issuing_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date productionIssuinglDate;
+    private Date productionIssuingDate;
     //产品注册证编号
     @Column(name = "product_registration_code")
     private String productRegistrationCode;
@@ -244,7 +245,21 @@ public class Supplier implements Serializable, ChineseName {
             uid = UUID.randomUUID().toString().replace("-", "");
         }
     }
+    public Date getProductionIssuingDate() {
+        return productionIssuingDate;
+    }
 
+    public void setProductionIssuingDate(Date productionIssuingDate) {
+        this.productionIssuingDate = productionIssuingDate;
+    }
+
+    public Date getBusinessIssuingDate() {
+        return businessIssuingDate;
+    }
+
+    public void setBusinessIssuingDate(Date businessIssuingDate) {
+        this.businessIssuingDate = businessIssuingDate;
+    }
     public String getTenantUID() {
         return tenantUID;
     }
@@ -537,13 +552,6 @@ public class Supplier implements Serializable, ChineseName {
         this.permitEndDate = permitEndDate;
     }
 
-    public Date getBusinessIssuinglDate() {
-        return businessIssuinglDate;
-    }
-
-    public void setBusinessIssuinglDate(Date businessIssuinglDate) {
-        this.businessIssuinglDate = businessIssuinglDate;
-    }
 
     public String getManufacturingPermitCode() {
         return manufacturingPermitCode;
@@ -561,13 +569,6 @@ public class Supplier implements Serializable, ChineseName {
         this.manufacturingPermitEndDate = manufacturingPermitEndDate;
     }
 
-    public Date getProductionIssuinglDate() {
-        return productionIssuinglDate;
-    }
-
-    public void setProductionIssuinglDate(Date productionIssuinglDate) {
-        this.productionIssuinglDate = productionIssuinglDate;
-    }
 
     public String getProductRegistrationCode() {
         return productRegistrationCode;
