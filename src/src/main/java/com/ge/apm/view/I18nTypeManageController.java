@@ -200,6 +200,8 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
             resetCache();
             LOGGER.info("end saveConfig:{}",selected.getMsgType());
             WebUtil.addSuccessMessage("保存成功");
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(currentUser.getTenantUID());
+            i18nTypeManageService.updateI18nRedis(tenantInfo.getId());
         } catch (Exception e) {
             e.printStackTrace();
             WebUtil.addErrorMessage("保存失败");
