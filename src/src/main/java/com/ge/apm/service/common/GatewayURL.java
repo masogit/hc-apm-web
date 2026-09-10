@@ -249,6 +249,10 @@ public enum GatewayURL {
     IMAGE_CONTENT_EXTRACTION("/hcapmassetservice/api/apm/asset/assetinfos/plateRecognition/image/{objectId}"),
     DIFY_CREATE_SHARE_MESSAGE("/hcapmgateway/api/apm/model/share"),
     DIFY_GET_SHARE_MESSAGE("/hcapmgateway/api/apm/model/shareMessage"),
+
+
+    UPDATE_I18N_FOR_REDIS("/hcapmmasterdataservice/api/apm/masterData/i8nMessages/updateI18"),
+
     ;
     private final String url;
 

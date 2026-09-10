@@ -75,7 +75,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @JoinColumn(name = "order_id", referencedColumnName = "id", insertable = false, updatable = false,foreignKey = @ForeignKey(name = "none",value = ConstraintMode.NO_CONSTRAINT))
     @NotFound(action = NotFoundAction.IGNORE)
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<OrderSnatchingPerson> orderSnatchingPerson;
     @Basic(optional = false)
     @NotNull

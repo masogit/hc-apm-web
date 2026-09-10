@@ -4,21 +4,27 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.mapper.I18nTypeManageMapper;
+import com.ge.apm.domain.AssetClassificationModel;
 import com.ge.apm.domain.I18nTypeManage;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
-public class I18nTypeManageService {
+public class I18nTypeManageService extends MicroServiceInvoker {
 
     protected static final Logger logger = Logger.getLogger(I18nTypeManageService.class);
 
@@ -90,5 +96,20 @@ public class I18nTypeManageService {
             }
         }
         return ew;
+    }
+
+    public Map<String, Object> updateI18nRedis(Integer siteId) {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<AssetClassificationModel> requestEntity = new HttpEntity<>(header);
+        String gatewayURL = getGatewayURL(GatewayURL.UPDATE_I18N_FOR_REDIS);
+        String url = gatewayURL.concat("?siteId="+siteId);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody().get("data");
+            logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
+            return responseMap;
+        } else {
+            return null;
+        }
     }
 }
