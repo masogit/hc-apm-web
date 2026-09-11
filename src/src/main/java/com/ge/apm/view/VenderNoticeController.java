@@ -70,7 +70,9 @@ public class VenderNoticeController extends GenericCRUDUUIDController<VenderNoti
             this.removeFilterOnField("venderCompanyId");
             searchFilters.add(new SearchFilter("venderCompanyId", SearchFilter.Operator.IN, venderCompanyIds));
         }
-        pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), new Sort(Sort.Direction.DESC,"lastModifiedDate"));
+        if (pageRequest.getSort() == null) {
+            pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), new Sort(Sort.Direction.DESC, "lastModifiedDate"));
+        }
         searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
