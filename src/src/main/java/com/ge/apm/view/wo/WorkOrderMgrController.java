@@ -350,6 +350,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Integer approvalStatus;
     @Getter @Setter
     private boolean myWorkOrder = false;
+    private boolean myWorkOrderInitialized = false;
 
     @Override
     protected void init() {
@@ -407,7 +408,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
-            myWorkOrder = userContextService.hasRole("AssetHead");
+            if (!myWorkOrderInitialized) {
+                Boolean savedMyWorkOrder = (Boolean) FacesContext.getCurrentInstance()
+                        .getExternalContext().getSessionMap().get("myWorkOrderSaved");
+                myWorkOrder = (savedMyWorkOrder != null) ? savedMyWorkOrder : userContextService.hasRole("AssetHead");
+                myWorkOrderInitialized = true;
+            }
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
             isYiMaiYangGuangTenant = userContextService.isYiMaiYangGuangTenant();
@@ -883,9 +889,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             Arrays.asList(fields).forEach(field -> removeFilterOnField(field));
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
-                if (myWorkOrder) {
-                    extendVisibilityWithMe();
-                } else if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
+                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                     searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -896,7 +900,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
             } else if (queryIndex == 3) { //待接单
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     //我的工单：可见范围 OR 当前责任人是我
                     extendVisibilityWithMe();
                     // stepId=3(待接单) 或 stepId=2且可抢/已抢(dispatchMode IN 2,3,5)
@@ -944,14 +948,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             } else if (queryIndex == 4) { //维修中
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 } else {
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
                 }
             } else if (queryIndex == 5) { //待验收
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                     searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
@@ -968,9 +972,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     }
                 }
             } else if (queryIndex == 6) { //待评价
-                if (myWorkOrder) {
-                    extendVisibilityWithMe();
-                } else if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
+                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                     searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
                 }
                 searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
@@ -982,14 +984,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 10));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 11));
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 } else {
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
                 }
             } else if (queryIndex == 8) { //已关单
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 } else if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
                     if (userContextService.hasRole("AssetStaff")) {
@@ -999,9 +1001,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             } else if (queryIndex == 9) { //已取消
-                if (myWorkOrder) {
-                    extendVisibilityWithMe();
-                }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
             } else if (queryIndex == 10) { //待审批
                 String tenantUID = loginUser.getTenantUID();
@@ -1048,7 +1047,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
 
             } else if (queryIndex == 11) { //全部维修单（不包含已取消）
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 3));
@@ -1076,20 +1075,20 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
                 }
             } else if (queryIndex == 13) {
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 10));
 
             } else if (queryIndex == 14) {
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 11));
             }else {//待办
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -4378,6 +4377,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 我的工单复选框切换监听
      */
     public void onMyWorkOrderToggle() {
+        FacesContext.getCurrentInstance().getExternalContext()
+                .getSessionMap().put("myWorkOrderSaved", myWorkOrder);
         LOGGER.info("myWorkOrder toggled, current value: " + myWorkOrder);
     }
 
