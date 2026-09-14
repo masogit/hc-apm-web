@@ -112,6 +112,11 @@
         <h:outputText value="#{item.createdBy}"/>
     </p:column>
 
+    <!-- 修改来源 -->
+    <p:column headerText="修改来源" width="100">
+        <h:outputText value="#{item.modifySource}"/>
+    </p:column>
+
     <p:column headerText="#{msg.spare06}" width="130"
               rendered="#{currentCustomConfigController.showImportantField('spare06')}">
         <h:outputText value="#{item.spare06}" />

@@ -22,6 +22,7 @@ import com.ge.healthcare.cn.common.llm.ApplicationType;
 import com.ge.healthcare.cn.common.llm.Result;
 import com.ge.healthcare.cn.common.llm.WorkflowResponse;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.collect.Lists;
@@ -229,6 +230,7 @@ public class MeasuringService {
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("handleExcel- operateMeasuringAndAssetInfo/operateMeasuringAndAssetInfo_For_ShaoYiFu");
         mqContext.setDescribe("计量导入修改设备信息");
+        mqContext.setModifySource(ModifySourceEnum.MEASURING_IMPORT.getCode());
         UserAccount currentUserAccount = userAccount;
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());

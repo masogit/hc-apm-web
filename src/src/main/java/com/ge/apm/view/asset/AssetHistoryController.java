@@ -13,6 +13,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.BatchFileController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -69,6 +70,22 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
     @Getter
     @Setter
     private String oneSearchStr;
+
+    @Getter
+    private String filterModifySource = "ALL";
+
+    public void setFilterModifySource(String filterModifySource) {
+        logger.info("setFilterModifySource called: {} -> {}", this.filterModifySource, filterModifySource);
+        this.filterModifySource = filterModifySource;
+    }
+
+    public String getFilterModifySourceLabel() {
+        if ("ALL".equals(filterModifySource)) {
+            return "修改来源";
+        }
+        String label = ModifySourceEnum.getLabelByCode(filterModifySource);
+        return "修改来源: " + (label != null ? label : filterModifySource);
+    }
 
     public void doSearch() {
         List<SearchFilter> filters = buildSearchFilters();
@@ -162,6 +179,15 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
 
         if (!StringUtils.isEmpty(oneSearchStr)) {
             filters.add(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr));
+        }
+
+        // 修改来源过滤
+        filters.removeIf(f -> "modify_source".equals(f.fieldName));
+        if (!"ALL".equals(filterModifySource) && StringUtils.isNotEmpty(filterModifySource)) {
+            logger.info("modify_source filter applied: {}", filterModifySource);
+            filters.add(new SearchFilter("modify_source", SearchFilter.Operator.EQ, filterModifySource));
+        } else {
+            logger.info("modify_source filter: ALL (no filter)");
         }
 
         return filters;

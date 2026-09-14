@@ -14,6 +14,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
@@ -504,7 +505,7 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             assetInfo.setStatus(1);
             assetInfo.setIsValid(true);
             assetInfo.setTerminateDate(null);
-            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo);
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo,ModifySourceEnum.BATCH_RESTORE_SCRAP.getCode());
             dao.save(assetInfo);
 //            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }

@@ -13,6 +13,7 @@ import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -162,6 +163,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
         mqContext.setClassName("SecondmentAssetSettingController");
         mqContext.setMethodName("changeStatus");
         mqContext.setDescribe(message);
+        mqContext.setModifySource(ModifySourceEnum.DEPT_SECONDMENT.getCode());
         mqUtils.sendAssetToMQ(newAsset,userAccount,mqContext);
     }
 

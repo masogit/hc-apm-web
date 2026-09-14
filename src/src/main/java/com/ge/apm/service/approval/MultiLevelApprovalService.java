@@ -37,6 +37,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -1161,6 +1162,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                         mqContext.setServiceName("hc-apm-web");
                                         mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
                                         mqContext.setDescribe("资产转科审核同意");
+                                        mqContext.setModifySource(ModifySourceEnum.ASSET_TRANSFER.getCode());
                                         mqContext.setSource("departmentConvert");
                                         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
                                         mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
@@ -1722,6 +1724,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 assetInfo.setStatus(1);
             }
             assetInfoDao.save(assetInfo);
+            saveAssetHistoryIfUpdated(assetInfo);
         }
 
     }
@@ -1738,6 +1741,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("saveAssetHistoryIfUpdated");
         mqContext.setDescribe("资产报废多级审批流程");
+        mqContext.setModifySource(ModifySourceEnum.ASSET_SCRAP.getCode());
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());

@@ -10,6 +10,7 @@ import com.ge.apm.service.utils.*;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.apm.domain.SavedAdvancedSearch;
@@ -1596,7 +1597,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             int originStatus = assetInfo.getStatus();
             assetInfo.setStatus(4);
             dao.save(assetInfo);
-            assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo,ModifySourceEnum.ASSET_SCRAP.getCode());
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
 //            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }

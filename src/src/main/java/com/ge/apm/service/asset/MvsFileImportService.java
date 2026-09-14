@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MvsContractDateInfoRepository;
 import com.ge.apm.dao.MvsOrgInfoRepository;
@@ -300,6 +301,7 @@ public class MvsFileImportService {
         mqContext.setMethodName("saveContractInfo");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setDescribe("MVS合同导入修改设备");
+        mqContext.setModifySource(ModifySourceEnum.MVS_IMPORT.getCode());
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
