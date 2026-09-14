@@ -455,13 +455,18 @@ public class WorkOrderDocxRenderService {
 
         List<V2_WorkOrder_Step> steps = v2WorkOrderStepDao.findByWorkOrder(id);
         List<Map<String, Object>> woSteps = new ArrayList<>();
+        boolean enableAutoAcceptance = Boolean.TRUE.toString().equalsIgnoreCase(getConfigItemValue("repairShowAutoAcceptance"));
         for (V2_WorkOrder_Step step : steps) {
             Map<String, Object> woStep = new HashedMap();
             woStep.put("步骤名称", step.getStepName());
             woStep.put("责任人", step.getOwnerName());
             woStep.put("开始时间", formatDate(step.getStartTime()));
             woStep.put("结束时间", formatDate(step.getEndTime()));
-            woStep.put("处理描述", step.getComments());
+            if ("待验收".equals(step.getStepName()) && !enableAutoAcceptance) {
+                woStep.put("处理描述", "验收");
+            } else {
+                woStep.put("处理描述", step.getComments());
+            }
             woSteps.add(woStep);
         }
 
