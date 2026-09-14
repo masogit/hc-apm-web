@@ -80,8 +80,9 @@
                                 </h:outputText>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.arrivalListContractNum}</label>
+                                <label class="label">#{msg.arrivalListContractNum}2</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.contractNum}" />
+                                <p:link style="margin-left: 10px;" href="#{assetInstallationController.contractUrl(assetInstallationController.arrivalListItem.arrivalList.contractItemId)}" value="查看合同" target="_blank" rendered="#{not empty assetInstallationController.arrivalListItem.arrivalList.contractItemId}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.vendor}</label>
@@ -971,6 +972,14 @@
 <!--                    PF('relRuleAssetDialog').show()-->
 <!--                }-->
 <!--            }-->
+
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
         </script>
 
     </ui:define>

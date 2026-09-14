@@ -20,6 +20,7 @@ import com.ge.apm.service.systemTempate.SystemTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PinYinComparator;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
@@ -58,6 +59,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import java.io.IOException;
 import java.util.*;
@@ -97,6 +99,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private UserContextService userContextService;
     private AssetFileImportSupportingService supportingService;
     private List<V2_BlobObject> attachList;
+    private ContractInfoItemRepository contractItemDao;
+
     @Getter
     @Setter
     private List<I18nMessage> code68List;
@@ -230,6 +234,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         userContextService=WebUtil.getBean(UserContextService.class);
         supportingService = WebUtil.getBean(AssetFileImportSupportingService.class);
+        contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
@@ -1527,5 +1532,22 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
         equipmentNameplate = null;
 
+    }
+
+
+    public String contractUrl(String contractItemId){
+        if(StrUtil.isEmpty(contractItemId)){
+            return "";
+        }
+        ContractInfoItem contractInfoItem = contractItemDao.findById(contractItemId);
+        if(contractInfoItem == null || StrUtil.isEmpty(contractInfoItem.getContractId())){
+            return "";
+        }
+        String str = "action=Edit&selectedid=".concat(contractInfoItem.getContractId());
+        String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+        // 返回绝对路径
+        String url = contextPath + "/portal/asset/contract/ContractView.xhtml?str="+ UrlParamUtil.encodeUrlQueryString(str);
+        System.out.println(url);
+        return url;
     }
 }

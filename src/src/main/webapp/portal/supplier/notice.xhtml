@@ -30,12 +30,12 @@
                 </p:column>
                 <p:column headerText="#{msg.noticeDate}" sortBy="#{item.noticeDate}">
                     <h:outputText value="#{item.noticeDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
                     <f:facet name="filter">
-                        <p:selectOneMenu value="#{venderCompanyController.supplierType}" onchange="PF('varDataList').filter()" >
+                        <p:selectOneMenu onchange="PF('varDataList2').filter()" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" noSelectionOption="true" />
                             <f:selectItem itemLabel="#{msg.NotCompleted}" itemValue="0" />
                             <f:selectItem itemLabel="#{msg.Completed}" itemValue="1" />
@@ -51,7 +51,7 @@
                 </p:column>
                 <p:column headerText="#{msg.replyDate}" sortBy="#{item.replyDate}">
                     <h:outputText value="#{item.replyDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
                     </h:outputText>
                 </p:column>
                 <f:facet name="{Toolbar}">
