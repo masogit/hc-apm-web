@@ -276,6 +276,14 @@ public class VenderCompany implements Serializable {
     @JoinColumn(name = "vender_company_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private List<Supplier> supplierList = new ArrayList<>();
 
+    public Date getBusinessIssuingDate() {
+        return businessIssuingDate;
+    }
+
+    public void setBusinessIssuingDate(Date businessIssuingDate) {
+        this.businessIssuingDate = businessIssuingDate;
+    }
+
     public String getAuthor() {
         return author;
     }
