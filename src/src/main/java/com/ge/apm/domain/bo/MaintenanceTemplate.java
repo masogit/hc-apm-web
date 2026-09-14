@@ -5,6 +5,7 @@ import com.deepoove.poi.data.style.TableStyle;
 import com.ge.apm.domain.bo.parser.SchemaParser;
 import com.ge.apm.domain.pure.TableSchema;
 import com.google.common.collect.Lists;
+import org.apache.poi.xwpf.usermodel.TableRowAlign;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class MaintenanceTemplate {
         TableRenderData tableRenderData = Tables.create(Rows.create("暂无"));
         TableStyle tableStyle = new TableStyle();
         tableStyle.setWidth(String.valueOf(8000));
+        tableStyle.setAlign(TableRowAlign.CENTER);
         tableRenderData.setTableStyle(tableStyle);
         return tableRenderData;
     }

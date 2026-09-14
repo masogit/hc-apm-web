@@ -188,8 +188,12 @@ public class WorkOrderDocxRenderService {
         bindings.put("audit_table", new AuditTableRenderPolicy());
         bindings.put("work_hours_table", new WorkHourTableRenderPolicy());
         bindings.put("coworker_hours_table", new CoworkerHoursTable());
-        bindings.put("parts_picture_table",  new PartsPictureTableRenderPolicy(blobService, 2));
-        return  WordExportServiceUtil.generate(datas, templateBytes, bindings);
+        bindings.put("parts_picture_table",  new PartsPictureTableRenderPolicy(blobService));
+        bindings.put("work_order_picture",  new PmPartsPictureTableRenderPolicy( 3));
+        bindings.put("service_request_picture",  new PmPartsPictureTableRenderPolicy( 3));
+        Map<Character, RenderPolicy> plugins = new HashMap<>();
+        plugins.put('&',new DynamicColumnTableRenderPolicy(datas));
+        return  WordExportServiceUtil.generate(datas, templateBytes, bindings,plugins);
 
     }
 
@@ -250,6 +254,7 @@ public class WorkOrderDocxRenderService {
 //                target.put("auditDateList" + i, "");
 //            }
 //        }
+        List<byte[]> serviceRequestPictureList = new ArrayList<>();
         size=0;
         if (source.containsKey("serviceRequestPicture")) {
             List<String> serviceRequestPicture= (List)source.get("serviceRequestPicture");
@@ -259,8 +264,11 @@ public class WorkOrderDocxRenderService {
                     String storageId = serviceRequestPicture.get(i);
                     if (storageId !=null){
                         mapESignSignature(storageId, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ",260,260);
+                        PictureRenderData data =(PictureRenderData) target.get("serviceRequestPicture" + i);
+                        serviceRequestPictureList.add(data.getPictureSupplier().get());
                     }
                 }
+                target.put("service_request_picture",serviceRequestPictureList);
             }
         }
         if(size<5){
@@ -268,6 +276,7 @@ public class WorkOrderDocxRenderService {
                 mapESignSignature(null, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ");
             }
         }
+        List<byte[]> workOrderPictureList = new ArrayList<>();
         size=0;
         if (source.containsKey("workOrderPicture")) {
             List<String> workOrderPicture= (List)source.get("workOrderPicture");
@@ -277,8 +286,11 @@ public class WorkOrderDocxRenderService {
                     String storageId = workOrderPicture.get(i);
                     if (storageId !=null){
                         mapESignSignature(storageId, target,"workOrderPicture"+i, "workorder_picture_title"+i, "维修图片： ",260,260);
+                        PictureRenderData data =(PictureRenderData) target.get("workOrderPicture" + i);
+                        workOrderPictureList.add(data.getPictureSupplier().get());
                     }
                 }
+                target.put("work_order_picture",workOrderPictureList);
             }
         }
         if(size<5){
