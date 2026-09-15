@@ -408,8 +408,8 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_EDIT') and workOrderMgrController.queryIndex==8}"><!--已关单-->
                     <h:panelGroup>
-                        <p:commandButton value="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()" disabled="#{!(workOrderMgrController.myWorkOrder or item.currentPersonId==userContextService.loginUserId)}"/>
-                        <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="handleCancelOrderSubmit(xhr, status, args);" disabled="#{!(workOrderMgrController.myWorkOrder or item.currentPersonId==userContextService.loginUserId)}"/>
+                        <p:commandButton value="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()" disabled="#{!(workOrderMgrController.myWorkOrder or userContextService.hasRole('AssetHead') or userContextService.isDispatcher() or item.currentPersonId==userContextService.loginUserId)}"/>
+                        <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareActCancel(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="handleCancelOrderSubmit(xhr, status, args);" disabled="#{!(workOrderMgrController.myWorkOrder or userContextService.hasRole('AssetHead') or userContextService.isDispatcher() or item.currentPersonId==userContextService.loginUserId)}"/>
                     </h:panelGroup>
                 </p:column>
 
