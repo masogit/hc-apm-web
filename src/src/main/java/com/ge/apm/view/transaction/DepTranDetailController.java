@@ -1,32 +1,37 @@
 package com.ge.apm.view.transaction;
 
 import com.ge.apm.dao.DeptTransactionLogRepository;
-import com.ge.apm.domain.DeptTransactionLog;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.transaction.TransactionService;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TransactionForm;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.dao.GenericRepository;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.Serializable;
-import lombok.Getter;
-import lombok.Setter;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -50,6 +55,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     private Date endTime;
     private TransactionService transactionService;
     private UserContextService userContextService;
+    private UserAccountRepository userAccountRepository;
     @Setter @Getter
     private DeptTransactionLog deptTransactionLog;
     private Integer authorId;
@@ -58,10 +64,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     private List<V2_BlobObject> transactionImages;
     @Getter @Setter
     private List<V2_BlobObject> viewImages;
+    @Getter @Setter
+    private StreamedContent templateFile;
     //    private ServerEventInterface callingController;
     @Setter @Getter
     private List<DeptTransactionLog> deptTranLogList;
-
+    @Setter @Getter
+    private ConfigCacheService configCacheService;
     @Getter @Setter
     TransactionStatis transactionStatis;
     @Override
@@ -82,7 +91,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         deptDao = WebUtil.getBean(DeptTransactionLogRepository.class);
         transactionImages = new ArrayList<>();
         blobFileService = WebUtil.getBean(BlobFileService.class);
-        transactionImages = new ArrayList<>();
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
     }
     public String titleNameDetail(){
         if(userContextService.isOnlyAssetStaff()){
@@ -221,6 +231,10 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             viewImages = new ArrayList<>();
         }
     }
+
+    public String getImageBase64(String objectStorageId) {
+        return blobFileService.getImgBase64(objectStorageId);
+    }
     public List<DeptTransactionLog> refreshLoadDataForSelectedItem(DepTranForTrans dep){
         HashMap<String, Object> trListByPerson = transactionService.getTransactionListByPerson(dep,UserContextService.getAccessToken());
         totalSize = (Integer)trListByPerson.get("rowCount");
@@ -341,10 +355,25 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         selected.setHours(hours);
         selected.setCategory(tmCategory);
         selected.setTimes(times);
+        if(checkRepetition(userContextService.getLoginUser().getLoginName(),startTime,tmCategory, selected.getId())){
+            WebUtil.addErrorMessage("重复数据，请检查");
+            return;
+        }
         transactionService.localUpdateTransaction(selected);
         WebUtil.addSuccessMessage("更新成功");
     }
 
+    public boolean checkRepetition(String authorName,Date date,Integer category){
+        return checkRepetition(authorName, date, category, null);
+    }
+
+    public boolean checkRepetition(String authorName,Date date,Integer category, Integer excludeId){
+        // 重复校验：姓名 + 日期 + 类别 三者一致即为重复
+        if (excludeId != null) {
+            return deptDao.existsByAuthorNameAndDateAndCategoryExcludeId(authorName, date, category, excludeId) > 0;
+        }
+        return deptDao.existsByAuthorNameAndDateAndCategory(authorName, date, category) > 0;
+    }
     public void locUpdateTransactionbyLink(){
         TransactionForm tf = new TransactionForm();
         tf.setCategory(tmCategory);
@@ -352,8 +381,16 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setHours(hours);
         tf.setTimes(times);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
-        transactionService.updateTransaction(tf,selected.getUid(),UserContextService.getAccessToken());
-        // 保存新上传的图片关联
+        if(checkRepetition(userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory, selected.getId())){
+            WebUtil.addErrorMessage("重复数据，请检查");
+            return;
+        }
+        String result = transactionService.updateTransaction(tf,selected.getId().toString(),UserContextService.getAccessToken());
+        if(result == null){
+            WebUtil.addErrorMessage("更新失败，微服务调用异常，请稍后重试");
+            return;
+        }
+        // 保存新上传的图片关联（boUuid为null的是本次新上传的，需要关联到当前记录）
         if(transactionImages!=null && selected.getId()!=null){
             for(V2_BlobObject img : transactionImages){
                 if(img.getBoUuid()==null){
@@ -362,6 +399,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                 }
             }
         }
+        WebUtil.addSuccessMessage("更新成功");
     }
 
     public void createTransaction(){
@@ -372,9 +410,43 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
-        transactionService.createTmByLink(tf, UserContextService.getAccessToken());
+        if(checkRepetition(userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory)){
+            WebUtil.addErrorMessage("重复数据，请检查");
+            return;
+        }
+        // 保存创建前的图片列表引用，cancel()会清空transactionImages
+        List<V2_BlobObject> imagesToAssociate = transactionImages != null ? new ArrayList<>(transactionImages) : new ArrayList<>();
+        LinkedHashMap<String, Object> createdData = transactionService.createTmByLink(tf, UserContextService.getAccessToken());
+
+        // 关联图片到新创建的科务记录
+        if(!imagesToAssociate.isEmpty()){
+            String newIdStr = null;
+            // 优先从微服务响应中获取ID
+            if(createdData != null){
+                Object newId = createdData.get("id");
+                if(newId != null){
+                    newIdStr = newId.toString();
+                }
+            }
+            // 回退：从本地DB查询最新创建的记录
+            if(newIdStr == null){
+                DeptTransactionLog latest = deptDao.findLatestByAuthorNameAndDateAndCategory(
+                    userContextService.getLoginUser().getLoginName(), upStartTime, tmCategory);
+                if(latest != null && latest.getId() != null){
+                    newIdStr = latest.getId().toString();
+                }
+            }
+            if(newIdStr != null){
+                for(V2_BlobObject img : imagesToAssociate){
+                    if(img.getBoUuid() == null){
+                        img.setBoUuid(newIdStr);
+                        blobFileService.saveBlobObject(img);
+                    }
+                }
+            }
+        }
+
         WebUtil.addSuccessMessage("成功创建科务记录");
-        // refreshLoadData(userContextService.getLoginUserId());
         cancel();
         deptTransactionLog= new DeptTransactionLog();
     }
@@ -398,6 +470,266 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
 
 
 
+
+    public void downloadTemplate() {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("科务管理模板");
+
+            // 创建表头
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"姓名", "日期", "类别", "次数", "工时", "备注"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+
+            // 设置列宽
+            for (int i = 0; i < headers.length; i++) {
+                sheet.setColumnWidth(i, 256 * 20);
+            }
+
+            // 获取类别下拉选项
+            List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
+            if (categoryList != null && !categoryList.isEmpty()) {
+                String[] categoryValues = new String[categoryList.size()];
+                for (int i = 0; i < categoryList.size(); i++) {
+                    categoryValues[i] = categoryList.get(i).getValue();
+                }
+
+                // 为类别列添加下拉选择
+                DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
+                CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
+                DataValidation validation = validationHelper.createValidation(constraint, addressList);
+                validation.setShowErrorBox(true);
+                sheet.addValidationData(validation);
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            templateFile = new DefaultStreamedContent(
+                    new ByteArrayInputStream(out.toByteArray()),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "科务管理模板.xlsx");
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("模板生成失败");
+        }
+    }
+
+    public void handleImportUpload(FileUploadEvent event) {
+        UploadedFile uploadedFile = event.getFile();
+        if (uploadedFile == null || uploadedFile.getFileName() == null) {
+            WebUtil.addErrorMessage("请选择文件");
+            return;
+        }
+        String fileName = uploadedFile.getFileName().toLowerCase();
+        if (!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx")) {
+            WebUtil.addErrorMessage("只支持xls或xlsx格式的文件");
+            return;
+        }
+
+        try (Workbook workbook = WorkbookFactory.create(uploadedFile.getInputstream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+            if (sheet == null || sheet.getLastRowNum() < 1) {
+                WebUtil.addErrorMessage("文件中没有数据");
+                return;
+            }
+            if ( sheet.getLastRowNum() > 101) {
+                WebUtil.addErrorMessage("请分批次导入，单次限制100条");
+                return;
+            }
+
+            // 解析表头，建立列索引映射
+            Row headerRow = sheet.getRow(0);
+            Map<String, Integer> headerMap = new HashMap<>();
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                Cell cell = headerRow.getCell(i);
+                if (cell != null) {
+                    String header = cell.getStringCellValue().trim();
+                    headerMap.put(header, i);
+                }
+            }
+
+            Integer nameIdx = headerMap.get("姓名");
+            Integer dateIdx = headerMap.get("日期");
+            Integer categoryIdx = headerMap.get("类别");
+            Integer timesIdx = headerMap.get("次数");
+            Integer hoursIdx = headerMap.get("工时");
+            Integer remarkIdx = headerMap.get("备注");
+
+            if (nameIdx == null || dateIdx == null || categoryIdx == null) {
+                WebUtil.addErrorMessage("表头必须包含姓名、日期、类别列");
+                return;
+            }
+
+            // 构建类别显示值→码值的双向映射
+            List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
+            Map<String, String> categoryNameToKey = new HashMap<>();
+            Map<String, String> categoryKeyToName = new HashMap<>();
+            for (I18nMessage msg : categoryList) {
+                categoryNameToKey.put(msg.getValue(), msg.getMsgKey());
+                categoryKeyToName.put(msg.getMsgKey(), msg.getValue());
+            }
+
+            UserAccount currentUser = userContextService.getLoginUser();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+
+            int successCount = 0;
+            int duplicateCount = 0;
+            List<String> errors = new ArrayList<>();
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                try {
+                    // 读取姓名
+                    String authorName = getCellStringValue(row.getCell(nameIdx));
+                    if (authorName == null || authorName.trim().isEmpty()) {
+                        errors.add("第" + (i + 1) + "行: 姓名为空，已跳过");
+                        continue;
+                    }
+                    UserAccount byLoginName = userAccountRepository.getByLoginName(authorName);
+                    if (byLoginName == null) {
+                        errors.add("第" + (i + 1) + "行: 姓名不存在，已跳过");
+                        continue;
+                    }
+
+                    // 读取日期
+                    Date date = parseDateCell(row.getCell(dateIdx), sdf);
+                    if (date == null) {
+                        errors.add("第" + (i + 1) + "行: 日期格式不正确，已跳过");
+                        continue;
+                    }
+
+                    // 读取类别（显示值）并转换为码值
+                    String categoryName = getCellStringValue(row.getCell(categoryIdx));
+                    if (categoryName == null || categoryName.trim().isEmpty()) {
+                        errors.add("第" + (i + 1) + "行: 类别为空，已跳过");
+                        continue;
+                    }
+                    String categoryKey = categoryNameToKey.get(categoryName.trim());
+                    if (categoryKey == null) {
+                        errors.add("第" + (i + 1) + "行: 类别'" + categoryName + "'不存在，已跳过");
+                        continue;
+                    }
+                    Integer category = Integer.valueOf(categoryKey);
+
+                    // 重复校验：姓名 + 日期 + 类别 三者一致即为重复
+                    if (deptDao.existsByAuthorNameAndDateAndCategory(authorName.trim(), date, category) > 0) {
+                        duplicateCount++;
+                        continue;
+                    }
+
+                    // 读取次数、工时、备注
+                    Integer times = null;
+                    if (timesIdx != null) {
+                        String timesStr = getCellStringValue(row.getCell(timesIdx));
+                        if (timesStr != null && !timesStr.trim().isEmpty()) {
+                            times = (int) Double.parseDouble(timesStr.trim());
+                        }
+                    }
+
+                    Double hours = null;
+                    if (hoursIdx != null) {
+                        String hoursStr = getCellStringValue(row.getCell(hoursIdx));
+                        if (hoursStr != null && !hoursStr.trim().isEmpty()) {
+                            hours = Double.parseDouble(hoursStr.trim());
+                        }
+                    }
+
+                    String remark = null;
+                    if (remarkIdx != null) {
+                        remark = getCellStringValue(row.getCell(remarkIdx));
+                    }
+                    DeptTransactionLog deptTransactionLog = new DeptTransactionLog();
+                    deptTransactionLog.setAuthorId(currentUser.getId());
+                    deptTransactionLog.setAuthorLogin(currentUser.getLoginName());
+                    deptTransactionLog.setAuthorName(authorName);
+                    deptTransactionLog.setAuthorUID(currentUser.getUid());
+                    deptTransactionLog.setTimes(times);
+                    deptTransactionLog.setDate(date);
+                    deptTransactionLog.setHours(hours);
+                    deptTransactionLog.setCategory(category);
+                    deptTransactionLog.setRemark(remark);
+                    OrgInfo dept = configCacheService.findOrgInfoByUid(currentUser.getOrgInfoUID());
+                    deptTransactionLog.setClinicalDeptId(dept.getId());
+                    deptTransactionLog.setClinicalDeptUID(dept.getUid());
+                    deptTransactionLog.setClinicalDeptName(dept.getName());
+                    deptTransactionLog.setTenantUID(dept.getTenantUID());
+                    deptTransactionLog.setInstitutionUID(dept.getInstitutionUID());
+                    deptTransactionLog.setHospitalUID(dept.getHospitalUID());
+                    deptTransactionLog.setSiteUID(dept.getSiteUID());
+                    deptTransactionLog.setCreatedBy(currentUser.getLoginName());
+                    deptTransactionLog.setCreatedDate(new Date());
+                    transactionService.localUpdateTransaction(deptTransactionLog);
+                    successCount++;
+                } catch (Exception e) {
+                    errors.add("第" + (i + 1) + "行: " + e.getMessage());
+                }
+            }
+
+            // 显示导入结果
+            StringBuilder msg = new StringBuilder();
+            msg.append("导入完成，成功: ").append(successCount).append("条");
+            if (duplicateCount > 0) {
+                msg.append("，重复跳过: ").append(duplicateCount).append("条");
+            }
+            if (!errors.isEmpty()) {
+                msg.append("，失败: ").append(errors.size()).append("条");
+            }
+            WebUtil.addSuccessMessage(msg.toString());
+
+            // 逐条显示错误详情
+            for (String error : errors) {
+                WebUtil.addErrorMessage(error);
+            }
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("文件解析失败: " + e.getMessage());
+        }
+    }
+
+    private String getCellStringValue(Cell cell) {
+        if (cell == null) return null;
+        switch (cell.getCellTypeEnum()) {
+            case STRING:
+                return cell.getStringCellValue().trim();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return new SimpleDateFormat("yyyy/MM/dd").format(cell.getDateCellValue());
+                }
+                double numVal = cell.getNumericCellValue();
+                if (numVal == Math.floor(numVal)) {
+                    return String.valueOf((long) numVal);
+                }
+                return String.valueOf(numVal);
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            default:
+                return null;
+        }
+    }
+
+    private Date parseDateCell(Cell cell, SimpleDateFormat sdf) {
+        if (cell == null) return null;
+        try {
+            if (cell.getCellTypeEnum() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+                return cell.getDateCellValue();
+            }
+            String dateStr = getCellStringValue(cell);
+            if (dateStr == null || dateStr.trim().isEmpty()) return null;
+            dateStr = dateStr.trim();
+            // 支持 yyyy/MM/dd 和 yyyy-MM-dd 两种格式
+            if (dateStr.contains("-") && !dateStr.contains("/")) {
+                dateStr = dateStr.replace("-", "/");
+            }
+            return sdf.parse(dateStr);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public void postProcessXLS(Object document) {
         HSSFWorkbook wb = (HSSFWorkbook) document;
