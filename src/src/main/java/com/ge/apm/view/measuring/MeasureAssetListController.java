@@ -784,7 +784,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         String uid = measuringCertificateDetail.getAssetUID();
         measuringCertificateDetailDao.delete(mcdUid);
         blobService.deleteBlobFileByBoUuid(mcdUid);
-        if(matchType!=1 && StringUtils.hasText(uid)){
+        if(StringUtils.hasText(uid)){
             AssetInfo assetInfo = dao.findByUid(uid);
             if(assetInfo != null){
                 measuringService.updateMeasuringDate(assetInfo);
