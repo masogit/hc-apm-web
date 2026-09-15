@@ -885,7 +885,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             this.setSearchFilter();
             String[] fields = new String[]{"status", "currentStepId", "currentStepName", "currentPersonId", "dispatchMode"
                     , "srId", "feedbackRating", "assetId", "approvalStatus", "assetInfo.assetOwnerId", "assetInfo.assetOwnerId2"
-                    , "assetInfo.assetOwnerId3", "assetInfo.uid", "assetInfo.clinicalDeptUID", "approverId", "serviceRequest.status"};
+                    , "assetInfo.assetOwnerId3", "assetInfo.uid", "assetInfo.clinicalDeptUID", "approverId", "serviceRequest.status","orderSnatchingPerson.userUid"};
             Arrays.asList(fields).forEach(field -> removeFilterOnField(field));
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
