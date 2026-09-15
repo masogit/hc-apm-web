@@ -13,6 +13,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.preview.QRPreViewerBean;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -320,6 +321,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         mqContext.setClassName("AssetOutStockedController");
         mqContext.setMethodName("generatedReturnedStockDoc");
         mqContext.setDescribe("设备退库修改科室");
+        mqContext.setModifySource(ModifySourceEnum.STOCK_IN_OUT.getCode());
         mqContext.setSource("departmentReturned");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("stockedType", "assetReturnedStock");

@@ -11,6 +11,7 @@ import com.ge.apm.domain.secondment.SecondmentOrder;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.data.FilterEvent;
@@ -173,6 +174,7 @@ public class SecondmentConfigController extends GenericCRUDUUIDController<Second
         mqContext.setClassName("SecondmentConfigController");
         mqContext.setMethodName("delete");
         mqContext.setDescribe(message);
+        mqContext.setModifySource(ModifySourceEnum.DEPT_SECONDMENT.getCode());
         mqUtils.sendAssetToMQ(newAsset,userAccount,mqContext);
     }
 

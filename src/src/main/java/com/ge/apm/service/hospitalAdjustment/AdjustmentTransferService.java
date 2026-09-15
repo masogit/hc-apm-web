@@ -16,6 +16,7 @@ import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.date.DatePattern;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -126,6 +127,7 @@ public class AdjustmentTransferService {
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("confirmReceipt");
         mqContext.setDescribe("院区间调剂借用确认到货");
+        mqContext.setModifySource(ModifySourceEnum.SITE_ADJUSTMENT.getCode());
 
         mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
         dao.save(selected);
@@ -248,6 +250,7 @@ public class AdjustmentTransferService {
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("returnConfirm");
         mqContext.setDescribe("院区间调剂借用设备退回确认");
+        mqContext.setModifySource(ModifySourceEnum.SITE_ADJUSTMENT.getCode());
         mqUtils.sendAssetToMQ(assetInfo, currentUserAccount, mqContext);
     }
 

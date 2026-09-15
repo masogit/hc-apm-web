@@ -7,6 +7,7 @@ import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.secondment.dept.SecondmentAssetSettingBatchController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
@@ -222,6 +223,7 @@ public class SpecialAssetBatchController extends GenericCRUDController<AssetInfo
         mqContext.setClassName("SpecialAssetBatchController");
         mqContext.setMethodName("save");
         mqContext.setDescribe(message);
+        mqContext.setModifySource(ModifySourceEnum.SPECIAL_ASSET.getCode());
         mqUtils.sendAssetToMQ(newAsset,userAccount,mqContext);
     }
 

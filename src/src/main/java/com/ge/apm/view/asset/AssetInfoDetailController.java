@@ -107,6 +107,7 @@ public class AssetInfoDetailController {
 
 
     private SpecialAssetInfo specialAssetInfo;
+
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -146,6 +147,8 @@ public class AssetInfoDetailController {
             selected = assetDao.findByUid(assetUid);
         }
         selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
+        UdidSearchService udidSearchService = WebUtil.getBean(UdidSearchService.class);
+        selected.setRegistrationInfo(udidSearchService.selectByRegistryNum(selected.getRegistrationNo()));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -639,5 +642,20 @@ public class AssetInfoDetailController {
         log.info("timeline_url:"+url);
         RequestContext.getCurrentInstance().addCallbackParam("url", url);
 
+    }
+
+    // 是否显示注册信息tab
+    public boolean renderRegistrationInfo() {
+        return selected != null && StringUtils.isNotBlank(selected.getRegistrationNo()) && selected.getRegistrationInfo() != null;
+    }
+
+    // 是注册信息
+    public boolean renderRegistration() {
+        return renderRegistrationInfo() && StringUtils.isNotBlank(selected.getRegistrationInfo().getRegistryNum()) && selected.getRegistrationInfo().getRegistryNum().contains("注");
+    }
+
+    // 是备案信息
+    public boolean renderFiling() {
+        return renderRegistrationInfo() && StringUtils.isNotBlank(selected.getRegistrationInfo().getRegistryNum()) && selected.getRegistrationInfo().getRegistryNum().contains("备");
     }
 }

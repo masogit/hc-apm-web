@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.ge.apm.domain.UdidRegistryNumInfo">
+        <result property="registryNo" column="registry_no" jdbcType="VARCHAR"/>
+        <result property="qxlb" column="qxlb" jdbcType="VARCHAR"/>
+        <result property="cplb" column="cplb" jdbcType="VARCHAR"/>
+        <result property="cpmctymc" column="cpmctymc" jdbcType="VARCHAR"/>
+        <result property="ggxh" column="ggxh" jdbcType="VARCHAR"/>
+        <result property="flbm" column="flbm" jdbcType="VARCHAR"/>
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="dbId" column="db_id" jdbcType="VARCHAR"/>
+        <result property="registryNum" column="registry_num" jdbcType="VARCHAR"/>
+        <result property="registrantName" column="registrant_name" jdbcType="VARCHAR"/>
+        <result property="registrantAddress" column="registrant_address" jdbcType="VARCHAR"/>
+        <result property="productionAddress" column="production_address" jdbcType="VARCHAR"/>
+        <result property="productName" column="product_name" jdbcType="VARCHAR"/>
+        <result property="managementCategory" column="management_category" jdbcType="VARCHAR"/>
+        <result property="modelSpec" column="model_spec" jdbcType="VARCHAR"/>
+        <result property="structureComposition" column="structure_composition" jdbcType="VARCHAR"/>
+        <result property="scopeOfUse" column="scope_of_use" jdbcType="VARCHAR"/>
+        <result property="storageConditions" column="storage_conditions" jdbcType="VARCHAR"/>
+        <result property="attachments" column="attachments" jdbcType="VARCHAR"/>
+        <result property="otherContent" column="other_content" jdbcType="VARCHAR"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+        <result property="approvalDept" column="approval_dept" jdbcType="VARCHAR"/>
+        <result property="approvalDate" column="approval_date" jdbcType="VARCHAR"/>
+        <result property="validPeriod" column="valid_period" jdbcType="VARCHAR"/>
+        <result property="changes" column="changes" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        registry_no
+        ,qxlb,cplb,cpmctymc,ggxh,flbm,
+        id,db_id,registry_num,registrant_name,registrant_address,
+        production_address,product_name,management_category,model_spec,structure_composition,
+        scope_of_use,storage_conditions,attachments,other_content,remarks,
+        approval_dept,approval_date,valid_period,changes,created_at,
+        updated_at
+    </sql>
+
+    <select id="selectByRegistryNum" resultType="com.ge.apm.domain.UdidRegistryNumInfo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM udid_registry_num_info where registry_num = #{registryNum}
+        ORDER BY updated_at DESC
+        LIMIT 1
+    </select>
+</mapper>

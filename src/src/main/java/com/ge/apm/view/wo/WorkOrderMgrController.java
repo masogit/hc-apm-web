@@ -885,28 +885,33 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             this.setSearchFilter();
             String[] fields = new String[]{"status", "currentStepId", "currentStepName", "currentPersonId", "dispatchMode"
                     , "srId", "feedbackRating", "assetId", "approvalStatus", "assetInfo.assetOwnerId", "assetInfo.assetOwnerId2"
-                    , "assetInfo.assetOwnerId3", "assetInfo.uid", "assetInfo.clinicalDeptUID", "approverId", "serviceRequest.status"};
+                    , "assetInfo.assetOwnerId3", "assetInfo.uid", "assetInfo.clinicalDeptUID", "approverId", "serviceRequest.status","orderSnatchingPerson.userUid"};
             Arrays.asList(fields).forEach(field -> removeFilterOnField(field));
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
-                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }else{
+                    if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
+                        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                    }
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.LTE, 3));
             } else if (queryIndex == 2) { //待派工
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
                 searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
             } else if (queryIndex == 3) { //待接单
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if (!myWorkOrder) {
-                    //我的工单：可见范围 OR 当前责任人是我
                     extendVisibilityWithMe();
-                    // stepId=3(待接单) 或 stepId=2且可抢/已抢(dispatchMode IN 2,3,5)
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+"));
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+"));
-                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*3+"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+1*"));
+                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*3+1*"));
                 } else {
                     //原有逻辑 - 包含人员匹配/资产责任人/tagGroup等过滤
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
@@ -972,8 +977,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     }
                 }
             } else if (queryIndex == 6) { //待评价
-                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                } else {
+                    if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
+                        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
+                    }
                 }
                 searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
@@ -1001,6 +1010,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             } else if (queryIndex == 9) { //已取消
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
             } else if (queryIndex == 10) { //待审批
                 String tenantUID = loginUser.getTenantUID();
@@ -1071,6 +1083,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
 
             } else if (queryIndex == 12) { //指定设备queryAssetUid 工单 设备详细页面跳转
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 if (!Strings.isNullOrEmpty(queryAssetUid)) {
                     searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
                 }
@@ -4387,9 +4402,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 使查询结果为 (可见范围 OR 当前责任人是我) AND 其他条件
      */
     private void extendVisibilityWithMe() {
-        String visibilityPath = searchFilters.stream()
-                .anyMatch(sf -> "1*3+".equals(sf.conditionPath)) ? "1*3+me+" : "1*2+me+";
-        updateSearchFilter(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), visibilityPath));
+
+        updateSearchFilter(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
     }
 
     /**

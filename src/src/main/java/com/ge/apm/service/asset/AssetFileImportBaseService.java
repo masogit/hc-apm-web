@@ -20,6 +20,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -1144,6 +1145,7 @@ public class AssetFileImportBaseService {
     public void saveAssetHistory(AssetInfo newAsset) {
         MqContext mqContext = new MqContext();
         mqContext.setDescribe("资产导入添加");
+        mqContext.setModifySource(ModifySourceEnum.ASSET_IMPORT.getCode());
         mqContext.setMethodName("importOneAsset");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetFileImportBaseService");
@@ -1160,6 +1162,7 @@ public class AssetFileImportBaseService {
     public void saveAssetHistoryAsync(AssetInfo newAsset, UserAccount currentUser, Locale locale) {
         MqContext mqContext = new MqContext();
         mqContext.setDescribe("资产导入添加");
+        mqContext.setModifySource(ModifySourceEnum.ASSET_IMPORT.getCode());
         mqContext.setMethodName("importOneAsset");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetFileImportBaseService");

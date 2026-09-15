@@ -105,6 +105,11 @@
         <h:outputText value="#{item.createdBy}"/>
     </p:column>
 
+    <!-- 修改来源 -->
+    <p:column headerText="修改来源" width="100">
+        <h:outputText value="#{item.modifySource}"/>
+    </p:column>
+
     <!-- 修改时间 -->
     <p:column headerText="#{msg.modifiedTime}" width="160" filterBy="#{item.createdDate}" filterMatchMode="GTE">
         <f:facet name="filter">

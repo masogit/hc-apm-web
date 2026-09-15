@@ -71,6 +71,12 @@ public class AssetHistory implements Serializable {
     @Column(name = "asset_json", nullable = true, columnDefinition = "VARCHAR(3072)")
     private String assetJson;
 
+    @Column(name = "source")
+    private String source;
+
+    @Column(name = "modify_source")
+    private String modifySource;
+
     public static class AssetHistoryInfo {
 
         @Getter

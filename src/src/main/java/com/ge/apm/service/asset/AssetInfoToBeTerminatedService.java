@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class AssetInfoToBeTerminatedService{
         assetInfo.setStatus(4);
         assetInfo.setIsValid(false);
         assetInfo.setTerminateDate(new Date());
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo,ModifySourceEnum.ASSET_SCRAP.getCode());
         dao.save(assetInfo);
 //        assetLifecyleService.saveLifecycle(originStatus,assetInfo,userAccount);
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());

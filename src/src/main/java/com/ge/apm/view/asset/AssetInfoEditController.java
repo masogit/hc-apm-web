@@ -32,6 +32,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -1538,7 +1539,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
         this.selected.setStatus(4);
         update();
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected,ModifySourceEnum.ASSET_SCRAP.getCode());
 //        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
@@ -1659,7 +1660,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setIsValid(true);
         this.selected.setTerminateDate(null);
         update();
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected,ModifySourceEnum.LEDGER_EDIT.getCode());
 //        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
         return "AssetTerminateEntryList?faces-redirect=true";
     }
@@ -2207,6 +2208,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mqContext.setClassName("AssetInfoEditController");
         mqContext.setMethodName("applyChange");
         mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
+        mqContext.setModifySource(ModifySourceEnum.LEDGER_EDIT.getCode());
         mqUtils.sendAssetToMQ(newAsset,loginUser,mqContext);
     }
 

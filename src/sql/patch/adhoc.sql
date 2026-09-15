@@ -44,3 +44,5 @@ ALTER TABLE supplier ADD COLUMN IF NOT EXISTS business_issuing_date TIMESTAMP;
 ALTER TABLE supplier ADD COLUMN IF NOT EXISTS production_issuing_date TIMESTAMP;
 ALTER TABLE supplier ADD COLUMN IF NOT EXISTS license_approval_date TIMESTAMP;
 
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
+select replace(uuid_generate_v4()::text,'-',''), 14, '', '不良事件上报Account passoword', 'adverseEventsReportAccountPass', '不良事件上报Account password', 'f','t',1 where not exists(select * from config_item where key = 'adverseEventsReportAccountPass');

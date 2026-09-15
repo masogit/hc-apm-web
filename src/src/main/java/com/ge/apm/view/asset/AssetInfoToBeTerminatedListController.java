@@ -14,6 +14,7 @@ import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
@@ -718,7 +719,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         assetInfo.setStatus(4);
         assetInfo.setIsValid(false);
         assetInfo.setTerminateDate(new Date());
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo,ModifySourceEnum.ASSET_SCRAP.getCode());
         dao.save(assetInfo);
 //        assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());

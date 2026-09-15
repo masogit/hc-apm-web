@@ -8,6 +8,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -722,6 +723,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private void sendAssetMq(AssetInfo newAsset) {
         MqContext mqContext = new MqContext();
         mqContext.setDescribe("批量修改设备");
+        mqContext.setModifySource(ModifySourceEnum.BULK_EDIT.getCode());
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetInfoBulkEditController");
         mqContext.setMethodName("verifyIfRequiredBeforeApplyChange");
