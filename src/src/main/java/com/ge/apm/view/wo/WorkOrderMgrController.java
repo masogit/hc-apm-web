@@ -4402,8 +4402,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 使查询结果为 (可见范围 OR 当前责任人是我) AND 其他条件
      */
     private void extendVisibilityWithMe() {
+        if (ObjectUtil.isEmpty(selectedAccessOrgNodes)) {
+            updateSearchFilter(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
+        }
 
-        updateSearchFilter(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
     }
 
     /**
