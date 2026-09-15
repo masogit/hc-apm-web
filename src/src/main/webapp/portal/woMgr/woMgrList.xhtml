@@ -33,7 +33,7 @@
             <h:panelGroup id="myWorkOrderPanel"
                           rendered="#{userContextService.hasRole('AssetHead')}">
                 <p:selectBooleanCheckbox value="#{workOrderMgrController.myWorkOrder}" itemLabel="我的工单">
-                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist" process="@this"/>
+                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist filterApplyTimePanel" process="@this"/>
                 </p:selectBooleanCheckbox>
             </h:panelGroup>
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
@@ -428,6 +428,21 @@
                     </p:commandButton>
                 </f:facet>
             </p:dataTable>
+
+            <h:panelGroup id="filterApplyTimePanel">
+            <p:overlayPanel  widgetVar="panelFilterApplyTime" for="woTab:woMgrListForm:datalist:filterApplyTime" dismissable="false" appendTo="@(body)">
+                <h:panelGrid columns="2">
+                    <p:outputLabel for="cal1" />
+                    <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{workOrderMgrController.applyTimeFrom}"
+                                pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                    <p:outputLabel for="cal2"/>
+                    <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold"
+                                pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                </h:panelGrid>
+                <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+            </p:overlayPanel>
+            </h:panelGroup>
         </h:form>
         <ui:include src="woMgrView.xhtml"/>
 
@@ -444,18 +459,7 @@
         <ui:include src="moreAccDialogPrice.xhtml"/>
         <ui:include src="manHoursMgrDlg.xhtml"/>
 
-        <p:overlayPanel  widgetVar="panelFilterApplyTime" for="woTab:woMgrListForm:datalist:filterApplyTime" dismissable="false">
-            <h:panelGrid columns="2">
-                <p:outputLabel for="cal1" />
-                <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{workOrderMgrController.applyTimeFrom}"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
-                <p:outputLabel for="cal2"/>
-                <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
-            </h:panelGrid>
-            <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
-        </p:overlayPanel>
+
     </div>
     <p:dialog id="ackEditDialog" widgetVar="ackEditDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.UpdateRepairResult}">
         <h:form id="ackEditForm" >

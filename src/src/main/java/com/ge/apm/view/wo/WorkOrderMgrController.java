@@ -889,12 +889,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             Arrays.asList(fields).forEach(field -> removeFilterOnField(field));
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
-                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }else{
+                    if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
+                        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                    }
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.LTE, 3));
             } else if (queryIndex == 2) { //待派工
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
                 searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
@@ -1003,6 +1010,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             } else if (queryIndex == 9) { //已取消
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
             } else if (queryIndex == 10) { //待审批
                 String tenantUID = loginUser.getTenantUID();
@@ -1073,6 +1083,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
 
             } else if (queryIndex == 12) { //指定设备queryAssetUid 工单 设备详细页面跳转
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 if (!Strings.isNullOrEmpty(queryAssetUid)) {
                     searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
                 }
@@ -1090,6 +1103,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 11));
             }else {//待办
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if(stepFileter!=null) {
                     fillterStepId = woStatus.get(stepFileter);
