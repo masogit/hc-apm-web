@@ -1,14 +1,19 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.primefaces.model.LazyDataModel;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -29,20 +34,31 @@ public class DeptTransactionLog implements Serializable {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     private String uid;
-
+    @Column(name = "author_uid", columnDefinition = "CHAR(32)")
+    private String authorUID;
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;
     @Column(name = "author_name")
     private String authorName;
-
+    @Column
+    private Integer clinicalDeptId;
+    @Column
+    private String authorLogin;
    /* @Basic(optional = false)
     @NotNull
     @Column(name = "name")
     private String name;*/
+   @CreatedBy
+   @Column(name = "created_by", nullable = true, length = 50, updatable = false)
+   @JsonIgnore
+   private String createdBy = "system";
 
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    @JsonIgnore
+    private Date createdDate;
     @Column(name = "hours")
     private Double hours;
-
 //    @Basic(optional = false)
 //    @Column(name = "start_time")
 //    @Temporal(TemporalType.TIMESTAMP)

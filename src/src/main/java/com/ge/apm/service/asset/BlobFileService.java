@@ -349,6 +349,10 @@ public class BlobFileService {
         return microService.downloadSingleFile(storageId);
     }
 
+    public String getImgBase64(String objectStorageId) {
+        return microService.getImgBase64(objectStorageId);
+    }
+
 
     public V2_BlobObject compressByObjectId(String objectStorageId) {
         Map<String, Object> fileObject = microService.compressByObjectId(objectStorageId);

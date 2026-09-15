@@ -4,10 +4,10 @@ import com.ge.apm.domain.DataTableConfig;
 import com.ge.apm.domain.DeptTransactionLog;
 import com.ge.apm.view.transaction.TransactionStatis;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepository;
-import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.web.mvc.JpaCRUDController;
 
+import java.util.Date;
 import java.util.List;
 
 public interface DeptTransactionLogRepository extends GenericRepository<DeptTransactionLog> {
@@ -37,4 +37,13 @@ public interface DeptTransactionLogRepository extends GenericRepository<DeptTran
 
     @Query(value="select count(1) from dept_transaction_log where category = ?1 and tenant_uid = ?2", nativeQuery = true)
     int countByCategoryAndTenant(Integer category, String tenantUid);
+
+    @Query(value = "select count(1) from dept_transaction_log where author_name = :authorName and date = :date and category = :category", nativeQuery = true)
+    int existsByAuthorNameAndDateAndCategory(@Param("authorName") String authorName, @Param("date") Date date, @Param("category") Integer category);
+
+    @Query(value = "select count(1) from dept_transaction_log where author_name = :authorName and date = :date and category = :category and id != :excludeId", nativeQuery = true)
+    int existsByAuthorNameAndDateAndCategoryExcludeId(@Param("authorName") String authorName, @Param("date") Date date, @Param("category") Integer category, @Param("excludeId") Integer excludeId);
+
+    @Query(value = "select * from dept_transaction_log where author_name = :authorName and date = :date and category = :category order by id desc limit 1", nativeQuery = true)
+    DeptTransactionLog findLatestByAuthorNameAndDateAndCategory(@Param("authorName") String authorName, @Param("date") Date date, @Param("category") Integer category);
 }
