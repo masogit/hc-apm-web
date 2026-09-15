@@ -1181,6 +1181,12 @@ public class AssetInfo implements ChineseName, Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date estimatedRiskDate; //预估风险评估日期
 
+    @Transient
+    @TableField(exist = false)
+    @Getter
+    @Setter
+    private UdidRegistryNumInfo registrationInfo;
+
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
             DateTime dt = TimeUtil.toJodaDate(nextMeteringDate);
