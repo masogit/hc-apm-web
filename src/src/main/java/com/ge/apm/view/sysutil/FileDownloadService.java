@@ -149,25 +149,26 @@ public class FileDownloadService {
     }
 
     private InputStream getDeptTransationLog(InputStream inputStream) {
-        try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
+        // 获取类别下拉选项
+        List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
+        if(CollectionUtils.isEmpty(categoryList)){
+            return inputStream;
+        }
+        try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)){
+            XSSFSheet sheet = workbook.getSheetAt(0);
 
-            // 获取类别下拉选项
-            List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
-            if (categoryList != null && !categoryList.isEmpty()) {
-                String[] categoryValues = new String[categoryList.size()];
-                for (int i = 0; i < categoryList.size(); i++) {
-                    categoryValues[i] = categoryList.get(i).getValue();
-                }
-
-                // 为类别列添加下拉选择
-                DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
-                CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
-                DataValidation validation = validationHelper.createValidation(constraint, addressList);
-                validation.setShowErrorBox(true);
-                sheet.addValidationData(validation);
+            String[] categoryValues = new String[categoryList.size()];
+            for (int i = 0; i < categoryList.size(); i++) {
+                categoryValues[i] = categoryList.get(i).getValue();
             }
+
+            // 为类别列添加下拉选择
+            DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+            DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
+            CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
+            DataValidation validation = validationHelper.createValidation(constraint, addressList);
+            validation.setShowErrorBox(true);
+            sheet.addValidationData(validation);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
@@ -212,10 +213,13 @@ public class FileDownloadService {
         try {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            response.reset();
             response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
             StreamUtils.copy(inputStream, response.getOutputStream());
+            response.getOutputStream().flush();
             facesContext.responseComplete();
-            facesContext.renderResponse();
         } catch (Exception e) {
             e.printStackTrace();
         }
