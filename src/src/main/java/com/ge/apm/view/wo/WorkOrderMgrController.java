@@ -4414,24 +4414,38 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      */
     public boolean canTakeOrCompete(V2_WorkOrder wo) {
         if (wo == null) return false;
-        // 当前责任人是我
-        if (wo.getCurrentPersonId() != null && wo.getCurrentPersonId().equals(loginUser.getId())) return true;
-        // 我是资产责任人
-        if (wo.getAssetInfo() != null) {
-            if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId())) return true;
-            if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId2())) return true;
-            if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId3())) return true;
-            // 资产在我的标签组内
-            Integer assetId = wo.getAssetInfo().getId();
-            if (assetId != null) {
-                List<Integer> tagGroupAssets = getTagGroupAssets();
-                if (tagGroupAssets != null && tagGroupAssets.contains(assetId)) return true;
-                List<Integer> noTagGroupAssets = getNoTagGroupAssets();
-                if (noTagGroupAssets != null && noTagGroupAssets.contains(assetId)) return true;
+        int dispatchMode = wo.getDispatchMode() != null ? wo.getDispatchMode() : 0;
+        int stepId = wo.getCurrentStepId() != null ? wo.getCurrentStepId() : 0;
+        // 1. 当前责任人是我
+        if (wo.getCurrentPersonId() != null && wo.getCurrentPersonId().equals(loginUser.getId())) {
+            // 1a. dispatchMode(2,3) + stepId=2 → 接单
+            if ((dispatchMode == 2 || dispatchMode == 3) && stepId == 2) return true;
+            // 1b. stepId=3 → 已派工的单
+            if (stepId == 3) return true;
+        }
+        // 2. dispatchMode(2,3) 时检查资产相关条件
+        if (dispatchMode == 2 || dispatchMode == 3) {
+            if (wo.getAssetInfo() != null) {
+                Integer assetId = wo.getAssetInfo().getId();
+                boolean isOwner = loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId())
+                        || loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId2())
+                        || loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId3());
+                // 2a. 资产在我的标签组内（不需要是owner）
+                if (assetId != null) {
+                    List<Integer> tagGroupAssets = getTagGroupAssets();
+                    if (tagGroupAssets != null && !tagGroupAssets.isEmpty() && tagGroupAssets.contains(assetId)) {
+                        return true;
+                    }
+                    // 2b. 我是责任人 + 资产在无标签组内
+                    List<Integer> noTagGroupAssets = getNoTagGroupAssets();
+                    if (noTagGroupAssets != null && !noTagGroupAssets.isEmpty() && noTagGroupAssets.contains(assetId) && isOwner) {
+                        return true;
+                    }
+                }
             }
         }
-        // 我是抢单人
-        if (wo.getOrderSnatchingPerson() != null) {
+        // 3. dispatchMode=5 时检查抢单人
+        if (dispatchMode == 5 && wo.getOrderSnatchingPerson() != null) {
             for (OrderSnatchingPerson osp : wo.getOrderSnatchingPerson()) {
                 if (loginUser.getUid().equals(osp.getUserUid())) return true;
             }
