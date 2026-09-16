@@ -314,6 +314,7 @@ public class DetailsController extends GenericCRUDController<AssetInfo> implemen
 
 
         AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setId(selected.getUid());
         assetClassificationModel.setBrand(selected.getMakerShortName());
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getName());

@@ -1424,6 +1424,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     public  List<SelectItemDto>  autoAssetClassification32() {
 
         AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setId(arrivalListItem.getId());
         assetClassificationModel.setBrand(arrivalListItem.getBrand());
         assetClassificationModel.setPattern(arrivalListItem.getFunctionType());
         assetClassificationModel.setSourceName(arrivalListItem.getArrivalList().getAssetName());

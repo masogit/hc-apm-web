@@ -394,6 +394,7 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
             if (StringUtils.isEmpty(assetInfo.getCategory1())) {
                 needClassify.add(assetInfo);
                 AssetClassificationModel m = new AssetClassificationModel();
+                m.setId(assetInfo.getUid());
                 m.setBrand(assetInfo.getMakerShortName());
                 m.setPattern(assetInfo.getFunctionType());
                 m.setSourceName(assetInfo.getName());

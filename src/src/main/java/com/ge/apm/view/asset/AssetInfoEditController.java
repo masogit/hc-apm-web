@@ -2728,6 +2728,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public  List<SelectItemDto>  autoAssetClassification32() {
         AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setId(selected.getUid());
         assetClassificationModel.setBrand(selected.getMakerShortName());
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getName());
