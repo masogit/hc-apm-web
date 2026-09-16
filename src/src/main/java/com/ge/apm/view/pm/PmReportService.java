@@ -597,7 +597,7 @@ public class PmReportService {
 
         byte[] activeTemplateBytes =  systemTemplateService.getTemplateFileByte(SystemTemplateEnum.PM_ORDER_REPORT, user);
 
-        String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "已关单保养工单.zip";
+        String reportName = DateFormatUtils.format(new Date(), "yyyy-MM-dd") + "保养工单.zip";
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
              ZipOutputStream zout = new ZipOutputStream(bout)) {
             List<String> ids = new ArrayList<>();
