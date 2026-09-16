@@ -46,3 +46,28 @@ ALTER TABLE supplier ADD COLUMN IF NOT EXISTS license_approval_date TIMESTAMP;
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type)
 select replace(uuid_generate_v4()::text,'-',''), 14, '', '不良事件上报Account passoword', 'adverseEventsReportAccountPass', '不良事件上报Account password', 'f','t',1 where not exists(select * from config_item where key = 'adverseEventsReportAccountPass');
+
+-- YHAAO-29462 效期管理-增加可见角色控制
+INSERT INTO custom_role (
+    name, role_desc, tenant_uid,
+    created_by, created_date,
+    last_modified_by, last_modified_date,
+    function_list, web_authorities_ch,
+    menus, menus_ch, cards, cards_ch,
+    authorities, authorities_ch, groups, web_authorities ) SELECT DISTINCT '效期管理员','效期管理权限角色',ti.uid,'system', NOW(),'system', NOW(),'["ASSET_DEVICE_OVERDUE_VIEW","ASSET_DEVICE_EXPIRY_MANAGEMENT"]',
+    '设备档案.设备超期,效期管理.设备效期管理','', '', '', '','', '', '', ''
+FROM tenant_info ti WHERE ti.feature_list LIKE '%ASSET_DEVICE_OVERDUE%' AND NOT EXISTS ( SELECT 1 FROM custom_role cr WHERE cr.tenant_uid = ti.uid AND cr.name = '效期管理员');
+
+INSERT INTO user_role (user_id, role_id, role_type)
+SELECT ua.id, cr.id, 1
+FROM user_account ua
+         JOIN user_role ur ON ua.id = ur.user_id AND ur.role_type = 0 AND ur.role_id IN (2, 3)
+         JOIN custom_role cr ON cr.tenant_uid = ua.tenant_uid AND cr.name = '效期管理员'
+WHERE ua.tenant_uid IN (SELECT uid FROM tenant_info WHERE feature_list LIKE '%ASSET_DEVICE_OVERDUE%')
+  AND ua.is_active = true
+  AND (ua.is_deleted IS NULL OR ua.is_deleted = false)
+  AND NOT EXISTS (
+    SELECT 1 FROM user_role ur2
+    WHERE ur2.user_id = ua.id AND ur2.role_type = 1 AND ur2.role_id = cr.id
+);
+
