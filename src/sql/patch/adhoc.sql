@@ -136,3 +136,6 @@ CREATE TABLE IF NOT EXISTS udid_device_cube (
 
 -- YHAAO-29608, YHAAO-29621 外部工单重新处理
 update import_files set status = 'STARTING' where status = 'FAILED' and file_type = 'SrReportPdf' and uploaded_time > CURRENT_DATE - 30;
+
+-- YHAAO-29584 常州中HIS取消失败重新处理
+update his_adjust_business_job set task_status = 0 where task_status = 2 and created_date > '2026-07-21';
