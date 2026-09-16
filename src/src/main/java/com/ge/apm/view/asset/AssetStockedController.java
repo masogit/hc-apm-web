@@ -20,6 +20,7 @@ import lombok.Setter;
 import org.primefaces.component.tree.Tree;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.data.FilterEvent;
@@ -38,6 +39,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -106,6 +108,14 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
     private Map<String, String> userMap;
     @Getter @Setter
     private Map<Integer, String> supplierMap;
+    @Getter @Setter
+    private BigDecimal ownFunds;
+    @Getter @Setter
+    private BigDecimal govtFunds;
+    @Getter@ Setter
+    private BigDecimal sciFunds;
+    @Getter @Setter
+    private String enableShowSourceFunds;
 
     @Override
     protected void init() {
@@ -130,6 +140,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         org = orgInfoRepository.findById(currentUser.getOrgInfoId());
         orgTreeEdit = initOrgTree(uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(currentUser.getOrgInfoUID(), currentUser.getUid(), 4));
         initSearchItem();
+        enableShowSourceFunds = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "enableShowSourceFunds");
     }
 
     public void initSearchItem() {
@@ -324,6 +335,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             selectedItem.setInStockNo(inStockNo);
             selectedItem.setInStockUser(currentUser.getUid());
             selectedItem.setStockStatus(3);
+            updateAssetModify(selectedItem);
             AssetInStockRecord assetInStockRecord = new AssetInStockRecord();
             if (ObjectUtil.isNotEmpty(selectedItem.getArrivalList())) {
                 assetInStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
@@ -362,6 +374,112 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         assetInStockRecordRepository.updateStatusByInStock(selectedItems.stream().map(AssetStocked::getAssetUid).collect(Collectors.toList()));
         assetInStockRecordRepository.save(inStockRecords);
         dao.save(selectedItems);
+    }
+
+    public void updateAssetModify(AssetStocked selectedItem){
+        AssetStocked original = dao.findById(selectedItem.getId());
+        if (original == null) {
+            return;
+        }
+        boolean isModify = false;
+        AssetInfo assetInfo = selectedItem.getAssetInfo();
+        String originalComments = original.getComments();
+        String editedComments = selectedItem.getComments();
+
+        if (!Objects.equals(originalComments, editedComments)) {
+            assetInfo.setComments(editedComments);
+            isModify = true;
+        }
+
+        // 2. 保存 AssetInfo（Hibernate 脏检查会自动处理 ownFunds、govtFunds、sciFunds、purchasePrice 的变更）
+        //    只生成实际变更字段的 UPDATE SQL，未变更字段不会更新
+        assetInfoRepository.save(assetInfo);
+    }
+
+    public void saveBatchModifyFunds(){
+        for (AssetStocked item : selectedItems) {
+            AssetInfo itemAssetInfo = item.getAssetInfo();
+            if (itemAssetInfo == null) {
+                continue;
+            }
+
+            // 自有资金：目标为 null 时才同步
+            if (ownFunds != null && itemAssetInfo.getOwnFunds() == null) {
+                itemAssetInfo.setOwnFunds(ownFunds);
+            }
+
+            // 财政拨款：目标为 null 时才同步
+            if (govtFunds != null && itemAssetInfo.getGovtFunds() == null) {
+                itemAssetInfo.setGovtFunds(govtFunds);
+            }
+
+            // 科教资金：目标为 null 时才同步
+            if (sciFunds != null && itemAssetInfo.getSciFunds() == null) {
+                itemAssetInfo.setSciFunds(sciFunds);
+            }
+        }
+    }
+
+    public void onRowEdit(RowEditEvent event) {
+        AssetStocked edited = (AssetStocked) event.getObject();
+        if (edited == null || edited.getId() == null) {
+            return;
+        }
+
+        AssetStocked original = dao.findById(edited.getId());
+        if (original == null) {
+            return;
+        }
+
+        String originalComments = original.getComments();
+        String editedComments = edited.getComments();
+
+        if (!Objects.equals(originalComments, editedComments)) {
+            edited.getAssetInfo().setComments(editedComments);
+        }
+
+        // 2. 处理资金同步：将当前编辑行的资金值同步到 selectedItems 中其他数据
+        AssetInfo editedAssetInfo = edited.getAssetInfo();
+        if (editedAssetInfo != null) {
+            BigDecimal ownFunds = editedAssetInfo.getOwnFunds();
+            BigDecimal govtFunds = editedAssetInfo.getGovtFunds();
+            BigDecimal sciFunds = editedAssetInfo.getSciFunds();
+
+            List<AssetInfo> assetInfosToSave = new ArrayList<>();
+            // 遍历 selectedItems，将资金同步到其他行（跳过当前编辑行）
+            for (AssetStocked item : selectedItems) {
+                if (item == edited || item.getId().equals(edited.getId())) {
+                    continue;
+                }
+
+                AssetInfo itemAssetInfo = item.getAssetInfo();
+                if (itemAssetInfo == null) {
+                    continue;
+                }
+
+                boolean changed = false;
+
+                // 自有资金：目标为 null 时才同步
+                if (ownFunds != null && itemAssetInfo.getOwnFunds() == null) {
+                    itemAssetInfo.setOwnFunds(ownFunds);
+                    changed = true;
+                }
+
+                // 财政拨款：目标为 null 时才同步
+                if (govtFunds != null && itemAssetInfo.getGovtFunds() == null) {
+                    itemAssetInfo.setGovtFunds(govtFunds);
+                    changed = true;
+                }
+
+                // 科教资金：目标为 null 时才同步
+                if (sciFunds != null && itemAssetInfo.getSciFunds() == null) {
+                    itemAssetInfo.setSciFunds(sciFunds);
+                    changed = true;
+                }
+            }
+        }
+        //RequestContext.getCurrentInstance().update(":assetOutStockTab:GeneratedInStockForm:inStockDocList");
+
     }
 
     public void prepareGeneratedOutStockDoc() {
@@ -429,6 +547,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             assetOutStockRecord.setStockSource(selectedItem.getStockSource());
             outStockRecords.add(assetOutStockRecord);
         }
+        String outStockUpdateInstallDateFlag = configItemValueRepository.findByKeyAndSiteForUseParent(currentUser.getSiteUID(), currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID(), "outStockUpdateInstallDateFlag");
         if (ObjectUtil.isNotEmpty(assetInfos)) {
             for (AssetInfo assetInfo : assetInfos) {
                 assetInfo.setTenantUID(recruiteDept.getTenantUID());
@@ -438,6 +557,9 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
                 assetInfo.setClinicalDeptId(recruiteDept.getId());
                 assetInfo.setClinicalDeptUID(recruiteDept.getUid());
                 assetInfo.setClinicalDeptName(recruiteDept.getName());
+                if(StrUtil.isNotEmpty(outStockUpdateInstallDateFlag) && "true".equals(outStockUpdateInstallDateFlag)){
+                    assetInfo.setInstallDate(now);
+                }
             }
             assetInfoRepository.save(assetInfos);
             for (AssetInfo assetInfo : assetInfos) {
@@ -446,6 +568,10 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         }
         assetOutStockRecordRepository.save(outStockRecords);
         dao.save(selectedItems);
+    }
+
+    public void updateAssetInstallDate(){
+
     }
 
     private void saveAssetHistory(AssetInfo newAsset) {

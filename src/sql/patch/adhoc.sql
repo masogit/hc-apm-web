@@ -44,3 +44,9 @@ ALTER TABLE supplier ADD COLUMN IF NOT EXISTS business_issuing_date TIMESTAMP;
 ALTER TABLE supplier ADD COLUMN IF NOT EXISTS production_issuing_date TIMESTAMP;
 ALTER TABLE supplier ADD COLUMN IF NOT EXISTS license_approval_date TIMESTAMP;
 
+
+--YHAAO-25799
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 3, 'false', '是否显示资金来源', 'enableShowSourceFunds', '是否显示资金来源', 'f', 't', 3 where not exists (select * from config_item where key = 'enableShowSourceFunds');
+
+--YHAAO-29493
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 3, 'false', '出库业务时间是否更新启用日期', 'outStockUpdateInstallDateFlag', '出库业务时间是否更新启用日期', 'f', 't', 3 where not exists (select * from config_item where key = 'outStockUpdateInstallDateFlag');

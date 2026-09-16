@@ -1133,6 +1133,36 @@
             </p:inputNumber>
         </h:panelGroup>
     </c:if>
+    <!-- YHAAO-25799 -->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'ownFunds')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.OwnFunds}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['ownFunds'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="ownFunds" value="#{assetInfoEditController.selected.ownFunds}" required="#{assetInfoEditController.customConfig.assetFields['ownFunds'].required}"
+                           requiredMessage="#{msg.OwnFunds} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('ownFunds')}" >
+                <p:ajax />
+            </p:inputNumber>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'govtFunds')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.GovtFunds}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['govtFunds'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="govtFunds" value="#{assetInfoEditController.selected.ownFunds}" required="#{assetInfoEditController.customConfig.assetFields['govtFunds'].required}"
+                           requiredMessage="#{msg.GovtFunds} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('govtFunds')}" >
+                <p:ajax />
+            </p:inputNumber>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'sciFunds')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.SciFunds}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['sciFunds'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="sciFunds" value="#{assetInfoEditController.selected.ownFunds}" required="#{assetInfoEditController.customConfig.assetFields['sciFunds'].required}"
+                           requiredMessage="#{msg.SciFunds} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('sciFunds')}" >
+                <p:ajax />
+            </p:inputNumber>
+        </h:panelGroup>
+    </c:if>
+
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'salvageValue')}" >
         <h:panelGroup>
             <label class="label">#{msg.salvageValue}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['salvageValue'].required? '*':''}</span></label>

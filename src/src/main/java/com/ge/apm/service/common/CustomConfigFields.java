@@ -156,6 +156,9 @@ public enum CustomConfigFields {
     epc(fieldName, "epc" ,Text),  //epc码
     estimatedRiskLevel(fieldName, "estimatedRiskLevel" ,Select),  //风险等级(预估)
     meteringCycle(fieldName, "meteringCycle" ,Select),  //计量周期（月）
+    ownFunds(fieldName, "ownFunds" ,Text),  //自有资金
+    govtFunds(fieldName, "govtFunds" ,Text),  //计量周期（月）
+    sciFunds(fieldName, "sciFunds" ,Text),  //科教资金
 
     ;
 
