@@ -385,7 +385,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
-        String result = transactionService.updateTransaction(tf,selected.getId().toString(),UserContextService.getAccessToken());
+        String result = transactionService.updateTransaction(tf,selected.getUid(),UserContextService.getAccessToken());
         if(result == null){
             WebUtil.addErrorMessage("更新失败，微服务调用异常，请稍后重试");
             return;
@@ -547,8 +547,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                         errors.add("第" + (i + 1) + "行: 姓名为空，已跳过");
                         continue;
                     }
-                    UserAccount byLoginName = userAccountRepository.getByLoginName(authorName);
-                    if (byLoginName == null || !currentUser.getTenantUID().equals(byLoginName.getTenantUID())) {
+                    UserAccount byName = userAccountRepository.getByName(authorName);
+                    if (byName == null || !currentUser.getTenantUID().equals(byName.getTenantUID())) {
                         errors.add("第" + (i + 1) + "行: 姓名不存在，已跳过");
                         continue;
                     }

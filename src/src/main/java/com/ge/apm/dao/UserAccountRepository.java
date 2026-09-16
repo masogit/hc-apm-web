@@ -20,6 +20,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<String> getAccessScope(String userUID);
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getByLoginName(String loginName);
+
+    UserAccount getByName(String name);
     List<UserAccount> getByLoginNameIn(Collection<String> loginNames);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
@@ -351,4 +353,5 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
      */
     @Query("select distinct u from UserAccount u, UserRole r where u.id=r.userId and r.roleId in ?1 and r.roleType=1 and (u.isDisable=false or u.isDisable is null) and (u.isDeleted=false or u.isDeleted is null)")
     List<UserAccount> findUsersByCustomRoleIds(List<Integer> customRoleIds);
+
 }
