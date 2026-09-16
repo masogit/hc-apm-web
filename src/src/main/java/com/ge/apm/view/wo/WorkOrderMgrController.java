@@ -4421,6 +4421,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId())) return true;
             if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId2())) return true;
             if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId3())) return true;
+            // 资产在我的标签组内
+            Integer assetId = wo.getAssetInfo().getId();
+            if (assetId != null) {
+                List<Integer> tagGroupAssets = getTagGroupAssets();
+                if (tagGroupAssets != null && tagGroupAssets.contains(assetId)) return true;
+                List<Integer> noTagGroupAssets = getNoTagGroupAssets();
+                if (noTagGroupAssets != null && noTagGroupAssets.contains(assetId)) return true;
+            }
         }
         // 我是抢单人
         if (wo.getOrderSnatchingPerson() != null) {
