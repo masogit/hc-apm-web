@@ -4431,8 +4431,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 boolean isOwner = loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId())
                         || loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId2())
                         || loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId3());
+                boolean twoOwnersNull = (wo.getAssetInfo().getAssetOwnerId2() == null && wo.getAssetInfo().getAssetOwnerId3() == null)
+                        || (wo.getAssetInfo().getAssetOwnerId() == null && wo.getAssetInfo().getAssetOwnerId3() == null)
+                        || (wo.getAssetInfo().getAssetOwnerId() == null && wo.getAssetInfo().getAssetOwnerId2() == null);
                 List<Integer> noTagGroupAssets = getNoTagGroupAssets();
-                if (noTagGroupAssets != null && !noTagGroupAssets.isEmpty() && noTagGroupAssets.contains(assetId) && isOwner) return true;
+                if (noTagGroupAssets != null && !noTagGroupAssets.isEmpty() && noTagGroupAssets.contains(assetId) && (isOwner || twoOwnersNull)) return true;
             }
         }
         // 分支B: 已派工的单 → currentPersonId=me AND stepId=3
