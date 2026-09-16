@@ -471,50 +471,6 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
 
 
 
-    public void downloadTemplate() {
-        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("科务管理模板");
-
-            // 创建表头
-            Row headerRow = sheet.createRow(0);
-            String[] headers = {"姓名", "日期", "类别", "次数", "工时", "备注"};
-            for (int i = 0; i < headers.length; i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(headers[i]);
-            }
-
-            // 设置列宽
-            for (int i = 0; i < headers.length; i++) {
-                sheet.setColumnWidth(i, 256 * 20);
-            }
-
-            // 获取类别下拉选项
-            List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
-            if (categoryList != null && !categoryList.isEmpty()) {
-                String[] categoryValues = new String[categoryList.size()];
-                for (int i = 0; i < categoryList.size(); i++) {
-                    categoryValues[i] = categoryList.get(i).getValue();
-                }
-
-                // 为类别列添加下拉选择
-                DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
-                CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
-                DataValidation validation = validationHelper.createValidation(constraint, addressList);
-                validation.setShowErrorBox(true);
-                sheet.addValidationData(validation);
-            }
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            workbook.write(out);
-            templateFile = new DefaultStreamedContent(
-                    new ByteArrayInputStream(out.toByteArray()),
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    "科务管理模板.xlsx");
-        } catch (Exception e) {
-            WebUtil.addErrorMessage("模板生成失败");
-        }
-    }
 
     public void handleImportUpload(FileUploadEvent event) {
         UploadedFile uploadedFile = event.getFile();
@@ -592,7 +548,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                         continue;
                     }
                     UserAccount byLoginName = userAccountRepository.getByLoginName(authorName);
-                    if (byLoginName == null) {
+                    if (byLoginName == null || !currentUser.getTenantUID().equals(byLoginName.getTenantUID())) {
                         errors.add("第" + (i + 1) + "行: 姓名不存在，已跳过");
                         continue;
                     }

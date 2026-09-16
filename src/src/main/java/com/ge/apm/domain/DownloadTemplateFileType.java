@@ -68,6 +68,7 @@ public enum DownloadTemplateFileType {
 
     ASSET_PURCHASE(SystemTemplateEnum.ASSET_PURCHASE, SystemTemplateEnum.ASSET_PURCHASE),
     SPECIAL_ASSET(SystemTemplateEnum.SPECIAL_ASSET_INFO, SystemTemplateEnum.SPECIAL_ASSET_INFO),
+    DEPT_TRANSACTION_LOG(SystemTemplateEnum.DEPT_TRANSACTION_LOG, SystemTemplateEnum.DEPT_TRANSACTION_LOG),
     ;
 
     private final SystemTemplateEnum enumZh;

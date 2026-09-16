@@ -9,6 +9,7 @@ import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
 import com.ge.apm.domain.CustomRole;
 import com.ge.apm.domain.DownloadTemplateFileType;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.service.utils.MicroServiceUtil;
@@ -18,6 +19,8 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.context.RequestContext;
 import org.springframework.util.CollectionUtils;
@@ -124,24 +127,55 @@ public class FileDownloadService {
     }
 
     public void exportTemplateFile(String type) {
-        UserContextService ucs = WebUtil.getBean(UserContextService.class);
-//        String fileName = DownloadTemplateFileType.getTemplateFile(type, ucs.isLocale());
-
-        SystemTemplateEnum systemTemplate = DownloadTemplateFileType.getSystemTemplate(type, ucs.isLocale());
-
-//        InputStream inputStream = FileDownloadService.class.getClassLoader().getResourceAsStream("template/" + fileName);
-
-        InputStream inputStream = getTemplateFileInputStream(systemTemplate.getCode(), systemTemplate.getFileType());
-
-        inputStream =processorTemplateFile(inputStream,type);
-        exportFile(inputStream, systemTemplate.getFileName());
+        try {
+            UserContextService ucs = WebUtil.getBean(UserContextService.class);
+            SystemTemplateEnum systemTemplate = DownloadTemplateFileType.getSystemTemplate(type, ucs.isLocale());
+            InputStream inputStream = getTemplateFileInputStream(systemTemplate.getCode(), systemTemplate.getFileType());
+            inputStream = processorTemplateFile(inputStream, type);
+            exportFile(inputStream, systemTemplate.getFileName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private InputStream processorTemplateFile(InputStream inputStream,String type)  {
         if(DownloadTemplateFileType.USER_ACCOUNT.name().equals(type)){
             return getCustomRole(inputStream);
         }
+        if(DownloadTemplateFileType.DEPT_TRANSACTION_LOG.name().equals(type)){
+            return getDeptTransationLog(inputStream);
+        }
         return inputStream;
+    }
+
+    private InputStream getDeptTransationLog(InputStream inputStream) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // 获取类别下拉选项
+            List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
+            if (categoryList != null && !categoryList.isEmpty()) {
+                String[] categoryValues = new String[categoryList.size()];
+                for (int i = 0; i < categoryList.size(); i++) {
+                    categoryValues[i] = categoryList.get(i).getValue();
+                }
+
+                // 为类别列添加下拉选择
+                DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
+                CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
+                DataValidation validation = validationHelper.createValidation(constraint, addressList);
+                validation.setShowErrorBox(true);
+                sheet.addValidationData(validation);
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return inputStream;
+        }
     }
 
     private InputStream getCustomRole(InputStream inputStream) {
