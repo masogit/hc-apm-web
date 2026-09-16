@@ -21,12 +21,15 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.primefaces.component.tree.Tree;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
@@ -40,6 +43,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -105,6 +111,8 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
     private Map<Integer, String> supplierMap;
     @Getter @Setter
     private String setAssetOutStockDept;
+    @Getter @Setter
+    private StreamedContent exportExcelFile;
 
     @Override
     protected void init() {
@@ -536,6 +544,129 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
 
     public List<AssetOutStockRecord> getSelectedItems() {
         return selectedItems;
+    }
+
+    public void exportExcel() {
+        try {
+            List<AssetOutStockRecord> exportList;
+            if (ObjectUtil.isNotEmpty(selectedItems)) {
+                exportList = selectedItems;
+            } else {
+                List<SearchFilter> exportFilters = new ArrayList<>();
+                pckFilters(exportFilters);
+                if (ObjectUtil.isNotEmpty(outStockBusinessStartDate)) {
+                    exportFilters.add(new SearchFilter("businessDate", SearchFilter.Operator.GTE, outStockBusinessStartDate, "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(outStockBusinessEndDate)) {
+                    exportFilters.add(new SearchFilter("businessDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(outStockBusinessEndDate).toDate(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(searchItem.getAssetName())) {
+                    exportFilters.add(new SearchFilter("assetName", SearchFilter.Operator.LIKE, searchItem.getAssetName(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(supplier.getId())) {
+                    exportFilters.add(new SearchFilter("supplierId", SearchFilter.Operator.EQ, supplier.getId(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(searchItem.getPurchasePrice())) {
+                    exportFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, searchItem.getPurchasePrice(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(startPrice)) {
+                    exportFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, startPrice, "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(endPrice)) {
+                    exportFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.LTE, endPrice, "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(searchItem.getFunctionType())) {
+                    exportFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, searchItem.getFunctionType(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(searchItem.getInvoiceNum())) {
+                    exportFilters.add(new SearchFilter("invoiceNum", SearchFilter.Operator.LIKE, searchItem.getInvoiceNum(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(searchItem.getOutStockNo())) {
+                    exportFilters.add(new SearchFilter("outStockNo", SearchFilter.Operator.LIKE, searchItem.getOutStockNo(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(searchItem.getStockStatus())) {
+                    exportFilters.add(new SearchFilter("stockStatus", SearchFilter.Operator.EQ, searchItem.getStockStatus(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(queryRecruiteDept)) {
+                    exportFilters.add(new SearchFilter("recruiteDeptUid", SearchFilter.Operator.EQ, queryRecruiteDept.getUid(), "1*"));
+                }
+                if (ObjectUtil.isNotEmpty(searchItem.getContractNum())) {
+                    exportFilters.add(new SearchFilter("contractNum", SearchFilter.Operator.LIKE, searchItem.getContractNum(), "1*"));
+                }
+                Page<AssetOutStockRecord> page = dao.findBySearchFilter(exportFilters, new PageRequest(0, 5000));
+                exportList = page.getContent();
+            }
+            if (ObjectUtil.isEmpty(exportList)) {
+                WebUtil.addErrorMessage("无导出数据！");
+                return;
+            }
+            String[] headers = {"出库单号", "业务时间", msg("vendor"), "制单人", msg("financingNum"), msg("assetName"),
+                    msg("arrivalListContractNum"), msg("installDate"), msg("functionType"), msg("serialNum"),
+                    msg("comments"), "资产价值", msg("arrivalListInvoiceNum"), "发票日期", "领用科室",
+                    msg("stockStatus"), msg("stockSource"), "退库单号"};
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            SXSSFWorkbook workbook = new SXSSFWorkbook();
+            Sheet sheet = workbook.createSheet();
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setFontHeightInPoints((short) 12);
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+            for (int i = 0; i < exportList.size(); i++) {
+                AssetOutStockRecord item = exportList.get(i);
+                Row row = sheet.createRow(i + 1);
+                row.createCell(0).setCellValue(nullSafe(item.getOutStockNo()));
+                row.createCell(1).setCellValue(item.getBusinessDate() != null ? sdf.format(item.getBusinessDate()) : "");
+                row.createCell(2).setCellValue(nullSafe(supplierMap != null && item.getAssetInfo() != null ? supplierMap.get(item.getAssetInfo().getSupplierId()) : ""));
+                row.createCell(3).setCellValue(nullSafe(userMap != null ? userMap.get(item.getOutStockUser()) : ""));
+                row.createCell(4).setCellValue(nullSafe(item.getAssetInfo() != null ? item.getAssetInfo().getFinancingNum() : ""));
+                row.createCell(5).setCellValue(nullSafe(item.getAssetInfo() != null ? item.getAssetInfo().getName() : ""));
+                row.createCell(6).setCellValue(nullSafe(item.getArrivalList() != null ? item.getArrivalList().getContractNum() : ""));
+                row.createCell(7).setCellValue(item.getAssetInfo() != null && item.getAssetInfo().getInstallDate() != null ? sdf.format(item.getAssetInfo().getInstallDate()) : "");
+                row.createCell(8).setCellValue(nullSafe(item.getAssetInfo() != null ? item.getAssetInfo().getFunctionType() : ""));
+                row.createCell(9).setCellValue(nullSafe(item.getAssetInfo() != null ? item.getAssetInfo().getSerialNum() : ""));
+                row.createCell(10).setCellValue(nullSafe(item.getComments()));
+                row.createCell(11).setCellValue(item.getAssetInfo() != null && item.getAssetInfo().getPurchasePrice() != null ? item.getAssetInfo().getPurchasePrice() : 0);
+                row.createCell(12).setCellValue(nullSafe(item.getArrivalList() != null ? item.getArrivalList().getInvoiceNum() : ""));
+                row.createCell(13).setCellValue(item.getArrivalList() != null && item.getArrivalList().getInvoiceDate() != null ? sdf.format(item.getArrivalList().getInvoiceDate()) : "");
+                String orgName = "";
+                if (ObjectUtil.isNotEmpty(item.getRecruiteDeptUid())) {
+                    try { orgName = nullSafe(getOrgNameByUid(item.getRecruiteDeptUid())); } catch (Exception ignored) {}
+                }
+                row.createCell(14).setCellValue(orgName);
+                row.createCell(15).setCellValue(nullSafe(com.ge.apm.view.sysutil.FieldValueMessageController.fieldValue("stockStatus", item.getStockStatus() != null ? String.valueOf(item.getStockStatus()) : "")));
+                row.createCell(16).setCellValue(nullSafe(com.ge.apm.view.sysutil.FieldValueMessageController.fieldValue("stockSource", item.getStockSource() != null ? String.valueOf(item.getStockSource()) : "")));
+                row.createCell(17).setCellValue(nullSafe(item.getReturnedStockNo()));
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            workbook.write(baos);
+            workbook.close();
+            exportExcelFile = new DefaultStreamedContent(new ByteArrayInputStream(baos.toByteArray()), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "OutStockedRecord_Export.xlsx");
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("导出失败：" + e.getMessage());
+        }
+    }
+
+    private String nullSafe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private String msg(String key) {
+        try {
+            return WebUtil.getMessage(key);
+        } catch (Exception e) {
+            return key;
+        }
     }
 
     public void setSelectedItems(List<AssetOutStockRecord> selectedItems) {

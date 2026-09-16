@@ -138,6 +138,9 @@
             <f:facet name="{Toolbar}">
                 <p:commandButton value="生成入库单" action="#{assetStockedController.prepareGeneratedInStockDoc()}" actionListener="#{assetStockedController.generatedStockDoc('inStock')}" validateClient="true" oncomplete="handleGeneratedInStockDoc(xhr, status, args);" update=":growl :assetOutStockTab:GeneratedInStockDocDlg"/>
                 <p:commandButton value="生成出库单"  action="#{assetStockedController.prepareGeneratedOutStockDoc()}" actionListener="#{assetStockedController.generatedStockDoc('outStock')}" validateClient="true" oncomplete="handleGeneratedOutStockDoc(xhr, status, args);" update=":growl :assetOutStockTab:GeneratedOutStockDocDlg"/>
+                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" actionListener="#{assetStockedController.exportExcel}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                    <p:fileDownload value="#{assetStockedController.exportExcelFile}"/>
+                </p:commandButton>
             </f:facet>
         </p:dataTable>
     </h:form>
