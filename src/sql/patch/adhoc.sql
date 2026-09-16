@@ -133,3 +133,6 @@ CREATE TABLE IF NOT EXISTS udid_device_cube (
                                   device_pattern text NULL,
                                   device_category text NULL
 );
+
+-- YHAAO-29608, YHAAO-29621 外部工单重新处理
+update import_files set status = 'STARTING' where status = 'FAILED' and file_type = 'SrReportPdf' and uploaded_time > CURRENT_DATE - 30;
