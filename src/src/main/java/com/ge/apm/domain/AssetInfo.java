@@ -1187,6 +1187,18 @@ public class AssetInfo implements ChineseName, Serializable {
     @Setter
     private UdidRegistryNumInfo registrationInfo;
 
+    // 自有资金
+    @Column(name = "own_funds", precision = 19, scale = 2)
+    private BigDecimal ownFunds;
+
+    // 财政拨款
+    @Column(name = "govt_funds", precision = 19, scale = 2)
+    private BigDecimal govtFunds;
+
+    // 科教资金
+    @Column(name = "sci_funds", precision = 19, scale = 2)
+    private BigDecimal sciFunds;
+
     public String getMeasuringAlertStatus() {
         if (ObjectUtil.isNotEmpty(nextMeteringDate)) {
             DateTime dt = TimeUtil.toJodaDate(nextMeteringDate);
@@ -3649,6 +3661,30 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public void setDateWarningMessage(String dateWarningMessage) {
         this.dateWarningMessage = dateWarningMessage;
+    }
+
+    public BigDecimal getOwnFunds() {
+        return ownFunds;
+    }
+
+    public void setOwnFunds(BigDecimal ownFunds) {
+        this.ownFunds = ownFunds;
+    }
+
+    public BigDecimal getGovtFunds() {
+        return govtFunds;
+    }
+
+    public void setGovtFunds(BigDecimal govtFunds) {
+        this.govtFunds = govtFunds;
+    }
+
+    public BigDecimal getSciFunds() {
+        return sciFunds;
+    }
+
+    public void setSciFunds(BigDecimal sciFunds) {
+        this.sciFunds = sciFunds;
     }
 
     /**

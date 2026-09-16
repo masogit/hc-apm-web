@@ -598,6 +598,30 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'ownFunds')}">
+        <h:panelGroup>
+            <label class="label">#{msg.ownFunds}</label>
+            <p:inputText id="ownFunds" value="#{assetInfoDetailController.selected.ownFunds}" readonly="true" title="#{assetInfoDetailController.selected.ownFunds}">
+                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'govtFunds')}">
+        <h:panelGroup>
+            <label class="label">#{msg.govtFunds}</label>
+            <p:inputText id="govtFunds" value="#{assetInfoDetailController.selected.govtFunds}" readonly="true" title="#{assetInfoDetailController.selected.govtFunds}">
+                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'sciFunds')}">
+        <h:panelGroup>
+            <label class="label">#{msg.sciFunds}</label>
+            <p:inputText id="sciFunds" value="#{assetInfoDetailController.selected.sciFunds}" readonly="true" title="#{assetInfoDetailController.selected.sciFunds}">
+                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'salvageValue')}">
         <h:panelGroup>
             <label class="label">#{msg.salvageValue}</label>
