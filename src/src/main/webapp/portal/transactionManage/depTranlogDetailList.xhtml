@@ -75,6 +75,9 @@
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="科务管理"   postProcessor="#{depTranDetailController.postProcessXLS}" />
                         </p:commandButton>
+                        <p:commandButton icon="fa fa-cogs" class="btnEdit" title="#{msg.BatchFileImport}"
+                                         onclick="PF('importDlg').show(); return false;" type="button"/>
+
                         <!--<p:commandButton title="#{msg.Delete}"   process="@this" icon="ui-icon-close"  actionListener="#{depTranDetailController.deleteKW()}">
                             <p:confirm
                                     header="#{msg.DeleteConformation}"
@@ -87,17 +90,41 @@
 
         </h:form>
 
+        <p:dialog id="importDlg" widgetVar="importDlg" modal="true" width="500" height="250"
+                  resizable="false" draggable="true" appendTo="@(body)" header="批量导入科务记录">
+            <h:panelGroup>
+                <p style="margin-bottom:6px;">说明：</p>
+                <div style="line-height:1.8;">
+                    1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('DEPT_TRANSACTION_LOG')}" styleClass="p-mr-2"/><br/>
+                    2. 在模板中填写数据，类别列请从下拉选择<br/>
+                    3. 上传文件进行导入，姓名+日期+类别相同视为重复，重复记录将跳过<br/>
+                    4. 上传文件单次限制100条
+                </div>
+            </h:panelGroup>
+            <h:form id="importForm" enctype="multipart/form-data">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
+                    <p:fileUpload fileUploadListener="#{depTranDetailController.handleImportUpload}"
+                                  mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+                                  sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                  invalidFileMessage="只支持xls或xlsx格式的文件"
+                                  invalidSizeMessage="文件大小不超过5M"
+                                  update=":deptTransactionForm:tranTabView:trDetailFormNew:datalist :growl"
+                                  label="选择文件" cancelLabel="取消" uploadLabel="确认上传"/>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
+
         <p:dialog id="viewImageDlg" widgetVar="viewImageDlg" width="650" height="450" modal="true"
                   resizable="true" draggable="true" appendTo="@this" header="查看图片">
             <h:panelGroup id="viewImagePanel">
                 <p:dataTable value="#{depTranDetailController.viewImages}" var="img" emptyMessage="暂无图片">
                     <p:column headerText="预览" width="120">
                         <h:panelGroup styleClass="img-thumb-wrap">
-                            <p:graphicImage value="#{fileDownloadService.getFile(img.objectStorageId)}"
-                                            alt="不支持预览" height="80" width="120" stream="false"
-                                            style="cursor:pointer;" styleClass="view-img-thumb"/>
-                            <p:graphicImage value="#{fileDownloadService.getFile(img.objectStorageId)}"
-                                            alt="" stream="false" style="display:none;" styleClass="view-img-full"/>
+                            <img src="#{depTranDetailController.getImageBase64(img.objectStorageId)}"
+                                 alt="不支持预览" style="height:80px;width:120px;object-fit:cover;cursor:pointer;"
+                                 class="view-img-thumb" onclick="var s=this.src;if(s){document.getElementById('viewFullImg').src=s;PF('viewFullImageDlg').show();}"/>
+                            <img src="#{depTranDetailController.getImageBase64(img.objectStorageId)}"
+                                 style="display:none;" class="view-img-full"/>
                         </h:panelGroup>
                     </p:column>
                     <p:column headerText="文件名">
@@ -116,13 +143,6 @@
         </p:dialog>
 
         <script type="text/javascript">
-            $(document).on('click', '.view-img-thumb', function() {
-                var fullSrc = $(this).siblings('.view-img-full').attr('src');
-                if (fullSrc) {
-                    $('#viewFullImg').attr('src', fullSrc);
-                    PF('viewFullImageDlg').show();
-                }
-            });
         </script>
 
         <ui:include src="newOrUpdateDefTranLog.xhtml"/>

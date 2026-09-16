@@ -1181,6 +1181,12 @@ public class AssetInfo implements ChineseName, Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date estimatedRiskDate; //预估风险评估日期
 
+    @Transient
+    @TableField(exist = false)
+    @Getter
+    @Setter
+    private UdidRegistryNumInfo registrationInfo;
+
     // 自有资金
     @Column(name = "own_funds", precision = 19, scale = 2)
     private BigDecimal ownFunds;

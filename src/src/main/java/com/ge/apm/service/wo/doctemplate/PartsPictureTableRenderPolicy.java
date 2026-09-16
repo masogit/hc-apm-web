@@ -8,6 +8,7 @@ import com.deepoove.poi.template.ElementTemplate;
 import com.deepoove.poi.template.run.RunTemplate;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.healthcare.cn.common.utils.render.AbstractWoTableRenderPolicy;
+import com.ge.healthcare.cn.common.utils.render.DynamicColumnTableRenderPolicy;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -26,6 +27,10 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
 
     private int maxCell;
 
+    private int width;
+
+    private int height;
+
     private BlobFileService blobService;
 
     public PartsPictureTableRenderPolicy(BlobFileService blobService){
@@ -35,6 +40,8 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
     public PartsPictureTableRenderPolicy(BlobFileService blobService,int maxCell){
         this.blobService = blobService;
         this.maxCell = maxCell;
+        this.width =  540 / this.maxCell;
+        this.height =  540 / this.maxCell;
     }
 
     @Override
@@ -57,6 +64,18 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
     }
     public void render(XWPFTable table, Object data) {
         if(data instanceof List){
+            String[] dynamicParameter = DynamicColumnTableRenderPolicy.getDynamicParameter();
+            if(dynamicParameter != null && dynamicParameter.length == 3){
+                String[] parameters = dynamicParameter[1].split("[|,，、\\-]");
+                this.maxCell = Integer.parseInt(parameters[0]);
+                if(parameters.length > 2){
+                    this.width =  Integer.parseInt(parameters[1]);
+                    this.height =  Integer.parseInt(parameters[2]);
+                }else{
+                    this.width =  540 / this.maxCell;
+                    this.height =  540 / this.maxCell;
+                }
+            }
             List<PartsPictureTableRenderPolicy.PartsPictureTable>  partsPictureTableList= (List<PartsPictureTableRenderPolicy.PartsPictureTable> )data;
             Set<Integer> merge = new HashSet<>();
             for (int i = 0; i < partsPictureTableList.size(); i++) {
@@ -67,14 +86,14 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
                 if(CollectionUtils.isEmpty(object)){
                     continue;
                 }
-                int maxCell = object.size() > this.maxCell ? this.maxCell:object.size();
-                for (int j = 0; j < maxCell-1; j++) {
+//                int maxCell = object.size() > this.maxCell ? this.maxCell:object.size();
+                for (int j = 0; j < this.maxCell-1; j++) {
                     addCell(row, "备件名称: "+ partsPictureTable.getPartsName());
                     merge.add(table.getNumberOfRows());
                 }
                 XWPFTableRow rowImage = null;
                 for (int i1 = 0; i1 < object.size(); i1++) {
-                    if(i1 % maxCell == 0){
+                    if(i1 % this.maxCell == 0){
                         rowImage = addRow(table);
                     }
                     addCellImages(rowImage, object.get(i1));
@@ -162,7 +181,7 @@ public class PartsPictureTableRenderPolicy extends AbstractWoTableRenderPolicy {
             XWPFParagraph paragraph = xwpfTableCell.getParagraphs().get(0);;
             XWPFRun run = paragraph.createRun();
             paragraph.setAlignment(ParagraphAlignment.CENTER);
-            run.addPicture(picture, XWPFDocument.PICTURE_TYPE_PNG, "banner.png", Units.toEMU(200), Units.toEMU(200));
+            run.addPicture(picture, XWPFDocument.PICTURE_TYPE_PNG, "banner.png", Units.toEMU(this.width), Units.toEMU(this.height));
         } catch (InvalidFormatException | IOException e) {
             e.printStackTrace();
         }

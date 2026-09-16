@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <h:form id="RegistrationInfoForm">
+        <p:panel header="&quot;#{assetInfoDetailController.selected.registrationInfo.registryNum}&quot;&nbsp;基本信息">
+            <p:panelGrid layout="tabular" style="width: 100%;" rendered="#{assetInfoDetailController.renderRegistration()}">
+                <p:row>
+                    <p:column style="width: 20%; text-align: right">注册证编号</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registryNum}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">注册人名称</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registrantName}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">注册人住所</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registrantAddress}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">生产地址</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.productionAddress}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">产品名称</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.productName}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">管理类别</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.managementCategory}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">型号规格</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.modelSpec}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">结构及组成/主要组成成分</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.structureComposition}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">适用范围/预期用途</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.scopeOfUse}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">产品储存条件及有效期</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.storageConditions}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">附件</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.attachments}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">其他内容</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.otherContent}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">备注</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.remarks}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">审批部门</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.approvalDept}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">批准日期</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.approvalDate}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">生效日期</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.approvalDate}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">有效期至</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.validPeriod}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">变更情况</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.changes}</p:column>
+                </p:row>
+            </p:panelGrid>
+            <p:panelGrid layout="tabular" style="width: 100%;" rendered="#{assetInfoDetailController.renderFiling()}">
+                <p:row>
+                    <p:column style="width: 20%; text-align: right">备案号</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registryNum}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">备案人名称</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registrantName}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">备案人注册地址</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registrantAddress}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">生产地址</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.productionAddress}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">产品名称/产品分类名称</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.productName}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">型号规格/包装规格</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.modelSpec}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">产品描述/主要组成成分</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.structureComposition}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">预期用途</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.scopeOfUse}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">产品存储及有效期</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.storageConditions}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">备注</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.remarks}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">备案单位</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.approvalDept}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">备案日期</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.approvalDate}</p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: right">变更情况</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.changes}</p:column>
+                </p:row>
+            </p:panelGrid>
+        </p:panel>
+    </h:form>
+</ui:composition>
+</html>

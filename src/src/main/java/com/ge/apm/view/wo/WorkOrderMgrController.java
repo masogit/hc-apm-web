@@ -350,6 +350,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Integer approvalStatus;
     @Getter @Setter
     private boolean myWorkOrder = false;
+    private boolean myWorkOrderInitialized = false;
 
     @Override
     protected void init() {
@@ -407,7 +408,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
-            myWorkOrder = userContextService.hasRole("AssetHead");
+            if (!myWorkOrderInitialized) {
+                Boolean savedMyWorkOrder = (Boolean) FacesContext.getCurrentInstance()
+                        .getExternalContext().getSessionMap().get("myWorkOrderSaved");
+                myWorkOrder = (savedMyWorkOrder != null) ? savedMyWorkOrder : userContextService.hasRole("AssetHead");
+                myWorkOrderInitialized = true;
+            }
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
             isYiMaiYangGuangTenant = userContextService.isYiMaiYangGuangTenant();
@@ -879,30 +885,33 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             this.setSearchFilter();
             String[] fields = new String[]{"status", "currentStepId", "currentStepName", "currentPersonId", "dispatchMode"
                     , "srId", "feedbackRating", "assetId", "approvalStatus", "assetInfo.assetOwnerId", "assetInfo.assetOwnerId2"
-                    , "assetInfo.assetOwnerId3", "assetInfo.uid", "assetInfo.clinicalDeptUID", "approverId", "serviceRequest.status"};
+                    , "assetInfo.assetOwnerId3", "assetInfo.uid", "assetInfo.clinicalDeptUID", "approverId", "serviceRequest.status","orderSnatchingPerson.userUid"};
             Arrays.asList(fields).forEach(field -> removeFilterOnField(field));
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
-                } else if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                }else{
+                    if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
+                        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                    }
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.LTE, 3));
             } else if (queryIndex == 2) { //待派工
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
                 searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
             } else if (queryIndex == 3) { //待接单
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                if (myWorkOrder) {
-                    //我的工单：可见范围 OR 当前责任人是我
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
-                    // stepId=3(待接单) 或 stepId=2且可抢/已抢(dispatchMode IN 2,3,5)
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+"));
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+"));
-                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*3+"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+1*"));
+                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*3+1*"));
                 } else {
                     //原有逻辑 - 包含人员匹配/资产责任人/tagGroup等过滤
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
@@ -944,14 +953,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             } else if (queryIndex == 4) { //维修中
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 } else {
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
                 }
             } else if (queryIndex == 5) { //待验收
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                     searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
@@ -968,10 +977,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     }
                 }
             } else if (queryIndex == 6) { //待评价
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
-                } else if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
+                } else {
+                    if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
+                        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
+                    }
                 }
                 searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
@@ -982,14 +993,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 10));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 11));
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 } else {
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId()));
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
                 }
             } else if (queryIndex == 8) { //已关单
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 } else if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
                     if (userContextService.hasRole("AssetStaff")) {
@@ -999,7 +1010,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             } else if (queryIndex == 9) { //已取消
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
@@ -1048,7 +1059,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
 
             } else if (queryIndex == 11) { //全部维修单（不包含已取消）
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 3));
@@ -1072,24 +1083,27 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 }
 
             } else if (queryIndex == 12) { //指定设备queryAssetUid 工单 设备详细页面跳转
+                if (!myWorkOrder) {
+                    extendVisibilityWithMe();
+                }
                 if (!Strings.isNullOrEmpty(queryAssetUid)) {
                     searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
                 }
             } else if (queryIndex == 13) {
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 10));
 
             } else if (queryIndex == 14) {
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 11));
             }else {//待办
-                if (myWorkOrder) {
+                if (!myWorkOrder) {
                     extendVisibilityWithMe();
                 }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -4378,6 +4392,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 我的工单复选框切换监听
      */
     public void onMyWorkOrderToggle() {
+        FacesContext.getCurrentInstance().getExternalContext()
+                .getSessionMap().put("myWorkOrderSaved", myWorkOrder);
         LOGGER.info("myWorkOrder toggled, current value: " + myWorkOrder);
     }
 
@@ -4386,9 +4402,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 使查询结果为 (可见范围 OR 当前责任人是我) AND 其他条件
      */
     private void extendVisibilityWithMe() {
-        String visibilityPath = searchFilters.stream()
-                .anyMatch(sf -> "1*3+".equals(sf.conditionPath)) ? "1*3+me+" : "1*2+me+";
-        updateSearchFilter(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), visibilityPath));
+        if (ObjectUtil.isEmpty(selectedAccessOrgNodes)) {
+            updateSearchFilter(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
+        }
+
     }
 
     /**
@@ -4397,16 +4414,34 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      */
     public boolean canTakeOrCompete(V2_WorkOrder wo) {
         if (wo == null) return false;
-        // 当前责任人是我
-        if (wo.getCurrentPersonId() != null && wo.getCurrentPersonId().equals(loginUser.getId())) return true;
-        // 我是资产责任人
-        if (wo.getAssetInfo() != null) {
-            if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId())) return true;
-            if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId2())) return true;
-            if (loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId3())) return true;
+        int dispatchMode = wo.getDispatchMode() != null ? wo.getDispatchMode() : 0;
+        int stepId = wo.getCurrentStepId() != null ? wo.getCurrentStepId() : 0;
+        boolean isCurrentPerson = wo.getCurrentPersonId() != null && wo.getCurrentPersonId().equals(loginUser.getId());
+
+        // 分支A: dispatchMode(2,3) + 人员条件 + 资产条件
+        if (dispatchMode == 2 || dispatchMode == 3) {
+            // 人员条件: 不是责任人 → 接单, 或 是责任人+stepId=2 → 抢单
+            boolean personMatch = !isCurrentPerson || (isCurrentPerson && stepId == 2);
+            if (personMatch && wo.getAssetInfo() != null) {
+                // 资产条件: assetId=0兜底 或 tagGroup匹配 或 noTagGroup+owner
+                Integer assetId = wo.getAssetInfo().getId();
+                if (assetId == null || assetId == 0) return true;
+                List<Integer> tagGroupAssets = getTagGroupAssets();
+                if (tagGroupAssets != null && !tagGroupAssets.isEmpty() && tagGroupAssets.contains(assetId)) return true;
+                boolean isOwner = loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId())
+                        || loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId2())
+                        || loginUser.getId().equals(wo.getAssetInfo().getAssetOwnerId3());
+                boolean twoOwnersNull = (wo.getAssetInfo().getAssetOwnerId2() == null && wo.getAssetInfo().getAssetOwnerId3() == null)
+                        || (wo.getAssetInfo().getAssetOwnerId() == null && wo.getAssetInfo().getAssetOwnerId3() == null)
+                        || (wo.getAssetInfo().getAssetOwnerId() == null && wo.getAssetInfo().getAssetOwnerId2() == null);
+                List<Integer> noTagGroupAssets = getNoTagGroupAssets();
+                if (noTagGroupAssets != null && !noTagGroupAssets.isEmpty() && noTagGroupAssets.contains(assetId) && (isOwner || twoOwnersNull)) return true;
+            }
         }
-        // 我是抢单人
-        if (wo.getOrderSnatchingPerson() != null) {
+        // 分支B: 已派工的单 → currentPersonId=me AND stepId=3
+        if (isCurrentPerson && stepId == 3) return true;
+        // 分支C: 抢单 → dispatchMode=5 AND snatcher=me
+        if (dispatchMode == 5 && wo.getOrderSnatchingPerson() != null) {
             for (OrderSnatchingPerson osp : wo.getOrderSnatchingPerson()) {
                 if (loginUser.getUid().equals(osp.getUserUid())) return true;
             }

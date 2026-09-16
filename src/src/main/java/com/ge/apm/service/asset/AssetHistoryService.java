@@ -16,6 +16,7 @@ import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -144,6 +145,7 @@ public class AssetHistoryService {
             jsonObject.put("createdBy", assetHistory.getCreatedBy());
             jsonObject.put("createdDate", assetHistory.getCreatedDate());
             jsonObject.put("assetUid", assetHistory.getAssetUid());
+            jsonObject.put("modifySource", ModifySourceEnum.getLabelByCode(assetHistory.getModifySource()));
 
             //multiple column value changed
             objects.stream().forEach(item -> {
@@ -427,6 +429,7 @@ public class AssetHistoryService {
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("bathDepartmentConvert");
         mqContext.setDescribe("资产批量转科");
+        mqContext.setModifySource(ModifySourceEnum.BATCH_TRANSFER.getCode());
         mqContext.setSource("departmentConvert");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Locale locale = LocaleContextHolder.getLocale();
@@ -434,12 +437,13 @@ public class AssetHistoryService {
         mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
 
-    public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset) {
+    public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset, String modifySource) {
         MqContext mqContext = new MqContext();
         mqContext.setClassName("AssetHistoryService");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("saveAssetHistoryIfUpdated");
-        mqContext.setDescribe("批量修改设备院区/调剂等");
+        mqContext.setDescribe(ModifySourceEnum.getLabelByCode(modifySource));
+        mqContext.setModifySource(modifySource);
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
@@ -452,6 +456,7 @@ public class AssetHistoryService {
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("deleteAsset");
         mqContext.setDescribe("删除设备");
+        mqContext.setModifySource(ModifySourceEnum.ASSET_DELETE.getCode());
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
@@ -531,6 +536,7 @@ public class AssetHistoryService {
             resultMap.put("是否进口设备", importFilesVO.get("importEquipment"));
             resultMap.put("医疗器械分类", importFilesVO.get("functionGroup"));
             resultMap.put("修改人", importFilesVO.get("createdBy"));
+            resultMap.put("修改来源", importFilesVO.get("modifySource"));
             if(importFilesVO.get("createdDate") != null){
                 resultMap.put("修改时间", sdf.format(importFilesVO.get("createdDate")));
             }

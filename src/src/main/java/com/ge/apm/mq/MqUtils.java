@@ -104,7 +104,11 @@ public class MqUtils {
         mqContextDTO.setDescribe(mqContext.getDescribe());
         mqContextDTO.setLocale(mqContext.getLocale());
         mqContextDTO.setSource(mqContext.getSource());
+        mqContextDTO.setModifySource(mqContext.getModifySource());
         JSONObject jsonObject = ObjectUtil.isNotEmpty(mqContext.getJsonObject()) ? mqContext.getJsonObject() : new JSONObject();
+        if (StringUtils.isNotBlank(mqContext.getModifySource())) {
+            jsonObject.put("modifySource", mqContext.getModifySource());
+        }
         jsonObject.put("currentUserAccount", userAccount);
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         Field[] declaredFields = asset.getClass().getDeclaredFields();

@@ -1,6 +1,7 @@
 package com.ge.apm.service.sharedasset;
 
 import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
@@ -68,6 +69,7 @@ public class SharedAssetRequestService {
         mqContext.setClassName("SharedAssetRequestService");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setDescribe("设备调剂借用/归还交付变更设备");
+        mqContext.setModifySource(ModifySourceEnum.CENTRAL_ALLOCATION.getCode());
         for (AssetInfo assetInfo:assetInfos){
             mqUtils.sendAssetToMQ(assetInfo,currentUserAccount,mqContext);
         }

@@ -174,7 +174,7 @@
                         </p:column>
 
                         <!-- 占用总时长（天） -->
-                        <p:column headerText="占用总时长（天）" sortBy="#{item.totalOccupationDays}">
+                        <p:column headerText="占用总时长（天/24h）" sortBy="#{item.totalOccupationDays}">
                             <h:outputText value="#{item.totalOccupationDays}">
                                 <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
                             </h:outputText>
