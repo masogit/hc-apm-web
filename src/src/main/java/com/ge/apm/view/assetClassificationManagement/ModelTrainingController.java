@@ -22,6 +22,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -103,6 +104,11 @@ public class ModelTrainingController extends GenericCRUDUUIDController<AssetClas
             selected.setTenantUid(user.getTenantUID());
             Map<String, Object> stringObjectMap = masterDataService.saveAssetClassificationModel(selected);
             if(stringObjectMap!=null){
+                if (stringObjectMap.containsKey("failMessage")) {
+                    WebUtil.addErrorMessage(String.valueOf(stringObjectMap.get("failMessage")));
+                    FacesContext.getCurrentInstance().validationFailed();
+                    return;
+                }
                 WebUtil.addSuccessMessage("添加成功");
             }
         }

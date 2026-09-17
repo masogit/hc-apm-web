@@ -70,6 +70,12 @@ public class MasterDataService  extends MicroServiceInvoker {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return responseMap;
         } else {
+            String failMessage = getResponseFailMessage(response);
+            if (failMessage != null && !failMessage.isEmpty()) {
+                LinkedHashMap<String, Object> errorMap = new LinkedHashMap<>();
+                errorMap.put("failMessage", failMessage);
+                return errorMap;
+            }
             return null;
         }
     }
