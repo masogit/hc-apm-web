@@ -30,6 +30,7 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 import java.io.ByteArrayInputStream;
@@ -137,6 +138,24 @@ public class FileDownloadService {
             exportFile(inputStream, systemTemplate.getFileName());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 供 p:fileDownload 使用，通过 AJAX 方式下载模板，避免 response.reset() 在 appendTo dialog 中失败的问题
+     */
+    public StreamedContent getTemplateFileStream() {
+        try {
+            UserContextService ucs = WebUtil.getBean(UserContextService.class);
+            SystemTemplateEnum systemTemplate = DownloadTemplateFileType.getSystemTemplate("DEPT_TRANSACTION_LOG", ucs.isLocale());
+            InputStream inputStream = getTemplateFileInputStream(systemTemplate.getCode(), systemTemplate.getFileType());
+            inputStream = processorTemplateFile(inputStream, "DEPT_TRANSACTION_LOG");
+            return new DefaultStreamedContent(inputStream,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    systemTemplate.getFileName());
+        } catch (Exception e) {
+            log.error("Failed to prepare template file stream", e);
+            return null;
         }
     }
 
