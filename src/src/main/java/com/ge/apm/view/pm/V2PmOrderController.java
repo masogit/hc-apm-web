@@ -1945,6 +1945,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService = WebUtil.getBean(V2_PmOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        if (!myPmOrderInitialized) {
+            Boolean saved = (Boolean) FacesContext.getCurrentInstance()
+                .getExternalContext().getSessionMap().get("myPmOrderSaved");
+            myPmOrder = (saved != null) ? saved : true;
+            myPmOrderInitialized = true;
+        }
         blobService = WebUtil.getBean(BlobFileService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
@@ -2220,13 +2226,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         this.setSearchFilter();
 
-        // 从Session恢复myPmOrder
-        if (!myPmOrderInitialized) {
-            Boolean saved = (Boolean) FacesContext.getCurrentInstance()
-                .getExternalContext().getSessionMap().get("myPmOrderSaved");
-            myPmOrder = (saved != null) ? saved : true;
-            myPmOrderInitialized = true;
-        }
 
         if(queryIndex == 20){
             filterOutPm(filterArrayList);
