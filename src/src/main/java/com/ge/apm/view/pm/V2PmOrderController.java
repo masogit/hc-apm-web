@@ -338,6 +338,53 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private boolean repaFlag = false;
 
+    private boolean myPmOrder;
+    private boolean myPmOrderInitialized;
+
+    public boolean isMyPmOrder() { return myPmOrder; }
+    public void setMyPmOrder(boolean myPmOrder) { this.myPmOrder = myPmOrder; }
+
+    public void onMyPmOrderToggle() {
+        FacesContext.getCurrentInstance().getExternalContext()
+            .getSessionMap().put("myPmOrderSaved", myPmOrder);
+    }
+
+    private void extendVisibilityWithMe() {
+        filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ,
+            UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+    }
+
+    /**
+     * 判断当前用户是否可以对待抢单工单执行操作（接单/抢单）
+     * 镜像Tab31查询条件：dispatchMode(2,3) + 步骤(Assign/Accept) + 资产条件(tagGroup/owner)
+     */
+    public boolean canPmTakeOrCompete(V2_PmOrder pmOrder) {
+        if (pmOrder == null) return false;
+        Integer dispatchMode = pmOrder.getDispatchMode();
+        if (dispatchMode == null || (dispatchMode != 2 && dispatchMode != 3)) return false;
+        String stepId = pmOrder.getCurrentStepId();
+        if (!"Assign".equals(stepId) && !"Accept".equals(stepId)) return false;
+        if (pmOrder.getAssetInfo() == null) return false;
+        Integer assetId = pmOrder.getAssetId();
+        if (assetId == null || assetId == 0) return true;
+        // 打过标签的设备
+        List<Integer> tagGroupAssets = getTagGroupAssets();
+        if (tagGroupAssets != null && !tagGroupAssets.isEmpty() && tagGroupAssets.contains(assetId)) return true;
+        // 没打过标签的设备 + owner匹配
+        List<Integer> noTagGroupAssets = getNoTagGroupAssets();
+        if (noTagGroupAssets != null && !noTagGroupAssets.isEmpty() && noTagGroupAssets.contains(assetId)) {
+            Integer myId = UserContextService.getCurrentUserAccount().getId();
+            boolean isOwner = myId.equals(pmOrder.getAssetInfo().getAssetOwnerId())
+                || myId.equals(pmOrder.getAssetInfo().getAssetOwnerId2())
+                || myId.equals(pmOrder.getAssetInfo().getAssetOwnerId3());
+            boolean twoOwnersNull = (pmOrder.getAssetInfo().getAssetOwnerId2() == null && pmOrder.getAssetInfo().getAssetOwnerId3() == null)
+                || (pmOrder.getAssetInfo().getAssetOwnerId() == null && pmOrder.getAssetInfo().getAssetOwnerId3() == null)
+                || (pmOrder.getAssetInfo().getAssetOwnerId() == null && pmOrder.getAssetInfo().getAssetOwnerId2() == null);
+            if (isOwner || twoOwnersNull) return true;
+        }
+        return false;
+    }
+
     @Getter @Setter
     private TreeNode[] selectedAccessOrgNodes;
 
@@ -1898,6 +1945,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService = WebUtil.getBean(V2_PmOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        if (!myPmOrderInitialized) {
+            Boolean saved = (Boolean) FacesContext.getCurrentInstance()
+                .getExternalContext().getSessionMap().get("myPmOrderSaved");
+            myPmOrder = (saved != null) ? saved : true;
+            myPmOrderInitialized = true;
+        }
         blobService = WebUtil.getBean(BlobFileService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
@@ -2173,6 +2226,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         this.setSearchFilter();
 
+
         if(queryIndex == 20){
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ,
@@ -2218,7 +2272,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pmIdList = new ArrayList<>();
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new   Sort.Order(Sort.Direction.DESC,"pmNum"));
@@ -2267,82 +2320,106 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } else if (queryIndex == 3) {//待接单
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-            //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            if (myPmOrder) {
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            } else {
+                extendVisibilityWithMe();
+            }
         } else if (queryIndex == 31) {//待抢单 dispatch 2表示人工派工或抢单模式 3表示抢单模式 4表示人工派工
             isBatchOp=true;
             //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
-            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign", "1*3+"));
-            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept", "1*3+7*"));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+7*"));
-            filterArrayList.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
-            /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));*/
-            //用户必须对其可视范围内的设备都可见,包括打过标签的设备(如果该设备的标签和组绑定了，并且当前用户没有在该组内，那是看不到的)和没有打过标签的设备
-            //打过标签的设备(该标签都和组绑定过)
-            List<Integer> tagGroupAssets = getTagGroupAssets();
-            if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+"));
-            } else {
-                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+"));
-            }
-            //没有打过标签的设备
-            tagGroupAssets = getNoTagGroupAssets();
-            if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+owner*"));
-            } else {
-                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+owner*"));
-            }
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
-            //维修责任人数量小于等于1的条件
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
-            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
-
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            if (myPmOrder) {
+                filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign", "1*3+"));
+                filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept", "1*3+7*"));
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+7*"));
+                filterArrayList.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+                //打过标签的设备(该标签都和组绑定过)
+                List<Integer> tagGroupAssets = getTagGroupAssets();
+                if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
+                    filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+"));
+                } else {
+                    filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+"));
+                }
+                //没有打过标签的设备
+                tagGroupAssets = getNoTagGroupAssets();
+                if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
+                    filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+owner*"));
+                } else {
+                    filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+owner*"));
+                }
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+                //维修责任人数量小于等于1的条件
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
+                filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
+            } else {
+                extendVisibilityWithMe();
+                filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign", "1*3+"));
+                filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept", "1*3+"));
+                filterArrayList.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            }
         } else if (queryIndex == 6) { //待关单
             filterOutPm(filterArrayList);
-            filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            if (myPmOrder) {
+                filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            } else {
+                extendVisibilityWithMe();
+            }
         } else if (queryIndex == 8) { //待审核
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
             //1表示该pm工单已被提交等待审核
             filterArrayList.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            if (myPmOrder) {
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            } else {
+                extendVisibilityWithMe();
+            }
         } else if (queryIndex == 0) { //已计划
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
-            filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-            filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            if (myPmOrder) {
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+                filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+                filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            } else {
+                extendVisibilityWithMe();
+            }
         } else if (queryIndex == 11) { //待验收
             filterOutPm(filterArrayList);
             filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Acceptance"));
-            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
             filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-
+            if (myPmOrder) {
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+            } else {
+                extendVisibilityWithMe();
+            }
         } else if (queryIndex == 7) { //已关单
-
-            if (!userContextService.hasRole("AssetHead") && !userContextService.isPmDispatcher()) {
+            filterArrayList.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已关单"));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
+            if (!myPmOrder) {
+                extendVisibilityWithMe();
+            } else if (!userContextService.hasRole("AssetHead") && !userContextService.isPmDispatcher()) {
                 filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
                 filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             }
-            filterArrayList.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已关单"));
-            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
         }
         this.selected = null;
         Sort sort = returnSort(pageRequest);
