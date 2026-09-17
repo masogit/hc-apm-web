@@ -24,6 +24,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
@@ -1434,7 +1435,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             arrivalListItem.getArrivalList() != null ? arrivalListItem.getArrivalList().getClinicalDeptName() : null);
         assetClassificationModel.setRegistrationNo(arrivalListItem.getRegistrationNo());
         assetClassificationModel.setIsEmergencyDevice(
-            arrivalListItem.getEmergencyEquipment() != null ? (arrivalListItem.getEmergencyEquipment() == 1 ? "是" : "否") : null);
+                arrivalListItem.getEmergencyEquipment() != null ? FieldValueMessageController.fieldValue("emergencyEquipment", String.valueOf(arrivalListItem.getEmergencyEquipment())) : null);
         assetClassificationModel.setPurchasePrice(
             arrivalListItem.getPurchasePrice() != null ? String.valueOf(arrivalListItem.getPurchasePrice()) : null);
 

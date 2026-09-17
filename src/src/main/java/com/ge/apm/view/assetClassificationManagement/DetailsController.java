@@ -329,7 +329,7 @@ public class DetailsController extends GenericCRUDController<AssetInfo> implemen
         assetClassificationModel.setMeterLevel(StringUtils.isNotBlank(meterVal) ? meterVal : null);
         assetClassificationModel.setRegistrationNo(selected.getRegistrationNo());
         assetClassificationModel.setIsEmergencyDevice(
-            selected.getEmergencyEquipment() != null ? (selected.getEmergencyEquipment() == 1 ? "是" : "否") : null);
+                selected.getEmergencyEquipment() != null ? FieldValueMessageController.fieldValue("emergencyEquipment", String.valueOf(selected.getEmergencyEquipment())) : null);
         assetClassificationModel.setPurchasePrice(
             selected.getPurchasePrice() != null ? String.valueOf(selected.getPurchasePrice()) : null);
 

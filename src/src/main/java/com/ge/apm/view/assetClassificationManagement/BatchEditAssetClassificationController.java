@@ -409,7 +409,7 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
                 m.setMeterLevel(org.apache.commons.lang.StringUtils.isNotBlank(meterVal) ? meterVal : null);
                 m.setRegistrationNo(assetInfo.getRegistrationNo());
                 m.setIsEmergencyDevice(
-                    assetInfo.getEmergencyEquipment() != null ? (assetInfo.getEmergencyEquipment() == 1 ? "是" : "否") : null);
+                    assetInfo.getEmergencyEquipment() != null ? FieldValueMessageController.fieldValue("emergencyEquipment", String.valueOf(assetInfo.getEmergencyEquipment())) : null);
                 m.setPurchasePrice(
                     assetInfo.getPurchasePrice() != null ? String.valueOf(assetInfo.getPurchasePrice()) : null);
                 models.add(m);
