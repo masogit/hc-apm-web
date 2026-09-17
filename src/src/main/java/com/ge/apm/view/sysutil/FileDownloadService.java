@@ -18,6 +18,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -43,6 +44,7 @@ import java.util.List;
  */
 @ManagedBean
 @ViewScoped
+@Slf4j
 public class FileDownloadService {
 
     private MicroServiceUtil msService;
@@ -150,7 +152,16 @@ public class FileDownloadService {
 
     private InputStream getDeptTransationLog(InputStream inputStream) {
         // 获取类别下拉选项
-        List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
+        int instId = -1;
+        try {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            if (user != null && user.getSiteId() != null) {
+                instId = user.getSiteId();
+            }
+        } catch (Exception ex) {
+            log.error("Failed to get siteId for template export", ex);
+        }
+        List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction",instId);
         if(CollectionUtils.isEmpty(categoryList)){
             return inputStream;
         }

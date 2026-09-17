@@ -547,8 +547,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                         errors.add("第" + (i + 1) + "行: 姓名为空，已跳过");
                         continue;
                     }
-                    UserAccount byName = userAccountRepository.getByName(authorName);
-                    if (byName == null || !currentUser.getTenantUID().equals(byName.getTenantUID())) {
+                    UserAccount byName = userAccountRepository.findFirstByTenantUIDAndName(currentUser.getTenantUID(),authorName);
+                    if (byName == null) {
                         errors.add("第" + (i + 1) + "行: 姓名不存在，已跳过");
                         continue;
                     }
