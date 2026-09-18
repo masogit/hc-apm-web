@@ -1260,17 +1260,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (StringUtils.isNotEmpty(siteUidFilter)) {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
         }
-        if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
-            List<String> selectedSiteList = ListUtil.newArrayList();
-            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
-                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
-                selectedSiteList.add(orgInfo.getUid());
-            }
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-        }
+
         if (!this.hasFilterOnField("siteUID")) {
             if(enableAuditGroupConfiguration && queryIndex == 10) {
                 String hospitalUID = loginUser.getHospitalUID();
@@ -1288,7 +1278,22 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
         }
-
+        if (ObjectUtil.isNotEmpty(selectedAccessOrgNodes)) {
+            List<String> selectedSiteList = ListUtil.newArrayList();
+            for (TreeNode selectedAccessOrgNode : selectedAccessOrgNodes) {
+                OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
+                selectedSiteList.add(orgInfo.getUid());
+            }
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+        }else{
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "tenantUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "institutionUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "hospitalUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
+        }
         // 资产分类权限
         if (ObjectUtil.isNotEmpty(selectedAssetTypeNodes)) {
             List<String> selectedAssetTypeList = ListUtil.newArrayList();
@@ -4402,10 +4407,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * 使查询结果为 (可见范围 OR 当前责任人是我) AND 其他条件
      */
     private void extendVisibilityWithMe() {
-        if (ObjectUtil.isEmpty(selectedAccessOrgNodes)) {
             updateSearchFilter(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, loginUser.getId(), "1*2+"));
-        }
-
     }
 
     /**
