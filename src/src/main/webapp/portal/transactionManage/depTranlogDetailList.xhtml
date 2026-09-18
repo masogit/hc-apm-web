@@ -94,7 +94,9 @@
                 <h:panelGroup>
                     <p style="margin-bottom:6px;">说明：</p>
                     <div style="line-height:1.8;">
-                        1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('DEPT_TRANSACTION_LOG')}" styleClass="p-mr-2"/><br/>
+                        1. <p:commandButton value="#{msg.downloadTemplateFile}" ajax="false" process="@this"
+                                              actionListener="#{fileDownloadService.exportTemplateFile('DEPT_TRANSACTION_LOG')}"
+                                              styleClass="p-mr-2 ui-button-flat"/><br/>
                         2. 在模板中填写数据，类别列请从下拉选择<br/>
                         3. 上传文件进行导入，姓名+日期+类别相同视为重复，重复记录将跳过<br/>
                         4. 上传文件单次限制100条

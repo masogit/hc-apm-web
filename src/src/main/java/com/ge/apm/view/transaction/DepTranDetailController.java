@@ -13,12 +13,10 @@ import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TransactionForm;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
@@ -30,13 +28,12 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @ManagedBean
 @ViewScoped
+@Slf4j
 public class DepTranDetailController extends JpaCRUDController<DeptTransactionLog> implements ServerEventInterface{
 
     @Getter @Setter
@@ -431,6 +428,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
+        log.info("重复数据校验参数 name{},date{},category{}",userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory);
         if(checkRepetition(userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory)){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
