@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
@@ -68,6 +69,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     private String filterClinicalDeptOrg;
     private List<OrgInfo> clinicalDeptList;
     private OrgInfoTreeService orgInfoTreeService;
+    private AssetHistoryService assetHistoryService;
     private Set<String> clinicalDeptOrgUidSet;
     @Getter @Setter
     private Map<Integer, Boolean> selectedMap; //复选的设备
@@ -92,6 +94,7 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         equipmentExpiryManagementRepository = WebUtil.getBean(EquipmentExpiryManagementRepository.class);
         systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -352,18 +355,30 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     public void applyChange() {
         try {
             Assert.isTrue((lifecycle != null && lifecycle > 0), WebUtil.getMessage("saveUsageYearError"));
+            List<AssetInfo> assetInfos = new ArrayList<>();
+
             // 年份转月份
             Integer usageMonth = lifecycle * 12;
             if (selected != null) {
                 selected.setLifecycle(usageMonth);
                 selected.setLastModifiedDate(new Date());
                 dao.save(selected);
+
+                assetInfos.add(selected);
             } else {
                 Set<Integer> assetIds = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toSet());
                 if (!assetIds.isEmpty()) {
                     dao.updateLifecycleByIds(usageMonth, assetIds);
                 }
+
+                assetInfos = dao.findByIdIn(assetIds);
             }
+
+            for (AssetInfo assetInfo : assetInfos) {
+                assetInfo.setCreateType("Edit");
+                assetHistoryService.saveAssetHistory(assetInfo);
+            }
+
             WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
         } catch (Exception e) {
             WebUtil.addErrorMessage(e.getMessage());
