@@ -914,7 +914,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             headerFont.setFontHeightInPoints((short) 12);
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
-            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillForegroundColor(IndexedColors.WHITE.getIndex());
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             headerStyle.setAlignment(HorizontalAlignment.CENTER);
             Row headerRow = sheet.createRow(0);
