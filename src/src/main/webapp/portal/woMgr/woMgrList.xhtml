@@ -33,7 +33,7 @@
             <h:panelGroup id="myWorkOrderPanel"
                           rendered="#{userContextService.hasRole('AssetHead')}">
                 <p:selectBooleanCheckbox value="#{workOrderMgrController.myWorkOrder}" itemLabel="我的工单">
-                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist filterApplyTimePanel" process="@this"/>
+                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist filterApplyTimePanel woTab:searchForm:varPanelOrg1" process="@this"/>
                 </p:selectBooleanCheckbox>
             </h:panelGroup>
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
