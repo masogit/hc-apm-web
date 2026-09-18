@@ -345,7 +345,7 @@
                    </c:when>
                    <c:when test="#{item eq 'MVS_ASSET'}">
                        <!-- MVS设备管理 -->
-                       <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('MVS_')}">
+                       <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o fa-fw" rendered="#{userContextService.accessContainsFunctionMenu('MVS_DEVICE_')}">
                            <p:menuitem fragment="um3001" id="um3001" value="#{msg.BasicInfo}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.accessContainsFunctionMenu('MVS_DEVICE_INFO')}"/>
                            <p:menuitem fragment="um3002" id="um3002" value="#{msg.PurchaseManagement}" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MVS_DEVICE_PURCHASE')}"/>
                        </p:submenu>

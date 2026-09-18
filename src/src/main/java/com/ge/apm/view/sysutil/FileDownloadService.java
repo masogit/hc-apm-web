@@ -15,6 +15,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -26,6 +27,7 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 import java.io.ByteArrayInputStream;
@@ -40,6 +42,7 @@ import java.util.List;
  */
 @ManagedBean
 @ViewScoped
+@Slf4j
 public class FileDownloadService {
 
     private MicroServiceUtil msService;
@@ -139,6 +142,24 @@ public class FileDownloadService {
         }
     }
 
+    /**
+     * 供 p:fileDownload 使用，通过 AJAX 方式下载模板，避免 response.reset() 在 appendTo dialog 中失败的问题
+     */
+    public StreamedContent getTemplateFileStream() {
+        try {
+            UserContextService ucs = WebUtil.getBean(UserContextService.class);
+            SystemTemplateEnum systemTemplate = DownloadTemplateFileType.getSystemTemplate("DEPT_TRANSACTION_LOG", ucs.isLocale());
+            InputStream inputStream = getTemplateFileInputStream(systemTemplate.getCode(), systemTemplate.getFileType());
+            inputStream = processorTemplateFile(inputStream, "DEPT_TRANSACTION_LOG");
+            return new DefaultStreamedContent(inputStream,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    systemTemplate.getFileName());
+        } catch (Exception e) {
+            log.error("Failed to prepare template file stream", e);
+            return null;
+        }
+    }
+
     private InputStream processorTemplateFile(InputStream inputStream,String type)  {
         if(DownloadTemplateFileType.USER_ACCOUNT.name().equals(type)){
             return getCustomRole(inputStream);
@@ -150,25 +171,35 @@ public class FileDownloadService {
     }
 
     private InputStream getDeptTransationLog(InputStream inputStream) {
-        try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
-
-            // 获取类别下拉选项
-            List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction");
-            if (categoryList != null && !categoryList.isEmpty()) {
-                String[] categoryValues = new String[categoryList.size()];
-                for (int i = 0; i < categoryList.size(); i++) {
-                    categoryValues[i] = categoryList.get(i).getValue();
-                }
-
-                // 为类别列添加下拉选择
-                DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
-                CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
-                DataValidation validation = validationHelper.createValidation(constraint, addressList);
-                validation.setShowErrorBox(true);
-                sheet.addValidationData(validation);
+        // 获取类别下拉选项
+        int instId = -1;
+        try {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            if (user != null && user.getSiteId() != null) {
+                instId = user.getSiteId();
             }
+        } catch (Exception ex) {
+            log.error("Failed to get siteId for template export", ex);
+        }
+        List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction",instId);
+        if(CollectionUtils.isEmpty(categoryList)){
+            return inputStream;
+        }
+        try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)){
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            String[] categoryValues = new String[categoryList.size()];
+            for (int i = 0; i < categoryList.size(); i++) {
+                categoryValues[i] = categoryList.get(i).getValue();
+            }
+
+            // 为类别列添加下拉选择
+            DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+            DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
+            CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
+            DataValidation validation = validationHelper.createValidation(constraint, addressList);
+            validation.setShowErrorBox(true);
+            sheet.addValidationData(validation);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
@@ -213,10 +244,13 @@ public class FileDownloadService {
         try {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            response.reset();
             response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
             StreamUtils.copy(inputStream, response.getOutputStream());
+            response.getOutputStream().flush();
             facesContext.responseComplete();
-            facesContext.renderResponse();
         } catch (Exception e) {
             e.printStackTrace();
         }

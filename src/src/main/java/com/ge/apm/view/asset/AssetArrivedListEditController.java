@@ -1540,6 +1540,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public  List<SelectItemDto>  autoAssetClassification32() {
         AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+        assetClassificationModel.setId(selected.getId());
         assetClassificationModel.setBrand(selected.getMakerShortName());
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getAssetName());

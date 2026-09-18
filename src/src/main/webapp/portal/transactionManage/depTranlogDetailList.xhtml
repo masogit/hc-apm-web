@@ -88,31 +88,34 @@
                 </p:dataTable>
             </p:fieldset>
 
-        </h:form>
+            <!-- importDlg 放在 h:form 内部，确保 p:commandLink ajax=false 能找到父级 form -->
+            <p:dialog id="importDlg" widgetVar="importDlg" modal="true" width="500" height="250"
+                      resizable="false" draggable="true" header="批量导入科务记录">
+                <h:panelGroup>
+                    <p style="margin-bottom:6px;">说明：</p>
+                    <div style="line-height:1.8;">
+                        1. <p:commandButton value="#{msg.downloadTemplateFile}" ajax="false" process="@this"
+                                              actionListener="#{fileDownloadService.exportTemplateFile('DEPT_TRANSACTION_LOG')}"
+                                              styleClass="p-mr-2 ui-button-flat"/><br/>
+                        2. 在模板中填写数据，类别列请从下拉选择<br/>
+                        3. 上传文件进行导入，姓名+日期+类别相同视为重复，重复记录将跳过<br/>
+                        4. 上传文件单次限制100条
+                    </div>
+                </h:panelGroup>
+                <h:form id="importForm" enctype="multipart/form-data">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
+                        <p:fileUpload fileUploadListener="#{depTranDetailController.handleImportUpload}"
+                                      mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+                                      sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                      invalidFileMessage="只支持xls或xlsx格式的文件"
+                                      invalidSizeMessage="文件大小不超过5M"
+                                      update=":deptTransactionForm:tranTabView:trDetailFormNew:datalist :growl"
+                                      label="选择文件" cancelLabel="取消" uploadLabel="确认上传"/>
+                    </p:panelGrid>
+                </h:form>
+            </p:dialog>
 
-        <p:dialog id="importDlg" widgetVar="importDlg" modal="true" width="500" height="250"
-                  resizable="false" draggable="true" appendTo="@(body)" header="批量导入科务记录">
-            <h:panelGroup>
-                <p style="margin-bottom:6px;">说明：</p>
-                <div style="line-height:1.8;">
-                    1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('DEPT_TRANSACTION_LOG')}" styleClass="p-mr-2"/><br/>
-                    2. 在模板中填写数据，类别列请从下拉选择<br/>
-                    3. 上传文件进行导入，姓名+日期+类别相同视为重复，重复记录将跳过<br/>
-                    4. 上传文件单次限制100条
-                </div>
-            </h:panelGroup>
-            <h:form id="importForm" enctype="multipart/form-data">
-                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
-                    <p:fileUpload fileUploadListener="#{depTranDetailController.handleImportUpload}"
-                                  mode="advanced" dragDropSupport="false" multiple="false" auto="true"
-                                  sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
-                                  invalidFileMessage="只支持xls或xlsx格式的文件"
-                                  invalidSizeMessage="文件大小不超过5M"
-                                  update=":deptTransactionForm:tranTabView:trDetailFormNew:datalist :growl"
-                                  label="选择文件" cancelLabel="取消" uploadLabel="确认上传"/>
-                </p:panelGrid>
-            </h:form>
-        </p:dialog>
+        </h:form>
 
         <p:dialog id="viewImageDlg" widgetVar="viewImageDlg" width="650" height="450" modal="true"
                   resizable="true" draggable="true" appendTo="@this" header="查看图片">

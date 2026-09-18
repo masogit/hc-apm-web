@@ -77,3 +77,65 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 --YHAAO-29493
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 3, 'false', '出库业务时间是否更新启用日期', 'outStockUpdateInstallDateFlag', '出库业务时间是否更新启用日期', 'f', 't', 3 where not exists (select * from config_item where key = 'outStockUpdateInstallDateFlag');
+-- YHAAO-28998
+CREATE TABLE IF NOT EXISTS udid_device_category (
+                                           id serial4 NOT NULL,
+                                           seq_no INT4 NULL,
+                                           cat1_code INT4 NULL,
+                                           cat2_code INT4 NULL,
+                                           cat3_code INT4 NULL,
+                                           category_code VARCHAR (20) NULL,
+                                           CATALOG_NAME VARCHAR (255) NULL,
+                                           primary_category VARCHAR (255) NULL,
+                                           secondary_category VARCHAR (255) NULL,
+                                           product_description TEXT NULL,
+                                           intended_use TEXT NULL,
+                                           product_examples TEXT NULL,
+                                           management_class VARCHAR (10) NULL
+);
+
+-- YHAAO-28998
+CREATE TABLE IF NOT EXISTS udid_registry_num_info (
+                                             registry_no TEXT NULL,
+                                             qxlb TEXT NULL,
+                                             cplb TEXT NULL,
+                                             cpmctymc JSON NULL,
+                                             ggxh JSON NULL,
+                                             flbm JSON NULL,
+                                             id VARCHAR NULL,
+                                             db_id VARCHAR NULL,
+                                             registry_num TEXT NULL,
+                                             registrant_name TEXT NULL,
+                                             registrant_address TEXT NULL,
+                                             production_address TEXT NULL,
+                                             product_name TEXT NULL,
+                                             management_category TEXT NULL,
+                                             model_spec TEXT NULL,
+                                             structure_composition TEXT NULL,
+                                             scope_of_use TEXT NULL,
+                                             storage_conditions TEXT NULL,
+                                             attachments TEXT NULL,
+                                             other_content TEXT NULL,
+                                             remarks TEXT NULL,
+                                             approval_dept TEXT NULL,
+                                             approval_date TEXT NULL,
+                                             valid_period TEXT NULL,
+                                             changes TEXT NULL,
+                                             created_at TIMESTAMP NULL,
+                                             updated_at TIMESTAMP NULL
+);
+
+-- YHAAO-28998
+CREATE TABLE IF NOT EXISTS udid_device_cube (
+                                  registry_num text NULL,
+                                  registrant_name text NULL,
+                                  device_name text NULL,
+                                  device_pattern text NULL,
+                                  device_category text NULL
+);
+
+-- YHAAO-29608, YHAAO-29621 外部工单重新处理
+update import_files set status = 'STARTING' where status = 'FAILED' and file_type = 'SrReportPdf' and uploaded_time > CURRENT_DATE - 30;
+
+-- YHAAO-29584 常州中HIS取消失败重新处理
+update his_adjust_business_job set task_status = 0 where task_status = 2;

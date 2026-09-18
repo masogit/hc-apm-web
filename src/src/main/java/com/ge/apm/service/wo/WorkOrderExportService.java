@@ -212,6 +212,7 @@ public class WorkOrderExportService {
         List<I18nMessage> spare03 = i18nMessageService.getByMsgType("spare03");
         List<I18nMessage> spare04 = i18nMessageService.getByMsgType("spare04");
         List<I18nMessage> spare05 = i18nMessageService.getByMsgType("spare05");
+        List<I18nMessage> assetStatus = i18nMessageService.getByMsgType("assetStatus");
         List<Integer> assetIds = mvsWorkOrderList.stream().map(WorkOrderExportPojo::getAssetId).collect(Collectors.toList());
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             workOrderExportPojo.setMVSWorkOrder(assetIds.contains(workOrderExportPojo.getAssetId()));
@@ -432,6 +433,8 @@ public class WorkOrderExportService {
             workOrderMap.put("main_sub", "sub".equals(workOrderExportPojo.getMainSub())?"子工单":"主工单");
             workOrderMap.put("related_order_number", Optional.of(srMap.get(workOrderExportPojo.getSrId()).size()-1).orElse(null));
             workOrderMap.put(WebUtil.getMessage("UseDeptName_xlsx"), workOrderExportPojo.getUseDeptName());
+            Integer assetStatus1 = workOrderExportPojo.getAssetStatus();
+            workOrderMap.put("assetStatusName",assetStatus1 != null?findI18nValue(assetStatus, assetStatus1.toString()):"");
 
             resultList.add(workOrderMap);
         }
@@ -557,7 +560,9 @@ public class WorkOrderExportService {
                     (String) m.get(WebUtil.getMessage("srNum_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentName_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentID_xlsx"))));
-
+            m.put("brand", m.get(WebUtil.getMessage("brand")));
+            m.put("assetStatusName", m.get("assetStatusName"));
+            m.put("srNum", m.get(WebUtil.getMessage("srNum_xlsx")));
             List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), null); //微信端之前上传的图片没有 boSubType区分
             if (pictureList != null) {
                 List<V2_BlobObject> serviceRequestPicture = new ArrayList<>();  //报修图片

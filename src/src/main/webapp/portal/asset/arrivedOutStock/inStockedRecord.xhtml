@@ -75,7 +75,7 @@
                      selection="#{assetInStockedController.selectedItems}"
                      lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                      rowKey="#{item.id}" sortMode="single" sortBy="#{item.businessDate}"   sortOrder="descending"
-                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                      rows="20" emptyMessage="#{msg.noRecordFound}"
                      rowsPerPageTemplate="20,50,100,500">
@@ -139,6 +139,11 @@
             <p:column headerText="#{msg.stockSource}">
                 <h:outputText value="#{fieldMsg.fieldValue('stockSource', item.stockSource)}"/>
             </p:column>
+            <f:facet name="{Toolbar}">
+                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" actionListener="#{assetInStockedController.exportExcel}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                    <p:fileDownload value="#{assetInStockedController.exportExcelFile}"/>
+                </p:commandButton>
+            </f:facet>
         </p:dataTable>
     </h:form>
     <script type="text/javascript">
