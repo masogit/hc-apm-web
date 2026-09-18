@@ -1210,7 +1210,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }else{
             assetInfo.setCreateType("Edit");
         }
-        this.saveAssetHistory(assetInfo);
+        assetHistoryService.saveAssetHistory(assetInfo);
         creteRule();
         if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
             assetInfoBulkEditCheckService.deleteNursiteMaintain(unCheckNurseSiteMaintain.get(0));
@@ -2199,17 +2199,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setSubZkbFileDirectoryList(List<ZkbFileDirectory> subZkbFileDirectoryList) {
         this.subZkbFileDirectoryList = subZkbFileDirectoryList;
-    }
-
-
-    private void saveAssetHistory(AssetInfo newAsset) {
-        MqContext mqContext = new MqContext();
-        mqContext.setServiceName("hc-apm-web");
-        mqContext.setClassName("AssetInfoEditController");
-        mqContext.setMethodName("applyChange");
-        mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
-        mqContext.setModifySource(ModifySourceEnum.LEDGER_EDIT.getCode());
-        mqUtils.sendAssetToMQ(newAsset,loginUser,mqContext);
     }
 
     public int getAssetChangeHistoryCount() {
