@@ -1284,10 +1284,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
                 selectedSiteList.add(orgInfo.getUid());
             }
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
         }else{
             searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
             searchFilters.removeAll(searchFilters.stream().filter(item -> "tenantUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
