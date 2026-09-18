@@ -107,6 +107,28 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return res;
     }
 
+    public String getImgBase64(String fileId, V2_BlobObject blobObject) {
+        String res = "data:image/jpeg;base64,";
+        try {
+            if (blobObject != null) {
+                if (!blobObject.isImageType()) {
+                    String objectName = blobObject.getObjectName();
+                    String type = objectName.substring(objectName.lastIndexOf(".") + 1).toLowerCase();
+                    return getDefaultImage(type);
+                }
+            }
+            HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+            String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
+            ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
+            byte[] result = response.getBody();
+            res += Base64Utils.encodeToString(result);
+        } catch (Exception e) {
+            logger.error("encode image base64 error:{}",e);
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     List<String> imageTypeList = ListUtil.newArrayList("png", "jpg", "jpeg");
 
     public String getImgBase64ByStream(TempFileUtil tempFileUtil) {

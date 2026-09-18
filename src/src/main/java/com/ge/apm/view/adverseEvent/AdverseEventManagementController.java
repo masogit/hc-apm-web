@@ -159,6 +159,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
         adverseEventsService = WebUtil.getBean(AdverseEventsService.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
 
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();

@@ -126,6 +126,8 @@ public class AdverseEventApproveController extends AdverseEventBaseController{
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
         String selectedId = WebUtil.getRequestParameter("selectedId");

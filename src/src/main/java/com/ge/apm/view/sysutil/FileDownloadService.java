@@ -7,10 +7,7 @@ package com.ge.apm.view.sysutil;
 
 import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.dao.SystemTemplateValueRepository;
-import com.ge.apm.domain.CustomRole;
-import com.ge.apm.domain.DownloadTemplateFileType;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.dto.FileInfoResult;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import javax.faces.bean.ManagedBean;
@@ -116,6 +113,10 @@ public class FileDownloadService {
 
     public String getImgBase64(String fileId) {
         return msService.getImgBase64(fileId);
+    }
+
+    public String getImgBase64ByObject(String fileId, V2_BlobObject blobObject) {
+        return msService.getImgBase64(fileId, blobObject);
     }
 
     public String getImgBase64ByStream(TempFileUtil tempFileUtil) {

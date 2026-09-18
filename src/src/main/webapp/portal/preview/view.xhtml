@@ -11,8 +11,8 @@
         <c:choose>
             <c:when test="#{preViewerBean.type eq 0}">
                 <div class="row" id="imgDiv" style="width: auto">
-                    <img data-original="#{fileDownloadService.getImgBase64(preViewerBean.getObjectId())}"
-                         src="#{fileDownloadService.getImgBase64(preViewerBean.getObjectId())}"
+                    <img data-original="#{fileDownloadService.getImgBase64ByObject(preViewerBean.getObjectId(), preViewerBean.blobObject)}"
+                         src="#{fileDownloadService.getImgBase64ByObject(preViewerBean.getObjectId(), preViewerBean.blobObject)}"
                          style="opacity:0; width:1px; height:1px"/>
                 </div>
                 <script>
