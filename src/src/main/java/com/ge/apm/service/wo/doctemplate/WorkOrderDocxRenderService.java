@@ -145,6 +145,9 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("tube_install_date", WebUtil.getMessage("tubeInstallDate"));
         COPY_KEY_MAPPING.put("total_exposure_count", WebUtil.getMessage("totalExposureCount"));
         COPY_KEY_MAPPING.put("total_inspection_count", WebUtil.getMessage("totalInspectionCount"));
+        COPY_KEY_MAPPING.put("brand", "brand");
+        COPY_KEY_MAPPING.put("assetStatusName", "assetStatusName");
+        COPY_KEY_MAPPING.put("srNum", "srNum");
     }
 
     public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
