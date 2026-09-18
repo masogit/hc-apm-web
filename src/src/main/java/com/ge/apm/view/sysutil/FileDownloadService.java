@@ -23,6 +23,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.primefaces.context.RequestContext;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StreamUtils;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
@@ -181,31 +182,72 @@ public class FileDownloadService {
         } catch (Exception ex) {
             log.error("Failed to get siteId for template export", ex);
         }
-        List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction",instId);
-        if(CollectionUtils.isEmpty(categoryList)){
+        List<I18nMessage> categoryList = FieldValueMessageController.getFieldValueList("transaction", instId);
+        if (CollectionUtils.isEmpty(categoryList)) {
             return inputStream;
         }
-        try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)){
+        try (XSSFWorkbook workbook = new XSSFWorkbook(inputStream)) {
             XSSFSheet sheet = workbook.getSheetAt(0);
-
-            String[] categoryValues = new String[categoryList.size()];
-            for (int i = 0; i < categoryList.size(); i++) {
-                categoryValues[i] = categoryList.get(i).getValue();
+    
+            // 根据locale获取对应的i18n值，参考AssetFileDynamicTemplate
+            List<String> categoryValues;
+            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")) {
+                categoryValues = new java.util.ArrayList<>(categoryList.size());
+                for (I18nMessage msg : categoryList) {
+                    categoryValues.add(msg.getValueZh());
+                }
+            } else {
+                categoryValues = new java.util.ArrayList<>(categoryList.size());
+                for (I18nMessage msg : categoryList) {
+                    categoryValues.add(msg.getValueEn());
+                }
+            }
+    
+            // 创建隐藏sheet写入类别值，通过公式引用方式生成下拉列表
+            String hiddenSheetName = "_category_values";
+            XSSFSheet hiddenSheet = workbook.createSheet(hiddenSheetName);
+            for (int i = 0; i < categoryValues.size(); i++) {
+                XSSFRow row = hiddenSheet.createRow(i);
+                row.createCell(0).setCellValue(categoryValues.get(i));
+            }
+            int hiddenSheetIndex = workbook.getSheetIndex(hiddenSheetName);
+            workbook.setSheetHidden(hiddenSheetIndex, true);
+    
+            // 移除模板中已存在的覆盖C列（索引2）的验证规则，避免旧下拉列表覆盖新的i18n值
+            org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet ctWorksheet = sheet.getCTWorksheet();
+            if (ctWorksheet.isSetDataValidations()) {
+                org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDataValidations ctDataValidations = ctWorksheet.getDataValidations();
+                java.util.Iterator<org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDataValidation> it = ctDataValidations.getDataValidationList().iterator();
+                while (it.hasNext()) {
+                    org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDataValidation ctDv = it.next();
+                    String sqref = ctDv.getSqref() != null ? ctDv.getSqref().toString() : "";
+                    // sqref格式如 "C2:C200" 或 "$C$2:$C$200"，检查是否包含C列引用
+                    if (sqref.matches(".*(?<![A-Z])[A-C](?![A-Z]).*")) {
+                        it.remove();
+                    }
+                }
+                if (ctDataValidations.sizeOfDataValidationArray() == 0) {
+                    ctWorksheet.unsetDataValidations();
+                }
             }
 
-            // 为类别列添加下拉选择
+            // 通过createFormulaListConstraint公式引用隐藏sheet区域生成下拉列表
             DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-            DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(categoryValues);
-            CellRangeAddressList addressList = new CellRangeAddressList(1, 5000, 2, 2);
-            DataValidation validation = validationHelper.createValidation(constraint, addressList);
-            validation.setShowErrorBox(true);
-            sheet.addValidationData(validation);
-
+            String formulaRef = hiddenSheetName + "!$A$1:$A$" + categoryValues.size();
+            DataValidationConstraint dvConstraint = validationHelper.createFormulaListConstraint(formulaRef);
+            // 第三列（C列，索引2）从第2行开始设置下拉
+            CellRangeAddressList addressList = new CellRangeAddressList(1, 200, 2, 2);
+            DataValidation dataValidation = validationHelper.createValidation(dvConstraint, addressList);
+            dataValidation.setShowErrorBox(true);
+            dataValidation.setSuppressDropDownArrow(true);
+            dataValidation.setShowPromptBox(true);
+            sheet.addValidationData(dataValidation);
+    
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             return new ByteArrayInputStream(outputStream.toByteArray());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to process dept transaction log template", e);
             return inputStream;
         }
     }

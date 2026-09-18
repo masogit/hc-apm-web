@@ -38,12 +38,12 @@ public interface DeptTransactionLogRepository extends GenericRepository<DeptTran
     @Query(value="select count(1) from dept_transaction_log where category = ?1 and tenant_uid = ?2", nativeQuery = true)
     int countByCategoryAndTenant(Integer category, String tenantUid);
 
-    @Query(value = "select count(1) from dept_transaction_log where author_name = :authorName and date = :date and category = :category", nativeQuery = true)
+    @Query(value = "select count(1) from dept_transaction_log where author_name = :authorName and date = CAST(:date AS DATE) and category = :category", nativeQuery = true)
     int existsByAuthorNameAndDateAndCategory(@Param("authorName") String authorName, @Param("date") Date date, @Param("category") Integer category);
 
-    @Query(value = "select count(1) from dept_transaction_log where author_name = :authorName and date = :date and category = :category and id != :excludeId", nativeQuery = true)
+    @Query(value = "select count(1) from dept_transaction_log where author_name = :authorName and date = CAST(:date AS DATE) and category = :category and id != :excludeId", nativeQuery = true)
     int existsByAuthorNameAndDateAndCategoryExcludeId(@Param("authorName") String authorName, @Param("date") Date date, @Param("category") Integer category, @Param("excludeId") Integer excludeId);
 
-    @Query(value = "select * from dept_transaction_log where author_name = :authorName and date = :date and category = :category order by id desc limit 1", nativeQuery = true)
+    @Query(value = "select * from dept_transaction_log where author_name = :authorName and date = CAST(:date AS DATE) and category = :category order by id desc limit 1", nativeQuery = true)
     DeptTransactionLog findLatestByAuthorNameAndDateAndCategory(@Param("authorName") String authorName, @Param("date") Date date, @Param("category") Integer category);
 }
