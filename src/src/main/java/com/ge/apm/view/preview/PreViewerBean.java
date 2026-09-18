@@ -43,6 +43,7 @@ public class PreViewerBean implements ServerEventInterface {
 
     Pattern pattern = Pattern.compile("^(.*\\.(?i)(jpg|jpeg|png|gif|bmp|tiff|pdf|JPG|JPEG|PNG|GIF|BMP|TIFF|PDF))$");
 
+    @Getter @Setter
     private V2_BlobObject blobObject;
     private Integer type;  // 0 图片, 1 pdf    -1 其他
     private String objectId;
