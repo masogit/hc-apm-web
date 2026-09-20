@@ -909,9 +909,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if (!myWorkOrder) {
                     extendVisibilityWithMe();
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*4+"));
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*4+1*"));
-                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*4+1*"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+1*"));
+                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*3+1*"));
                 } else {
                     //原有逻辑 - 包含人员匹配/资产责任人/tagGroup等过滤
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
@@ -1254,7 +1254,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item != null && "serviceRequest.fromDeptUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
         }
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if (StringUtils.isNotEmpty(siteUidFilter)) {
@@ -1284,15 +1284,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
                 selectedSiteList.add(orgInfo.getUid());
             }
-            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
         }else{
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "tenantUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "institutionUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "hospitalUID".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item != null && "siteUID".equals(item.fieldName) && "1*5+".equals(item.conditionPath)).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item != null && "tenantUID".equals(item.fieldName) && "1*5+".equals(item.conditionPath)).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item != null && "institutionUID".equals(item.fieldName) && "1*5+".equals(item.conditionPath)).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item != null && "hospitalUID".equals(item.fieldName) && "1*5+".equals(item.conditionPath)).collect(Collectors.toList()));
         }
         // 资产分类权限
         if (ObjectUtil.isNotEmpty(selectedAssetTypeNodes)) {

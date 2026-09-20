@@ -75,6 +75,21 @@ public class UdidRegistryNumInfo implements Serializable {
     private String productionAddress;
 
     /**
+     * 代理人
+     */
+    private String agentName;
+
+    /**
+     * 代理人地址
+     */
+    private String agentAddress;
+
+    /**
+     * 代理人注册地址
+     */
+    private String agentRegAddress;
+
+    /**
      * 产品名称
      */
     private String productName;
@@ -130,6 +145,11 @@ public class UdidRegistryNumInfo implements Serializable {
     private String approvalDate;
 
     /**
+     * 生效日期
+     */
+    private String effectiveDate;
+
+    /**
      * 有效期
      */
     private String validPeriod;
@@ -138,6 +158,20 @@ public class UdidRegistryNumInfo implements Serializable {
      * 变更记录
      */
     private String changes;
+
+    /**
+     * 是否为注册信息
+     * true为注册信息，false为备案信息
+     */
+    @TableField(exist = false)
+    private boolean isRegistration;
+
+    /**
+     * 是否为境内注册或境内备案
+     * true为境内注册或境内备案，false为进口注册或进口备案
+     */
+    @TableField(exist = false)
+    private boolean isDomestic;
 
     /**
      * 创建时间

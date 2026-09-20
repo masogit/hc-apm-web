@@ -648,14 +648,4 @@ public class AssetInfoDetailController {
     public boolean renderRegistrationInfo() {
         return selected != null && StringUtils.isNotBlank(selected.getRegistrationNo()) && selected.getRegistrationInfo() != null;
     }
-
-    // 是注册信息
-    public boolean renderRegistration() {
-        return renderRegistrationInfo() && StringUtils.isNotBlank(selected.getRegistrationInfo().getRegistryNum()) && selected.getRegistrationInfo().getRegistryNum().contains("注");
-    }
-
-    // 是备案信息
-    public boolean renderFiling() {
-        return renderRegistrationInfo() && StringUtils.isNotBlank(selected.getRegistrationInfo().getRegistryNum()) && selected.getRegistrationInfo().getRegistryNum().contains("备");
-    }
 }
