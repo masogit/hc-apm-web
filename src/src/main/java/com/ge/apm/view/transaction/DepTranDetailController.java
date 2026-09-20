@@ -468,8 +468,6 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
 
 
 
-
-
     public void handleImportUpload(FileUploadEvent event) {
         UploadedFile uploadedFile = event.getFile();
         if (uploadedFile == null || uploadedFile.getFileName() == null) {
@@ -550,7 +548,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                         errors.add("第" + (i + 1) + "行: 姓名不存在，已跳过");
                         continue;
                     }
-                    if (!Objects.equals(byName.getSiteId(),currentUser.getSiteId())) {
+                    if (!Objects.equals(byName.getSiteUID(),currentUser.getSiteUID())) {
                         errors.add("第" + (i + 1) + "行: 不是同一个院区，已跳过");
                         continue;
                     }
