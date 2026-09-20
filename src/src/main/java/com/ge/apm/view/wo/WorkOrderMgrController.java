@@ -909,9 +909,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if (!myWorkOrder) {
                     extendVisibilityWithMe();
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+"));
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+1*"));
-                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*3+1*"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*4+"));
+                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*4+1*"));
+                    searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3, 5), "1*4+1*"));
                 } else {
                     //原有逻辑 - 包含人员匹配/资产责任人/tagGroup等过滤
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));

@@ -10,7 +10,7 @@
     <div class="ui-g-12 card">
         <h:form id="searchForm" class="searchForm">
             <h:panelGroup>
-               <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="#{workOrderMgrController.siteFor}" hideEffect="fade" dynamic="false" modal="false" >
+               <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1"  id="varPanelOrg1" for="#{workOrderMgrController.siteFor}" hideEffect="fade" dynamic="false" modal="false" >
                     <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab:searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab" value="确定"/>
@@ -33,7 +33,7 @@
             <h:panelGroup id="myWorkOrderPanel"
                           rendered="#{userContextService.hasRole('AssetHead')}">
                 <p:selectBooleanCheckbox value="#{workOrderMgrController.myWorkOrder}" itemLabel="我的工单">
-                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist filterApplyTimePanel woTab:searchForm:varPanelOrg1" process="@this"/>
+                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist filterApplyTimePanel woTab" process="@this"/>
                 </p:selectBooleanCheckbox>
             </h:panelGroup>
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
