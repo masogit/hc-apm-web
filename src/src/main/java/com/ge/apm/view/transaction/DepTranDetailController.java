@@ -352,7 +352,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         selected.setHours(hours);
         selected.setCategory(tmCategory);
         selected.setTimes(times);
-        if(checkRepetition(userContextService.getLoginUser().getLoginName(),startTime,tmCategory, selected.getId())){
+        if(checkRepetition(userContextService.getLoginUser().getName(),startTime,tmCategory, selected.getId())){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
@@ -379,13 +379,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setHours(hours);
         tf.setTimes(times);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
-        if(checkRepetition(userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory, selected.getId())){
+        if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory, selected.getId())){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
         String result = transactionService.updateTransaction(tf,selected.getUid(),UserContextService.getAccessToken());
         if(result == null){
-            WebUtil.addErrorMessage("更新失败，微服务调用异常，请稍后重试");
+            WebUtil.addErrorMessage("更新失败，请联系管理员");
             return;
         }
         // 保存新上传的图片关联（boUuid为null的是本次新上传的，需要关联到当前记录）
@@ -408,7 +408,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
-        if(checkRepetition(userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory)){
+        if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory)){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
