@@ -2956,10 +2956,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 OrgInfo orgInfo =(OrgInfo) selectedAccessOrgNode.getData();
                 selectedSiteList.add(orgInfo.getUid());
             }
-            filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
-            filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
+            filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
+            filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
+            filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, selectedSiteList, "1*5+"));
         }
         updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
