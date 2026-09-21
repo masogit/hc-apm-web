@@ -43,6 +43,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     @Getter @Setter
     private Integer times;
     @Getter @Setter
+    private String uid;
+    @Getter @Setter
     private String remark;
     @Getter @Setter
     private Integer tmCategory;
@@ -116,7 +118,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         hours= selected.getHours();
         times= selected.getTimes();
         remark=selected.getRemark();
-        times=selected.getTimes();
+        uid = selected.getUid();
         // 加载已有图片
         if(selected.getId()!=null){
             transactionImages = blobFileService.fetchBlobObject(selected.getId().toString(), V2_BlobObject.BO_TYPE_DeptTransactionLog, V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -383,7 +385,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
-        String result = transactionService.updateTransaction(tf,selected.getUid(),UserContextService.getAccessToken());
+        String result = transactionService.updateTransaction(tf,uid,UserContextService.getAccessToken());
         if(result == null){
             WebUtil.addErrorMessage("更新失败，请联系管理员");
             return;
