@@ -133,6 +133,13 @@ CREATE TABLE IF NOT EXISTS udid_registry_num_info
 );
 
 -- YHAAO-28998
+ALTER TABLE udid_registry_num_info
+    ADD COLUMN IF NOT EXISTS effective_date    text NULL,
+    ADD COLUMN IF NOT EXISTS agent_name        text NULL,
+    ADD COLUMN IF NOT EXISTS agent_address     text NULL,
+    ADD COLUMN IF NOT EXISTS agent_reg_address text NULL;
+
+-- YHAAO-28998
 CREATE TABLE IF NOT EXISTS udid_device_cube
 (
     registry_num    text NULL,
