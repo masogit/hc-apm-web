@@ -73,9 +73,9 @@ public Integer getCurrentMonth(){
 public String getDate(){
         String date = "";
         if(startTime == null){
-            date = DateUtils.format(new Date(),"yyyy-MM");
+            date = DateUtils.format(new Date(),"yyyy/MM");
         }else{
-            date = DateUtils.format(startTime,"yyyy-MM");
+            date = DateUtils.format(startTime,"yyyy/MM");
         }
     return date;
 }
