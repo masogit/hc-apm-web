@@ -344,7 +344,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             selectedItem.setInStockNo(inStockNo);
             selectedItem.setInStockUser(currentUser.getUid());
             selectedItem.setStockStatus(3);
-            updateAssetModify(selectedItem);
+            //updateAssetModify(selectedItem);
             AssetInStockRecord assetInStockRecord = new AssetInStockRecord();
             if (ObjectUtil.isNotEmpty(selectedItem.getArrivalList())) {
                 assetInStockRecord.setContractNum(selectedItem.getArrivalList().getContractNum());
@@ -426,6 +426,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             if (sciFunds != null && itemAssetInfo.getSciFunds() == null) {
                 itemAssetInfo.setSciFunds(sciFunds);
             }
+            assetInfoRepository.save(itemAssetInfo);
         }
     }
 
@@ -435,60 +436,37 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
             return;
         }
 
-        AssetStocked original = dao.findById(edited.getId());
+        AssetInfo original = assetInfoRepository.findByUid(edited.getAssetUid());
+        AssetInfo editedAssetInfo = edited.getAssetInfo();
+
         if (original == null) {
             return;
         }
 
-        String originalComments = original.getComments();
-        String editedComments = edited.getComments();
+        String editedComments = editedAssetInfo.getComments();
+        BigDecimal ownFunds = editedAssetInfo.getOwnFunds();
+        BigDecimal govtFunds = editedAssetInfo.getGovtFunds();
+        BigDecimal sciFunds = editedAssetInfo.getSciFunds();
+        String financingNum = editedAssetInfo.getFinancingNum();
 
-        if (!Objects.equals(originalComments, editedComments)) {
-            edited.getAssetInfo().setComments(editedComments);
+
+        boolean changed = false;
+        if (!Objects.equals(original.getComments(), editedComments)) {
+            changed = true;
         }
-
-        // 2. 处理资金同步：将当前编辑行的资金值同步到 selectedItems 中其他数据
-        AssetInfo editedAssetInfo = edited.getAssetInfo();
-        if (editedAssetInfo != null) {
-            BigDecimal ownFunds = editedAssetInfo.getOwnFunds();
-            BigDecimal govtFunds = editedAssetInfo.getGovtFunds();
-            BigDecimal sciFunds = editedAssetInfo.getSciFunds();
-
-            List<AssetInfo> assetInfosToSave = new ArrayList<>();
-            // 遍历 selectedItems，将资金同步到其他行（跳过当前编辑行）
-            for (AssetStocked item : selectedItems) {
-                if (item == edited || item.getId().equals(edited.getId())) {
-                    continue;
-                }
-
-                AssetInfo itemAssetInfo = item.getAssetInfo();
-                if (itemAssetInfo == null) {
-                    continue;
-                }
-
-                boolean changed = false;
-
-                // 自有资金：目标为 null 时才同步
-                if (ownFunds != null && itemAssetInfo.getOwnFunds() == null) {
-                    itemAssetInfo.setOwnFunds(ownFunds);
-                    changed = true;
-                }
-
-                // 财政拨款：目标为 null 时才同步
-                if (govtFunds != null && itemAssetInfo.getGovtFunds() == null) {
-                    itemAssetInfo.setGovtFunds(govtFunds);
-                    changed = true;
-                }
-
-                // 科教资金：目标为 null 时才同步
-                if (sciFunds != null && itemAssetInfo.getSciFunds() == null) {
-                    itemAssetInfo.setSciFunds(sciFunds);
-                    changed = true;
-                }
-            }
+        if (!Objects.equals(original.getOwnFunds(), ownFunds)) {
+            changed = true;
         }
-        //RequestContext.getCurrentInstance().update(":assetOutStockTab:GeneratedInStockForm:inStockDocList");
-
+        if (!Objects.equals(original.getGovtFunds(), govtFunds)) {
+            changed = true;
+        }
+        if (!Objects.equals(original.getSciFunds(), sciFunds)) {
+            changed = true;
+        }
+        if (!Objects.equals(original.getFinancingNum(), financingNum)) {
+            changed = true;
+        }
+        assetInfoRepository.save(editedAssetInfo);
     }
 
     public void prepareGeneratedOutStockDoc() {

@@ -160,113 +160,126 @@
                     </p:autoComplete>
                 </h:panelGroup>
             </p:panelGrid>
-            <p:dataTable id="inStockDocList" value="#{assetStockedController.selectedItems}" var="item" selectionMode="single" scrollable="false"
-                         lazy="true" paginator="true" rowKey="#{item.id}" rows="1000"  editable="true" widgetVar="inStockTable"
-                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
-                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                         emptyMessage="#{msg.noRecordFound}">
-              <!--  <p:ajax event="rowEdit" listener="#{assetStockedController.onRowEdit}" update=":assetOutStockTab:GeneratedInStockForm:inStockDocList"/>
-                <p:ajax event="rowEditCancel"  update=":growl"/>-->
+            <div style="max-height: 600px; overflow-y: auto; overflow-x: auto;">
+                <p:dataTable id="inStockDocList" value="#{assetStockedController.selectedItems}" var="item" selectionMode="single"
+                             lazy="true" paginator="true" rowKey="#{item.id}" editable="true" widgetVar="inStockTable"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"  scrollable="false" scrollHeight="400px"
+                             rows="10" emptyMessage="#{msg.noRecordFound}"   scrollRows="8"
+                             rowsPerPageTemplate="10,50,100,500" >
+                    <p:ajax event="rowEdit" listener="#{assetStockedController.onRowEdit}" update=":assetOutStockTab:GeneratedInStockForm:inStockDocList"/>
+                    <p:ajax event="rowEditCancel"  update=":growl"/>
+                    <p:column headerText="业务时间">
+                        <h:outputText value="#{item.businessDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.vendor}">
+                        <h:outputText value="#{item.arrivalList.vendor}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.financingNum}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{item.assetInfo.financingNum}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{item.assetInfo.financingNum}" required="true" />
+                            </f:facet>
+                        </p:cellEditor>
 
-                <p:column headerText="业务时间">
-                    <h:outputText value="#{item.businessDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="#{msg.vendor}">
-                    <h:outputText value="#{item.arrivalList.vendor}"/>
-                </p:column>
-                <p:column headerText="#{msg.financingNum}">
-                    <p:inputText value="#{item.assetInfo.financingNum}" required="true" />
-                </p:column>
-                <p:column headerText="#{msg.assetName}">
-                    <h:outputText value="#{item.arrivalList.assetName}"/>
-                </p:column>
-                <p:column headerText="#{msg.arrivalListContractNum}">
-                    <h:outputText value="#{item.arrivalList.contractNum}"/>
-                </p:column>
-                <p:column headerText="#{msg.functionType}">
-                    <h:outputText value="#{item.arrivalList.functionType}"/>
-                </p:column>
-                <p:column headerText="#{msg.comments}">
-                    <!--<p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{item.comments}">
-                            </h:outputText>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputText value="#{item.comments}" />
-                        </f:facet>
-                    </p:cellEditor>-->
-                    <p:inputText value="#{item.comments}" />
-                </p:column>
-                <p:column headerText="资产价值">
-                    <!--<p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{item.assetInfo.purchasePrice}">
-                                <f:convertNumber pattern="#,##0.00"/>
-                            </h:outputText>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputNumber value="#{item.assetInfo.purchasePrice}" decimalPlaces="2"/>
-                        </f:facet>
-                    </p:cellEditor>-->
-                    <p:inputNumber value="#{item.assetInfo.purchasePrice}" decimalPlaces="2"/>
-                </p:column>
-                <p:column headerText="自有资金" sortBy="#{item.assetInfo.ownFunds}" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}">
-                   <!-- <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{item.assetInfo.ownFunds}">
-                                <f:convertNumber pattern="#,##0.00"/>
-                            </h:outputText>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputNumber value="#{item.assetInfo.ownFunds}" decimalPlaces="2"/>
-                        </f:facet>
-                    </p:cellEditor>-->
-                    <p:inputNumber value="#{item.assetInfo.ownFunds}" decimalPlaces="2"/>
+                    </p:column>
+                    <p:column headerText="#{msg.assetName}">
+                        <h:outputText value="#{item.arrivalList.assetName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.arrivalListContractNum}">
+                        <h:outputText value="#{item.arrivalList.contractNum}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.functionType}">
+                        <h:outputText value="#{item.arrivalList.functionType}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.comments}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{item.assetInfo.comments}">
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{item.assetInfo.comments}" />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="资产价值">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{item.assetInfo.purchasePrice}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber value="#{item.assetInfo.purchasePrice}" decimalPlaces="2"/>
+                            </f:facet>
+                        </p:cellEditor>
+                        <!--<p:inputNumber value="#{item.assetInfo.purchasePrice}" decimalPlaces="2"/>-->
+                    </p:column>
+                    <p:column headerText="自有资金" sortBy="#{item.assetInfo.ownFunds}" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{item.assetInfo.ownFunds}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber value="#{item.assetInfo.ownFunds}" decimalPlaces="2"/>
+                            </f:facet>
+                        </p:cellEditor>
+                        <!-- <p:inputNumber value="#{item.assetInfo.ownFunds}" decimalPlaces="2"/>-->
+                    </p:column>
+                    <p:column headerText="财政拨款" sortBy="#{item.assetInfo.govtFunds}" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{item.assetInfo.govtFunds}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber value="#{item.assetInfo.govtFunds}" decimalPlaces="2"/>
+                            </f:facet>
+                        </p:cellEditor>
+                        <!-- <p:inputNumber value="#{item.assetInfo.govtFunds}" decimalPlaces="2"/>-->
+                    </p:column>
+                    <p:column headerText="科教资金" sortBy="#{item.assetInfo.sciFunds}" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{item.assetInfo.sciFunds}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber value="#{item.assetInfo.sciFunds}" decimalPlaces="2"/>
+                            </f:facet>
+                        </p:cellEditor>
+                        <!--<p:inputNumber value="#{item.assetInfo.sciFunds}" decimalPlaces="2"/>-->
+                    </p:column>
+                    <p:column headerText="#{msg.arrivalListInvoiceNum}">
+                        <h:outputText value="#{item.arrivalList.invoiceNum}"/>
+                    </p:column>
+                    <p:column headerText="发票日期">
+                        <h:outputText value="#{item.arrivalList.invoiceDate}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.stockStatus}">
+                        <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}"/>
+                    </p:column>
+                    <p:column style="width:6rem">
+                        <p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit" saveTitle="Save Row"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="batchButton" validateClient="false" immediate="true" icon="ui-icon-settings" oncomplete="PF('batchModifyFundsDialog').show()" class="btn btn-sm btn-gray batch-terminated" title="批量修改资金" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}"/>
+                    </f:facet>
+                </p:dataTable>
 
-                </p:column>
-                <p:column headerText="财政拨款" sortBy="#{item.assetInfo.govtFunds}" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}">
-                   <!-- <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{item.assetInfo.govtFunds}">
-                                <f:convertNumber pattern="#,##0.00"/>
-                            </h:outputText>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputNumber value="#{item.assetInfo.govtFunds}" decimalPlaces="2"/>
-                        </f:facet>
-                    </p:cellEditor>-->
-                    <p:inputNumber value="#{item.assetInfo.govtFunds}" decimalPlaces="2"/>
-                </p:column>
-                <p:column headerText="科教资金" sortBy="#{item.assetInfo.sciFunds}" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}">
-                    <!--<p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{item.assetInfo.sciFunds}">
-                                <f:convertNumber pattern="#,##0.00"/>
-                            </h:outputText>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputNumber value="#{item.assetInfo.sciFunds}" decimalPlaces="2"/>
-                        </f:facet>
-                    </p:cellEditor>-->
-                    <p:inputNumber value="#{item.assetInfo.sciFunds}" decimalPlaces="2"/>
-                </p:column>
-                <p:column headerText="#{msg.arrivalListInvoiceNum}">
-                    <h:outputText value="#{item.arrivalList.invoiceNum}"/>
-                </p:column>
-                <p:column headerText="发票日期">
-                    <h:outputText value="#{item.arrivalList.invoiceDate}"/>
-                </p:column>
-                <p:column headerText="#{msg.stockStatus}">
-                    <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}"/>
-                </p:column>
-
-                <f:facet name="{Toolbar}">
-                    <p:commandButton id="batchButton" validateClient="false" immediate="true" icon="ui-icon-settings" oncomplete="PF('batchModifyFundsDialog').show()" class="btn btn-sm btn-gray batch-terminated" title="批量修改资金" rendered="#{assetStockedController.enableShowSourceFunds eq 'true'}"/>
-                </f:facet>
-            </p:dataTable>
+            </div>
             <p:commandButton validateClient="true" action="#{assetStockedController.generatedInStockDoc()}" rendered="#{!assetStockedController.inStock}"
                              value="#{msg.Confirm}" update=":assetOutStockTab:GeneratedInStockForm :assetOutStockTab:AssetStockedManageListForm:datalist" icon="ui-icon-check"
                              oncomplete="handleSubmit(args, 'GeneratedInStockDocDialog');"/>
