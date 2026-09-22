@@ -10,7 +10,7 @@
     <div class="ui-g-12 card">
         <h:form id="searchForm" class="searchForm">
             <h:panelGroup>
-               <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1" for="#{workOrderMgrController.siteFor}" hideEffect="fade" dynamic="false" modal="false" >
+               <p:overlayPanel appendTo="searchForm" widgetVar="varPanelOrg1"  id="varPanelOrg1" for="#{workOrderMgrController.siteFor}" hideEffect="fade" dynamic="false" modal="false" >
                     <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab:searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByNameType4()}" value="#{msg.Search}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="woTab:searchForm:treeNodeNameFilter @this" update="woTab" value="确定"/>
@@ -33,7 +33,7 @@
             <h:panelGroup id="myWorkOrderPanel"
                           rendered="#{userContextService.hasRole('AssetHead')}">
                 <p:selectBooleanCheckbox value="#{workOrderMgrController.myWorkOrder}" itemLabel="我的工单">
-                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist filterApplyTimePanel" process="@this"/>
+                    <p:ajax listener="#{workOrderMgrController.onMyWorkOrderToggle}" update="buttonSet datalist filterApplyTimePanel woTab" process="@this"/>
                 </p:selectBooleanCheckbox>
             </h:panelGroup>
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
@@ -502,14 +502,14 @@
             <h:panelGroup id="display1">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup>
-                        <label class="label">#{msg.deviceStatus}*</label>
+                        <label class="label">#{msg.deviceStatus}<span style="color:red">*</span></label>
                         <p:selectOneMenu value="#{workOrderMgrController.assetStatus}" >
                             <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                             <f:selectItems value="#{assetInfoEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup >
-                        <label class="label">#{msg.cancelWorkOrderReason}</label>
+                        <label class="label">#{msg.cancelWorkOrderReason}<span style="color:red">*</span></label>
                         <p:inputTextarea value="#{workOrderMgrController.cancelReason}" maxlength="256"  required="true" requiredMessage="#{msg.cancelWorkOrderReason}#{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>

@@ -1,16 +1,15 @@
 package com.ge.apm.view.transaction;
 
+import com.alibaba.excel.util.DateUtils;
 import com.ge.apm.domain.DeptTransactionLog;
 import com.ge.apm.service.transaction.TransactionService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TimeForm;
-import com.ge.apm.web.TransactionForm;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.tabview.TabView;
-import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -18,7 +17,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @ManagedBean
 @ViewScoped
@@ -67,6 +69,15 @@ public class DepTranSummaryController  implements Serializable{
 
 public Integer getCurrentMonth(){
     return  TimeUtils.getMonthNumber(startTime);
+}
+public String getDate(){
+        String date = "";
+        if(startTime == null){
+            date = DateUtils.format(new Date(),"yyyy/MM");
+        }else{
+            date = DateUtils.format(startTime,"yyyy/MM");
+        }
+    return date;
 }
 
    /* public List<DeptTransactionLog> refreshLoadData(){

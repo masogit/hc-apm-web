@@ -43,6 +43,8 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     @Getter @Setter
     private Integer times;
     @Getter @Setter
+    private String uid;
+    @Getter @Setter
     private String remark;
     @Getter @Setter
     private Integer tmCategory;
@@ -116,7 +118,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         hours= selected.getHours();
         times= selected.getTimes();
         remark=selected.getRemark();
-        times=selected.getTimes();
+        uid = selected.getUid();
         // 加载已有图片
         if(selected.getId()!=null){
             transactionImages = blobFileService.fetchBlobObject(selected.getId().toString(), V2_BlobObject.BO_TYPE_DeptTransactionLog, V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -352,7 +354,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         selected.setHours(hours);
         selected.setCategory(tmCategory);
         selected.setTimes(times);
-        if(checkRepetition(userContextService.getLoginUser().getLoginName(),startTime,tmCategory, selected.getId())){
+        if(checkRepetition(userContextService.getLoginUser().getName(),startTime,tmCategory, selected.getId())){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
@@ -365,33 +367,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     }
 
     public boolean checkRepetition(String authorName,Date date,Integer category, Integer excludeId){
-        Date normalizedDate = normalizeToGMT8Midnight(date);
         // 重复校验：姓名 + 日期 + 类别 三者一致即为重复
         if (excludeId != null) {
-            return deptDao.existsByAuthorNameAndDateAndCategoryExcludeId(authorName, normalizedDate, category, excludeId) > 0;
+            return deptDao.existsByAuthorNameAndDateAndCategoryExcludeId(authorName, date, category, excludeId) > 0;
         }
-        return deptDao.existsByAuthorNameAndDateAndCategory(authorName, normalizedDate, category) > 0;
+        return deptDao.existsByAuthorNameAndDateAndCategory(authorName, date, category) > 0;
     }
 
-    /**
-     * 将日期归一化：先从 GMT+8 提取日期组件（年月日），再用 JVM 默认时区构造午夜 Date。
-     * 确保无论服务器时区如何，JDBC 绑定到 SQL DATE 时提取的日期组件与 GMT+8 一致。
-     * 例如：用户选 2026-09-17，无论 JVM 是 UTC 还是 GMT+8，最终 Date 在各自时区下都是 2026-09-17 00:00
-     */
-    private Date normalizeToGMT8Midnight(Date date) {
-        if (date == null) return null;
-        // 1. 从 GMT+8 提取正确的日期组件
-        Calendar gmt8Cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
-        gmt8Cal.setTime(date);
-        int year = gmt8Cal.get(Calendar.YEAR);
-        int month = gmt8Cal.get(Calendar.MONTH);
-        int day = gmt8Cal.get(Calendar.DAY_OF_MONTH);
-        // 2. 用 JVM 默认时区构造午夜 Date，确保 JDBC 转换 SQL DATE 时提取到相同的日期组件
-        Calendar jvmCal = Calendar.getInstance();
-        jvmCal.clear();
-        jvmCal.set(year, month, day, 0, 0, 0);
-        return jvmCal.getTime();
-    }
     public void locUpdateTransactionbyLink(){
         TransactionForm tf = new TransactionForm();
         tf.setCategory(tmCategory);
@@ -399,13 +381,13 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setHours(hours);
         tf.setTimes(times);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
-        if(checkRepetition(userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory, selected.getId())){
+        if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory, selected.getId())){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
-        String result = transactionService.updateTransaction(tf,selected.getUid(),UserContextService.getAccessToken());
+        String result = transactionService.updateTransaction(tf,uid,UserContextService.getAccessToken());
         if(result == null){
-            WebUtil.addErrorMessage("更新失败，微服务调用异常，请稍后重试");
+            WebUtil.addErrorMessage("更新失败，请联系管理员");
             return;
         }
         // 保存新上传的图片关联（boUuid为null的是本次新上传的，需要关联到当前记录）
@@ -428,8 +410,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
-        log.info("重复数据校验参数 name{},date{},category{}",userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory);
-        if(checkRepetition(userContextService.getLoginUser().getLoginName(),upStartTime,tmCategory)){
+        if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory)){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
         }
@@ -450,7 +431,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             // 回退：从本地DB查询最新创建的记录
             if(newIdStr == null){
                 DeptTransactionLog latest = deptDao.findLatestByAuthorNameAndDateAndCategory(
-                    userContextService.getLoginUser().getLoginName(), normalizeToGMT8Midnight(upStartTime), tmCategory);
+                    userContextService.getLoginUser().getLoginName(), upStartTime, tmCategory);
                 if(latest != null && latest.getId() != null){
                     newIdStr = latest.getId().toString();
                 }
@@ -486,8 +467,6 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
     public void onSelectSummary(TransactionStatis transactionStatis){
         System.out.println(transactionStatis);
     }*/
-
-
 
 
 
@@ -571,7 +550,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                         errors.add("第" + (i + 1) + "行: 姓名不存在，已跳过");
                         continue;
                     }
-                    if (!Objects.equals(byName.getSiteId(),currentUser.getSiteId())) {
+                    if (!Objects.equals(byName.getSiteUID(),currentUser.getSiteUID())) {
                         errors.add("第" + (i + 1) + "行: 不是同一个院区，已跳过");
                         continue;
                     }
@@ -582,9 +561,6 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                         errors.add("第" + (i + 1) + "行: 日期格式不正确，已跳过");
                         continue;
                     }
-                    // 归一化日期，避免服务器时区不同导致查询/存储日期偏差
-                    date = normalizeToGMT8Midnight(date);
-
                     // 读取类别（显示值）并转换为码值
                     String categoryName = getCellStringValue(row.getCell(categoryIdx));
                     if (categoryName == null || categoryName.trim().isEmpty()) {

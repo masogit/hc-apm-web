@@ -16,6 +16,9 @@
         <result property="registryNum" column="registry_num" jdbcType="VARCHAR"/>
         <result property="registrantName" column="registrant_name" jdbcType="VARCHAR"/>
         <result property="registrantAddress" column="registrant_address" jdbcType="VARCHAR"/>
+        <result property="agentName" column="agent_name" jdbcType="VARCHAR"/>
+        <result property="agentAddress" column="agent_address" jdbcType="VARCHAR"/>
+        <result property="agentRegAddress" column="agent_reg_address" jdbcType="VARCHAR"/>
         <result property="productionAddress" column="production_address" jdbcType="VARCHAR"/>
         <result property="productName" column="product_name" jdbcType="VARCHAR"/>
         <result property="managementCategory" column="management_category" jdbcType="VARCHAR"/>
@@ -28,27 +31,50 @@
         <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
         <result property="approvalDept" column="approval_dept" jdbcType="VARCHAR"/>
         <result property="approvalDate" column="approval_date" jdbcType="VARCHAR"/>
+        <result property="effectiveDate" column="effective_date" jdbcType="VARCHAR"/>
         <result property="validPeriod" column="valid_period" jdbcType="VARCHAR"/>
         <result property="changes" column="changes" jdbcType="VARCHAR"/>
         <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
         <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
-        registry_no
-        ,qxlb,cplb,cpmctymc,ggxh,flbm,
-        id,db_id,registry_num,registrant_name,registrant_address,
-        production_address,product_name,management_category,model_spec,structure_composition,
-        scope_of_use,storage_conditions,attachments,other_content,remarks,
-        approval_dept,approval_date,valid_period,changes,created_at,
-        updated_at
-    </sql>
-
     <select id="selectByRegistryNum" resultType="com.ge.apm.domain.UdidRegistryNumInfo">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM udid_registry_num_info where registry_num = #{registryNum}
-        ORDER BY updated_at DESC
-        LIMIT 1
+        SELECT ta.registry_no,
+               ta.qxlb,
+               ta.cplb,
+               ta.cpmctymc,
+               ta.ggxh,
+               ta.flbm,
+               ta.id,
+               ta.db_id,
+               ta.registry_num,
+               ta.registrant_name,
+               ta.registrant_address,
+               ta.agent_name,
+               ta.agent_address,
+               ta.agent_reg_address,
+               ta.production_address,
+               ta.product_name,
+               ta.management_category,
+               ta.model_spec,
+               ta.structure_composition,
+               ta.scope_of_use,
+               ta.storage_conditions,
+               ta.attachments,
+               ta.other_content,
+               ta.remarks,
+               ta.approval_dept,
+               ta.approval_date,
+               ta.effective_date,
+               ta.valid_period,
+               ta.changes,
+               tb.is_registration,
+               tb.is_domestic,
+               ta.created_at,
+               ta.updated_at
+        FROM udid_registry_num_info AS ta
+                 LEFT JOIN udid_db AS tb ON ta.db_id = tb.id
+        where registry_num = #{registryNum}
+        ORDER BY updated_at DESC LIMIT 1
     </select>
 </mapper>

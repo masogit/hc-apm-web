@@ -463,6 +463,16 @@ public class AssetHistoryService {
         mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
 
+    public void saveAssetHistory(AssetInfo newAsset) {
+        MqContext mqContext = new MqContext();
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetInfoEditController");
+        mqContext.setMethodName("applyChange");
+        mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
+        mqContext.setModifySource(ModifySourceEnum.LEDGER_EDIT.getCode());
+        mqUtils.sendAssetToMQ(newAsset, UserContextService.getCurrentUserAccount(), mqContext);
+    }
+
     public  <T> T depCopy(T srcList) {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         try {

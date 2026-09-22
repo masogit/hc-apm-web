@@ -54,13 +54,13 @@
                         <h:outputText value="#{img.objectName}"/>
                     </p:column>
                     <p:column headerText="操作" width="50">
-                        <p:commandButton icon="ui-icon-delete" title="删除" actionListener="#{depTranDetailController.removeImage(img)}" update=":deptTransactionForm:tranTabView:newDefTranManForm:newImagePanel" process="@this" class="popupIconButton"/>
+                        <p:commandButton icon="ui-icon-delete" title="删除" actionListener="#{depTranDetailController.removeImage(img)}" update="@form:newImagePanel" process="@this" class="popupIconButton"/>
                     </p:column>
                 </p:dataTable>
                 <p:fileUpload id="newImgUpload" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/"
                               fileUploadListener="#{depTranDetailController.handleImageUpload}" mode="advanced"
                               dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="10000000"
-                              update=":deptTransactionForm:tranTabView:newDefTranManForm:newImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
+                              update="@form:newImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
                               invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="文件大小不超过10M" label="添加图片"/>
             </h:panelGroup>
            <h:panelGroup >
@@ -119,13 +119,13 @@
                         <h:outputText value="#{img.objectName}"/>
                     </p:column>
                     <p:column headerText="操作" width="50">
-                        <p:commandButton icon="ui-icon-delete" title="删除" actionListener="#{depTranDetailController.removeImage(img)}" update=":deptTransactionForm:tranTabView:updateDefTranManForm:updateImagePanel" process="@this" class="popupIconButton"/>
+                        <p:commandButton icon="ui-icon-delete" title="删除" actionListener="#{depTranDetailController.removeImage(img)}" update="@form:updateImagePanel" process="@this" class="popupIconButton"/>
                     </p:column>
                 </p:dataTable>
                 <p:fileUpload id="updateImgUpload" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/"
                               fileUploadListener="#{depTranDetailController.handleImageUpload}" mode="advanced"
                               dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="20000000"
-                              update=":deptTransactionForm:tranTabView:updateDefTranManForm:updateImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
+                              update="@form:updateImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
                               invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="文件大小不超过20M" label="添加图片"/>
             </h:panelGroup>
 

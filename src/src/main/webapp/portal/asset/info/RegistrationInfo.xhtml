@@ -9,7 +9,7 @@
 <ui:composition>
     <h:form id="RegistrationInfoForm">
         <p:panel header="&quot;#{assetInfoDetailController.selected.registrationInfo.registryNum}&quot;&nbsp;基本信息">
-            <p:panelGrid layout="tabular" style="width: 100%;" rendered="#{assetInfoDetailController.renderRegistration()}">
+            <p:panelGrid layout="tabular" style="width: 100%;" rendered="#{assetInfoDetailController.selected.registrationInfo.registration}">
                 <p:row>
                     <p:column style="width: 20%; text-align: right">注册证编号</p:column>
                     <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registryNum}</p:column>
@@ -25,6 +25,14 @@
                 <p:row>
                     <p:column style="text-align: right">生产地址</p:column>
                     <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.productionAddress}</p:column>
+                </p:row>
+                <p:row rendered="#{not assetInfoDetailController.selected.registrationInfo.domestic}">
+                    <p:column style="text-align: right">代理人名称</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.agentName}</p:column>
+                </p:row>
+                <p:row rendered="#{not assetInfoDetailController.selected.registrationInfo.domestic}">
+                    <p:column style="text-align: right">代理人住所</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.agentAddress}</p:column>
                 </p:row>
                 <p:row>
                     <p:column style="text-align: right">产品名称</p:column>
@@ -70,10 +78,10 @@
                     <p:column style="text-align: right">批准日期</p:column>
                     <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.approvalDate}</p:column>
                 </p:row>
-<!--                <p:row>-->
-<!--                    <p:column style="text-align: right">生效日期</p:column>-->
-<!--                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.approvalDate}</p:column>-->
-<!--                </p:row>-->
+                <p:row>
+                    <p:column style="text-align: right">生效日期</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.effectiveDate}</p:column>
+                </p:row>
                 <p:row>
                     <p:column style="text-align: right">有效期至</p:column>
                     <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.validPeriod}</p:column>
@@ -83,7 +91,7 @@
                     <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.changes}</p:column>
                 </p:row>
             </p:panelGrid>
-            <p:panelGrid layout="tabular" style="width: 100%;" rendered="#{assetInfoDetailController.renderFiling()}">
+            <p:panelGrid layout="tabular" style="width: 100%;" rendered="#{not assetInfoDetailController.selected.registrationInfo.registration}">
                 <p:row>
                     <p:column style="width: 20%; text-align: right">备案号</p:column>
                     <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.registryNum}</p:column>
@@ -99,6 +107,14 @@
                 <p:row>
                     <p:column style="text-align: right">生产地址</p:column>
                     <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.productionAddress}</p:column>
+                </p:row>
+                <p:row rendered="#{not assetInfoDetailController.selected.registrationInfo.domestic}">
+                    <p:column style="text-align: right">代理人</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.agentName}</p:column>
+                </p:row>
+                <p:row rendered="#{not assetInfoDetailController.selected.registrationInfo.domestic}">
+                    <p:column style="text-align: right">代理人注册地址</p:column>
+                    <p:column style="text-align: left">#{assetInfoDetailController.selected.registrationInfo.agentRegAddress}</p:column>
                 </p:row>
                 <p:row>
                     <p:column style="text-align: right">产品名称/产品分类名称</p:column>

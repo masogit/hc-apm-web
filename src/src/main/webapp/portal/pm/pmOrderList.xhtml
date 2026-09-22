@@ -33,7 +33,7 @@
         <h:form id="pmOrderListForm">
             <h:panelGroup id="myPmOrderPanel" rendered="#{userContextService.hasRole('AssetHead')}">
                 <p:selectBooleanCheckbox value="#{v2PmOrderController.myPmOrder}" itemLabel="我的工单">
-                    <p:ajax listener="#{v2PmOrderController.onMyPmOrderToggle}" update="buttonSet datalist" process="@this"/>
+                    <p:ajax listener="#{v2PmOrderController.onMyPmOrderToggle}" update="buttonSet datalist pmTab :pmTab:idPanelFilterPlannedCompletionTime :pmTab:idPanelFilterActualCompletionTime" process="@this"/>
                 </p:selectBooleanCheckbox>
             </h:panelGroup>
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
