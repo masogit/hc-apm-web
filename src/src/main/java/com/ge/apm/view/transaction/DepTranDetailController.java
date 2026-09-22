@@ -231,6 +231,14 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         }
     }
 
+    public boolean hasViewImages(DeptTransactionLog item) {
+        if (item != null && item.getId() != null) {
+            List<V2_BlobObject> images = blobFileService.fetchBlobObject(item.getId().toString(), V2_BlobObject.BO_TYPE_DeptTransactionLog, V2_BlobObject.BO_SUB_TYPE_IMG);
+            return images != null && !images.isEmpty();
+        }
+        return false;
+    }
+
     public String getImageBase64(String objectStorageId) {
         return blobFileService.getImgBase64(objectStorageId);
     }
