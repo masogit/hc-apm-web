@@ -389,6 +389,10 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setHours(hours);
         tf.setTimes(times);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
+        if(transactionImages!=null && transactionImages.size()>=5){
+            WebUtil.addErrorMessage("最多上传5张图片");
+            return;
+        }
         if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory, selected.getId())){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
@@ -418,6 +422,10 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
+        if(transactionImages!=null && transactionImages.size()>=5){
+            WebUtil.addErrorMessage("最多上传5张图片");
+            return;
+        }
         if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory)){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
