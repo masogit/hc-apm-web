@@ -1146,7 +1146,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'govtFunds')}" >
         <h:panelGroup>
             <label class="label">#{msg.GovtFunds}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['govtFunds'].required? '*':''}</span></label>
-            <p:inputNumber minValue="0" decimalPlaces="2" id="govtFunds" value="#{assetInfoEditController.selected.ownFunds}" required="#{assetInfoEditController.customConfig.assetFields['govtFunds'].required}"
+            <p:inputNumber minValue="0" decimalPlaces="2" id="govtFunds" value="#{assetInfoEditController.selected.govtFunds}" required="#{assetInfoEditController.customConfig.assetFields['govtFunds'].required}"
                            requiredMessage="#{msg.GovtFunds} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('govtFunds')}" >
                 <p:ajax />
             </p:inputNumber>
@@ -1155,7 +1155,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'sciFunds')}" >
         <h:panelGroup>
             <label class="label">#{msg.SciFunds}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['sciFunds'].required? '*':''}</span></label>
-            <p:inputNumber minValue="0" decimalPlaces="2" id="sciFunds" value="#{assetInfoEditController.selected.ownFunds}" required="#{assetInfoEditController.customConfig.assetFields['sciFunds'].required}"
+            <p:inputNumber minValue="0" decimalPlaces="2" id="sciFunds" value="#{assetInfoEditController.selected.sciFunds}" required="#{assetInfoEditController.customConfig.assetFields['sciFunds'].required}"
                            requiredMessage="#{msg.SciFunds} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('sciFunds')}" >
                 <p:ajax />
             </p:inputNumber>
