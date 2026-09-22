@@ -601,6 +601,12 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                     if (remarkIdx != null) {
                         remark = getCellStringValue(row.getCell(remarkIdx));
                     }
+                    if (remark != null && remark.trim().isEmpty()) {
+                        remark = null;
+                    } else if (remark != null && remark.length() > 256) {
+                        remark = remark.substring(0, 256);
+                        log.info("科务管理触发备注触发截取");
+                    }
                     DeptTransactionLog deptTransactionLog = new DeptTransactionLog();
                     deptTransactionLog.setAuthorId(currentUser.getId());
                     deptTransactionLog.setAuthorLogin(currentUser.getLoginName());
