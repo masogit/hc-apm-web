@@ -55,6 +55,7 @@
                     </p:column>
                     <p:column headerText="图片" width="60" exportable="false">
                         <p:commandButton icon="ui-icon-image" title="查看图片"
+                                         rendered="#{depTranDetailController.hasViewImages(item2)}"
                                          actionListener="#{depTranDetailController.loadViewImages(item2)}"
                                          update=":deptTransactionForm:tranTabView:viewImagePanel"
                                          oncomplete="PF('viewImageDlg').show()"

@@ -231,6 +231,14 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         }
     }
 
+    public boolean hasViewImages(DeptTransactionLog item) {
+        if (item != null && item.getId() != null) {
+            List<V2_BlobObject> images = blobFileService.fetchBlobObject(item.getId().toString(), V2_BlobObject.BO_TYPE_DeptTransactionLog, V2_BlobObject.BO_SUB_TYPE_IMG);
+            return images != null && !images.isEmpty();
+        }
+        return false;
+    }
+
     public String getImageBase64(String objectStorageId) {
         return blobFileService.getImgBase64(objectStorageId);
     }
@@ -381,6 +389,10 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setHours(hours);
         tf.setTimes(times);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
+        if(transactionImages!=null && transactionImages.size()>=5){
+            WebUtil.addErrorMessage("最多上传5张图片");
+            return;
+        }
         if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory, selected.getId())){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
@@ -410,6 +422,10 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
+        if(transactionImages!=null && transactionImages.size()>=5){
+            WebUtil.addErrorMessage("最多上传5张图片");
+            return;
+        }
         if(checkRepetition(userContextService.getLoginUser().getName(),upStartTime,tmCategory)){
             WebUtil.addErrorMessage("重复数据，请检查");
             return;
