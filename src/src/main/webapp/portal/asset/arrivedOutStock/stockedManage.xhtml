@@ -160,7 +160,7 @@
                     </p:autoComplete>
                 </h:panelGroup>
             </p:panelGrid>
-            <div style="max-height: 600px; overflow-y: auto; overflow-x: auto;">
+            <div style="max-height: 550px; overflow-y: auto; overflow-x: auto;">
                 <p:dataTable id="inStockDocList" value="#{assetStockedController.selectedItems}" var="item" selectionMode="single"
                              lazy="true" paginator="true" rowKey="#{item.id}" editable="true" widgetVar="inStockTable"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
@@ -271,7 +271,7 @@
                     <p:column headerText="#{msg.stockStatus}">
                         <h:outputText value="#{fieldMsg.fieldValue('stockStatus',item.stockStatus)}"/>
                     </p:column>
-                    <p:column style="width:6rem">
+                    <p:column headerText="操作" style="width:6rem">
                         <p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit" saveTitle="Save Row"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
@@ -358,7 +358,7 @@
                     </p:overlayPanel>
                 </h:panelGroup>
             </p:panelGrid>
-            <div style="max-height: 620px; overflow-y: auto; overflow-x: auto;">
+            <div style="max-height: 550px; overflow-y: auto; overflow-x: auto;">
                 <p:dataTable id="outStockDocList" value="#{assetStockedController.selectedItems}" var="item"
                              lazy="false" paginator="true" rowKey="#{item.id}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
