@@ -76,7 +76,7 @@
             and r.request_time >= #{requestTimeGTE}
         </if>
         <if test="requestTimeLTE != null">
-            and r.request_time <![CDATA[<]]>= #{requestTimeLTE}
+            and r.request_time <![CDATA[<=]]> #{requestTimeLTE}
         </if>
         <if test="siteUidList != null">
             and (w.site_uid IN
