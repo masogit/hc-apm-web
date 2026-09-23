@@ -140,23 +140,25 @@
                     </p:commandButton>
                 </f:facet>
             </p:dataTable>
+
+            <h:panelGroup id="filterApplyTimePanel">
+            <p:overlayPanel  widgetVar="panelFilterApplyTime" for="woTab:woAllMgrListForm:datalist:filterApplyTime" dismissable="false" appendTo="@(body)">
+                <h:panelGrid columns="2">
+                    <p:outputLabel for="cal11" />
+                    <p:calendar id="cal11" widgetVar="varApplyTimeFrom" effect="fold" value="#{workOrderUnifiedController.applyTimeFrom}"
+                                pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                    <p:outputLabel for="cal22"/>
+                    <p:calendar id="cal22" widgetVar="varApplyTimeTo" effect="fold"
+                                pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                </h:panelGrid>
+                <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+            </p:overlayPanel>
+            </h:panelGroup>
         </h:form>
 
         <ui:include src="woMgrUnifiedView.xhtml"/>
         <ui:include src="woMgrMvsUnifiedView.xhtml"/>
-
-        <p:overlayPanel  widgetVar="panelFilterApplyTime" for="woTab:woAllMgrListForm:datalist:filterApplyTime" dismissable="false">
-            <h:panelGrid columns="2">
-                <p:outputLabel for="cal11" />
-                <p:calendar id="cal11" widgetVar="varApplyTimeFrom" effect="fold" value="#{workOrderUnifiedController.applyTimeFrom}"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
-                <p:outputLabel for="cal22"/>
-                <p:calendar id="cal22" widgetVar="varApplyTimeTo" effect="fold"
-                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
-            </h:panelGrid>
-            <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
-        </p:overlayPanel>
     </div>
 
 
