@@ -30,6 +30,7 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	private Boolean checkValue=Boolean.TRUE;
 	private Date dateValue;
 	private Boolean required;
+	private Boolean defaultPowerOn;
 	public String getId() {
 		return id;
 	}
@@ -196,5 +197,16 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 
 	public void setRequired(Boolean required) {
 		this.required = required;
+	}
+
+	public Boolean getDefaultPowerOn() {
+		if(defaultPowerOn == null){
+			defaultPowerOn = Boolean.FALSE;
+		}
+		return defaultPowerOn;
+	}
+
+	public void setDefaultPowerOn(Boolean defaultPowerOn) {
+		this.defaultPowerOn = defaultPowerOn;
 	}
 }
