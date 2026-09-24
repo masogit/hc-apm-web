@@ -23,6 +23,9 @@
 						<p:column headerText="备注">
 							<h:outputText value="#{item.description}" />
 						</p:column>
+						<p:column headerText="是否默认开机操作">
+							<h:outputText value="#{item.defaultPowerOn ? '是' : '否'}" />
+						</p:column>
 						<p:column headerText="#{msg.Actions}">
 							<p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" update=":checkItemCreateDlg"
 								oncomplete="PF('checkItemCreateDlg').show()" rendered="#{empty item.name}" />
@@ -59,6 +62,10 @@
 					<h:panelGroup>
 						<label>备注：</label>
 						<p:inputText id="description" value="#{maintainConfigJNController.objCheckItem.description}" />
+					</h:panelGroup>
+					<h:panelGroup>
+						<label>是否默认开机操作：</label>
+						<p:selectBooleanCheckbox value="#{maintainConfigJNController.objCheckItem.defaultPowerOn}" />
 					</h:panelGroup>
 				</p:panelGrid>
 				<p:commandButton validateClient="true" actionListener="#{maintainConfigJNController.saveCheckListItem}"
