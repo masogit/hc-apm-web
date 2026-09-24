@@ -84,6 +84,9 @@
                         </f:facet>
                         <h:outputText value="#{measureAssetListController.getOrgInfoByUid(item.assetDeptUID).name}"/>
                     </p:column>
+                    <p:column headerText="#{msg.measuringOwnerName}" filterBy="#{item.measuringOwnerName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.measuringOwnerName}"/>
+                    </p:column>
                     <p:column headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}"/>
                         <f:facet name="filter">
