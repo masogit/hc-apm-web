@@ -59,7 +59,7 @@
                 </p:dataTable>
                 <p:fileUpload id="newImgUpload" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/"
                               fileUploadListener="#{depTranDetailController.handleImageUpload}" mode="advanced"
-                              dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="10000000"
+                              dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="10000000"
                               update="@form:newImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
                               invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="文件大小不超过10M" label="添加图片"/>
             </h:panelGroup>
@@ -124,7 +124,7 @@
                 </p:dataTable>
                 <p:fileUpload id="updateImgUpload" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/"
                               fileUploadListener="#{depTranDetailController.handleImageUpload}" mode="advanced"
-                              dragDropSupport="false" style="width:100%" multiple="true" sizeLimit="20000000"
+                              dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="20000000"
                               update="@form:updateImagePanel" auto="true" disabled="#{depTranDetailController.imageUploadDisabled}"
                               invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="文件大小不超过20M" label="添加图片"/>
             </h:panelGroup>
