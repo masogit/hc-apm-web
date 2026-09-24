@@ -107,15 +107,6 @@
         <h:outputText value="#{item.functionType}" />
     </p:column>
 
-    <!-- 修改人 contains-->
-    <p:column headerText="#{msg.ModifiedBy}" width="80" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
-        <h:outputText value="#{item.createdBy}"/>
-    </p:column>
-
-    <!-- 修改来源 -->
-    <p:column headerText="修改来源" width="100">
-        <h:outputText value="#{item.modifySource}"/>
-    </p:column>
 
     <p:column headerText="#{msg.spare06}" width="130"
               rendered="#{currentCustomConfigController.showImportantField('spare06')}">
@@ -227,6 +218,15 @@
         <h:outputText value="#{item.createdDate}">
             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
         </h:outputText>
+    </p:column>
+    <!-- 修改人 contains-->
+    <p:column headerText="#{msg.ModifiedBy}" width="80" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
+        <h:outputText value="#{item.createdBy}"/>
+    </p:column>
+
+    <!-- 修改来源 -->
+    <p:column headerText="修改来源" width="100">
+        <h:outputText value="#{item.modifySource}"/>
     </p:column>
 
     <!-- 导出文件 -->
