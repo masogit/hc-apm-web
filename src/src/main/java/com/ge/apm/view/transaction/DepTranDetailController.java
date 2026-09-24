@@ -309,7 +309,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         return tranList;
     }
     public void handleImageUpload(FileUploadEvent event) {
-        if(transactionImages!=null && transactionImages.size()>=5){
+        if(transactionImages!=null && transactionImages.size()>5){
             WebUtil.addErrorMessage("最多上传5张图片");
             return;
         }
@@ -389,7 +389,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setHours(hours);
         tf.setTimes(times);
         tf.setDate(TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS"));
-        if(transactionImages!=null && transactionImages.size()>=5){
+        if(transactionImages!=null && transactionImages.size()>5){
             WebUtil.addErrorMessage("最多上传5张图片");
             return;
         }
@@ -422,7 +422,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
         tf.setTimes(times);
         String date= TimeUtils.getStrYHMS(upStartTime,"YYYYMMDDHHMMSS");
         tf.setDate(date);
-        if(transactionImages!=null && transactionImages.size()>=5){
+        if(transactionImages!=null && transactionImages.size()>5){
             WebUtil.addErrorMessage("最多上传5张图片");
             return;
         }
