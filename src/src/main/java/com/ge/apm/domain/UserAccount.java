@@ -689,7 +689,7 @@ public class UserAccount implements ChineseName, Serializable {
 		if (userRoleNames == null) {
 			userRoleNames = new ArrayList<>();
 			for (UserRole userRole : userRoleList) {
-				if(userRole.getRoleType() == 0){
+				if(Objects.equals(userRole.getRoleType(), 0)){
 					userRoleNames.add(userRole.getRole().getName());
 				}
 			}
@@ -705,9 +705,9 @@ public class UserAccount implements ChineseName, Serializable {
 
 			//add mvs role
 			if (this.getMvsRoleType() != null) {
-				if (this.getMvsRoleType() == 1 || this.getMvsRoleType() == 3) {
+				if (Objects.equals(this.getMvsRoleType(), 1) || Objects.equals(this.getMvsRoleType(), 3)) {
 					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_ADMIN);
-				} else if (this.getMvsRoleType() == 2) {
+				} else if (Objects.equals(this.getMvsRoleType(), 2)) {
 					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_FE);
 				}
 			} else {
@@ -979,15 +979,15 @@ public class UserAccount implements ChineseName, Serializable {
 		OrgInfo parentOrg = org;
 		String name="";
 		while (parentOrg != null) {
-			if (parentOrg.getOrgType() == 0) {
+			if (Objects.equals(parentOrg.getOrgType(), 0)) {
 				setTenantName(parentOrg.getName());
-			} else if (parentOrg.getOrgType() == 1) {
+			} else if (Objects.equals(parentOrg.getOrgType(), 1)) {
 				setInstitutionName(parentOrg.getName());
-			} else if (parentOrg.getOrgType() == 2) {
+			} else if (Objects.equals(parentOrg.getOrgType(), 2)) {
 				setHospitalName(parentOrg.getName());
-			} else if (parentOrg.getOrgType() == 3) {
+			} else if (Objects.equals(parentOrg.getOrgType(), 3)) {
 				setSiteName(parentOrg.getName());
-			} else if (parentOrg.getOrgType() == 4) {
+			} else if (Objects.equals(parentOrg.getOrgType(), 4)) {
 				if(StringUtils.isEmpty(departName)){
 					String tempDepartName=parentOrg.getName();
 					String[] arrTempDepartName=tempDepartName.split("-");

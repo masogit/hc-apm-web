@@ -154,7 +154,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     public String getNameWithOrgName(UserAccount user) {
         if(user!=null){
             OrgInfo org = orgInfoDao.getByUid(user.getOrgInfoUID());
-            if(4 == org.getOrgType()){
+            if(Objects.equals(org.getOrgType(), 4)){
                 return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
             }
             return user.getName() + "-" + org.getName();

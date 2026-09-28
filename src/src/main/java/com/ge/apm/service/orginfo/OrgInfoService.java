@@ -165,25 +165,25 @@ public class OrgInfoService {
                     //update name if depart name, site name, hospital name, institution name changed
                     String name = null;
                     String nameEn = null;
-                    if (found.getOrgType() == 4) {
+                    if (Objects.equals(found.getOrgType(), 4)) {
                         if (StringUtils.isEmpty(departName)) {
                             throw new Exception("科室名称不能为空！");
                         }
                         name = departName;
                         nameEn = departEn;
-                    } else if (found.getOrgType() == 3) {
+                    } else if (Objects.equals(found.getOrgType(), 3)) {
                         if (StringUtils.isEmpty(siteName)) {
                             throw new Exception("院区名称不能为空！");
                         }
                         name = siteName;
                         nameEn = siteEn;
-                    } else if (found.getOrgType() == 2) {
+                    } else if (Objects.equals(found.getOrgType(), 2)) {
                         if (StringUtils.isEmpty(hospitalName)) {
                             throw new Exception("医院名称不能为空！");
                         }
                         name = hospitalName;
                         nameEn = hospitalEn;
-                    } else if (found.getOrgType() == 1) {
+                    } else if (Objects.equals(found.getOrgType(), 1)) {
                         if (StringUtils.isEmpty(institutionName)) {
                             throw new Exception("集团名称不能为空！");
                         }
@@ -200,11 +200,11 @@ public class OrgInfoService {
                         isSame = false;
                     }else if(!Objects.equals(found.getNameEn(), nameEn)) {
                         isSame = false;
-                    }else if(found.getOrgType() == 2){
+                    }else if(Objects.equals(found.getOrgType(), 2)){
                         if(!Objects.equals(found.getHospitalUcmid(), ucmid)) {
                             isSame = false;
                         }
-                    }else if(found.getOrgType() == 4){
+                    }else if(Objects.equals(found.getOrgType(), 4)){
                         if(!Objects.equals(found.getBuildingNum(), buildingNum)) {
                             isSame = false;
                         } else if(!Objects.equals(found.getFloorNum(), floorNum)){
@@ -215,7 +215,7 @@ public class OrgInfoService {
                         found.setShortName(name);
                         found.setName(name);
                         found.setNameEn(nameEn);
-                        if(found.getOrgType() == 4 ){
+                        if(Objects.equals(found.getOrgType(), 4 )){
                             found.setBuildingNum(buildingNum);
                             found.setFloorNum(floorNum);
                         }
@@ -230,7 +230,7 @@ public class OrgInfoService {
 
                         orgDao.save(found);
                         configCacheService.cleanOrgInfoCacheByUid(found.getUid());
-                        if (found.getOrgType() == 4) {
+                        if (Objects.equals(found.getOrgType(), 4)) {
                             assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
                         }
                         message = "更新成功";
@@ -405,7 +405,7 @@ public class OrgInfoService {
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;
-        if(46==user.getSiteId()){
+        if(Objects.equals(user.getSiteId(), 46)){
             //1.获取对应住户下的所有集团
             List<OrgInfo> orginfoInstitutionlist = orgDao.getHospitalByTenantUIDAndType(user.getTenantUID());
             OrgInfo parent = orgDao.getOrgInfoByUid(user.getTenantUID());
@@ -518,16 +518,16 @@ public class OrgInfoService {
 
     private void exportOrg(OrgInfo orgInfo, List<Map<String, Object>> resultList, final Map<String, OrgInfo> orgInfoMap) {
         Map<String, Object> map = new HashMap<>();
-        if (orgInfo.getOrgType() == 1) {
+        if (Objects.equals(orgInfo.getOrgType(), 1)) {
             map.put("集团", orgInfo.getName());
             map.put("集团名称En", orgInfo.getNameEn());
-        } else if (orgInfo.getOrgType() == 2) {
+        } else if (Objects.equals(orgInfo.getOrgType(), 2)) {
             OrgInfo institutionLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
             map.put("集团名称En", institutionLevelOrg.getNameEn());
             map.put("医院", orgInfo.getName());
             map.put("医院名称En", orgInfo.getNameEn());
-        } else if (orgInfo.getOrgType() == 3) {
+        } else if (Objects.equals(orgInfo.getOrgType(), 3)) {
             OrgInfo hospitalLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
@@ -536,14 +536,14 @@ public class OrgInfoService {
             map.put("医院名称En", hospitalLevelOrg.getNameEn());
             map.put("院区", orgInfo.getName());
             map.put("院区名称En", orgInfo.getNameEn());
-        } else if (orgInfo.getOrgType() == 4) {
-            if (orgInfo.getOrgLevel() == 0) {
+        } else if (Objects.equals(orgInfo.getOrgType(), 4)) {
+            if (Objects.equals(orgInfo.getOrgLevel(), 0)) {
 
-            } else if (orgInfo.getOrgLevel() == 1) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 1)) {
                 OrgInfo institutionLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 map.put("集团", institutionLevelOrg.getName());
                 map.put("集团名称En", institutionLevelOrg.getNameEn());
-            } else if (orgInfo.getOrgLevel() == 2) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 2)) {
                 OrgInfo hospitalLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
@@ -602,7 +602,7 @@ public class OrgInfoService {
     }
 
     public int getClinicalLevel(OrgInfo currentOrg) {
-        if (currentOrg.getOrgType() != 4) {
+        if (!Objects.equals(currentOrg.getOrgType(), 4)) {
             return 0;
         }
 
@@ -712,7 +712,7 @@ public class OrgInfoService {
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 1) {
+        if (Objects.equals(oi.getOrgLevel(), 1)) {
             return oi.getName();
         }
         return null;
@@ -723,7 +723,7 @@ public class OrgInfoService {
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 2) {
+        if (Objects.equals(oi.getOrgLevel(), 2)) {
             return oi.getName();
         }
         return null;
@@ -734,7 +734,7 @@ public class OrgInfoService {
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 3) {
+        if (Objects.equals(oi.getOrgLevel(), 3)) {
             return oi.getName();
         }
         return null;

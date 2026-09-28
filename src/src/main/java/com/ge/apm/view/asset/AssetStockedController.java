@@ -187,6 +187,7 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         if (ObjectUtil.isNotEmpty(endDate)) {
             searchFilters.add(new SearchFilter("businessDate", SearchFilter.Operator.LTE, DateUtil.endOfDay(endDate).toDate(), "1*"));
         }
+
         if (ObjectUtil.isNotEmpty(searchItem.getAssetName())) {
             searchFilters.add(new SearchFilter("assetInfo.name", SearchFilter.Operator.LIKE, searchItem.getAssetName(), "1*"));
         }

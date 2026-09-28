@@ -339,7 +339,7 @@ public class AcquisitionPlanService {
             acquisitionPlanStepRepository.save(oldPlanStep);
         }
 
-        if(acquisitionPlan.getApplicationStep() != 9){
+        if(!Objects.equals(acquisitionPlan.getApplicationStep(), 9)){
             //创建下一个节点
             AcquisitionPlanStep acquisitionPlanStep = new AcquisitionPlanStep();
             acquisitionPlanStep.setPid(acquisitionPlan.getId());

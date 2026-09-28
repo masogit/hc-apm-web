@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -62,11 +63,11 @@ public class OrgService {
     List<Map<String,String>> tempOrgMapList = new ArrayList<>();
     List<OrgInfo> tempInstitutionList = orgDao.findByTenantUID(tenantUID);
     Map<Integer, String> orgNameMap = new HashMap<>();
-    tempInstitutionList.stream().filter(o -> 1 == o.getOrgType())
+    tempInstitutionList.stream().filter(o -> Objects.equals(o.getOrgType(), 1))
             .forEach(o -> orgNameMap.put(o.getId(), o.getName()));
-    tempInstitutionList.stream().filter(o -> 2 == o.getOrgType() && orgNameMap.get(o.getParentID()) != null)
+    tempInstitutionList.stream().filter(o -> Objects.equals(o.getOrgType(), 2) && orgNameMap.get(o.getParentID()) != null)
             .forEach(o -> orgNameMap.put(o.getId(), orgNameMap.get(o.getParentID()).concat("/").concat(o.getName())));
-    tempInstitutionList.stream().filter(o -> 3 == o.getOrgType()  && orgNameMap.get(o.getParentID()) != null)
+    tempInstitutionList.stream().filter(o -> Objects.equals(o.getOrgType(), 3)  && orgNameMap.get(o.getParentID()) != null)
             .forEach(o -> orgNameMap.put(o.getId(), orgNameMap.get(o.getParentID()).concat("/").concat(o.getName())));
     tempOrgMapList=orgNameMap.entrySet().stream().map(i -> ImmutableMap.of("id", Integer.toString(i.getKey()), "name", i.getValue()))
             .collect(Collectors.toList());
