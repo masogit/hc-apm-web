@@ -47,6 +47,9 @@
                         </f:facet>
                         <h:outputText value="#{assetArrivedItemsController.getOrgNameByUid(item.clinicalDeptUID)}"/>
                     </p:column>
+                    <p:column headerText="#{msg.locationName}" sortBy="#{item.locationName}" filterBy="#{item.locationName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.locationName}"/>
+                    </p:column>
                     <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.arrivalList.creator.name}"/>
                     </p:column>
