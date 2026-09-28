@@ -190,6 +190,9 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         if (ObjectUtil.isNotEmpty(searchItem.getAssetName())) {
             searchFilters.add(new SearchFilter("assetInfo.name", SearchFilter.Operator.LIKE, searchItem.getAssetName(), "1*"));
         }
+        if (ObjectUtil.isNotEmpty(searchItem.getLocationName())) {
+            searchFilters.add(new SearchFilter("arrivalListItem.locationName", SearchFilter.Operator.LIKE, searchItem.getLocationName(), "1*"));
+        }
         if (ObjectUtil.isNotEmpty(supplier.getId())) {
             searchFilters.add(new SearchFilter("assetInfo.supplierId", SearchFilter.Operator.EQ, supplier.getId(), "1*"));
         }
@@ -235,13 +238,20 @@ public class AssetStockedController extends GenericCRUDUUIDController<AssetStock
         return page;
     }
 
-    private void pckFilters(List<SearchFilter> searchFilters) {
-        if (!this.hasFilterOnField("assetInfo.siteUID")) {
+    private void pckFilters(List<SearchFilter> filters) {
+        boolean hasFieldFilter = false;
+        for (SearchFilter filter : filters) {
+            if ("assetInfo.siteUID".equals(filter.fieldName)) {
+                hasFieldFilter = true;
+                break;
+            }
+        }
+        if (!hasFieldFilter) {
             List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
 
